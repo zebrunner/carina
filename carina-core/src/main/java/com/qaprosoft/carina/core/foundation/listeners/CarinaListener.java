@@ -16,8 +16,6 @@
 package com.qaprosoft.carina.core.foundation.listeners;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -76,14 +74,11 @@ import com.qaprosoft.carina.core.foundation.skip.ExpectedSkipManager;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
-import com.qaprosoft.carina.core.foundation.utils.JsonUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.ZebrunnerNameResolver;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.ftp.FtpUtils;
-import com.qaprosoft.carina.core.foundation.utils.metadata.MetadataCollector;
-import com.qaprosoft.carina.core.foundation.utils.metadata.model.ElementsInfo;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
@@ -933,35 +928,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
         private static final Logger LOGGER = Logger.getLogger(ShutdownHook.class);
 
-        private void generateMetadata() {
-            Map<String, ElementsInfo> allData = MetadataCollector.getAllCollectedData();
-            if (allData.size() > 0) {
-                LOGGER.debug("Generating collected metadada start...");
-            }
-            for (String key : allData.keySet()) {
-                LOGGER.debug("Creating... medata for '" + key + "' object...");
-                File file = new File(
-                        ReportContext.getArtifactsFolder().getAbsolutePath() + "/metadata/" + key.hashCode() + ".json");
-                PrintWriter out = null;
-                try {
-                    out = new PrintWriter(file);
-                    out.append(JsonUtils.toJson(MetadataCollector.getAllCollectedData().get(key)));
-                    out.flush();
-                } catch (FileNotFoundException e) {
-                    LOGGER.error("Unable to write metadata to json file: " + file.getAbsolutePath(), e);
-                } finally {
-                    if (out != null) {
-                        out.close();
-                    }
-                }
-                LOGGER.debug("Created medata for '" + key + "' object...");
-            }
-
-            if (allData.size() > 0) {
-                LOGGER.debug("Generating collected metadada finish...");
-            }
-        }
-
         private void quitAllDriversOnHook() {
             // as it is shutdown hook just try to quit all existing drivers one by one
             for (CarinaDriver carinaDriver : driversPool) {
@@ -986,7 +952,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             if (!Configuration.getBoolean(Parameter.FORCIBLY_DISABLE_DRIVER_QUIT)) {
                 quitAllDriversOnHook();
             }
-            generateMetadata();
         }
 
     }
