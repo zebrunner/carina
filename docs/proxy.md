@@ -7,7 +7,6 @@ proxy_port=NULL
 proxy_protocols=http,https,ftp
 proxy_set_to_system=true
 browsermob_proxy=false
-browsermob_host=NULL
 browsermob_disabled_mitm=false
 browsermob_port=0
 ```
@@ -20,17 +19,18 @@ Note: The above settings are mostly required to get public internet access throu
 Also, Carina can start an embedded proxy to proxy/view/filter requests/responses. There is an inbuilt library BrowserMobProxy in Carina-proxy module. Below you can find BrowserMob proxy related parameters in your **config.properties** file:
 ```
 browsermob_proxy=true
-browsermob_host=NULL
 browsermob_disabled_mitm=false
 browsermob_port=0
+browsermob_ports_range=NULL
 ```
 With the enabled **browsermob_proxy**, Carina will start the dedicated proxy instance on every test method. 
 
-**browsermob_host=NULL** means that Carina automatically detects an IP address and puts it into the capabilities, etc.
-
-**browsermob_host=myhostname** is useful in case of running maven process inside a docker container. Override the hostname, and it will be available from Selenium instance.
+Carina automatically detects an IP address for your local browsermob proxy and puts it into the capabilities in case if **proxy_host=NULL**. If you want to map some publicly available IP address for your browsermob proxy instance then you'll need to override it via **proxy_host** property.
+E.g. **proxy_host=myhostname** is useful in case of running maven process inside a docker container. Override the hostname, and it will be available from Selenium instance.
 
 **browsermob_port=0** means that Carina dynamically identifies a free port for a proxy session.
+
+**browsermob_ports_range=8001:8003** means that Carina will use only ports from given range for starting of browsermob sessions. That's reasonable for cases when only several ports are shared at environment and can be accessed from other machines within the network. If all ports are used then test will wait for the first freed port.
 
 **browsermob_disabled_mitm** is disabled by default. 
 
