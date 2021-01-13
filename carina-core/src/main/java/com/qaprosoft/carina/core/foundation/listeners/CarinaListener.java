@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -69,7 +70,8 @@ import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
-import com.qaprosoft.carina.core.foundation.report.testrail.ITestCases;
+import com.qaprosoft.carina.core.foundation.report.qtest.IQTestManager;
+import com.qaprosoft.carina.core.foundation.report.testrail.ITestRailManager;
 import com.qaprosoft.carina.core.foundation.skip.ExpectedSkipManager;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -107,7 +109,7 @@ import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
  * 
  * @author Vadim Delendik
  */
-public class CarinaListener extends AbstractTestListener implements ISuiteListener, ITestCases {
+public class CarinaListener extends AbstractTestListener implements ISuiteListener, IQTestManager, ITestRailManager {
     private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass());
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
@@ -914,59 +916,19 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     }
     
     private void attachLabels(ITestResult result) {
-        // as we don't support several testcase management systems at the same run we can detect exact TCM provider using project and suite Id values
-        int testRailProjectId = getTestRailProjectId(result.getTestContext());
-        int testRailSuiteId = getTestRailSuiteId(result.getTestContext());
-        if (testRailProjectId != -1 && testRailSuiteId != -1) {
-            // register testrail cases...
-            List<String> testRailCases = new ArrayList<>();
-            for (String entry: getCases()) {
-                testRailCases.add(testRailProjectId + "-" + testRailSuiteId + "-" + entry);
-            }
-            Label.attachToTest(SpecialKeywords.TESTRAIL_TESTCASE_UUID, Arrays.copyOf(testRailCases.toArray(), testRailCases.size(), String[].class));
+        // register testrail cases...
+        Set<String> trCases = getTestRailCasesUuid(result);
+        if (trCases.size() > 0) {
+            Label.attachToTest(SpecialKeywords.TESTRAIL_TESTCASE_UUID, Arrays.copyOf(trCases.toArray(), trCases.size(), String[].class));
         }
-        
-        int qtestProjectId = getQTestProjectId(result.getTestContext());
-        if (qtestProjectId != -1) {
-            // register qtest cases...
-            List<String> qtestCases = new ArrayList<>();
-            for (String entry: getCases()) {
-                qtestCases.add(qtestProjectId + "-" + entry);
-            }
+
+        // register qtest cases...
+        Set<String> qtestCases = getQTestCasesUuid(result);
+        if (qtestCases.size() > 0) {
             Label.attachToTest(SpecialKeywords.QTEST_TESTCASE_UUID, Arrays.copyOf(qtestCases.toArray(), qtestCases.size(), String[].class));
         }
-        
-        // clear all custom cases
-        clearCases();
     }
     
-    private int getTestRailProjectId(ITestContext context) {
-        String id = context.getSuite().getParameter(SpecialKeywords.TESTRAIL_PROJECT_ID);
-        if (id != null) {
-            return Integer.valueOf(id.trim());
-        } else {
-            return -1;
-        }
-    }
-
-    private int getTestRailSuiteId(ITestContext context) {
-        String id = context.getSuite().getParameter(SpecialKeywords.TESTRAIL_SUITE_ID);
-        if (id != null) {
-            return Integer.valueOf(id.trim());
-        } else {
-            return -1;
-        }
-    }
-    
-    private int getQTestProjectId(ITestContext context) {
-        String id = context.getSuite().getParameter(SpecialKeywords.QTEST_PROJECT_ID);
-        if (id != null) {
-            return Integer.valueOf(id.trim());
-        } else {
-            return -1;
-        }
-    }
-
     public static class ShutdownHook extends Thread {
 
         private static final Logger LOGGER = Logger.getLogger(ShutdownHook.class);
