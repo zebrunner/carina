@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -69,6 +70,8 @@ import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
+import com.qaprosoft.carina.core.foundation.report.qtest.IQTestManager;
+import com.qaprosoft.carina.core.foundation.report.testrail.ITestRailManager;
 import com.qaprosoft.carina.core.foundation.skip.ExpectedSkipManager;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -96,6 +99,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.AutoScreenshotRule;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
 import com.zebrunner.agent.core.registrar.CurrentTest;
+import com.zebrunner.agent.core.registrar.Label;
 import com.zebrunner.agent.core.registrar.label.CompositeLabelResolver;
 import com.zebrunner.agent.core.registrar.maintainer.ChainedMaintainerResolver;
 import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
@@ -105,7 +109,7 @@ import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
  * 
  * @author Vadim Delendik
  */
-public class CarinaListener extends AbstractTestListener implements ISuiteListener {
+public class CarinaListener extends AbstractTestListener implements ISuiteListener, IQTestManager, ITestRailManager {
     private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass());
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
@@ -329,6 +333,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
             List<String> tickets = Jira.getTickets(result);
             result.setAttribute(SpecialKeywords.JIRA_TICKET, tickets);
+            
+            attachLabels(result);
 
             // we shouldn't deregister info here as all retries will not work
             // TestNamingUtil.releaseZafiraTest();
@@ -908,7 +914,21 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
         return carinaVersion;
     }
+    
+    private void attachLabels(ITestResult result) {
+        // register testrail cases...
+        Set<String> trCases = getTestRailCasesUuid(result);
+        if (trCases.size() > 0) {
+            Label.attachToTest(SpecialKeywords.TESTRAIL_TESTCASE_UUID, Arrays.copyOf(trCases.toArray(), trCases.size(), String[].class));
+        }
 
+        // register qtest cases...
+        Set<String> qtestCases = getQTestCasesUuid(result);
+        if (qtestCases.size() > 0) {
+            Label.attachToTest(SpecialKeywords.QTEST_TESTCASE_UUID, Arrays.copyOf(qtestCases.toArray(), qtestCases.size(), String[].class));
+        }
+    }
+    
     public static class ShutdownHook extends Thread {
 
         private static final Logger LOGGER = Logger.getLogger(ShutdownHook.class);

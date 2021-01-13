@@ -17,11 +17,7 @@ package com.qaprosoft.carina.core.foundation.report.testrail;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -34,31 +30,17 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 public interface ITestRailManager extends ITestCases {
     static final Logger TESTRAIL_LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    @SuppressWarnings("unlikely-arg-type")
     default Set<String> getTestRailCasesUuid(ITestResult result) {
         Set<String> testCases = new HashSet<String>();
 
-        //add cases form xls/cvs dataprovider
         int projectID = getTestRailProjectId(result.getTestContext());
         int suiteID = getTestRailSuiteId(result.getTestContext());
-
-        //do not add test rail id if no integration tags/parameters detected
-        if (projectID != -1 && suiteID != -1) {
-
-            List<String> dataProviderIds = new ArrayList<String>();
-            @SuppressWarnings("unchecked")
-            Map<Object[], String> testNameTestRailMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TESTRAIL_ARGS_MAP);
-            if (testNameTestRailMap != null) {
-                String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));
-                if (testNameTestRailMap.containsKey(testHash) && testNameTestRailMap.get(testHash) != null) {
-                    dataProviderIds = new ArrayList<String>(Arrays.asList(testNameTestRailMap.get(testHash).split(",")));
-                }
-            }
-
-            testCases.addAll(dataProviderIds);
-
+        
+        if (projectID == -1 || suiteID == -1) {
+            // no sense to return something as integration data not provided
+            return testCases;
         }
-
+        
         // Get a handle to the class and method
         Class<?> testClass;
         try {
@@ -85,7 +67,7 @@ public interface ITestRailManager extends ITestCases {
                         String[] testCaseList = methodAnnotation.testCasesId().split(",");
                         for (String tcase : testCaseList) {
                             String uuid = tcase;
-                            testCases.add(uuid);
+                            testCases.add(projectID + "-" + suiteID + "-" + uuid);
                             TESTRAIL_LOGGER.debug("TestRail test case uuid '" + uuid + "' is registered.");
                         }
 
@@ -101,7 +83,7 @@ public interface ITestRailManager extends ITestCases {
                             String[] testCaseList = tcLocal.testCasesId().split(",");
                             for (String tcase : testCaseList) {
                                 String uuid = tcase;
-                                testCases.add(uuid);
+                                testCases.add(projectID + "-" + suiteID + "-" + uuid);
                                 TESTRAIL_LOGGER.debug("TestRail test case uuid '" + uuid + "' is registered.");
                             }
                         }
@@ -113,27 +95,32 @@ public interface ITestRailManager extends ITestCases {
         }
 
         // append cases id values from ITestCases map (custom TestNG provider)
-        List<String> customCases = getCases();
-        testCases.addAll(customCases);
-
+        for (String entry: getCases()) {
+            testCases.add(projectID + "-" + suiteID + "-" + entry);
+        }
         clearCases();
 
         return testCases;
     }
 
-    default int getTestRailProjectId(ITestContext context) {
-        String id = context.getSuite().getParameter(SpecialKeywords.TESTRAIL_PROJECT_ID);
-        if (id != null) {
-            return Integer.valueOf(id.trim());
+  private int getTestRailProjectId(ITestContext context) {
+        if (context.getSuite().getParameter(SpecialKeywords.TESTRAIL_PROJECT_ID) != null) {
+            return Integer.valueOf(context.getSuite().getParameter(SpecialKeywords.TESTRAIL_PROJECT_ID).trim());
+        } else if (context.getSuite().getAttribute(SpecialKeywords.TESTRAIL_PROJECT_ID) != null){
+            //use-case to support unit tests
+            return Integer.valueOf(context.getSuite().getAttribute(SpecialKeywords.TESTRAIL_PROJECT_ID).toString());
         } else {
             return -1;
         }
+            
     }
 
-    default int getTestRailSuiteId(ITestContext context) {
-        String id = context.getSuite().getParameter(SpecialKeywords.TESTRAIL_SUITE_ID);
-        if (id != null) {
-            return Integer.valueOf(id.trim());
+  private int getTestRailSuiteId(ITestContext context) {
+        if (context.getSuite().getParameter(SpecialKeywords.TESTRAIL_SUITE_ID) != null) {
+            return Integer.valueOf(context.getSuite().getParameter(SpecialKeywords.TESTRAIL_SUITE_ID).trim());
+        } else if (context.getSuite().getAttribute(SpecialKeywords.TESTRAIL_SUITE_ID) != null) {
+            //use-case to support unit tests
+            return Integer.valueOf(context.getSuite().getAttribute(SpecialKeywords.TESTRAIL_SUITE_ID).toString());
         } else {
             return -1;
         }

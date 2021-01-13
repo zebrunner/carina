@@ -74,10 +74,9 @@ public class SpecialKeywords {
     public static final String TEST_NAME_ARGS_MAP = "testNameArgsMap";
     public static final String JIRA_ARGS_MAP = "jiraArgsMap";
     
-    public static final String TESTRAIL_ARGS_MAP = "testRailCasesArgsMap";
     public static final String TESTRAIL_SUITE_ID = "TestRailSuiteId";
     public static final String TESTRAIL_PROJECT_ID = "TestRailProjectId";
-    public static final String TESTRAIL_TESTCASE_UUID = "TESTRAIL_TESTCASE_UUID";
+    public static final String TESTRAIL_TESTCASE_UUID = "com.zebrunner.app/tcm.testrail.testcase-id";
 
     public static final String BEFORE_TEST_METHOD = "executeBeforeTestMethod";
 
@@ -164,7 +163,7 @@ public class SpecialKeywords {
     public static final String ENABLE_ADB = "capabilities.enableAdb";
     
     // ------------- qTEST PROPERTIES -------------------------------
-    public static final String QTEST_TESTCASE_UUID = "QTEST_TESTCASE_UUID";
+    public static final String QTEST_TESTCASE_UUID = "com.zebrunner.app/tcm.qtest.testcase-id";
     public static final String QTEST_PROJECT_ID = "qTestProjectId";
 
 
