@@ -86,7 +86,7 @@ public class DesktopFactory extends AbstractFactory {
                     break;
                 case SpecialKeywords.SELENIUM:
                     capabilities.setCapability("videoName", VIDEO_DEFAULT);
-                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(VIDEO, "artifacts/driver-sessions/%s/" + VIDEO_DEFAULT)));
+                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(VIDEO, "artifacts/test-sessions/%s/" + VIDEO_DEFAULT)));
                     break;
                 default:
                     // nothing to do with unknown hub provider
@@ -104,7 +104,7 @@ public class DesktopFactory extends AbstractFactory {
                     break;
                 case SpecialKeywords.SELENIUM:
                     capabilities.setCapability("logName", SESSION_LOG_DEFAULT);
-                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(LOG, "artifacts/driver-sessions/%s/" + SESSION_LOG_DEFAULT)));
+                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact(LOG, "artifacts/test-sessions/%s/" + SESSION_LOG_DEFAULT)));
                     break;                    
                 default:
                     // nothing to do with unknown hub provider
@@ -115,7 +115,7 @@ public class DesktopFactory extends AbstractFactory {
             if (isEnabled(SpecialKeywords.ENABLE_METADATA)) {
                 switch (getHubProvider()) {
                 case SpecialKeywords.SELENIUM:
-                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact("Metadata", "artifacts/driver-sessions/%s/%s.json")));
+                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact("Metadata", "artifacts/test-sessions/%s/%s.json")));
                     break;                    
                 default:
                     // nothing to do with unfamiliar hub provider
