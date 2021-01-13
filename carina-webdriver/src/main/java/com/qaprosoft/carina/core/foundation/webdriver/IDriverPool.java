@@ -64,9 +64,7 @@ public interface IDriverPool {
     static final ConcurrentHashMap<CarinaDriver, Integer> driversMap = new ConcurrentHashMap<>();
     @SuppressWarnings("static-access")
     static final Set<CarinaDriver> driversPool = driversMap.newKeySet();
-    // static final Set<CarinaDriver> driversPool = new HashSet<CarinaDriver>();
     
-    //TODO: [VD] make device related param private after migrating to java 9+
     static final ThreadLocal<Device> currentDevice = new ThreadLocal<Device>();
     static final Device nullDevice = new Device();
 
@@ -130,34 +128,12 @@ public interface IDriverPool {
             }
         }
 
-        // Long threadId = Thread.currentThread().getId();
-        // ConcurrentHashMap<String, WebDriver> currentDrivers = getDrivers();
-
-        // TODO [VD] do we really need finding by groupThreads?
-        /*
-         * if (currentDrivers.containsKey(name)) { drv =
-         * currentDrivers.get(name); } else if
-         * (Configuration.getInt(Parameter.THREAD_COUNT) == 1 &&
-         * Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) <= 1) {
-         * Thread[] threads =
-         * getGroupThreads(Thread.currentThread().getThreadGroup());
-         * logger.debug(
-         * "Try to find driver by ThreadGroup id values! Current ThreadGroup count is: "
-         * + threads.length); for (int i = 0; i < threads.length; i++) {
-         * currentDrivers = drivers.get(threads[i].getId()); if (currentDrivers
-         * != null) { if (currentDrivers.containsKey(name)) { drv =
-         * currentDrivers.get(name);
-         * logger.debug("##########        GET ThreadGroupId: " + threadId +
-         * "; driver: " + drv); break; } } } }
-         */
-
         if (drv == null) {
             POOL_LOGGER.debug("Starting new driver as nothing was found in the pool");
             drv = createDriver(name, capabilities, seleniumHost);
         }
 
-        // [VD] do not wrap EventFiringWebDriver here otherwise DriverListener
-        // and all logging will be lost!
+        // [VD] do not wrap EventFiringWebDriver here otherwise DriverListener and all logging will be lost!
         return drv;
 
     }
@@ -240,10 +216,6 @@ public interface IDriverPool {
         quitDriver(DEFAULT);
     }
 
-    // TODO: Fix after migrating to java9
-    // [VD] quitDriver and quitDrivers has code duplicates as inside interface
-    // we can't create private methods!
-
     /**
      * Quit driver by name
      * 
@@ -302,8 +274,7 @@ public interface IDriverPool {
         // driversPool.removeIf(carinaDriver -> phase.equals(carinaDriver.getPhase()) && threadId.equals(carinaDriver.getThreadId()));
     }
     
-    //TODO: [VD] make it as private after migrating to java 9+
-    default void quitDriver(CarinaDriver carinaDriver, boolean keepProxyDuring) {
+    private void quitDriver(CarinaDriver carinaDriver, boolean keepProxyDuring) {
         try {
             carinaDriver.getDevice().disconnectRemote();
             if (!keepProxyDuring) {
@@ -391,7 +362,7 @@ public interface IDriverPool {
         }
     }
     
-    default Set<String> getAvailableDriverLogTypes(WebDriver driver) {
+    private Set<String> getAvailableDriverLogTypes(WebDriver driver) {
         Set<String> logTypes = Collections.<String>emptySet();
         if (driver.manage() != null) {
             try {
@@ -415,7 +386,7 @@ public interface IDriverPool {
      * 
      * @return LogEntries entries
      */
-    default LogEntries getDriverLogs(WebDriver driver, String logType) {
+    private LogEntries getDriverLogs(WebDriver driver, String logType) {
         //TODO: make it async in parallel thread
         LogEntries logEntries = new LogEntries(Collections.emptyList());
         POOL_LOGGER.debug("start getting driver logs: " + logType);
@@ -434,6 +405,7 @@ public interface IDriverPool {
         POOL_LOGGER.debug("finish getting driver logs");
         return logEntries;
     }
+    
     /**
      * Create driver with custom capabilities
      * 
@@ -445,8 +417,7 @@ public interface IDriverPool {
      *            String
      * @return WebDriver
      */
-    default WebDriver createDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
-        // TODO: make current method as private after migrating to java 9+
+    private WebDriver createDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
         int count = 0;
         WebDriver drv = null;
         Device device = nullDevice;
@@ -485,8 +456,7 @@ public interface IDriverPool {
                     MDC.put("device", "[" + device.getName() + "] ");
                 }
                 
-                // moved proxy start logic here since device will be initialized
-                // here only
+                // moved proxy start logic here since device will be initialized here only
                 if (Configuration.getBoolean(Parameter.BROWSERMOB_PROXY)) {
                     if (!device.isNull()) {
                     	int proxyPort;
@@ -513,7 +483,7 @@ public interface IDriverPool {
                 // but initially try to implement it on selenium-hub level
                 String msg = String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s", name, count,
                         maxCount, e.getMessage());
-                POOL_LOGGER.error(msg, e); //TODO: test how 2 messages are displayed in logs and zafira
+                POOL_LOGGER.error(msg, e);
                 if (count == maxCount) {
                     throw e;
                 }
@@ -538,19 +508,6 @@ public interface IDriverPool {
      */
     default boolean isDriverRegistered(String name) {
         return getDrivers().containsKey(name);
-    }
-
-    // TODO: think about hiding getDriversCount and removing size when migration to java 9+ happens
-    /**
-     * Return number of registered driver per thread
-     * 
-     * @return int
-     */
-    default public int getDriversCount() {
-        Long threadId = Thread.currentThread().getId();
-        int size = getDrivers().size();
-        POOL_LOGGER.debug("Number of registered drivers for thread '" + threadId + "' is " + size);
-        return size;
     }
 
     /**
