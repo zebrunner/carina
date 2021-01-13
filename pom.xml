@@ -63,7 +63,7 @@
         <selenium.version>3.141.59</selenium.version>
         <appium.version>7.4.1</appium.version>
         <!-- Zebrunner integrations -->
-        <zebrunner-testng-pluggable.version>1.2.0</zebrunner-testng-pluggable.version>
+        <zebrunner-testng-pluggable.version>LATEST</zebrunner-testng-pluggable.version>
         <!-- Others -->
         <aws-java-sdk.version>1.11.923</aws-java-sdk.version>
         <monte-repack.version>1.0</monte-repack.version>
@@ -98,6 +98,17 @@
         <module>carina-core</module>
     </modules>
     <repositories>
+	    <repository>
+	        <id>zebrunner_snapshots</id>
+	        <name>zebrunner Snapshots</name>
+	        <url>https://nexus.zebrunner.dev/repository/ce-snapshots/</url>
+	        <releases>
+	            <enabled>false</enabled>
+	        </releases>
+	        <snapshots>
+	            <enabled>true</enabled>
+	        </snapshots>
+	    </repository>
         <repository>
             <id>qaprosoft_snapshots</id>
             <name>Qaprosoft Snapshots</name>
