@@ -17,19 +17,27 @@ package com.qaprosoft.carina.core.foundation.utils.ownership;
 
 import java.lang.reflect.Method;
 
-import org.testng.ITestContext;
-
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.zebrunner.agent.core.registrar.maintainer.MaintainerResolver;
 
 public class Ownership implements MaintainerResolver {
+    private String owner = "";
+
+    public Ownership(String owner) {
+        if (owner != null) {
+            this.owner = owner;
+        }
+    }
+    
+    public Ownership() {
+        this("");
+    }
 
     @Override
     public String resolve(Class<?> clazz, Method method) {
         // Get a handle to the class and method
-        String owner = "";
         // We can't use getMethod() because we may have parameterized tests
-        // for which we won't know the matching signature
+        // for which we don't know the matching signature
         String methodName = method.getName();
         Method testMethod = null;
         Method[] possibleMethods = clazz.getMethods();
@@ -43,7 +51,7 @@ public class Ownership implements MaintainerResolver {
         // do a scan for single Methodowner annotation as well)
         if (testMethod.isAnnotationPresent(MethodOwner.class)) {
             MethodOwner methodAnnotation = testMethod.getAnnotation(MethodOwner.class);
-            owner = methodAnnotation.owner();
+            this.owner = methodAnnotation.owner();
         }
         
         // scan all MethodOwner annotations to find default ownership without any platform
@@ -52,7 +60,7 @@ public class Ownership implements MaintainerResolver {
             for (MethodOwner methodOwner : methodAnnotation.value()) {
                 String actualPlatform = methodOwner.platform();
                 if (actualPlatform.isEmpty()) {
-                    owner = methodOwner.owner();
+                    this.owner = methodOwner.owner();
                     break;
                 }            
             }
@@ -67,24 +75,16 @@ public class Ownership implements MaintainerResolver {
                 String expectedPlatform = Configuration.getPlatform();
                 
                 if (!actualPlatform.isEmpty() && isValidPlatform(actualPlatform, expectedPlatform)) {
-                    owner = methodOwner.owner();
+                    this.owner = methodOwner.owner();
                 }               
             }
         }
 
-        return owner;
+        return this.owner;
     }
     
     private static boolean isValidPlatform(String actualPlatform, String expectedPlatform) {
         return actualPlatform.equalsIgnoreCase(expectedPlatform);
-    }
-
-    public static String getSuiteOwner(ITestContext context) {
-        String owner = context.getSuite().getParameter("suiteOwner");
-        if (owner == null) {
-            owner = "";
-        }
-        return owner;
     }
 
 }

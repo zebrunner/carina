@@ -160,8 +160,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             updateAppPath();
             
             TestNameResolverRegistry.set(new ZebrunnerNameResolver());
-            // first means that ownership/maintainer resolver from carina has higher priority
-            ChainedMaintainerResolver.addFirst(new Ownership());
             CompositeLabelResolver.addResolver(new TagManager());
             CompositeLabelResolver.addResolver(new PriorityManager());
 
@@ -173,6 +171,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     @Override
     public void onStart(ISuite suite) {
         LOGGER.debug("CarinaListener->onStart(ISuite suite)");
+        
+        // first means that ownership/maintainer resolver from carina has higher priority
+        ChainedMaintainerResolver.addFirst(new Ownership(suite.getParameter("suiteOwner")));
 
         List<String> coreLogPackages = new ArrayList<String>(
                 Arrays.asList(Configuration.get(Parameter.CORE_LOG_PACKAGES).split(",")));
