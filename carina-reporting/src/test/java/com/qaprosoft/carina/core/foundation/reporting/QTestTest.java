@@ -21,8 +21,10 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
+import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.Reporter;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
@@ -38,12 +40,18 @@ public class QTestTest implements IQTestManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     
-    private static final String VERIFICATION_PREFIX = "-1-";
+    private static final String PROJECT_ID = "1";
+    private static final String VERIFICATION_PREFIX = PROJECT_ID + "-";
 
     private static final String TEST_ID = "5,6,65500";
     private static final String EXPECTED_TEST_ID = "65500";
     private static final String FIRST_TEST_ID = "65536";
     private static final String SECOND_TEST_ID = "15536";
+    
+    @BeforeSuite()
+    public void initData(ITestContext context) {
+        context.getSuite().setAttribute(SpecialKeywords.QTEST_PROJECT_ID, PROJECT_ID);
+    }
 
     @Test
     @QTestCases(id = TEST_ID)

@@ -35,6 +35,10 @@ public interface IQTestManager extends ITestCases {
         Set<String> testCases = new HashSet<String>();
         
         int projectID = getQTestProjectId(result.getTestContext());
+        if (projectID == -1) {
+            // no sense to return something as integration data not provided
+            return testCases;
+        }
 
         // Get a handle to the class and method
         Class<?> testClass;
@@ -100,9 +104,11 @@ public interface IQTestManager extends ITestCases {
 
 
     default int getQTestProjectId(ITestContext context) {
-        String id = context.getSuite().getParameter(SpecialKeywords.QTEST_PROJECT_ID);
-        if (id != null) {
-            return Integer.valueOf(id.trim());
+        if (context.getSuite().getParameter(SpecialKeywords.QTEST_PROJECT_ID) != null) {
+            return Integer.valueOf(context.getSuite().getParameter(SpecialKeywords.QTEST_PROJECT_ID).trim());
+        } else if (context.getSuite().getAttribute(SpecialKeywords.QTEST_PROJECT_ID) != null) {
+            //use-case to support unit tests
+            return Integer.valueOf(context.getSuite().getAttribute(SpecialKeywords.QTEST_PROJECT_ID).toString());
         } else {
             return -1;
         }

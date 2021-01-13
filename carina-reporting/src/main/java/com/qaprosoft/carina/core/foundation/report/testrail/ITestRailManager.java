@@ -35,7 +35,12 @@ public interface ITestRailManager extends ITestCases {
 
         int projectID = getTestRailProjectId(result.getTestContext());
         int suiteID = getTestRailSuiteId(result.getTestContext());
-
+        
+        if (projectID == -1 || suiteID == -1) {
+            // no sense to return something as integration data not provided
+            return testCases;
+        }
+        
         // Get a handle to the class and method
         Class<?> testClass;
         try {
@@ -99,18 +104,23 @@ public interface ITestRailManager extends ITestCases {
     }
 
   private int getTestRailProjectId(ITestContext context) {
-        String id = context.getSuite().getParameter(SpecialKeywords.TESTRAIL_PROJECT_ID);
-        if (id != null) {
-            return Integer.valueOf(id.trim());
+        if (context.getSuite().getParameter(SpecialKeywords.TESTRAIL_PROJECT_ID) != null) {
+            return Integer.valueOf(context.getSuite().getParameter(SpecialKeywords.TESTRAIL_PROJECT_ID).trim());
+        } else if (context.getSuite().getAttribute(SpecialKeywords.TESTRAIL_PROJECT_ID) != null){
+            //use-case to support unit tests
+            return Integer.valueOf(context.getSuite().getAttribute(SpecialKeywords.TESTRAIL_PROJECT_ID).toString());
         } else {
             return -1;
         }
+            
     }
 
   private int getTestRailSuiteId(ITestContext context) {
-        String id = context.getSuite().getParameter(SpecialKeywords.TESTRAIL_SUITE_ID);
-        if (id != null) {
-            return Integer.valueOf(id.trim());
+        if (context.getSuite().getParameter(SpecialKeywords.TESTRAIL_SUITE_ID) != null) {
+            return Integer.valueOf(context.getSuite().getParameter(SpecialKeywords.TESTRAIL_SUITE_ID).trim());
+        } else if (context.getSuite().getAttribute(SpecialKeywords.TESTRAIL_SUITE_ID) != null) {
+            //use-case to support unit tests
+            return Integer.valueOf(context.getSuite().getAttribute(SpecialKeywords.TESTRAIL_SUITE_ID).toString());
         } else {
             return -1;
         }
