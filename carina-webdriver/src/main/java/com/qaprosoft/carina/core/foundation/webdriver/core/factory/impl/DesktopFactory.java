@@ -115,7 +115,7 @@ public class DesktopFactory extends AbstractFactory {
             if (isEnabled(SpecialKeywords.ENABLE_METADATA)) {
                 switch (getHubProvider()) {
                 case SpecialKeywords.SELENIUM:
-                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact("Metadata", "artifacts/test-sessions/%s/%s.json")));
+                    ce.getListeners().add(new ZebrunnerArtifactListener(initArtifact("Metadata", "artifacts/test-sessions/%s/" + METADATA_LOG_DEFAULT)));
                     break;                    
                 default:
                     // nothing to do with unfamiliar hub provider

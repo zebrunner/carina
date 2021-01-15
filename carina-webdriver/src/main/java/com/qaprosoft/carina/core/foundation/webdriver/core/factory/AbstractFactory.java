@@ -47,6 +47,7 @@ public abstract class AbstractFactory {
     
     protected final static String VIDEO_DEFAULT = "video.mp4";
     protected final static String SESSION_LOG_DEFAULT = "session.log";
+    protected final static String METADATA_LOG_DEFAULT = "metadata.json";
 
 
     /**
