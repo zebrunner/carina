@@ -181,21 +181,30 @@ public abstract class AbstractCapabilities {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("test-type");
         
+        //prefs 
+        HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
+        boolean needsPrefs = false;
+        
         //update browser language
         String browserLang = Configuration.get(Parameter.BROWSER_LANGUAGE); 
         if (!browserLang.isEmpty()) {
             LOGGER.info("Set Chrome language to: " + browserLang);
             options.addArguments("--lang=" + browserLang);
+            chromePrefs.put("intl.accept_languages", browserLang);
+            needsPrefs = true;
         }
 
         if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD)) {
-            HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
             chromePrefs.put("download.prompt_for_download", false);
             chromePrefs.put("download.default_directory", getAutoDownloadFolderPath());
             chromePrefs.put("plugins.always_open_pdf_externally", true);
-            options.setExperimentalOption("prefs", chromePrefs);
+            needsPrefs = true;
         }
 
+        if (needsPrefs) {
+        	options.setExperimentalOption("prefs", chromePrefs);
+        }
+        
         // [VD] no need to set proxy via options anymore!
         // moreover if below code is uncommented then we have double proxy start and mess in host:port values
         
