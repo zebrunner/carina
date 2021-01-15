@@ -149,7 +149,7 @@ public class MobileFactory extends AbstractFactory {
                         case SpecialKeywords.MCLOUD:
                             ce.getListeners()
                             .add(new MobileRecordingListener<AndroidStartScreenRecordingOptions, AndroidStopScreenRecordingOptions>(ce, o1,
-                                    o2, initArtifact(VIDEO, "video/" + SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
+                                    o2, initArtifact(VIDEO, "artifacts/test-sessions/%s/" + SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
                             break;
                         default:
                             // nothing to do with unknown hub provider
@@ -195,7 +195,7 @@ public class MobileFactory extends AbstractFactory {
                             break;
                         case SpecialKeywords.MCLOUD:
                             ce.getListeners().add(new MobileRecordingListener<IOSStartScreenRecordingOptions, IOSStopScreenRecordingOptions>(ce, o1,
-                                    o2, initArtifact(VIDEO, "video/" + SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
+                                    o2, initArtifact(VIDEO, "artifacts/test-sessions/%s/" + SpecialKeywords.DEFAULT_VIDEO_FILENAME)));
                             break;
                         default:
                             // nothing to do with unknown hub provider
