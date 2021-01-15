@@ -27,6 +27,8 @@ import org.openqa.selenium.remote.DriverCommand;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.zafira.models.dto.TestArtifactType;
 
 import io.appium.java_client.MobileCommand;
@@ -69,8 +71,13 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 			registerArtifact(command, videoArtifact);
 
 			if (DriverCommand.QUIT.equals(command.getName())) {
-			    // stop video recording and publish it to local artifacts
-			    String data = "";
+                if (!Configuration.getBoolean(Parameter.MOBILE_RECORDER)) {
+                    // no sense to do extra appium call to stop video recording as feature disabled
+                    return;
+                }
+
+                // stop video recording and publish it to local artifacts
+                String data = "";
                 try {
                     LOGGER.debug("Stopping mobile video recording and upload data locally for " + command.getSessionId());
                     data = commandExecutor
@@ -115,9 +122,13 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
                 
                 videoArtifact.setLink(String.format(videoArtifact.getLink(), command.getSessionId().toString()));
                 
-                commandExecutor.execute(new Command(command.getSessionId(), MobileCommand.START_RECORDING_SCREEN,
-                        MobileCommand.startRecordingScreenCommand((BaseStartScreenRecordingOptions) startRecordingOpt)
-                                .getValue()));
+                if (Configuration.getBoolean(Parameter.MOBILE_RECORDER)) {
+                    // do extra appium call to start video recording only when feature explicitly enabled 
+                    commandExecutor.execute(new Command(command.getSessionId(), MobileCommand.START_RECORDING_SCREEN,
+                            MobileCommand.startRecordingScreenCommand((BaseStartScreenRecordingOptions) startRecordingOpt)
+                                    .getValue()));
+                }
+                
             } catch (Exception e) {
                 LOGGER.error("Unable to start screen recording: " + e.getMessage(), e);
             }
