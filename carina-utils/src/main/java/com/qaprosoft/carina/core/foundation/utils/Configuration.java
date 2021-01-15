@@ -227,6 +227,8 @@ public class Configuration {
         DEFAULT_DEVICE_LANGUAGE("default_device_language"),
 
         // For screen recording
+        MOBILE_RECORDER("mobile_recorder"),
+        
         ANDROID_SCREEN_RECORDING_SIZE("android_screen_record_size"),
 
         ANDROID_SCREEN_RECORDING_BITRATE("android_screen_record_bitrate"),
