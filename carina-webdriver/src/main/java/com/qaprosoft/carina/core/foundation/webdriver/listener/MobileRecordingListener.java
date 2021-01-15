@@ -130,16 +130,16 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
             try {
                 recording = true;
                 
-                if (!inited) {
-                    // update link first time only
-                    String sessionId = command.getSessionId().toString();
-                    if (sessionId.length() >= 64 ) {
-                        //use case with GoGridRouter so we have to cut first 32 symbols!
-                        sessionId = sessionId.substring(32);
-                    }
-                    videoArtifact.setLink(String.format(videoArtifact.getLink(), sessionId));
-                    inited = true;
+                // update link first time only
+                String sessionId = command.getSessionId().toString();
+                if (sessionId.length() >= 64 ) {
+                    //use case with GoGridRouter so we have to cut first 32 symbols!
+                    sessionId = sessionId.substring(32);
                 }
+                LOGGER.info("default video url: " + videoArtifact.getLink());
+                videoArtifact.setLink(String.format(videoArtifact.getLink(), sessionId));
+                LOGGER.info("udtaed video url: " + videoArtifact.getLink());
+                inited = true;
                 
                 if (Configuration.getBoolean(Parameter.MOBILE_RECORDER)) {
                     // do extra appium call to start video recording only when feature explicitly enabled 

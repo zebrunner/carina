@@ -133,9 +133,6 @@ public class MobileFactory extends AbstractFactory {
                             }
                         }
                         AndroidStopScreenRecordingOptions o2 = new AndroidStopScreenRecordingOptions();
-                        // .withUploadOptions(new ScreenRecordingUploadOptions()
-                        // .withRemotePath(String.format(R.CONFIG.get("screen_record_ftp"), videoName))
-                        // .withAuthCredentials(R.CONFIG.get("screen_record_user"), R.CONFIG.get("screen_record_pass")));
 
                         switch (getHubProvider()) {
                         case SpecialKeywords.BROWSERSTACK:
