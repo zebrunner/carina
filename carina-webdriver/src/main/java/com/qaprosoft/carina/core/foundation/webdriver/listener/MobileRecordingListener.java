@@ -136,9 +136,7 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
                     //use case with GoGridRouter so we have to cut first 32 symbols!
                     sessionId = sessionId.substring(32);
                 }
-                LOGGER.info("default video url: " + videoArtifact.getLink());
                 videoArtifact.setLink(String.format(videoArtifact.getLink(), sessionId));
-                LOGGER.info("udtaed video url: " + videoArtifact.getLink());
                 inited = true;
                 
                 if (Configuration.getBoolean(Parameter.MOBILE_RECORDER)) {

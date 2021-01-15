@@ -62,8 +62,7 @@ public class ZebrunnerArtifactListener implements IDriverCommandListener {
             sessionId = sessionId.substring(32);
         }
 
-        // double %s replacement by session to support sessionId/sessionId.json metadata!
-        testArtifact.setLink(String.format(testArtifact.getLink(), sessionId, sessionId));
+        testArtifact.setLink(String.format(testArtifact.getLink(), sessionId));
         inited = true;
     }
 
