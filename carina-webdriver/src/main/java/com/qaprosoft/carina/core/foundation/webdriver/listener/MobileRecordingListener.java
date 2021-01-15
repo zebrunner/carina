@@ -56,6 +56,8 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 	private boolean recording = false;
 
 	private TestArtifactType videoArtifact;
+    // boolean property to identify when artifact is ready for registration using valid sessionId
+    private boolean inited = false;
 
 	public MobileRecordingListener(CommandExecutor commandExecutor, O1 startRecordingOpt, O2 stopRecordingOpt,
 			TestArtifactType artifact) {
@@ -68,7 +70,10 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 	@Override
 	public void beforeEvent(Command command) {
 		if (recording) {
-			registerArtifact(command, videoArtifact);
+
+            if (inited) {
+                registerArtifact(command, videoArtifact);
+            }
 
 			if (DriverCommand.QUIT.equals(command.getName())) {
                 if (!Configuration.getBoolean(Parameter.MOBILE_RECORDER)) {
@@ -116,11 +121,25 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
 
     @Override
     public void afterEvent(Command command) {
-        if (!recording && command.getSessionId() != null) {
+        // all supported artifacts used sessionId to finalize valid value so we should wait a command when valid id is available
+        if (command.getSessionId() == null) {
+            return;
+        }
+        
+        if (!recording) {
             try {
                 recording = true;
                 
-                videoArtifact.setLink(String.format(videoArtifact.getLink(), command.getSessionId().toString()));
+                if (!inited) {
+                    // update link first time only
+                    String sessionId = command.getSessionId().toString();
+                    if (sessionId.length() >= 64 ) {
+                        //use case with GoGridRouter so we have to cut first 32 symbols!
+                        sessionId = sessionId.substring(32);
+                    }
+                    videoArtifact.setLink(String.format(videoArtifact.getLink(), sessionId));
+                    inited = true;
+                }
                 
                 if (Configuration.getBoolean(Parameter.MOBILE_RECORDER)) {
                     // do extra appium call to start video recording only when feature explicitly enabled 
