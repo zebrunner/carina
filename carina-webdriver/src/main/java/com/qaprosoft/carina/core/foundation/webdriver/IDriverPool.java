@@ -289,7 +289,7 @@ public interface IDriverPool {
 
             // removed by default logs generator in 7.0 after making independent logs/video upload from device to s3 compatible storage
             // https://github.com/qaprosoft/carina/issues/1174
-            if (R.CONFIG.getBoolean(SpecialKeywords.ENABLE_LOG) && Configuration.getBoolean(Parameter.MOBILE_RECORDER)) {
+            if (R.CONFIG.getBoolean(SpecialKeywords.ENABLE_LOG) && Configuration.getBoolean(Parameter.DRIVER_RECORDER)) {
                 try {
                     SessionId sessionId = ((RemoteWebDriver) drv).getSessionId();
                     for (String logType : getAvailableDriverLogTypes(carinaDriver.getDriver())) {

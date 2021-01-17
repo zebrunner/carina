@@ -73,9 +73,13 @@ public class Configuration {
 
         SELENIUM_HOST("selenium_host"),
 
+        DRIVER_RECORDER("driver_recorder"),
+        
         DRIVER_EVENT_LISTENERS("driver_event_listeners"),
 
         MAX_DRIVER_COUNT("max_driver_count"),
+        
+        FORCIBLY_DISABLE_DRIVER_QUIT("forcibly_disable_driver_quit"),
 
         CUSTOM_CAPABILITIES("custom_capabilities"),
         
@@ -179,8 +183,6 @@ public class Configuration {
         
         PAGE_OPENING_STRATEGY("page_opening_strategy"),
         
-        FORCIBLY_DISABLE_DRIVER_QUIT("forcibly_disable_driver_quit"),
-
         // Amazon
         S3_BUCKET_NAME("s3_bucket_name"),
 
@@ -224,8 +226,6 @@ public class Configuration {
         DEFAULT_DEVICE_LANGUAGE("default_device_language"),
 
         // For screen recording
-        MOBILE_RECORDER("mobile_recorder"),
-
         ANDROID_SCREEN_RECORDING_SIZE("android_screen_record_size"),
 
         ANDROID_SCREEN_RECORDING_BITRATE("android_screen_record_bitrate"),
