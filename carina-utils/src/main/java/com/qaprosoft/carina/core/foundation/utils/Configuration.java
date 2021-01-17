@@ -285,7 +285,11 @@ public class Configuration {
     }
 
     public static boolean getBoolean(Parameter param) {
-        return Boolean.valueOf(get(param).trim());
+        String value = get(param).trim();
+        if (value == null || value.equalsIgnoreCase(SpecialKeywords.NULL)) {
+            return false;
+        }
+        return Boolean.valueOf(value);
     }
 
     public static String asString() {
