@@ -73,6 +73,8 @@ public class Configuration {
         SELENIUM_HOST("selenium_host"),
 
         DRIVER_EVENT_LISTENERS("driver_event_listeners"),
+        
+        DRIVER_RECORDER("driver_recorder"),
 
         MAX_DRIVER_COUNT("max_driver_count"),
 
@@ -227,8 +229,6 @@ public class Configuration {
         DEFAULT_DEVICE_LANGUAGE("default_device_language"),
 
         // For screen recording
-        MOBILE_RECORDER("mobile_recorder"),
-        
         ANDROID_SCREEN_RECORDING_SIZE("android_screen_record_size"),
 
         ANDROID_SCREEN_RECORDING_BITRATE("android_screen_record_bitrate"),

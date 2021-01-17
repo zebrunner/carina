@@ -76,7 +76,7 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
             }
 
 			if (DriverCommand.QUIT.equals(command.getName())) {
-                if (!Configuration.getBoolean(Parameter.MOBILE_RECORDER)) {
+                if (!Configuration.getBoolean(Parameter.DRIVER_RECORDER)) {
                     // no sense to do extra appium call to stop video recording as feature disabled
                     return;
                 }
@@ -139,7 +139,7 @@ public class MobileRecordingListener<O1 extends BaseStartScreenRecordingOptions,
                 videoArtifact.setLink(String.format(videoArtifact.getLink(), sessionId));
                 inited = true;
                 
-                if (Configuration.getBoolean(Parameter.MOBILE_RECORDER)) {
+                if (Configuration.getBoolean(Parameter.DRIVER_RECORDER)) {
                     // do extra appium call to start video recording only when feature explicitly enabled 
                     commandExecutor.execute(new Command(command.getSessionId(), MobileCommand.START_RECORDING_SCREEN,
                             MobileCommand.startRecordingScreenCommand((BaseStartScreenRecordingOptions) startRecordingOpt)
