@@ -64,6 +64,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.FileManager;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.ZipManager;
+import com.zebrunner.agent.core.registrar.Artifact;
 
 /*
  * Be careful with LOGGER usage here because potentially it could do recursive call together with ThreadLogAppender functionality
@@ -264,6 +265,7 @@ public class ReportContext {
             try {
                 FileUtils.copyURLToFile(new URL(url), file);
                 LOGGER.debug("Successfully downloaded artifact: " + name);
+                Artifact.attachToTest(name, file); // publish as test artifact to Zebrunner Reporting
             } catch (IOException e) {
                 LOGGER.error("Artifact: " + url + " wasn't downloaded to " + path, e);
             }
@@ -396,12 +398,16 @@ public class ReportContext {
         File artifact = new File(String.format("%s/%s", getArtifactsFolder(), name));
         artifact.createNewFile();
         FileUtils.writeByteArrayToFile(artifact, IOUtils.toByteArray(source));
+        
+        Artifact.attachToTest(name, IOUtils.toByteArray(source));
     }
 
     public static void saveArtifact(File source) throws IOException {
         File artifact = new File(String.format("%s/%s", getArtifactsFolder(), source.getName()));
         artifact.createNewFile();
         FileUtils.copyFile(source, artifact);
+        
+        Artifact.attachToTest(source.getName(), artifact);
     }
 
     /**
