@@ -16,7 +16,7 @@ Carina is a Java-based test automation framework that unites all testing layers:
 
 ## Sponsor
 [Zebrunner](https://zebrunner.com) The first cloud-based Selenium hub with by-minute pricing. No limitations by threads number!<br>
-[<b>Try it out for free.</b>](https://zebrunner.com/setup-wizard/company-details)
+[<b>Try it out for free.</b>](https://zebrunner.com)
 
 ## Documentation and free support
 * [User manual](http://qaprosoft.github.io/carina)
