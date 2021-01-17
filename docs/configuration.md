@@ -202,8 +202,8 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>project_report_directory</td>
-		<td>Path to a folder where the reports will be saved</td>
-		<td>./reports/qa</td>
+		<td>Path to a folder where the testing report will be saved</td>
+		<td>./reports</td>
 	</tr>
 	<tr>
 		<td>big_screen_width</td>
