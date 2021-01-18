@@ -196,12 +196,14 @@ public class TestNamingService {
     private static String appendDataProviderLine(ITestResult testResult, String testName) {
         ITestNGMethod testMethod = testResult.getMethod();
         ITestContext testContext = testResult.getTestContext();
+        Object[] parameters = testResult.getParameters();
+
         int dataProviderSize = RunContextService.getDataProviderSize(testMethod, testContext);
         if (dataProviderSize > 0) {
             // adding extra zero at the beginning of the data provider line number
             int indexMaxLength = Integer.toString(dataProviderSize).length() + 1;
             String lineFormat = " [L%0" + indexMaxLength + "d]";
-            int index = RunContextService.getDataProviderCurrentIndex(testMethod, testContext) + 1;
+            int index = RunContextService.getCurrentDataProviderIndex(testMethod, testContext, parameters) + 1;
             testName += String.format(lineFormat, index);
         }
         return testName;
