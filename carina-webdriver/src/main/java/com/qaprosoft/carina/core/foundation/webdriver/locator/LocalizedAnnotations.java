@@ -67,9 +67,9 @@ public class LocalizedAnnotations extends Annotations {
             param = StringUtils.remove(param, "By.name: ");
             by = MobileBy.AccessibilityId(param);
         } else if (getField().isAnnotationPresent(ExtendedFindBy.class)) {
-            if (param.startsWith("By.AndroidUIAutomator: ")) {
-                param = StringUtils.remove(param, "By.AndroidUIAutomator: ");
-                by = MobileBy.AndroidUIAutomator(param);
+            By extendedBy = createExtendedBy(param);
+            if (extendedBy != null) {
+                by = extendedBy;
             }
             LOGGER.debug("Annotation ExtendedFindBy has been detected. Returning locator : " + by);
         } else {
@@ -118,5 +118,19 @@ public class LocalizedAnnotations extends Annotations {
         }       
 
         throw new RuntimeException(String.format("Unable to generate By using locator: '%s'!", locator));
+    }
+
+    private By createExtendedBy(String locator) {
+        if (locator.startsWith("By.AndroidUIAutomator: ")) {
+            return MobileBy.AndroidUIAutomator(StringUtils.remove(locator, "By.AndroidUIAutomator: "));
+        } else if (locator.startsWith("By.IosClassChain: ")) {
+            return MobileBy.iOSClassChain(StringUtils.remove(locator, "By.IosClassChain: "));
+        } else if (locator.startsWith("By.IosNsPredicate: ")) {
+            return MobileBy.iOSNsPredicateString(StringUtils.remove(locator, "By.IosNsPredicate: "));
+        } else if (locator.startsWith("By.xpath: ")) { // for @ExtendedFindBy 'text' attribute L10N supporting
+            return By.xpath(StringUtils.remove(locator, "By.xpath: "));
+        }
+
+        return null;
     }
 }
