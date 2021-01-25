@@ -18,6 +18,9 @@ package com.qaprosoft.carina.core.foundation.exception;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.R;
+
 public class ExceptionsTest {
 
     @Test
@@ -142,6 +145,16 @@ public class ExceptionsTest {
             throw new TestCreationException();
         } catch (TestCreationException e) {
             Assert.assertTrue(e.getMessage().equals("Test creation exception"));
+        }
+    }
+    
+    @Test
+    public void testNotImplementedException() {
+        try {
+            R.CONFIG.put(SpecialKeywords.PLATFORM, "iOS", true);
+            throw new NotImplementedException();
+        } catch (Exception e) {
+            Assert.assertEquals(e.getMessage(), "Method [testNotImplementedException] isn't implemented for iOS!");
         }
     }
 
