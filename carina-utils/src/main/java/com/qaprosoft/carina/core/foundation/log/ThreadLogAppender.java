@@ -77,7 +77,12 @@ public class ThreadLogAppender extends AppenderSkeleton {
                 String logLevel = event.getLevel().toString();
 
                 String message = "[%s] [%s] [%s] [%s] %s";
-                message = String.format(message, time, fileName, threadId, logLevel, event.getMessage().toString());
+                String eventMessage = "";
+                if (event != null && event.getMessage() != null) {
+                    eventMessage = event.getMessage().toString();
+                }
+                
+                message = String.format(message, time, fileName, threadId, logLevel, eventMessage);
                 ensureCapacity(message.length());
                 fw.write(message);
             } else {
