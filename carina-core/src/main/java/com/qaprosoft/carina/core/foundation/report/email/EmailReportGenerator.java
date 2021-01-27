@@ -73,6 +73,7 @@ public class EmailReportGenerator {
     private static final String SKIP_REASON_PLACEHOLDER = "${skip_reason}";
     private static final String FAIL_CONFIG_REASON_PLACEHOLDER = "${fail_config_reason}";
     private static final String SCREENSHOTS_URL_PLACEHOLDER = "${screenshots_url}";
+    private static final String VIDEO_URL_PLACEHOLDER = "${video_url_html}";
     private static final String LOG_URL_PLACEHOLDER = "${log_url}";
     private static final String CREATED_ITEMS_LIST_PLACEHOLDER = "${created_items_list}";
     private static final String CREATED_ITEM_PLACEHOLDER = "${created_item}";
@@ -81,6 +82,9 @@ public class EmailReportGenerator {
     
     // Cucumber section
     private static final String CUCUMBER_RESULTS_PLACEHOLDER = "${cucumber_results}";
+
+    // Artifacts section
+    private static final String ARTIFACTS_RESULTS_PLACEHOLDER = "${artifacts}";
 
     private static boolean INCLUDE_PASS = R.EMAIL.getBoolean("include_pass");
     private static boolean INCLUDE_FAIL = R.EMAIL.getBoolean("include_fail");
@@ -109,7 +113,10 @@ public class EmailReportGenerator {
         emailBody = emailBody.replace(CREATED_ITEMS_LIST_PLACEHOLDER, getCreatedItemsList(createdItems));
         
         // Cucumber section
-        emailBody = emailBody.replace(CUCUMBER_RESULTS_PLACEHOLDER, getCucumberResults());
+        emailBody = emailBody.replace(CUCUMBER_RESULTS_PLACEHOLDER, getCucumberResultsHTML());
+
+        // Artifacts section
+        emailBody = emailBody.replace(ARTIFACTS_RESULTS_PLACEHOLDER, getArtifactsLinkHTML());
     }
 
     public String getEmailBody() {
@@ -227,6 +234,14 @@ public class EmailReportGenerator {
             }
         }
 
+        // putting of video URL
+        String videoHTML = "";
+        if (ReportContext.getAllArtifacts().stream().anyMatch(f -> f.getName().endsWith(".mp4"))) {
+            videoHTML = String.format("<a target='_blank' href='%s' style='color: white; display: block'>Video</a>",
+                    ReportContext.getTestArtifactsLink());
+        }
+        result = result.replace(VIDEO_URL_PLACEHOLDER, videoHTML);
+
         // generate valid url or just a number
         List<String> jiraTickets = testResultItem.getJiraTickets();
         String bugUrl = "";
@@ -328,14 +343,31 @@ public class EmailReportGenerator {
         return reasonText;
     }
 
-    private String getCucumberResults() {
+    private String getArtifactsLinkHTML() {
+        String result = "";
+
+        if (!ReportContext.getAllArtifacts().isEmpty()) {
+
+            String link = ReportContext.getTestArtifactsLink();
+            LOGGER.debug("Artifacts gallery link: " + link);
+            result = String.format(
+                    "<br/><b><a href='%s' style='color: black;' target='_blank' style='display: block'> Open Artifacts gallery in a new tab</a></b><br/>",
+                    link);
+            LOGGER.debug("Artifacts gallery: " + result);
+        }
+
+        return result;
+    }
+
+    private String getCucumberResultsHTML() {
         String result = "";
 
         if (isCucumberReportFolderExists()) {
 
             String link = ReportContext.getCucumberReportLink();
             LOGGER.debug("Cucumber Report link: " + link);
-            result = String.format("<br/><b><a href='%s' style='color: green;' target='_blank'> Open Cucumber Report in new Window </a></b><br/>",
+            result = String.format(
+                    "<br/><b><a href='%s' style='color: green;' target='_blank' style='display: block'> Open Cucumber Report in a new tab</a></b><br/>",
                     link);
             LOGGER.debug("Cucumber result: " + result);
         }
