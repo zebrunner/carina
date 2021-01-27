@@ -21,6 +21,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
 public class MobileCapabilies extends AbstractCapabilities {
@@ -49,7 +50,18 @@ public class MobileCapabilies extends AbstractCapabilities {
         String localeValue = Configuration.get(Parameter.LOCALE);
         LOGGER.debug("Default locale value is : " + localeValue);
         String[] values = localeValue.split("_");
-        if (values.length == 2) {
+        if (values.length == 1) {
+            // only locale is present!
+            caps.setCapability("locale", localeValue);
+            
+            String langValue = R.CONFIG.get("language");
+            if (!langValue.isEmpty()) {
+                LOGGER.debug("Default language value is : " + langValue);
+                // provide extra capability language only if it exists among config parameters...
+                caps.setCapability("language", langValue);
+            }
+            
+        } else if (values.length == 2) {
             if (Configuration.getPlatform(caps).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
                 LOGGER.debug("Put language and locale to android capabilities. language: " + values[0] + "; locale: " + values[1]);
                 caps.setCapability("language", values[0]);
@@ -59,6 +71,8 @@ public class MobileCapabilies extends AbstractCapabilities {
                 caps.setCapability("language", values[0]);
                 caps.setCapability("locale", localeValue);
             }        
+        } else {
+            LOGGER.error("Undefined locale provided (ignoring for mobile capabilitites): " + localeValue);
         }
         return caps;
     }
