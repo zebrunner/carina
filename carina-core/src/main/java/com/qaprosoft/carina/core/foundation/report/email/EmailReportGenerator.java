@@ -234,11 +234,12 @@ public class EmailReportGenerator {
             }
         }
 
-        // putting of video URL
+        // putting of video URLs
         String videoHTML = "";
-        if (ReportContext.getAllArtifacts().stream().anyMatch(f -> f.getName().endsWith(".mp4"))) {
-            videoHTML = String.format("<a target='_blank' href='%s' style='color: white; display: block'>Video</a>",
-                    ReportContext.getTestArtifactsLink());
+        List<String> videoLinks = testResultItem.getLinksToVideo();
+        for (int i = 0; i < videoLinks.size(); i++) {
+            videoHTML = videoHTML.concat(String.format("<a target='_blank' href='%s' style='color: white; display: block'>%s</a>", videoLinks.get(i),
+                    (videoLinks.size() > 1) ? "Video_" + (i + 1) : "Video"));
         }
         result = result.replace(VIDEO_URL_PLACEHOLDER, videoHTML);
 

@@ -268,8 +268,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     @Override
     public void onTestSuccess(ITestResult result) {
         LOGGER.debug("CarinaListener->onTestSuccess");
-        super.onTestSuccess(result);
         onTestFinish(result);
+        super.onTestSuccess(result);
     }
 
     @Override
@@ -277,8 +277,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         LOGGER.debug("CarinaListener->onTestFailure");
         String errorMessage = getFailureReason(result);
         takeScreenshot(result, "TEST FAILED - " + errorMessage);
+        onTestFinish(result);
         super.onTestFailure(result);
-        onTestFinish(result);    
     }
 
     @Override
@@ -286,8 +286,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         LOGGER.debug("CarinaListener->onTestSkipped");
         String errorMessage = getFailureReason(result);
         takeScreenshot(result, "TEST FAILED - " + errorMessage);
+        onTestFinish(result);
         super.onTestSkipped(result);
-        onTestFinish(result);  
     }
 
     private boolean hasDependencies(ITestResult result) {

@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -47,6 +48,7 @@ import org.testng.Assert;
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.exception.DriverPoolException;
+import com.qaprosoft.carina.core.foundation.listeners.TestNamingService;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -65,6 +67,8 @@ public interface IDriverPool {
     @SuppressWarnings("static-access")
     static final Set<CarinaDriver> driversPool = driversMap.newKeySet();
     
+    static final ConcurrentHashMap<SessionId, String> sessionsMap = new ConcurrentHashMap<>();
+
     static final ThreadLocal<Device> currentDevice = new ThreadLocal<Device>();
     static final Device nullDevice = new Device();
 
@@ -446,6 +450,9 @@ public interface IDriverPool {
                 
                 drv = DriverFactory.create(name, capabilities, seleniumHost);
 
+                String testName = TestNamingService.getTestName();
+                sessionsMap.put(((RemoteWebDriver) ((EventFiringWebDriver) drv).getWrappedDriver()).getSessionId(), testName);
+
                 if (device.isNull()) {
                     // During driver creation we choose device and assign it to
                     // the test thread
@@ -528,6 +535,18 @@ public interface IDriverPool {
             }
         }
         return currentDrivers;
+    }
+
+    default List<String> getSessionsForCurrentTest() {
+        String testName = TestNamingService.getTestName();
+        List<String> sessions = new ArrayList<>();
+        for (SessionId sessionId : sessionsMap.keySet()) {
+            if (testName.equals(sessionsMap.get(sessionId))) {
+                sessions.add(sessionId.toString());
+            }
+        }
+        POOL_LOGGER.debug("Amount of sessions for current thread: " + sessions.size());
+        return sessions;
     }
 
     // ------------------------ DEVICE POOL METHODS -----------------------
