@@ -64,6 +64,7 @@ public class ZafiraConfigurator implements IConfigurator, ITestRailManager, IQTe
             conf.getArg().add(buildArgumentType(parameter.getKey(), R.CONFIG.get(parameter.getKey())));
         }
         
+        LOGGER.debug("Detected locale: '" + R.CONFIG.get("locale") + "';");
         // Override using actual platform, browser etc versions
         
         String platform = Configuration.getPlatform();
