@@ -93,8 +93,8 @@ public class MobileFactory extends AbstractFactory {
             EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
             
             if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
-                // MOBILE_SCREEN_RECORD_ENABLE - should be disabled for MCloud and Zebrunner CI as they record video on their own
-                if (isEnabled(SpecialKeywords.ENABLE_VIDEO) && Configuration.getBoolean(Parameter.MOBILE_SCREEN_RECORD_ENABLE)) {
+                // MOBILE_RECORDER - should be disabled for MCloud and Zebrunner CI as they record video on their own
+                if (isEnabled(SpecialKeywords.ENABLE_VIDEO) && Configuration.getBoolean(Parameter.MOBILE_RECORDER)) {
                     // Details about available parameters
                     // https://github.com/appium/java-client/blob/master/src/main/java/io/appium/java_client/android/AndroidStartScreenRecordingOptions.java
                     AndroidStartScreenRecordingOptions o1 = new AndroidStartScreenRecordingOptions()
@@ -134,8 +134,8 @@ public class MobileFactory extends AbstractFactory {
 
             } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.IOS)
                     || mobilePlatformName.equalsIgnoreCase(SpecialKeywords.TVOS)) {
-                // MOBILE_SCREEN_RECORD_ENABLE - should be disabled for MCloud and Zebrunner CI as they record video on their own
-                if (isEnabled(SpecialKeywords.ENABLE_VIDEO) && Configuration.getBoolean(Parameter.MOBILE_SCREEN_RECORD_ENABLE)) {
+                // MOBILE_RECORDER - should be disabled for MCloud and Zebrunner CI as they record video on their own
+                if (isEnabled(SpecialKeywords.ENABLE_VIDEO) && Configuration.getBoolean(Parameter.MOBILE_RECORDER)) {
                     // Details about available parameters
                     // https://github.com/appium/java-client/blob/master/src/main/java/io/appium/java_client/ios/IOSStartScreenRecordingOptions.java
                     IOSStartScreenRecordingOptions o1 = new IOSStartScreenRecordingOptions()

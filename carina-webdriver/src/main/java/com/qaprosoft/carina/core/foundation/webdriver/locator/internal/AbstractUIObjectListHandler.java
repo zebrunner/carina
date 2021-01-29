@@ -41,8 +41,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
-import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.gui.AbstractUIObject;
@@ -156,7 +154,6 @@ public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements 
 		long timeout = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 		long RETRY_TIME = Configuration.getLong(Parameter.RETRY_INTERVAL);
 		
-		Timer.start(ACTION_NAME.WAIT);
 		@SuppressWarnings("rawtypes")
 		Wait wait = new WebDriverWait(webDriver, timeout, RETRY_TIME).ignoring(WebDriverException.class)
 				.ignoring(NoSuchSessionException.class);
@@ -172,7 +169,6 @@ public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements 
 			LOGGER.error("waitUntil: " + condition.toString(), e);
 			result = false;
 		}
-		Timer.stop(ACTION_NAME.WAIT);
 		return result;
 	}
 }

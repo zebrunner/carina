@@ -43,8 +43,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
-import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -208,8 +206,6 @@ public class Screenshot {
             }
 
             LOGGER.debug("Screenshot->captureFullSize starting...");
-            Timer.start(ACTION_NAME.CAPTURE_SCREENSHOT);
-            
             driver = castDriver(driver); // remove all DriverListener casting to WebDriver
             
             // Define test screenshot root
@@ -268,7 +264,6 @@ public class Screenshot {
             LOGGER.warn("Unable to capture screenshot due to the Exception!");
             LOGGER.debug(e.getMessage(), e);
         } finally {
-            Timer.stop(ACTION_NAME.CAPTURE_SCREENSHOT);
             LOGGER.debug("Screenshot->captureFullSize finished.");
         }
         return screen;
@@ -338,7 +333,6 @@ public class Screenshot {
         // For the rest of cases returned previous implementation
 
         if (isTakeScreenshot) {
-            Timer.start(ACTION_NAME.CAPTURE_SCREENSHOT);
             LOGGER.debug("Screenshot->capture starting...");
             
             driver = castDriver(driver); // remove all DriverListener casting to WebDriver
@@ -419,7 +413,6 @@ public class Screenshot {
                 LOGGER.warn("Unable to capture screenshot due to the Exception!");
                 LOGGER.debug(e.getMessage(), e);
             } finally {
-                Timer.stop(ACTION_NAME.CAPTURE_SCREENSHOT);
                 LOGGER.debug("Screenshot->capture finished.");
             }
         }
@@ -607,7 +600,6 @@ public class Screenshot {
             ImageDiff diff = imageDiff.makeDiff(bufferedImageExpected, bufferedImageActual);
             if (diff.hasDiff()) {
                 screen = diff.getMarkedImage();
-                Timer.start(ACTION_NAME.CAPTURE_SCREENSHOT);
                 // Define test screenshot root
                 File testScreenRootDir = ReportContext.getTestDir();
 
@@ -644,7 +636,7 @@ public class Screenshot {
             LOGGER.warn("Unable to compare screenshots!");
             LOGGER.debug(e.getMessage(), e);
         } finally {
-            Timer.stop(ACTION_NAME.CAPTURE_SCREENSHOT);
+            // do nothing
         }
         return true;
     }

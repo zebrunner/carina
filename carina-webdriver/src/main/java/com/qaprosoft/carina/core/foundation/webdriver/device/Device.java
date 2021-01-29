@@ -35,7 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.performance.DRIVER_TYPE;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -696,22 +695,6 @@ public class Device implements IDriverPool {
         }
         
         return null;
-    }
-    
-    /**
-     * return unique ACTION_NAME for driver to measure selenium slave usage 
-     * @return WEB_DRIVER or MOBILE_DRIVER
-     */
-    public DRIVER_TYPE getMetricName() {
-        DRIVER_TYPE metricName = DRIVER_TYPE.WEB_DRIVER;
-        if (isMobile()) {
-            metricName = DRIVER_TYPE.MOBILE_DRIVER;
-        }
-        return metricName;
-    }
-    
-    private boolean isMobile() {
-        return SpecialKeywords.ANDROID.equalsIgnoreCase(getOs()) || SpecialKeywords.IOS.equalsIgnoreCase(getOs()) || SpecialKeywords.TVOS.equalsIgnoreCase(getOs());
     }
     
     private boolean isIOS() {

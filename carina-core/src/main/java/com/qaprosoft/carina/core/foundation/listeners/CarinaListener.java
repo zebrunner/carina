@@ -119,6 +119,15 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         try {
             // Add shutdown hook
             Runtime.getRuntime().addShutdownHook(new ShutdownHook());
+
+            // Zebrunner core java agent is user for capturing events of RemoteDriverSession instances.
+            // Internally, the agent uses java instrumentation agent for its purposes.
+            // The instrumentation agent implicitly triggers initialization of the R class because it uses logger.
+            // Carina has the ThreadLogAppender class which is closely related to logging and internally uses the R class.
+            // Technically, this happen when the maven-surefire-plugin has not set inherited program arguments (passed to mvn process).
+            // That is why it is necessary to reinit R class here when TestNG loads the CarinaListener class.
+            R.reinit();
+
             // Set log4j properties
             URL log4jUrl = ClassLoader.getSystemResource("carina-log4j.properties");
             LOGGER.debug("carina-log4j.properties: " + log4jUrl);

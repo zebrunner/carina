@@ -40,13 +40,23 @@ All the project configuration properties are located in a **_config.properties**
 		<td>chrome / firefox / safari / iexplore</td>
 	</tr>
 	<tr>
-        	<td>headless</td>
-        	<td>Run tests in headless browser mode. Enabled when headless=true</td>
-        	<td>Boolean</td>
+		<td>headless</td>
+		<td>Run tests in headless browser mode. Enabled when headless=true. Default: false.</td>
+		<td>Boolean</td>
+	</tr>
+	<tr>
+		<td>browser_version</td>
+		<td>Browser version or an empty string if unknown for Selenium Grid</td>
+		<td>"87", "72"</td>
+	</tr>
+		<tr>
+		<td>browser_language</td>
+		<td>Browser language or nothing to use the English version by default.</td>
+		<td>"es", "fr"</td>
 	</tr>
 	<tr>
 		<td>selenium_host</td>
-		<td>Selenium server host</td>
+		<td>Selenium/Appium server host</td>
 		<td>http://localhost:4444/wd/hub</td>
 	</tr>
 	<tr>
@@ -60,13 +70,24 @@ All the project configuration properties are located in a **_config.properties**
 		<td>en_GB,de_DE,fr_FR</td>
 	</tr>
 	<tr>
+		<td>enable_l10n</td>
+		<td>Enables L10N feature</td>
+		<td>false, true</td>
+	</tr>
+	<tr>
+		<td>l10n_encoding</td>
+		<td>Charset for l10n feature</td>
+		<td>ISO-8859-5, ISO-8859-6, UTF-8</td>
+	</tr>
+
+	<tr>
 		<td>retry_interval</td>
-		<td>Timeout interval between calling HTML DOM for the element.<br><b>Note:</b> in ms. For mobile automation specify a number from 500-1500 range</td>
+		<td>Timeout interval between calling HTML DOM for the element.<br><b>Note:</b> in ms. For mobile automation specify a number from 500-1000 range</td>
 		<td>Integer</td>
 	</tr>
 	<tr>
 		<td>auto_screenshot</td>
-		<td>Global switch for taking screenshots. When disabled, only failures will be captured</td>
+		<td>Global switch for taking screenshots. When disabled, screenshots will be captured only after failures</td>
 		<td>Boolean</td>
 	</tr>
 	<tr>
@@ -76,7 +97,7 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>max_screen_history</td>
-		<td>Max number of reports in history</td>
+		<td>Max number of reports artifacts saving in history. Default: 10</td>
 		<td>Integer</td>
 	</tr>
 	<tr>
@@ -90,31 +111,21 @@ All the project configuration properties are located in a **_config.properties**
 		<td>STAG, PROD, DEMO</td>
 	</tr>
 	<tr>
-		<td>env_arg_resolver</td>
-		<td>This parameter is optional, if it isn't set, the default value will be used. In most cases, <b> the default value is enough</b></td>
-		<td>java class </td>
-	</tr>
-		<tr>
-		<td>browser_version</td>
-		<td>Browser version or an empty string if unknown for Selenium Grid</td>
-		<td>"8.0", "52.1"</td>
-	</tr>
-		<tr>
-		<td>browser_language</td>
-		<td>Browser language or nothing to use the English version by default. <br><b>Note:</b> Only applicable for Chrome and Firefox!</td>
-		<td>"es", "fr"</td>
+		<td>driver_event_listeners</td>
+		<td>Comma-separated list of extra driver listeners listeners. Listeners provide extra custom actions for WebDriver and have to be the instances of WebDriverEventListener</td>
+		<td>com.some_company.core.EventListener</td>
 	</tr>
 	<tr>
-		<td>driver_event_listeners</td>
-		<td>Comma-separated list of listeners. Listeners provide more logs from WebDriver and have to be the instances of WebDriverEventListener</td>
-		<td>com.someCompane.core.EventListener</td>
-	</tr>
-		<tr>
 		<td>max_driver_count</td>
-		<td>Max number of drivers per thread</td>
+		<td>Max number of drivers per thread. Default: 3</td>
 		<td>Integer</td>
 	</tr>
-		<tr>
+	<tr>
+		<td>forcibly_disable_driver_quit</td>
+		<td>If enabled turns off webdriver shutdown after test finishing by any reason. Default: false</td>
+		<td>Boolean</td>
+	</tr>
+	<tr>
 		<td>custom_capabilities</td>
 		<td>Name of a properties file with custom capabilities (key-value)</td>
 		<td>custom.properties</td>
@@ -186,13 +197,13 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>big_screen_width</td>
-		<td>Screenshots will be resized according to this width if their own width is bigger</td>
-		<td>500, 1200, Integer</td>
+		<td>Screenshots will be resized according to this width if their own width is bigger. Default: -1 to keep existing size.</td>
+		<td>Integer</td>
 	</tr>
 	<tr>
 		<td>big_screen_height</td>
-		<td>Screenshots will be resized according to this height if their own height is bigger</td>
-		<td>500, 1200, Integer</td>
+		<td>Screenshots will be resized according to this height if their own height is bigger. Default: -1 to keep existing size.</td>
+		<td>Integer</td>
 	<tr>
 		<td>init_retry_count</td>
 		<td>Number of attempts to create a driver. The default value 0 means that there will be only 1 attempt</td>
@@ -207,16 +218,6 @@ All the project configuration properties are located in a **_config.properties**
 		<td>retry_count</td>
 		<td>Number of test-retryings in case of failure. The default value 0 means that a test will be performed only once</td>
 		<td>Integer</td>
-	</tr>
-		<tr>
-		<td>enable_l10n</td>
-		<td>Enables L10N feature</td>
-		<td>false, true</td>
-	</tr>
-			<tr>
-		<td>l10n_encoding</td>
-		<td>Charset for l10n feature</td>
-		<td>ISO-8859-5, ISO-8859-6, UTF-8</td>
 	</tr>
 		<tr>
 		<td>thread_count</td>
@@ -236,12 +237,12 @@ All the project configuration properties are located in a **_config.properties**
 		<tr>
 		<td>core_log_packages</td>
 		<td>Comma-separated list of core packages where you want to redefine the log level</td>
-		<td>com.qaprosoft.carina.core, ZafiraConfigurator etc</td>
+		<td>com.qaprosoft.carina.core, com.zebrunner etc</td>
 	</tr>
 		<tr>
 		<td>log_all_json</td>
 		<td>API response will be logged in JSON format</td>
-		<td>true, false</td>
+		<td>Boolean</td>
 	</tr>
 		<tr>
 		<td>date_format</td>
@@ -270,17 +271,17 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 		<tr>
 		<td>access_key_id</td>
-		<td>Access key id for Amazon S3. More info [here](#https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)</td>
+		<td>Access key id for Amazon S3 build uploader. More info [here](#https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)</td>
 		<td>gkhcvdgvceUYF67897hbjsbdc</td>
 	</tr>
 		<tr>
 		<td>secret_key</td>
-		<td>Secret key for Amazon S3. More info [here](#https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)</td>
+		<td>Secret key for Amazon S3 build uploader. More info [here](#https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)</td>
 		<td>gkhcvdgvceUYF67897hbjsbdc</td>
 	</tr>
 		<tr>
 		<td>s3_local_storage</td>
-		<td>Directory for downloading artefacts</td>
+		<td>Local directory for downloading build artifacts</td>
 		<td>./s3</td>
 	</tr>
 		<tr>
@@ -296,7 +297,7 @@ All the project configuration properties are located in a **_config.properties**
 		<tr>
 		<td>add_new_localization</td>
 		<td>Should be set to 'true' if you want to create new localization files for the required Locale. Otherwise, there will be just the localization checking</td>
-		<td>false, true</td>
+		<td>Boolean</td>
 	</tr>
 		<tr>
 		<td>add_new_localization_encoding</td>
@@ -343,11 +344,6 @@ All the project configuration properties are located in a **_config.properties**
 		<td>Determines how carina detects whether expected page is opened: by expected url pattern, by marker element loading state or by both these conditions</td>
 		<td>BY_ELEMENT, BY_URL, BY_URL_AND_ELEMENT</td>
 	</tr>
-	<tr>
-		<td>forcibly_disable_driver_quit</td>
-		<td>If enabled turns off webdriver shutdown after test finishing by any reason. Default value is 'false'</td>
-		<td>false, true</td>
-	</tr>
 </table>
 Most of the properties may be read in the following way:
 ```
@@ -371,41 +367,31 @@ Configuration.getEnvArg("url")
 ```
 As a result, you switch between the environments just changing the env argument in the _config.properties file.
 
-### [Zafira](https://github.com/qaprosoft/zafira) configuration
-[**zafira.properties**](https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/zafira.properties) are used for Zafira QA reporting integration, here you should specify some values for a proper integration:<table>
+### [Zebrunner Reporting](https://zebrunner.com/documentation/agents/testng) configuration
+[**agent.properties**](https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/agent.properties) are used for Zebrunner Reporting integration, here you should specify some values for a proper integration:<table>
 	<tr>
 		<th>Attribute</th>
 		<th>Meaning</th>
 		<th>Example</th>
 	</tr>
 	<tr>
-		<td>zafira_enabled</td>
+		<td>reporting.enabled</td>
 		<td>Root switch</td>
 		<td>true/false</td>
 	</tr>
 	<tr>
-		<td>zafira_service_url</td>
-		<td>Webservice URL</td>
-		<td>http://localhost:8080/zafira-ws</td>
+		<td>reporting.server.hostname</td>
+		<td>Zebrunner Service URL</td>
+		<td>https://mycompany.zebrunner.com</td>
 	</tr>
 	<tr>
-		<td>zafira_project</td>
-		<td>Project name (created in Zafira)</td>
-		<td>empty or any created</td>
-	</tr>
-	<tr>
-		<td>zafira_rerun_failures</td>
-		<td>Reruns only failures</td>
+		<td>reporting.server.access-token</td>
+		<td>Zebrunner Access Token</td>
 		<td>true/false</td>
 	</tr>
 	<tr>
-		<td>zafira_report_emails</td>
-		<td>List of emails for report</td>
-		<td>user1@qps.com,user2@qps.com</td>
+		<td>reporting.projectKey</td>
+		<td>Zebrunner Project name</td>
+		<td>empty or any existing name</td>
 	</tr>
-	<tr>
-		<td>zafira_configurator</td>
-		<td>Configurator class (used by default)</td>
-		<td>com.qaprosoft.carina.core.foundation.report.ZafiraConfigurator</td>
-	</tr>	
 </table>
