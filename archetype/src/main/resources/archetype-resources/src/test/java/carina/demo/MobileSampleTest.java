@@ -52,6 +52,7 @@ public class MobileSampleTest extends AbstractTest implements IMobileUtils {
         contactUsPage.typeName("John Doe");
         contactUsPage.typeEmail("some@email.com");
         contactUsPage.typeQuestion("This is a message");
+        //TODO: [VD] move page driver related action outside from test class!
         hideKeyboard();
         contactUsPage.submit();
         Assert.assertTrue(contactUsPage.isSuccessMessagePresent() || contactUsPage.isRecaptchaPresent(),

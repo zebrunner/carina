@@ -2,7 +2,7 @@
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-<suite verbose="1" name="Carina Demo Tests - Web Multiple Browser Sample">
+<suite verbose="1" name="Carina Demo Tests - Web Multiple Browser Sample" parallel="methods">
 
     <parameter name="suiteOwner" value="qpsdemo"/>
     <parameter name="zafira_project" value="UNKNOWN"/>
@@ -16,7 +16,7 @@
 
     <test name="Multiple Browser Test">
         <classes>
-            <class name="com.qaprosoft.carina.demo.WebMultipleBrowserTest"/>
+            <class name="${package}.carina.demo.WebMultipleBrowserTest"/>
         </classes>
     </test>
 

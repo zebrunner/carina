@@ -15,13 +15,14 @@ import ${package}.carina.demo.gui.components.NewsItem;
 import ${package}.carina.demo.gui.pages.HomePage;
 import ${package}.carina.demo.gui.pages.NewsPage;
 
-import cucumber.api.java.en.And;
-import cucumber.api.java.en.Given;
-import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
+
 
 public class GSMArenaNewsSteps extends CucumberRunner {
-
+    
     HomePage homePage = null;
     NewsPage newsPage = null;
 
@@ -31,7 +32,7 @@ public class GSMArenaNewsSteps extends CucumberRunner {
         homePage.open();
         return homePage.isPageOpened();
     }
-
+    
     @When("^I open 'News' page${symbol_dollar}")
     public void iOpenNewsPage()  {
         newsPage = homePage.getFooterMenu().openNewsPage();
@@ -42,7 +43,7 @@ public class GSMArenaNewsSteps extends CucumberRunner {
     public void pageSettingsShouldBeOpen() {
         Assert.assertTrue(newsPage.isPageOpened(), "News page is not opened!");
     }
-
+    
     @And("^page 'News' should contains all items${symbol_dollar}")
     public void pageSettingsShouldContainsAllItems() {
         final String searchQ = "iphone";

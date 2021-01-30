@@ -1,4 +1,7 @@
-<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
 <suite verbose="1" name="Carina Demo Tests - Hello World" parallel="methods">
 
 	<parameter name="suiteOwner" value="qpsdemo"/>
@@ -10,7 +13,7 @@
 	
 	<test name="Hello World test">
 		<classes>
-			<class name="com.qaprosoft.carina.demo.HelloWorld" />
+			<class name="${package}.carina.demo.HelloWorld" />
 		</classes>
 	</test>
 

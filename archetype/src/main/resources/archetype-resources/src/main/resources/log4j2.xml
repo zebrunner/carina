@@ -1,0 +1,19 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration packages="com.zebrunner.agent.core.logging.log4j2">
+   <properties>
+      <property name="pattern">[%d{HH:mm:ss}] %-5p (%F:%L) - %m%n</property>
+   </properties>
+   <appenders>
+      <ReportingAppender name="ReportingAppender">
+         <PatternLayout pattern="${pattern}" />
+      </ReportingAppender>
+   </appenders>
+   <loggers>
+      <root level="info">
+         <appender-ref ref="ReportingAppender"/>
+      </root>
+   </loggers>
+</configuration>

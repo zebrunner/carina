@@ -97,17 +97,17 @@
         <module>carina-core</module>
     </modules>
     <repositories>
-	    <repository>
-	        <id>zebrunner_snapshots</id>
-	        <name>zebrunner Snapshots</name>
-	        <url>https://nexus.zebrunner.dev/repository/ce-snapshots/</url>
-	        <releases>
-	            <enabled>false</enabled>
-	        </releases>
-	        <snapshots>
-	            <enabled>true</enabled>
-	        </snapshots>
-	    </repository>
+        <repository>
+            <id>zebrunner_snapshots</id>
+            <name>zebrunner Snapshots</name>
+            <url>https://nexus.zebrunner.dev/repository/ce-snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
         <repository>
             <id>qaprosoft_snapshots</id>
             <name>Qaprosoft Snapshots</name>

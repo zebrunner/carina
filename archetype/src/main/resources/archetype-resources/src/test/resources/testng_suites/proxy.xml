@@ -1,0 +1,26 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite verbose="1" name="Carina Demo Tests - Proxy Sample" parallel="methods">
+
+	<parameter name="suiteOwner" value="qpsdemo"/>
+	<parameter name="zafira_project" value="UNKNOWN"/>
+	<parameter name="jenkinsJobName" value="Proxy-Demo-Test"/>
+	<parameter name="jenkinsJobType" value="web"/>
+	<parameter name="jenkinsEnvironments" value="DEMO"/>
+	<parameter name="jenkinsEmail" value="demo@qaprosoft.com"/>
+  
+	<parameter name="jenkinsRegressionPipeline" value="web_regression, full_regression"/>
+	<parameter name="jenkinsPipelineEnvironments" value="DEMO"/>
+
+	<parameter name="jenkinsJobExecutionOrder" value="1"/>
+	<parameter name="jenkinsJobExecutionMode" value="continue"/>
+
+	<test name="GSM arena proxy web test">
+		<classes>
+			<class name="${package}.carina.demo.ProxySampleTest" />
+		</classes>
+	</test>
+
+</suite>

@@ -1,7 +1,7 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-<!DOCTYPE suite SYSTEM "http://testng.org/testng-${version}.dtd">
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
 <suite name="Carina Demo Tests - Mobile Sample (Android)" verbose="1" parallel="methods">
 
 	<parameter name="suiteOwner" value="qpsdemo" />

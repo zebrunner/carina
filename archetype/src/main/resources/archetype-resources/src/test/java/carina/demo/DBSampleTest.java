@@ -2,7 +2,7 @@
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
 /*
- * Copyright 2013-2020 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2021 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ import ${package}.carina.demo.db.models.UserPreference;
 
 /**
  * This sample shows how create DB test.
- *
+ * 
  * @author qpsdemo
  */
 public class DBSampleTest extends AbstractTest {

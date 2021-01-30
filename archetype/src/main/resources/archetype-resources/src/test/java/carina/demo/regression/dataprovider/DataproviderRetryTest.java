@@ -2,7 +2,7 @@
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
 /*
- * Copyright 2013-2020 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2021 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ public class DataproviderRetryTest extends AbstractTest {
     public void testDataproviderRetry(String testRailColumn, int a, int b, int c) {
         boolean isPassed = (new Random().nextInt(2) == 1) ? true : false;
         Assert.assertTrue(isPassed);
-
+        
         setCases(testRailColumn.split(","));
         int actual = a * b;
         int expected = c;

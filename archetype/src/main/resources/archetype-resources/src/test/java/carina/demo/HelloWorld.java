@@ -2,7 +2,7 @@
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
 /*
- * Copyright 2013-2018 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2021 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@
  */
 package ${package}.carina.demo;
 
+import java.lang.invoke.MethodHandles;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
@@ -31,7 +33,7 @@ import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
  * @author qpsdemo
  */
 public class HelloWorld extends AbstractTest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TagManagerTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Test()
     @MethodOwner(owner = "qpsdemo")
