@@ -631,7 +631,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             // generate presign url explicitly to register link as run artifact
             long hours = 72L*1000*60*60; // generate presigned url for nearest 3 days
             String presignedAppUrl = AmazonS3Manager.getInstance().generatePreSignUrl(bucketName, key, hours).toString();
-            LOGGER.debug("preSigned URL: " + presignedAppUrl);
+            LOGGER.info("preSigned URL: " + presignedAppUrl);
             Artifact.attachReferenceToTestRun("app", presignedAppUrl);
 
             if (Configuration.getBoolean(Parameter.S3_USE_PRESIGN_URL)) {
