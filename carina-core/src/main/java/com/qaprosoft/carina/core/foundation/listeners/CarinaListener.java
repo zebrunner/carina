@@ -93,6 +93,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.Capabiliti
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.AutoScreenshotRule;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
+import com.zebrunner.agent.core.registrar.Artifact;
 import com.zebrunner.agent.core.registrar.CurrentTest;
 import com.zebrunner.agent.core.registrar.Label;
 import com.zebrunner.agent.core.registrar.label.CompositeLabelResolver;
@@ -626,12 +627,15 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 }
 
             }
+            
+            // generate presign url explicitly to register link as run artifact
+            long hours = 72L*1000*60*60; // generate presigned url for nearest 3 days
+            String presignedAppUrl = AmazonS3Manager.getInstance().generatePreSignUrl(bucketName, key, hours).toString();
+            LOGGER.debug("preSigned URL: " + presignedAppUrl);
+            Artifact.attachReferenceToTestRun("app", presignedAppUrl);
 
             if (Configuration.getBoolean(Parameter.S3_USE_PRESIGN_URL)) {
-                // generate presigned url for nearest 8 hours
-                long hours = 8L*1000*60*60;
-                String presignedAppUrl = AmazonS3Manager.getInstance().generatePreSignUrl(bucketName, key, hours).toString();
-                LOGGER.debug("preSigned URL: " + presignedAppUrl);
+                // update app path using presign url only if S3_USE_PRESIGN_URL=true
                 Configuration.setMobileApp(presignedAppUrl);
             } else {
                 // download artifact into the local storage
