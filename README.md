@@ -19,9 +19,9 @@ Carina is a Java-based test automation framework that unites all testing layers:
 [<b>Try it out for free.</b>](https://zebrunner.com)
 
 ## Documentation and free support
-* [User manual](http://qaprosoft.github.io/carina)
-* [Demo project](https://github.com/qaprosoft/carina-demo)
-* [Telegram channel](https://t.me/qps_carina)
+* [User Manual](http://qaprosoft.github.io/carina)
+* [Demo Project](https://github.com/qaprosoft/carina-demo)
+* [Telegram Channel](https://t.me/qps_carina)
 
 ## Code formatter
 We propose to use our configured [**Java code formatter for Eclipse**](https://github.com/qaprosoft/carina/blob/master/carina_formatter.xml). To use same formatter in IntelliJ IDEA you should install and configure [**Eclipse Code Formatter**](https://plugins.jetbrains.com/plugin/6546-eclipse-code-formatter).
