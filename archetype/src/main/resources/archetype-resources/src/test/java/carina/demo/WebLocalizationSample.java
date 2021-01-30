@@ -22,7 +22,7 @@ package ${package}.carina.demo;
 import com.qaprosoft.carina.core.foundation.AbstractTest;
 import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
-import com.qaprosoft.carina.demo.gui.pages.localizationSample.WikipediaHomePage;
+import ${package}.carina.demo.gui.pages.localizationSample.WikipediaHomePage;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
