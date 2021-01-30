@@ -118,7 +118,6 @@ public class AppCenterManager {
             try {
                 LOGGER.debug("Beginning Transfer of AppCenter Build");
                 URL downloadLink = new URL(buildToDownload);
-                R.CONFIG.put(Parameter.APP_PRESIGN_URL.getKey(), downloadLink.toString()); //register app presign url to register in test run later
                 int retryCount = 0;
                 boolean retry = true;
                 while (retry && retryCount <= 5) {
@@ -245,6 +244,7 @@ public class AppCenterManager {
                                 String.format(
                                         "Fetching Build ID (%s) Version: %s (%s)", latestBuildNumber, versionShort, versionLong));
                         String buildUrl = appBuild.get("download_url").asText();
+                        R.CONFIG.put(Parameter.APP_PRESIGN_URL.getKey(), buildUrl); //register app presign url to register in test run later
                         LOGGER.info("Download URL For Build: " + buildUrl);
 
                         return buildUrl;
