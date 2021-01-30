@@ -47,6 +47,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.qaprosoft.appcenter.http.resttemplate.RestTemplateBuilder;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.R;
 
 /**
  * Created by boyle on 8/16/17.
@@ -117,6 +118,7 @@ public class AppCenterManager {
             try {
                 LOGGER.debug("Beginning Transfer of AppCenter Build");
                 URL downloadLink = new URL(buildToDownload);
+                R.CONFIG.put(Parameter.APP_PRESIGN_URL.getKey(), downloadLink.toString()); //register app presign url to register in test run later
                 int retryCount = 0;
                 boolean retry = true;
                 while (retry && retryCount <= 5) {

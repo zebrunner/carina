@@ -114,7 +114,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     protected static final String XML_SUITE_NAME = " (%s)";
     
     protected static boolean automaticDriversCleanup = true;
-
+    
     static {
         try {
             // Add shutdown hook
@@ -201,6 +201,13 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
         setThreadCount(suite);
         onHealthCheck(suite);
+        
+        //register app link artifact if available...
+        String appUrl = Configuration.get(Parameter.APP_PRESIGN_URL);
+        if (!appUrl.isEmpty()) {
+            LOGGER.debug("app url: " + appUrl);
+            Artifact.attachReferenceToTestRun("app", appUrl);
+        }
         
         LOGGER.info("CARINA_CORE_VERSION: " + getCarinaVersion());
     }
@@ -540,7 +547,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     }
 
     private static void updateAppPath() {
-
         try {
             if (!Configuration.get(Parameter.ACCESS_KEY_ID).isEmpty()) {
                 updateS3AppPath();
@@ -556,7 +562,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         } catch (Exception e) {
             LOGGER.error("AppCenter manager exception detected!", e);
         }
-
     }
 
     /**
@@ -631,8 +636,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             // generate presign url explicitly to register link as run artifact
             long hours = 72L*1000*60*60; // generate presigned url for nearest 3 days
             String presignedAppUrl = AmazonS3Manager.getInstance().generatePreSignUrl(bucketName, key, hours).toString();
-            LOGGER.info("preSigned URL: " + presignedAppUrl);
-            Artifact.attachReferenceToTestRun("app", presignedAppUrl);
+            R.CONFIG.put(Parameter.APP_PRESIGN_URL.getKey(), presignedAppUrl);
 
             if (Configuration.getBoolean(Parameter.S3_USE_PRESIGN_URL)) {
                 // update app path using presign url only if S3_USE_PRESIGN_URL=true

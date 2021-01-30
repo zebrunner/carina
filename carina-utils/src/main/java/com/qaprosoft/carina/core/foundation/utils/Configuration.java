@@ -182,6 +182,8 @@ public class Configuration {
         ELEMENT_LOADING_STRATEGY("element_loading_strategy"),
         
         PAGE_OPENING_STRATEGY("page_opening_strategy"),
+
+        APP_PRESIGN_URL("app_presign_url"),
         
         // Amazon
         S3_BUCKET_NAME("s3_bucket_name"),
