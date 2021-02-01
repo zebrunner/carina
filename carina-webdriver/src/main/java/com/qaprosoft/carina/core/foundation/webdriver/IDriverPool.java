@@ -125,6 +125,7 @@ public interface IDriverPool {
         if (currentDrivers.containsKey(name)) {
             CarinaDriver cdrv = currentDrivers.get(name);
             drv = cdrv.getDriver();
+            registerDriverSession((RemoteWebDriver) ((EventFiringWebDriver) drv).getWrappedDriver());
             if (Phase.BEFORE_SUITE.equals(cdrv.getPhase())) {
                 POOL_LOGGER.info("Before suite registered driver will be returned.");
             } else {
@@ -290,12 +291,12 @@ public interface IDriverPool {
             if (drv instanceof EventFiringWebDriver) {
                 drv = ((EventFiringWebDriver) drv).getWrappedDriver();
             }
+            SessionId sessionId = ((RemoteWebDriver) drv).getSessionId();
 
             // removed by default logs generator in 7.0 after making independent logs/video upload from device to s3 compatible storage
             // https://github.com/qaprosoft/carina/issues/1174
             if (R.CONFIG.getBoolean(SpecialKeywords.ENABLE_LOG) && Configuration.getBoolean(Parameter.DRIVER_RECORDER)) {
                 try {
-                    SessionId sessionId = ((RemoteWebDriver) drv).getSessionId();
                     for (String logType : getAvailableDriverLogTypes(carinaDriver.getDriver())) {
                         if ("bugreport".equals(logType) || "performance".equals(logType)) {
                             // bugreport -  there is no sense to upload as it is too slow (~1 min) and doesn't return valuable info
@@ -450,8 +451,7 @@ public interface IDriverPool {
                 
                 drv = DriverFactory.create(name, capabilities, seleniumHost);
 
-                String testName = TestNamingService.getTestName();
-                sessionsMap.put(((RemoteWebDriver) ((EventFiringWebDriver) drv).getWrappedDriver()).getSessionId(), testName);
+                registerDriverSession((RemoteWebDriver) ((EventFiringWebDriver) drv).getWrappedDriver());
 
                 if (device.isNull()) {
                     // During driver creation we choose device and assign it to
@@ -506,6 +506,24 @@ public interface IDriverPool {
     }
 
     /**
+     * Associates driver session id with test name and stores it in thread-safe map
+     * 
+     * @param drv
+     *            RemoteWebDriver instance of driver for session ID retrieving
+     */
+    private void registerDriverSession(RemoteWebDriver drv) {
+        try {
+            @SuppressWarnings("deprecation")
+            String testName = TestNamingService.getTestName();
+            if (!sessionsMap.containsKey(drv.getSessionId())) {
+                sessionsMap.put(drv.getSessionId(), testName);
+            }
+        } catch (RuntimeException e) {
+            POOL_LOGGER.debug("Unable to retrieve test name for thread");
+        }
+    }
+
+    /**
      * Verify if driver is registered in the DriverPool
      * 
      * @param name
@@ -537,15 +555,26 @@ public interface IDriverPool {
         return currentDrivers;
     }
 
+    /**
+     * Returns list of registered driver sessions for test name retrieved from current thread
+     * 
+     * @return
+     *         List<String> list of registered sessions
+     */
     default List<String> getSessionsForCurrentTest() {
-        String testName = TestNamingService.getTestName();
         List<String> sessions = new ArrayList<>();
-        for (SessionId sessionId : sessionsMap.keySet()) {
-            if (testName.equals(sessionsMap.get(sessionId))) {
-                sessions.add(sessionId.toString());
+        try {
+            @SuppressWarnings("deprecation")
+            String testName = TestNamingService.getTestName();
+            for (SessionId sessionId : sessionsMap.keySet()) {
+                if (testName.equals(sessionsMap.get(sessionId))) {
+                    sessions.add(sessionId.toString());
+                }
             }
+            POOL_LOGGER.debug("Amount of sessions for current thread: " + sessions.size());
+        } catch (RuntimeException e) {
+            POOL_LOGGER.debug("Unable to retrieve test name for thread");
         }
-        POOL_LOGGER.debug("Amount of sessions for current thread: " + sessions.size());
         return sessions;
     }
 

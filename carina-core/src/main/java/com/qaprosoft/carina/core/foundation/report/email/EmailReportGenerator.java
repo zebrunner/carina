@@ -238,7 +238,7 @@ public class EmailReportGenerator {
         String videoHTML = "";
         List<String> videoLinks = testResultItem.getLinksToVideo();
         for (int i = 0; i < videoLinks.size(); i++) {
-            videoHTML = videoHTML.concat(String.format("<a target='_blank' href='%s' style='color: white; display: block'>%s</a>", videoLinks.get(i),
+            videoHTML = videoHTML.concat(String.format("<span> | </span><a target='_blank' href='%s' style='color: white'>%s</a>", videoLinks.get(i),
                     (videoLinks.size() > 1) ? "Video_" + (i + 1) : "Video"));
         }
         result = result.replace(VIDEO_URL_PLACEHOLDER, videoHTML);
@@ -344,6 +344,11 @@ public class EmailReportGenerator {
         return reasonText;
     }
 
+    /**
+     * Get HTML block for link to artifacts folder in local file system
+     * 
+     * @return generated HTML block
+     */
     private String getArtifactsLinkHTML() {
         String result = "";
 

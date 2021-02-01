@@ -398,6 +398,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             ReportContext.generateHtmlReport(emailContent);
 
             printExecutionSummary(EmailReportItemCollector.getTestResults());
+            ReportContext.setCustomTestDirName("run_summary");
 
             TestResultType suiteResult = EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
             switch (suiteResult) {
@@ -508,7 +509,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     }
 
     private void printExecutionSummary(List<TestResultItem> tris) {
-        Messager.INROMATION.info("**************** Test execution summary ****************");
+        Messager.INFORMATION.info("**************** Test execution summary ****************");
         int num = 1;
         for (TestResultItem tri : tris) {
             String failReason = tri.getFailReason();
