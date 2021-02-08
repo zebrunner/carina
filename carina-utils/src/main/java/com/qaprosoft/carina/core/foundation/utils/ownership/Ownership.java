@@ -49,7 +49,7 @@ public class Ownership implements MaintainerResolver {
         }
         
         // do a scan for single Methodowner annotation as well)
-        if (testMethod.isAnnotationPresent(MethodOwner.class)) {
+        if (testMethod != null && testMethod.isAnnotationPresent(MethodOwner.class)) {
             MethodOwner methodAnnotation = testMethod.getAnnotation(MethodOwner.class);
             this.owner = methodAnnotation.owner();
         }
