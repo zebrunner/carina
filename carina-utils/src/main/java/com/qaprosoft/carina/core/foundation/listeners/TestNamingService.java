@@ -149,13 +149,12 @@ public class TestNamingService {
         name = name.replace(SpecialKeywords.METHOD_THREAD_POOL_SIZE, String.valueOf(m.getThreadPoolSize()));
 
         if (m.getDescription() != null) {
-            LOGGER.debug("Test method : " + m.getDescription());
+            LOGGER.debug("Test method description: " + m.getDescription());
             name = name.replace(SpecialKeywords.METHOD_DESCRIPTION, m.getDescription());
         } else {
             name = name.replace(SpecialKeywords.METHOD_DESCRIPTION, "");
         }
         
-        LOGGER.debug("Final test method name: " + name);
         return name;
     }
     
