@@ -592,7 +592,7 @@ public class ReportContext {
         if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
             link = String.format("%s/%d/artifacts", Configuration.get(Parameter.REPORT_URL), rootID);
         } else {
-            link = String.format("file://%s/%d/artifacts", baseDirectory, rootID);
+            link = String.format("file://%s/artifacts", getBaseDirAbsolutePath());
         }
 
         return link;
@@ -620,11 +620,34 @@ public class ReportContext {
         if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
             link = String.format("%s/%d/%s/report.html", Configuration.get(Parameter.REPORT_URL), rootID, test);
         } else {
-            link = String.format("./%d/%s/report.html", rootID, test);
+            link = String.format("file://%s/%s/report.html", getBaseDirAbsolutePath(), test);
         }
 
         return link;
 
+    }
+
+    /**
+     * Returns list of links to video in local file system for recorded driver sessions
+     * 
+     * @param sessionIds
+     *            List<String> session Ids to find video files for
+     * @return
+     *         List<String> list of generated links
+     */
+    public static List<String> getTestVideoLinks(List<String> sessionIds) {
+        List<String> links = new ArrayList<>();
+        for (String sessionId : sessionIds) {
+            String videoFileName = String.format(SpecialKeywords.DEFAULT_VIDEO_FILENAME, sessionId);
+            File videoFile = new File(ReportContext.getArtifactsFolder() + File.separator + videoFileName);
+            if (!videoFile.exists()) {
+                // no video file at all
+                continue;
+            }
+
+            links.add(getTestArtifactsLink() + File.separator + videoFileName);
+        }
+        return links;
     }
 
     /**
@@ -643,7 +666,7 @@ public class ReportContext {
         if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
             link = String.format("%s/%d/%s/test.log", Configuration.get(Parameter.REPORT_URL), rootID, test);
         } else {
-            link = String.format("./%d/%s/test.log", rootID, test);
+            link = String.format("file://%s/%s/test.log", getBaseDirAbsolutePath(), test);
         }
 
         return link;
@@ -661,7 +684,6 @@ public class ReportContext {
         String fileName = SpecialKeywords.CUCUMBER_REPORT_FILE_NAME;
 
         String link = "";
-        // String subfolder = "cucumber-html-reports";
         if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
             // remove report url and make link relative
             // link = String.format("./%d/report.html", rootID);
@@ -672,8 +694,7 @@ public class ReportContext {
             }
             link = String.format("%s/%d/%s/%s/%s", report_url, rootID, folder, subFolder, fileName);
         } else {
-            //TODO: link might be broken on CI like https://github.com/qaprosoft/carina/issues/1001
-            link = String.format("file://%s/%s/%s", folder, subFolder, fileName);
+            link = String.format("file://%s/%s/%s/%s", getBaseDirAbsolutePath(), folder, subFolder, fileName);
         }
 
         return link;
@@ -815,6 +836,13 @@ public class ReportContext {
         if (screenSteps.containsKey(screenId))
             comment = screenSteps.get(screenId);
         return comment;
+    }
+
+    private static String getBaseDirAbsolutePath() {
+        if (baseDirectory != null) {
+            return baseDirectory.getAbsolutePath();
+        }
+        return null;
     }
 
 }

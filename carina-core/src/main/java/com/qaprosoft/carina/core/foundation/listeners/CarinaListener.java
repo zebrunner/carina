@@ -276,8 +276,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     @Override
     public void onTestSuccess(ITestResult result) {
         LOGGER.debug("CarinaListener->onTestSuccess");
-        super.onTestSuccess(result);
         onTestFinish(result);
+        super.onTestSuccess(result);
     }
 
     @Override
@@ -285,8 +285,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         LOGGER.debug("CarinaListener->onTestFailure");
         String errorMessage = getFailureReason(result);
         takeScreenshot(result, "TEST FAILED - " + errorMessage);
+        onTestFinish(result);
         super.onTestFailure(result);
-        onTestFinish(result);    
     }
 
     @Override
@@ -294,8 +294,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         LOGGER.debug("CarinaListener->onTestSkipped");
         String errorMessage = getFailureReason(result);
         takeScreenshot(result, "TEST FAILED - " + errorMessage);
+        onTestFinish(result);
         super.onTestSkipped(result);
-        onTestFinish(result);  
     }
 
     private boolean hasDependencies(ITestResult result) {
@@ -406,6 +406,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             ReportContext.generateHtmlReport(emailContent);
 
             printExecutionSummary(EmailReportItemCollector.getTestResults());
+            ReportContext.setCustomTestDirName("run_summary");
 
             TestResultType suiteResult = EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
             switch (suiteResult) {
@@ -516,7 +517,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     }
 
     private void printExecutionSummary(List<TestResultItem> tris) {
-        Messager.INROMATION.info("**************** Test execution summary ****************");
+        Messager.INFORMATION.info("**************** Test execution summary ****************");
         int num = 1;
         for (TestResultItem tri : tris) {
             String failReason = tri.getFailReason();

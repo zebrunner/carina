@@ -60,7 +60,7 @@ public enum Messager implements IMessager {
 
     VALIDATION_FAIL("FAIL: '%s' !"),
 
-    INROMATION("INFO: '%s'."),
+    INFORMATION("INFO: '%s'."),
 
     ERROR("ERROR: '%s'!"),
 
