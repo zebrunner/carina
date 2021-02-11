@@ -631,7 +631,7 @@ public class ReportContext {
      * Returns list of links to video in local file system for recorded driver sessions
      * 
      * @param sessionIds
-     *            List session Ids to find video files for
+     *            String list of session Ids to find video files for
      * @return
      *         String list of generated links
      */
