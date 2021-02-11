@@ -564,7 +564,7 @@ public interface IDriverPool {
      * Returns list of registered driver sessions for test name retrieved from current thread
      * 
      * @return
-     *         List<String> list of registered sessions
+     *         String list of registered sessions
      */
     default List<String> getSessionsForCurrentTest() {
         List<String> sessions = new ArrayList<>();
