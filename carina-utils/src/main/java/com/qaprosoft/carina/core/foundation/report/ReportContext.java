@@ -631,9 +631,9 @@ public class ReportContext {
      * Returns list of links to video in local file system for recorded driver sessions
      * 
      * @param sessionIds
-     *            List<String> session Ids to find video files for
+     *            String list of session Ids to find video files for
      * @return
-     *         List<String> list of generated links
+     *         String list of generated links
      */
     public static List<String> getTestVideoLinks(List<String> sessionIds) {
         List<String> links = new ArrayList<>();
