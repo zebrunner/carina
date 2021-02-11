@@ -125,7 +125,7 @@ public interface IDriverPool {
         if (currentDrivers.containsKey(name)) {
             CarinaDriver cdrv = currentDrivers.get(name);
             drv = cdrv.getDriver();
-            registerDriverSession((RemoteWebDriver) ((EventFiringWebDriver) drv).getWrappedDriver());
+            registerDriverSession(drv);
             if (Phase.BEFORE_SUITE.equals(cdrv.getPhase())) {
                 POOL_LOGGER.info("Before suite registered driver will be returned.");
             } else {
@@ -451,7 +451,7 @@ public interface IDriverPool {
                 
                 drv = DriverFactory.create(name, capabilities, seleniumHost);
 
-                registerDriverSession((RemoteWebDriver) ((EventFiringWebDriver) drv).getWrappedDriver());
+                registerDriverSession(drv);
 
                 if (device.isNull()) {
                     // During driver creation we choose device and assign it to
@@ -511,15 +511,20 @@ public interface IDriverPool {
      * @param drv
      *            RemoteWebDriver instance of driver for session ID retrieving
      */
-    private void registerDriverSession(RemoteWebDriver drv) {
+    private void registerDriverSession(WebDriver drv) {
         try {
+            if (drv instanceof EventFiringWebDriver) {
+                drv = ((EventFiringWebDriver) drv).getWrappedDriver();
+            }
+            SessionId sessionId = ((RemoteWebDriver) drv).getSessionId();
+
             @SuppressWarnings("deprecation")
             String testName = TestNamingService.getTestName();
-            if (!sessionsMap.containsKey(drv.getSessionId())) {
-                sessionsMap.put(drv.getSessionId(), testName);
+            if (!sessionsMap.containsKey(sessionId)) {
+                sessionsMap.put(sessionId, testName);
             }
-        } catch (RuntimeException e) {
-            POOL_LOGGER.debug("Unable to retrieve test name for thread");
+        } catch (Exception e) {
+            POOL_LOGGER.debug("Exception during registering test session", e);
         }
     }
 
