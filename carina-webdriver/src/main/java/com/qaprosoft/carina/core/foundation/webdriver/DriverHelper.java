@@ -371,21 +371,27 @@ public class DriverHelper {
      * @param url
      *            to open.
      */
-	public void openURL(String url) {
-		String decryptedURL = cryptoTool.decryptByPattern(url, CRYPTO_PATTERN);
+    public void openURL(String url) {
+        String decryptedURL = cryptoTool.decryptByPattern(url, CRYPTO_PATTERN);
 
-		decryptedURL = getEnvArgURL(decryptedURL);
+        decryptedURL = getEnvArgURL(decryptedURL);
 
-		WebDriver drv = getDriver();
+        WebDriver drv = getDriver();
 
-		Messager.OPENING_URL.info(url);
+        Messager.OPENING_URL.info(url);
 
-		DriverListener.setMessages(Messager.OPEN_URL.getMessage(url), Messager.NOT_OPEN_URL.getMessage(url));
-        
+        DriverListener.setMessages(Messager.OPEN_URL.getMessage(url), Messager.NOT_OPEN_URL.getMessage(url));
+
         try {
+            // increase default implicit timeout for opening url to handle 
+            // "org.openqa.selenium.json.JsonException: Expected to read a START_MAP but instead have: END. Last 0 characters read"
+            drv.manage().timeouts().implicitlyWait(EXPLICIT_TIMEOUT, TimeUnit.SECONDS);
             drv.get(decryptedURL);
         } catch (UnhandledAlertException e) {
             drv.switchTo().alert().accept();
+        } finally {
+            // return default implicit timeout to 0
+            drv.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
         }
     }
 
