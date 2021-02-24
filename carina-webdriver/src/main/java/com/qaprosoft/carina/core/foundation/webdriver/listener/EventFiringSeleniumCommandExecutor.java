@@ -58,6 +58,16 @@ public class EventFiringSeleniumCommandExecutor extends HttpCommandExecutor {
             LOGGER.debug("Repeit the command due to the JsonException: " + command.getName(), e);
             CommonUtils.pause(0.1);
             response = super.execute(command);
+        } catch (Exception e) {
+            if (e.getMessage() != null && e.getMessage().contains("An unknown error has occurred")) {
+                // to handle potential grid/hub issue: 'An unknown error has occurred'
+                LOGGER.debug("Repeit the command due to the 'An unknown error has occurred': " + command.getName(), e);
+                CommonUtils.pause(0.1);
+                response = super.execute(command);
+            } else {
+                throw e;
+            }
+            
         }
 
         for (IDriverCommandListener listener : listeners) {
