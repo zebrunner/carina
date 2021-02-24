@@ -16,6 +16,7 @@
 package com.qaprosoft.carina.core.foundation.webdriver;
 
 import java.lang.invoke.MethodHandles;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -42,6 +43,7 @@ import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
@@ -372,9 +374,7 @@ public class DriverHelper {
      *            to open.
      */
     public void openURL(String url) {
-        String decryptedURL = cryptoTool.decryptByPattern(url, CRYPTO_PATTERN);
-
-        decryptedURL = getEnvArgURL(decryptedURL);
+        final String decryptedURL = getEnvArgURL(cryptoTool.decryptByPattern(url, CRYPTO_PATTERN));
 
         WebDriver drv = getDriver();
 
@@ -383,16 +383,25 @@ public class DriverHelper {
         DriverListener.setMessages(Messager.OPEN_URL.getMessage(url), Messager.NOT_OPEN_URL.getMessage(url));
 
         try {
-            // increase default implicit timeout for opening url to handle 
-            // "org.openqa.selenium.json.JsonException: Expected to read a START_MAP but instead have: END. Last 0 characters read"
-            drv.manage().timeouts().implicitlyWait(EXPLICIT_TIMEOUT, TimeUnit.SECONDS);
-            drv.get(decryptedURL);
-        } catch (UnhandledAlertException e) {
-            drv.switchTo().alert().accept();
-        } finally {
-            // return default implicit timeout to 0
-            drv.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+            Wait<WebDriver> wait = new FluentWait<WebDriver>(drv)
+                    .pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)))
+                    .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
+                    .ignoring(WebDriverException.class);
+
+            wait.until(new Function<WebDriver, Boolean>() {
+                public Boolean apply(WebDriver driver) {
+                    try {
+                        drv.get(decryptedURL);
+                    } catch (UnhandledAlertException e) {
+                        drv.switchTo().alert().accept();
+                    }
+                    return true;
+                }
+            });
+        } catch (Exception e) {
+            LOGGER.error("Unable to open url!", e);
         }
+
     }
 
     /**
