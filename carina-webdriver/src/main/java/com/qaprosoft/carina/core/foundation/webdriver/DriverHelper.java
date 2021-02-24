@@ -368,7 +368,7 @@ public class DriverHelper {
     }
 
     /**
-     * Opens full or relative URL.
+     * Open URL.
      * 
      * @param url
      *            to open.
@@ -382,27 +382,45 @@ public class DriverHelper {
 
         DriverListener.setMessages(Messager.OPEN_URL.getMessage(url), Messager.NOT_OPEN_URL.getMessage(url));
 
-        try {
-            Wait<WebDriver> wait = new FluentWait<WebDriver>(drv)
-                    .pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)))
-                    .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
-                    .ignoring(WebDriverException.class);
+        Wait<WebDriver> wait = new FluentWait<WebDriver>(drv)
+                .pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)))
+                .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
+                .ignoring(WebDriverException.class);
 
-            wait.until(new Function<WebDriver, Boolean>() {
-                public Boolean apply(WebDriver driver) {
-                    try {
-                        drv.get(decryptedURL);
-                    } catch (UnhandledAlertException e) {
-                        drv.switchTo().alert().accept();
-                    }
-                    return true;
+        wait.until(new Function<WebDriver, Boolean>() {
+            public Boolean apply(WebDriver driver) {
+                try {
+                    drv.get(decryptedURL);
+                } catch (UnhandledAlertException e) {
+                    drv.switchTo().alert().accept();
                 }
-            });
-        } catch (Exception e) {
-            LOGGER.error("Unable to open url!", e);
-        }
-
+                return true;
+            }
+        });
     }
+    
+    /*
+     * Get and return the source of the last loaded page.
+     * @return String
+     */
+    public String getPageSource() {
+        WebDriver drv = getDriver();
+
+        Messager.GET_PAGE_SOURCE.info();
+
+        DriverListener.setMessages(Messager.GET_PAGE_SOURCE.getMessage(), Messager.FAIL_GET_PAGE_SOURCE.getMessage());
+
+        Wait<WebDriver> wait = new FluentWait<WebDriver>(drv)
+                .pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)))
+                .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
+                .ignoring(WebDriverException.class);
+
+        return wait.until(new Function<WebDriver, String>() {
+            public String apply(WebDriver driver) {
+                return drv.getPageSource();
+            }
+        });
+    }    
 
     /**
      * Checks that current URL is as expected.
