@@ -22,9 +22,14 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Optional;
 
-import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.*;
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.NoSuchSessionException;
+import org.openqa.selenium.Point;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -33,6 +38,7 @@ import org.openqa.selenium.support.ui.Wait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Function;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -44,6 +50,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.deskt
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.OperaCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.SafariCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
 
 public class DesktopFactory extends AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -67,7 +74,8 @@ public class DesktopFactory extends AbstractFactory {
         }
 
         try {
-            driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);
+            EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(new URL(seleniumHost));
+            driver = new RemoteWebDriver(ce, capabilities);
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed selenium URL!", e);
         }
