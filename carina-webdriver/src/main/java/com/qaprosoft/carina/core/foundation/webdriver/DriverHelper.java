@@ -383,7 +383,7 @@ public class DriverHelper {
         DriverListener.setMessages(Messager.OPEN_URL.getMessage(url), Messager.NOT_OPEN_URL.getMessage(url));
 
         Wait<WebDriver> wait = new FluentWait<WebDriver>(drv)
-                .pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL) * 10)) // there is no sense to refresh url address too often
+                .pollingEvery(Duration.ofMillis(10000)) // there is no sense to refresh url address too often
                 .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
                 .ignoring(WebDriverException.class);
 
@@ -411,7 +411,7 @@ public class DriverHelper {
         DriverListener.setMessages(Messager.GET_PAGE_SOURCE.getMessage(), Messager.FAIL_GET_PAGE_SOURCE.getMessage());
 
         Wait<WebDriver> wait = new FluentWait<WebDriver>(drv)
-                .pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL) * 10)) // there is no sense to refresh url address too often
+                .pollingEvery(Duration.ofMillis(10000)) // there is no sense to refresh url address too often
                 .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
                 .ignoring(WebDriverException.class);
 
