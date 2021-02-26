@@ -54,6 +54,10 @@ public enum Messager implements IMessager {
 
     OPENING_URL("INFO: url '%s' is being opened..."),
     
+    GET_PAGE_SOURCE("INFO: getting page source"),
+    
+    FAIL_GET_PAGE_SOURCE("FAIL: getting page source"),
+    
     OPEN_URL("INFO: url '%s' is opened."),
     
     NOT_OPEN_URL("FAIL: url '%s' is not opened!"),

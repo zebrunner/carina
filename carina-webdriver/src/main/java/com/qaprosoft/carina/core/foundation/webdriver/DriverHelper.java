@@ -16,6 +16,7 @@
 package com.qaprosoft.carina.core.foundation.webdriver;
 
 import java.lang.invoke.MethodHandles;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -42,6 +43,7 @@ import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
@@ -366,28 +368,59 @@ public class DriverHelper {
     }
 
     /**
-     * Opens full or relative URL.
+     * Open URL.
      * 
      * @param url
      *            to open.
      */
-	public void openURL(String url) {
-		String decryptedURL = cryptoTool.decryptByPattern(url, CRYPTO_PATTERN);
+    public void openURL(String url) {
+        final String decryptedURL = getEnvArgURL(cryptoTool.decryptByPattern(url, CRYPTO_PATTERN));
 
-		decryptedURL = getEnvArgURL(decryptedURL);
+        WebDriver drv = getDriver();
 
-		WebDriver drv = getDriver();
+        Messager.OPENING_URL.info(url);
 
-		Messager.OPENING_URL.info(url);
+        DriverListener.setMessages(Messager.OPEN_URL.getMessage(url), Messager.NOT_OPEN_URL.getMessage(url));
 
-		DriverListener.setMessages(Messager.OPEN_URL.getMessage(url), Messager.NOT_OPEN_URL.getMessage(url));
-        
-        try {
-            drv.get(decryptedURL);
-        } catch (UnhandledAlertException e) {
-            drv.switchTo().alert().accept();
-        }
+        Wait<WebDriver> wait = new FluentWait<WebDriver>(drv)
+                .pollingEvery(Duration.ofMillis(10000)) // there is no sense to refresh url address too often
+                .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
+                .ignoring(WebDriverException.class);
+
+        wait.until(new Function<WebDriver, Boolean>() {
+            public Boolean apply(WebDriver driver) {
+                try {
+                    drv.get(decryptedURL);
+                } catch (UnhandledAlertException e) {
+                    drv.switchTo().alert().accept();
+                }
+                return true;
+            }
+        });
     }
+    
+    /*
+     * Get and return the source of the last loaded page.
+     * @return String
+     */
+    public String getPageSource() {
+        WebDriver drv = getDriver();
+
+        Messager.GET_PAGE_SOURCE.info();
+
+        DriverListener.setMessages(Messager.GET_PAGE_SOURCE.getMessage(), Messager.FAIL_GET_PAGE_SOURCE.getMessage());
+
+        Wait<WebDriver> wait = new FluentWait<WebDriver>(drv)
+                .pollingEvery(Duration.ofMillis(10000)) // there is no sense to refresh url address too often
+                .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
+                .ignoring(WebDriverException.class);
+
+        return wait.until(new Function<WebDriver, String>() {
+            public String apply(WebDriver driver) {
+                return drv.getPageSource();
+            }
+        });
+    }    
 
     /**
      * Checks that current URL is as expected.

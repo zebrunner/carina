@@ -349,7 +349,7 @@ public interface IDriverPool {
             } catch (InterruptedException | java.util.concurrent.TimeoutException e) {
                 POOL_LOGGER.error("Unable to quit driver for " + wait + "sec!", e);
             } catch (ExecutionException e) {
-                POOL_LOGGER.warn("ExecutionException error on driver quit detected!");
+                POOL_LOGGER.warn("ExecutionException error on driver quit detected! Enable DEBUG log level for details.");
                 POOL_LOGGER.debug(e.getMessage(), e);
             } catch (Exception e) {
                 POOL_LOGGER.warn("Undefined error on driver quit detected!");
