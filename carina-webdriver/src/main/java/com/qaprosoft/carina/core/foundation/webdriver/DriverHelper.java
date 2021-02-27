@@ -41,6 +41,7 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.json.JsonException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
@@ -48,6 +49,7 @@ import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
@@ -374,29 +376,37 @@ public class DriverHelper {
      *            to open.
      */
     public void openURL(String url) {
+        openURL(url, Configuration.getInt(Parameter.EXPLICIT_TIMEOUT));
+    }
+    
+    /**
+     * Open URL.
+     * 
+     * @param url
+     *            to open.
+     * @param timeout
+     */
+    public void openURL(String url, long timeout) {
         final String decryptedURL = getEnvArgURL(cryptoTool.decryptByPattern(url, CRYPTO_PATTERN));
 
         WebDriver drv = getDriver();
 
-        Messager.OPENING_URL.info(url);
-
         DriverListener.setMessages(Messager.OPEN_URL.getMessage(url), Messager.NOT_OPEN_URL.getMessage(url));
-
-        Wait<WebDriver> wait = new FluentWait<WebDriver>(drv)
-                .pollingEvery(Duration.ofMillis(10000)) // there is no sense to refresh url address too often
-                .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
-                .ignoring(WebDriverException.class);
-
-        wait.until(new Function<WebDriver, Boolean>() {
-            public Boolean apply(WebDriver driver) {
-                try {
-                    drv.get(decryptedURL);
-                } catch (UnhandledAlertException e) {
-                    drv.switchTo().alert().accept();
-                }
-                return true;
+        
+        // [VD] there is no sense to use fluent wait here as selenium just don't return something until page is ready!
+        try {
+            Messager.OPENING_URL.info(url);
+            drv.get(decryptedURL);
+        } catch (UnhandledAlertException e) {
+            drv.switchTo().alert().accept();
+        } catch (JsonException e) {
+            if (e.getMessage() != null && e.getMessage().contains("Expected to read a START_MAP but instead have: END. Last 0 characters read")) {
+                // TODO: implement time calculation to show that page was not opened due to the server hub timeout!
+                Assert.fail("Selenium hub couldn't open and cancel request by timeout!");
+            } else {
+                throw e;
             }
-        });
+        }
     }
     
     /*
