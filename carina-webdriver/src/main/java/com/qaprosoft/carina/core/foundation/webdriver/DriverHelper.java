@@ -49,7 +49,6 @@ import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
@@ -402,10 +401,10 @@ public class DriverHelper {
         } catch (JsonException e) {
             if (e.getMessage() != null && e.getMessage().contains("Expected to read a START_MAP but instead have: END. Last 0 characters read")) {
                 // TODO: implement time calculation to show that page was not opened due to the server hub timeout!
-                Assert.fail("Selenium hub couldn't open and cancel request by timeout!");
-            } else {
-                throw e;
+                LOGGER.error("Selenium hub couldn't open and cancel request by timeout!");
             }
+            //re-throw original exception as we already put to the log important info
+            throw e;
         }
     }
     
