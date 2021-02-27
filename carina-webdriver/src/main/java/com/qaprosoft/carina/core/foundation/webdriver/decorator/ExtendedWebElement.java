@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
@@ -1405,7 +1406,15 @@ public class ExtendedWebElement {
 					DriverListener.setMessages(Messager.ELEMENT_CLICKED.getMessage(getName()),
 							Messager.ELEMENT_NOT_CLICKED.getMessage(getNameWithLocator()));
 
-					element.click();
+					try {
+					    element.click();
+					} catch (ElementNotInteractableException e) {
+                        // not visible so we can't interact using selenium or actions
+                        LOGGER.warn("Trying to do click by JavascriptExecutor because element '" + getNameWithLocator()
+                                + "' is not visible...");
+                        JavascriptExecutor executor = (JavascriptExecutor) getDriver();
+                        executor.executeScript("arguments[0].click();", element);
+					}
                     /*
                      * if (element.isDisplayed()) {
                      * element.click();
