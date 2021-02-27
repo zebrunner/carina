@@ -381,7 +381,8 @@ public class ExtendedWebElement {
                 element = getDriver().findElement(by);
             }
         } catch (WebDriverException e) {
-            LOGGER.debug("catched WebDriverException: ", e);
+            LOGGER.debug("refindElement catched WebDriverException: ", e);
+            LOGGER.warn(e.getMessage());
             // that's should fix use case when we switch between tabs and corrupt searchContext (mostly for Appium for mobile)
             element = getDriver().findElement(by);
         }
@@ -1372,7 +1373,8 @@ public class ExtendedWebElement {
 			output = overrideAction(actionName, inputArgs);
 		} catch (WebDriverException e) {
 			// TODO: move to error for snapshot build to detect different negative use-cse and move to debug for released versions!
-			LOGGER.debug("catched WebDriverException: ", e);
+			LOGGER.debug("doAction catched WebDriverException: ", e);
+			LOGGER.warn(e.getMessage());
 			// try to find again using driver
 			try {
 				element = refindElement();
