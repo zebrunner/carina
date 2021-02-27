@@ -400,8 +400,7 @@ public class DriverHelper {
             drv.switchTo().alert().accept();
         } catch (JsonException e) {
             if (e.getMessage() != null && e.getMessage().contains("Expected to read a START_MAP but instead have: END. Last 0 characters read")) {
-                // TODO: implement time calculation to show that page was not opened due to the server hub timeout!
-                LOGGER.error("Selenium hub couldn't open and cancel request by timeout!");
+                LOGGER.error("Selenium Hub couldn't handle request due to overloading or timeout!");
             }
             //re-throw original exception as we already put to the log important info
             throw e;

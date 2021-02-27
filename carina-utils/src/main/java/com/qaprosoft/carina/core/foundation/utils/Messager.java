@@ -52,11 +52,11 @@ public enum Messager implements IMessager {
 
     TEST_RESULT("RESULT #%s: TEST [%s] %s [%s]"),
 
-    OPENING_URL("INFO: url '%s' is being opened..."),
-    
     GET_PAGE_SOURCE("INFO: getting page source"),
     
     FAIL_GET_PAGE_SOURCE("FAIL: getting page source"),
+    
+    OPENING_URL("INFO: opening url '%s'"),
     
     OPEN_URL("INFO: url '%s' is opened."),
     
