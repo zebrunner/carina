@@ -80,11 +80,6 @@ public class JiraTest {
         Assert.assertEquals(Jira.jiraTickets.get().size(), 6);
         Assert.assertTrue(Jira.jiraTickets.get().contains(ticket50Char_verify));
     }
-    
-    @Test(description = "JIRA# " + customTicket6)
-    public void testJiraTicketFromTestDescriptionAnnotation() {
-        // do nothing. verification is in AfterMethod
-    }
 
     @AfterMethod
     public void testGetJiraTickets(ITestResult result) {
@@ -95,13 +90,6 @@ public class JiraTest {
             Assert.assertTrue(tickets.contains(customTicket2));
 
             Assert.assertTrue(Jira.isRetryDisabled(result));
-        }
-
-        if (result.getMethod().getMethodName().equals("testJiraTicketFromTestDescriptionAnnotation")) {
-            List<String> tickets = Jira.getTickets(result);
-            // #938 parse all spaces and commas before registration!
-            Assert.assertTrue(tickets.contains(customTicket6_verify));
-
         }
 
     }

@@ -75,18 +75,6 @@ public class Jira {
                     parseTicket(
                             result.getTestContext().getCurrentXmlTest().getParameter(SpecialKeywords.JIRA_TICKET)));
         }
-        if (result.getMethod().getDescription() != null && result.getMethod().getDescription().contains(SpecialKeywords.JIRA_TICKET)) {
-            tickets.clear();
-            String description = result.getMethod().getDescription();
-            
-            if (description.split("#").length > 1) {
-	            try {
-	                tickets.add(parseTicket(description.split("#")[1].trim()));
-	            } catch (Exception e) {
-	                LOG.error("Incorrect Jira-ticket format: " + description, e);
-	            }
-            }
-        }
 
         @SuppressWarnings("unchecked")
         Map<Object[], String> testnameJiraMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.JIRA_ARGS_MAP);
