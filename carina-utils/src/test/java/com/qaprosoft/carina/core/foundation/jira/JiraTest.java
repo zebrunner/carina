@@ -37,9 +37,6 @@ public class JiraTest {
     
     private static final String customTicket5 = "bug5 , with comma after space";
     private static final String customTicket5_verify = "bug5";
-
-    private static final String customTicket6 = "Ticket From Test Description";
-    private static final String customTicket6_verify = "Ticket";
     
     private static final String ticket50Char        = "1234567890123456789012345678901234567890123456";
     private static final String ticket50Char_verify = "123456789012345678901234567890123456789012345";
