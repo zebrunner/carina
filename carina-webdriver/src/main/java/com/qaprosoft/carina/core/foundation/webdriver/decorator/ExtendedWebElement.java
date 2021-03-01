@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
@@ -381,7 +382,7 @@ public class ExtendedWebElement {
                 element = getDriver().findElement(by);
             }
         } catch (WebDriverException e) {
-            LOGGER.debug("catched WebDriverException: ", e);
+            LOGGER.debug("refindElement catched WebDriverException: '" + e.getMessage() + "'", e);
             // that's should fix use case when we switch between tabs and corrupt searchContext (mostly for Appium for mobile)
             element = getDriver().findElement(by);
         }
@@ -1372,7 +1373,7 @@ public class ExtendedWebElement {
 			output = overrideAction(actionName, inputArgs);
 		} catch (WebDriverException e) {
 			// TODO: move to error for snapshot build to detect different negative use-cse and move to debug for released versions!
-			LOGGER.debug("catched WebDriverException: ", e);
+			LOGGER.debug("doAction catched WebDriverException: '" + e.getMessage() + "'", e);
 			// try to find again using driver
 			try {
 				element = refindElement();
@@ -1403,16 +1404,15 @@ public class ExtendedWebElement {
 					DriverListener.setMessages(Messager.ELEMENT_CLICKED.getMessage(getName()),
 							Messager.ELEMENT_NOT_CLICKED.getMessage(getNameWithLocator()));
 
-					if (element.isDisplayed()) {
-						element.click();
-					} else {
-						// not visible so we can't interact using selenium or
-						// actions
-						LOGGER.warn("Trying to do click by JavascriptExecutor because element '" + getNameWithLocator()
-								+ "' is not visible...");
-						JavascriptExecutor executor = (JavascriptExecutor) getDriver();
-						executor.executeScript("arguments[0].click();", element);
-					}
+                    try {
+                        element.click();
+                    } catch (ElementNotInteractableException e) { //TODO: investigate if more exceptions should be catched
+                        // not visible so we can't interact using selenium or actions
+                        LOGGER.warn("Trying to do click by JavascriptExecutor because element '" + getNameWithLocator()
+                                + "' is not visible...");
+                        JavascriptExecutor executor = (JavascriptExecutor) getDriver();
+                        executor.executeScript("arguments[0].click();", element);
+                    }
 				} catch (WebDriverException e) {
 					if (e != null && (e.getMessage().contains("Other element would receive the click:"))) {
 						LOGGER.warn("Trying to do click by Actions due to the: " + e.getMessage());

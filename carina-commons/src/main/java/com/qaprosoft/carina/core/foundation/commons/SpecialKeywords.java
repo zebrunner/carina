@@ -135,7 +135,6 @@ public class SpecialKeywords {
     public static final String CAPABILITIES = "capabilities";
     public static final String ENABLE_VIDEO = "capabilities.enableVideo";
     public static final String ENABLE_LOG = "capabilities.enableLog";
-    public static final String ENABLE_METADATA = "capabilities.enableMetadata";
     public static final String PLATFORM = "capabilities.platform";
     public static final String PLATFORM_NAME = "capabilities.platformName";
     public static final String PLATFORM_VERSION = "capabilities.platformVersion";
