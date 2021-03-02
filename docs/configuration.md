@@ -101,11 +101,6 @@ All the project configuration properties are located in a **_config.properties**
 		<td>Integer</td>
 	</tr>
 	<tr>
-		<td>jira_url</td>
-		<td>JIRA base URL for direct links with bugs description</td>
-		<td>https://jira.carina.com/browse/</td>
-	</tr>
-	<tr>
 		<td>env</td>
 		<td>Environment specific configuration. More about this [feature](#environment-specific-configuration)</td>
 		<td>STAG, PROD, DEMO</td>
@@ -174,11 +169,6 @@ All the project configuration properties are located in a **_config.properties**
 		<td>no_proxy</td>
 		<td>Excluded hostname(s) for communication via proxy. Available only when proxy_host and proxy_port are declared!</td>
 		<td>localhost.example.com</td>
-	</tr>
-		<tr>
-		<td>track_known_issues</td>
-		<td>Boolean parameter. If it is true and some Jira tickets are associated with the test, in case of failure Jira info will be added to the report</td>
-		<td>true,false</td>
 	</tr>
 	<tr>
 		<td>explicit_timeout</td>

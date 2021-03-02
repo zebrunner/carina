@@ -37,9 +37,7 @@ public abstract class BaseDataProvider {
 
     protected Map<String, String> testMethodOwnerArgsMap = Collections.synchronizedMap(new HashMap<>());
 
-    protected Map<String, String> jiraArgsMap = Collections.synchronizedMap(new HashMap<>());
     protected Map<String, String> testRailsArgsMap = Collections.synchronizedMap(new HashMap<>());
-    protected Map<String, String> bugArgsMap = Collections.synchronizedMap(new HashMap<>());
 
     protected List<String> argsList;
     protected List<String> staticArgsList;
@@ -61,16 +59,8 @@ public abstract class BaseDataProvider {
         return testMethodOwnerArgsMap;
     }
 
-    public Map<String, String> getJiraArgsMap() {
-        return jiraArgsMap;
-    }
-
     public Map<String, String> getTestRailsArgsMap() {
         return testRailsArgsMap;
-    }
-
-    public Map<String, String> getBugArgsMap() {
-        return bugArgsMap;
     }
 
     public List<String> getDoNotRunRowsIDs() {

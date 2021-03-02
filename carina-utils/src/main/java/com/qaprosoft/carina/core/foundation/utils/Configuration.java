@@ -117,8 +117,6 @@ public class Configuration {
 
         REPORT_URL("report_url"),
 
-        TRACK_KNOWN_ISSUES("track_known_issues"),
-
         AUTO_SCREENSHOT("auto_screenshot"),
 
         EXPLICIT_TIMEOUT("explicit_timeout"),
@@ -174,8 +172,6 @@ public class Configuration {
         CRYPTO_KEY_PATH("crypto_key_path"),
 
         SUITE_NAME("suite_name"),
-
-        JIRA_URL("jira_url"),
 
         TEST_NAMING_PATTERN("test_naming_pattern"),
         
