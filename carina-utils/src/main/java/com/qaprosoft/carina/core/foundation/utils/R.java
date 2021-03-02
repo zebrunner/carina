@@ -99,14 +99,6 @@ public enum R {
                     }
                 }
 
-                // init R.CONFIG with default values for required fields
-                if (resource.resourceFile.equals("config.properties")) {
-                    properties.put(Parameter.ENV_ARG_RESOLVER.getKey(), "com.qaprosoft.carina.core.foundation.utils.DefaultEnvArgResolver");
-                    properties.put(Parameter.PROJECT_REPORT_DIRECTORY.getKey(), "./reports");
-                    properties.put(Parameter.MAX_LOG_FILE_SIZE.getKey(), "150");
-                    properties.put(Parameter.MAX_SCREENSHOOT_HISTORY.getKey(), "0");
-                }
-
                 if (resource.resourceFile.contains("config.properties")) {
                     // no need to read env variables using System.getenv()
                     final String prefix = SpecialKeywords.CAPABILITIES + ".";
@@ -187,7 +179,8 @@ public enum R {
             return value;
         }
         
-        value = CONFIG.resourceFile.equals(resourceFile) ? PlaceholderResolver.resolve(propertiesHolder.get(resourceFile), key)
+        value = CONFIG.resourceFile.equals(resourceFile) ?
+                PlaceholderResolver.resolve(propertiesHolder.get(resourceFile), key)
                 : propertiesHolder.get(resourceFile).getProperty(key);
 
         // [VD] Decryption is prohibited here otherwise we have plain sensitive information in logs! 

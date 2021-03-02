@@ -579,11 +579,12 @@ public class ReportContext {
 
 
             File reportFileToBase = new File(String.format("%s/%s", getBaseDir(), emailableReport));
-            FileWriter fwToBaseDir = new FileWriter(reportFileToBase.getAbsolutePath());
 
             if (!reportFileToBase.exists()) {
                 reportFileToBase.createNewFile();
             }
+
+            FileWriter fwToBaseDir = new FileWriter(reportFileToBase.getAbsolutePath());
             try {
                 BufferedWriter bw = new BufferedWriter(fwToBaseDir);
                 try {
