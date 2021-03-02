@@ -75,8 +75,6 @@ public class EmailReportGenerator {
     private static final String LOG_URL_PLACEHOLDER = "${log_url}";
     private static final String CREATED_ITEMS_LIST_PLACEHOLDER = "${created_items_list}";
     private static final String CREATED_ITEM_PLACEHOLDER = "${created_item}";
-    //TODO: remove bug placeholder from emailable report and appropriate column
-    private static final String BUG_URL_PLACEHOLDER = "${bug_url}";
     private static final int MESSAGE_LIMIT = R.EMAIL.getInt("fail_description_limit");
     
     // Cucumber section
@@ -233,9 +231,6 @@ public class EmailReportGenerator {
                     (videoLinks.size() > 1) ? "Video_" + (i + 1) : "Video"));
         }
         result = result.replace(VIDEO_URL_PLACEHOLDER, videoHTML);
-        String bugUrl = "";
-        result = result.replace(BUG_URL_PLACEHOLDER, bugUrl);
-        
         return result;
     }
 
