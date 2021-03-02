@@ -107,7 +107,7 @@ public class ReportContext {
     /**
      * Crates new screenshot directory at first call otherwise returns created directory. Directory is specific for any
      * new test suite launch.
-     * 
+     *
      * @return root screenshot folder for test launch.
      */
     public static synchronized File getBaseDir() {
@@ -214,7 +214,7 @@ public class ReportContext {
 
     /**
      * Check that Artifacts Folder exists.
-     * 
+     *
      * @return boolean
      */
     public static boolean isArtifactsFolderExists() {
@@ -235,9 +235,9 @@ public class ReportContext {
 
     /**
      * download artifact from selenoid to local java machine
-     * 
-     * @param driver WebDriver
-     * @param name String
+     *
+     * @param driver  WebDriver
+     * @param name    String
      * @param timeout long
      * @return artifact File
      */
@@ -290,9 +290,9 @@ public class ReportContext {
 
     /**
      * check if artifact exists
-     * 
-     * @param driver WebDriver
-     * @param name String
+     *
+     * @param driver  WebDriver
+     * @param name    String
      * @param timeout long
      * @return boolean
      */
@@ -310,8 +310,8 @@ public class ReportContext {
 
     /**
      * check if artifact exists using http
-     * 
-     * @param url String
+     *
+     * @param url      String
      * @param username String
      * @param password String
      * @return boolean
@@ -339,8 +339,8 @@ public class ReportContext {
 
     /**
      * get username or password from url
-     * 
-     * @param url String
+     *
+     * @param url      String
      * @param position int
      * @return String
      */
@@ -354,9 +354,9 @@ public class ReportContext {
 
     /**
      * generate url for artifact by name
-     * 
+     *
      * @param driver WebDriver
-     * @param name String
+     * @param name   String
      * @return String
      */
     private static String getUrl(WebDriver driver, String name) {
@@ -398,7 +398,7 @@ public class ReportContext {
         File artifact = new File(String.format("%s/%s", getArtifactsFolder(), name));
         artifact.createNewFile();
         FileUtils.writeByteArrayToFile(artifact, IOUtils.toByteArray(source));
-        
+
         Artifact.attachToTest(name, IOUtils.toByteArray(source));
     }
 
@@ -406,14 +406,14 @@ public class ReportContext {
         File artifact = new File(String.format("%s/%s", getArtifactsFolder(), source.getName()));
         artifact.createNewFile();
         FileUtils.copyFile(source, artifact);
-        
+
         Artifact.attachToTest(source.getName(), artifact);
     }
 
     /**
      * Creates new test directory at first call otherwise returns created directory. Directory is specific for any new
      * test launch.
-     * 
+     *
      * @return test log/screenshot folder.
      */
     public static File getTestDir() {
@@ -427,6 +427,7 @@ public class ReportContext {
             if (!dirName.isEmpty()) {
                 uniqueDirName = dirName;
             }
+            String str = String.format("%s", getBaseDir());
             String directory = String.format("%s/%s", getBaseDir(), uniqueDirName);
 
             testDir = new File(directory);
@@ -442,9 +443,8 @@ public class ReportContext {
 
     /**
      * Rename test directory from unique number to custom name.
-     * 
+     *
      * @param dirName String
-     * 
      * @return test report dir
      */
     public synchronized static File setCustomTestDirName(String dirName) {
@@ -577,6 +577,24 @@ public class ReportContext {
                 fw.close();
             }
 
+
+            File reportFileToBase = new File(String.format("%s/%s", getBaseDir(), emailableReport));
+            FileWriter fwToBaseDir = new FileWriter(reportFileToBase.getAbsolutePath());
+
+            if (!reportFileToBase.exists()) {
+                reportFileToBase.createNewFile();
+            }
+            try {
+                BufferedWriter bw = new BufferedWriter(fwToBaseDir);
+                try {
+                    bw.write(content);
+                } finally {
+                    bw.close();
+                }
+            } finally {
+                fw.close();
+            }
+
         } catch (IOException e) {
             LOGGER.error("generateHtmlReport failure", e);
         }
@@ -584,7 +602,7 @@ public class ReportContext {
 
     /**
      * Returns URL for test artifacts folder.
-     * 
+     *
      * @return - URL for test screenshot folder.
      */
     public static String getTestArtifactsLink() {
@@ -601,22 +619,22 @@ public class ReportContext {
 
     /**
      * Returns URL for test screenshot folder.
-     * 
+     *
      * @return - URL for test screenshot folder.
      */
     public static String getTestScreenshotsLink() {
         String link = "";
         try {
-            if (FileUtils.listFiles(ReportContext.getTestDir(), new String[] { "png" }, false).isEmpty()) {
+            if (FileUtils.listFiles(ReportContext.getTestDir(), new String[]{"png"}, false).isEmpty()) {
                 // no png screenshot files at all
                 return link;
             }
         } catch (Exception e) {
             LOGGER.error("Exception during report directory scanning", e);
         }
-        
+
         String test = testDirectory.get().getName().replaceAll("[^a-zA-Z0-9.-]", "_");
-        
+
         if (!Configuration.get(Parameter.REPORT_URL).isEmpty()) {
             link = String.format("%s/%d/%s/report.html", Configuration.get(Parameter.REPORT_URL), rootID, test);
         } else {
@@ -629,11 +647,9 @@ public class ReportContext {
 
     /**
      * Returns list of links to video in local file system for recorded driver sessions
-     * 
-     * @param sessionIds
-     *            String list of session Ids to find video files for
-     * @return
-     *         String list of generated links
+     *
+     * @param sessionIds String list of session Ids to find video files for
+     * @return String list of generated links
      */
     public static List<String> getTestVideoLinks(List<String> sessionIds) {
         List<String> links = new ArrayList<>();
@@ -652,6 +668,7 @@ public class ReportContext {
 
     /**
      * Returns URL for test log.
+     *
      * @return - URL to test log folder.
      */
     public static String getTestLogLink() {
@@ -674,7 +691,7 @@ public class ReportContext {
 
     /**
      * Returns URL for cucumber report.
-     * 
+     *
      * @return - URL to test log folder.
      */
     public static String getCucumberReportLink() {
@@ -702,9 +719,8 @@ public class ReportContext {
 
     /**
      * Saves screenshot.
-     * 
+     *
      * @param screenshot - {@link BufferedImage} file to save
-     * 
      * @return - screenshot name.
      */
     public static String saveScreenshot(BufferedImage screenshot) {
@@ -815,8 +831,7 @@ public class ReportContext {
      * Stores comment for screenshot.
      *
      * @param screenId screenId id
-     * @param msg message
-     * 
+     * @param msg      message
      */
     public static void addScreenshotComment(String screenId, String msg) {
         if (!StringUtils.isEmpty(screenId)) {
@@ -826,9 +841,8 @@ public class ReportContext {
 
     /**
      * Return comment for screenshot.
-     * 
+     *
      * @param screenId Screen Id
-     * 
      * @return screenshot comment
      */
     public static String getScreenshotComment(String screenId) {
