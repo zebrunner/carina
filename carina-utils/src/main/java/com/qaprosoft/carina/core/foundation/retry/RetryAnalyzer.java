@@ -23,7 +23,6 @@ import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 import org.testng.internal.TestResult;
 
-import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
@@ -42,9 +41,6 @@ public class RetryAnalyzer implements IRetryAnalyzer {
 
         LOGGER.debug("RetryAnalyzer: " + result.getMethod().getRetryAnalyzer(result) + "Method: " + result.getMethod().getMethodName()
                 + "; Incremented retryCount: " + runCount);
-        if (runCount <= maxCount && !Jira.isRetryDisabled(result)) {
-            return true;
-        }
-        return false;
+        return runCount <= maxCount;
     }
 }

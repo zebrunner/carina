@@ -185,12 +185,6 @@ public class CsvDataProvider extends BaseDataProvider {
             // add testMethoOwner from xls datasource to special hashMap
             addValueToSpecialMap(testMethodOwnerArgsMap, testMethodOwnerColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
 
-            // add jira ticket from xls datasource to special hashMap
-            addValueToSpecialMap(jiraArgsMap, jiraColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
-
-            // add bug id from csv datasource to special hashMap
-            addValueToSpecialMap(bugArgsMap, bugColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
-
             // add testrails cases from xls datasource to special hashMap
             addValueToSpecialMap(testRailsArgsMap, testRailColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
 

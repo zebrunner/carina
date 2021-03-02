@@ -32,7 +32,6 @@ import org.testng.internal.annotations.DisabledRetryAnalyzer;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
-import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
@@ -252,11 +251,8 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         List<String> linksToVideo = ReportContext.getTestVideoLinks(getSessionsForCurrentTest());
 
         String test = StringEscapeUtils.escapeHtml4(TestNameResolverRegistry.get().resolve(result));
-        TestResultItem testResultItem = new TestResultItem(group, test, resultType, linkToScreenshots, linkToLog, linksToVideo, failReason);
-        testResultItem.setDescription(description);
-        // AUTO-1081 eTAF report does not show linked Jira tickets if test PASSED
-        // jira tickets should be used for tracking tasks. application issues will be tracked by planned zafira feature
-        testResultItem.setJiraTickets(Jira.getTickets(result));
+        TestResultItem testResultItem = new TestResultItem(group, test, description, resultType, linkToScreenshots, linkToLog, linksToVideo,
+                failReason);
         return testResultItem;
     }
 

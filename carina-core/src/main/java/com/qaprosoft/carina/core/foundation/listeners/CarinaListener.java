@@ -62,7 +62,6 @@ import com.qaprosoft.amazon.AmazonS3Manager;
 import com.qaprosoft.appcenter.AppCenterManager;
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.jira.Jira;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
@@ -343,14 +342,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 }
             }
 
-            List<String> tickets = Jira.getTickets(result);
-            result.setAttribute(SpecialKeywords.JIRA_TICKET, tickets);
-            
             attachLabels(result);
-
-            // we shouldn't deregister info here as all retries will not work
-            // TestNamingUtil.releaseZafiraTest();
-
         } catch (Exception e) {
             LOGGER.error("Exception in CarinaListener->onTestFinish!", e);
         }

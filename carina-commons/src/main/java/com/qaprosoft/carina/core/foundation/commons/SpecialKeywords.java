@@ -41,7 +41,6 @@ public class SpecialKeywords {
     public static final String MUST_OVERRIDE = "{must_override}";
     public static final String EXCEL_DS_ARGS = "{excel_ds_args}";
     public static final String EXCEL_DS_UID = "{excel_ds_uid}";
-    public static final String EXCEL_DS_JIRA = "{excel_ds_jira}";
     public static final String EXCEL_DS_FLAG = "{excel_ds_flag}";
     public static final String EXCEL_DS_FILE = "{excel_ds_file}";
     public static final String EXCEL_DS_SHEET = "{excel_ds_sheet}";
@@ -50,7 +49,6 @@ public class SpecialKeywords {
     public static final String DS_CUSTOM_PROVIDER = "{ds_custom_provider}";
     public static final String DS_ARGS = "{ds_args}";
     public static final String DS_UID = "{ds_uid}";
-    public static final String DS_JIRA = "{ds_jira}";
     public static final String DS_FLAG = "{ds_flag}";
     public static final String DS_FILE = "{ds_file}";
     public static final String DS_EXECUTE_COLUMN = "{ds_execute_column}";
@@ -59,7 +57,6 @@ public class SpecialKeywords {
 
     public static final String TEST_LOG_ID = "{test_log_id}";
 
-    public static final String JIRA_TICKET = "JIRA#";
     public static final String TEST_FAILURE_MESSAGE = "testFailureMessage";
     public static final String UUID = "UUID";
 
@@ -72,7 +69,6 @@ public class SpecialKeywords {
     public static final String METHOD_THREAD_POOL_SIZE = "{method_thread_pool_size}";
 
     public static final String TEST_NAME_ARGS_MAP = "testNameArgsMap";
-    public static final String JIRA_ARGS_MAP = "jiraArgsMap";
     
     public static final String TESTRAIL_SUITE_ID = "TestRailSuiteId";
     public static final String TESTRAIL_PROJECT_ID = "TestRailProjectId";
