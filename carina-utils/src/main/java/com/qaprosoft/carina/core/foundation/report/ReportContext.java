@@ -577,6 +577,23 @@ public class ReportContext {
                 fw.close();
             }
 
+            File reportFileToBase = new File(String.format("%s/%s", getBaseDir(), emailableReport));
+            FileWriter fwToBaseDir = new FileWriter(reportFileToBase.getAbsolutePath());
+
+            if (!reportFileToBase.exists()) {
+                reportFileToBase.createNewFile();
+            }
+            try {
+                BufferedWriter bw = new BufferedWriter(fwToBaseDir);
+                try {
+                    bw.write(content);
+                } finally {
+                    bw.close();
+                }
+            } finally {
+                fw.close();
+            }
+
         } catch (IOException e) {
             LOGGER.error("generateHtmlReport failure", e);
         }
