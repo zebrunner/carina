@@ -57,6 +57,8 @@ public enum R {
 
     private static final String OVERRIDE_SIGN = "_";
 
+    private static final String ENG_ARG_RESOLVER_PATH = "com.qaprosoft.carina.core.foundation.utils.DefaultEnvArgResolver";
+
     private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
 
     private String resourceFile;
@@ -101,10 +103,13 @@ public enum R {
 
                 // init R.CONFIG with default values for required fields
                 if (resource.resourceFile.equals("config.properties")) {
-                    properties.put(Parameter.ENV_ARG_RESOLVER.getKey(), "com.qaprosoft.carina.core.foundation.utils.DefaultEnvArgResolver");
-                    properties.put(Parameter.PROJECT_REPORT_DIRECTORY.getKey(), "./reports");
-                    properties.put(Parameter.MAX_LOG_FILE_SIZE.getKey(), "150");
-                    properties.put(Parameter.MAX_SCREENSHOOT_HISTORY.getKey(), "0");
+                    properties.put(Parameter.ENV_ARG_RESOLVER.getKey(),ENG_ARG_RESOLVER_PATH);
+                    if (!CONFIG.isInit(Parameter.PROJECT_REPORT_DIRECTORY,properties)) {
+                        properties.put(Parameter.PROJECT_REPORT_DIRECTORY.getKey(), "./reports");
+                    }
+                    if (!CONFIG.isInit(Parameter.MAX_SCREENSHOOT_HISTORY,properties)) {
+                        properties.put(Parameter.MAX_SCREENSHOOT_HISTORY.getKey(), "10");
+                    }
                 }
 
                 if (resource.resourceFile.contains("config.properties")) {
@@ -128,6 +133,11 @@ public enum R {
                 throw new InvalidConfigurationException("Invalid config in '" + resource + "': " + e.getMessage());
             }
         }
+    }
+
+    private boolean isInit(Parameter parameter, Properties properties){
+        String value = (String) properties.get(parameter.getKey());
+        return !(value == null || value.length() == 0 || value.equals("NULL"));
     }
 
     R(String resourceKey) {
