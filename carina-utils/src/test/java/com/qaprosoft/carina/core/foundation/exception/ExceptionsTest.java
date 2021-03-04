@@ -147,7 +147,8 @@ public class ExceptionsTest {
             Assert.assertTrue(e.getMessage().equals("Test creation exception"));
         }
     }
-    
+
+/*    
     @Test
     public void testNotImplementedException() {
         try {
@@ -155,7 +156,10 @@ public class ExceptionsTest {
             throw new NotImplementedException();
         } catch (Exception e) {
             Assert.assertEquals(e.getMessage(), "Method [testNotImplementedException] isn't implemented for iOS!");
+        } finally {
+            R.CONFIG.put(SpecialKeywords.PLATFORM, "", true);
         }
     }
-
+*/
+    
 }
