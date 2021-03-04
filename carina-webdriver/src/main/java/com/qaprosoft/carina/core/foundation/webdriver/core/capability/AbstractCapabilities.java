@@ -102,8 +102,15 @@ public abstract class AbstractCapabilities {
         
         //TODO: [VD] reorganize in the same way Firefox profiles args/options if any and review other browsers
         // support customization for Chrome args and options
-        String browser = Configuration.getBrowser();
 
+        // for pc we may set browserName through Desired capabilities in our Test with a help of a method initBaseCapabilities,
+        // so we don't want to override with value from config
+        String browser;
+        if (capabilities.getBrowserName() != null && capabilities.getBrowserName().length() > 0) {
+            browser = capabilities.getBrowserName();
+        } else {
+            browser = Configuration.getBrowser();
+        }
 
         if (BrowserType.FIREFOX.equalsIgnoreCase(browser)) {
             capabilities = addFirefoxOptions(capabilities);
