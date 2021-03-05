@@ -110,6 +110,42 @@ public class CaseInsensitiveTest {
     	By result = ExtendedElementLocator.toCaseInsensitive(xpath);
         Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
     }
+
+    @Test()
+    public void testMobileTextLocatorWithQuoteAndDollarSymbolInText() {
+        String xpath = "//android.widget.Button[@text = 'Text text$169,90']";
+        By expectedRes = By.xpath("//android.widget.Button[translate(@text, 'TEXT TEXT$169,90', 'text text$169,90')=translate('Text text$169,90', 'TEXT TEXT$169,90', 'text text$169,90')]");
+
+        By result = ExtendedElementLocator.toCaseInsensitive(xpath);
+        Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
+    }
+
+    @Test()
+    public void testWebTextLocatorWithQuoteAndDollarSymbolInText() {
+        String xpath = "//div[text() = 'Text text$169,90']";
+        By expectedRes = By.xpath("//div[translate(text(), 'TEXT TEXT$169,90', 'text text$169,90')=translate('Text text$169,90', 'TEXT TEXT$169,90', 'text text$169,90')]");
+
+        By result = ExtendedElementLocator.toCaseInsensitive(xpath);
+        Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
+    }
+
+    @Test()
+    public void testMobileTextLocatorWithDoubleQuoteAndDollarSymbolInText() {
+        String xpath = "//android.widget.Button[@text = \"Text text$169,90\"]";
+        By expectedRes = By.xpath("//android.widget.Button[translate(@text, \"TEXT TEXT$169,90\", \"text text$169,90\")=translate(\"Text text$169,90\", \"TEXT TEXT$169,90\", \"text text$169,90\")]");
+
+        By result = ExtendedElementLocator.toCaseInsensitive(xpath);
+        Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
+    }
+
+    @Test()
+    public void testWebTextLocatorWithDoubleQuoteAndDollarSymbolInText() {
+        String xpath = "//div[text() = \"Text text$169,90\"]";
+        By expectedRes = By.xpath("//div[translate(text(), \"TEXT TEXT$169,90\", \"text text$169,90\")=translate(\"Text text$169,90\", \"TEXT TEXT$169,90\", \"text text$169,90\")]");
+
+        By result = ExtendedElementLocator.toCaseInsensitive(xpath);
+        Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
+    }
     
     @Test()
     public void testComplexMobileTextLocator() {
