@@ -57,6 +57,7 @@ import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.DriverFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import com.zebrunner.agent.core.registrar.Label;
 
 public interface IDriverPool {
     static final Logger POOL_LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -629,6 +630,8 @@ public interface IDriverPool {
         long threadId = Thread.currentThread().getId();
         POOL_LOGGER.debug("Set current device '" + device.getName() + "' to thread: " + threadId);
         currentDevice.set(device);
+        
+        Label.attachToTest("device", device.getName());
 
         POOL_LOGGER.debug("register device for current thread id: " + threadId + "; device: '" + device.getName() + "'");
 
