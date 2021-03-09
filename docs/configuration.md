@@ -75,12 +75,6 @@ All the project configuration properties are located in a **_config.properties**
 		<td>false, true</td>
 	</tr>
 	<tr>
-		<td>l10n_encoding</td>
-		<td>Charset for l10n feature</td>
-		<td>ISO-8859-5, ISO-8859-6, UTF-8</td>
-	</tr>
-
-	<tr>
 		<td>retry_interval</td>
 		<td>Timeout interval between calling HTML DOM for the element.<br><b>Note:</b> in ms. For mobile automation specify a number from 500-1000 range</td>
 		<td>Integer</td>

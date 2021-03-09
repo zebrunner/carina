@@ -15,10 +15,14 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.resources;
 
-import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -175,22 +179,7 @@ public class L10N {
             ResourceBundle bundle = iter.next();
             try {
                 String value = bundle.getString(key);
-				if (isUTF8()) {
-					try {
-						LOGGER.debug("converting key '" + value + "' to UTF-8");
-						value = new String(value.getBytes("ISO-8859-1"), "UTF-8");
-					} catch (UnsupportedEncodingException er) {
-						LOGGER.debug("Error: ", er);
-					}
-				}
-				
-//                LOGGER.debug("Looking for value for locale:'"
-//                        + locale.toString()
-//                        + "' current iteration locale is: '"
-//                        + bundle.getLocale().toString() + "'.");
                 if (bundle.getLocale().toString().equals(locale.toString())) {
-//                    LOGGER.debug("Found locale:'" + locale.toString()
-//                            + "' and value is '" + value + "'.");
                     return value;
                 }
             } catch (MissingResourceException e) {
@@ -248,18 +237,4 @@ public class L10N {
         return returnString;
     }
 
-    /**
-     * get Localization Encoding from properties.
-     *
-     * @return boolean
-     */
-    public static boolean isUTF8() {
-        String encoding = "ISO-8859-1";
-        try {
-            encoding = Configuration.get(Parameter.L10N_ENCODING);
-        } catch (Exception e) {
-            LOGGER.debug("There is no l10n_encoding parameter in config properties.");
-        }
-        return encoding.toUpperCase().contains("UTF-8");
-    }
 }

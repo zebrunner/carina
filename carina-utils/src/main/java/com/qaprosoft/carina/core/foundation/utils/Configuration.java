@@ -149,8 +149,6 @@ public class Configuration {
 
         ENABLE_L10N("enable_l10n"),
 
-        L10N_ENCODING("l10n_encoding"),
-
         LOCALE("locale"),
 
         THREAD_COUNT("thread_count"),
