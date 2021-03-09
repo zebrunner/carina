@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2021 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,25 +34,28 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 
-/*
+/**
  * L10Nparser can be used for checking multiple localization values and for creating new localization property file
  * based on actual localization of public elements.
- * 
+ *
  * Usage:
- * First of all you have to set following properties in _config.properties file
+ * First of all you have to set following properties in _config.properties file.
  * add_new_localization=false - should be set to 'true' if you want to create new localization files for required Locale.
  * Otherwise there will be just localization checking
  * add_new_localization_path=null - path where created localization properties should be saved.
  * If null - they will be added to artifactory folder in report
  * add_new_localization_property_name=new_custom_messages_ - the basic template for property name.
- * There will be locale added at the end of the filename.
- * 
- * 
+ * There will be locale added at the end of the filename. Better to create localization properties files in UTF-8 file encoding.
+
+ * add_new_localization_encoding=UTF-8 - localization encoding in which property file will be save.
+ * By default or if property is missed it set to ISO-8859-1.
+ * If UTF-8 is not suitable, you can use for Japan ISO-2022-JP and for Chinese ISO-2022-CN
+ *
  * Then in your test you should set locale:
  * L10Nparser.setActualLocale(countryCode);
  * countryCode can be String or Locale in format 'en' or 'en_US'. You can get it from excel file as DataProvider
  * if you have multiple locale text checking.
- * 
+ *
  * For localization checking and parsing new localization text you can use one of following checkLocalizationText() functions. See JavaDoc below.
  * For example:
  * Assert.assertTrue(L10Nparser.checkLocalizationText(homePage.getEnterNowBtnText(), "enterbutton"),
@@ -63,23 +66,24 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebEleme
  * For example:
  * public ExtendedWebElement signInTopText;
  * public ExtendedWebElement[] localizationCheckList = { signInTopText, loginBtn, forgotPasswordLink, createAccountBtn };
- * 
+ *
  * And in test use following function: checkMultipleLocalization()
- * 
+ *
  * In this case localization tag in property file will have same name as element name.
- * 
+ *
  * For example:
  * Assert.assertTrue(L10Nparser.checkMultipleLocalization(loginPage.localizationCheckList), "Localization issue: "
  * + L10Nparser.getAssertErrorMsg());
- * 
+ *
  * And the MOST IMPORTANT thing - at the end of your test use following:
  * L10Nparser.saveLocalization();
  * to save your localization property file.
- * 
+ *
  * FYI: if you create new localization (add_new_localization=true) localization checking will always Pass.
  * Do not forget to switch property to false after adding new localization in your localization files.
- * 
- */
+ *
+ **/
+
 
 public class L10Nparser {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -256,7 +260,7 @@ public class L10Nparser {
             add_new_loc_name = "new_localization_";
         }
 
-        ret = add_new_loc_path + "\\" + add_new_loc_name + localName + ".properties";
+        ret = add_new_loc_path + "/" + add_new_loc_name + localName + ".properties";
 
         return ret;
     }
