@@ -368,6 +368,33 @@
     Carina's webdriver initialization
   </a>
   
+    <nav class="md-nav" aria-label="Carina's webdriver initialization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#carinas-capabilities-templates" class="md-nav__link">
+    Carina's capabilities templates:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#creating-custom-capabilities" class="md-nav__link">
+    Creating custom capabilities:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#additional-capabilities" class="md-nav__link">
+    Additional capabilities
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -491,6 +518,33 @@
     Carina's webdriver initialization
   </a>
   
+    <nav class="md-nav" aria-label="Carina's webdriver initialization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#carinas-capabilities-templates" class="md-nav__link">
+    Carina's capabilities templates:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#creating-custom-capabilities" class="md-nav__link">
+    Creating custom capabilities:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#additional-capabilities" class="md-nav__link">
+    Additional capabilities
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -523,13 +577,15 @@
                 <h1 id="driver-configuration">Driver configuration</h1>
 <p>In Carina, WebDriver is initialized by method <strong>getDriver()</strong>.
 It will create a WebDriver named "default" with capabilities from _config.properties.
-But what if we need to launch several different browsers? Or do it with different capabilities and browser options? Carina is got a solution.</p>
-<p>Currently supported browsers by Carina:
-- Chrome
-- Firefox
-- Microsoft Edge
-- Opera
-- Safari</p>
+Also with the help of this method could be launched several automation sessions with different capabilities and browser options.</p>
+<p>Currently supported browsers by Carina:</p>
+<ul>
+<li>Chrome</li>
+<li>Firefox</li>
+<li>Microsoft Edge</li>
+<li>Opera</li>
+<li>Safari</li>
+</ul>
 <h2 id="carinas-webdriver-initialization">Carina's webdriver initialization</h2>
 <p>WebDriver can be created in several ways:</p>
 <ul>
@@ -537,13 +593,16 @@ But what if we need to launch several different browsers? Or do it with differen
 </ul>
 <p>In this case we may need to specify -Dwebdriver when launching selenium server. If there is no driver in Driver pool with name we passed, Carina will create a new WebDriver with capabilities from _config.properties file. We can access the driver by his name. By using different names we can create several Automation sessions.</p>
 <ul>
-<li><strong>getDriver() without arguments.</strong></li>
+<li><strong>getDriver()</strong></li>
 </ul>
-<p>In this case we need to specify -Dwebdriver when launching selenium server. The parameter name will get the default value "default", it means, that we can access this driver by simply calling method getDriver() or getDriver("default"). If default driver is null Carina will initialize new driver with capabilities from _config.properties file.</p>
+<p>In this case we need to specify -Dwebdriver when launching selenium server. The driver's name will be setted as "default". So it means that we can access this driver by calling method getDriver() or getDriver("default"). If default driver is null Carina will initialize new driver with capabilities from _config.properties file.</p>
 <ul>
 <li><strong>getDriver(String name, DesiredCapabilities capabilities).</strong></li>
 </ul>
-<p>In this case we need to describe capabilities in code. You can do it by your own or use Carina's default capabilities for different browsers. Carina’s default:</p>
+<p>In this case we will use our custom capabilities. There are two ways: 
+1) Use Carina's capabilities templates for different browsers.
+2) Describe DesiredCapabilities inside your program javaTest.class. </p>
+<h3 id="carinas-capabilities-templates">Carina's capabilities templates:</h3>
 <pre><code class="java">getDriver(&quot;chrome&quot;, new ChromeCapabilities().getCapability(&quot;Chrome Test&quot;))
 getDriver(&quot;firefox&quot;, new FirefoxCapabilities().getCapability(&quot;Firefox Test&quot;))
 getDriver(&quot;safari&quot;, new SafariCapabilities().getCapability(&quot;Safari test&quot;))
@@ -551,12 +610,12 @@ getDriver(&quot;edge&quot;, new EdgeCapabilities().getCapability(&quot;Edge test
 getDriver(&quot;opera&quot;, new OperaCapabilities().getCapability(&quot;Opera test&quot;))
 </code></pre>
 
-<p>You can decide the max number of drivers by parameter max_driver_count in _config.properties. By default it's 3.
+<p>You can decide the max number of drivers by parameter <strong>max_driver_count</strong> in <strong>_config.properties</strong>. By default it's 3.
 New driver could be accessed by name.</p>
 <pre><code>getDriver(&quot;safari&quot;);
 </code></pre>
 
-<p>In Carina you can also create your own capabilities and send them to the driver. For example:</p>
+<h3 id="creating-custom-capabilities">Creating custom capabilities:</h3>
 <pre><code class="java">DesiredCapabilities capabilities = DesiredCapabilities.safari();
 capabilities.setBrowserName(&quot;safari&quot;);
 capabilities.setCapability(CapabilityType.PLATFORM_NAME, SpecialKeywords.MAC);
@@ -566,14 +625,15 @@ Assert.assertTrue(safariHomePage.isPageOpened());
 </code></pre>
 
 <p>List of all selenium <a href="https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities">capabilities</a>.</p>
-<p>There is also a possibility to send capabilities to Carina through _config.properties. All parameters with prefix capabilities. will be added to the driver’s capabilities.</p>
+<h3 id="additional-capabilities">Additional capabilities</h3>
+<p>There is also a possibility to send additional capabilities to Carina through _config.properties. All parameters with prefix <strong>capabilities.</strong> will be added to the driver’s capabilities.</p>
 <pre><code>capabilities.platformName=MAC
 </code></pre>
 
 <ul>
 <li><strong>getDriver(String name, DesiredCapabilities capabilities, String seleniumHost).</strong></li>
 </ul>
-<p>You can select the selenium server host. By default Carina will use your _config.properties selenium_host parameter.</p>
+<p>There we also need to pass selenium server host. In case of seleniumHost == null Carina will use your _config.properties selenium_host parameter.</p>
 <h2 id="options">Options</h2>
 <p>Options are used to tune your browser for tests.</p>
 <pre><code class="java">DesiredCapabilities capabilities = DesiredCapabilities.safari();
@@ -588,7 +648,7 @@ safariHomePage.open();
 Assert.assertTrue(safariHomePage.isPageOpened());
 </code></pre>
 
-<p>Options also could be setted through _config.properties. If there are multiple options to pass, split them by comma. Available options for now:</p>
+<p>Options also could be setted through _config.properties. If there are multiple options to pass, split them by comma. Available parameters to pass options:</p>
 <pre><code>chrome_args=
 chrome_experimental_opts=
 chrome_mobile_emulation_opts=
