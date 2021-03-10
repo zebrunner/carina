@@ -10,11 +10,11 @@ pages:
       - Mobile: automation/mobile.md
       - API: automation/api.md
     - Advanced:
+      - Database: advanced/database.md
+      - DataProvider: advanced/dataprovider.md
       - Driver: advanced/driver.md
       - Proxy: advanced/proxy.md
-      - Database: advanced/database.md
       - Security: advanced/security.md
-      - DataProvider: advanced/dataprovider.md
     - Cucumber: cucumber.md
     - Contribution: contribution.md
 theme:
