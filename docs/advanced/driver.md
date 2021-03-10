@@ -2,7 +2,7 @@
 
 In Carina WebDriver is initialized by method **getDriver()**.
 It will create a WebDriver named "default" with capabilities from _config.properties.
-With a help of this method we also can launch several automation sessions with different capabilities and browser options
+With a help of this method we can launch several automation sessions with different capabilities and browser options.
 
 Currently supported browsers by Carina:
 
@@ -21,11 +21,12 @@ In this case we may need to specify -Dwebdriver when launching selenium server. 
 
 * **getDriver()**
 
-In this case we need to specify -Dwebdriver when launching selenium server. The driver's name will be setted as "default". So it means that we can access this driver by calling method getDriver() or getDriver("default"). If default driver is null Carina will initialize new driver with capabilities from _config.properties file.
+In this case we need to specify -Dwebdriver when launching selenium server. The driver's name will be setted as _"default"_. So it means that we can access this driver by calling method getDriver() or getDriver("default"). If default driver is null Carina will initialize new driver with capabilities from _config.properties file.
 
 * **getDriver(String name, DesiredCapabilities capabilities).**
 
 In this case we will use our custom capabilities. There are two ways: 
+
 1) Use Carina's capabilities templates for different browsers.
 2) Describe DesiredCapabilities inside your program javaTest.class. 
 
