@@ -9,7 +9,7 @@ pages:
       - Web: automation/web.md
       - Mobile: automation/mobile.md
       - API: automation/api.md
-    - Advanced usage:
+    - Advanced:
       - Driver: advanced/driver.md
       - Proxy: advanced/proxy.md
       - Database: advanced/database.md
