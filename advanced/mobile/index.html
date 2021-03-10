@@ -633,8 +633,8 @@
 <h3 id="android-special-requirements">Android special requirements:</h3>
 <ol>
 <li>Android SDK (part of <a href="https://developer.android.com/studio/">Android Studio</a>) is an important component for work. Pay attention that after installing Android Studio you sometimes (depends on a version) need to additionally install ADB and aapt (for Mac only). </li>
-<li>Edit your PATH variable and add ANDROID_HOME (path to “sdk” folder) to PATH. 
-Hint: you sometimes (especially on Mac) need to add paths to important folders inside sdk, such as “platform-tools” (ADB is located here), “tools” and “build-tools” (aapt is located here).</li>
+<li>Edit your PATH variable and add ANDROID_HOME (path to "sdk" folder) to PATH. 
+Hint: you sometimes (especially on Mac) need to add paths to important folders inside sdk, such as "platform-tools" (ADB is located here), "tools" and "build-tools" (aapt is located here).</li>
 <li>.apk file - installation file of a program that’s being tested is required, the same for both - a real device and an emulator.</li>
 </ol>
 <h3 id="ios-special-requirements">iOS special requirements:</h3>
@@ -643,7 +643,7 @@ Hint: you sometimes (especially on Mac) need to add paths to important folders i
 <li>Installation file of a program that’s being tested is required. For a real device it’s .ipa file, and for a simulator it’s .app file. .app file should be provided by developers and has special signatures to work correctly, but automation on the simulator is free. On the other hand, the license is needed to work with the real device.</li>
 </ol>
 <h3 id="mobile-config-properties">Mobile config properties</h3>
-<p>We can provide any Appium capability in the <strong>config.properties</strong> file using capabilities.name=value format. In the table below we are providing the description of the most popular mobile capabilities:</p>
+<p>We can provide any Appium capability in the <strong>_config.properties</strong> file using <code>capabilities.name=value</code> format. In the table below we are providing the description of the most popular mobile capabilities:</p>
 <table>
     <tr>
         <th>Attribute</th>
@@ -676,12 +676,6 @@ Hint: you sometimes (especially on Mac) need to add paths to important folders i
         <td>6.0.1</td>
     </tr>
         <tr>
-        <td>capabilities.automationName</td>
-        <td>Name of the program used for automation (for Android 7+ use uiautomator2 instead of Appium)</td>
-                <td>n/a</td>
-        <td>Appium/uiautomator2/XCUITest</td>
-    </tr>
-        <tr>
         <td>capabilities.app</td>
         <td>Path to the application (apk/app/ipa) which is tested, can be provided as a pattern from AWS S3 storage with automatic downloading</td>
                 <td>n/a</td>
@@ -699,25 +693,7 @@ Hint: you sometimes (especially on Mac) need to add paths to important folders i
                 <td>n/a</td>
         <td>759b543c</td>
     </tr>
-        <tr>
-        <td>capabilities.device</td>
-        <td>Specifies a particular mobile device for the test environment on Browserstack</td>
-                <td>n/a</td>
-        <td>Galaxy Note 8, iPhone X</td>
-    </tr>
-     <tr>
-        <td>capabilities.os_version</td>
-        <td>Version of OS for Browserstack</td>
-                <td>n/a</td>
-        <td>ios, android</td>
-    </tr>
     <tr>
-        <td>capabilities.remoteURL</td>
-        <td>Remote URL for using Selenium Grid</td>
-                <td>n/a</td>
-        <td> 'http://localhost:4444/wd/hub'</td>
-    </tr>
-        <tr>
         <td>capabilities.appActivity</td>
         <td>Activity name for the Android activity you want to launch from your package.</td>
                 <td>n/a</td>
@@ -741,78 +717,32 @@ Hint: you sometimes (especially on Mac) need to add paths to important folders i
                 <td>n/a</td>
         <td>true, false</td>
     </tr>
-    <tr>
-        <td>capabilities.skipUnlock</td>
-        <td>Skips the device unlock process. Defaults to false</td>
-                <td>n/a</td>
-        <td>true, false</td>
-    </tr>
 </table>
 
-<p><b>Important:</b>
-* though it’s not necessary to run Selenium, seleniumum_host must be defined.
-* The file _config.properties should be located in src/main/resources</p>
 <h3 id="example-for-android-of-_configproperties">Example for Android of _config.properties:</h3>
-<pre><code>#=====================================================#
-#================= Configuration v2 ==================#
-#=====================================================#
-
-selenium_host=http://localhost:4723/wd/hub
-extra_selenium_driver_host=http://localhost:4444/wd/hub
-
+<pre><code>selenium_host=http://localhost:4723/wd/hub
 #============ Android Local Mobile ===================#
-
-##for Android 7+ use uiautomator2 instead of Appium
-capabilities.automationName=uiautomator2
-capabilities.appPackage=
-capabilities.deviceName=Nexus_6
-capabilities.udid=emulator-5554
-capabilities.noSign=true
-capabilities.deviceType=phone
-capabilities.app=/Users/{user}/qaprosoft/mmf/test-app.apk
 capabilities.platformName=ANDROID
+capabilities.deviceName=Nexus_6
+capabilities.app=https://qaprosoft.s3-us-west-2.amazonaws.com/carinademoexample.apk
+capabilities.noSign=true
 capabilities.autoGrantPermissions=true
 #=====================================================#
 </code></pre>
 
-<p><b>Note:</b>
-To get the device’s unique id (UDID), the command “adb devices” is used. This command provides a list of devices attached with their UDIDs. For a real device, it will look like “759b543c” (can be shorter or longer), and for an emulator, it will be like “emulator-5554”.</p>
 <h3 id="example-for-ios-of-_configproperties">Example for iOS of _config.properties:</h3>
-<pre><code>#=====================================================#
-#================= Configuration v2 ==================#
-#=====================================================#
-
-selenium_host=http://localhost:4723/wd/hub
-extra_selenium_driver_host=http://localhost:4444/wd/hub
-
+<pre><code>selenium_host=http://localhost:4723/wd/hub
 #======== Local Run for iOS Mobile ===============#
-capabilities.app=/Users/{user}/qaprosoft/mmf/TestApp-iphonesimulator.app
 capabilities.platformName=iOS
 capabilities.deviceName=iPhone X
-capabilities.platform=iOS
-capabilities.deviceType=phone
-capabilities.platformVersion=11.4
-capabilities.automationName=XCUITest
-capabilities.udid=D85FF1CD-D95F-4B78-A007-77A11EBD3ABB
-capabilities.newCommandTimeout=1800
+capabilities.app=https://qaprosoft.s3-us-west-2.amazonaws.com/carinademoexample.zip
 #=====================================================#
 </code></pre>
 
-<p><b>Note:</b>
-To get the device’s unique id (UDID) for an emulator, the command “xcrun simctl list” is used. It will show the list of simulators with their names, iOS versions, udids and statuses (shutdown or booted). 
-To get UDID from the real device, you need to plug your phone into a computer and copy it out of iTunes:
-1. Launch iTunes and connect your iPhone.
-2. In the right panel, locate the information about your iPhone, including its name, capacity, software version, serial number, and phone number.
-3. Reveal the Identifier by clicking on the Serial Number.</p>
 <h3 id="implementation-of-page-objects">Implementation of Page Objects:</h3>
-<p>The main idea is the same as in <a href="http://qaprosoft.github.io/carina/automation/web/#implementation-of-page-objects">web-testing</a> except that CSS isn’t used in Mobile. 
-ExtendedWebElement (Carina’s implementation of WebElement) is used instead of WebElement, and it has methods similar to those that WebElement has, but more reliable and convenient ones.
-<b>Important</b>:
- * Page should extend com.qaprosoft.carina.core.gui.AbstractPage
- * Use com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement instead of Selenium WebElement
- * Locate Page Object classes in src/main/java package</p>
+<p>The main idea is the same as in <a href="http://qaprosoft.github.io/carina/automation/web/#implementation-of-page-objects">web-testing</a>. </p>
 <h3 id="how-to-find-locators-for-android-application">How to find locators for Android application</h3>
-<p>To obtain the locators of web elements from an Android app, different programs are used, such as the latest Appium itself and a convenient Android SDK tool: uiautomatorviewer. It’s located in $ANDROID_HOME/tools/bin and can be launched using the command line  (./uiautomatorviewer).
+<p>To obtain the locators of web elements from an Android app, different programs are used, such as the latest Appium itself and a convenient Android SDK tool: uiautomatorviewer. It's located in $ANDROID_HOME/tools/bin and can be launched using the command line <code>./uiautomatorviewer</code>.
 Example:</p>
 <pre><code> @FindBy(xpath = &quot;//*[@resource-id='name_input']&quot;)
  private ExtendedWebElement input;
@@ -820,7 +750,7 @@ Example:</p>
 
 <h3 id="how-to-find-locators-for-ios-application">How to find locators for iOS application</h3>
 <p>To obtain the locators of web elements from an iOS app, different programs are used, such as GUI Appium itself and a convenient <a href="https://macacajs.github.io/app-inspector/">Macaca App Inspector</a>.
-To speed up the work, @Predicate is used. Complicate “xpaths” can’t be used with predicates, but “id”, “name”, “className” and etc. search is sufficient. 
+To speed up the work, @Predicate is used. Complicate "xpaths" can't be used with predicates. 
 Example:</p>
 <pre><code>@FindBy(xpath = &quot;name = 'DONE'&quot;)
 @Predicate
@@ -862,8 +792,8 @@ protected ExtendedWebElement developerText;
                 googleTestPage.clickOnSpinner();
                 googleTestPage.selectCar(carName);
                 googleTestPage.clickOnSendYourNameButton();
-                Assert.assertTrue(myWayOfHelloPage.isTextElementPresent(name), “Assert message” );
-                Assert.assertTrue(myWayOfHelloPage.isTextElementPresent(carName.toLowerCase()), “Assert message” );
+                Assert.assertTrue(myWayOfHelloPage.isTextElementPresent(name), &quot;Assert message&quot; );
+                Assert.assertTrue(myWayOfHelloPage.isTextElementPresent(carName.toLowerCase()), &quot;Assert message&quot; );
 
     }
 
@@ -968,12 +898,12 @@ public class HomePage extends HomePageBase {
 <p>If there are differences in application according to OS version, just implement the pages for different versions and include the version parameter in @DeviceType for every page.</p>
 <p><strong>Example:</strong></p>
 <p>For Android 8 (either 8.0 or 8.1)</p>
-<pre><code>@DeviceType(pageType = DeviceType.Type.ANDROID_PHONE, version = “8”, parentClass = HomePageBase.class)
+<pre><code>@DeviceType(pageType = DeviceType.Type.ANDROID_PHONE, version = &quot;8&quot;, parentClass = HomePageBase.class)
 public class HomePage extends HomePageBase {
 </code></pre>
 
 <p>Or for a specific version</p>
-<pre><code>@DeviceType(pageType = DeviceType.Type.ANDROID_PHONE, version = “8.1”, parentClass = HomePageBase.class)
+<pre><code>@DeviceType(pageType = DeviceType.Type.ANDROID_PHONE, version = &quot;8.1&quot;, parentClass = HomePageBase.class)
 public class HomePage extends HomePageBase {
 </code></pre>
 
