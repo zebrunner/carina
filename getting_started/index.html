@@ -488,21 +488,21 @@
 <ul>
 <li>Install and configure JDK 11+</li>
 <li>Install and configure <a href="http://maven.apache.org/">Apache Maven 3.6.0+</a></li>
-<li>Download the latest version of <a href="http://www.eclipse.org/downloads/">Eclipse</a> and install <a href="http://testng.org/doc/download.html">TestNG plugin</a></li>
+<li>Download the latest version of <a href="http://www.eclipse.org/downloads/">Eclipse</a> and install <a href="http://testng.org/doc/download.html">TestNG plugin</a>, maven-dependency-plugin connector and optionally lombok</li>
 </ul>
 <h3 id="generating-project">Generating project</h3>
-<p>The easiest way to initialize a new project is to use Carina archetype, you will get correct project structure along with test samples:</p>
+<p>The easiest way to initialize a new project is to use Carina archetype, you will get correct project structure along with test samples. Run below command from any empty folder:</p>
 <pre><code>mvn archetype:generate -DarchetypeGroupId=com.qaprosoft \
                        -DarchetypeArtifactId=carina-archetype \
                        -DarchetypeVersion=RELEASE \
                        -DgroupId=&lt;your_groupId&gt; \
                        -DartifactId=&lt;your_artifactId&gt; \
-                       -Dname=&quot;&lt;you_proj_name&gt;&quot; \
-                       -Durl=&lt;your_proj_url&gt; \
-                       -Dversion=&lt;your_proj_version&gt;
+                       -Dname=&quot;&lt;you_project_name&gt;&quot; \
+                       -Durl=&lt;your_project_url&gt; \
+                       -Dversion=&lt;your_project_version&gt;
 </code></pre>
 
-<p>If any attribute contains spaces, it should be set in quotes (e.g.: -Dname="Hello World"). In the above Maven command you need to specify 5 attributes, while the first 3 should be left unchanged. Let's go through these attributes:</p>
+<p>If any attribute contains spaces, it should be set in quotes (e.g.: -Dname="Hello World"). In the above Maven command you need to specify 5 attributes, while the first 3 should be left unchanged:</p>
 <table>
     <tr>
         <th>Attribute</th>
@@ -512,22 +512,22 @@
     <tr>
         <td>-DgroupId</td>
         <td>Company domain in reverse order</td>
-        <td>com.qaprosoft</td>
+        <td>com.mycompany</td>
     </tr>
     <tr>
         <td>-DartifactId</td>
         <td>Java project name</td>
-        <td>carina-qa</td>
+        <td>project-qa</td>
     </tr>
     <tr>
         <td>-Dname</td>
         <td>Name with more details</td>
-        <td>"Carina Test Automation"</td>
+        <td>"Test Automation Project"</td>
     </tr>
     <tr>
         <td>-Durl</td>
         <td>Company URL</td>
-        <td>http://qaprosoft.com</td>
+        <td>http://mycompany.com</td>
     </tr>
     <tr>
         <td>-Dversion</td>
