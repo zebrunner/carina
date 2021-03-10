@@ -1,44 +1,9 @@
-### Selenium server
+### Selenium/Appium
 
 [![Carina - Start Selenium](https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png)](https://youtu.be/YGXsVoEY74M)
 
-Before running any web test, you have to start Selenium server locally or use a remote Selenium server. You may download the latest version of Selenium standalone server on [the official website](https://www.seleniumhq.org/download) along with a browser binary for Chrome, Firefox, IE, etc. For running a test with Chrome browser, you will need to download chromedriver and place it along with selenium-standalone-server-X.jar and execute (make sure that you replace 'X' by the current Selenium version):
-```
-java -jar -Dwebdriver.chrome.driver=./chromedriver selenium-server-standalone-X.jar
-```
-You have several options to run [Selenium in Docker](https://github.com/SeleniumHQ/docker-selenium), the easiest way is to create docker-compose.yml:
-```
-# To execute this docker-compose yml file, use docker-compose -f <file_name> up
-# Add the "-d" flag at the end for deattached execution
-version: '2'
-services:
-  firefox:
-    image: selenium/node-firefox:3.11.0-californium
-    volumes:
-      - /dev/shm:/dev/shm
-    depends_on:
-      - hub
-    environment:
-      HUB_HOST: hub
-
-  chrome:
-    image: selenium/node-chrome:3.11.0-californium
-    volumes:
-      - /dev/shm:/dev/shm
-    depends_on:
-      - hub
-    environment:
-      HUB_HOST: hub
-
-  hub:
-    image: selenium/hub:3.11.0-californium
-    ports:
-      - "4444:4444"
-```
-Now you may start Selenium, running the following command in terminal:
-```
-docker-compose up
-```
+Before running any web or mobile test, you have to start Selenium/Appium locally or use a remote Selenium Grid. 
+We recommend to use lightweight Zebrunner [Selenoid](https://github.com/zebrunner/selenoid) and [MCloud](https://github.com/zebrunner/mcloud) solutions.
 
 ### Running tests
 
