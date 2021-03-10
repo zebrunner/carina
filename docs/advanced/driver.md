@@ -2,7 +2,7 @@
 
 In Carina, WebDriver is initialized by method **getDriver()**.
 It will create a WebDriver named "default" with capabilities from _config.properties.
-Also with the help of this method could be launched several automation sessions with different capabilities and browser options.
+With a help of this method we also can launch several automation sessions with different capabilities and browser options
 
 Currently supported browsers by Carina:
 
@@ -15,15 +15,15 @@ Currently supported browsers by Carina:
 ##Carina's webdriver initialization
 WebDriver can be created in several ways:
 
-- **getDriver(String name).**
+* **getDriver(String name).**
 
 In this case we may need to specify -Dwebdriver when launching selenium server. If there is no driver in Driver pool with name we passed, Carina will create a new WebDriver with capabilities from _config.properties file. We can access the driver by his name. By using different names we can create several Automation sessions.
 
-- **getDriver()**
+* **getDriver()**
 
 In this case we need to specify -Dwebdriver when launching selenium server. The driver's name will be setted as "default". So it means that we can access this driver by calling method getDriver() or getDriver("default"). If default driver is null Carina will initialize new driver with capabilities from _config.properties file.
 
-- **getDriver(String name, DesiredCapabilities capabilities).**
+* **getDriver(String name, DesiredCapabilities capabilities).**
 
 In this case we will use our custom capabilities. There are two ways: 
 1) Use Carina's capabilities templates for different browsers.
@@ -55,15 +55,16 @@ Assert.assertTrue(safariHomePage.isPageOpened());
 
 List of all selenium [capabilities](https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities).
 
-###Additional capabilities
+* **getDriver(String name, DesiredCapabilities capabilities, String seleniumHost).**
+
+ There we also need to pass selenium server host. In case of seleniumHost == null Carina will use your _config.properties selenium_host parameter.
+ 
+ ###Additional capabilities
 
 There is also a possibility to send additional capabilities to Carina through _config.properties. All parameters with prefix **capabilities.** will be added to the driver’s capabilities.
 ```
 capabilities.platformName=MAC
 ```
-- **getDriver(String name, DesiredCapabilities capabilities, String seleniumHost).**
-
- There we also need to pass selenium server host. In case of seleniumHost == null Carina will use your _config.properties selenium_host parameter.
 
 ##Options 
 
