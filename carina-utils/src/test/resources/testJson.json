@@ -1,0 +1,19 @@
+{
+  "name": "Metro City",
+  "formed": 2016,
+  "active": true,
+  "members": [
+    {
+      "name": "Molecule Man",
+      "age": 29
+    },
+    {
+      "name": "Madame Uppercut",
+      "age": 39
+    },
+    {
+      "name": "Eternal Flame",
+      "age": 25
+    }
+  ]
+}
