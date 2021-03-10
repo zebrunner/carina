@@ -86,7 +86,7 @@ To specify the XLS/CSV spreadsheets for a test, you should declare `@XlsDataSour
 
 Here you can look at a spreadsheet as a data provider example for your further tests:
 
-![XLS file - Data Provider - screenshot](./img/xlsscreen.png)
+![XLS file - Data Provider - screenshot](../img/xlsscreen.png)
 
 In the TUID column, you should specify some unique test identifier that will be set at the beginning of the test name in a test result report. In the next columns, you can specify arguments for a test and their values in the bottom lines. They will be used as parameters in `@XlsDataSourceParameters`. In this example, the values of a, b, c arguments were defined in 3 sets of values with different TUID.
 

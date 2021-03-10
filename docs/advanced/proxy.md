@@ -95,23 +95,23 @@ To add and configure content filters, look [here](https://github.com/lightbody/b
 1. Go [here](https://github.com/lightbody/browsermob-proxy/blob/master/browsermob-core/src/main/resources/sslSupport/ca-certificate-rsa.cer) and save it as **ca-certificate-rsa.cer**.
 2. A double click creates a file. The next window should appear:
 
-![Adding ssl certificate](img/SSLInstallStep1.png)
+![Adding ssl certificate](../img/SSLInstallStep1.png)
 
 3. After authorization, the certificate will be added into your system certificates,  but it's still untrusted:
 
-![Adding ssl certificate](img/SSLInstallStep2.png)
+![Adding ssl certificate](../img/SSLInstallStep2.png)
 
 4. To make it trusted, double click on it. The following window should appear:
 
-![Adding ssl certificate](img/SSLInstallStep3.png)
+![Adding ssl certificate](../img/SSLInstallStep3.png)
 
 5. First, click the drop-down menu and select **Always Trust** option. Then close the window (a second authorization will be required):
 
-![Adding ssl certificate](img/SSLInstallStep4.png)
+![Adding ssl certificate](../img/SSLInstallStep4.png)
 
 6. Make sure the red cross on your certificate turned into a blue one:
 
-![Adding ssl certificate](img/SSLInstallStep5.png)
+![Adding ssl certificate](../img/SSLInstallStep5.png)
 
 #### Adding SSL certificate into Java keystore:
 
