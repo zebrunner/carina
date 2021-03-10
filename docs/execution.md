@@ -2,7 +2,7 @@
 
 [![Carina - Start Selenium](https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png)](https://youtu.be/YGXsVoEY74M)
 
-Before running any web or mobile test, you have to start Selenium/Appium locally or use a remote Selenium Grid. 
+Before running any web or mobile test you have to start Selenium/Appium locally or use a remote Selenium Grid. 
 We recommend to use lightweight Zebrunner [Selenoid](https://github.com/zebrunner/selenoid) and [MCloud](https://github.com/zebrunner/mcloud) solutions.
 
 ### Running tests
@@ -15,9 +15,13 @@ To run test suite from Eclipse IDE, just select the required TestNG xml file: Ri
 
 ![Execution from Eclipse IDE](img/006-Configuration-and-execution.png)
 
-
 To run the same test suite from the console, navigate to the test project root (where pom.xml is located) and execute the following command:
 
 ```
 mvn clean -Dsuite=api test
+```
+
+> Overriden configuration parameters migth be provided as java Arguments:
+```
+mvn clean -Denv=STAG -Dbrowser=firefox -Dsuite=web test
 ```
