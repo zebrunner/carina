@@ -173,7 +173,7 @@ It is good practice to implement all elements search logic of Page Object/UI Obj
 * Locate tests in src/test/java source folder
 
 ### Test configuration
-There are a few critical properties in a config.properties file which are required for web test execution:
+There are a few critical properties in a _config.properties file which are required for web test execution:
 
 * url=http://www.gsmarena.com
 * browser=chrome
@@ -181,9 +181,9 @@ There are a few critical properties in a config.properties file which are requir
 
 The implemented test cases should be placed in a TestNG xml file according to the test group the test belongs to. You can find more details about TestNG configuration in the [official documentation](http://testng.org/doc/documentation-main.html).
 ```
-<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
 
-<suite verbose="1" name="Carina Demo Tests - Web tests" skipfailedinvocationcounts="false" junit="false" parallel="tests" data-provider-thread-count="50" annotations="JDK">
+<suite verbose="1" name="Carina Demo Tests - Web Sample" parallel="methods">
 
 	<test name="GSM arena web tests">
 		<classes>

@@ -21,7 +21,7 @@ To run the same test suite from the console, navigate to the test project root (
 mvn clean -Dsuite=api test
 ```
 
-> Overriden configuration parameters migth be provided as java Arguments:
+> Overriden configuration parameters migth be provided as Java arguments:
 ```
 mvn clean -Denv=STAG -Dbrowser=firefox -Dsuite=web test
 ```
