@@ -563,7 +563,7 @@
                 <h1 id="driver-configuration">Driver configuration</h1>
 <p>In Carina WebDriver is initialized by method <strong>getDriver()</strong>.
 It will create a WebDriver named "default" with capabilities from _config.properties.
-With a help of this method we also can launch several automation sessions with different capabilities and browser options</p>
+With a help of this method we can launch several automation sessions with different capabilities and browser options.</p>
 <p>Currently supported browsers by Carina:</p>
 <ul>
 <li>Chrome</li>
@@ -581,12 +581,12 @@ With a help of this method we also can launch several automation sessions with d
 <ul>
 <li><strong>getDriver()</strong></li>
 </ul>
-<p>In this case we need to specify -Dwebdriver when launching selenium server. The driver's name will be setted as "default". So it means that we can access this driver by calling method getDriver() or getDriver("default"). If default driver is null Carina will initialize new driver with capabilities from _config.properties file.</p>
+<p>In this case we need to specify -Dwebdriver when launching selenium server. The driver's name will be setted as <em>"default"</em>. So it means that we can access this driver by calling method getDriver() or getDriver("default"). If default driver is null Carina will initialize new driver with capabilities from _config.properties file.</p>
 <ul>
 <li><strong>getDriver(String name, DesiredCapabilities capabilities).</strong></li>
 </ul>
-<p>In this case we will use our custom capabilities. There are two ways: 
-1) Use Carina's capabilities templates for different browsers.
+<p>In this case we will use our custom capabilities. There are two ways: </p>
+<p>1) Use Carina's capabilities templates for different browsers.
 2) Describe DesiredCapabilities inside your program javaTest.class. </p>
 <h3 id="carinas-capabilities-templates">Carina's capabilities templates:</h3>
 <pre><code class="java">getDriver(&quot;chrome&quot;, new ChromeCapabilities().getCapability(&quot;Chrome Test&quot;))
