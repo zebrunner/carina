@@ -48,7 +48,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#selenium-server" class="md-skip">
+        <a href="#seleniumappium" class="md-skip">
           Skip to content
         </a>
       
@@ -255,8 +255,8 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#selenium-server" class="md-nav__link">
-    Selenium server
+  <a href="#seleniumappium" class="md-nav__link">
+    Selenium/Appium
   </a>
   
 </li>
@@ -449,8 +449,8 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#selenium-server" class="md-nav__link">
-    Selenium server
+  <a href="#seleniumappium" class="md-nav__link">
+    Selenium/Appium
   </a>
   
 </li>
@@ -484,45 +484,10 @@
                 
                   <h1>Execution</h1>
                 
-                <h3 id="selenium-server">Selenium server</h3>
+                <h3 id="seleniumappium">Selenium/Appium</h3>
 <p><a href="https://youtu.be/YGXsVoEY74M"><img alt="Carina - Start Selenium" src="https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png" /></a></p>
-<p>Before running any web test, you have to start Selenium server locally or use a remote Selenium server. You may download the latest version of Selenium standalone server on <a href="https://www.seleniumhq.org/download">the official website</a> along with a browser binary for Chrome, Firefox, IE, etc. For running a test with Chrome browser, you will need to download chromedriver and place it along with selenium-standalone-server-X.jar and execute (make sure that you replace 'X' by the current Selenium version):</p>
-<pre><code>java -jar -Dwebdriver.chrome.driver=./chromedriver selenium-server-standalone-X.jar
-</code></pre>
-
-<p>You have several options to run <a href="https://github.com/SeleniumHQ/docker-selenium">Selenium in Docker</a>, the easiest way is to create docker-compose.yml:</p>
-<pre><code># To execute this docker-compose yml file, use docker-compose -f &lt;file_name&gt; up
-# Add the &quot;-d&quot; flag at the end for deattached execution
-version: '2'
-services:
-  firefox:
-    image: selenium/node-firefox:3.11.0-californium
-    volumes:
-      - /dev/shm:/dev/shm
-    depends_on:
-      - hub
-    environment:
-      HUB_HOST: hub
-
-  chrome:
-    image: selenium/node-chrome:3.11.0-californium
-    volumes:
-      - /dev/shm:/dev/shm
-    depends_on:
-      - hub
-    environment:
-      HUB_HOST: hub
-
-  hub:
-    image: selenium/hub:3.11.0-californium
-    ports:
-      - &quot;4444:4444&quot;
-</code></pre>
-
-<p>Now you may start Selenium, running the following command in terminal:</p>
-<pre><code>docker-compose up
-</code></pre>
-
+<p>Before running any web or mobile test, you have to start Selenium/Appium locally or use a remote Selenium Grid. 
+We recommend to use lightweight Zebrunner <a href="https://github.com/zebrunner/selenoid">Selenoid</a> and <a href="https://github.com/zebrunner/mcloud">MCloud</a> solutions.</p>
 <h3 id="running-tests">Running tests</h3>
 <p><a href="https://youtu.be/QGHCezE-d-I"><img alt="Carina - Running tests" src="http://img.youtube.com/vi/QGHCezE-d-I/0.jpg" /></a></p>
 <p>There are several options to execute a test: you may run test suite from Eclipse IDE or initiate test execution from the console using Maven Surefire plugin built into Carina framework.</p>
