@@ -5,15 +5,16 @@ pages:
     - Project structure: project_structure.md
     - Configuration: configuration.md
     - Execution: execution.md
-    - Advanced:
-      - Web automation: advanced/web.md
-      - Mobile automation: advanced/mobile.md
-      - API automation: advanced/api.md
-      - Drivers usage: advanced/drivers.md
+    - Automation:
+      - Web: automation/web.md
+      - Mobile: automation/mobile.md
+      - API: automation/api.md
+    - Advanced usage:
+      - Driver: advanced/driver.md
       - Proxy: advanced/proxy.md
-      - Database usage: advanced/databases.md
+      - Database: advanced/database.md
       - Security: advanced/security.md
-      - Dataproviders: advanced/dataproviders.md
+      - DataProvider: advanced/dataprovider.md
     - Cucumber: cucumber.md
     - Contribution: contribution.md
 theme:
