@@ -385,13 +385,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#additional-capabilities" class="md-nav__link">
-    Additional capabilities
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -535,13 +528,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#additional-capabilities" class="md-nav__link">
-    Additional capabilities
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -577,7 +563,7 @@
                 <h1 id="driver-configuration">Driver configuration</h1>
 <p>In Carina, WebDriver is initialized by method <strong>getDriver()</strong>.
 It will create a WebDriver named "default" with capabilities from _config.properties.
-Also with the help of this method could be launched several automation sessions with different capabilities and browser options.</p>
+With a help of this method we also can launch several automation sessions with different capabilities and browser options</p>
 <p>Currently supported browsers by Carina:</p>
 <ul>
 <li>Chrome</li>
@@ -625,15 +611,15 @@ Assert.assertTrue(safariHomePage.isPageOpened());
 </code></pre>
 
 <p>List of all selenium <a href="https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities">capabilities</a>.</p>
-<h3 id="additional-capabilities">Additional capabilities</h3>
-<p>There is also a possibility to send additional capabilities to Carina through _config.properties. All parameters with prefix <strong>capabilities.</strong> will be added to the driver’s capabilities.</p>
-<pre><code>capabilities.platformName=MAC
-</code></pre>
-
 <ul>
 <li><strong>getDriver(String name, DesiredCapabilities capabilities, String seleniumHost).</strong></li>
 </ul>
 <p>There we also need to pass selenium server host. In case of seleniumHost == null Carina will use your _config.properties selenium_host parameter.</p>
+<p>###Additional capabilities</p>
+<p>There is also a possibility to send additional capabilities to Carina through _config.properties. All parameters with prefix <strong>capabilities.</strong> will be added to the driver’s capabilities.</p>
+<pre><code>capabilities.platformName=MAC
+</code></pre>
+
 <h2 id="options">Options</h2>
 <p>Options are used to tune your browser for tests.</p>
 <pre><code class="java">DesiredCapabilities capabilities = DesiredCapabilities.safari();
