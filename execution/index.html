@@ -486,7 +486,7 @@
                 
                 <h3 id="seleniumappium">Selenium/Appium</h3>
 <p><a href="https://youtu.be/YGXsVoEY74M"><img alt="Carina - Start Selenium" src="https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png" /></a></p>
-<p>Before running any web or mobile test, you have to start Selenium/Appium locally or use a remote Selenium Grid. 
+<p>Before running any web or mobile test you have to start Selenium/Appium locally or use a remote Selenium Grid. 
 We recommend to use lightweight Zebrunner <a href="https://github.com/zebrunner/selenoid">Selenoid</a> and <a href="https://github.com/zebrunner/mcloud">MCloud</a> solutions.</p>
 <h3 id="running-tests">Running tests</h3>
 <p><a href="https://youtu.be/QGHCezE-d-I"><img alt="Carina - Running tests" src="http://img.youtube.com/vi/QGHCezE-d-I/0.jpg" /></a></p>
@@ -495,6 +495,12 @@ We recommend to use lightweight Zebrunner <a href="https://github.com/zebrunner/
 <p><img alt="Execution from Eclipse IDE" src="../img/006-Configuration-and-execution.png" /></p>
 <p>To run the same test suite from the console, navigate to the test project root (where pom.xml is located) and execute the following command:</p>
 <pre><code>mvn clean -Dsuite=api test
+</code></pre>
+
+<blockquote>
+<p>Overriden configuration parameters migth be provided as java Arguments:</p>
+</blockquote>
+<pre><code>mvn clean -Denv=STAG -Dbrowser=firefox -Dsuite=web test
 </code></pre>
                 
               
