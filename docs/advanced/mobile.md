@@ -1,4 +1,4 @@
-Carina framework provides a useful and elegant way of Mobile (Android and iOS) Test Automation. The best practices have a lot in common with web automation, so it’s highly recommended to look through [Web automation article](http://qaprosoft.github.io/carina/automation/web/).
+Carina framework provides a useful and elegant way of Mobile (Android and iOS) Test Automation. The best practices have a lot in common with web automation, so it's highly recommended to look through [Web automation article](http://qaprosoft.github.io/carina/automation/web/).
 
 ### Mobile special requirements:
 To run mobile tests, [Appium](http://appium.io/) is used instead of Selenium. There are 2 versions of Appium: desktop and console ones, and both are good for Carina. <b>Appium must be running every time before the test run.</b>
@@ -6,14 +6,14 @@ To run mobile tests, [Appium](http://appium.io/) is used instead of Selenium. Th
 ![Alt text](../img/appium_design.png "Appium")
 	
 ### Android special requirements:	
-1. Android SDK (part of [Android Studio](https://developer.android.com/studio/)) is an important component for work. Pay attention that after installing Android Studio you sometimes (depends on a version) need to additionally install ADB and aapt (for Mac only). 
+1. Android SDK (part of [Android Studio](https://developer.android.com/studio/)) is an important component for work. Pay attention that after installing Android Studio you sometimes (depends on a version) need to additionally install ADB (Mac only). 
 2. Edit your PATH variable and add ANDROID_HOME (path to "sdk" folder) to PATH. 
-Hint: you sometimes (especially on Mac) need to add paths to important folders inside sdk, such as "platform-tools" (ADB is located here), "tools" and "build-tools" (aapt is located here).
-3. .apk file - installation file of a program that’s being tested is required, the same for both - a real device and an emulator.
+  > Sometimes (mostly on Mac) need to add paths to important folders inside sdk, such as "platform-tools" (ADB is located here), "tools" and "build-tools".
+3. apk file - installation file of a program that's being tested is required, the same for both - a real device and an emulator.
 
 ### iOS special requirements:
-1. [Xcode](https://developer.apple.com/xcode/) is a vital component for work, but unfortunately, it’s Mac-used only. It’s impossible to do iOS automation on Windows.
-2. Installation file of a program that’s being tested is required. For a real device it’s .ipa file, and for a simulator it’s .app file. .app file should be provided by developers and has special signatures to work correctly, but automation on the simulator is free. On the other hand, the license is needed to work with the real device.
+1. [Xcode](https://developer.apple.com/xcode/) is a vital component for work so iOS testing is available only on Mac OS.
+2. Installation file of a program that's being tested is required. For a real device it's ipa file, and for a simulator it is app file. App file should be provided by developers and has special signatures to work correctly.
 
 ### Mobile config properties
 We can provide any Appium capability in the **_config.properties** file using `capabilities.name=value` format. In the table below we are providing the description of the most popular mobile capabilities:
@@ -93,6 +93,8 @@ We can provide any Appium capability in the **_config.properties** file using `c
 	</tr>
 </table>
 
+Actual list of Appium capabilities can be found [here](https://appium.io/docs/en/writing-running-appium/caps/).
+
 ### Example for Android of _config.properties:
 ```
 selenium_host=http://localhost:4723/wd/hub
@@ -119,7 +121,7 @@ capabilities.app=https://qaprosoft.s3-us-west-2.amazonaws.com/carinademoexample.
 The main idea is the same as in [web-testing](http://qaprosoft.github.io/carina/automation/web/#implementation-of-page-objects). 
 
 ### How to find locators for Android application
-To obtain the locators of web elements from an Android app, different programs are used, such as the latest Appium itself and a convenient Android SDK tool: uiautomatorviewer. It's located in $ANDROID_HOME/tools/bin and can be launched using the command line `./uiautomatorviewer`.
+To obtain the locators of elements from an Android app different programs are used such as Appium itself or convenient Android SDK tool: `uiautomatorviewer`.
 Example:
 ```
  @FindBy(xpath = "//*[@resource-id='name_input']")
@@ -128,8 +130,8 @@ Example:
 
 
 ### How to find locators for iOS application
-To obtain the locators of web elements from an iOS app, different programs are used, such as GUI Appium itself and a convenient [Macaca App Inspector](https://macacajs.github.io/app-inspector/).
-To speed up the work, @Predicate is used. Complicate "xpaths" can't be used with predicates. 
+To obtain the locators of elements from an iOS app different programs are used such as Appium itself or convenient [Macaca App Inspector](https://macacajs.github.io/app-inspector/).
+To speed up element detection @Predicate annotation can be used used. Complicate "xpath" can't be used with predicates. 
 Example:
 ```
 @FindBy(xpath = "name = 'DONE'")
@@ -198,7 +200,7 @@ Every page has an abstract declaration and different implementations if needed (
  * iOS page in ios package with iOS methods and elements;
  * Android page in android package with Android methods and elements.
 
-Child pages should extend BasePage implementing all abstract methods. Annotation @DeviceType will provide the information about the device type and the parent (common) page.
+Children pages should extend BasePage implementing all abstract methods. Annotation @DeviceType will provide the information about the device type and the parent (common) page.
 
 **Examples:**
 
@@ -302,9 +304,9 @@ Or for a specific version
 public class HomePage extends HomePageBase {
 ```
 
-### How to use Find by image strategy
+### How to use Find by Image strategy
 
-Find by image strategy is based on [appium implementation](https://github.com/appium/appium/blob/master/docs/en/writing-running-appium/image-comparison.md). Be sure you have openCV libraries installed to [your system](https://github.com/justadudewhohacks/opencv4nodejs).
+Find by image strategy is based on [appium implementation](https://github.com/appium/appium/blob/master/docs/en/writing-running-appium/image-comparison.md). Be sure you have OpenCV libraries installed to [your system](https://github.com/justadudewhohacks/opencv4nodejs).
 Find by image logic is covered by ```@ExtendedFindBy``` annotation. 
 
 **Example:**
