@@ -1,6 +1,6 @@
 #Driver configuration
 
-In Carina, WebDriver is initialized by method **getDriver()**.
+In Carina WebDriver is initialized by method **getDriver()**.
 It will create a WebDriver named "default" with capabilities from _config.properties.
 With a help of this method we also can launch several automation sessions with different capabilities and browser options
 
@@ -17,7 +17,7 @@ WebDriver can be created in several ways:
 
 * **getDriver(String name).**
 
-In this case we may need to specify -Dwebdriver when launching selenium server. If there is no driver in Driver pool with name we passed, Carina will create a new WebDriver with capabilities from _config.properties file. We can access the driver by his name. By using different names we can create several Automation sessions.
+In this case we may need to specify -Dwebdriver when launching selenium server. If there is no driver in Driver pool with name we passed Carina will create a new WebDriver with capabilities from _config.properties file. We can access the driver by his name. By using different names we can create several Automation sessions.
 
 * **getDriver()**
 
@@ -81,7 +81,7 @@ HomePage safariHomePage = new HomePage(getDriver("safari",capabilities));
 safariHomePage.open();
 Assert.assertTrue(safariHomePage.isPageOpened());
 ```
-Options also could be setted through _config.properties. If there are multiple options to pass, split them by comma. Available parameters to pass options:
+Options also could be setted through _config.properties. If there are multiple options to pass split them by comma. Available parameters to pass options:
 ```
 chrome_args=
 chrome_experimental_opts=
