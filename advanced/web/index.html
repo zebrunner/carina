@@ -681,16 +681,16 @@ assertEquals(&quot;MyCityName&quot;, city.getText());
 <li>Locate tests in src/test/java source folder</li>
 </ul>
 <h3 id="test-configuration">Test configuration</h3>
-<p>There are a few critical properties in a config.properties file which are required for web test execution:</p>
+<p>There are a few critical properties in a _config.properties file which are required for web test execution:</p>
 <ul>
 <li>url=http://www.gsmarena.com</li>
 <li>browser=chrome</li>
 <li>browser_version=*</li>
 </ul>
 <p>The implemented test cases should be placed in a TestNG xml file according to the test group the test belongs to. You can find more details about TestNG configuration in the <a href="http://testng.org/doc/documentation-main.html">official documentation</a>.</p>
-<pre><code>&lt;!DOCTYPE suite SYSTEM &quot;http://testng.org/testng-1.0.dtd&quot;&gt;
+<pre><code>&lt;!DOCTYPE suite SYSTEM &quot;https://testng.org/testng-1.0.dtd&quot;&gt;
 
-&lt;suite verbose=&quot;1&quot; name=&quot;Carina Demo Tests - Web tests&quot; skipfailedinvocationcounts=&quot;false&quot; junit=&quot;false&quot; parallel=&quot;tests&quot; data-provider-thread-count=&quot;50&quot; annotations=&quot;JDK&quot;&gt;
+&lt;suite verbose=&quot;1&quot; name=&quot;Carina Demo Tests - Web Sample&quot; parallel=&quot;methods&quot;&gt;
 
     &lt;test name=&quot;GSM arena web tests&quot;&gt;
         &lt;classes&gt;
