@@ -561,7 +561,7 @@
                 
                 
                 <h1 id="driver-configuration">Driver configuration</h1>
-<p>In Carina, WebDriver is initialized by method <strong>getDriver()</strong>.
+<p>In Carina WebDriver is initialized by method <strong>getDriver()</strong>.
 It will create a WebDriver named "default" with capabilities from _config.properties.
 With a help of this method we also can launch several automation sessions with different capabilities and browser options</p>
 <p>Currently supported browsers by Carina:</p>
@@ -577,7 +577,7 @@ With a help of this method we also can launch several automation sessions with d
 <ul>
 <li><strong>getDriver(String name).</strong></li>
 </ul>
-<p>In this case we may need to specify -Dwebdriver when launching selenium server. If there is no driver in Driver pool with name we passed, Carina will create a new WebDriver with capabilities from _config.properties file. We can access the driver by his name. By using different names we can create several Automation sessions.</p>
+<p>In this case we may need to specify -Dwebdriver when launching selenium server. If there is no driver in Driver pool with name we passed Carina will create a new WebDriver with capabilities from _config.properties file. We can access the driver by his name. By using different names we can create several Automation sessions.</p>
 <ul>
 <li><strong>getDriver()</strong></li>
 </ul>
@@ -634,7 +634,7 @@ safariHomePage.open();
 Assert.assertTrue(safariHomePage.isPageOpened());
 </code></pre>
 
-<p>Options also could be setted through _config.properties. If there are multiple options to pass, split them by comma. Available parameters to pass options:</p>
+<p>Options also could be setted through _config.properties. If there are multiple options to pass split them by comma. Available parameters to pass options:</p>
 <pre><code>chrome_args=
 chrome_experimental_opts=
 chrome_mobile_emulation_opts=
