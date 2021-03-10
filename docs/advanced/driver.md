@@ -25,7 +25,7 @@ In this case we need to specify -Dwebdriver when launching selenium server. The 
 
 * **getDriver(String name, DesiredCapabilities capabilities).**
 
-In this case we will use our custom capabilities. There are two ways: 
+In this case we need to use our custom capabilities. There are two ways: 
 
 1. Use Carina's capabilities templates for different browsers.
 2. Describe DesiredCapabilities inside your program javaTest.class. 
