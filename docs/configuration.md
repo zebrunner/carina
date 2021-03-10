@@ -258,19 +258,14 @@ All the project configuration properties are located in a **_config.properties**
 		<td>Suite name for the report and TestRail. If this parameter is NULL, will be taken from TestNG xml (the parameter suite name) or _email.properties (the title)</td>
 		<td>Advanced Acceptance</td>
 	</tr>
-	<tr>
-		<td>jira_url</td>
-		<td>URL to Jira</td>
-		<td>https://yourclass.atlassian.net</td>
-	</tr>
 		<tr>
 		<td>access_key_id</td>
-		<td>Access key id for Amazon S3 build uploader. More info [here](#https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)</td>
+		<td>Access key id for Amazon S3 build uploader. More info [here](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)</td>
 		<td>gkhcvdgvceUYF67897hbjsbdc</td>
 	</tr>
 		<tr>
 		<td>secret_key</td>
-		<td>Secret key for Amazon S3 build uploader. More info [here](#https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)</td>
+		<td>Secret key for Amazon S3 build uploader. More info [here](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)</td>
 		<td>gkhcvdgvceUYF67897hbjsbdc</td>
 	</tr>
 		<tr>
@@ -296,17 +291,17 @@ All the project configuration properties are located in a **_config.properties**
 		<tr>
 		<td>add_new_localization_encoding</td>
 		<td>Encoding for a new localization</td>
-		<td>utf-16, utf-32</td>
+		<td>UTF-8</td>
 	</tr>
 		<tr>
 		<td>add_new_localization_path</td>
 		<td>Path where created localization properties should be saved. If null, they will be added to an artifactory folder in the report</td>
-		<td>utf-16, utf-32</td>
+		<td>./src/main/resources/L10N</td>
 	</tr>
 		<tr>
 		<td>add_new_localization_property_name</td>
-		<td>Path where created localization properties should be saved. If null, they will be added to an artifactory folder in the report</td>
 		<td>Basic template for property name.</td>
+		<td>new_locale_file_</td>
 	</tr>
 		<tr>
 		<td>tls_keysecure_location</td>
@@ -362,7 +357,7 @@ Configuration.getEnvArg("url")
 As a result, you switch between the environments just changing the env argument in the _config.properties file.
 
 ### [Zebrunner Reporting](https://zebrunner.com/documentation/agents/testng) configuration
-[**agent.properties**](https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/agent.properties) are used for Zebrunner Reporting integration, here you should specify some values for a proper integration:<table>
+[**agent.properties**](https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/agent.properties) file is used for Zebrunner Reporting integration, here you should specify some values for a proper integration:<table>
 	<tr>
 		<th>Attribute</th>
 		<th>Meaning</th>
@@ -375,17 +370,17 @@ As a result, you switch between the environments just changing the env argument 
 	</tr>
 	<tr>
 		<td>reporting.server.hostname</td>
-		<td>Zebrunner Service URL</td>
+		<td>Service URL</td>
 		<td>https://mycompany.zebrunner.com</td>
 	</tr>
 	<tr>
 		<td>reporting.server.access-token</td>
-		<td>Zebrunner Access Token</td>
-		<td>true/false</td>
+		<td>Access Token</td>
+		<td>eyJhbGciOiJIUzUxMiJ9...</td>
 	</tr>
 	<tr>
 		<td>reporting.projectKey</td>
-		<td>Zebrunner Project name</td>
+		<td>Project Name</td>
 		<td>empty or any existing name</td>
 	</tr>
 </table>
