@@ -586,8 +586,10 @@ With a help of this method we can launch several automation sessions with differ
 <li><strong>getDriver(String name, DesiredCapabilities capabilities).</strong></li>
 </ul>
 <p>In this case we will use our custom capabilities. There are two ways: </p>
-<p>1) Use Carina's capabilities templates for different browsers.
-2) Describe DesiredCapabilities inside your program javaTest.class. </p>
+<ol>
+<li>Use Carina's capabilities templates for different browsers.</li>
+<li>Describe DesiredCapabilities inside your program javaTest.class. </li>
+</ol>
 <h3 id="carinas-capabilities-templates">Carina's capabilities templates:</h3>
 <pre><code class="java">getDriver(&quot;chrome&quot;, new ChromeCapabilities().getCapability(&quot;Chrome Test&quot;))
 getDriver(&quot;firefox&quot;, new FirefoxCapabilities().getCapability(&quot;Firefox Test&quot;))
