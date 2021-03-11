@@ -1,4 +1,4 @@
-#Driver configuration
+# Driver configuration
 
 In Carina WebDriver is initialized by method **getDriver()**.
 It will create a WebDriver named "default" with capabilities from _config.properties.
@@ -12,7 +12,7 @@ Currently supported browsers by Carina:
 * Opera
 * Safari
 
-##Carina's webdriver initialization
+## Carina's webdriver initialization
 WebDriver can be created in several ways:
 
 * **getDriver(String name).**
@@ -30,7 +30,7 @@ In this case we need to use our custom capabilities. There are two ways:
 1. Use Carina's capabilities templates for different browsers.
 2. Describe DesiredCapabilities inside your program javaTest.class. 
 
-###Carina's capabilities templates:
+### Carina's capabilities templates:
 ```java
 getDriver("chrome", new ChromeCapabilities().getCapability("Chrome Test"))
 getDriver("firefox", new FirefoxCapabilities().getCapability("Firefox Test"))
@@ -44,7 +44,7 @@ New driver could be accessed by name.
 getDriver("safari");
 ```
 
-###Creating custom capabilities:
+### Creating custom capabilities:
 ``` java
 DesiredCapabilities capabilities = DesiredCapabilities.safari();
 capabilities.setBrowserName("safari");
@@ -60,14 +60,14 @@ List of all selenium [capabilities](https://github.com/SeleniumHQ/selenium/wiki/
 
 There we also need to pass selenium server host. In case of seleniumHost == null Carina will use your _config.properties selenium_host parameter.
  
-###Additional capabilities
+### Additional capabilities
 
 There is also a possibility to send additional capabilities to Carina through _config.properties. All parameters with prefix **capabilities.** will be added to the driver’s capabilities.
 ```
 capabilities.platformName=MAC
 ```
 
-##Options 
+## Options 
 
 Options are used to tune your browser for tests.
 ``` java
