@@ -58,9 +58,9 @@ List of all selenium [capabilities](https://github.com/SeleniumHQ/selenium/wiki/
 
 * **getDriver(String name, DesiredCapabilities capabilities, String seleniumHost).**
 
- There we also need to pass selenium server host. In case of seleniumHost == null Carina will use your _config.properties selenium_host parameter.
+There we also need to pass selenium server host. In case of seleniumHost == null Carina will use your _config.properties selenium_host parameter.
  
- ###Additional capabilities
+###Additional capabilities
 
 There is also a possibility to send additional capabilities to Carina through _config.properties. All parameters with prefix **capabilities.** will be added to the driver’s capabilities.
 ```
