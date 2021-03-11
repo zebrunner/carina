@@ -36,7 +36,7 @@ public class StringGenerator {
 
         for (int i = 0; i < keySize; i++) {
 
-            int step = Integer.valueOf(base.substring(i, i + 1)) * sign;
+            int step = Integer.parseInt(base.substring(i, i + 1)) * sign;
             if (position + step > 0 && position + step < ALPHABET.length() - 1) {
                 position += step;
             } else {
@@ -58,13 +58,12 @@ public class StringGenerator {
     }
 
     private static String generateBase(int keySize) {
-
-        String base = "";
+        StringBuilder base = new StringBuilder();
 
         for (int i = 0; i < keySize; i++) {
-            base += String.valueOf(RANDOM.nextInt(9));
+            base.append(RANDOM.nextInt(9));
         }
-        return base;
+        return base.toString();
     }
 
     public static void generateInputParameters(Object[] params) {
@@ -72,7 +71,7 @@ public class StringGenerator {
         for (int i = 0; i < params.length; i++) {
             if (params[i].toString().contains(GENERATE)) {
                 String newLine = params[i].toString();
-                int size = Integer.valueOf(newLine.split(":")[1]);
+                int size = Integer.parseInt(newLine.split(":")[1]);
                 newLine = newLine.substring(0, newLine.indexOf(GENERATE));
                 newLine += generateWord(size);
                 params[i] = newLine;
