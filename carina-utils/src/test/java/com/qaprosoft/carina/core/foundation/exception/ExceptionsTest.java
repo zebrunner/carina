@@ -28,7 +28,7 @@ public class ExceptionsTest {
         try {
             throw new DataLoadingException("test");
         } catch (DataLoadingException e) {
-            Assert.assertTrue(e.getMessage().equals("Can't load data: test"));
+            Assert.assertEquals(e.getMessage(), "Can't load data: test", "Message wasn't overridden in " + e.getClass().getName());
         }
     }
 
@@ -37,7 +37,25 @@ public class ExceptionsTest {
         try {
             throw new DataLoadingException();
         } catch (DataLoadingException e) {
-            Assert.assertTrue(e.getMessage().equals("Can't load data."));
+            Assert.assertEquals(e.getMessage(), "Can't load data.", "Message wasn't overridden in " + e.getClass().getName());
+        }
+    }
+
+    @Test
+    public void testDriverPoolExceptionWithText() {
+        try {
+            throw new DriverPoolException("test");
+        } catch (DriverPoolException e) {
+            Assert.assertEquals(e.getMessage(), "test", "Message wasn't overridden in " + e.getClass().getName());
+        }
+    }
+
+    @Test
+    public void testDriverPoolExceptionWithoutText() {
+        try {
+            throw new DriverPoolException();
+        } catch (DriverPoolException e) {
+            Assert.assertEquals(e.getMessage(), "Undefined failure in DriverPool!", "Message wasn't overridden in " + e.getClass().getName());
         }
     }
 
@@ -46,7 +64,7 @@ public class ExceptionsTest {
         try {
             throw new InvalidArgsException("test");
         } catch (InvalidArgsException e) {
-            Assert.assertTrue(e.getMessage().equals("Invalid test arguments exception: test"));
+            Assert.assertEquals(e.getMessage(), "Invalid test arguments exception: test", "Message wasn't overridden in " + e.getClass().getName());
         }
     }
 
@@ -55,7 +73,7 @@ public class ExceptionsTest {
         try {
             throw new InvalidArgsException();
         } catch (InvalidArgsException e) {
-            Assert.assertTrue(e.getMessage().equals("Invalid test arguments exception"));
+            Assert.assertEquals(e.getMessage(), "Invalid test arguments exception", "Message wasn't overridden in " + e.getClass().getName());
         }
     }
 
@@ -64,7 +82,7 @@ public class ExceptionsTest {
         try {
             throw new InvalidConfigurationException("test");
         } catch (InvalidConfigurationException e) {
-            Assert.assertTrue(e.getMessage().equals("test"));
+            Assert.assertEquals(e.getMessage(), "test", "Message wasn't overridden in " + e.getClass().getName());
         }
     }
 
@@ -74,7 +92,7 @@ public class ExceptionsTest {
             Exception e = new Exception("test");
             throw new InvalidConfigurationException(e);
         } catch (InvalidConfigurationException e) {
-            Assert.assertTrue(e.getMessage().equals("java.lang.Exception: test"));
+            Assert.assertEquals(e.getMessage(), "java.lang.Exception: test", "Message wasn't overridden in " + e.getClass().getName());
         }
     }
 
@@ -83,7 +101,7 @@ public class ExceptionsTest {
         try {
             throw new NotSupportedOperationException("test");
         } catch (NotSupportedOperationException e) {
-            Assert.assertTrue(e.getMessage().equals("Not supported operation: test!"));
+            Assert.assertEquals(e.getMessage(), "Not supported operation: test!", "Message wasn't overridden in " + e.getClass().getName());
         }
     }
 
@@ -92,7 +110,7 @@ public class ExceptionsTest {
         try {
             throw new NotSupportedOperationException();
         } catch (NotSupportedOperationException e) {
-            Assert.assertTrue(e.getMessage().equals("Not supported operation!"));
+            Assert.assertEquals(e.getMessage(), "Not supported operation!", "Message wasn't overridden in " + e.getClass().getName());
         }
     }
 
@@ -101,7 +119,7 @@ public class ExceptionsTest {
         try {
             throw new PlaceholderResolverException("test");
         } catch (PlaceholderResolverException e) {
-            Assert.assertTrue(e.getMessage().equals("Value not found by key 'test'"));
+            Assert.assertEquals(e.getMessage(), "Value not found by key 'test'", "Message wasn't overridden in " + e.getClass().getName());
         }
     }
 
@@ -110,15 +128,16 @@ public class ExceptionsTest {
         try {
             throw new PlaceholderResolverException();
         } catch (PlaceholderResolverException e) {
-            Assert.assertNull(e.getMessage());
+            Assert.assertNull(e.getMessage(), "Message wasn't overridden in " + e.getClass().getName());
         }
     }
 
+    @Test
     public void testRequiredCtorNotFoundExceptionWithText() {
         try {
             throw new RequiredCtorNotFoundException("test");
         } catch (RequiredCtorNotFoundException e) {
-            Assert.assertTrue(e.getMessage().equals("Required constructor isn't found: test"));
+            Assert.assertEquals(e.getMessage(), "Required constructor isn't found: test", "Message wasn't overridden in " + e.getClass().getName());
         }
     }
 
@@ -127,15 +146,16 @@ public class ExceptionsTest {
         try {
             throw new RequiredCtorNotFoundException();
         } catch (RequiredCtorNotFoundException e) {
-            Assert.assertTrue(e.getMessage().equals("Required constructor isn't found."));
+            Assert.assertEquals(e.getMessage(), "Required constructor isn't found.", "Message wasn't overridden in " + e.getClass().getName());
         }
     }
 
+    @Test
     public void testTestCreationExceptionWithText() {
         try {
             throw new TestCreationException("test");
         } catch (TestCreationException e) {
-            Assert.assertTrue(e.getMessage().equals("Test creation exception: test"));
+            Assert.assertEquals(e.getMessage(), "Test creation exception: test", "Message wasn't overridden in " + e.getClass().getName());
         }
     }
 
@@ -144,11 +164,11 @@ public class ExceptionsTest {
         try {
             throw new TestCreationException();
         } catch (TestCreationException e) {
-            Assert.assertTrue(e.getMessage().equals("Test creation exception"));
+            Assert.assertEquals(e.getMessage(), "Test creation exception", "Message wasn't overridden in " + e.getClass().getName());
         }
     }
 
-/*    
+/*
     @Test
     public void testNotImplementedException() {
         try {
@@ -161,5 +181,5 @@ public class ExceptionsTest {
         }
     }
 */
-    
+
 }

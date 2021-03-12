@@ -28,8 +28,9 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
 public class RetryAnalyzer implements IRetryAnalyzer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Integer maxCount = Configuration.getInt(Parameter.RETRY_COUNT);
+
     private Integer runCount = 0;
-    private Integer maxCount = Configuration.getInt(Parameter.RETRY_COUNT);
 
     @Override
     public boolean retry(ITestResult result) {
