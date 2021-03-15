@@ -587,55 +587,72 @@
                 
                 
                 <h1 id="driver-configuration">Driver configuration</h1>
-<p>In Carina WebDriver is initialized by method <strong>getDriver()</strong>.
-It will create a WebDriver named "default" with capabilities from _config.properties.
-With a help of this method we can launch several automation sessions with different capabilities and browser options.</p>
+<p>In Carina WebDriver is initialized by method <strong>getDriver()</strong>.</p>
 <p>Currently supported browsers by Carina:</p>
 <ul>
 <li>Chrome</li>
 <li>Firefox</li>
+<li>Internet Explorer</li>
 <li>Microsoft Edge</li>
 <li>Opera</li>
 <li>Safari</li>
 </ul>
 <h2 id="carinas-webdriver-initialization">Carina's webdriver initialization</h2>
-<p>WebDriver can be created in several ways:</p>
-<ul>
-<li><strong>getDriver(String name).</strong></li>
-</ul>
-<p>In this case we may need to specify -Dwebdriver when launching selenium server. If there is no driver in Driver pool with name we passed Carina will create a new WebDriver with capabilities from _config.properties file. We can access the driver by his name. By using different names we can create several Automation sessions.</p>
 <ul>
 <li><strong>getDriver()</strong></li>
 </ul>
-<p>In this case we need to specify -Dwebdriver when launching selenium server. The driver's name will be setted as <em>"default"</em>. So it means that we can access this driver by calling method getDriver() or getDriver("default"). If default driver is null Carina will initialize new driver with capabilities from _config.properties file.</p>
+<p>If method called for the first time Carina will initialize new driver with capabilities from <em>config.properties file. The driver's name will be set as </em>"default"_. So it means that we can access this driver by calling method getDriver() or getDriver("default").</p>
+<ul>
+<li><strong>getDriver(String name).</strong></li>
+</ul>
+<p>If there is no driver in Driver pool with name we passed Carina will create a new WebDriver with capabilities from _config.properties file. We can access the driver by his name. By using different names we can create several Automation sessions with same capabilities.</p>
 <ul>
 <li><strong>getDriver(String name, DesiredCapabilities capabilities).</strong></li>
 </ul>
-<p>In this case we need to use our custom capabilities. There are two ways: </p>
+<p>In this case we need to declare our custom capabilities. There are two ways: </p>
 <ol>
 <li>Use Carina's capabilities templates for different browsers.</li>
-<li>Describe DesiredCapabilities inside your program javaTest.class. </li>
+<li>Describe DesiredCapabilities inside your Test.class. </li>
 </ol>
 <h3 id="carinas-capabilities-templates">Carina's capabilities templates:</h3>
-<pre><code class="java">getDriver(&quot;chrome&quot;, new ChromeCapabilities().getCapability(&quot;Chrome Test&quot;))
-getDriver(&quot;firefox&quot;, new FirefoxCapabilities().getCapability(&quot;Firefox Test&quot;))
-getDriver(&quot;safari&quot;, new SafariCapabilities().getCapability(&quot;Safari test&quot;))
-getDriver(&quot;edge&quot;, new EdgeCapabilities().getCapability(&quot;Edge test&quot;))
-getDriver(&quot;opera&quot;, new OperaCapabilities().getCapability(&quot;Opera test&quot;))
+<pre><code class="java">@Test
+public void someTest() {
+
+    WebDriver chromeDriver = getDriver(&quot;chrome&quot;, new ChromeCapabilities().getCapability(&quot;Chrome Test&quot;));
+    HomePage homePageChrome = new HomePage(chromeDriver);
+    homePageChrome.open();
+    //or
+    getDriver(&quot;firefox&quot;, new FirefoxCapabilities().getCapability(&quot;Firefox Test&quot;));
+    HomePage homePageFirefox = new HomePage(getDriver(&quot;firefox&quot;));
+    homePageFirefox.open();
+    //or
+    HomePage homePageSafari = new HomePage(
+    getDriver(&quot;safari&quot;, new SafariCapabilities().getCapability(&quot;Safari test&quot;)));
+    homePageSafari.open();
+    //etc
+    getDriver(&quot;edge&quot;, new EdgeCapabilities().getCapability(&quot;Edge test&quot;));
+    getDriver(&quot;opera&quot;, new OperaCapabilities().getCapability(&quot;Opera test&quot;));
+    getDriver(&quot;ie&quot;, new IECapabilities().getCapability(&quot;Internet Explorer test&quot;));
+}
 </code></pre>
 
 <p>You can decide the max number of drivers by parameter <strong>max_driver_count</strong> in <strong>_config.properties</strong>. By default it's 3.
-New driver could be accessed by name.</p>
+New driver could be accessed by init name.</p>
 <pre><code>getDriver(&quot;safari&quot;);
 </code></pre>
 
 <h3 id="creating-custom-capabilities">Creating custom capabilities:</h3>
-<pre><code class="java">DesiredCapabilities capabilities = DesiredCapabilities.safari();
-capabilities.setBrowserName(&quot;safari&quot;);
-capabilities.setCapability(CapabilityType.PLATFORM_NAME, SpecialKeywords.MAC);
-HomePage safariHomePage = new HomePage(getDriver(&quot;safari&quot;,capabilities));
-safariHomePage.open();
-Assert.assertTrue(safariHomePage.isPageOpened());
+<pre><code class="java">@Test
+public void someTest() {
+    DesiredCapabilities capabilities = DesiredCapabilities.safari();
+    capabilities.setBrowserName(&quot;safari&quot;);
+    capabilities.setCapability(CapabilityType.PLATFORM_NAME, SpecialKeywords.MAC);
+
+    HomePage safariHomePage = new HomePage(getDriver(&quot;safari&quot;,capabilities));
+    safariHomePage.open();
+
+    Assert.assertTrue(safariHomePage.isPageOpened());
+}
 </code></pre>
 
 <p>List of all selenium <a href="https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities">capabilities</a>.</p>
@@ -649,23 +666,31 @@ Assert.assertTrue(safariHomePage.isPageOpened());
 </code></pre>
 
 <h2 id="options">Options</h2>
-<p>Options are used to tune your browser for tests.</p>
-<pre><code class="java">DesiredCapabilities capabilities = DesiredCapabilities.safari();
-capabilities.setBrowserName(&quot;safari&quot;);
-capabilities.setCapability(CapabilityType.PLATFORM_NAME, SpecialKeywords.MAC);
-ChromeOptions options = new ChromeOptions();
-options.addArguments(&quot;--no-first-run&quot;);
-options.addArguments(&quot;--disable-notifications&quot;);
-capabilities.setCapability(ChromeOptions.CAPABILITY,options);
-HomePage safariHomePage = new HomePage(getDriver(&quot;safari&quot;,capabilities));
-safariHomePage.open();
-Assert.assertTrue(safariHomePage.isPageOpened());
+<p>Options are used to tune your browser for tests. Available for Chrome and Firefox. </p>
+<pre><code class="java">public void someTest() {
+    FirefoxOptions options = new FirefoxOptions();
+    options.addArguments(&quot;--no-first-run&quot;);
+    options.addArguments(&quot;--disable-notifications&quot;);
+
+    DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+    capabilities.setBrowserName(&quot;firefox&quot;);
+    capabilities.setCapability(CapabilityType.PLATFORM_NAME, SpecialKeywords.MAC);
+    capabilities.setCapability(FirefoxOptions.FIREFOX_OPTIONS,options);
+
+    HomePage safariHomePage = new HomePage(getDriver(&quot;firefox&quot;,capabilities));
+    safariHomePage.open();
+
+    Assert.assertTrue(safariHomePage.isPageOpened());
+}
 </code></pre>
 
-<p>Options also could be setted through _config.properties. If there are multiple options to pass split them by comma. Available parameters to pass options:</p>
-<pre><code>chrome_args=
+<p>Options also could be set through _config.properties. If there are multiple options to pass split them by comma. Available attributes to pass options:</p>
+<pre><code>*chrome
+chrome_args=
 chrome_experimental_opts=
 chrome_mobile_emulation_opts=
+
+#firefox
 firefox_args=
 firefox_preferences=
 </code></pre>
