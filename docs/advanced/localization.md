@@ -3,7 +3,7 @@
 Carina framework supports multi-localized testing.
 To use this feature we need to:
 
-1. Set properties in _config.properties.
+1) Set properties in _config.properties.
 ```
 locale=de_DE 	         
 #localization language
@@ -14,8 +14,9 @@ browser_language=en_US
 enable_l10n=true         
 #enable/disable localzation testin
 ```
-2. Add locale file into **src->main->resources->L10N**. Locale file samples could be found [here](https://github.com/qaprosoft/carina-demo/tree/master/src/main/resources/L10N). Ask developers to provide locale files and place them into folder mentioned above. If there are no locale files, check out **L10Nparser** section.
-3. find WebElements with a help of a key we described in locale_ file.
+2) Add locale file into **src->main->resources->L10N**. Locale file samples could be found [here](https://github.com/qaprosoft/carina-demo/tree/master/src/main/resources/L10N). Ask developers to provide locale files and place them into folder mentioned above. If there are no locale files, check out **L10Nparser** section.
+ 
+3) find WebElements with a help of a key we described in locale_ file.
    >Syntax is '{L10N:key}'
 
    Example:
@@ -26,13 +27,13 @@ private ExtendedWebElement welcomeText;
 @FindBy(linkText = "{L10N:discussionElem}")
 private ExtendedWebElement discussionBtn;
 ```
-4. Launch tests
+4) Launch tests
 
-##L10Nparser
+## L10Nparser
 
 If there is a need to create locale files by your own Carina can generate them with a help of L10Nparser.class.
 
-1. Set parameters in _config.properties:
+1) Set parameters in _config.properties:
 ```
 #true: Carina will create locale file with missing key-value pairs
 #false: Carina will check if locale key-value pairs present and print which aren't
@@ -46,7 +47,7 @@ add_new_localization_encoding=UTF-8
 #prefix to new locale file
 add_new_localization_property_name=new_locale_ 
 ```
-2. Find elements by not using locale text, for example by id:
+2) Find elements by not using locale text, for example by id:
 ```java
 @FindBy(id = "pt-anontalk")
 private ExtendedWebElement discussionElem;
@@ -57,7 +58,7 @@ private ExtendedWebElement contribElem;
 @FindBy(id = "pt-createaccount") 
 private ExtendedWebElement createAccountElem;
 ```
-3. Create method in your page.class. Place in _localizationCheckList_ webElements that are currently on the page and which locale pair you want to create.
+3) Create method in your page.class. Place in _localizationCheckList_ webElements that are currently on the page and which locale pair you want to create.
 ```java
 public boolean checkMultipleLocalization() {
         ExtendedWebElement[] localizationCheckList = {discussionElem, createAccountElem, contribElem};
@@ -65,7 +66,7 @@ public boolean checkMultipleLocalization() {
         return L10Nparser.checkMultipleLocalization(localizationCheckList);
 }
 ```
-4. Create test as below where checkMultipleLocalization() method is called when according page is opened.
+4) Create test as below where checkMultipleLocalization() method is called when according page is opened.
 ```java
 public void testAddNewLanguages() {
 
@@ -92,8 +93,8 @@ public void testAddNewLanguages() {
     sa.assertAll();
 }
 ```
-5. Copy all required values in your existing **locale_xx_XX.properties** file from **new_locale_xx_XX** file.
-6. Now elements could be accessed by locale text.
+5) Copy all required values in your existing **locale_xx_XX.properties** file from **new_locale_xx_XX** file.
+6) Now elements could be accessed by locale text.
 ```java
 @FindBy(id = "pt-anontalk")
 private ExtendedWebElement discussionElem;
