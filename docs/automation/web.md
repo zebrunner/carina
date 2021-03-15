@@ -290,7 +290,7 @@ Determines how carina detects appearing of web elements on page
 
 > It is recommended to use _element_loading_strategy=BY_VISIBILITY_ because in some cases condition with presence happens faster but elements are still not accessible due to invisibility at this short period of time.
 
-Element loading strategy could be set at the same places as **Page loading strategy**.
+Element loading strategy could be set at the same places as **Page opening strategy**.
 
 To check if element presence:
 ```java
