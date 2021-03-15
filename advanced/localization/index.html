@@ -530,7 +530,7 @@
                 
                 <h2 id="l10n">L10N</h2>
 <p>Carina framework supports multi-localized testing.
-To use this feature we need to:</p>
+To use this feature you need to:</p>
 <p>1) Set properties in _config.properties.</p>
 <pre><code>locale=de_DE             
 #localization language
@@ -543,7 +543,7 @@ enable_l10n=true
 </code></pre>
 
 <p>2) Add locale file into <strong>src-&gt;main-&gt;resources-&gt;L10N</strong>. Locale file samples could be found <a href="https://github.com/qaprosoft/carina-demo/tree/master/src/main/resources/L10N">here</a>. Ask developers to provide locale files and place them into folder mentioned above. If there are no locale files, check out <strong>L10Nparser</strong> section.</p>
-<p>3) find WebElements with a help of a key we described in locale_ file.</p>
+<p>3) Find WebElements with a help of a key you described in <strong>locale_</strong> file.</p>
 <blockquote>
 <p>Syntax is '{L10N:key}'</p>
 </blockquote>
@@ -618,8 +618,8 @@ private ExtendedWebElement createAccountElem;
 }
 </code></pre>
 
-<p>5) Copy all required values in your existing <strong>locale_xx_XX.properties</strong> file from <strong>new_locale_xx_XX</strong> file.
-6) Now elements could be accessed by locale text.</p>
+<p>5) Copy all required values in your existing <strong>locale_xx_XX.properties</strong> file from <strong>new_locale_xx_XX</strong> file.</p>
+<p>6) Now elements could be accessed by locale text.</p>
 <pre><code class="java">@FindBy(id = &quot;pt-anontalk&quot;)
 private ExtendedWebElement discussionElem;
 
