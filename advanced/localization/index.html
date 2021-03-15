@@ -532,14 +532,14 @@
 <p>Carina framework supports multi-localized testing.
 To use this feature you need to:</p>
 <p>1) Set properties in _config.properties.</p>
-<pre><code>locale=de_DE             
-#localization language
+<pre><code>#localization language
+locale=de_DE             
 
-browser_language=en_US   
 #Determines browser interface language. It won't affect locale parameter.
+browser_language=en_US   
 
+#enable/disable localzation testing
 enable_l10n=true         
-#enable/disable localzation testin
 </code></pre>
 
 <p>2) Add locale file into <strong>src-&gt;main-&gt;resources-&gt;L10N</strong>. Locale file samples could be found <a href="https://github.com/qaprosoft/carina-demo/tree/master/src/main/resources/L10N">here</a>. Ask developers to provide locale files and place them into folder mentioned above. If there are no locale files, check out <strong>L10Nparser</strong> section.</p>
@@ -583,7 +583,7 @@ private ExtendedWebElement contribElem;
 private ExtendedWebElement createAccountElem;
 </code></pre>
 
-<p>3) Create method in your page.class. Place in <em>localizationCheckList</em> webElements that are currently on the page and which locale pair you want to create.</p>
+<p>3) Create method below in your page.class. Place in <em>localizationCheckList</em> webElements that are currently on the page and which locale pair you want to create.</p>
 <pre><code class="java">public boolean checkMultipleLocalization() {
         ExtendedWebElement[] localizationCheckList = {discussionElem, createAccountElem, contribElem};
 
@@ -618,7 +618,7 @@ private ExtendedWebElement createAccountElem;
 }
 </code></pre>
 
-<p>5) Copy all required values in your existing <strong>locale_xx_XX.properties</strong> file from <strong>new_locale_xx_XX</strong> file.</p>
+<p>5) Copy all key-value pairs in your existing <strong>locale_xx_XX.properties</strong> file from <strong>new_locale_xx_XX</strong> file.</p>
 <p>6) Now elements could be accessed by locale text.</p>
 <pre><code class="java">@FindBy(id = &quot;pt-anontalk&quot;)
 private ExtendedWebElement discussionElem;
