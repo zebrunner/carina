@@ -1,4 +1,4 @@
-##Localization
+##L10N
 
 Carina framework supports multi-localized testing.
 To use this feature we need to:
