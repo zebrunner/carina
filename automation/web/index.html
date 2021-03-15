@@ -838,7 +838,7 @@ assertEquals(&quot;MyCityName&quot;, city.getText());
 page.assertPageOpened();  // equals Assert.assertTrue(page.isPageOpened(),&quot;PageName not loaded: reason);
 </code></pre>
 
-<p>Page open strategy configuration can be set in several places:</p>
+<p>Page opening strategy configuration can be set in several places:</p>
 <p>1) in <a href="http://qaprosoft.github.io/carina/configuration/">_config.properties</a>. This determines whole project page open strategy.</p>
 <p>2) in page.class. This overrides global page open strategy for a specific page.</p>
 <pre><code class="java">public class Page extends AbstractPage {
@@ -910,6 +910,7 @@ public Page(WebDriver driver) {
 <blockquote>
 <p>It is recommended to use <em>element_loading_strategy=BY_VISIBILITY</em> because in some cases condition with presence happens faster but elements are still not accessible due to invisibility at this short period of time.</p>
 </blockquote>
+<p>Element loading strategy could be set at the same places as <strong>Page loading strategy</strong>.</p>
 <p>To check if element presence:</p>
 <pre><code class="java">Component component = Page.getComponent();
 component.assertUIObjectPresent();      // equals to Assert.assertTrue(component.isUIObjectPresent(),&quot;UI object componentName does not present!&quot;);
