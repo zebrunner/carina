@@ -839,10 +839,8 @@ page.assertPageOpened();  // equals Assert.assertTrue(page.isPageOpened(),&quot;
 </code></pre>
 
 <p>Page open strategy configuration can be set in several places:</p>
-<ol>
-<li>in <a href="http://qaprosoft.github.io/carina/configuration/">_config.properties</a>. This determines whole project page open strategy.</li>
-<li>in page.class. This overrides global page open strategy for a specific page.</li>
-</ol>
+<p>1) in <a href="http://qaprosoft.github.io/carina/configuration/">_config.properties</a>. This determines whole project page open strategy.</p>
+<p>2) in page.class. This overrides global page open strategy for a specific page.</p>
 <pre><code class="java">public class Page extends AbstractPage {
 
     public Page(WebDriver driver){
@@ -852,9 +850,7 @@ page.assertPageOpened();  // equals Assert.assertTrue(page.isPageOpened(),&quot;
 }
 </code></pre>
 
-<ol>
-<li>in test.class. This also overrides global page open strategy for a specific page.</li>
-</ol>
+<p>3) in test.class. This also overrides global page open strategy for a specific page.</p>
 <pre><code class="java">@Test
 public void test(){
         HomePage homePage=new HomePage(getDriver());
