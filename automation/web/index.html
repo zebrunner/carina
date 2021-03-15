@@ -321,6 +321,40 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#page-open-strategy" class="md-nav__link">
+    Page Open Strategy
+  </a>
+  
+    <nav class="md-nav" aria-label="Page Open Strategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#by-url" class="md-nav__link">
+    By URL
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#by-element" class="md-nav__link">
+    By Element
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#by-url-and-element" class="md-nav__link">
+    By URL and Element
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -534,6 +568,40 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#page-open-strategy" class="md-nav__link">
+    Page Open Strategy
+  </a>
+  
+    <nav class="md-nav" aria-label="Page Open Strategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#by-url" class="md-nav__link">
+    By URL
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#by-element" class="md-nav__link">
+    By Element
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#by-url-and-element" class="md-nav__link">
+    By URL and Element
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -560,7 +628,7 @@
 <p>Carina framework follows Selenium best practices for web test automation. If you are familiar with Selenium WebDriver and have already implemented a few tests with the Page Object Pattern, the following guide will be much easier for understanding. We have chosen <a href="https://www.gsmarena.com/">GSM Arena</a> public web site for demonstration purposes, the whole test source code is located in <a href="https://github.com/qaprosoft/carina-demo">carina-demo</a> Github repo.</p>
 <h3 id="implementation-of-page-objects">Implementation of Page Objects</h3>
 <p>When you are writing functional tests using Selenium, the major part of your code will consist of interactions with the web interface you are testing through the WebDriver API. After fetching elements, you will verify some state of an element through various assertions and move on to fetching the next element. You may find WebElements directly in your tests:</p>
-<pre><code>List&lt;WebElement&gt; zipCodes = driver.findElements(By.id(&quot;zipCodes&quot;));
+<pre><code class="java">List&lt;WebElement&gt; zipCodes = driver.findElements(By.id(&quot;zipCodes&quot;));
 for (WebElement zipCode : zipCodes) {
     if (zipCode.getText().equals(&quot;12345&quot;)){
         zipCode.click();
@@ -581,7 +649,7 @@ assertEquals(&quot;MyCityName&quot;, city.getText());
 <p>You create an object that represents the UI you want to test, which can be a whole page or a significant part of it. The responsibility of this object is to wrap HTML elements and encapsulate interactions with the UI, meaning that this is where all calls to WebDriver will go. This is where most WebElements are. And this is the only place you need to modify when the UI changes.</p>
 <p><img alt="Page Object Pattern" src="../../img/page-objects.png" /></p>
 <p>In general, Page Object contains locators of the elements situated on the page and some business logic that may be reused by different tests:</p>
-<pre><code>public class ModelInfoPage extends AbstractPage {
+<pre><code class="java">public class ModelInfoPage extends AbstractPage {
     @FindBy(css = &quot;.help-display strong&quot;)
     private ExtendedWebElement displayInfoLabel;
 
@@ -629,7 +697,7 @@ assertEquals(&quot;MyCityName&quot;, city.getText());
 </ul>
 <h3 id="implementation-of-ui-components">Implementation of UI Components</h3>
 <p>In some cases, it is useful to implement UI Objects that may be reused between multiple Page Objects. For instance, a top menu or footer may be shared between multiple pages:</p>
-<pre><code>public class FooterMenu extends AbstractUIObject {
+<pre><code class="java">public class FooterMenu extends AbstractUIObject {
     @FindBy(linkText = &quot;Home&quot;)
     private ExtendedWebElement homeLink;
 
@@ -653,7 +721,7 @@ assertEquals(&quot;MyCityName&quot;, city.getText());
 </code></pre>
 
 <p>And then you can use this in Page Object:</p>
-<pre><code>public class HomePage extends AbstractPage {
+<pre><code class="java">public class HomePage extends AbstractPage {
     @FindBy(id = &quot;footmenu&quot;)
     private FooterMenu footerMenu;
 
@@ -691,7 +759,7 @@ assertEquals(&quot;MyCityName&quot;, city.getText());
 </ul>
 <h3 id="implementation-of-tests">Implementation of tests</h3>
 <p>Carina framework uses TestNG for test organization. In general, test represents a manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:</p>
-<pre><code>public class WebSampleTest extends AbstractTest {
+<pre><code class="java">public class WebSampleTest extends AbstractTest {
     @Test(description = &quot;JIRA#AUTO-0009&quot;)
     @MethodOwner(owner = &quot;qpsdemo&quot;)
     public void testCompareModels() {
@@ -730,7 +798,7 @@ assertEquals(&quot;MyCityName&quot;, city.getText());
 <li>browser_version=*</li>
 </ul>
 <p>The implemented test cases should be placed in a TestNG xml file according to the test group the test belongs to. You can find more details about TestNG configuration in the <a href="http://testng.org/doc/documentation-main.html">official documentation</a>.</p>
-<pre><code>&lt;!DOCTYPE suite SYSTEM &quot;https://testng.org/testng-1.0.dtd&quot;&gt;
+<pre><code class="xml">&lt;!DOCTYPE suite SYSTEM &quot;https://testng.org/testng-1.0.dtd&quot;&gt;
 
 &lt;suite verbose=&quot;1&quot; name=&quot;Carina Demo Tests - Web Sample&quot; parallel=&quot;methods&quot;&gt;
 
@@ -741,6 +809,81 @@ assertEquals(&quot;MyCityName&quot;, city.getText());
     &lt;/test&gt;
 
 &lt;/suite&gt;
+</code></pre>
+
+<h3 id="page-open-strategy">Page Open Strategy</h3>
+<p>Determines how carina detects whether expected page is opened:
+* By Url. (by default)
+* By Element presence on the page
+* By URL and Element</p>
+<p>To verify if page was opened is used: </p>
+<pre><code class="java">page.isPageOpened();
+//or
+page.assertPageOpened();  // equals Assert.assertTrue(page.isPageOpened(),&quot;PageName not loaded: reason);
+</code></pre>
+
+<p>Page open strategy configuration can be set in several places:
+1. in <a href="http://qaprosoft.github.io/carina/configuration/">_config.properties</a>. This determines whole project page open strategy.
+2. in page.class. This overrides global page open strategy for a specific page.</p>
+<pre><code class="java">public class Page extends AbstractPage {
+
+    public Page(WebDriver driver){
+        super(driver);
+        setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
+    }
+}
+</code></pre>
+
+<ol>
+<li>in test.class. This also overrides global page open strategy for a specific page.</li>
+</ol>
+<pre><code class="java">@Test
+public void test(){
+        HomePage homePage=new HomePage(getDriver());
+        homePage.open();
+        homePage.setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
+}
+</code></pre>
+
+<h4 id="by-url">By URL</h4>
+<p>This is a default value. To use it you need to set a real page urls into your page classes.</p>
+<pre><code class="java">private final String specificPageUrl = &quot;https://www.gsmarena.com/specific/url&quot;;
+
+public Page(WebDriver driver) {
+    super(driver);
+    setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
+
+    setPageAbsoluteURL(specificPageUrl);    //Will set full url
+    //or
+    setPageURL(&quot;/specific/url&quot;);            //Will add passed String to your url in _config_properties
+}
+</code></pre>
+
+<h4 id="by-element">By Element</h4>
+<pre><code class="java">@FindBy(id = &quot;id&quot;)
+private ExtendedWebElement element;
+
+public Page(WebDriver driver) {
+    super(driver);
+
+    setPageOpeningStrategy(PageOpeningStrategy.BY_ELEMENT);
+    setUiLoadedMarker(element);
+}
+</code></pre>
+
+<h4 id="by-url-and-element">By URL and Element</h4>
+<pre><code class="java">private final String specificPageUrl = &quot;https://www.gsmarena.com/specific/url&quot;;
+
+@FindBy(id = &quot;id&quot;)
+private ExtendedWebElement element;
+
+public Page(WebDriver driver) {
+    super(driver);
+
+    setPageOpeningStrategy(PageOpeningStrategy.BY_URL_AND_ELEMENT);
+    setUiLoadedMarker(element);
+    setPageAbsoluteURL(specificPageUrl);
+}
 </code></pre>
                 
               
