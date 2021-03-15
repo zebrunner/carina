@@ -211,8 +211,9 @@ page.assertPageOpened();  // equals Assert.assertTrue(page.isPageOpened(),"PageN
 
 Page open strategy configuration can be set in several places:
 
-1. in [_config.properties](http://qaprosoft.github.io/carina/configuration/). This determines whole project page open strategy.
-2. in page.class. This overrides global page open strategy for a specific page.
+1) in [_config.properties](http://qaprosoft.github.io/carina/configuration/). This determines whole project page open strategy.
+
+2) in page.class. This overrides global page open strategy for a specific page.
 
 ```java
 public class Page extends AbstractPage {
@@ -223,9 +224,7 @@ public class Page extends AbstractPage {
     }
 }
 ```
-
-3. in test.class. This also overrides global page open strategy for a specific page.
-
+3) in test.class. This also overrides global page open strategy for a specific page.
 ```java
 @Test
 public void test(){
