@@ -209,7 +209,7 @@ page.isPageOpened();
 page.assertPageOpened();  // equals Assert.assertTrue(page.isPageOpened(),"PageName not loaded: reason);
 ```
 
-Page open strategy configuration can be set in several places:
+Page opening strategy configuration can be set in several places:
 
 1) in [_config.properties](http://qaprosoft.github.io/carina/configuration/). This determines whole project page open strategy.
 
@@ -289,6 +289,8 @@ Determines how carina detects appearing of web elements on page
 * By presence or visibility (default).
 
 > It is recommended to use _element_loading_strategy=BY_VISIBILITY_ because in some cases condition with presence happens faster but elements are still not accessible due to invisibility at this short period of time.
+
+Element loading strategy could be set at the same places as **Page loading strategy**.
 
 To check if element presence:
 ```java
