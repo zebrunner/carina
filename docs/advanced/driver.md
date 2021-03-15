@@ -107,7 +107,7 @@ public void someTest() {
 ```
 Options also could be set through _config.properties. If there are multiple options to pass split them by comma. Available attributes to pass options:
 ```
-*chrome
+#chrome
 chrome_args=
 chrome_experimental_opts=
 chrome_mobile_emulation_opts=
