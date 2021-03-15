@@ -194,14 +194,15 @@ The implemented test cases should be placed in a TestNG xml file according to th
 </suite>
 ```
 
-### Page Opening Strategy
+### Page opening strategy
 
 Determines how carina detects whether expected page is opened:
+
 * By Url. (by default)
 * By Element presence on the page
 * By URL and Element
 
-To verify if page was opened is used: 
+To check if page was opened is used: 
 ```java
 page.isPageOpened();
 //or
@@ -209,6 +210,7 @@ page.assertPageOpened();  // equals Assert.assertTrue(page.isPageOpened(),"PageN
 ```
 
 Page open strategy configuration can be set in several places:
+
 1. in [_config.properties](http://qaprosoft.github.io/carina/configuration/). This determines whole project page open strategy.
 2. in page.class. This overrides global page open strategy for a specific page.
 
@@ -295,6 +297,5 @@ component.assertUIObjectPresent();      // equals to Assert.assertTrue(component
 
 component.assertUIObjectNotPresent();   // equals to Assert.assertTrue(!component.isUIObjectPresent(),"UI object componentName presents!");
 ```
-#### Dynamic elements loading
+>Dynamic elements loading. 
 **waitForJSToLoad()** method was introduced in AbstractPage class. It uses JS under the hood and helps to wait till all dynamic web elements on the page are getting loaded.
-
