@@ -547,7 +547,7 @@
 Under the hood it uses popular BDD framework Cucumber extending its basic functionality and integrating cool test reports. <br />
 To integrate carina-cucumber functionality you just need to add its library into your project. <br />
 For instance with maven that can be done by adding next lines into your pom.xml:</p>
-<pre><code>&lt;dependency&gt;
+<pre><code class="xml">&lt;dependency&gt;
     &lt;groupId&gt;com.qaprosoft&lt;/groupId&gt;
     &lt;artifactId&gt;carina-cucumber&lt;/artifactId&gt;
     &lt;version&gt;${carina-cucumber_version}&lt;/version&gt;
@@ -555,12 +555,14 @@ For instance with maven that can be done by adding next lines into your pom.xml:
 </code></pre>
 
 <h3 id="setting-up-cucumber-test-with-carina">Setting up cucumber test with carina</h3>
-<p>In order to automate your test on cucumber you'll need to implement couple of things:
-1. Write down text of your scenario using cucumber syntax
-2. Declare each step of your scenario in Jave сode
-3. Map text representation of scenario with Java classes describing it</p>
-<p>Carina supports Gherkin syntax for describing of test scenarios. More details on syntax can be found here: https://cucumber.io/docs/gherkin/reference/ <br />
-Here is the example of such scenario:</p>
+<p>In order to automate your test on cucumber you'll need to implement couple of things:</p>
+<ol>
+<li>Write down text of your scenario using cucumber syntax</li>
+<li>Declare each step of your scenario in Jave сode</li>
+<li>Map text representation of scenario with Java classes describing it</li>
+</ol>
+<p>Carina supports Gherkin syntax for describing of test scenarios. More details on syntax can be found <a href="https://cucumber.io/docs/gherkin/reference/">here</a>.</p>
+<p>Example of such scenario:</p>
 <pre><code>Feature: GSM Arena News testing
   In order to use Cucumber in my project, I want to check how to test GSM Arena News page
 
@@ -572,13 +574,15 @@ Here is the example of such scenario:</p>
     And page 'News' should contains all items
 </code></pre>
 
-<p>File should be stored in resources package and have .feature extension.</p>
-<p>To declare steps in Java you need to use cucumber annotations @Given, @When, @Then, etc. <br />
-More details on all possible annotations could be found in oficial cucumber documentation. <br />
-In case if some steps declaration is missing you'll get informative error in your console when you run the test. <br />
-If you need to operate with WebDriver instance within the class where you're declaring Java methods for you steps you can use <code>IDriverPool</code> class of carina. <br />
+<p>File should be stored in <em>test/java/resources/features/</em> package and have .feature extension.</p>
+<p>To declare steps in Java you need to use cucumber annotations <strong>@Given, @When, @Then,</strong> etc. <br />
+More details on all possible annotations could be found in official cucumber <a href="https://cucumber.io/docs/cucumber/">documentation</a>.   </p>
+<blockquote>
+<p>In case if some steps declaration is missing you'll get informative error in your console when you run the test.   </p>
+</blockquote>
+<p>If you need to operate with WebDriver instance within the class where you're declaring Java methods for you steps you can use <code>IDriverPool</code> class of carina. <br />
 Example:</p>
-<pre><code>public class GSMArenaNewsSteps implements IDriverPool {
+<pre><code class="java">public class GSMArenaNewsSteps implements IDriverPool {
 
     @Given(&quot;^I am on main page&quot;)
     public boolean iAmOnMainPage() {
@@ -589,11 +593,11 @@ Example:</p>
 }
 </code></pre>
 
-<p>Then finally to map text steps with Java declaration you need to create test class and extend it from CucumberBaseTest carina class.
-Then use @CucumberOptions annotation in order to complete the mapping itself.
+<p>Finally, to map text steps with Java declaration you need to create test class and extend it from <strong>CucumberBaseTest</strong> carina class.
+Then use <strong>@CucumberOptions</strong> annotation in order to complete the mapping itself.
 Class body can be empty since all logic for buildind of scripts and running them is implemented inside CucumberBaseTest class. <br />
 Here is the sample of such code:</p>
-<pre><code>@CucumberOptions(features = &quot;src/test/resources/features/GSMArenaNews.feature&quot;,
+<pre><code class="java">@CucumberOptions(features = &quot;src/test/resources/features/GSMArenaNews.feature&quot;, 
         glue = &quot;com.qaprosoft.carina.demo.cucumber.steps&quot;,
         plugin = {&quot;pretty&quot;,
                 &quot;html:target/cucumber-core-test-report&quot;,
@@ -601,8 +605,7 @@ Here is the sample of such code:</p>
                 &quot;json:target/cucumber-core-test-report.json&quot;,
                 &quot;junit:target/cucumber-core-test-report.xml&quot;}
 )
-public class CucumberWebSampleTest extends CucumberBaseTest {
-}
+public class CucumberWebSampleTest extends CucumberBaseTest {}
 </code></pre>
 
 <h3 id="cucumber-report">Cucumber report</h3>
