@@ -323,10 +323,10 @@
       
         <li class="md-nav__item">
   <a href="#page-opening-strategy" class="md-nav__link">
-    Page Opening Strategy
+    Page opening strategy
   </a>
   
-    <nav class="md-nav" aria-label="Page Opening Strategy">
+    <nav class="md-nav" aria-label="Page opening strategy">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -359,19 +359,6 @@
   <a href="#element-loading-strategy" class="md-nav__link">
     Element loading strategy
   </a>
-  
-    <nav class="md-nav" aria-label="Element loading strategy">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#dynamic-elements-loading" class="md-nav__link">
-    Dynamic elements loading
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -590,10 +577,10 @@
       
         <li class="md-nav__item">
   <a href="#page-opening-strategy" class="md-nav__link">
-    Page Opening Strategy
+    Page opening strategy
   </a>
   
-    <nav class="md-nav" aria-label="Page Opening Strategy">
+    <nav class="md-nav" aria-label="Page opening strategy">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -626,19 +613,6 @@
   <a href="#element-loading-strategy" class="md-nav__link">
     Element loading strategy
   </a>
-  
-    <nav class="md-nav" aria-label="Element loading strategy">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#dynamic-elements-loading" class="md-nav__link">
-    Dynamic elements loading
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -851,20 +825,24 @@ assertEquals(&quot;MyCityName&quot;, city.getText());
 &lt;/suite&gt;
 </code></pre>
 
-<h3 id="page-opening-strategy">Page Opening Strategy</h3>
-<p>Determines how carina detects whether expected page is opened:
-* By Url. (by default)
-* By Element presence on the page
-* By URL and Element</p>
-<p>To verify if page was opened is used: </p>
+<h3 id="page-opening-strategy">Page opening strategy</h3>
+<p>Determines how carina detects whether expected page is opened:</p>
+<ul>
+<li>By Url. (by default)</li>
+<li>By Element presence on the page</li>
+<li>By URL and Element</li>
+</ul>
+<p>To check if page was opened is used: </p>
 <pre><code class="java">page.isPageOpened();
 //or
 page.assertPageOpened();  // equals Assert.assertTrue(page.isPageOpened(),&quot;PageName not loaded: reason);
 </code></pre>
 
-<p>Page open strategy configuration can be set in several places:
-1. in <a href="http://qaprosoft.github.io/carina/configuration/">_config.properties</a>. This determines whole project page open strategy.
-2. in page.class. This overrides global page open strategy for a specific page.</p>
+<p>Page open strategy configuration can be set in several places:</p>
+<ol>
+<li>in <a href="http://qaprosoft.github.io/carina/configuration/">_config.properties</a>. This determines whole project page open strategy.</li>
+<li>in page.class. This overrides global page open strategy for a specific page.</li>
+</ol>
 <pre><code class="java">public class Page extends AbstractPage {
 
     public Page(WebDriver driver){
@@ -941,8 +919,10 @@ component.assertUIObjectPresent();      // equals to Assert.assertTrue(component
 component.assertUIObjectNotPresent();   // equals to Assert.assertTrue(!component.isUIObjectPresent(),&quot;UI object componentName presents!&quot;);
 </code></pre>
 
-<h4 id="dynamic-elements-loading">Dynamic elements loading</h4>
-<p><strong>waitForJSToLoad()</strong> method was introduced in AbstractPage class. It uses JS under the hood and helps to wait till all dynamic web elements on the page are getting loaded.</p>
+<blockquote>
+<p>Dynamic elements loading. 
+<strong>waitForJSToLoad()</strong> method was introduced in AbstractPage class. It uses JS under the hood and helps to wait till all dynamic web elements on the page are getting loaded.</p>
+</blockquote>
                 
               
               
