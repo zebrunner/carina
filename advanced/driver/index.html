@@ -601,11 +601,11 @@
 <ul>
 <li><strong>getDriver()</strong></li>
 </ul>
-<p>If method called for the first time Carina will initialize new driver with capabilities from <em>config.properties file. The driver's name will be set as </em>"default"_. So it means that we can access this driver by calling method getDriver() or getDriver("default").</p>
+<p>If method called for the first time Carina will initialize new driver with capabilities from _config.properties file. The driver's name will be set as <strong>"default"</strong>. So it means that we can access this driver by calling method getDriver() or getDriver("default").</p>
 <ul>
 <li><strong>getDriver(String name).</strong></li>
 </ul>
-<p>If there is no driver in Driver pool with name we passed Carina will create a new WebDriver with capabilities from _config.properties file. We can access the driver by his name. By using different names we can create several Automation sessions with same capabilities.</p>
+<p>If there is no driver in Driver pool with name we passed Carina will create a new WebDriver with capabilities from _config.properties file. We can access the driver by his name. By using different names we can create several automation sessions with same capabilities.</p>
 <ul>
 <li><strong>getDriver(String name, DesiredCapabilities capabilities).</strong></li>
 </ul>
@@ -627,7 +627,7 @@ public void someTest() {
     homePageFirefox.open();
     //or
     HomePage homePageSafari = new HomePage(
-    getDriver(&quot;safari&quot;, new SafariCapabilities().getCapability(&quot;Safari test&quot;)));
+        getDriver(&quot;safari&quot;, new SafariCapabilities().getCapability(&quot;Safari test&quot;)));
     homePageSafari.open();
     //etc
     getDriver(&quot;edge&quot;, new EdgeCapabilities().getCapability(&quot;Edge test&quot;));
@@ -636,8 +636,8 @@ public void someTest() {
 }
 </code></pre>
 
-<p>You can decide the max number of drivers by parameter <strong>max_driver_count</strong> in <strong>_config.properties</strong>. By default it's 3.
-New driver could be accessed by init name.</p>
+<p>You can decide the max number of drivers by parameter <strong>max_driver_count</strong> in <strong>_config.properties</strong> (3 by default).</p>
+<p>New driver could be accessed by init name.</p>
 <pre><code>getDriver(&quot;safari&quot;);
 </code></pre>
 
