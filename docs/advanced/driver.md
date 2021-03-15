@@ -15,11 +15,11 @@ Currently supported browsers by Carina:
 
 * **getDriver()**
 
-If method called for the first time Carina will initialize new driver with capabilities from _config.properties file. The driver's name will be set as _"default"_. So it means that we can access this driver by calling method getDriver() or getDriver("default").
+If method called for the first time Carina will initialize new driver with capabilities from _config.properties file. The driver's name will be set as **"default"**. So it means that we can access this driver by calling method getDriver() or getDriver("default").
 
 * **getDriver(String name).**
 
-If there is no driver in Driver pool with name we passed Carina will create a new WebDriver with capabilities from _config.properties file. We can access the driver by his name. By using different names we can create several Automation sessions with same capabilities.
+If there is no driver in Driver pool with name we passed Carina will create a new WebDriver with capabilities from _config.properties file. We can access the driver by his name. By using different names we can create several automation sessions with same capabilities.
 
 * **getDriver(String name, DesiredCapabilities capabilities).**
 
@@ -42,7 +42,7 @@ public void someTest() {
     homePageFirefox.open();
     //or
     HomePage homePageSafari = new HomePage(
-    getDriver("safari", new SafariCapabilities().getCapability("Safari test")));
+        getDriver("safari", new SafariCapabilities().getCapability("Safari test")));
     homePageSafari.open();
     //etc
     getDriver("edge", new EdgeCapabilities().getCapability("Edge test"));
@@ -50,7 +50,8 @@ public void someTest() {
     getDriver("ie", new IECapabilities().getCapability("Internet Explorer test"));
 }
 ```
-You can decide the max number of drivers by parameter **max_driver_count** in **_config.properties**. By default it's 3.
+You can decide the max number of drivers by parameter **max_driver_count** in **_config.properties** (3 by default).
+
 New driver could be accessed by init name.
 ```
 getDriver("safari");
