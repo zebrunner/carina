@@ -5,14 +5,14 @@ To use this feature you need to:
 
 1) Set properties in _config.properties.
 ```
-locale=de_DE 	         
 #localization language
+locale=de_DE 	         
 
-browser_language=en_US   
 #Determines browser interface language. It won't affect locale parameter.
+browser_language=en_US   
 
+#enable/disable localzation testing
 enable_l10n=true         
-#enable/disable localzation testin
 ```
 2) Add locale file into **src->main->resources->L10N**. Locale file samples could be found [here](https://github.com/qaprosoft/carina-demo/tree/master/src/main/resources/L10N). Ask developers to provide locale files and place them into folder mentioned above. If there are no locale files, check out **L10Nparser** section.
  
@@ -58,7 +58,7 @@ private ExtendedWebElement contribElem;
 @FindBy(id = "pt-createaccount") 
 private ExtendedWebElement createAccountElem;
 ```
-3) Create method in your page.class. Place in _localizationCheckList_ webElements that are currently on the page and which locale pair you want to create.
+3) Create method below in your page.class. Place in _localizationCheckList_ webElements that are currently on the page and which locale pair you want to create.
 ```java
 public boolean checkMultipleLocalization() {
         ExtendedWebElement[] localizationCheckList = {discussionElem, createAccountElem, contribElem};
@@ -93,7 +93,7 @@ public void testAddNewLanguages() {
     sa.assertAll();
 }
 ```
-5) Copy all required values in your existing **locale_xx_XX.properties** file from **new_locale_xx_XX** file.
+5) Copy all key-value pairs in your existing **locale_xx_XX.properties** file from **new_locale_xx_XX** file.
 
 6) Now elements could be accessed by locale text.
 ```java
