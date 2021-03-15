@@ -194,7 +194,7 @@ The implemented test cases should be placed in a TestNG xml file according to th
 </suite>
 ```
 
-### Page Open Strategy
+### Page Opening Strategy
 
 Determines how carina detects whether expected page is opened:
 * By Url. (by default)
