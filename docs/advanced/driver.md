@@ -1,7 +1,5 @@
 # Driver configuration
 
-In Carina WebDriver is initialized by method **getDriver()**.
-
 Currently supported browsers by Carina:
 
 * Chrome
@@ -12,6 +10,8 @@ Currently supported browsers by Carina:
 * Safari
 
 ## Carina's webdriver initialization
+
+In Carina WebDriver is initialized by method getDriver().
 
 * **getDriver()**
 
