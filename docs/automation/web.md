@@ -284,13 +284,14 @@ public Page(WebDriver driver) {
 ### Element loading strategy
 
 Determines how carina detects appearing of web elements on page
+
 * By presence. Carina waits for appearance of web elements in page DOM model.
 * By visibility. Carina waits until web elements would be visible in page.
 * By presence or visibility (default).
 
 > It is recommended to use _element_loading_strategy=BY_VISIBILITY_ because in some cases condition with presence happens faster but elements are still not accessible due to invisibility at this short period of time.
 
-To verify if element presence:
+To check if element presence:
 ```java
 Component component = Page.getComponent();
 component.assertUIObjectPresent();      // equals to Assert.assertTrue(component.isUIObjectPresent(),"UI object componentName does not present!");
