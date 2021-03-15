@@ -13,6 +13,7 @@ pages:
       - Database: advanced/database.md
       - DataProvider: advanced/dataprovider.md
       - Driver: advanced/driver.md
+      - Localization: advanced/localization.md
       - Proxy: advanced/proxy.md
       - Security: advanced/security.md
     - Cucumber: cucumber.md
