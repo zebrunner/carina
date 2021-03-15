@@ -64,7 +64,8 @@ public class FilterTestsListener implements ISuiteListener {
      */
     private void disableTest(ITestNGMethod testMethod) {
         LOGGER.info(String.format("Disable test: [%s]", testMethod.getMethodName()));
-        testMethod.setInvocationCount(0);
+        testMethod.setMissingGroup("enabled = false");
+//        testMethod.setInvocationCount(0);
     }
 
     /**

@@ -199,6 +199,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             }
         }
 
+        new FilterTestsListener().onStart(suite);
         setThreadCount(suite);
         onHealthCheck(suite);
         
