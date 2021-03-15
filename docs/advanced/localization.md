@@ -1,7 +1,7 @@
 ## L10N
 
 Carina framework supports multi-localized testing.
-To use this feature we need to:
+To use this feature you need to:
 
 1) Set properties in _config.properties.
 ```
@@ -16,7 +16,7 @@ enable_l10n=true
 ```
 2) Add locale file into **src->main->resources->L10N**. Locale file samples could be found [here](https://github.com/qaprosoft/carina-demo/tree/master/src/main/resources/L10N). Ask developers to provide locale files and place them into folder mentioned above. If there are no locale files, check out **L10Nparser** section.
  
-3) find WebElements with a help of a key we described in locale_ file.
+3) Find WebElements with a help of a key you described in **locale_** file.
    >Syntax is '{L10N:key}'
 
    Example:
@@ -94,6 +94,7 @@ public void testAddNewLanguages() {
 }
 ```
 5) Copy all required values in your existing **locale_xx_XX.properties** file from **new_locale_xx_XX** file.
+
 6) Now elements could be accessed by locale text.
 ```java
 @FindBy(id = "pt-anontalk")
