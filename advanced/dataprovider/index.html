@@ -570,7 +570,7 @@
 </ul>
 <h2 id="java-data-provider">Java data-provider</h2>
 <p>As far as Carina is based on TestNG framework, you are able to use well known Java data-providers which return a matrix of Objects and pass it to the appropriate test arguments. You have to use dataProvider attribute along with @Test annotation and implement the method annotated with <code>@DataProvider</code> that will return <code>Object[][]</code> as a test data set:</p>
-<pre><code class="java">@Test(dataProvider = &quot;DP1&quot;)
+<pre><code>@Test(dataProvider = &quot;DP1&quot;)
 public void testMuliplyOperation(int a, int b, int c)
 {
     int actual = a * b;
@@ -591,7 +591,7 @@ public static Object[][] dataprovider()
 
 <h2 id="xml-parametrization">XML parametrization</h2>
 <p>TestNG supports parametrization from XML files when you organize test suites using XML files. The parameterized test method should be annotated with <code>@Parameters({ "a", "b", "c" })</code> and appropriate method arguments should be listed. Also, you have to pass all required parameters from an XML suite file:</p>
-<pre><code class="java">@Test
+<pre><code>@Test
 @Parameters({ &quot;a&quot;, &quot;b&quot;, &quot;c&quot; })
 public void testSubstractOperation(int a, int b, int c) {
     int actual = Integer.valueOf(a) - Integer.valueOf(b);
@@ -616,9 +616,9 @@ public void testSubstractOperation(int a, int b, int c) {
 </code></pre>
 
 <h2 id="xlscsv-data-providers">XLS/CSV data-providers</h2>
-<p>Carina test framework provides a possibility to write all tests with data providers in one place, including parametrization using external XLS/CSV spreadsheets. First of all, you need to declare a test class that extends <code>AbstractTest.java</code>:
-After that, you can specify data provider tests as follows.</p>
-<pre><code class="java">public class DataprovidersSampleTest extends AbstractTest {
+<p>Carina test framework provides a possibility to write all tests with data providers in one place, including parametrization using external XLS/CSV spreadsheets. First of all, you need to declare a test class that extends <code>AbstractTest.java</code>.</p>
+<p>After that, you can specify data provider tests as follows.</p>
+<pre><code>public class DataprovidersSampleTest extends AbstractTest {
     @Test(dataProvider = &quot;DataProvider&quot;)
     @XlsDataSourceParameters(path = &quot;xls/demo.xlsx&quot;, sheet = &quot;Calculator&quot;, dsUid = &quot;TUID&quot;, dsArgs = &quot;a,b,c&quot;)
     public void testSumOperation(String a, String b, String c) {
@@ -650,7 +650,7 @@ After that, you can specify data provider tests as follows.</p>
 <p>In the TUID column, you should specify some unique test identifier that will be set at the beginning of the test name in a test result report. In the next columns, you can specify arguments for a test and their values in the bottom lines. They will be used as parameters in <code>@XlsDataSourceParameters</code>. In this example, the values of a, b, c arguments were defined in 3 sets of values with different TUID.</p>
 <h2 id="dataprovider-with-huge-number-of-columns">DataProvider with huge number of columns</h2>
 <p>In some cases, we have to provide 10+ columns into a test. In this case, there is one tricky point. Just removing dsArgs dataprovider parameter will collect all the lines into a single HashMap<String, String> object, so you can dynamically get any column in a test using the column name.</p>
-<pre><code class="java">public class DataprovidersSampleTest extends AbstractTest {
+<pre><code>public class DataprovidersSampleTest extends AbstractTest {
     @Test(dataProvider = &quot;DataProvider&quot;)
     @XlsDataSourceParameters(path = &quot;xls/demo.xlsx&quot;, sheet = &quot;Calculator&quot;, dsUid = &quot;TUID&quot;)
     public void testSumOperation(HashMap&lt;String, String&gt; args) {

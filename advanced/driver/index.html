@@ -408,6 +408,20 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#quit" class="md-nav__link">
+    Quit
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#restart" class="md-nav__link">
+    Restart
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -526,6 +540,20 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#quit" class="md-nav__link">
+    Quit
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#restart" class="md-nav__link">
+    Restart
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -556,8 +584,9 @@
 <li>Opera</li>
 <li>Safari</li>
 </ul>
+<p>All described methods are implemented inside <code>IDriverPool</code> interface and accessible by default from any test class. To access this functionality from another places like your services just implement this interface.</p>
 <h2 id="initialization">Initialization</h2>
-<p>Driver can be started in several ways:</p>
+<p>Driver can be started in several ways</p>
 <ul>
 <li><strong>getDriver()</strong> is the core method to start any Selenium/Appium session. It will create a RemoteWebDriver named "default" based on default capabilities from configuration.</li>
 </ul>
@@ -567,29 +596,29 @@
 <p><strong>getDriver(String name)</strong> start named driver session using default capabilities from configuration. That's allow to start several drivers (up to 3 according to <code>max_driver_count</code> property)</p>
 </li>
 <li>
-<p><strong>getDriver(String name, DesiredCapabilities capabilities).</strong> start named driver session using custom capabilities.</p>
+<p><strong>getDriver(String name, DesiredCapabilities capabilities)</strong> start named driver session using custom capabilities.</p>
 </li>
 </ul>
 <p>Example:</p>
 <pre><code>@Test
 public void carinaCapsTest() {
     // Chrome default capabilities builder usage:
-    WebDriver chromeDriver = getDriver(&quot;chrome&quot;, new ChromeCapabilities().getCapability(&quot;Chrome Test&quot;));
+    WebDriver chromeDriver = getDriver(&quot;chrome&quot;, new ChromeCapabilities().getCapability(&quot;Chrome Browser&quot;));
     HomePage homePageChrome = new HomePage(chromeDriver);
     homePageChrome.open();
 
     // Firefox default capabilities builder usage:
-    getDriver(&quot;firefox&quot;, new FirefoxCapabilities().getCapability(&quot;Firefox Test&quot;));
+    getDriver(&quot;firefox&quot;, new FirefoxCapabilities().getCapability(&quot;Firefox Browser&quot;));
     HomePage homePageFirefox = new HomePage(getDriver(&quot;firefox&quot;)); // return named &quot;firefox&quot; driver from the pool to init HomePage.
     homePageFirefox.open();
 
     // Safari, Edge, Opera and IE default capabilities builder usage:
-    HomePage homePageSafari = new HomePage(getDriver(&quot;safari&quot;, new SafariCapabilities().getCapability(&quot;Safari test&quot;)));
+    HomePage homePageSafari = new HomePage(getDriver(&quot;safari&quot;, new SafariCapabilities().getCapability(&quot;Safari Browser&quot;)));
     homePageSafari.open();
 
-    getDriver(&quot;edge&quot;, new EdgeCapabilities().getCapability(&quot;Edge test&quot;));
-    getDriver(&quot;opera&quot;, new OperaCapabilities().getCapability(&quot;Opera test&quot;));
-    getDriver(&quot;ie&quot;, new IECapabilities().getCapability(&quot;Internet Explorer test&quot;));
+    getDriver(&quot;edge&quot;, new EdgeCapabilities().getCapability(&quot;Edge Browser&quot;));
+    getDriver(&quot;opera&quot;, new OperaCapabilities().getCapability(&quot;Opera Browser&quot;));
+    getDriver(&quot;ie&quot;, new IECapabilities().getCapability(&quot;Internet Explorer Browser&quot;));
 
 }
 
@@ -607,10 +636,10 @@ public void desiredCapsTest() {
 </code></pre>
 
 <ul>
-<li><strong>getDriver(String name, DesiredCapabilities capabilities, String seleniumHost).</strong> start named driver session using custom capabilities using custom selenium url.</li>
+<li><strong>getDriver(String name, DesiredCapabilities capabilities, String seleniumHost)</strong> start named driver session using custom capabilities vs custom selenium url.</li>
 </ul>
 <h2 id="capabilities">Capabilities</h2>
-<p>Simple key value Selenium/Appium capability pairs can be provided in _config.properties using <strong>capabilities.</strong> prefix.</p>
+<p>Simple key value Selenium/Appium pairs can be provided in <code>_config.properties</code> using <strong>capabilities.</strong> prefix, for example:</p>
 <pre><code>capabilities.automationName=uiautomator2
 capabilities.deviceName=Samsung_Galaxy_S10
 capabilities.platformName=ANDROID
@@ -618,11 +647,9 @@ capabilities.app=https://qaprosoft.s3-us-west-2.amazonaws.com/carinademoexample.
 capabilities.newCommandTimeout=180
 </code></pre>
 
-<blockquote>
 <p>Visit <a href="https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities">selenium</a> or <a href="https://appium.io/docs/en/writing-running-appium/caps/">appium</a> to see all capabilities.</p>
-</blockquote>
 <h2 id="options">Options</h2>
-<p>Options and arguments could be provided through _config.properties as well using comma separated values for multiple options/args.</p>
+<p>Options and arguments could be provided through <code>_config.properties</code> as well using comma separated values for multiple options/args, for example:</p>
 <pre><code>firefox_args=--no-first-run,--disable-notifications
 firefox_preferences=
 chrome_args=
@@ -630,7 +657,7 @@ chrome_experimental_opts=
 chrome_mobile_emulation_opts=
 </code></pre>
 
-<p>To be able to provide complicated structures use advanced approach to build capabilities/options/arguments</p>
+<p>To provide complicated structures use advanced approach to build capabilities/options/arguments:</p>
 <pre><code>public void someTest() {
     FirefoxOptions options = new FirefoxOptions();
     options.addArguments(&quot;--no-first-run&quot;);
@@ -646,6 +673,25 @@ chrome_mobile_emulation_opts=
     Assert.assertTrue(homePage.isPageOpened());
 }
 </code></pre>
+
+<h2 id="quit">Quit</h2>
+<p>Carina determine driver lifecycle based on init phase (BeforeSuite/BeforeClass/BeforeMethod/Method) and quit driver automatically , i.e. <strong>no need to do it inside your test code</strong>.</p>
+<ul>
+<li><strong>@BeforeSuite</strong> drivers belong to all tests/classes and will be closed in <code>@AfterSuite</code></li>
+<li><strong>@BeforeTest</strong> drivers belong to all <code>&lt;test&gt;</code> classes and will be closed in <code>@AfterTest</code>. To be imlemented in [#1250]</li>
+<li><strong>@BeforeClass</strong> drivers belong to all tests inside current class and will be closed in <code>@AfterClass</code></li>
+<li><strong>@BeforeMethod</strong> or inside <strong>Test Method</strong> drivers belong to current test method and will be closed in <code>@AfterMethod</code></li>
+</ul>
+<blockquote>
+<p>Each parallel thread has their own named drivers pool, i.e. <code>getDriver()</code> return different objects per each parallel thread</p>
+</blockquote>
+<p>To quit driver forcibly if needed use <strong>quitDriver()</strong> or <strong>quitDriver(name)</strong></p>
+<p>To disable driver quit strategy completely and cotrol drivers init/quit on your own provide <code>forcibly_disable_driver_quit=true</code> in <code>_config.properties</code> or execute from any place of your test code <code>CarinaListener.disableDriversCleanup();</code></p>
+<h2 id="restart">Restart</h2>
+<ul>
+<li><strong>restartDriver()</strong> quit current driver and start new one with the same capabilities</li>
+<li><strong>restartDriver(boolean isSameDevice)</strong> quit current driver and start new one with on the same device using <code>uuid</code> capability. It is fully compatible with <a href="https://github.com/zebrunner/mcloud">MCloud</a> farm.</li>
+</ul>
                 
               
               

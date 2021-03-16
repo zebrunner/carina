@@ -594,7 +594,7 @@ More details on all possible annotations could be found in official cucumber <a 
 </blockquote>
 <p>If you need to operate with WebDriver instance within the class where you're declaring Java methods for you steps you can use <code>IDriverPool</code> class of carina. <br />
 Example:</p>
-<pre><code class="java">public class GSMArenaNewsSteps implements IDriverPool {
+<pre><code>public class GSMArenaNewsSteps implements IDriverPool {
 
     @Given(&quot;^I am on main page&quot;)
     public boolean iAmOnMainPage() {
@@ -609,7 +609,7 @@ Example:</p>
 Then use <strong>@CucumberOptions</strong> annotation in order to complete the mapping itself.
 Class body can be empty since all logic for buildind of scripts and running them is implemented inside CucumberBaseTest class. <br />
 Here is the sample of such code:</p>
-<pre><code class="java">@CucumberOptions(features = &quot;src/test/resources/features/GSMArenaNews.feature&quot;, 
+<pre><code>@CucumberOptions(features = &quot;src/test/resources/features/GSMArenaNews.feature&quot;, 
         glue = &quot;com.qaprosoft.carina.demo.cucumber.steps&quot;,
         plugin = {&quot;pretty&quot;,
                 &quot;html:target/cucumber-core-test-report&quot;,
