@@ -34,6 +34,7 @@ public class ConfigurationTest {
     @AfterClass
     public void tearDown() {
         R.CONFIG.put(SpecialKeywords.PLATFORM_NAME, "");
+        R.CONFIG.put(SpecialKeywords.PLATFORM, "");
     }
 
     @Test
