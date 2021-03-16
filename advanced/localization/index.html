@@ -547,17 +547,19 @@
                 
                 
                 <h1 id="localization-usage">Localization usage</h1>
-<p>There are enhanced utilities for adapting a product's translation to a specific country or region in Carina, i.e. we fully support Test Automation localization (L10N) testing.
-To reuse this feature effectively you have to discover localized resources and push them into the test project.
-We strongly recommend to find resources and don't generate by automation team!</p>
+<p>There is enhanced L10N utility to support Test Automation localization (L10N) testing. It might load localized resources on the fly and translate texts when needed.</p>
+<blockquote>
+<p>We recommend to reuse existing localized resources and don't generate them by automation team!</p>
+</blockquote>
 <h2 id="prerequisites">Prerequisites</h2>
 <p>Localized resources are located in <a href="https://github.com/qaprosoft/carina-demo/tree/master/src/main/resources/L10N"><strong>src/main/resources/L10N</strong></a> folder.
-Each localized resource file has key value pairs with actual translations.</p>
+Each localized resource file has unique keys with translated values.</p>
 <blockquote>
-<p>Verify that for every resource there is a file without any postfix otherwise Java can't load! For example <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/L10N/locale.properties">locale.properties</a></p>
+<p>Verify that for every resource there is a file without any postfix for example <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/L10N/locale.properties">locale.properties</a></p>
 </blockquote>
 <h2 id="implementation">Implementation</h2>
-<p>Declare page elements with L10N <a href="https://github.com/qaprosoft/carina-demo/blob/64b63927e8c3a1a76d5e567e28f837be82797d56/src/main/java/com/qaprosoft/carina/demo/gui/pages/localizationSample/WikipediaLocalePage.java#L41">key</a> usage.</p>
+<p>Declare page elements with L10N <a href="https://github.com/qaprosoft/carina-demo/blob/64b63927e8c3a1a76d5e567e28f837be82797d56/src/main/java/com/qaprosoft/carina/demo/gui/pages/localizationSample/WikipediaLocalePage.java#L26">prefix</a>.
+Use key after the ":" sign in @FindBy annotations which will be replaced by actual localized translations.</p>
 <pre><code>@FindBy(xpath = &quot;//*[text()='{L10N:HomePage.welcomeText}'&quot;)
 private ExtendedWebElement welcomeText;
 
@@ -565,12 +567,14 @@ private ExtendedWebElement welcomeText;
 private ExtendedWebElement discussionBtn;
 </code></pre>
 
-<p>Use <a href="https://github.com/qaprosoft/carina-demo/blob/64b63927e8c3a1a76d5e567e28f837be82797d56/src/test/java/com/qaprosoft/carina/demo/WebLocalizationSample.java#L53"><code>L10N.getText(key)</code></a> to get expected translations for assertions:
-  <code>String welcomeText = wikipediaLocalePage.getWelcomeText();
-  String expectedWelcomeText = L10N.getText("HomePage.welcomeText");
-  Assert.assertEquals(welcomeText, expectedWelcomeText.trim(), "Wikipedia welcome text was not the expected.");</code></p>
+<p>Use <a href="https://github.com/qaprosoft/carina-demo/blob/64b63927e8c3a1a76d5e567e28f837be82797d56/src/test/java/com/qaprosoft/carina/demo/WebLocalizationSample.java#L53"><code>L10N.getText(key)</code></a> to get expected translations for assertions:</p>
+<pre><code>String welcomeText = wikipediaLocalePage.getWelcomeText();
+String expectedWelcomeText = L10N.getText(&quot;HomePage.welcomeText&quot;);
+Assert.assertEquals(welcomeText, expectedWelcomeText.trim(), &quot;Wikipedia welcome text was not the expected.&quot;);
+</code></pre>
+
 <h2 id="execution">Execution</h2>
-<p>Make sure to provide valid <code>locale</code> parameter in configuration and launch test.</p>
+<p>Update <code>locale</code> parameter in configuration and launch test.</p>
 <pre><code>locale=de_DE
 #Optionally you could operate by browser locale as well using
 browser_language=de_DE
