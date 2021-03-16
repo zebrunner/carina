@@ -575,28 +575,26 @@
                 
                 
                 <h1 id="driver-usage">Driver usage</h1>
-<p>Currently supported browsers by Carina:</p>
-<ul>
-<li>Chrome</li>
-<li>Firefox</li>
-<li>Internet Explorer</li>
-<li>Microsoft Edge</li>
-<li>Opera</li>
-<li>Safari</li>
-</ul>
-<p>All described methods are implemented inside <code>IDriverPool</code> interface and accessible by default from any test class. To access this functionality from another places like your services just implement this interface.</p>
+<p>All described methods are implemented inside <code>IDriverPool</code> interface and accessible by default from any test class. 
+To access this functionality from another places like your services just implement this interface.</p>
+<blockquote>
+<p>Each thread has their own named driver pool</p>
+</blockquote>
+<p>Supported Browsers: Chrome, Firefox, Internet Explorer, Microsoft Edge, Opera, Safari etc</p>
 <h2 id="initialization">Initialization</h2>
-<p>Driver can be started in several ways</p>
 <ul>
-<li><strong>getDriver()</strong> is the core method to start any Selenium/Appium session. It will create a RemoteWebDriver named "default" based on default capabilities from configuration.</li>
-</ul>
+<li>
+<p><strong>getDriver()</strong> is the core method to start any Selenium/Appium session. It will create a RemoteWebDriver named "default" based on default capabilities from configuration.</p>
 <p>1st call of the method in current thread should start new driver. Next calls will return existing object. Based on the driver lifecycle carina do automatic driver quit.</p>
-<ul>
+</li>
 <li>
 <p><strong>getDriver(String name)</strong> start named driver session using default capabilities from configuration. That's allow to start several drivers (up to 3 according to <code>max_driver_count</code> property)</p>
 </li>
 <li>
 <p><strong>getDriver(String name, DesiredCapabilities capabilities)</strong> start named driver session using custom capabilities.</p>
+</li>
+<li>
+<p><strong>getDriver(String name, DesiredCapabilities capabilities, String seleniumHost)</strong> start named driver session using custom capabilities vs custom selenium url.</p>
 </li>
 </ul>
 <p>Example:</p>
@@ -635,11 +633,8 @@ public void desiredCapsTest() {
 }
 </code></pre>
 
-<ul>
-<li><strong>getDriver(String name, DesiredCapabilities capabilities, String seleniumHost)</strong> start named driver session using custom capabilities vs custom selenium url.</li>
-</ul>
 <h2 id="capabilities">Capabilities</h2>
-<p>Simple key value Selenium/Appium pairs can be provided in <code>_config.properties</code> using <strong>capabilities.</strong> prefix, for example:</p>
+<p>Simple key value Selenium/Appium pairs can be provided in <code>_config.properties</code> using <code>capabilities.name=value</code> , for example:</p>
 <pre><code>capabilities.automationName=uiautomator2
 capabilities.deviceName=Samsung_Galaxy_S10
 capabilities.platformName=ANDROID
@@ -649,7 +644,7 @@ capabilities.newCommandTimeout=180
 
 <p>Visit <a href="https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities">selenium</a> or <a href="https://appium.io/docs/en/writing-running-appium/caps/">appium</a> to see all capabilities.</p>
 <h2 id="options">Options</h2>
-<p>Options and arguments could be provided through <code>_config.properties</code> as well using comma separated values for multiple options/args, for example:</p>
+<p>Options and arguments could be provided through <code>_config.properties</code> using comma separated values for multiple options/args, for example:</p>
 <pre><code>firefox_args=--no-first-run,--disable-notifications
 firefox_preferences=
 chrome_args=
@@ -675,18 +670,18 @@ chrome_mobile_emulation_opts=
 </code></pre>
 
 <h2 id="quit">Quit</h2>
-<p>Carina determine driver lifecycle based on init phase (BeforeSuite/BeforeClass/BeforeMethod/Method) and quit driver automatically , i.e. <strong>no need to do it inside your test code</strong>.</p>
+<p>Quit driver operation is executed automatically based on driver init phase (@BeforeSuite/@BeforeTest/@BeforeClass/@BeforeMethod/Method), i.e. <strong>no need to do it inside your test code</strong>.</p>
 <ul>
-<li><strong>@BeforeSuite</strong> drivers belong to all tests/classes and will be closed in <code>@AfterSuite</code></li>
+<li><strong>@BeforeSuite</strong> drivers belong to all tests/classes and will be closed in <code>@AfterSuite</code> only</li>
 <li><strong>@BeforeTest</strong> drivers belong to all <code>&lt;test&gt;</code> classes and will be closed in <code>@AfterTest</code>. To be imlemented in [#1250]</li>
 <li><strong>@BeforeClass</strong> drivers belong to all tests inside current class and will be closed in <code>@AfterClass</code></li>
-<li><strong>@BeforeMethod</strong> or inside <strong>Test Method</strong> drivers belong to current test method and will be closed in <code>@AfterMethod</code></li>
-</ul>
-<blockquote>
-<p>Each parallel thread has their own named drivers pool, i.e. <code>getDriver()</code> return different objects per each parallel thread</p>
+<li><strong>@BeforeMethod</strong> or inside <strong>Test Method</strong> drivers belong to current test method and will be closed in <code>@AfterMethod</code><blockquote>
+<p>Also driver is saved for all dependent test methods inside test class by default.</p>
 </blockquote>
+</li>
+</ul>
 <p>To quit driver forcibly if needed use <strong>quitDriver()</strong> or <strong>quitDriver(name)</strong></p>
-<p>To disable driver quit strategy completely and cotrol drivers init/quit on your own provide <code>forcibly_disable_driver_quit=true</code> in <code>_config.properties</code> or execute from any place of your test code <code>CarinaListener.disableDriversCleanup();</code></p>
+<p>To disable driver quit strategy completely and cotrol drivers init/quit on your own provide <code>forcibly_disable_driver_quit=true</code> or execute from any place of your test code <code>CarinaListener.disableDriversCleanup();</code></p>
 <h2 id="restart">Restart</h2>
 <ul>
 <li><strong>restartDriver()</strong> quit current driver and start new one with the same capabilities</li>
