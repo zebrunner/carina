@@ -11,7 +11,7 @@ Supported Browsers: Chrome, Firefox, Internet Explorer, Microsoft Edge, Opera, S
 
 * **getDriver()** is the core method to start any Selenium/Appium session. It will create a RemoteWebDriver named "default" based on default capabilities from configuration.
 
-    1st call of the method in current thread should start new driver. Next calls will return existing object. Based on the driver lifecycle carina do automatic driver quit.
+    1st call of the method in current thread should start new driver. Next calls will return existing object.
 
 * **getDriver(String name)** start named driver session using default capabilities from configuration. That's allow to start several drivers (up to 3 according to `max_driver_count` property)
 
@@ -56,7 +56,7 @@ public void desiredCapsTest() {
 }
 ```
 
-##Capabilities 
+###Capabilities 
 
 Simple key value Selenium/Appium pairs can be provided in `_config.properties` using `capabilities.name=value` , for example:
 ```
@@ -69,7 +69,7 @@ capabilities.newCommandTimeout=180
 
 Visit [selenium](https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities) or [appium](https://appium.io/docs/en/writing-running-appium/caps/) to see all capabilities.
 
-##Options 
+###Options 
 
 Options and arguments could be provided through `_config.properties` using comma separated values for multiple options/args, for example:
 ```
@@ -99,10 +99,10 @@ public void someTest() {
 ```
 
 ##Quit
-Quit driver operation is executed automatically based on driver init phase (@BeforeSuite/@BeforeTest/@BeforeClass/@BeforeMethod/Method), i.e. **no need to do it inside your test code**.
+Quit driver operation is executed automatically based on driver init phase, i.e. **no need to do it inside your test code**.
 
 * **@BeforeSuite** drivers belong to all tests/classes and will be closed in `@AfterSuite` only
-* **@BeforeTest** drivers belong to all `<test>` classes and will be closed in `@AfterTest`. To be imlemented in [#1250]
+* **@BeforeTest** drivers belong to all `<test>` classes and will be closed in `@AfterTest`. To be imlemented in [#1250](https://github.com/qaprosoft/carina/issues/1250)
 * **@BeforeClass** drivers belong to all tests inside current class and will be closed in `@AfterClass`
 * **@BeforeMethod** or inside **Test Method** drivers belong to current test method and will be closed in `@AfterMethod`
   > Also driver is saved for all dependent test methods inside test class by default.
@@ -113,4 +113,4 @@ To disable driver quit strategy completely and cotrol drivers init/quit on your 
 
 ##Restart
 * **restartDriver()** quit current driver and start new one with the same capabilities
-* **restartDriver(boolean isSameDevice)** quit current driver and start new one with on the same device using `uuid` capability. It is fully compatible with [MCloud](https://github.com/zebrunner/mcloud) farm.
+* **restartDriver(boolean isSameDevice)** quit current driver and start new one on the same device using `uuid` capability. It is fully compatible with [MCloud](https://github.com/zebrunner/mcloud) farm.
