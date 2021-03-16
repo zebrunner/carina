@@ -554,19 +554,16 @@ We strongly recommend to find resources and don't generate by automation team!</
 <ul>
 <li>Localized resources are located in <a href="https://github.com/qaprosoft/carina-demo/tree/master/src/main/resources/L10N"><strong>src/main/resources/L10N</strong></a> folder.
   Each localized resource file has key value pairs with actual translations.<blockquote>
-<p>Verify that for every resource there is a file without any postfix otherwise Java can't load them! For example <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/L10N/locale.properties">locale.properties</a></p>
+<p>Verify that for every resource there is a file without any postfix otherwise Java can't load! For example <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/L10N/locale.properties">locale.properties</a></p>
 </blockquote>
 </li>
 </ul>
 <h2 id="implementation">Implementation</h2>
 <ul>
-<li>Develop page(s) using <a href="https://github.com/qaprosoft/carina-demo/blob/64b63927e8c3a1a76d5e567e28f837be82797d56/src/main/java/com/qaprosoft/carina/demo/gui/pages/localizationSample/WikipediaLocalePage.java#L41">localized key</a> usage.<blockquote>
-<p>Reuse {L10N:localizedKey} syntax to declare ExtendedWebElement.</p>
-</blockquote>
-</li>
+<li>Declare page elements with L10N <a href="https://github.com/qaprosoft/carina-demo/blob/64b63927e8c3a1a76d5e567e28f837be82797d56/src/main/java/com/qaprosoft/carina/demo/gui/pages/localizationSample/WikipediaLocalePage.java#L41">key</a> usage.</li>
 </ul>
-<p>```
-  @FindBy(xpath = "//*[text()='{L10N:HomePage.welcomeText}'")
+<p>```</p>
+<p>@FindBy(xpath = "//*[text()='{L10N:HomePage.welcomeText}'")
   private ExtendedWebElement welcomeText;</p>
 <p>@FindBy(linkText = "{L10N:discussionElem}")
   private ExtendedWebElement discussionBtn;
