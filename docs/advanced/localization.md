@@ -14,14 +14,13 @@ We strongly recommend to find resources and don't generate by automation team!
 
 * Declare page elements with L10N [key](https://github.com/qaprosoft/carina-demo/blob/64b63927e8c3a1a76d5e567e28f837be82797d56/src/main/java/com/qaprosoft/carina/demo/gui/pages/localizationSample/WikipediaLocalePage.java#L41) usage.
 
-  ```
+```
+@FindBy(xpath = "//*[text()='{L10N:HomePage.welcomeText}'")
+private ExtendedWebElement welcomeText;
 
-  @FindBy(xpath = "//*[text()='{L10N:HomePage.welcomeText}'")
-  private ExtendedWebElement welcomeText;
-
-  @FindBy(linkText = "{L10N:discussionElem}")
-  private ExtendedWebElement discussionBtn;
-  ```
+@FindBy(linkText = "{L10N:discussionElem}")
+private ExtendedWebElement discussionBtn;
+```
 
 * Use [`L10N.getText(key)`](https://github.com/qaprosoft/carina-demo/blob/64b63927e8c3a1a76d5e567e28f837be82797d56/src/test/java/com/qaprosoft/carina/demo/WebLocalizationSample.java#L53) to get expected translations for assertions:
   ```
