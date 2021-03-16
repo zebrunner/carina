@@ -382,6 +382,8 @@
     
     <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
     
+      
+    
     
       <label class="md-nav__link md-nav__link--active" for="__toc">
         Proxy
@@ -398,6 +400,8 @@
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon">
@@ -406,13 +410,6 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#proxy-usage" class="md-nav__link">
-    Proxy usage
-  </a>
-  
-</li>
       
         <li class="md-nav__item">
   <a href="#raising-inbuilt-proxy-server-browsermob" class="md-nav__link">
@@ -536,6 +533,8 @@
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon">
@@ -544,13 +543,6 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#proxy-usage" class="md-nav__link">
-    Proxy usage
-  </a>
-  
-</li>
       
         <li class="md-nav__item">
   <a href="#raising-inbuilt-proxy-server-browsermob" class="md-nav__link">
@@ -632,9 +624,7 @@
                   
                 
                 
-                  <h1>Proxy</h1>
-                
-                <h3 id="proxy-usage">Proxy usage</h3>
+                <h1 id="proxy-usage">Proxy usage</h1>
 <p>There is a possibility to send all test traffic via proxy including the embedded light-weight BrowserMob proxy server.
 There are several properties available to manage all kinds of proxy usage:</p>
 <pre><code>proxy_host=NULL
@@ -649,7 +639,7 @@ browsermob_port=0
 <p>Declare proxy_host, proxy_port and proxy_protocols to send all Web and API test traffic via your static network proxy.
 Also, to enable proxy for TestNG Java process, <strong>proxy_set_to_system</strong> must be specifed to <strong>true</strong>, otherwise only WebDrivers and API clients will be proxied.</p>
 <p>Note: The above settings are mostly required to get public internet access through corporate proxies.</p>
-<h3 id="raising-inbuilt-proxy-server-browsermob">Raising inbuilt proxy-server (BrowserMob)</h3>
+<h2 id="raising-inbuilt-proxy-server-browsermob">Raising inbuilt proxy-server (BrowserMob)</h2>
 <p>Also, Carina can start an embedded proxy to proxy/view/filter requests/responses. There is an inbuilt library BrowserMobProxy in Carina-proxy module. Below you can find BrowserMob proxy related parameters in your <strong>config.properties</strong> file:</p>
 <pre><code>browsermob_proxy=true
 browsermob_disabled_mitm=false
@@ -664,7 +654,7 @@ E.g. <strong>proxy_host=myhostname</strong> is useful in case of running maven p
 <p><strong>browsermob_ports_range=8001:8003</strong> means that Carina will use only ports from given range for starting of browsermob sessions. That's reasonable for cases when only several ports are shared at environment and can be accessed from other machines within the network. If all ports are used then test will wait for the first freed port.</p>
 <p><strong>browsermob_disabled_mitm</strong> is disabled by default. </p>
 <p><strong>Important!</strong> If you have troubles with  SSL traffic sniffing, the first thing you should do is to change <strong>browsermob_disabled_mitm</strong> property value!</p>
-<h4 id="using-proxy-server-in-java-code">Using proxy-server in Java code:</h4>
+<h3 id="using-proxy-server-in-java-code">Using proxy-server in Java code:</h3>
 <ol>
 <li>Make sure the driver instance is already started:</li>
 </ol>
@@ -722,8 +712,8 @@ try {
 <li>addLastHttpFilterFactory</li>
 </ol>
 <p>To add and configure content filters, look <a href="https://github.com/lightbody/browsermob-proxy#http-request-manipulation">here</a>.</p>
-<h4 id="dealing-with-mitm-and-installing-ssl-certificate-into-your-system">Dealing with MITM and installing SSL certificate into your system:</h4>
-<h5 id="for-mac-users">For Mac users:</h5>
+<h3 id="dealing-with-mitm-and-installing-ssl-certificate-into-your-system">Dealing with MITM and installing SSL certificate into your system:</h3>
+<h4 id="for-mac-users">For Mac users:</h4>
 <ol>
 <li>Go <a href="https://github.com/lightbody/browsermob-proxy/blob/master/browsermob-core/src/main/resources/sslSupport/ca-certificate-rsa.cer">here</a> and save it as <strong>ca-certificate-rsa.cer</strong>.</li>
 <li>A double click creates a file. The next window should appear:</li>
@@ -745,13 +735,13 @@ try {
 <li>Make sure the red cross on your certificate turned into a blue one:</li>
 </ol>
 <p><img alt="Adding ssl certificate" src="../../img/SSLInstallStep5.png" /></p>
-<h4 id="adding-ssl-certificate-into-java-keystore">Adding SSL certificate into Java keystore:</h4>
+<h3 id="adding-ssl-certificate-into-java-keystore">Adding SSL certificate into Java keystore:</h3>
 <p>If you are still receiving the following exception:</p>
 <pre><code>javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
 </code></pre>
 
 <p>you may need to set up <strong>ca-certificate-rsa.cer</strong> into your Java keystore.</p>
-<h5 id="for-mac-and-linux-users">For Mac and Linux users:</h5>
+<h4 id="for-mac-and-linux-users">For Mac and Linux users:</h4>
 <pre><code>sudo keytool -importcert -alias browsermob -file pathToYourCertificateLocation/BrowserMobCertificate.crt -keystore /Library/Java/JavaVirtualMachines/jdk1.8.0_181.jdk/Contents/Home/jre/lib/security/cacerts
 </code></pre>
 
