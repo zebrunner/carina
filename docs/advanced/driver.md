@@ -1,26 +1,23 @@
 #Driver usage
 
-Currently supported browsers by Carina:
+All described methods are implemented inside `IDriverPool` interface and accessible by default from any test class. 
+To access this functionality from another places like your services just implement this interface.
 
-* Chrome
-* Firefox
-* Internet Explorer
-* Microsoft Edge
-* Opera
-* Safari
+> Each thread has their own named driver pool
 
-All described methods are implemented inside `IDriverPool` interface and accessible by default from any test class. To access this functionality from another places like your services just implement this interface.
+Supported Browsers: Chrome, Firefox, Internet Explorer, Microsoft Edge, Opera, Safari etc
 
 ##Initialization
-Driver can be started in several ways
 
 * **getDriver()** is the core method to start any Selenium/Appium session. It will create a RemoteWebDriver named "default" based on default capabilities from configuration.
 
-  1st call of the method in current thread should start new driver. Next calls will return existing object. Based on the driver lifecycle carina do automatic driver quit.
+    1st call of the method in current thread should start new driver. Next calls will return existing object. Based on the driver lifecycle carina do automatic driver quit.
 
 * **getDriver(String name)** start named driver session using default capabilities from configuration. That's allow to start several drivers (up to 3 according to `max_driver_count` property)
 
 * **getDriver(String name, DesiredCapabilities capabilities)** start named driver session using custom capabilities.
+
+* **getDriver(String name, DesiredCapabilities capabilities, String seleniumHost)** start named driver session using custom capabilities vs custom selenium url.
 
 Example:
 ```
@@ -59,11 +56,9 @@ public void desiredCapsTest() {
 }
 ```
 
-* **getDriver(String name, DesiredCapabilities capabilities, String seleniumHost)** start named driver session using custom capabilities vs custom selenium url.
- 
 ##Capabilities 
 
-Simple key value Selenium/Appium pairs can be provided in `_config.properties` using **capabilities.** prefix, for example:
+Simple key value Selenium/Appium pairs can be provided in `_config.properties` using `capabilities.name=value` , for example:
 ```
 capabilities.automationName=uiautomator2
 capabilities.deviceName=Samsung_Galaxy_S10
@@ -76,7 +71,7 @@ Visit [selenium](https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities
 
 ##Options 
 
-Options and arguments could be provided through `_config.properties` as well using comma separated values for multiple options/args, for example:
+Options and arguments could be provided through `_config.properties` using comma separated values for multiple options/args, for example:
 ```
 firefox_args=--no-first-run,--disable-notifications
 firefox_preferences=
@@ -104,18 +99,17 @@ public void someTest() {
 ```
 
 ##Quit
-Carina determine driver lifecycle based on init phase (BeforeSuite/BeforeClass/BeforeMethod/Method) and quit driver automatically , i.e. **no need to do it inside your test code**.
+Quit driver operation is executed automatically based on driver init phase (@BeforeSuite/@BeforeTest/@BeforeClass/@BeforeMethod/Method), i.e. **no need to do it inside your test code**.
 
-* **@BeforeSuite** drivers belong to all tests/classes and will be closed in `@AfterSuite`
+* **@BeforeSuite** drivers belong to all tests/classes and will be closed in `@AfterSuite` only
 * **@BeforeTest** drivers belong to all `<test>` classes and will be closed in `@AfterTest`. To be imlemented in [#1250]
 * **@BeforeClass** drivers belong to all tests inside current class and will be closed in `@AfterClass`
 * **@BeforeMethod** or inside **Test Method** drivers belong to current test method and will be closed in `@AfterMethod`
-
-> Each parallel thread has their own named drivers pool, i.e. `getDriver()` return different objects per each parallel thread
+  > Also driver is saved for all dependent test methods inside test class by default.
 
 To quit driver forcibly if needed use **quitDriver()** or **quitDriver(name)**
 
-To disable driver quit strategy completely and cotrol drivers init/quit on your own provide `forcibly_disable_driver_quit=true` in `_config.properties` or execute from any place of your test code `CarinaListener.disableDriversCleanup();`
+To disable driver quit strategy completely and cotrol drivers init/quit on your own provide `forcibly_disable_driver_quit=true` or execute from any place of your test code `CarinaListener.disableDriversCleanup();`
 
 ##Restart
 * **restartDriver()** quit current driver and start new one with the same capabilities
