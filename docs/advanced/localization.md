@@ -6,21 +6,14 @@ We strongly recommend to find resources and don't generate by automation team!
 
 ## Prerequisites
 
-* Localized resources are located in [**src/main/resources/L10N**](https://github.com/qaprosoft/carina-demo/tree/master/src/main/resources/L10N) folder of your test project.
-  Each localized resource file has key value pairs. Where key is unique key and value is valid translation:
-
-  ```
-  HomePage.welcomeText=Welcome to Wikipedia,
-  discussionElem=Discussion
-  ```
-
-    > Verify that for every resource there is a file without any postfix otherwise Java can't load them!
-      For example [locale.properties](https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/L10N/locale.properties)
+* Localized resources are located in [**src/main/resources/L10N**](https://github.com/qaprosoft/carina-demo/tree/master/src/main/resources/L10N) folder.
+  Each localized resource file has key value pairs with actual translations.
+  > Verify that for every resource there is a file without any postfix otherwise Java can't load them! For example [locale.properties](https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/L10N/locale.properties)
 
 ## Implementation
 
 * Develop page(s) using [localized key](https://github.com/qaprosoft/carina-demo/blob/64b63927e8c3a1a76d5e567e28f837be82797d56/src/main/java/com/qaprosoft/carina/demo/gui/pages/localizationSample/WikipediaLocalePage.java#L41) usage.
-  > Reuse `{L10N:localizedKey}` syntax to declare ExtendedWebElement.
+  > Reuse {L10N:localizedKey} syntax to declare ExtendedWebElement.
 
   ```
   @FindBy(xpath = "//*[text()='{L10N:HomePage.welcomeText}'")
