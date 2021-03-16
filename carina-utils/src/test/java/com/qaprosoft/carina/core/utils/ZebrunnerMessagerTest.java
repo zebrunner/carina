@@ -19,9 +19,9 @@ public class ZebrunnerMessagerTest {
     @Test
     public void testMessageErrorWithSingleParam() {
         ZebrunnerMessager messager = ZebrunnerMessager.RAW_MESSAGE;
-        String printedMassage = messager.error(MESSAGE);
+        String printedMessage = messager.error(MESSAGE);
 
-        Assert.assertEquals(printedMassage, MESSAGE, printedMassage + " doesn't equal to " + MESSAGE);
+        Assert.assertEquals(printedMessage, MESSAGE, printedMessage + " doesn't equal to " + MESSAGE);
     }
 
     @Test
