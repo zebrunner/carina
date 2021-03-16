@@ -1,4 +1,4 @@
-### Proxy usage
+# Proxy usage
 There is a possibility to send all test traffic via proxy including the embedded light-weight BrowserMob proxy server.
 There are several properties available to manage all kinds of proxy usage:
 ```
@@ -15,7 +15,7 @@ Also, to enable proxy for TestNG Java process, **proxy_set_to_system** must be s
 
 Note: The above settings are mostly required to get public internet access through corporate proxies.
 
-### Raising inbuilt proxy-server (BrowserMob)
+## Raising inbuilt proxy-server (BrowserMob)
 Also, Carina can start an embedded proxy to proxy/view/filter requests/responses. There is an inbuilt library BrowserMobProxy in Carina-proxy module. Below you can find BrowserMob proxy related parameters in your **config.properties** file:
 ```
 browsermob_proxy=true
@@ -36,7 +36,7 @@ E.g. **proxy_host=myhostname** is useful in case of running maven process inside
 
 **Important!** If you have troubles with  SSL traffic sniffing, the first thing you should do is to change **browsermob_disabled_mitm** property value!
 
-#### Using proxy-server in Java code:
+### Using proxy-server in Java code:
 
 1. Make sure the driver instance is already started:
 ```
@@ -88,9 +88,9 @@ Your .har file will be created in the project root folder
 
 To add and configure content filters, look [here](https://github.com/lightbody/browsermob-proxy#http-request-manipulation).
 
-#### Dealing with MITM and installing SSL certificate into your system:
+### Dealing with MITM and installing SSL certificate into your system:
 
-##### For Mac users:
+#### For Mac users:
 
 1. Go [here](https://github.com/lightbody/browsermob-proxy/blob/master/browsermob-core/src/main/resources/sslSupport/ca-certificate-rsa.cer) and save it as **ca-certificate-rsa.cer**.
 2. A double click creates a file. The next window should appear:
@@ -113,7 +113,7 @@ To add and configure content filters, look [here](https://github.com/lightbody/b
 
 ![Adding ssl certificate](../img/SSLInstallStep5.png)
 
-#### Adding SSL certificate into Java keystore:
+### Adding SSL certificate into Java keystore:
 
 If you are still receiving the following exception:
 ```
@@ -121,7 +121,7 @@ javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: 
 ```
 you may need to set up **ca-certificate-rsa.cer** into your Java keystore.
 
-##### For Mac and Linux users:
+#### For Mac and Linux users:
 
 ```
 sudo keytool -importcert -alias browsermob -file pathToYourCertificateLocation/BrowserMobCertificate.crt -keystore /Library/Java/JavaVirtualMachines/jdk1.8.0_181.jdk/Contents/Home/jre/lib/security/cacerts
