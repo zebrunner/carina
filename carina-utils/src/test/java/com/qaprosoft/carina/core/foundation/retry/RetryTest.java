@@ -15,53 +15,25 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.retry;
 
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import org.testng.Assert;
+import org.testng.Reporter;
 import org.testng.annotations.Test;
-
-import com.qaprosoft.carina.core.foundation.utils.R;
 
 public class RetryTest {
 
-/*    @Test
-    public void testInitRetryCounter() {
-        RetryAnalyzer retryAnalyzer = new RetryAnalyzer();
-        retryAnalyzer.resetCounter();
-        
-        int count = retryAnalyzer.getRunCount();
-        Assert.assertEquals(count, 0);
-    }
+    private static final int maxRetryCount = Configuration.getInt(Configuration.Parameter.RETRY_COUNT);
 
     @Test
-    public void testRetryCounterIncrement() {
+    public void testRetryAnalyzer() {
         RetryAnalyzer retryAnalyzer = new RetryAnalyzer();
-        retryAnalyzer.resetCounter();
-        
-        int count = retryAnalyzer.getRunCount();
-        Assert.assertEquals(count, 0);
-        retryAnalyzer.incrementRunCount();
-        count = retryAnalyzer.getRunCount();
-        Assert.assertEquals(count, 1);
+
+        for (int i = 0; i < maxRetryCount; i++) {
+            Assert.assertTrue(retryAnalyzer.retry(Reporter.getCurrentTestResult()),
+                    "retryAnalyzer retried " + i + " times, but had to " + maxRetryCount);
+        }
+
+        Assert.assertFalse(retryAnalyzer.retry(Reporter.getCurrentTestResult()), "Run count is more than " + maxRetryCount);
     }
-    
-    @Test
-    public void testRetryCounterReset() {
-        RetryAnalyzer retryAnalyzer = new RetryAnalyzer();
-        retryAnalyzer.resetCounter();
-        
-        int count = retryAnalyzer.getRunCount();
-        Assert.assertEquals(count, 0);
-        retryAnalyzer.incrementRunCount();
-        count = retryAnalyzer.getRunCount();
-        Assert.assertEquals(count, 1);
-        retryAnalyzer.resetCounter();
-        count = retryAnalyzer.getRunCount();
-        Assert.assertEquals(count, 0);
-    }
-    
-    @Test
-    public void testGetMaxRetryCountForTest() {
-        R.CONFIG.put("retry_count", "1");
-        Assert.assertEquals(RetryAnalyzer.getMaxRetryCountForTest(), 1);
-    }*/
 
 }

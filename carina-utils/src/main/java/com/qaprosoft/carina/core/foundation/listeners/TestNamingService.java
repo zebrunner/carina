@@ -79,7 +79,7 @@ public class TestNamingService {
     /**
      * Set full test name based on test class, method and other generic information. It is generated based by ITestResult object.
      * 
-     * @param ITestResult result
+     * @param result ITestResult
      * @return String test name
      */     
     @SuppressWarnings("unlikely-arg-type")
@@ -171,7 +171,8 @@ public class TestNamingService {
     /**
      * calculate InvocationCount number based on test name
      * 
-     * @param String test
+     * @param testResult ITestResult
+     * @param testName String
      * @return int invCount
      */
     private static String appendInvocationCount(ITestResult testResult, String testName) {
