@@ -9,7 +9,7 @@ Modern test automation frameworks should support data-driven testing, when you a
 
 ## Java data-provider
 As far as Carina is based on TestNG framework, you are able to use well known Java data-providers which return a matrix of Objects and pass it to the appropriate test arguments. You have to use dataProvider attribute along with @Test annotation and implement the method annotated with `@DataProvider` that will return `Object[][]` as a test data set:
-```java
+```
 @Test(dataProvider = "DP1")
 public void testMuliplyOperation(int a, int b, int c)
 {
@@ -31,7 +31,7 @@ public static Object[][] dataprovider()
 
 ## XML parametrization
 TestNG supports parametrization from XML files when you organize test suites using XML files. The parameterized test method should be annotated with `@Parameters({ "a", "b", "c" })` and appropriate method arguments should be listed. Also, you have to pass all required parameters from an XML suite file:
-```java
+```
 @Test
 @Parameters({ "a", "b", "c" })
 public void testSubstractOperation(int a, int b, int c) {
@@ -57,9 +57,11 @@ public void testSubstractOperation(int a, int b, int c) {
 ```
 
 ## XLS/CSV data-providers
-Carina test framework provides a possibility to write all tests with data providers in one place, including parametrization using external XLS/CSV spreadsheets. First of all, you need to declare a test class that extends `AbstractTest.java`:
+Carina test framework provides a possibility to write all tests with data providers in one place, including parametrization using external XLS/CSV spreadsheets. First of all, you need to declare a test class that extends `AbstractTest.java`.
+
 After that, you can specify data provider tests as follows.
-```java
+
+```
 public class DataprovidersSampleTest extends AbstractTest {
 	@Test(dataProvider = "DataProvider")
 	@XlsDataSourceParameters(path = "xls/demo.xlsx", sheet = "Calculator", dsUid = "TUID", dsArgs = "a,b,c")
@@ -92,7 +94,7 @@ In the TUID column, you should specify some unique test identifier that will be 
 
 ## DataProvider with huge number of columns
 In some cases, we have to provide 10+ columns into a test. In this case, there is one tricky point. Just removing dsArgs dataprovider parameter will collect all the lines into a single HashMap<String, String> object, so you can dynamically get any column in a test using the column name.
-```java
+```
 public class DataprovidersSampleTest extends AbstractTest {
 	@Test(dataProvider = "DataProvider")
 	@XlsDataSourceParameters(path = "xls/demo.xlsx", sheet = "Calculator", dsUid = "TUID")

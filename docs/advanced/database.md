@@ -148,7 +148,7 @@ The next step is MyBatis mappers implementation, read [the official documentatio
 ```
 
 Now we have to implement a DB domain object [User class](https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/models/User.java) which reflects the DB table structure:
-```java
+```
 package com.qaprosoft.carina.demo.db.models;
 
 import java.util.ArrayList;
@@ -240,7 +240,7 @@ public class User {
 
 Also, we have to describe the mapper interface, [UserMapper interface](https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/mappers/UserMapper.java):
 
-```java
+```
 package com.qaprosoft.carina.demo.db.mappers;
 
 import com.qaprosoft.carina.demo.db.models.User;
@@ -308,7 +308,7 @@ All the mappers and reference to _database.properties should be specified in **s
 
 ## Connection factory
 Connection factory is responsible for MyBatis context initialization and creation of mapper instances, take a look at the sample implementation of [ConnectionFactory](https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/ConnectionFactory.java):
-```java
+```
 package com.qaprosoft.carina.demo.utils;
 
 import java.io.IOException;
@@ -350,7 +350,7 @@ public class ConnectionFactory {
 
 ## Usage sample
 Finally, [DBSampleTest](https://github.com/qaprosoft/carina-demo/blob/master/src/test/java/com/qaprosoft/carina/demo/DBSampleTest.java) illustrates the usage of MyBatis in tests:
-```java
+```
 package com.qaprosoft.carina.demo;
 
 import static org.testng.Assert.assertEquals;

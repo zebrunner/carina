@@ -20,7 +20,7 @@ enable_l10n=true
    >Syntax is '{L10N:key}'
 
    Example:
-```java
+```
 @FindBy(xpath = "//*[@id='{L10N:HomePage.welcomeTextId}'")
 private ExtendedWebElement welcomeText;
 
@@ -48,7 +48,7 @@ add_new_localization_encoding=UTF-8
 add_new_localization_property_name=new_locale_ 
 ```
 2) Find elements by not using locale text, for example by id:
-```java
+```
 @FindBy(id = "pt-anontalk")
 private ExtendedWebElement discussionElem;
  
@@ -59,7 +59,7 @@ private ExtendedWebElement contribElem;
 private ExtendedWebElement createAccountElem;
 ```
 3) Create method below in your page.class. Place in _localizationCheckList_ webElements that are currently on the page and which locale pair you want to create.
-```java
+```
 public boolean checkMultipleLocalization() {
         ExtendedWebElement[] localizationCheckList = {discussionElem, createAccountElem, contribElem};
         
@@ -67,7 +67,7 @@ public boolean checkMultipleLocalization() {
 }
 ```
 4) Create test as below where checkMultipleLocalization() method is called when according page is opened.
-```java
+```
 public void testAddNewLanguages() {
 
     WikipediaHomePage wikipediaHomePage = new WikipediaHomePage(getDriver());
@@ -96,7 +96,7 @@ public void testAddNewLanguages() {
 5) Copy all key-value pairs in your existing **locale_xx_XX.properties** file from **new_locale_xx_XX** file.
 
 6) Now elements could be accessed by locale text.
-```java
+```
 @FindBy(id = "pt-anontalk")
 private ExtendedWebElement discussionElem;
 

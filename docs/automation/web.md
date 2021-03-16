@@ -5,7 +5,7 @@ Carina framework follows Selenium best practices for web test automation. If you
 
 ### Implementation of Page Objects
 When you are writing functional tests using Selenium, the major part of your code will consist of interactions with the web interface you are testing through the WebDriver API. After fetching elements, you will verify some state of an element through various assertions and move on to fetching the next element. You may find WebElements directly in your tests:
-```java
+```
 List<WebElement> zipCodes = driver.findElements(By.id("zipCodes"));
 for (WebElement zipCode : zipCodes) {
     if (zipCode.getText().equals("12345")){
@@ -29,7 +29,7 @@ You create an object that represents the UI you want to test, which can be a who
 ![Page Object Pattern](../img/page-objects.png)
 
 In general, Page Object contains locators of the elements situated on the page and some business logic that may be reused by different tests:
-```java
+```
 public class ModelInfoPage extends AbstractPage {
     @FindBy(css = ".help-display strong")
     private ExtendedWebElement displayInfoLabel;
@@ -78,7 +78,7 @@ public class ModelInfoPage extends AbstractPage {
 
 ### Implementation of UI Components
 In some cases, it is useful to implement UI Objects that may be reused between multiple Page Objects. For instance, a top menu or footer may be shared between multiple pages:
-```java
+```
 public class FooterMenu extends AbstractUIObject {
     @FindBy(linkText = "Home")
     private ExtendedWebElement homeLink;
@@ -102,7 +102,7 @@ public class FooterMenu extends AbstractUIObject {
 }
 ```
 And then you can use this in Page Object:
-```java
+```
 public class HomePage extends AbstractPage {
     @FindBy(id = "footmenu")
     private FooterMenu footerMenu;
@@ -140,7 +140,7 @@ public class HomePage extends AbstractPage {
 
 ### Implementation of tests
 Carina framework uses TestNG for test organization. In general, test represents a manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:
-```java
+```
 public class WebSampleTest extends AbstractTest {
     @Test(description = "JIRA#AUTO-0009")
     @MethodOwner(owner = "qpsdemo")
@@ -203,7 +203,7 @@ Determines how carina detects whether expected page is opened:
 * By URL and Element
 
 To check if page was opened is used: 
-```java
+```
 page.isPageOpened();
 //or
 page.assertPageOpened();  // equals Assert.assertTrue(page.isPageOpened(),"PageName not loaded: reason);
@@ -215,7 +215,7 @@ Page opening strategy configuration can be set in several places:
 
 2) in page.class. This overrides global page open strategy for a specific page.
 
-```java
+```
 public class Page extends AbstractPage {
 
     public Page(WebDriver driver){
@@ -225,7 +225,7 @@ public class Page extends AbstractPage {
 }
 ```
 3) in test.class. This also overrides global page open strategy for a specific page.
-```java
+```
 @Test
 public void test(){
         HomePage homePage=new HomePage(getDriver());
@@ -237,7 +237,7 @@ public void test(){
 #### By URL
 
 This is a default value. To use it you need to set a real page urls into your page classes.
-```java
+```
 private final String specificPageUrl = "https://www.gsmarena.com/specific/url";
 
 public Page(WebDriver driver) {
@@ -252,7 +252,7 @@ public Page(WebDriver driver) {
 
 #### By Element
 
-```java
+```
 @FindBy(id = "id")
 private ExtendedWebElement element;
 
@@ -265,7 +265,7 @@ public Page(WebDriver driver) {
 ```
 
 #### By URL and Element
-```java
+```
 private final String specificPageUrl = "https://www.gsmarena.com/specific/url";
 
 @FindBy(id = "id")
@@ -293,7 +293,7 @@ Determines how carina detects appearing of web elements on page
 Element loading strategy could be set at the same places as **Page opening strategy**.
 
 To check if element presence:
-```java
+```
 Component component = Page.getComponent();
 component.assertUIObjectPresent();      // equals to Assert.assertTrue(component.isUIObjectPresent(),"UI object componentName does not present!");
 

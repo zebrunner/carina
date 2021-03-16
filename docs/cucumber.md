@@ -42,7 +42,7 @@ More details on all possible annotations could be found in official cucumber [do
 
 If you need to operate with WebDriver instance within the class where you're declaring Java methods for you steps you can use `IDriverPool` class of carina.   
 Example:
-```java
+```
 public class GSMArenaNewsSteps implements IDriverPool {
     
     @Given("^I am on main page")
@@ -58,7 +58,7 @@ Finally, to map text steps with Java declaration you need to create test class a
 Then use **@CucumberOptions** annotation in order to complete the mapping itself.
 Class body can be empty since all logic for buildind of scripts and running them is implemented inside CucumberBaseTest class.   
 Here is the sample of such code:
-```java
+```
 @CucumberOptions(features = "src/test/resources/features/GSMArenaNews.feature", 
         glue = "com.qaprosoft.carina.demo.cucumber.steps",
         plugin = {"pretty",
