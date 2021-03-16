@@ -7,14 +7,15 @@ We strongly recommend to find resources and don't generate by automation team!
 ## Prerequisites
 
 * Localized resources are located in [**src/main/resources/L10N**](https://github.com/qaprosoft/carina-demo/tree/master/src/main/resources/L10N) folder of your test project.
-  Each localized resource file has key value pairs. Where key is unique key and value is valid translation
+  Each localized resource file has key value pairs. Where key is unique key and value is valid translation:
+
   ```
   HomePage.welcomeText=Welcome to Wikipedia,
   discussionElem=Discussion
   ```
 
-  > Verify that for every resource there is a file without any locale postfix with default translations (en_US) otherwise Java can't load resources correctly!
-    For example [locale.properties](https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/L10N/locale.properties)
+    > Verify that for every resource there is a file without any postfix otherwise Java can't load them!
+      For example [locale.properties](https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/L10N/locale.properties)
 
 ## Implementation
 
