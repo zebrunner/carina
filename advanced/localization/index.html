@@ -562,12 +562,13 @@ We strongly recommend to find resources and don't generate by automation team!</
 <ul>
 <li>Declare page elements with L10N <a href="https://github.com/qaprosoft/carina-demo/blob/64b63927e8c3a1a76d5e567e28f837be82797d56/src/main/java/com/qaprosoft/carina/demo/gui/pages/localizationSample/WikipediaLocalePage.java#L41">key</a> usage.</li>
 </ul>
-<p>```</p>
-<p>@FindBy(xpath = "//*[text()='{L10N:HomePage.welcomeText}'")
-  private ExtendedWebElement welcomeText;</p>
-<p>@FindBy(linkText = "{L10N:discussionElem}")
-  private ExtendedWebElement discussionBtn;
-  ```</p>
+<pre><code>@FindBy(xpath = &quot;//*[text()='{L10N:HomePage.welcomeText}'&quot;)
+private ExtendedWebElement welcomeText;
+
+@FindBy(linkText = &quot;{L10N:discussionElem}&quot;)
+private ExtendedWebElement discussionBtn;
+</code></pre>
+
 <ul>
 <li>Use <a href="https://github.com/qaprosoft/carina-demo/blob/64b63927e8c3a1a76d5e567e28f837be82797d56/src/test/java/com/qaprosoft/carina/demo/WebLocalizationSample.java#L53"><code>L10N.getText(key)</code></a> to get expected translations for assertions:
   <code>String welcomeText = wikipediaLocalePage.getWelcomeText();
