@@ -4,7 +4,7 @@ Carina allows you to integrate BDD approach into your test project easily.
 Under the hood it uses popular BDD framework Cucumber extending its basic functionality and integrating cool test reports.   
 To integrate carina-cucumber functionality you just need to add its library into your project.   
 For instance with maven that can be done by adding next lines into your pom.xml:
-```
+```xml
 <dependency>
     <groupId>com.qaprosoft</groupId>
     <artifactId>carina-cucumber</artifactId>
@@ -15,12 +15,14 @@ For instance with maven that can be done by adding next lines into your pom.xml:
 ### Setting up cucumber test with carina
 
 In order to automate your test on cucumber you'll need to implement couple of things:
+
 1. Write down text of your scenario using cucumber syntax
 2. Declare each step of your scenario in Jave сode
 3. Map text representation of scenario with Java classes describing it
 
-Carina supports Gherkin syntax for describing of test scenarios. More details on syntax can be found here: https://cucumber.io/docs/gherkin/reference/   
-Here is the example of such scenario:
+Carina supports Gherkin syntax for describing of test scenarios. More details on syntax can be found [here](https://cucumber.io/docs/gherkin/reference/).
+
+Example of such scenario:
 ```
 Feature: GSM Arena News testing
   In order to use Cucumber in my project, I want to check how to test GSM Arena News page
@@ -32,14 +34,15 @@ Feature: GSM Arena News testing
     Then page 'News' should be open
     And page 'News' should contains all items
 ```
-File should be stored in resources package and have .feature extension.
+File should be stored in _test/java/resources/features/_ package and have .feature extension.
 
-To declare steps in Java you need to use cucumber annotations @Given, @When, @Then, etc.   
-More details on all possible annotations could be found in oficial cucumber documentation.   
-In case if some steps declaration is missing you'll get informative error in your console when you run the test.   
+To declare steps in Java you need to use cucumber annotations **@Given, @When, @Then,** etc.   
+More details on all possible annotations could be found in official cucumber [documentation](https://cucumber.io/docs/cucumber/).   
+>In case if some steps declaration is missing you'll get informative error in your console when you run the test.   
+
 If you need to operate with WebDriver instance within the class where you're declaring Java methods for you steps you can use `IDriverPool` class of carina.   
 Example:
-```
+```java
 public class GSMArenaNewsSteps implements IDriverPool {
     
     @Given("^I am on main page")
@@ -51,21 +54,20 @@ public class GSMArenaNewsSteps implements IDriverPool {
 }
 ```
 
-Then finally to map text steps with Java declaration you need to create test class and extend it from CucumberBaseTest carina class.
-Then use @CucumberOptions annotation in order to complete the mapping itself.
+Finally, to map text steps with Java declaration you need to create test class and extend it from **CucumberBaseTest** carina class.
+Then use **@CucumberOptions** annotation in order to complete the mapping itself.
 Class body can be empty since all logic for buildind of scripts and running them is implemented inside CucumberBaseTest class.   
 Here is the sample of such code:
-```
-@CucumberOptions(features = "src/test/resources/features/GSMArenaNews.feature",
-		glue = "com.qaprosoft.carina.demo.cucumber.steps",
+```java
+@CucumberOptions(features = "src/test/resources/features/GSMArenaNews.feature", 
+        glue = "com.qaprosoft.carina.demo.cucumber.steps",
         plugin = {"pretty",
                 "html:target/cucumber-core-test-report",
                 "pretty:target/cucumber-core-test-report.txt",
                 "json:target/cucumber-core-test-report.json",
                 "junit:target/cucumber-core-test-report.xml"}
 )
-public class CucumberWebSampleTest extends CucumberBaseTest {
-}
+public class CucumberWebSampleTest extends CucumberBaseTest {}
 ```
 
 ### Cucumber report
