@@ -48,7 +48,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#driver-configuration" class="md-skip">
+        <a href="#driver-usage" class="md-skip">
           Skip to content
         </a>
       
@@ -388,36 +388,16 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#carinas-webdriver-initialization" class="md-nav__link">
-    Carina's webdriver initialization
-  </a>
-  
-    <nav class="md-nav" aria-label="Carina's webdriver initialization">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#carinas-capabilities-templates" class="md-nav__link">
-    Carina's capabilities templates:
+  <a href="#initialization" class="md-nav__link">
+    Initialization
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#creating-custom-capabilities" class="md-nav__link">
-    Creating custom capabilities:
+      
+        <li class="md-nav__item">
+  <a href="#capabilities" class="md-nav__link">
+    Capabilities
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#additional-capabilities" class="md-nav__link">
-    Additional capabilities
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -526,36 +506,16 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#carinas-webdriver-initialization" class="md-nav__link">
-    Carina's webdriver initialization
-  </a>
-  
-    <nav class="md-nav" aria-label="Carina's webdriver initialization">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#carinas-capabilities-templates" class="md-nav__link">
-    Carina's capabilities templates:
+  <a href="#initialization" class="md-nav__link">
+    Initialization
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#creating-custom-capabilities" class="md-nav__link">
-    Creating custom capabilities:
+      
+        <li class="md-nav__item">
+  <a href="#capabilities" class="md-nav__link">
+    Capabilities
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#additional-capabilities" class="md-nav__link">
-    Additional capabilities
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -586,7 +546,7 @@
                   
                 
                 
-                <h1 id="driver-configuration">Driver configuration</h1>
+                <h1 id="driver-usage">Driver usage</h1>
 <p>Currently supported browsers by Carina:</p>
 <ul>
 <li>Chrome</li>
@@ -596,103 +556,95 @@
 <li>Opera</li>
 <li>Safari</li>
 </ul>
-<h2 id="carinas-webdriver-initialization">Carina's webdriver initialization</h2>
-<p>In Carina WebDriver is initialized by method getDriver().</p>
+<h2 id="initialization">Initialization</h2>
+<p>Driver can be started in several ways:</p>
 <ul>
-<li><strong>getDriver()</strong></li>
+<li><strong>getDriver()</strong> is the core method to start any Selenium/Appium session. It will create a RemoteWebDriver named "default" based on default capabilities from configuration.</li>
 </ul>
-<p>If method called for the first time Carina will initialize new driver with capabilities from _config.properties file. The driver's name will be set as <strong>"default"</strong>. So it means that we can access this driver by calling method getDriver() or getDriver("default").</p>
+<p>1st call of the method in current thread should start new driver. Next calls will return existing object. Based on the driver lifecycle carina do automatic driver quit.</p>
 <ul>
-<li><strong>getDriver(String name).</strong></li>
+<li>
+<p><strong>getDriver(String name)</strong> start named driver session using default capabilities from configuration. That's allow to start several drivers (up to 3 according to <code>max_driver_count</code> property)</p>
+</li>
+<li>
+<p><strong>getDriver(String name, DesiredCapabilities capabilities).</strong> start named driver session using custom capabilities.</p>
+</li>
 </ul>
-<p>If there is no driver in Driver pool with name we passed Carina will create a new WebDriver with capabilities from _config.properties file. We can access the driver by his name. By using different names we can create several automation sessions with same capabilities.</p>
-<ul>
-<li><strong>getDriver(String name, DesiredCapabilities capabilities).</strong></li>
-</ul>
-<p>In this case we need to declare our custom capabilities. There are two ways: </p>
-<ol>
-<li>Use Carina's capabilities templates for different browsers.</li>
-<li>Describe DesiredCapabilities inside your Test.class. </li>
-</ol>
-<h3 id="carinas-capabilities-templates">Carina's capabilities templates:</h3>
-<pre><code class="java">@Test
-public void someTest() {
-
+<p>Example:</p>
+<pre><code>@Test
+public void carinaCapsTest() {
+    // Chrome default capabilities builder usage:
     WebDriver chromeDriver = getDriver(&quot;chrome&quot;, new ChromeCapabilities().getCapability(&quot;Chrome Test&quot;));
     HomePage homePageChrome = new HomePage(chromeDriver);
     homePageChrome.open();
-    //or
+
+    // Firefox default capabilities builder usage:
     getDriver(&quot;firefox&quot;, new FirefoxCapabilities().getCapability(&quot;Firefox Test&quot;));
-    HomePage homePageFirefox = new HomePage(getDriver(&quot;firefox&quot;));
+    HomePage homePageFirefox = new HomePage(getDriver(&quot;firefox&quot;)); // return named &quot;firefox&quot; driver from the pool to init HomePage.
     homePageFirefox.open();
-    //or
-    HomePage homePageSafari = new HomePage(
-        getDriver(&quot;safari&quot;, new SafariCapabilities().getCapability(&quot;Safari test&quot;)));
+
+    // Safari, Edge, Opera and IE default capabilities builder usage:
+    HomePage homePageSafari = new HomePage(getDriver(&quot;safari&quot;, new SafariCapabilities().getCapability(&quot;Safari test&quot;)));
     homePageSafari.open();
-    //etc
+
     getDriver(&quot;edge&quot;, new EdgeCapabilities().getCapability(&quot;Edge test&quot;));
     getDriver(&quot;opera&quot;, new OperaCapabilities().getCapability(&quot;Opera test&quot;));
     getDriver(&quot;ie&quot;, new IECapabilities().getCapability(&quot;Internet Explorer test&quot;));
+
 }
-</code></pre>
 
-<p>You can decide the max number of drivers by parameter <strong>max_driver_count</strong> in <strong>_config.properties</strong> (3 by default).</p>
-<p>New driver could be accessed by init name.</p>
-<pre><code>getDriver(&quot;safari&quot;);
-</code></pre>
-
-<h3 id="creating-custom-capabilities">Creating custom capabilities:</h3>
-<pre><code class="java">@Test
-public void someTest() {
+@Test
+public void desiredCapsTest() {
+    // Manage DesiredCapabilities on your own to build complicated caps structure:
     DesiredCapabilities capabilities = DesiredCapabilities.safari();
-    capabilities.setBrowserName(&quot;safari&quot;);
     capabilities.setCapability(CapabilityType.PLATFORM_NAME, SpecialKeywords.MAC);
 
-    HomePage safariHomePage = new HomePage(getDriver(&quot;safari&quot;,capabilities));
+    HomePage safariHomePage = new HomePage(getDriver(&quot;safari&quot;, capabilities));
     safariHomePage.open();
 
     Assert.assertTrue(safariHomePage.isPageOpened());
 }
 </code></pre>
 
-<p>List of all selenium <a href="https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities">capabilities</a>.</p>
 <ul>
-<li><strong>getDriver(String name, DesiredCapabilities capabilities, String seleniumHost).</strong></li>
+<li><strong>getDriver(String name, DesiredCapabilities capabilities, String seleniumHost).</strong> start named driver session using custom capabilities using custom selenium url.</li>
 </ul>
-<p>There we also need to pass selenium server host. In case of seleniumHost == null Carina will use your _config.properties selenium_host parameter.</p>
-<h3 id="additional-capabilities">Additional capabilities</h3>
-<p>There is also a possibility to send additional capabilities to Carina through _config.properties. All parameters with prefix <strong>capabilities.</strong> will be added to the driver’s capabilities.</p>
-<pre><code>capabilities.platformName=MAC
+<h2 id="capabilities">Capabilities</h2>
+<p>Simple key value Selenium/Appium capability pairs can be provided in _config.properties using <strong>capabilities.</strong> prefix.</p>
+<pre><code>capabilities.automationName=uiautomator2
+capabilities.deviceName=Samsung_Galaxy_S10
+capabilities.platformName=ANDROID
+capabilities.app=https://qaprosoft.s3-us-west-2.amazonaws.com/carinademoexample.apk
+capabilities.newCommandTimeout=180
 </code></pre>
 
+<blockquote>
+<p>Visit <a href="https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities">selenium</a> or <a href="https://appium.io/docs/en/writing-running-appium/caps/">appium</a> to see all capabilities.</p>
+</blockquote>
 <h2 id="options">Options</h2>
-<p>Options are used to tune your browser for tests. Available for Chrome and Firefox. </p>
-<pre><code class="java">public void someTest() {
+<p>Options and arguments could be provided through _config.properties as well using comma separated values for multiple options/args.</p>
+<pre><code>firefox_args=--no-first-run,--disable-notifications
+firefox_preferences=
+chrome_args=
+chrome_experimental_opts=
+chrome_mobile_emulation_opts=
+</code></pre>
+
+<p>To be able to provide complicated structures use advanced approach to build capabilities/options/arguments</p>
+<pre><code>public void someTest() {
     FirefoxOptions options = new FirefoxOptions();
     options.addArguments(&quot;--no-first-run&quot;);
     options.addArguments(&quot;--disable-notifications&quot;);
 
     DesiredCapabilities capabilities = DesiredCapabilities.firefox();
-    capabilities.setBrowserName(&quot;firefox&quot;);
     capabilities.setCapability(CapabilityType.PLATFORM_NAME, SpecialKeywords.MAC);
-    capabilities.setCapability(FirefoxOptions.FIREFOX_OPTIONS,options);
+    capabilities.setCapability(FirefoxOptions.FIREFOX_OPTIONS, options);
 
-    HomePage safariHomePage = new HomePage(getDriver(&quot;firefox&quot;,capabilities));
-    safariHomePage.open();
+    HomePage homePage = new HomePage(getDriver(&quot;firefox&quot;, capabilities));
+    homePage.open();
 
-    Assert.assertTrue(safariHomePage.isPageOpened());
+    Assert.assertTrue(homePage.isPageOpened());
 }
-</code></pre>
-
-<p>Options also could be set through _config.properties. If there are multiple options to pass split them by comma. Available attributes to pass options:</p>
-<pre><code>#chrome
-chrome_args=
-chrome_experimental_opts=
-chrome_mobile_emulation_opts=
-
-#firefox
-firefox_args=
-firefox_preferences=
 </code></pre>
                 
               
