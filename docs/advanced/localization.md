@@ -1,112 +1,41 @@
-## L10N
+# Localization usage
 
-Carina framework supports multi-localized testing.
-To use this feature you need to:
+## Prerequisites
 
-1) Set properties in _config.properties.
-```
-#localization language
-locale=de_DE 	         
+There are enhanced utilities for adapting a product's translation to a specific country or region in Carina, i.e. we fully support Test Automation localization (L10N).
+To reuse this feature effectively you have to discover localized resources and push them into the test project, for [example](https://github.com/qaprosoft/carina-demo/tree/master/src/main/resources/L10N)
+> Every localized application obligatory has set of resources. We strongly recommend to find them and don't generate by automation team!
 
-#Determines browser interface language. It won't affect locale parameter.
-browser_language=en_US   
+* Collect and put localized resources into the **src->main->resources->L10N** folder/package. 
+  Each localized resource file has key value pairs. Where key is unique key and value is valid translation
+  ```
+  HomePage.welcomeText=Welcome to Wikipedia,
+  discussionElem=Discussion
+  ```
 
-#enable/disable localzation testing
-enable_l10n=true         
-```
-2) Add locale file into **src->main->resources->L10N**. Locale file samples could be found [here](https://github.com/qaprosoft/carina-demo/tree/master/src/main/resources/L10N). Ask developers to provide locale files and place them into folder mentioned above. If there are no locale files, check out **L10Nparser** section.
- 
-3) Find WebElements with a help of a key you described in **locale_** file.
-   >Syntax is '{L10N:key}'
+* Verify that for every resource there is a file without any locale postfix with default translations (en_US), for example [locale.properties](https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/L10N/locale.properties)
+  This file will be loaded into the L10N as a default locale resource.
 
-   Example:
-```
-@FindBy(xpath = "//*[@id='{L10N:HomePage.welcomeTextId}'")
-private ExtendedWebElement welcomeText;
+## Elements declaration
 
-@FindBy(linkText = "{L10N:discussionElem}")
-private ExtendedWebElement discussionBtn;
-```
-4) Launch tests
+* Implement page(s) using localized elements usage, for [example](https://github.com/qaprosoft/carina-demo/blob/64b63927e8c3a1a76d5e567e28f837be82797d56/src/main/java/com/qaprosoft/carina/demo/gui/pages/localizationSample/WikipediaLocalePage.java#L41)
 
-## L10Nparser
+* Reuse `{L10N:localizedKey}` syntax to declare ExtendedWebElement. That's allow to operate with elements by localized text at runtime based on `locale` parameter
+  ```
+  @FindBy(xpath = "//*[text()='{L10N:HomePage.welcomeText}'")
+  private ExtendedWebElement welcomeText;
 
-If there is a need to create locale files by your own Carina can generate them with a help of L10Nparser.class.
+  @FindBy(linkText = "{L10N:discussionElem}")
+  private ExtendedWebElement discussionBtn;
+  ```
 
-1) Set parameters in _config.properties:
-```
-#true: Carina will create locale file with missing key-value pairs
-#false: Carina will check if locale key-value pairs present and print which aren't
-add_new_localization=true/false          
+  During the test actual translations will be used to locate element.
 
-#path to new locale File
-add_new_localization_path=./src/main/resources/L10N 
+## Execution
 
-add_new_localization_encoding=UTF-8
-
-#prefix to new locale file
-add_new_localization_property_name=new_locale_ 
-```
-2) Find elements by not using locale text, for example by id:
-```
-@FindBy(id = "pt-anontalk")
-private ExtendedWebElement discussionElem;
- 
-@FindBy(id = "pt-anoncontribs")
-private ExtendedWebElement contribElem;
- 
-@FindBy(id = "pt-createaccount") 
-private ExtendedWebElement createAccountElem;
-```
-3) Create method below in your page.class. Place in _localizationCheckList_ webElements that are currently on the page and which locale pair you want to create.
-```
-public boolean checkMultipleLocalization() {
-        ExtendedWebElement[] localizationCheckList = {discussionElem, createAccountElem, contribElem};
-        
-        return L10Nparser.checkMultipleLocalization(localizationCheckList);
-}
-```
-4) Create test as below where checkMultipleLocalization() method is called when according page is opened.
-```
-public void testAddNewLanguages() {
-
-    WikipediaHomePage wikipediaHomePage = new WikipediaHomePage(getDriver());
-    wikipediaHomePage.open();
-
-    String expectedWelcomeText = L10N.getText("HomePage.welcomeText");
-    String welcomeText = wikipediaLocalePage.getWelcomeText();
-
-    SoftAssert sa = new SoftAssert();
-    sa.assertEquals(welcomeText, expectedWelcomeText.trim(), "Wikipedia welcome text was not the expected.");
-
-    WikipediaLocalePage wikipediaLocalePage = wikipediaHomePage.goToWikipediaLocalePage(getDriver());
-
-    // To set correct locale for creating new localization text.
-    // Can be changed dynamically during test execution.
-    L10Nparser.setActualLocale(Configuration.get(Configuration.Parameter.LOCALE));
-    Locale actualLocale = L10Nparser.getActualLocale();
-    LOGGER.info(actualLocale.toString());
-    
-    sa.assertTrue(wikipediaLocalePage.checkMultipleLocalization(), "Localization error: " + L10Nparser.getAssertErrorMsg());
-
-    L10Nparser.saveLocalization();
-    sa.assertAll();
-}
-```
-5) Copy all key-value pairs in your existing **locale_xx_XX.properties** file from **new_locale_xx_XX** file.
-
-6) Now elements could be accessed by locale text.
-```
-@FindBy(id = "pt-anontalk")
-private ExtendedWebElement discussionElem;
-
-@FindBy(linkText = "{L10N:discussionElem}")
-private ExtendedWebElement discussionBtn;
-
-public String getDiscussionText(){
-    if (discussionBtn.isPresent()) {
-        return welcomeText.getText();
-    }
-    return "";
-}
-```
+* Make sure to provide valid `locale` parameter in configuration before start.
+  ```
+  locale=de_DE
+  #Optionally you could operate by browser locale as well using
+  browser_language=de_DE
+  ```
