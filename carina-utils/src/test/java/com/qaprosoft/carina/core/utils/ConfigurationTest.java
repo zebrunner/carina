@@ -19,6 +19,7 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -29,6 +30,12 @@ import com.qaprosoft.carina.core.foundation.utils.R;
  * Tests for {@link Configuration}
  */
 public class ConfigurationTest {
+
+    @AfterClass
+    public void tearDown() {
+        R.CONFIG.put(SpecialKeywords.PLATFORM_NAME, "");
+        R.CONFIG.put(SpecialKeywords.PLATFORM, "");
+    }
 
     @Test
     public void testConfigOverride() {
@@ -61,14 +68,14 @@ public class ConfigurationTest {
 
     @Test
     public void testAdbExecTimeout() {
-        R.CONFIG.put("capabilities.adbExecTimeout", "30000");
+        R.CONFIG.put(SpecialKeywords.ADB_EXEC_TIMEOUT, "30000");
 
         Assert.assertEquals(Configuration.getAdbExecTimeout(), 30000, "capabilities.adbExecTimeout wasn't set");
     }
 
     @Test
     public void testPlatformVersion() {
-        R.CONFIG.put("capabilities.platformVersion", "11.0.0");
+        R.CONFIG.put(SpecialKeywords.PLATFORM_VERSION, "11.0.0");
 
         Assert.assertEquals(Configuration.getPlatformVersion(), "11.0.0", "capabilities.platformVersion wasn't set");
     }
@@ -89,7 +96,7 @@ public class ConfigurationTest {
 
     @Test
     public void testDeviceType() {
-        R.CONFIG.put("capabilities.platformName", "Android");
+        R.CONFIG.put(SpecialKeywords.PLATFORM_NAME, "Android");
 
         Assert.assertEquals(Configuration.getDriverType(), "mobile", "Can't find out device type");
     }
@@ -114,7 +121,7 @@ public class ConfigurationTest {
 
     @Test
     public void testGetCapability() {
-        R.CONFIG.put("capabilities.platformName", "Android");
+        R.CONFIG.put(SpecialKeywords.PLATFORM_NAME, "Android");
 
         Assert.assertEquals(Configuration.getCapability("platformName"), "Android",
                 Configuration.getCapability("platformName") + " doesn't equal to Android");
