@@ -40,7 +40,7 @@ public class CommonUtils {
             long timeoutLong = timeoutFloat.longValue();
             Thread.sleep(timeoutLong);
         } catch (InterruptedException e) {
-            // do nothing
+            Thread.currentThread().interrupt();
         }
         LOGGER.debug("Pause is overed. Keep going..");
     }
