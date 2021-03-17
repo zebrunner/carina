@@ -147,8 +147,6 @@ public class Configuration {
 
         RETRY_COUNT("retry_count"),
 
-        ENABLE_L10N("enable_l10n"),
-
         LOCALE("locale"),
 
         THREAD_COUNT("thread_count"),

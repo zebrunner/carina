@@ -66,13 +66,8 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>locale</td>
-		<td>Locale for using L10N feature. Enabled when enable_l10n=true</td>
+		<td>Locale for using L10N feature</td>
 		<td>en_GB,de_DE,fr_FR</td>
-	</tr>
-	<tr>
-		<td>enable_l10n</td>
-		<td>Enables L10N feature</td>
-		<td>false, true</td>
 	</tr>
 	<tr>
 		<td>retry_interval</td>
