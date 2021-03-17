@@ -183,11 +183,10 @@ public class MobileFactory extends AbstractFactory {
                     device = new Device();
                     device.setUdid(udid);
                     device.setName(deviceName);
-                } else {
-                    device = new Device(capabilities);
+                    IDriverPool.registerDevice(device);
                 }
+                // there is no sense to register device in the pool as driver is not started and we don't have custom exception from MCloud
             } 
-            IDriverPool.registerDevice(device);
             throw e;
         }
 
