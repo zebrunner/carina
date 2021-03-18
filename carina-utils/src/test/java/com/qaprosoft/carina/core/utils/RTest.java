@@ -65,7 +65,20 @@ public class RTest {
     @Test
     public void testGetProperties() {
         Assert.assertEquals(R.CONFIG.getProperties().getProperty("port"), "8081");
-    }  
+    }
+
+    @Test
+    public void testGetPropertiesAfterSetNewValue() {
+        R.CONFIG.clearTestProperties();
+        Assert.assertEquals(R.CONFIG.get("key3"), "");
+        R.CONFIG.put("key3", "value3", true);
+        Assert.assertEquals(R.CONFIG.getProperties().get("key3"), "value3", "value3 to key3 wasn't set");
+    }
+
+    @Test
+    public void testGetResourcePath() {
+        Assert.assertTrue(R.getResourcePath("email.properties").endsWith("email.properties"), "email.properties resource path is wrong");
+    }
     
     @Test
     public void testPlaceholders() {
@@ -114,6 +127,12 @@ public class RTest {
     @Test
     public void testPlaceholdersWithEncryptionTestData() {
         Assert.assertEquals(R.TESTDATA.getDecrypted("test_credentials"), "test@gmail.com/EncryptMe");
+    }
+
+    @Test
+    public void testPlaceholdersWithWrongEncryptionTestData() {
+        R.TESTDATA.put("wrong_encrypted", "{crypt:8O9iA4+f3nMzz85szmvKmQ==", true);
+        Assert.assertEquals(R.TESTDATA.getDecrypted("wrong_encrypted"), "{crypt:8O9iA4+f3nMzz85szmvKmQ==");
     }
 
     @Test

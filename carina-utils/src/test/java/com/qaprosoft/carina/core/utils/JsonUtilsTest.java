@@ -18,7 +18,7 @@ import java.util.Objects;
 
 public class JsonUtilsTest {
 
-    private static final String JSON_PATH = "src/test/resources/testJson.json";
+    private static final String JSON_PATH = "src/test/resources/json/testJson.json";
 
     private static final Member MEMBER1 = new Member("Molecule Man", 29);
     private static final Member MEMBER2 = new Member("Madame Uppercut", 39);
