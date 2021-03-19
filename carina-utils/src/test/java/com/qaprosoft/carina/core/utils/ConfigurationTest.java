@@ -35,6 +35,7 @@ public class ConfigurationTest {
     public void tearDown() {
         R.CONFIG.put(SpecialKeywords.PLATFORM_NAME, "");
         R.CONFIG.put(SpecialKeywords.PLATFORM, "");
+        R.CONFIG.put(Parameter.BROWSER.getKey(), "chrome");
     }
 
     @Test
@@ -82,14 +83,14 @@ public class ConfigurationTest {
 
     @Test
     public void testBrowser() {
-        R.CONFIG.put("browser", "firefox");
+        R.CONFIG.put(Parameter.BROWSER.getKey(), "firefox");
 
         Assert.assertEquals(Configuration.getBrowser(), "firefox", "browser wasn't set");
     }
 
     @Test
     public void testBrowserVersion() {
-        R.CONFIG.put("capabilities.browserVersion", "88.0.0");
+        R.CONFIG.put(Parameter.BROWSER_VERSION.getKey(), "88.0.0");
 
         Assert.assertEquals(Configuration.getBrowserVersion(), "88.0.0", "capabilities.browserVersion wasn't set");
     }
