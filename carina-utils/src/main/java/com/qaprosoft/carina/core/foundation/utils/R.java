@@ -135,7 +135,7 @@ public enum R {
         }
     }
 
-    private boolean isInit(Parameter parameter, Properties properties){
+    private static boolean isInit(Parameter parameter, Properties properties){
         String value = (String) properties.get(parameter.getKey());
         return !(value == null || value.length() == 0 || value.equals("NULL"));
     }

@@ -12,6 +12,7 @@ pages:
     - Advanced:
       - Database: advanced/database.md
       - DataProvider: advanced/dataprovider.md
+      - Program flow: advanced/debug_entry_point.md
       - Driver: advanced/driver.md
       - Localization: advanced/localization.md
       - Proxy: advanced/proxy.md
