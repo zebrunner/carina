@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ public class DevicePoolTest implements IDriverPool {
     @Test()
     public void registerDevice() {
         Assert.assertFalse(isDeviceRegistered(), "device is registered incorrectly");
-        Device device = new Device("name", "type", "os", "osVersion", "udid", "remoteUrl");
+        Device device = new Device("name", "type", "os", "osVersion", "udid", "remoteUrl", "vnc", "proxyPort");
         IDriverPool.registerDevice(device);
         
         Assert.assertTrue(isDeviceRegistered(), "device is registered incorrectly");

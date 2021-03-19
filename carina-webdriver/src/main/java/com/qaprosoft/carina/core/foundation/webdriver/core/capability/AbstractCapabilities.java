@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,14 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability;
 
+import java.io.File;
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -31,6 +32,8 @@ import org.openqa.selenium.net.PortProber;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
@@ -41,13 +44,14 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.proxy.SystemProxy;
 
 public abstract class AbstractCapabilities {
-    private static final Logger LOGGER = Logger.getLogger(AbstractCapabilities.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static ArrayList<Integer> firefoxPorts = new ArrayList<Integer>();
 
     public abstract DesiredCapabilities getCapability(String testName);
 
     protected DesiredCapabilities initBaseCapabilities(DesiredCapabilities capabilities, String browser, String testName) {
 
+        // TODO: should use provide capabilities as an argument for getPlatform call below?
         String platform = Configuration.getPlatform();
         if (!platform.equals("*")) {
             capabilities.setPlatform(Platform.extractFromSysProperty(platform));
@@ -85,13 +89,10 @@ public abstract class AbstractCapabilities {
                 if (!value.isEmpty()) {
                     String cap = entry.getKey().replaceAll(prefix, "");
                     if ("false".equalsIgnoreCase(value)) {
-                        LOGGER.debug("Set capabilities value as boolean: false");
                         capabilities.setCapability(cap, false);
                     } else if ("true".equalsIgnoreCase(value)) {
-                        LOGGER.debug("Set capabilities value as boolean: true");
                         capabilities.setCapability(cap, true);
                     } else {
-                        LOGGER.debug("Set capabilities value as string: " + value);
                         capabilities.setCapability(cap, value);
                     }
                 }
@@ -101,15 +102,34 @@ public abstract class AbstractCapabilities {
         
         //TODO: [VD] reorganize in the same way Firefox profiles args/options if any and review other browsers
         // support customization for Chrome args and options
-        String browser = Configuration.getBrowser();
 
+        // for pc we may set browserName through Desired capabilities in our Test with a help of a method initBaseCapabilities,
+        // so we don't want to override with value from config
+        String browser;
+        if (capabilities.getBrowserName() != null && capabilities.getBrowserName().length() > 0) {
+            browser = capabilities.getBrowserName();
+        } else {
+            browser = Configuration.getBrowser();
+        }
 
         if (BrowserType.FIREFOX.equalsIgnoreCase(browser)) {
             capabilities = addFirefoxOptions(capabilities);
         } else if (BrowserType.CHROME.equalsIgnoreCase(browser)) {
             capabilities = addChromeOptions(capabilities);
         }
-        
+
+        if (Configuration.getBoolean(Parameter.HEADLESS)) {
+            if (BrowserType.FIREFOX.equalsIgnoreCase(browser)
+                    || BrowserType.CHROME.equalsIgnoreCase(browser)
+                    && Configuration.getDriverType().equalsIgnoreCase(SpecialKeywords.DESKTOP)) {
+                LOGGER.info("Browser will be started in headless mode. VNC and Video will be disabled.");
+                capabilities.setCapability("enableVNC", false);
+                capabilities.setCapability("enableVideo", false);
+            } else {
+                LOGGER.error(String.format("Headless mode isn't supported by %s browser / platform.", browser));
+            }
+        }
+
         return capabilities;
     }
 
@@ -168,21 +188,30 @@ public abstract class AbstractCapabilities {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("test-type");
         
+        //prefs 
+        HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
+        boolean needsPrefs = false;
+        
         //update browser language
         String browserLang = Configuration.get(Parameter.BROWSER_LANGUAGE); 
         if (!browserLang.isEmpty()) {
             LOGGER.info("Set Chrome language to: " + browserLang);
             options.addArguments("--lang=" + browserLang);
+            chromePrefs.put("intl.accept_languages", browserLang);
+            needsPrefs = true;
         }
 
         if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD)) {
-            HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
             chromePrefs.put("download.prompt_for_download", false);
-            chromePrefs.put("download.default_directory", ReportContext.getArtifactsFolder().getAbsolutePath());
+            chromePrefs.put("download.default_directory", getAutoDownloadFolderPath());
             chromePrefs.put("plugins.always_open_pdf_externally", true);
-            options.setExperimentalOption("prefs", chromePrefs);
+            needsPrefs = true;
         }
 
+        if (needsPrefs) {
+        	options.setExperimentalOption("prefs", chromePrefs);
+        }
+        
         // [VD] no need to set proxy via options anymore!
         // moreover if below code is uncommented then we have double proxy start and mess in host:port values
         
@@ -235,7 +264,12 @@ public abstract class AbstractCapabilities {
         if (!mobileEmulation.isEmpty()) {
             options.setExperimentalOption("mobileEmulation", mobileEmulation);
         }
-        
+
+        if (Configuration.getBoolean(Parameter.HEADLESS)
+                && driverType.equals(SpecialKeywords.DESKTOP)) {
+            options.setHeadless(Configuration.getBoolean(Parameter.HEADLESS));
+        }
+
         caps.setCapability(ChromeOptions.CAPABILITY, options);
         return caps;
     }
@@ -254,7 +288,7 @@ public abstract class AbstractCapabilities {
             options.addArguments(arg.trim());
         }
         // add all custom firefox preferences
-        for (String preference : Configuration.get(Parameter.CHROME_EXPERIMENTAL_OPTS).split(",")) {
+        for (String preference : Configuration.get(Parameter.FIREFOX_PREFERENCES).split(",")) {
             if (preference.isEmpty()) {
                 continue;
             }
@@ -268,6 +302,12 @@ public abstract class AbstractCapabilities {
             } else {
                 options.addPreference(name, value);
             }
+        }
+
+        String driverType = Configuration.getDriverType();
+        if (Configuration.getBoolean(Parameter.HEADLESS)
+                && driverType.equals(SpecialKeywords.DESKTOP)) {
+            options.setHeadless(Configuration.getBoolean(Parameter.HEADLESS));
         }
 
         return caps;
@@ -312,7 +352,7 @@ public abstract class AbstractCapabilities {
         if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD) && !(Configuration.isNull(Configuration.Parameter.AUTO_DOWNLOAD_APPS)
                 || "".equals(Configuration.get(Configuration.Parameter.AUTO_DOWNLOAD_APPS)))) {
             profile.setPreference("browser.download.folderList", 2);
-            profile.setPreference("browser.download.dir", ReportContext.getArtifactsFolder().getAbsolutePath());
+            profile.setPreference("browser.download.dir", getAutoDownloadFolderPath());
             profile.setPreference("browser.helperApps.neverAsk.saveToDisk", Configuration.get(Configuration.Parameter.AUTO_DOWNLOAD_APPS));
             profile.setPreference("browser.download.manager.showWhenStarting", false);
             profile.setPreference("browser.download.saveLinkAsFilenameTimeout", 1);
@@ -330,5 +370,27 @@ public abstract class AbstractCapabilities {
 
         // TODO: implement support of custom args if any
         return profile;
+    }
+    
+    
+    private String getAutoDownloadFolderPath() {
+        // use custom folder for auto download
+        String autoDownloadFolder = Configuration.get(Parameter.AUTO_DOWNLOAD_FOLDER);
+        File autoDownloadPath;
+
+        if (!autoDownloadFolder.isEmpty()) {
+            autoDownloadPath = new File(autoDownloadFolder);
+            boolean isCreated = autoDownloadPath.exists() && autoDownloadPath.isDirectory();
+            if (!isCreated) {
+                isCreated = autoDownloadPath.mkdir();
+            } else {
+                LOGGER.info("Folder for auto download already exists: " + autoDownloadPath.getAbsolutePath());
+            }
+        } else {
+            // if no AUTO_DOWNLOAD_FOLDER defined use artifacts folder
+            autoDownloadPath = ReportContext.getArtifactsFolder();
+        }
+
+        return autoDownloadPath.getAbsolutePath();
     }
 }

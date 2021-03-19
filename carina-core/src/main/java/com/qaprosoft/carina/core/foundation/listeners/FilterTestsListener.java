@@ -1,22 +1,25 @@
 package com.qaprosoft.carina.core.foundation.listeners;
 
+import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testng.ISuite;
+import org.testng.ISuiteListener;
+import org.testng.ITestNGMethod;
+
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.filter.Filter;
 import com.qaprosoft.carina.core.foundation.filter.IFilter;
 import com.qaprosoft.carina.core.foundation.filter.rule.Rule;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import org.apache.log4j.Logger;
-import org.testng.ISuite;
-import org.testng.ISuiteListener;
-import org.testng.ITestNGMethod;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class FilterTestsListener implements ISuiteListener {
 
-    private static final Logger LOGGER = Logger.getLogger(FilterTestsListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private List<Rule> rules = new ArrayList<>();
 

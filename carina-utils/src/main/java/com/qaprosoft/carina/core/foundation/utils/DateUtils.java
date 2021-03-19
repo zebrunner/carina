@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ public class DateUtils {
         return String.format("%d:%02d:%02d", h, m, s);
     }
     
-    public static String timeFortmat(long elapsedDate) {
+    public static String timeFormat(long elapsedDate) {
         long seconds = (elapsedDate) / 1000;
         long s = seconds % 60;
         long m = (seconds / 60) % 60;

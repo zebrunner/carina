@@ -21,14 +21,11 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<source.version>1.8</source.version>
-		<target.version>1.8</target.version>
-
 		<!--imgscalr-lib.version>4.2</imgscalr-lib.version-->
 		<ashot.version>1.5.3</ashot.version>
 		<commons-httpclient.version>3.1</commons-httpclient.version>
 		<apache-http.version>4.4</apache-http.version>
-		<itext.version>5.0.6</itext.version>
+		<itext.version>5.5.13.2</itext.version>
 		<reflections.version>0.9.10</reflections.version>
 		<mockito-all.version>1.10.19</mockito-all.version>
 
@@ -67,17 +64,17 @@
 			<artifactId>carina-commons</artifactId>
 		</dependency>
 
-		<!-- Zafira -->
 		<dependency>
-			<groupId>com.qaprosoft</groupId>
-			<artifactId>zafira-client</artifactId>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
+			<!--  5-7 compilation failures w/o it. just agent-core dep doesn't work. -->
+			<groupId>com.zebrunner</groupId>
+			<artifactId>agent-testng-pluggable</artifactId>
 		</dependency>
-
+		
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
@@ -159,12 +156,6 @@
 			</exclusions>
 		</dependency>
 
-		<!-- AI integration -->
-		<dependency>
-			<groupId>com.qaprosoft</groupId>
-			<artifactId>alice-client</artifactId>
-		</dependency>
-
 		<!-- Reflections -->
 		<dependency>
 		    <groupId>org.reflections</groupId>
@@ -225,8 +216,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>${source.version}</source>
-					<target>${target.version}</target>
+					<release>${java.version}</release>
 				</configuration>
 			</plugin>
 			<plugin>

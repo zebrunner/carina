@@ -1,24 +1,23 @@
 
 [![Carina - Getting started](https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png)](https://youtu.be/UtY-KLFnmI8)
 
-* Install and configure JDK 1.8+
-* Install and configure [Apache Maven 3.5.2+](http://maven.apache.org/)
-* Download and start the latest [Selenium standalone server](http://www.seleniumhq.org/download/)
-* Download the latest version of [Eclipse](http://www.eclipse.org/downloads/) and install [TestNG plugin](http://testng.org/doc/download.html)
+* Install and configure JDK 11+
+* Install and configure [Apache Maven 3.6.0+](http://maven.apache.org/)
+* Download the latest version of [Eclipse](http://www.eclipse.org/downloads/) and install [TestNG plugin](http://testng.org/doc/download.html), maven-dependency-plugin connector and optionally lombok
 
 ### Generating project
-The easiest way to initialize a new project is to use Carina archetype, you will get correct project structure along with test samples:
+The easiest way to initialize a new project is to use Carina archetype, you will get correct project structure along with test samples. Run below command from any empty folder:
 ```
 mvn archetype:generate -DarchetypeGroupId=com.qaprosoft \
                        -DarchetypeArtifactId=carina-archetype \
                        -DarchetypeVersion=RELEASE \
                        -DgroupId=<your_groupId> \
                        -DartifactId=<your_artifactId> \
-                       -Dname="<you_proj_name>" \
-                       -Durl=<your_proj_url> \
-                       -Dversion=<your_proj_version>
+                       -Dname="<you_project_name>" \
+                       -Durl=<your_project_url> \
+                       -Dversion=<your_project_version>
 ```
-If any attribute contains spaces, it should be set in quotes (e.g.: -Dname="Hello World"). In the above Maven command you need to specify 5 attributes, while the first 3 should be left unchanged. Let's go through these attributes:
+If any attribute contains spaces, it should be set in quotes (e.g.: -Dname="Hello World"). In the above Maven command you need to specify 5 attributes, while the first 3 should be left unchanged:
 
 <table>
 	<tr>
@@ -29,22 +28,22 @@ If any attribute contains spaces, it should be set in quotes (e.g.: -Dname="Hell
 	<tr>
 		<td>-DgroupId</td>
 		<td>Company domain in reverse order</td>
-		<td>com.qaprosoft</td>
+		<td>com.mycompany</td>
 	</tr>
 	<tr>
 		<td>-DartifactId</td>
 		<td>Java project name</td>
-		<td>carina-qa</td>
+		<td>project-qa</td>
 	</tr>
 	<tr>
 		<td>-Dname</td>
 		<td>Name with more details</td>
-		<td>"Carina Test Automation"</td>
+		<td>"Test Automation Project"</td>
 	</tr>
 	<tr>
 		<td>-Durl</td>
 		<td>Company URL</td>
-		<td>http://qaprosoft.com</td>
+		<td>http://mycompany.com</td>
 	</tr>
 	<tr>
 		<td>-Dversion</td>

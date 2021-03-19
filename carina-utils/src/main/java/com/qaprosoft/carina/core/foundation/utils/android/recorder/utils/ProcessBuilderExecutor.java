@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,14 @@ package com.qaprosoft.carina.core.foundation.utils.android.recorder.utils;
 import java.io.Closeable;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.utils.android.recorder.exception.ExecutorException;
 
@@ -34,7 +36,7 @@ import com.qaprosoft.carina.core.foundation.utils.android.recorder.exception.Exe
  */
 public class ProcessBuilderExecutor {
 
-    private static final Logger LOGGER = Logger.getLogger(ProcessBuilderExecutor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final Map<Integer, Process> runPIDs = new HashMap<Integer, Process>();
 

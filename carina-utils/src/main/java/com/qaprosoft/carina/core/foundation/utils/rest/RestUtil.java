@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,19 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.rest;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.jayway.restassured.path.json.JsonPath;
-import com.jayway.restassured.response.Response;
+import io.restassured.path.json.JsonPath;
+import io.restassured.response.Response;
 
 public class RestUtil {
-    private static final Logger LOGGER = Logger.getLogger(RestUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public static Response sendHttpPost(String contentType, String payload, String httpPostCommand) {
         return sendHttpPost(contentType, payload, httpPostCommand, true);
@@ -35,7 +37,7 @@ public class RestUtil {
         if (responseLog) {
             return given()
                     .contentType(contentType)
-                    .formParameters(parameters)
+                    .formParams(parameters)
                     .log().all()
                     .expect()
                     .log().all()
@@ -44,7 +46,7 @@ public class RestUtil {
         }
         return given()
                 .contentType(contentType)
-                .formParameters(parameters)
+                .formParams(parameters)
                 // .log().all()
                 .when()
                 .post(httpPostCommand);

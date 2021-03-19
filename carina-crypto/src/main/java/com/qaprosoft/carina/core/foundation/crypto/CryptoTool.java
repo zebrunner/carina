@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package com.qaprosoft.carina.core.foundation.crypto;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.regex.Matcher;
@@ -27,12 +28,13 @@ import javax.crypto.NoSuchPaddingException;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 
 public class CryptoTool {
-    private static final Logger LOGGER = Logger.getLogger(CryptoTool.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private String algorithm;
     private Cipher cipher;
@@ -95,14 +97,16 @@ public class CryptoTool {
     }
 
     public String encryptByPattern(String content, Pattern pattern) {
-        String wildcard = pattern.pattern().substring(pattern.pattern().indexOf("{") + 1,
-                pattern.pattern().indexOf(":"));
-        if (content != null && content.contains(wildcard)) {
-            Matcher matcher = pattern.matcher(content);
-            while (matcher.find()) {
-                String group = matcher.group();
-                String crypt = StringUtils.removeStart(group, "{" + wildcard + ":").replace("}", "");
-                content = StringUtils.replace(content, group, encrypt(crypt));
+        if (isEncrypted(content, pattern)) {
+            String wildcard = pattern.pattern().substring(pattern.pattern().indexOf("{") + 1,
+                    pattern.pattern().indexOf(":"));
+            if (content != null && content.contains(wildcard)) {
+                Matcher matcher = pattern.matcher(content);
+                while (matcher.find()) {
+                    String group = matcher.group();
+                    String crypt = StringUtils.removeStart(group, "{" + wildcard + ":").replace("}", "");
+                    content = StringUtils.replace(content, group, encrypt(crypt));
+                }
             }
         }
         return content;
@@ -168,5 +172,18 @@ public class CryptoTool {
 
     public void setCipher(Cipher cipher) {
         this.cipher = cipher;
+    }
+    
+    private boolean isEncrypted(String content, Pattern pattern) {
+        String wildcard = pattern.pattern().substring(pattern.pattern().indexOf("{") + 1,
+                pattern.pattern().indexOf(":"));
+        if (content != null && content.contains(wildcard)) {
+            Matcher matcher = pattern.matcher(content);
+            if (matcher.find()) {
+                LOGGER.debug("'" + content + "' require decryption.");
+                return true;
+            }
+        }
+        return false;
     }
 }

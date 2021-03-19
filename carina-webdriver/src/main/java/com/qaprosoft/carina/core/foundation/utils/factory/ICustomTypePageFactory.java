@@ -1,5 +1,6 @@
 package com.qaprosoft.carina.core.foundation.utils.factory;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -7,19 +8,19 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.exception.RequiredCtorNotFoundException;
-import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.gui.AbstractPage;
 
 public interface ICustomTypePageFactory extends IDriverPool {
-    static final Logger PAGEFACTORY_LOGGER = Logger.getLogger(ICustomTypePageFactory.class);
+    static final Logger PAGEFACTORY_LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     String VERSION_SPLITTER = "\\.";
 

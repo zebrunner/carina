@@ -1,15 +1,18 @@
 package com.qaprosoft.carina.core.foundation.filter.impl;
 
-import com.qaprosoft.carina.core.foundation.filter.IFilter;
-import com.qaprosoft.carina.core.foundation.utils.tag.TestTag;
-import org.apache.log4j.Logger;
+import java.lang.invoke.MethodHandles;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.ITestNGMethod;
 
-import java.util.List;
+import com.qaprosoft.carina.core.foundation.filter.IFilter;
+import com.qaprosoft.carina.core.foundation.utils.tag.TestTag;
 
 public class TagFilter implements IFilter {
 
-    private static final Logger LOGGER = Logger.getLogger(TagFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public boolean isPerform(ITestNGMethod testMethod, List<String> expectedData) {

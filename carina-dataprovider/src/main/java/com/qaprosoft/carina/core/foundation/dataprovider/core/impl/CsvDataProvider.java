@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,16 @@ package com.qaprosoft.carina.core.foundation.dataprovider.core.impl;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.util.*;
+import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 
@@ -28,7 +35,6 @@ import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSour
 import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByMapper;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
-import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -37,7 +43,7 @@ import au.com.bytecode.opencsv.CSVReader;
  */
 public class CsvDataProvider extends BaseDataProvider {
 
-    private static final Logger LOGGER = Logger.getLogger(CsvDataProvider.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private Map<String, Integer> mapper = new HashMap<String, Integer>();
 
     private String executeColumn;
@@ -169,24 +175,15 @@ public class CsvDataProvider extends BaseDataProvider {
             testName = dsBean.setDataSorceUUID(testName, strings, mapper); // provide whole line from data provider for UUID generation
 
             HashMap<String, String> csvRow = (HashMap<String, String>) args[rowIndex][0];
-
-            canonicalTestNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), TestNamingUtil.appendTestMethodName(testName, testMethod));
-            if (testMethodColumn.isEmpty()) {
-                testNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), testName); // provide organized args to generate valid hash
-            } else {
-                // add testName value from csv datasource to special hashMap
+            
+            testNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), testName);
+            if (!testMethodColumn.isEmpty()) {
+                // override testName value from xls datasource to special hashMap
                 addValueToSpecialMap(testNameArgsMap, testMethodColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
-                addValueToSpecialMap(testMethodNameArgsMap, testMethodColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
             }
 
             // add testMethoOwner from xls datasource to special hashMap
             addValueToSpecialMap(testMethodOwnerArgsMap, testMethodOwnerColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
-
-            // add jira ticket from xls datasource to special hashMap
-            addValueToSpecialMap(jiraArgsMap, jiraColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
-
-            // add bug id from csv datasource to special hashMap
-            addValueToSpecialMap(bugArgsMap, bugColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
 
             // add testrails cases from xls datasource to special hashMap
             addValueToSpecialMap(testRailsArgsMap, testRailColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,8 @@ public enum ACTION_NAME implements IPerformanceOperation {
     SELECT_BY_INDEX("select_by_index"),
     GET_SELECTED_VALUE("get_selected_value"),
     GET_SELECTED_VALUES("get_selected_values"),
-    CAPTURE_SCREENSHOT("capture_screenshot");
+    CAPTURE_SCREENSHOT("capture_screenshot"),
+    GET_LOGS("get_logs"),;
 
 
     private String key;

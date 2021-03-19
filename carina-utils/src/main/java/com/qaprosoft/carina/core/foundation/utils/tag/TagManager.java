@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,110 +15,52 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.tag;
 
+import com.zebrunner.agent.core.registrar.domain.LabelDTO;
+import com.zebrunner.agent.core.registrar.label.LabelResolver;
+
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.apache.log4j.Logger;
-import org.testng.ITestResult;
+public class TagManager implements LabelResolver {
 
-public class TagManager {
-    private static final Logger LOGGER = Logger.getLogger(TagManager.class);
+    @Override
+    public List<LabelDTO> resolve(Class<?> clazz, Method method) {
+        Map<String, List<String>> labels = getAnnotations(clazz);
+        labels.putAll(getAnnotations(method));
 
-    private static final ThreadLocal<HashMap<String, String>> testTags = ThreadLocal.withInitial(HashMap::new);
-    private static final String FORBIDDEN_TAG_NAMES = "priority";
-
-    private TagManager() {
+        return labels.entrySet()
+                     .stream()
+                     .flatMap(keyToValues -> keyToValues.getValue().stream()
+                                                        .map(value -> new LabelDTO(keyToValues.getKey(), value)))
+                     .collect(Collectors.toList());
     }
 
-    /**
-     * get all test tags from annotations and defined via code to be register in Zafira.
-     *
-     * @param result - ITestResult
-     * @return Map of tags
-     */
-    public static Map<String, String> getTags(ITestResult result) {
-        //get custom tags which are set via code
-        Map<String, String> tags = testTags.get();
-        // append tags from annotations if any
-        try {
-            Class<?> testClass = Class.forName(result.getMethod().getTestClass().getName());
-
-            // We can't use getMethod() because we may have parameterized tests
-            // for which we won't know the matching signature
-            String methodName = result.getMethod().getMethodName();
-            Method[] possibleMethods = testClass.getMethods();
-            Map<String, String> declarativeTags = Arrays.stream(possibleMethods)
-                         .filter(possibleMethod -> possibleMethod.getName().equals(methodName))
-                         .findFirst()
-                         .map(retrieveTags())
-                         .orElse(new HashMap<>());
-            declarativeTags.forEach(tags::putIfAbsent);
-        } catch (ClassNotFoundException e) {
-            LOGGER.error(e.getMessage(), e);
-        } finally {
-            // remove all tags from current thread as information put to zafira by current method
-            testTags.remove();
-        }
-        return tags;
+    private Map<String, List<String>> getAnnotations(AnnotatedElement annotatedElement) {
+        return Optional.ofNullable(annotatedElement.getAnnotation(TestTag.List.class))
+                       .map(TestTag.List::value)
+                       .map(Arrays::stream)
+                       .orElseGet(() -> Stream.of(annotatedElement.getAnnotation(TestTag.class)))
+                       .filter(Objects::nonNull)
+                       .collect(Collectors.toMap(
+                               TestTag::name,
+                               tagLabel -> new ArrayList<>(Collections.singletonList(tagLabel.value())),
+                               this::union
+                       ));
     }
 
-    /**
-     * Add tags via code to current Method/Thread.
-     *
-     * @param tags - Map of tags/values
-     */
-    public static void add(HashMap<String, String> tags) {
-        testTags.get().putAll(tags);
-    }
-
-    /**
-     * Add tag via code to current Method/Thread.
-     *
-     * @param name - String
-     * @param value - String
-     */
-    public static void add(String name, String value) {
-        testTags.get().put(name, value);
-    }
-
-    private static Function<Method, Map<String, String>> retrieveTags() {
-        return testMethod -> {
-            HashMap<String, String> tags = new HashMap<>();
-            if (testMethod.isAnnotationPresent(TestTag.class)) {
-                TestTag methodAnnotation = testMethod.getAnnotation(TestTag.class);
-                if (isValid(methodAnnotation.name())) {
-                    tags.put(methodAnnotation.name(), methodAnnotation.value());
-                    LOGGER.debug("Method '" + testMethod + "' tag pair: " + methodAnnotation.name() + " : " + methodAnnotation.value());
-                }
-            }
-            if (testMethod.isAnnotationPresent(TestTag.List.class)) {
-                TestTag.List methodAnnotation = testMethod.getAnnotation(TestTag.List.class);
-                for (TestTag tagLocal : methodAnnotation.value()) {
-                    if (isValid(tagLocal.name())) {
-                        tags.put(tagLocal.name(), tagLocal.value());
-                        LOGGER.debug("Method '" + testMethod + "' tag pair: " + tagLocal.name() + " : " + tagLocal.value());
-                    }
-                }
-            }
-            return tags;
-        };
-    }
-
-    private static boolean isValid(String content) {
-        Pattern pattern = Pattern.compile(FORBIDDEN_TAG_NAMES);
-        if (content != null) {
-            Matcher matcher = pattern.matcher(content);
-            if (matcher.find()) {
-                LOGGER.error("TestTag name contains one of the forbidden tag names: " + content);
-                return false;
-            }
-        }
-        return true;
+    private List<String> union(List<String> values1, List<String> values2) {
+        ArrayList<String> values = new ArrayList<>(values1);
+        values.addAll(values2);
+        return values;
     }
 
 }

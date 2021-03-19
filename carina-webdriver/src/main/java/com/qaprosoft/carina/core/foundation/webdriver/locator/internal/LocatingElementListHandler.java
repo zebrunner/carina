@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.locator.internal;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -22,7 +23,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.SearchContext;
@@ -30,6 +30,8 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 
@@ -39,7 +41,7 @@ public class LocatingElementListHandler implements InvocationHandler {
     private By by;
     private final WebDriver driver;
     
-    private static final Logger LOGGER = Logger.getLogger(LocatingElementListHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public LocatingElementListHandler(WebDriver driver, ElementLocator locator, String name, By by) {
     	this.driver = driver;
@@ -73,7 +75,7 @@ public class LocatingElementListHandler implements InvocationHandler {
         if (elements != null) {
             extendedWebElements = new ArrayList<ExtendedWebElement>();
             
-            int i = 1;
+//            int i = 1;
 			for (WebElement element : elements) {
 				String tempName = name;
 				try {
@@ -88,7 +90,7 @@ public class LocatingElementListHandler implements InvocationHandler {
 				tempElement.setSearchContext((SearchContext) searchContextField.get(locator));
 //				tempElement.setBy(tempElement.generateByForList(by, i));
 				extendedWebElements.add(tempElement);
-				i++;
+//				i++;
 			}
 
         }

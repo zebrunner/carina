@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,15 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.decorator.extractor.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
@@ -29,7 +31,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.extractor.Abstra
 
 public class DivisionElementExtractor extends AbstractElementExtractor implements IDriverPool {
 
-    private static final Logger LOGGER = Logger.getLogger(DivisionElementExtractor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public ExtendedWebElement getElementsByCoordinates(int x, int y) {
@@ -41,7 +43,7 @@ public class DivisionElementExtractor extends AbstractElementExtractor implement
         int isLower;
         Rectangle tempRect;
         while (elements.size() != 1) {
-            index = (int) (Math.round(elements.size() / 2));
+            index = (int) (Math.round(elements.size() / 2f));
             tempElement = elements.get(index);
             tempRect = getRect(tempElement);
             isLower = isLower(tempRect, y);

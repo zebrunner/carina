@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.locator;
 
-import java.io.File;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -23,21 +23,14 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.OutputType;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.alice.models.dto.RecognitionMetaType;
-import com.qaprosoft.carina.core.foundation.webdriver.ai.FindByAI;
-import com.qaprosoft.carina.core.foundation.webdriver.ai.Label;
-import com.qaprosoft.carina.core.foundation.webdriver.ai.impl.AliceRecognition;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.DisableCacheLookup;
 
@@ -49,7 +42,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Disa
  * {@link org.openqa.selenium.support.CacheLookup}.
  */
 public class ExtendedElementLocator implements ElementLocator {
-    private static final Logger LOGGER = Logger.getLogger(ExtendedElementLocator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final SearchContext searchContext;
     private boolean shouldCache;
@@ -57,9 +50,6 @@ public class ExtendedElementLocator implements ElementLocator {
     private By by;
     private WebElement cachedElement;
 
-    private String aiCaption;
-    private Label aiLabel;
-    
     /**
      * Creates a new element locator.
      * 
@@ -82,11 +72,6 @@ public class ExtendedElementLocator implements ElementLocator {
                 this.caseInsensitive = true;
             }
         }
-        // Elements to be recognized by Alice
-        if (field.isAnnotationPresent(FindByAI.class)) {
-            this.aiCaption = field.getAnnotation(FindByAI.class).caption();
-            this.aiLabel = field.getAnnotation(FindByAI.class).label();
-        }
 
     }
 
@@ -95,7 +80,6 @@ public class ExtendedElementLocator implements ElementLocator {
      */
     public WebElement findElement() {
         if (cachedElement != null && shouldCache) {
-            LOGGER.debug("returning element from cache: " + by);
             return cachedElement;
         }
 
@@ -116,16 +100,13 @@ public class ExtendedElementLocator implements ElementLocator {
                 elements = searchContext.findElements(by);
                 if (!elements.isEmpty()) {
                     exception = null;
-                    element = searchContext.findElements(by).get(0);
+                    element = elements.get(0);
                 }
-                LOGGER.debug("Unable to find element: " + e.getMessage());
+                // hide below debug message as it is to often displayed in logs due to the fluent waits etc
+                //LOGGER.debug("Unable to find element: " + e.getMessage());
             }
         }
         
-        // Finding element using AI tool
-        if (element == null && AliceRecognition.INSTANCE.isEnabled()) {
-            element = findElementByAI((WebDriver) searchContext, aiLabel, aiCaption);
-        }
         // If no luck throw general NoSuchElementException
         if (element == null) {
             throw exception != null ? exception : new NoSuchElementException("Unable to find element by Selenium/AI");
@@ -143,7 +124,6 @@ public class ExtendedElementLocator implements ElementLocator {
      */
     public List<WebElement> findElements() {
         List<WebElement> elements = null;
-        NoSuchElementException exception = null;
 
         try {
             elements = searchContext.findElements(by);
@@ -155,27 +135,13 @@ public class ExtendedElementLocator implements ElementLocator {
         
         // If no luck throw general NoSuchElementException
         if (elements == null) {
-            throw exception != null ? exception : new NoSuchElementException("Unable to find elements by Selenium");
+            throw new NoSuchElementException("Unable to find elements by Selenium");
         }
 
         // we can't enable cache for lists by default as we can't handle/catch list.get(index).action(). And for all dynamic lists
         // As result for all dynamic lists we have too often out of bound index exceptions
 
         return elements;
-    }
-
-    private WebElement findElementByAI(WebDriver drv, Label label, String caption) {
-        WebElement element = null;
-        File screen = ((TakesScreenshot) drv).getScreenshotAs(OutputType.FILE);
-        RecognitionMetaType result = AliceRecognition.INSTANCE.recognize(aiLabel, aiCaption, screen);
-        if (result != null) {
-            int x = (result.getTopleft().getX() + result.getBottomright().getX()) / 2;
-            int y = (result.getTopleft().getY() + result.getBottomright().getY()) / 2;
-            element = (WebElement) ((JavascriptExecutor) drv).executeScript("return document.elementFromPoint(arguments[0], arguments[1])", x, y);
-        } else {
-            throw new NoSuchElementException("Unable to find element by AI label: " + aiLabel + ", caption: " + aiCaption);
-        }
-        return element;
     }
     
     /**
@@ -210,7 +176,7 @@ public class ExtendedElementLocator implements ElementLocator {
             String replacement = "translate(" + matcher.group(2) + ", " + matcher.group(4) + value.toUpperCase() + matcher.group(4) + ", " + matcher.group(4) + value.toLowerCase() + matcher.group(4) + ")" + matcher.group(3)
                     + "translate(" + matcher.group(4) + value + matcher.group(4)+ ", " + matcher.group(4) + value.toUpperCase() + matcher.group(4) + ", " + matcher.group(4) + value.toLowerCase() + matcher.group(6)
                     + ")" + matcher.group(7);
-            LOGGER.debug("xpath translate:");
+            replacement = replacement.replaceAll("\\$", "\\\\\\$");
             LOGGER.debug(replacement);
             matcher.appendReplacement(sb, replacement);
         }

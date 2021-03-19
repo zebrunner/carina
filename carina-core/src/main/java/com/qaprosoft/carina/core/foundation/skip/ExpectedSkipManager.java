@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,14 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.skip;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 
@@ -28,20 +30,16 @@ import com.qaprosoft.carina.core.foundation.rule.IRule;
 
 public class ExpectedSkipManager {
 
-    private static final Logger LOGGER = Logger.getLogger(ExpectedSkipManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static ExpectedSkipManager instance = null;
 
     private ExpectedSkipManager() {
     };
 
-    public static ExpectedSkipManager getInstance() {
+    public synchronized static ExpectedSkipManager getInstance() {
         if (null == instance) {
-            synchronized (ExpectedSkipManager.class) {
-                if (null == instance) {
-                    instance = new ExpectedSkipManager();
-                }
-            }
+            instance = new ExpectedSkipManager();
         }
         return instance;
     }

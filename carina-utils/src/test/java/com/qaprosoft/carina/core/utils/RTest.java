@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ public class RTest {
     
     @Test
     public void testGetDouble() {
-        Double doubleValue = 3.14;
+        double doubleValue = 3.14;
         Assert.assertEquals(R.CONFIG.getDouble("double"), doubleValue);
     }
     
@@ -98,21 +98,23 @@ public class RTest {
         R.CONFIG.put("key1", "value1", true);
         Assert.assertEquals(R.CONFIG.containsKey("key1"), true);
     }
-    
-    /*
-     * @Test
-     * public void testEncryption()
-     * {
-     * Assert.assertEquals(R.CONFIG.get("password"), "EncryptMe");
-     * Assert.assertEquals(R.CONFIG.getSecured("password"), "{crypt:8O9iA4+f3nMzz85szmvKmQ==}");
-     * }
-     * 
-     * @Test
-     * public void testPlaceholdersWithEncryption()
-     * {
-     * Assert.assertEquals(R.CONFIG.get("credentials"), "test@gmail.com/EncryptMe");
-     * }
-     */
+
+    @Test
+    public void testEncryption() {
+        Assert.assertEquals(R.CONFIG.get("password"), "{crypt:8O9iA4+f3nMzz85szmvKmQ==}");
+        Assert.assertEquals(R.CONFIG.getDecrypted("password"), "EncryptMe");
+        //Assert.assertEquals(R.CONFIG.getSecured("password"), "{crypt:8O9iA4+f3nMzz85szmvKmQ==}")
+    }
+
+    @Test
+    public void testPlaceholdersWithEncryption() {
+        Assert.assertEquals(R.CONFIG.getDecrypted("credentials"), "test@gmail.com/EncryptMe");
+    }
+
+    @Test
+    public void testPlaceholdersWithEncryptionTestData() {
+        Assert.assertEquals(R.TESTDATA.getDecrypted("test_credentials"), "test@gmail.com/EncryptMe");
+    }
 
     @Test
     public void testPlaceholdersInEmail() {

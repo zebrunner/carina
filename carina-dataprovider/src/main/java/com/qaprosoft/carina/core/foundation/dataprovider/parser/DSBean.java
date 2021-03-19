@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import com.qaprosoft.carina.core.foundation.exception.InvalidArgsException;
 import org.apache.commons.lang3.StringUtils;
 import org.testng.ITestContext;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
+import com.qaprosoft.carina.core.foundation.exception.InvalidArgsException;
 
 public class DSBean {
     Map<String, String> testParams;
@@ -42,12 +42,10 @@ public class DSBean {
 
     private boolean spreadsheet;
 
-    @Deprecated
     public DSBean(ITestContext context) {
         this(context.getCurrentXmlTest().getAllParameters());
     }
 
-    @Deprecated
     public DSBean(Map<String, String> testParams) {
         this.testParams = testParams;
         this.dsFile = testParams.get(SpecialKeywords.EXCEL_DS_FILE);
@@ -63,7 +61,6 @@ public class DSBean {
         }
     }
 
-    @Deprecated
     public DSBean(String xlsFile, String xlsSheet, String dsArgs, String dsUids) {
         this.dsFile = xlsFile;
         this.xlsSheet = xlsSheet;
@@ -79,7 +76,6 @@ public class DSBean {
 
     }
 
-    // TODO: Analyze DSBean for XLS and CSV DataProviders and remove code duplicates
     public DSBean(XlsDataSourceParameters parameters, Map<String, String> testParams) {
         // initialize default Xls data source parameters from suite xml file
         String xlsFile = testParams.get(SpecialKeywords.EXCEL_DS_FILE);

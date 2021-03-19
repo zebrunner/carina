@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,4 +23,5 @@ public class DebugLevelScreenshotRule implements IScreenshotRule {
     public boolean isTakeScreenshot() {
         return Configuration.get(Parameter.CORE_LOG_LEVEL).equalsIgnoreCase("debug");
     }
+
 }

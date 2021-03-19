@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,10 +40,6 @@ public interface ITestCases {
 
     default boolean isValidPlatform(String platform) {
         return platform.equalsIgnoreCase(Configuration.getPlatform()) || platform.isEmpty();
-    }
-    
-    default boolean isValidLanguage(String language) {
-        return language.equalsIgnoreCase(Configuration.get(Parameter.LANGUAGE)) || language.isEmpty();
     }
     
     default boolean isValidLocale(String locale) {

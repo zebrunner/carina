@@ -1,31 +1,24 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-<!DOCTYPE suite SYSTEM "http://testng.org/testng-${version}.dtd">
-<suite name="Carina Demo Tests - Mobile Sample (iOS)" verbose="1"
-	skipfailedinvocationcounts="false" junit="false" parallel="tests"
-	data-provider-thread-count="1" annotations="JDK">
-
-	<listeners>
-		<listener class-name="com.qaprosoft.zafira.listener.ZafiraListener"/>
-	</listeners>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Carina Demo Tests - Mobile Sample (iOS)" verbose="1" parallel="tests">
 
 	<parameter name="suiteOwner" value="qpsdemo" />
 	<parameter name="zafira_project" value="UNKNOWN" />
-	<parameter name="jenkinsJobCreation" value="true" />
+	<parameter name="provider" value="mcloud"/>
 	<parameter name="jenkinsJobName" value="Mobile-iOS-Demo-Test" />
 	<parameter name="jenkinsJobType" value="ios"/>
 	<parameter name="jenkinsEmail" value="demo@qaprosoft.com" />
 	<parameter name="jenkinsEnvironments" value="DEMO" />
 
-	<parameter name="stringParam::capabilities.app::path to carina demo mobile application on the appium server host" value="https://qaprosoft.s3-us-west-2.amazonaws.com/carinademoexample.zip" />
+	<parameter name="stringParam::capabilities.app::path to carina demo mobile application" value="https://qaprosoft.s3-us-west-2.amazonaws.com/carinademoexample.zip" />
 
-	<parameter name="jenkinsDefaultThreadCount" value="1" />
 	<parameter name="jenkinsMobileDefaultPool" value="ANY" />
 
-<!-- 	<parameter name="jenkinsRegressionPipeline" value="Carina-Demo-Regression-Pipeline" /> -->
+ 	<parameter name="jenkinsRegressionPipeline" value="mobile_regression" />
 	<parameter name="jenkinsPipelineEnvironments" value="DEMO" />
-	<parameter name="jenkinsJobExecutionOrder" value="1" />
+	<parameter name="jenkinsJobExecutionOrder" value="3" />
 	<parameter name="jenkinsJobExecutionMode" value="continue" />
 
 	<test name="Mobile test">

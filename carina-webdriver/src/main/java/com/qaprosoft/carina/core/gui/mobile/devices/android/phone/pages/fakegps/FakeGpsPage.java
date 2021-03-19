@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,12 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.fakegps;
 
-import org.apache.log4j.Logger;
+import java.lang.invoke.MethodHandles;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -35,7 +38,7 @@ import io.appium.java_client.android.nativekey.AndroidKey;
  */
 
 public class FakeGpsPage extends MobileAbstractPage implements IAndroidUtils {
-    private static final Logger LOGGER = Logger.getLogger(FakeGpsPage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @FindBy(id = "com.lexa.fakegps:id/buttonStart")
     private ExtendedWebElement setLocationButton;

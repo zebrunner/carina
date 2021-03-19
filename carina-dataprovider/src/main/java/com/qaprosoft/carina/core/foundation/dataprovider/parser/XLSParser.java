@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,30 @@
 package com.qaprosoft.carina.core.foundation.dataprovider.parser;
 
 import java.io.File;
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.log4j.Logger;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.model.ExternalLinksTable;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFTable;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.exception.DataLoadingException;
 import com.qaprosoft.carina.core.foundation.exception.InvalidArgsException;
 
 public class XLSParser extends AbstractXLSParser {
-    private static final Logger LOGGER = Logger.getLogger(XLSParser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static DataFormatter df;
     private static FormulaEvaluator evaluator;
 
@@ -146,15 +153,15 @@ public class XLSParser extends AbstractXLSParser {
             return "";
 
         switch (cell.getCellType()) {
-        case Cell.CELL_TYPE_STRING:
+        case STRING:
             return df.formatCellValue(cell).trim();
-        case Cell.CELL_TYPE_NUMERIC:
+        case NUMERIC:
             return df.formatCellValue(cell).trim();
-        case Cell.CELL_TYPE_BOOLEAN:
+        case BOOLEAN:
             return df.formatCellValue(cell).trim();
-        case Cell.CELL_TYPE_FORMULA:
+        case FORMULA:
             return (cell.getCellFormula().contains("[") && cell.getCellFormula().contains("]")) ? null : df.formatCellValue(cell, evaluator).trim();
-        case Cell.CELL_TYPE_BLANK:
+        case BLANK:
             return "";
         default:
             return null;
@@ -165,7 +172,7 @@ public class XLSParser extends AbstractXLSParser {
         if (cell == null)
             return null;
 
-        if (cell.getCellType() == Cell.CELL_TYPE_FORMULA) {
+        if (cell.getCellType() == CellType.FORMULA) {
             if (cell.getCellFormula().contains("#This Row")) {
                 if (cell.getCellFormula().contains("!")) {
                     // Parse link to the cell with table name in the external doc([2]!Table1[[#This Row],[Header6]])

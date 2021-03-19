@@ -11,14 +11,14 @@ carina-demo
     |-- xls
 |-- src/main/java
 |-- src/main/resources
-    |-- l18n
+    |-- L10N
 ```
 
 * **src/test/java** - contains test classes organized using TestNG annotations
 
 ![src/test/java](img/002-Project-structure.png)
 
-* **src/test/resources** - contains TestNG xml files, API templates and XLS data providers
+* **src/test/resources** - contains TestNG xml files, API templates and XLS/CSV data providers etc
 
 ![src/test/resources](img/003-Project-structure.png)
 
@@ -26,6 +26,6 @@ carina-demo
 
 ![src/main/java](img/004-Project-structure.png)
 
-* **src/main/resources** - contains l18n bundles, configuration properties files and MyBatis profiles if needed
+* **src/main/resources** - contains L10N resources, configuration properties files and MyBatis profiles if needed
 
 ![src/main/resources](img/005-Project-structure.png)

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,10 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.api.http;
 
-import com.jayway.restassured.response.Response;
-import com.jayway.restassured.specification.RequestSpecification;
 import com.qaprosoft.carina.proxy.SystemProxy;
+
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 
 /*
  * HttpClient - sends HTTP request with specified parameters and returns response.

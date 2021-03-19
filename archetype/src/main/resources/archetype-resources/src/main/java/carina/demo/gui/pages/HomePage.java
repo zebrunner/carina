@@ -2,7 +2,7 @@
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
 /*
- * Copyright 2013-2019 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2021 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,19 +18,23 @@
  */
 package ${package}.carina.demo.gui.pages;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.gui.AbstractPage;
 import ${package}.carina.demo.gui.components.FooterMenu;
-import org.apache.log4j.Logger;
+import ${package}.carina.demo.gui.components.WeValuePrivacyAd;
+
 
 public class HomePage extends AbstractPage {
-    private Logger LOGGER = Logger.getLogger(HomePage.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    
     @FindBy(id = "footmenu")
     private FooterMenu footerMenu;
 
@@ -56,5 +60,9 @@ public class HomePage extends AbstractPage {
             }
         }
         throw new RuntimeException("Unable to open brand: " + brand);
+    }
+    
+    public WeValuePrivacyAd getWeValuePrivacyAd() {
+    	return new WeValuePrivacyAd(driver);
     }
 }

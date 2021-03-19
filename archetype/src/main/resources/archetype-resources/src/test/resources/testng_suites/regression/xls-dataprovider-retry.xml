@@ -1,0 +1,30 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite verbose="1" name="XLS DataProvider Test With Retry (33% pass rate)" parallel="methods">
+
+	<parameter name="suiteOwner" value="qpsdemo"/>
+	<parameter name="zafira_project" value="UNKNOWN"/>
+	<parameter name="jenkinsJobName" value="API-XlsDataProvider-Retry"/>
+	<parameter name="jenkinsJobType" value="api"/>
+	<parameter name="jenkinsEnvironments" value="DEMO"/>
+	<parameter name="jenkinsEmail" value="demo@qaprosoft.com"/>
+
+	<parameter name="jenkinsRegressionPipeline" value="full_regression"/>
+	<parameter name="jenkinsRegressionMatrix_full_regression" value="retry_count:0; retry_count:3"/>
+	
+	<parameter name="jenkinsPipelineEnvironments" value="DEMO"/>
+	<parameter name="jenkinsJobExecutionMode" value="continue"/>
+
+	<!-- example declaring non default retry_count -->
+	<parameter name="jenkinsDefaultRetryCount" value="3"/>
+
+
+	<test name="XLS DataProvider with Retry">
+		<classes>
+			<class name="${package}.carina.demo.regression.dataprovider.XlsDataproviderRetryTest" />
+		</classes>
+	</test>
+
+</suite>

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package com.qaprosoft.carina.browsermobproxy;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -24,7 +25,8 @@ import java.util.Map;
 
 import javax.net.ssl.SSLContext;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -40,7 +42,7 @@ import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.proxy.CaptureType;
 
 public class BrowserMobTest {
-    private static final Logger LOGGER = Logger.getLogger(BrowserMobTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static String header = "my_header";
     private static String headerValue = "my_value";
     private static String testUrl = "https://ci.qaprosoft.com";

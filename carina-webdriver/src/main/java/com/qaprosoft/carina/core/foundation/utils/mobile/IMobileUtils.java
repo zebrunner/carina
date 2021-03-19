@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,11 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.mobile;
 
+import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
@@ -47,7 +49,7 @@ import io.appium.java_client.touch.offset.ElementOption;
 import io.appium.java_client.touch.offset.PointOption;
 
 public interface IMobileUtils extends IDriverPool {
-    static final Logger UTILS_LOGGER = Logger.getLogger(IMobileUtils.class);
+    static final Logger UTILS_LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public enum Direction {
         LEFT,
@@ -491,25 +493,25 @@ public interface IMobileUtils extends IDriverPool {
 
         switch (direction) {
         case LEFT:
-            starty = endy = elementLocation.getY() + Math.round(elementDimensions.getHeight() / 2);
+            starty = endy = elementLocation.getY() + Math.round(elementDimensions.getHeight() / 2f);
 
             startx = (int) (elementLocation.getX() + Math.round(maxCoefficient * elementDimensions.getWidth()));
             endx = (int) (elementLocation.getX() + Math.round(minCoefficient * elementDimensions.getWidth()));
             break;
         case RIGHT:
-            starty = endy = elementLocation.getY() + Math.round(elementDimensions.getHeight() / 2);
+            starty = endy = elementLocation.getY() + Math.round(elementDimensions.getHeight() / 2f);
 
             startx = (int) (elementLocation.getX() + Math.round(minCoefficient * elementDimensions.getWidth()));
             endx = (int) (elementLocation.getX() + Math.round(maxCoefficient * elementDimensions.getWidth()));
             break;
         case UP:
-            startx = endx = elementLocation.getX() + Math.round(elementDimensions.getWidth() / 2);
+            startx = endx = elementLocation.getX() + Math.round(elementDimensions.getWidth() / 2f);
 
             starty = (int) (elementLocation.getY() + Math.round(maxCoefficient * elementDimensions.getHeight()));
             endy = (int) (elementLocation.getY() + Math.round(minCoefficient * elementDimensions.getHeight()));
             break;
         case DOWN:
-            startx = endx = elementLocation.getX() + Math.round(elementDimensions.getWidth() / 2);
+            startx = endx = elementLocation.getX() + Math.round(elementDimensions.getWidth() / 2f);
 
             starty = (int) (elementLocation.getY() + Math.round(minCoefficient * elementDimensions.getHeight()));
             endy = (int) (elementLocation.getY() + Math.round(maxCoefficient * elementDimensions.getHeight()));

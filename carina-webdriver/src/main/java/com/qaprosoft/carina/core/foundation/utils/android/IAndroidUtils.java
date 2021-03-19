@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.utils.android;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -28,13 +29,14 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableMap;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
@@ -61,7 +63,7 @@ public interface IAndroidUtils extends IMobileUtils {
 
     // TODO: review carefully and remove duplicates and migrate completely to fluent
     // waits
-    static final Logger UTILS_LOGGER = Logger.getLogger(IAndroidUtils.class);
+    static final Logger UTILS_LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     static final int SCROLL_MAX_SEARCH_SWIPES = 55;
     static final long SCROLL_TIMEOUT = 300;
@@ -128,8 +130,7 @@ public interface IAndroidUtils extends IMobileUtils {
         int height = size.getHeight();
         int width = size.getWidth();
 
-        PointOption<?> option = PointOption.point(Double.valueOf(width * 0.915).intValue(),
-                Double.valueOf(height * 0.945).intValue());
+        PointOption<?> option = PointOption.point((int) (width * 0.915), (int) (height * 0.945));
         new TouchAction((AndroidDriver<?>) castDriver()).tap(option).perform();
     }
 
@@ -161,7 +162,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * @return boolean
      */
     default public boolean setDeviceLanguage(String language) {
-        boolean status = setDeviceLanguage(language, true, 20);
+        boolean status = setDeviceLanguage(language, 20);
         return status;
     }
 
@@ -188,16 +189,12 @@ public interface IAndroidUtils extends IMobileUtils {
      *
      * @param language
      *            to set. Can be es, en, etc.
-     * @param changeConfig
-     *            boolean if true - update config locale and language params
      * @param waitTime
      *            int wait in seconds before device refresh.
      * @return boolean
      */
-    default public boolean setDeviceLanguage(String language, boolean changeConfig, int waitTime) {
+    default public boolean setDeviceLanguage(String language, int waitTime) {
         boolean status = false;
-
-        String initLanguage = language;
 
         String currentAndroidVersion = IDriverPool.getDefaultDevice().getOsVersion();
 
@@ -237,22 +234,6 @@ public interface IAndroidUtils extends IMobileUtils {
         if (waitTime > 0) {
             UTILS_LOGGER.info("Wait for at least '" + waitTime + "' seconds before device refresh.");
             CommonUtils.pause(waitTime);
-        }
-
-        if (changeConfig) {
-            String loc;
-            String lang;
-            if (initLanguage.contains("_")) {
-                lang = initLanguage.split("_")[0];
-                loc = initLanguage.split("_")[1];
-            } else {
-                lang = initLanguage;
-                loc = initLanguage;
-            }
-            // [VD] never override global locale or language properties if you changed just one device locale
-//            LOGGER.info("Update config.properties locale to '" + loc + "' and language to '" + lang + "'.");
-//            R.CONFIG.put("locale", loc);
-//            R.CONFIG.put("language", lang);
         }
 
         actualDeviceLanguage = getDeviceLanguage();
@@ -747,8 +728,7 @@ public interface IAndroidUtils extends IMobileUtils {
      *            arguments.
      *
      *            NOTE: "adb -s {UDID} shell" - should be omitted.
-     * 
-     *            Example: "adb -s {UDID} shell list packages" -> "list packages"
+     *            Example: "adb -s {UDID} shell list packages" - list packages
      *            
      * NOTE: shell arguments with space symbols are unsupported!
      * 
@@ -762,15 +742,14 @@ public interface IAndroidUtils extends IMobileUtils {
     
     /**
      * 
-     * @param list of string commands
+     * @param commands list of string commands
      * 
      *            - ADB shell command represented as single String where 1st literal
      *            is a command itself. Everything that follow is treated as
      *            arguments.
      *
      *            NOTE: "adb -s {UDID} shell" - should be omitted.
-     * 
-     *            Example: "adb -s {UDID} shell list packages" -> "list packages"
+     *            Example: "adb -s {UDID} shell list packages" - list packages
      *            
      * @return String - response (might be empty)
      */
@@ -827,7 +806,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * - "network" - Using Wi-Fi, Bluetooth or cellular networks (Battery saving
      * mode);
      * 
-     * @return
+     * @return boolean
      */
     default public boolean isGPSEnabled() {
         String response = executeShell(SHELL_GPS_STATUS_CMD);
@@ -840,8 +819,6 @@ public interface IAndroidUtils extends IMobileUtils {
     
     /**
      * Works if ONLY DEVICE (GPS sensor) is user for obtaining location
-     * 
-     * @return
      */
     default public void disableGPS() {
         executeShell(SHELL_DISABLE_GPS_CMD);
@@ -863,8 +840,11 @@ public interface IAndroidUtils extends IMobileUtils {
     /**
      * This method provides app's version for the app that is already installed to
      * devices, based on its package name.
-     * 
      * In order to do that we search for "versionCode" parameter in system dump.
+     * 
+     * @param packageName String
+     * 
+     * @return appVersion String
      */
     default public String getAppVersion(String packageName) {
         String command = "dumpsys package ".concat(packageName);
@@ -877,10 +857,11 @@ public interface IAndroidUtils extends IMobileUtils {
     /**
      * This method provides app's version name for the app that is already installed to
      * devices, based on its package name.
-     *
      * In order to do that we search for "versionName" parameter in system dump.
-     *
      * Ex. "versionCode" returns 11200050, "versionName" returns 11.2.0
+     * 
+     * @param packageName String
+     * @return appVersion String
      */
     default public String getAppVersionName(String packageName){
         String command = "dumpsys package ".concat(packageName);
@@ -913,6 +894,8 @@ public interface IAndroidUtils extends IMobileUtils {
      * 
      * App's settings will be reset. User will be logged out. Application will be
      * closed to background.
+     * 
+     * @param packageName String
      */
     default public void clearAppCache(String packageName) {
         UTILS_LOGGER.info("Will clear data for the following app: " + packageName);
@@ -929,7 +912,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * If the application you're interested about is installed - returns "true".
      * Otherwise, returns "false".
      * 
-     * @param packageName
+     * @param packageName String
      * @return boolean
      */
     default public boolean isApplicationInstalled(String packageName) {
@@ -956,7 +939,7 @@ public interface IAndroidUtils extends IMobileUtils {
     /**
      * Will install application if path to apk-file on working machine is set.
      * 
-     * @param apkPath
+     * @param apkPath String
      */
     default public void installApp(String apkPath) {
         UTILS_LOGGER.info("Will install application with apk-file from " + apkPath);
@@ -966,7 +949,7 @@ public interface IAndroidUtils extends IMobileUtils {
     /**
      * To remove installed application by provided package name
      * 
-     * @param packageName
+     * @param packageName String
      * 
      * @return true if succeed
      */
@@ -999,8 +982,8 @@ public interface IAndroidUtils extends IMobileUtils {
      * With this method user is able to trigger a deeplink (link to specific place
      * within the application)
      * 
-     * @param link
-     * @param packageName
+     * @param link String
+     * @param packageName String
      */
     default public void triggerDeeplink(String link, String packageName) {
         Map<String, Object> preparedCommand = ImmutableMap.of("url", link, "package", packageName);
@@ -1015,9 +998,9 @@ public interface IAndroidUtils extends IMobileUtils {
     /**
      * To get list of granted/denied/requested permission for specified application
      * 
-     * @param packageName
-     * @param type
-     * @return ArrayList<String>
+     * @param packageName String
+     * @param type PermissionType
+     * @return ArrayList String
      */
     @SuppressWarnings("unchecked")
     default public ArrayList<String> getAppPermissions(String packageName, PermissionType type) {
@@ -1029,9 +1012,9 @@ public interface IAndroidUtils extends IMobileUtils {
     /**
      * To change (grant or revoke) application permissions.
      * 
-     * @param packageName
-     * @param action
-     * @param permissions
+     * @param packageName String
+     * @param action PermissionAction
+     * @param permissions Permission
      */
     default public void changePermissions(String packageName, PermissionAction action, Permission... permissions) {
         ArrayList<String> permissionsStr = new ArrayList<>();
@@ -1049,7 +1032,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * 
      * NOTE2: input field should be cleared previously.
      * 
-     * @param text
+     * @param text String
      */
     default public void typeWithADB(String text) {
         UTILS_LOGGER.info(String.format("Will enter '%s' to an active input field via ADB.", text));
@@ -1085,6 +1068,64 @@ public interface IAndroidUtils extends IMobileUtils {
             return;
         }
         UTILS_LOGGER.info("Wifi is already disabled. No actions needed");
+    }
+
+    /**
+     * Method enters an App's menu within device System Settings
+     * @param appName - Name of the app as it appears in the device's Apps list (Language specific)
+     */
+    default void openAppMenuFromDeviceSettings(String appName){
+        AndroidService androidService = AndroidService.getInstance();
+        androidService.executeAdbCommand("shell am start -a android.settings.APPLICATION_SETTINGS");
+
+        ExtendedWebElement appItem = new ExtendedWebElement(By.xpath(String.format("//*[contains(@text, '%s')]", appName)), "notifications", getDriver());
+        swipe(appItem);
+
+        appItem.click();
+    }
+
+    /**
+     * Toggles a specified app's ability to recieve Push Notifications on the system level
+     * @param appName - The app name as it appears within device System Settings
+     * @param setValue - The value you wish to set the toggle to
+     */
+    default void toggleAppNotificationsFromDeviceSettings(String appName, boolean setValue){
+        openAppMenuFromDeviceSettings(appName);
+
+        WebDriver driver = getDriver();
+        ExtendedWebElement element = new ExtendedWebElement(By.xpath("//*[contains(@text, 'Notifications') or contains(@text, 'notifications')]"), "notifications", driver);
+        element.click();
+
+        element = new ExtendedWebElement(By.xpath("//*[@resource-id='com.android.settings:id/switch_text']/following-sibling::android.widget.Switch"), "toggle", driver);
+        if(Boolean.valueOf(element.getAttribute("checked")) != setValue){
+            element.click();
+        }
+    }
+
+    /**
+     * @return - Returns if the device in use has a running LTE connection
+     */
+    default boolean isCarrierConnectionAvailable(){
+        AndroidService androidService = AndroidService.getInstance();
+        boolean status = ((AndroidDriver)this.castDriver()).getConnection().isDataEnabled();
+        boolean linkProperties = false;
+
+        String linkProp = androidService.executeAdbCommand("shell dumpsys telephony.registry | grep mPreciseDataConnectionState");
+        UTILS_LOGGER.info("PROP:  " + linkProp);
+        if(!linkProp.isEmpty()) {
+            linkProperties = !StringUtils.substringBetween(linkProp, "APN: ", " ").equals("null");
+        }
+        UTILS_LOGGER.info("STATUS ENABLED: " + status);
+        UTILS_LOGGER.info("CARRIER AVAILABLE: " + linkProperties);
+        return ((AndroidDriver)this.castDriver()).getConnection().isDataEnabled() && linkProperties;
+    }
+
+    /**
+     * @return - Returns the value of the device model in use as a String
+     */
+    default String getDeviceModel(){
+        AndroidService androidService = AndroidService.getInstance();
+        return StringUtils.substringAfter(androidService.executeAdbCommand("shell getprop | grep 'ro.product.model'"), "ro.product.model: ");
     }
 
     default public void openStatusBar() {

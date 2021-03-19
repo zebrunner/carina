@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,17 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.performance;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Calendar;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+@Deprecated
 public class Timer {
-    private static final Logger LOGGER = Logger.getLogger(Timer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     //data structure to collect summarized/combined datetime  
     private static ThreadLocal<ConcurrentHashMap<String, Long>> metrics = new ThreadLocal<ConcurrentHashMap<String, Long>>();

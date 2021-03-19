@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,12 @@
  ******************************************************************************/
 package com.qaprosoft.carina.browsermobproxy.rewrite;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.netty.handler.codec.http.HttpResponse;
 import net.lightbody.bmp.filters.ResponseFilter;
@@ -32,7 +34,7 @@ import net.lightbody.bmp.util.HttpMessageInfo;
  */
 public class CustomRsFilter implements ResponseFilter {
     
-    private static final Logger LOGGER = Logger.getLogger(CustomRsFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private List<RewriteItem> rewrites = new ArrayList<>();
 
@@ -79,8 +81,8 @@ public class CustomRsFilter implements ResponseFilter {
 
                 // body rewrite
                 String content = contents.getTextContents();
-                content.replaceAll(rewriteItem.getRegex(), rewriteItem.getReplacement());
-                contents.setTextContents(content);
+                String replacedContent = content.replaceAll(rewriteItem.getRegex(), rewriteItem.getReplacement());
+                contents.setTextContents(replacedContent);
             }
         }
 

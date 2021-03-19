@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,16 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.reporting;
 
-import java.util.HashSet;
+import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
+import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.Reporter;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
@@ -29,19 +32,26 @@ import com.qaprosoft.carina.core.foundation.report.qtest.IQTestManager;
 import com.qaprosoft.carina.core.foundation.report.qtest.QTestCases;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.zafira.models.dto.TagType;
 
 /**
  * Tests for {@link IQTestManager}
  */
 public class QTestTest implements IQTestManager {
 
-    private static final Logger LOGGER = Logger.getLogger(QTestTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    
+    private static final String PROJECT_ID = "1";
+    private static final String VERIFICATION_PREFIX = PROJECT_ID + "-";
 
     private static final String TEST_ID = "5,6,65500";
     private static final String EXPECTED_TEST_ID = "65500";
     private static final String FIRST_TEST_ID = "65536";
     private static final String SECOND_TEST_ID = "15536";
+    
+    @BeforeSuite()
+    public void initData(ITestContext context) {
+        context.getSuite().setAttribute(SpecialKeywords.QTEST_PROJECT_ID, PROJECT_ID);
+    }
 
     @Test
     @QTestCases(id = TEST_ID)
@@ -52,7 +62,7 @@ public class QTestTest implements IQTestManager {
 
         LOGGER.info("QTest list: " + QTestUdids.toString());
 
-        Assert.assertTrue(QTestUdids.contains(EXPECTED_TEST_ID), "QTest should contain id=" + EXPECTED_TEST_ID);
+        Assert.assertTrue(QTestUdids.contains(VERIFICATION_PREFIX + EXPECTED_TEST_ID), "QTest should contain id=" + EXPECTED_TEST_ID);
 
         Assert.assertEquals(QTestUdids.size(), 3);
 
@@ -66,7 +76,7 @@ public class QTestTest implements IQTestManager {
 
         Set<String> QTestUdids = getQTestCasesUuid(result);
 
-        Assert.assertTrue(QTestUdids.contains(FIRST_TEST_ID), "QTest should contain id=" + FIRST_TEST_ID);
+        Assert.assertTrue(QTestUdids.contains(VERIFICATION_PREFIX + FIRST_TEST_ID), "QTest should contain id=" + FIRST_TEST_ID);
 
         Assert.assertEquals(QTestUdids.size(), 1);
     }
@@ -80,7 +90,7 @@ public class QTestTest implements IQTestManager {
 
         Set<String> QTestUdids = getQTestCasesUuid(result);
 
-        Assert.assertTrue(QTestUdids.contains(FIRST_TEST_ID), "QTest should contain id=" + FIRST_TEST_ID);
+        Assert.assertTrue(QTestUdids.contains(VERIFICATION_PREFIX + FIRST_TEST_ID), "QTest should contain id=" + FIRST_TEST_ID);
 
         LOGGER.info("QTest list: " + QTestUdids.toString());
 
@@ -96,9 +106,9 @@ public class QTestTest implements IQTestManager {
 
         Set<String> QTestUdids = getQTestCasesUuid(result);
 
-        Assert.assertTrue(QTestUdids.contains(FIRST_TEST_ID), "QTest should contain id=" + FIRST_TEST_ID);
+        Assert.assertTrue(QTestUdids.contains(VERIFICATION_PREFIX + FIRST_TEST_ID), "QTest should contain id=" + FIRST_TEST_ID);
 
-        Assert.assertTrue(QTestUdids.contains(SECOND_TEST_ID), "QTest should contain id=" + SECOND_TEST_ID);
+        Assert.assertTrue(QTestUdids.contains(VERIFICATION_PREFIX + SECOND_TEST_ID), "QTest should contain id=" + SECOND_TEST_ID);
 
         Assert.assertEquals(QTestUdids.size(), 2);
     }
@@ -120,7 +130,7 @@ public class QTestTest implements IQTestManager {
 
         QTestUdids = getQTestCasesUuid(result);
 
-        Assert.assertTrue(QTestUdids.contains(FIRST_TEST_ID), "QTest should contain id=" + FIRST_TEST_ID);
+        Assert.assertTrue(QTestUdids.contains(VERIFICATION_PREFIX + FIRST_TEST_ID), "QTest should contain id=" + FIRST_TEST_ID);
 
         Assert.assertEquals(QTestUdids.size(), 1);
 
@@ -128,7 +138,7 @@ public class QTestTest implements IQTestManager {
 
         QTestUdids = getQTestCasesUuid(result);
 
-        Assert.assertTrue(QTestUdids.contains(SECOND_TEST_ID), "QTest should contain id=" + SECOND_TEST_ID);
+        Assert.assertTrue(QTestUdids.contains(VERIFICATION_PREFIX + SECOND_TEST_ID), "QTest should contain id=" + SECOND_TEST_ID);
 
         Assert.assertEquals(QTestUdids.size(), 1);
 
@@ -143,27 +153,12 @@ public class QTestTest implements IQTestManager {
 
         ITestResult result = Reporter.getCurrentTestResult();
 
-        Set<TagType> tags = new HashSet<TagType>();
-
         Set<String> QTestTags = getQTestCasesUuid(result);
 
-        int projectID = getQTestProjectId(result.getTestContext());
-
-        Set<TagType> finalTags = tags;
-        QTestTags.forEach((entry) -> {
-            TagType tagEntry = new TagType();
-            tagEntry.setName(SpecialKeywords.QTEST_TESTCASE_UUID);
-            tagEntry.setValue(projectID + "-" + entry);
-            finalTags.add(tagEntry);
-        });
-
-        tags.stream().forEachOrdered((entry) -> {
-            Object currentKey = entry.getName();
-            Object currentValue = entry.getValue();
-            LOGGER.info(currentKey + "=" + currentValue);
-        });
-
-        Assert.assertEquals(tags.size(), 3);
+        Assert.assertEquals(QTestTags.size(), 3);
+        Assert.assertTrue(QTestTags.contains(VERIFICATION_PREFIX + FIRST_TEST_ID), "TestRail should contain id=" + FIRST_TEST_ID);
+        Assert.assertTrue(QTestTags.contains(VERIFICATION_PREFIX + "3333"), "TestRail should contain id=" + "3333");
+        Assert.assertTrue(QTestTags.contains(VERIFICATION_PREFIX + "5555"), "TestRail should contain id=" + "5555");
 
     }
 
@@ -174,38 +169,18 @@ public class QTestTest implements IQTestManager {
     public void testTestRailByLocale() {
         ITestResult result = Reporter.getCurrentTestResult();
 
-        Set<String> testRailUdids = getQTestCasesUuid(result);
+        Set<String> QTestUdids = getQTestCasesUuid(result);
 
-        Assert.assertTrue(testRailUdids.contains(FIRST_TEST_ID), "TestRail should contain id=" + FIRST_TEST_ID);
-        Assert.assertEquals(testRailUdids.size(), 1);
+        Assert.assertTrue(QTestUdids.contains(VERIFICATION_PREFIX + FIRST_TEST_ID), "TestRail should contain id=" + FIRST_TEST_ID);
+        Assert.assertEquals(QTestUdids.size(), 1);
 
         R.CONFIG.put(Parameter.LOCALE.getKey(), "fr");
-        testRailUdids = getQTestCasesUuid(result);
+        QTestUdids = getQTestCasesUuid(result);
 
-        Assert.assertTrue(testRailUdids.contains(SECOND_TEST_ID), "TestRail should contain id=" + SECOND_TEST_ID);
-        Assert.assertEquals(testRailUdids.size(), 1);
+        Assert.assertTrue(QTestUdids.contains(VERIFICATION_PREFIX + SECOND_TEST_ID), "TestRail should contain id=" + SECOND_TEST_ID);
+        Assert.assertEquals(QTestUdids.size(), 1);
         
         R.CONFIG.put(Parameter.LOCALE.getKey(), "en");
-    }
-
-    @Test
-    @QTestCases(id = FIRST_TEST_ID, language = "en")
-    @QTestCases(id = SECOND_TEST_ID, language = "fr")
-    public void testTestRailBylanguage() {
-        ITestResult result = Reporter.getCurrentTestResult();
-
-        Set<String> testRailUdids = getQTestCasesUuid(result);
-
-        Assert.assertTrue(testRailUdids.contains(FIRST_TEST_ID), "TestRail should contain id=" + FIRST_TEST_ID);
-        Assert.assertEquals(testRailUdids.size(), 1);
-
-        R.CONFIG.put(Parameter.LANGUAGE.getKey(), "fr");
-        testRailUdids = getQTestCasesUuid(result);
-
-        Assert.assertTrue(testRailUdids.contains(SECOND_TEST_ID), "TestRail should contain id=" + SECOND_TEST_ID);
-        Assert.assertEquals(testRailUdids.size(), 1);
-        
-        R.CONFIG.put(Parameter.LANGUAGE.getKey(), "en");
     }
 
 }

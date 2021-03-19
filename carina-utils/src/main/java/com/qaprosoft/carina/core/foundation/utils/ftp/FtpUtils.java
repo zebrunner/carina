@@ -5,16 +5,22 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
 import java.util.Base64;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FtpUtils {
-    private static final Logger LOGGER = Logger.getLogger(FtpUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 	private static final int DEFAULT_PORT = 21;
+	
+	//TODO: https://github.com/qaprosoft/carina/issues/954
+	// migrate FtpUtils methods to use com.qaprosoft.carina.core.foundation.utils.async.AsyncOperation
+	private static int uploading = 0;
 
 	public static void uploadFile(String ftpHost, String user, String password, String filePassToUpload,
 			String fileName) {
@@ -64,7 +70,7 @@ public class FtpUtils {
 			LOGGER.debug("Reply code is : " + reply);
 			if (!FTPReply.isPositiveCompletion(reply)) {
 				ftp.disconnect();
-				LOGGER.info("FTP server refused connection. Reply code is : " + reply);
+				LOGGER.error("FTP server refused connection. Reply code is : " + reply);
 				throw new Exception("FTP server refused connection.");
 			}
 			if (!ftp.login(user, password)) {
@@ -78,17 +84,21 @@ public class FtpUtils {
 			    LOGGER.debug("Default port : " + ftp.getDefaultPort());
 			    LOGGER.debug("Local port : " + ftp.getLocalPort());
 			    LOGGER.debug("Remote port : " + ftp.getRemotePort());
+			    
+			    uploading++;
+			    LOGGER.info("Uploading video: " + fileName);
 				if (ftp.storeFile(fileName, is)) {
-				    long finish = System.currentTimeMillis();
-                    LOGGER.info("Video uploading completed in " + (finish - start) + " msecs.");
+                    LOGGER.info("Uploaded video in " + (System.currentTimeMillis() - start) + " msecs for: " + fileName);
 				} else {
-				    LOGGER.info("Some issues occures during storing file to FTP. storeFile method returns false.");			    
+				    LOGGER.error("Failed to upload video in " + (System.currentTimeMillis() - start) + " msecs for: " + fileName);			    
 				}
 			} catch (IOException e) {
-				LOGGER.info("Exception while storing file to FTP", e);
+				LOGGER.error("Exception while storing file to FTP", e);
+			} finally {
+			    uploading--;
 			}
 		} catch (Exception e) {
-			LOGGER.info("Exception while uploading while to FTP", e);
+			LOGGER.error("Exception while uploading while to FTP", e);
 		} finally {
 			ftpDisconnect(ftp);
 		}
@@ -108,5 +118,9 @@ public class FtpUtils {
             LOGGER.error("Throwable while disconnecting ftp", thr);
         }
         LOGGER.debug("FTP has been successfully disconnected.");
+    }
+    
+    public static boolean isUploading() {
+        return uploading > 0;
     }
 }

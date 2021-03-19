@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package com.qaprosoft.carina.core.foundation.crypto;
 
 import java.io.File;
+import java.lang.invoke.MethodHandles;
 import java.util.regex.Pattern;
 
 import javax.crypto.SecretKey;
@@ -28,13 +29,14 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 
 public class CryptoConsole {
-    private static final Logger LOG = Logger.getLogger(CryptoConsole.class);
-
+    private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    
     private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
     private static final String HELP_ARG = "help";
     private static final String ENCRYPT_ARG = "encrypt";

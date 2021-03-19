@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,16 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability;
 
-import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.R;
@@ -32,7 +34,7 @@ import com.qaprosoft.carina.core.foundation.utils.R;
  */
 public class CapabilitiesLoader {
 
-    private static final Logger LOGGER = Logger.getLogger(CapabilitiesLoader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
      * Load capabilities and properties from external file into the global CONFIG context.
@@ -121,10 +123,10 @@ public class CapabilitiesLoader {
                 props.load(baseResource.openStream());
                 LOGGER.info("Custom capabilities properties loaded: " + fileName);
             } else {
-                throw new RuntimeException("Unable to find custom capabilities file '" + fileName + "'!");
+                Assert.fail("Unable to find custom capabilities file '" + fileName + "'!");
             }
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to load custom capabilities from '" + baseResource.getPath() + "'!", e);
+        } catch (Exception e) {
+            Assert.fail("Unable to load custom capabilities from '" + baseResource.getPath() + "'!", e);
         }
 
         return props;

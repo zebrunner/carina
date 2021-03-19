@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +15,23 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.listeners;
 
-import java.io.File;
-import java.util.Arrays;
+import java.lang.invoke.MethodHandles;
 import java.util.Collection;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.TestListenerAdapter;
+import org.testng.internal.annotations.DisabledRetryAnalyzer;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
-import com.qaprosoft.carina.core.foundation.jira.Jira;
-import com.qaprosoft.carina.core.foundation.report.Artifacts;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
@@ -42,27 +42,22 @@ import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
-import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
-import com.qaprosoft.carina.core.foundation.utils.video.VideoAnalyzer;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
-import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import com.zebrunner.agent.testng.core.retry.RetryAnalyzerInterceptor;
+import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
+import com.zebrunner.agent.testng.listener.RetryService;
 
-@SuppressWarnings("deprecation")
 public class AbstractTestListener extends TestListenerAdapter implements IDriverPool {
-    private static final Logger LOGGER = Logger.getLogger(AbstractTestListener.class);
-    protected static ThreadLocal<TestResultItem> configFailures = new ThreadLocal<TestResultItem>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private void startItem(ITestResult result, Messager messager) {
-
-        String test = TestNamingUtil.getCanonicalTestName(result);
-        test = TestNamingUtil.associateTestInfo2Thread(test, Thread.currentThread().getId(), result);
-
+        String test = TestNameResolverRegistry.get().resolve(result);
         String deviceName = getDeviceName();
         messager.info(deviceName, test, DateUtils.now());
     }
 
     private void passItem(ITestResult result, Messager messager) {
-        String test = TestNamingUtil.getCanonicalTestName(result);
+        String test = TestNameResolverRegistry.get().resolve(result);
 
         String deviceName = getDeviceName();
 
@@ -75,7 +70,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     }
 
     private String failItem(ITestResult result, Messager messager) {
-        String test = TestNamingUtil.getCanonicalTestName(result);
+        String test = TestNameResolverRegistry.get().resolve(result);
 
         String errorMessage = getFailureReason(result);
         String deviceName = getDeviceName();
@@ -98,78 +93,6 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         return errorMessage;
     }
 
-    private String failRetryItem(ITestResult result, Messager messager, int count, int maxCount) {
-        String test = TestNamingUtil.getCanonicalTestName(result);
-
-        String errorMessage = getFailureReason(result);
-
-        String deviceName = getDeviceName();
-
-        messager.error(deviceName, test, String.valueOf(count), String.valueOf(maxCount), errorMessage);
-
-        result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
-        return errorMessage;
-    }
-
-    private String skipItem(ITestResult result, Messager messager) {
-        String test = TestNamingUtil.getCanonicalTestName(result);
-
-        String errorMessage = getFailureReason(result);
-        if (errorMessage.isEmpty()) {
-            // identify is it due to the dependent failure or exception in before suite/class/method
-            String[] methods = result.getMethod().getMethodsDependedUpon();
-
-            // find if any parent method failed/skipped
-            boolean dependentMethod = false;
-            String dependentMethodName = "";
-            for (ITestResult failedTest : result.getTestContext().getFailedTests().getAllResults()) {
-                for (int i = 0; i < methods.length; i++) {
-                    if (methods[i].contains(failedTest.getName())) {
-                        dependentMethodName = failedTest.getName();
-                        dependentMethod = true;
-                        break;
-                    }
-                }
-            }
-
-            for (ITestResult skippedTest : result.getTestContext().getSkippedTests().getAllResults()) {
-                for (int i = 0; i < methods.length; i++) {
-                    if (methods[i].contains(skippedTest.getName())) {
-                        dependentMethodName = skippedTest.getName();
-                        dependentMethod = true;
-                        break;
-                    }
-                }
-            }
-
-            if (dependentMethod) {
-                errorMessage = "Test skipped due to the dependency from: " + dependentMethodName;
-            } else {
-                // Try to find error details from last configuration failure in this thread
-                TestResultItem resultItem = getConfigFailure();
-                if (resultItem != null) {
-                    errorMessage = resultItem.getFailReason();
-                }
-            }
-        }
-
-        String deviceName = getDeviceName();
-
-        messager.warn(deviceName, test, DateUtils.now(), errorMessage);
-
-        EmailReportItemCollector
-                .push(createTestResult(result, TestResultType.SKIP, errorMessage, result.getMethod().getDescription()));
-
-        result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
-        return errorMessage;
-    }
-
-    private void skipAlreadyPassedItem(ITestResult result, Messager messager) {
-        String test = TestNamingUtil.getCanonicalTestName(result);
-        String deviceName = getDeviceName();
-        messager.info(deviceName, test, DateUtils.now());
-    }
-
     private String getDeviceName() {
         String deviceName = IDriverPool.getDefaultDevice().getName();
         String deviceUdid = IDriverPool.getDefaultDevice().getUdid();
@@ -181,72 +104,42 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         return deviceName;
     }
 
-    private void afterConfiguration(ITestResult result) {
-        TestNamingUtil.releaseTestInfoByThread();
-    }
-
     private void afterTest(ITestResult result) {
-        // TODO: do not publish log/demo anymore
+        // do not publish log/demo anymore
         //Artifacts.add("Logs", ReportContext.getTestLogLink(test));
         //Artifacts.add("Demo", ReportContext.getTestScreenshotsLink(test));
         
-        // device log
-        Device device = IDriverPool.getDefaultDevice();
-        if (!device.isNull()) {
-            LOGGER.debug("Device isn't null additional artifacts will be extracted.");
-            File sysLogFile = device.saveSysLog();
-            if (sysLogFile != null) {
-                LOGGER.debug("Logcat log will be extracted and added as artifact");
-                Artifacts.add("Logcat", ReportContext.getSysLogLink());
-            }
-        }
-        
         ReportContext.generateTestReport();
-
-        TestNamingUtil.releaseTestInfoByThread();
         ReportContext.emptyTestDirData();
     }
 
     @Override
     public void beforeConfiguration(ITestResult result) {
-        // added 3 below lines to be able to track log/screenshots for before suite/class/method actions too
-        TestNamingUtil.releaseTestInfoByThread();
-
+        LOGGER.debug("AbstractTestListener->beforeConfiguration");
         super.beforeConfiguration(result);
     }
 
     @Override
     public void onConfigurationSuccess(ITestResult result) {
-        afterConfiguration(result);
-        // passItem(result, Messager.CONFIG_PASSED);
+        LOGGER.debug("AbstractTestListener->onConfigurationSuccess");
         super.onConfigurationSuccess(result);
     }
 
     @Override
     public void onConfigurationSkip(ITestResult result) {
-        afterConfiguration(result);
-        // skipItem(result, Messager.CONFIG_SKIPPED);
+        LOGGER.debug("AbstractTestListener->onConfigurationSkip");
         super.onConfigurationSkip(result);
     }
 
     @Override
     public void onConfigurationFailure(ITestResult result) {
-        afterConfiguration(result);
-        // failItem(result, Messager.CONFIG_FAILED);
-        // String test = TestNamingUtil.getCanonicalTestName(result);
-        // closeLogAppender(test);
-
-        String errorMessage = getFailureReason(result);
-
-        TestResultItem resultItem = createTestResult(result, TestResultType.FAIL, errorMessage,
-                result.getMethod().getDescription());
-        setConfigFailure(resultItem);
-
+        LOGGER.debug("AbstractTestListener->onConfigurationFailure");
         super.onConfigurationFailure(result);
     }
 
     @Override
     public void onStart(ITestContext context) {
+        LOGGER.debug("AbstractTestListener->onStart(ITestContext context)");
         String uuid = StringGenerator.generateNumeric(8);
         ParameterGenerator.setUUID(uuid);
 
@@ -257,26 +150,29 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     @Override
     public void onTestStart(ITestResult result) {
-        VideoAnalyzer.disableVideoUpload();
-        IRetryAnalyzer curRetryAnalyzer = result.getMethod().getRetryAnalyzer();
-        if (curRetryAnalyzer == null) {
-            // Declare carina custom RetryAnalyzer annotation for each new test method. Handle use-case for data providers which has single method!
-            result.getMethod().setRetryAnalyzer(new RetryAnalyzer());
-        } else {
-            if (!(curRetryAnalyzer instanceof RetryAnalyzer)) {
-                LOGGER.warn("Custom RetryAnalyzer is used: " + curRetryAnalyzer.getClass().getName());                
-            }
-            
+        LOGGER.debug("AbstractTestListener->onTestStart");
+        IRetryAnalyzer curRetryAnalyzer = getRetryAnalyzer(result);
+        
+        if (curRetryAnalyzer == null
+                || curRetryAnalyzer instanceof DisabledRetryAnalyzer
+                || curRetryAnalyzer instanceof RetryAnalyzerInterceptor) {
+            // this call register retryAnalyzer.class both in Carina and Zebrunner client
+            RetryService.setRetryAnalyzerClass(RetryAnalyzer.class, result.getTestContext(), result.getMethod());
+            result.getMethod().setRetryAnalyzerClass(RetryAnalyzerInterceptor.class);
+        } else if (!(curRetryAnalyzer instanceof RetryAnalyzerInterceptor)) {
+            LOGGER.warn("Custom RetryAnalyzer is used: " + curRetryAnalyzer.getClass().getName());
+            RetryService.setRetryAnalyzerClass(curRetryAnalyzer.getClass(), result.getTestContext(), result.getMethod());
+            result.getMethod().setRetryAnalyzerClass(RetryAnalyzerInterceptor.class);
         }
         
         generateParameters(result);
 
-        if (!result.getTestContext().getCurrentXmlTest().getTestParameters()
+        if (!result.getTestContext().getCurrentXmlTest().getAllParameters()
                 .containsKey(SpecialKeywords.EXCEL_DS_CUSTOM_PROVIDER) &&
                 result.getParameters().length > 0) // set parameters from XLS only if test contains any parameter at
                                                    // all)
         {
-            if (result.getTestContext().getCurrentXmlTest().getTestParameters()
+            if (result.getTestContext().getCurrentXmlTest().getAllParameters()
                     .containsKey(SpecialKeywords.EXCEL_DS_ARGS)) {
                 DSBean dsBean = new DSBean(result.getTestContext());
                 int index = 0;
@@ -287,12 +183,11 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
             }
         }
-        // obligatory reset any registered canonical name because for ALREADY_PASSED methods we can't do this in
-        // onTestSkipped method
-        TestNamingUtil.releaseTestInfoByThread();
 
+        //TODO: do not write STARTED at message for retry! or move it into the DEBUG level!
         startItem(result, Messager.TEST_STARTED);
-
+        
+        super.onTestStart(result);
     }
     
     private void generateParameters(ITestResult result) {
@@ -319,120 +214,45 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     @Override
     public void onTestSuccess(ITestResult result) {
+        LOGGER.debug("AbstractTestListener->onTestSuccess");
         passItem(result, Messager.TEST_PASSED);
-        VideoAnalyzer.enableVideoUpload();
 
         afterTest(result);
         super.onTestSuccess(result);
-        
-        // resetCounter for current thread needed to support correctly data-provider reruns (multi-threading as well)
-        RetryAnalyzer retryAnalyzer = (RetryAnalyzer) result.getMethod().getRetryAnalyzer();
-        if (retryAnalyzer != null && retryAnalyzer.getRunCount() > 0) {
-            removeRetriedTests(result);
-            retryAnalyzer.resetCounter();
-        }
     }
     
     @Override
     public void onTestFailure(ITestResult result) {
+        LOGGER.debug("AbstractTestListener->onTestFailure");
         failItem(result, Messager.TEST_FAILED);
-        VideoAnalyzer.enableVideoUpload();
         afterTest(result);
         super.onTestFailure(result);
-
-        // resetCounter for current thread needed to support correctly data-provider reruns (multi-threading as well)
-        RetryAnalyzer retryAnalyzer = (RetryAnalyzer) result.getMethod().getRetryAnalyzer();
-        if (retryAnalyzer != null && retryAnalyzer.getRunCount() > 0) {
-            removeRetriedTests(result);
-            retryAnalyzer.resetCounter();
-        }
     }
     
     @Override
     public void onTestSkipped(ITestResult result) {
-        // handle Zafira already passed exception for re-run and do nothing. Return should be enough
-        if (result.getThrowable() != null && result.getThrowable().getMessage() != null
-                && result.getThrowable().getMessage().startsWith(SpecialKeywords.ALREADY_PASSED)) {
-            // [VD] it is prohibited to release TestInfoByThread in this place.!
-            skipAlreadyPassedItem(result, Messager.TEST_SKIPPED_AS_ALREADY_PASSED);
-            // [VD] no need to reset as we TestNG doesn't launch retryAnalyzer so we don't increment it on ALREADY_PASSDE skip exception
-            return;
-        }
+        LOGGER.debug("AbstractTestListener->onTestSkipped");
         
-        // handle AbstractTest->SkipExecution
-        if (result.getThrowable() != null && result.getThrowable().getMessage() != null
-                && result.getThrowable().getMessage().startsWith(SpecialKeywords.SKIP_EXECUTION)) {
-            // [VD] it is prohibited to release TestInfoByThread in this place.!
-            return;
-        }
-        
-        RetryAnalyzer retryAnalyzer = (RetryAnalyzer) result.getMethod().getRetryAnalyzer();
-        int count = retryAnalyzer != null ? retryAnalyzer.getRunCount() : 0;
-        int maxCount = RetryAnalyzer.getMaxRetryCountForTest();
-        LOGGER.debug("count: " + count + "; maxCount:" + maxCount);
-        
-        IRetryAnalyzer retry = result.getMethod().getRetryAnalyzer();
-        if (count > 0 && retry == null) {
-            LOGGER.error("retry_count will be ignored as RetryAnalyzer is not declared for "
-                    + result.getMethod().getMethodName());
-        } else if (count > 0 && count <= maxCount && !Jira.isRetryDisabled(result)) {
-            failRetryItem(result, Messager.RETRY_FAILED, count, maxCount + 1);
-            result.setStatus(2);
-            afterTest(result);
-            super.onTestFailure(result);
-        } else {
-            skipItem(result, Messager.TEST_SKIPPED);
-            afterTest(result);
-            super.onTestSkipped(result);
-            
-            if (retryAnalyzer != null) {
-                // resetCounter for current thread needed to support correctly data-provider reruns (multi-threading as well)
-                retryAnalyzer.resetCounter();
-            }
-        }
+        super.onTestSkipped(result);
     }
 
     @Override
     public void onFinish(ITestContext context) {
+        LOGGER.debug("AbstractTestListener->onFinish(ITestContext context)");
         super.onFinish(context);
-        removeAlreadyPassedTests(context);
-    }
-
-    private long getMethodId(ITestResult result) {
-        long id = result.getTestClass().getName().hashCode();
-        id = 31 * id + result.getMethod().getMethodName().hashCode();
-        id = 31
-                * id
-                + (result.getParameters() != null ? Arrays.hashCode(result
-                        .getParameters()) : 0);
-        // LOGGER.debug("Calculated id for " + result.getMethod().getMethodName() + " is " + id);
-        return id;
     }
 
     protected TestResultItem createTestResult(ITestResult result, TestResultType resultType, String failReason,
             String description) {
-        String group = TestNamingUtil.getPackageName(result);
+        String group = StringEscapeUtils.escapeHtml4(TestNamingService.getPackageName(result));
         
         String linkToLog = ReportContext.getTestLogLink();
         String linkToScreenshots = ReportContext.getTestScreenshotsLink();
+        List<String> linksToVideo = ReportContext.getTestVideoLinks(getSessionsForCurrentTest());
 
-        if (TestResultType.FAIL.equals(resultType)) {
-            String bugInfo = Jira.processBug(result);
-            if (bugInfo != null) {
-                if (failReason != null) {
-                    failReason = bugInfo.concat("\n").concat(failReason);
-                } else {
-                    failReason = bugInfo;
-                }
-            }
-        }
-
-        String test = TestNamingUtil.getCanonicalTestName(result);
-        TestResultItem testResultItem = new TestResultItem(group, test, resultType, linkToScreenshots, linkToLog, failReason);
-        testResultItem.setDescription(description);
-        // AUTO-1081 eTAF report does not show linked Jira tickets if test PASSED
-        // jira tickets should be used for tracking tasks. application issues will be tracked by planned zafira feature
-        testResultItem.setJiraTickets(Jira.getTickets(result));
+        String test = StringEscapeUtils.escapeHtml4(TestNameResolverRegistry.get().resolve(result));
+        TestResultItem testResultItem = new TestResultItem(group, test, description, resultType, linkToScreenshots, linkToLog, linksToVideo,
+                failReason);
         return testResultItem;
     }
 
@@ -475,43 +295,9 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         }
         return stackTrace;
     }
-
-    private TestResultItem getConfigFailure() {
-        return configFailures.get();
-    }
-
-    protected void setConfigFailure(TestResultItem resultItem) {
-        configFailures.set(resultItem);
-    }
     
-    private void removeRetriedTests(ITestResult result) {
-        ITestContext context = result.getTestContext();
-        long passedTestId = getMethodId(result);
-        LOGGER.debug("passedTest: " + passedTestId);
-
-        // Removed failed retries for passed tests
-        for (Iterator<ITestResult> iterator = context.getFailedTests()
-                .getAllResults().iterator(); iterator.hasNext();) {
-            ITestResult testResult = iterator.next();
-            if (getMethodId(testResult) == passedTestId) {
-                LOGGER.debug("Removed test retry from context: " + testResult.getName());
-                iterator.remove();
-            }
-        }
-    }
-    
-    private void removeAlreadyPassedTests(ITestContext context) {
-        // Remove skipped tests which exception starts with "ALREADY_PASSED".
-        // It should make default TestNG reports cleaner
-        for (Iterator<ITestResult> iterator = context.getSkippedTests()
-                .getAllResults().iterator(); iterator.hasNext();) {
-            ITestResult testResult = iterator.next();
-            
-            if (testResult.getThrowable().toString().startsWith("org.testng.SkipException: " + SpecialKeywords.ALREADY_PASSED)) {
-                LOGGER.debug("Removed skipped test from context: " + testResult.getName());
-                iterator.remove();
-            }
-        }
+    private IRetryAnalyzer getRetryAnalyzer(ITestResult result) {
+        return result.getMethod().getRetryAnalyzer(result);
     }
 
 }

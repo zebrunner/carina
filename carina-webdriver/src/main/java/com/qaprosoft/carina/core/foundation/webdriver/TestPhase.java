@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,10 @@ public class TestPhase {
     	BEFORE_SUITE, BEFORE_CLASS, BEFORE_METHOD, METHOD, AFTER_METHOD, AFTER_CLASS, AFTER_SUITE, ALL;
     }
 
-    //TODO: organize phases verification:
-    // https://github.com/qaprosoft/carina/issues/464 "find a way to track that all required system calls are executed"
     private static ThreadLocal<Phase> activePhase = new ThreadLocal<Phase>();
 
 	public static Phase getActivePhase() {
-		return activePhase.get();
+	    return activePhase.get();
 	}
 
 	public static void setActivePhase(Phase phase) {

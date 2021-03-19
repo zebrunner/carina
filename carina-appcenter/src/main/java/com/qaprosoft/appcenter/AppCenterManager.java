@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,22 @@ package com.qaprosoft.appcenter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.ReadableByteChannel;
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.RequestEntity;
@@ -38,16 +44,16 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.qaprosoft.appcenter.http.resttemplate.RestTemplateBuilder;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.appcenter.http.resttemplate.RestTemplateBuilder;
+import com.qaprosoft.carina.core.foundation.utils.R;
 
 /**
  * Created by boyle on 8/16/17.
  */
 public class AppCenterManager {
-    private static final Logger LOGGER = Logger.getLogger(AppCenterManager.class);
-    
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     
     protected RestTemplate restTemplate;
 
@@ -58,18 +64,14 @@ public class AppCenterManager {
     private static final String HOST_URL = "api.appcenter.ms";
     private static final String API_APPS = "/v0.1/apps";
 
-    private static volatile AppCenterManager instance = null;
+    private static AppCenterManager instance = null;
 
     private AppCenterManager() {
     }
 
-    public static AppCenterManager getInstance() {
+    public synchronized static AppCenterManager getInstance() {
         if (instance == null) {
-            synchronized (AppCenterManager.class) {
-                if (instance == null) {
-                    instance = new AppCenterManager();
-                }
-            }
+            instance = new AppCenterManager();
         }
         return instance;
     }
@@ -141,15 +143,12 @@ public class AppCenterManager {
      * @throws IOException throws a non Interruption Exception up.
      */
     private boolean downloadBuild(String fileName, URL downloadLink) throws IOException {
-        ReadableByteChannel readableByteChannel = null;
-        FileOutputStream fos = null;
-        try {
+        try (ReadableByteChannel readableByteChannel = Channels.newChannel(downloadLink.openStream());
+                FileOutputStream fos = new FileOutputStream(fileName)) {
             if (Thread.currentThread().isInterrupted()) {
                 LOGGER.debug(String.format("Current Thread (%s) is interrupted, clearing interruption.", Thread.currentThread().getId()));
                 Thread.interrupted();
             }
-            readableByteChannel = Channels.newChannel(downloadLink.openStream());
-            fos = new FileOutputStream(fileName);
             fos.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
             LOGGER.info("Successfully Transferred...");
             return false;
@@ -157,13 +156,6 @@ public class AppCenterManager {
             LOGGER.info("Retrying....");
             LOGGER.error("Getting Error: " + ie1.getMessage(), ie1);
             return true;
-        } finally {
-            if (fos != null) {
-                fos.close();
-            }
-            if (readableByteChannel != null) {
-                readableByteChannel.close();
-            }
         }
     }
 
@@ -252,6 +244,7 @@ public class AppCenterManager {
                                 String.format(
                                         "Fetching Build ID (%s) Version: %s (%s)", latestBuildNumber, versionShort, versionLong));
                         String buildUrl = appBuild.get("download_url").asText();
+                        R.CONFIG.put(Parameter.APP_PRESIGN_URL.getKey(), buildUrl); //register app presign url to register in test run later
                         LOGGER.info("Download URL For Build: " + buildUrl);
 
                         return buildUrl;
@@ -343,14 +336,6 @@ public class AppCenterManager {
         return fileName + ".apk";
     }
 
-    private String returnProperPlatformExtension(String platformName) {
-
-        if (platformName.toLowerCase().contains("ios")) {
-            return "ipa";
-        }
-        return "apk";
-    }
-
     private boolean checkNotesForCorrectBuild(String pattern, JsonNode node) {
 
         return checkForPattern("release_notes", pattern, node);
@@ -365,7 +350,7 @@ public class AppCenterManager {
         if (node.findPath("release_notes").isMissingNode()) {
             return false;
         }
-        
+
         String nodeField = node.get(nodeName).asText().toLowerCase();
         String[] splitPattern = pattern.split("\\.");
         LinkedList<Boolean> segmentsFound = new LinkedList<>();

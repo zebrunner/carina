@@ -35,52 +35,50 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Define project's dependency version properties here -->
-        <source.version>1.8</source.version>
-        <target.version>1.8</target.version>
+        <java.version>11</java.version>
         <maven-assembly-plugin.version>3.1.0</maven-assembly-plugin.version>
         <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
-        <jacoco-maven-plugin.version>0.8.4</jacoco-maven-plugin.version>
-        <maven-surefire-plugin.version>3.0.0-M3</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>3.0.0-M4</maven-surefire-plugin.version>
         <maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <!-- Testings -->
-        <testng.version>6.14.3</testng.version>
-        <!-- Logging and commons -->
+        <testng.version>7.3.0</testng.version>
+        <testng-foundation.version>2.0.1</testng-foundation.version>
+        <!-- Logging -->
         <log4j.version>1.2.17</log4j.version>
-        <commons-text.version>1.7</commons-text.version>
+        <slf4j.version>1.7.30</slf4j.version>
+
+        <!-- Commons -->
+        <commons-text.version>1.8</commons-text.version>
         <commons-lang3.version>3.5</commons-lang3.version>
         <commons-logging.version>1.2</commons-logging.version>
         <commons-cli.version>1.2</commons-cli.version>
         <commons-io.version>2.5</commons-io.version>
         <commons-codec.version>1.9</commons-codec.version>
-        <commons-collections.version>3.2.1</commons-collections.version>
+        <commons-collections.version>3.2.2</commons-collections.version>
         <httpclient.version>4.5.9</httpclient.version>
         <jna.version>3.0.9</jna.version>
         <!-- Selenium -->
         <selenium.version>3.141.59</selenium.version>
-        <appium.version>7.2.0</appium.version>
-        <!-- Qaprosoft integrations -->
-        <zafira-client.version>4.1.67</zafira-client.version>
-        <alice-client.version>1.1.0</alice-client.version>
-        <!-- HTTP and SMPT -->
-        <javax-mail.version>1.4</javax-mail.version>
+        <appium.version>7.4.1</appium.version>
+        <!-- Zebrunner integrations -->
+        <zebrunner-testng-pluggable.version>1.4.0</zebrunner-testng-pluggable.version>
         <!-- Others -->
-        <aws-java-sdk.version>1.11.386</aws-java-sdk.version>
-        <monte-repack.version>1.0</monte-repack.version>
-        <rest-assured.version>2.9.0</rest-assured.version>
+        <aws-java-sdk.version>1.11.923</aws-java-sdk.version>
+        <rest-assured.version>4.3.0</rest-assured.version>
         <imgscalr-lib.version>4.2</imgscalr-lib.version>
         <commons-beanutils.version>1.9.2</commons-beanutils.version>
         <gson.version>2.8.5</gson.version>
-        <google.apis.version>v4-rev581-1.25.0</google.apis.version>
-        <jackson-databind.version>2.9.10.1</jackson-databind.version>
+        <jackson-databind.version>2.9.10.7</jackson-databind.version>
         <jackson-annotations.version>2.9.9</jackson-annotations.version>
-        <apache-poi.version>3.11-beta3</apache-poi.version>
+        <apache-poi.version>4.1.2</apache-poi.version>
         <guava.version>25.0-jre</guava.version>
         <jaxb-api.version>2.2.2</jaxb-api.version>
         <hamcrest.version>1.3</hamcrest.version>
-        <org.json.version>20090211</org.json.version>
+        <org.json.version>20160810</org.json.version>
         <jersey.version>1.19.4</jersey.version>
+        <mokito-core.version>2.18.0</mokito-core.version>
         <!-- Never add mockito-all as compile dependency as it has their own invalid hamcrest-all implementation otherwise api fail to common with:
                 org.hamcrest.core.IsInstanceOf.any(Ljava/lang/Class;)Lorg/hamcrest/Matcher
          -->
@@ -101,6 +99,17 @@
     </modules>
     <repositories>
         <repository>
+            <id>zebrunner_snapshots</id>
+            <name>zebrunner Snapshots</name>
+            <url>https://nexus.zebrunner.dev/repository/ce-snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
             <id>qaprosoft_snapshots</id>
             <name>Qaprosoft Snapshots</name>
             <url>https://ci.qaprosoft.com/nexus/content/repositories/snapshots/</url>
@@ -116,11 +125,6 @@
             <name>Qaprosoft Thirdparty</name>
             <url>https://ci.qaprosoft.com/nexus/content/repositories/thirdparty/</url>
         </repository>
-        <repository>
-            <id>springio-plugins-release</id>
-            <name>Spring Plugins</name>
-            <url>https://repo.spring.io/plugins-release/</url>
-        </repository>
     </repositories>
     <profiles>
         <profile>
@@ -134,8 +138,7 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
                         <configuration>
-                            <source>${source.version}</source>
-                            <target>${target.version}</target>
+                            <release>${java.version}</release>
                         </configuration>
                     </plugin>
                     <plugin>
@@ -157,26 +160,6 @@
                         </executions>
                     </plugin>
 
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>${jacoco-maven-plugin.version}</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>report</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>report</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
                 </plugins>
                 <pluginManagement>
                     <plugins>
@@ -185,8 +168,7 @@
                             <artifactId>maven-compiler-plugin</artifactId>
                             <version>${maven-compiler-plugin.version}</version>
                             <configuration>
-                                <source>${source.version}</source>
-                                <target>${target.version}</target>
+                                <release>${java.version}</release>
                             </configuration>
                         </plugin>
                         <plugin>
@@ -236,8 +218,7 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
                         <configuration>
-                            <source>${source.version}</source>
-                            <target>${target.version}</target>
+                            <release>${java.version}</release>
                         </configuration>
                     </plugin>
                     <plugin>
@@ -275,6 +256,13 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
                         <version>${maven-gpg-plugin.version}</version>
+                        <configuration>
+                            <!-- Prevent `gpg` from using pinentry programs -->
+                            <gpgArguments>
+                                <arg>--pinentry-mode</arg>
+                                <arg>loopback</arg>
+                            </gpgArguments>
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
@@ -293,8 +281,7 @@
                             <artifactId>maven-compiler-plugin</artifactId>
                             <version>${maven-compiler-plugin.version}</version>
                             <configuration>
-                                <source>${source.version}</source>
-                                <target>${target.version}</target>
+                                <release>${java.version}</release>
                             </configuration>
                         </plugin>
                         <plugin>
@@ -398,13 +385,33 @@
                 <artifactId>carina-core</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>
-            <!-- Define 3rd paty compile-time dependencies here for children. Define
-                                         version as property, and refer to the versionPropertyName in <version> tag -->
+            <!-- Define 3rd paty compile-time dependencies here for children. 
+                 Define version as property, and refer to the versionPropertyName in <version> tag -->
+            <dependency>
+                <groupId>com.zebrunner</groupId>
+                <artifactId>agent-testng-pluggable</artifactId>
+                <version>${zebrunner-testng-pluggable.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
                 <version>${log4j.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+
+            <!-- Binding for Log4J -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
@@ -521,16 +528,12 @@
                 <version>${testng.version}</version>
                 <scope>compile</scope>
             </dependency>
-            <!-- AI integration -->
             <dependency>
-                <groupId>com.qaprosoft</groupId>
-                <artifactId>alice-client</artifactId>
-                <version>${alice-client.version}</version>
+                <groupId>com.nordstrom.tools</groupId>
+                <artifactId>testng-foundation</artifactId>
+                <version>${testng-foundation.version}</version>
+                <scope>compile</scope>
                 <exclusions>
-                    <exclusion>
-                        <groupId>commons-io</groupId>
-                        <artifactId>commons-io</artifactId>
-                    </exclusion>
                     <exclusion>
                         <groupId>org.testng</groupId>
                         <artifactId>testng</artifactId>
@@ -546,38 +549,6 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>com.qaprosoft</groupId>
-                <artifactId>zafira-client</artifactId>
-                <version>${zafira-client.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-io</groupId>
-                        <artifactId>commons-io</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>junit</groupId>
-                        <artifactId>junit</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.google.guava</groupId>
-                        <artifactId>guava</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>log4j</groupId>
-                        <artifactId>log4j</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.amazonaws</groupId>
-                        <artifactId>aws-java-sdk</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <!-- For ZafiraListener -->
-            <dependency>
                 <groupId>commons-beanutils</groupId>
                 <artifactId>commons-beanutils</artifactId>
                 <version>${commons-beanutils.version}</version>
@@ -589,17 +560,12 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>com.pojosontheweb</groupId>
-                <artifactId>monte-repack</artifactId>
-                <version>${monte-repack.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.jayway.restassured</groupId>
+                <groupId>io.rest-assured</groupId>
                 <artifactId>rest-assured</artifactId>
                 <version>${rest-assured.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.jayway.restassured</groupId>
+                <groupId>io.rest-assured</groupId>
                 <artifactId>json-path</artifactId>
                 <version>${rest-assured.version}</version>
             </dependency>
@@ -612,11 +578,6 @@
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
                 <version>${gson.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.apis</groupId>
-                <artifactId>google-api-services-sheets</artifactId>
-                <version>${google.apis.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
@@ -663,6 +624,12 @@
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-core</artifactId>
                 <version>${jersey.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${mokito-core.version}</version>
+                <scope>test</scope>
             </dependency>
 
         </dependencies>

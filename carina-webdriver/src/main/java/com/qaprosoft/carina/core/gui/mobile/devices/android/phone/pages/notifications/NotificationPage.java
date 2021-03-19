@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,29 +15,30 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.notifications;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.FindAll;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.FindBys;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.utils.android.AndroidService;
+import com.qaprosoft.carina.core.foundation.utils.android.IAndroidUtils;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
-import com.qaprosoft.carina.core.foundation.utils.mobile.MobileUtils;
 import com.qaprosoft.carina.core.foundation.utils.mobile.notifications.android.Notification;
+import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.gui.mobile.devices.MobileAbstractPage;
 
 import io.appium.java_client.MobileBy;
 
-public class NotificationPage extends MobileAbstractPage {
+public class NotificationPage extends MobileAbstractPage implements IAndroidUtils {
 
-    private static final Logger LOGGER = Logger.getLogger(NotificationPage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public NotificationPage(WebDriver driver) {
         super(driver);
@@ -63,8 +64,9 @@ public class NotificationPage extends MobileAbstractPage {
     @FindBy(xpath = "//*[@resource-id = 'android:id/status_bar_latest_event_content']/*")
     protected List<ExtendedWebElement> notificationsOtherDevices;
 
-    @FindBy(xpath = "//*[@resource-id='com.android.systemui:id/dismiss_text' " +
-            "or @resource-id='com.android.systemui:id/clear_all_button']")
+    @FindBy(xpath = "//*[@resource-id='com.android.systemui:id/clear_all' " +
+            "or @resource-id='com.android.systemui:id/clear_all_button' " +
+            "or @resource-id='com.android.systemui:id/dismiss_text']")
     protected ExtendedWebElement dismissBtn;
 
     // Found stable solution
@@ -88,11 +90,14 @@ public class NotificationPage extends MobileAbstractPage {
 
     String itemTitle_Locator_Text = "android:id/title";
 
-    @FindBys({
+    @FindAll({
             @FindBy(id = "android:id/big_text"),
             @FindBy(id = "android:id/text")
     })
-    private List<ExtendedWebElement> itemText;
+    private List<ExtendedWebElement> itemTextList;
+
+    @FindBy(xpath = "//*[@text='%s']")
+    private ExtendedWebElement textItem;
 
     String itemText_Phone_Locator_Text = "android:id/text";
     String itemText_Tablet_Locator_Text = "android:id/big_text";
@@ -197,30 +202,18 @@ public class NotificationPage extends MobileAbstractPage {
         if (!isOpened(1)) {
             notificationService.expandStatusBar();
         }
-        if (dismissBtn.isElementPresent(SHORT_TIMEOUT)) {
-            LOGGER.info("Dismiss all notifications btn is present.");
-            dismissBtn.click();
-        } else {
-            LOGGER.info("Dismiss all notifications btn isn't present. Attempt to clear all notifications manually");
-            LOGGER.debug("Notifications page source: ".concat(getDriver().getPageSource()));
-            int x1, x2, y1, y2;
-            Point point;
-            Dimension dim;
-            List<ExtendedWebElement> notificationList;
-            if (notifications.size() > 0) {
-                notificationList = notifications;
+
+        try{
+            swipe(dismissBtn, notification_scroller);
+            if(dismissBtn.getAttribute("enabled").equals("true")) {
+                LOGGER.info("Clicking 'Dismiss All Notifications' button...");
+                dismissBtn.click();
             } else {
-                notificationList = notificationsOtherDevices;
+                LOGGER.info("'Dismiss All Notifications' Button is present but disabled, meaning any alerts displayed are not closable. Collapsing tray...");
+                pressBack();
             }
-            LOGGER.info("Visible Notifications size:" + notificationList.size());
-            for (ExtendedWebElement notification : notificationList) {
-                point = notification.getElement().getLocation();
-                dim = notification.getElement().getSize();
-                x1 = point.x + dim.width / 6;
-                x2 = point.x + dim.width * 5 / 6;
-                y1 = y2 = point.y + dim.height / 2;
-                MobileUtils.swipe(x1, y1, x2, y2, SWIPE_DURATION);
-            }
+        } catch (AssertionError e){
+            LOGGER.info("Device tray closed by swiping which means no notifications were present. Proceeding with test.");
         }
     }
 
@@ -237,7 +230,6 @@ public class NotificationPage extends MobileAbstractPage {
      * @return List of Notification
      */
     public List<Notification> getAllAvailableNotifications() {
-        LOGGER.info("Android device");
         List<Notification> list = notificationService.getNotifications();
         return list;
     }
@@ -246,7 +238,6 @@ public class NotificationPage extends MobileAbstractPage {
      * collapseStatusBar
      */
     public void collapseStatusBar() {
-        LOGGER.info("Android device");
         notificationService.collapseStatusBar();
     }
 
@@ -256,9 +247,13 @@ public class NotificationPage extends MobileAbstractPage {
      * @return boolean
      */
     public boolean isStatusBarExpanded() {
-        LOGGER.info("Android device");
         notificationService.expandStatusBar();
         return isOpened(DELAY);
+    }
+
+    public void clickAlert(String alertText){
+        isStatusBarExpanded();
+        textItem.format(alertText).click();
     }
 
     /**
@@ -274,7 +269,7 @@ public class NotificationPage extends MobileAbstractPage {
 
     @Override
     public boolean isOpened() {
-        return isOpened(EXPLICIT_TIMEOUT);
+        return isOpened(DriverHelper.EXPLICIT_TIMEOUT);
     }
 
 }

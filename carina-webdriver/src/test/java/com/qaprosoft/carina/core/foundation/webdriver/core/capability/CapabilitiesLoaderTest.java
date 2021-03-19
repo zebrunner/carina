@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ public class CapabilitiesLoaderTest {
      * Test that loadCapabilities() raise exception if no properties file detected on classpath
      */
     @Test(expectedExceptions = {
-            RuntimeException.class }, expectedExceptionsMessageRegExp = "Unable to find custom capabilities file 'unexisting_file'!")
+            AssertionError.class }, expectedExceptionsMessageRegExp = "Unable to find custom capabilities file 'unexisting_file'!")
     public void loadCapabilitiesFromNonExistingFileTest() {
         new CapabilitiesLoader().loadCapabilities("unexisting_file");
     }

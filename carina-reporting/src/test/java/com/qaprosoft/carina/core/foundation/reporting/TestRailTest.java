@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,16 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.reporting;
 
-import java.util.HashSet;
+import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
+import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.Reporter;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
@@ -29,19 +32,28 @@ import com.qaprosoft.carina.core.foundation.report.testrail.ITestRailManager;
 import com.qaprosoft.carina.core.foundation.report.testrail.TestRailCases;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.zafira.models.dto.TagType;
 
 /**
  * Tests for {@link ITestRailManager}
  */
 public class TestRailTest implements ITestRailManager {
 
-    private static final Logger LOGGER = Logger.getLogger(TestRailTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    private static final String PROJECT_ID = "1";
+    private static final String SUITE_ID = "1";
+    
+    private static final String VERIFICATION_PREFIX = PROJECT_ID + "-" + SUITE_ID + "-";
     private static final String TEST_ID = "5,6,65500";
     private static final String EXPECTED_TEST_ID = "65500";
     private static final String FIRST_TEST_ID = "65536";
     private static final String SECOND_TEST_ID = "15536";
+    
+    @BeforeSuite()
+    public void initData(ITestContext context) {
+        context.getSuite().setAttribute(SpecialKeywords.TESTRAIL_PROJECT_ID, PROJECT_ID);
+        context.getSuite().setAttribute(SpecialKeywords.TESTRAIL_SUITE_ID, SUITE_ID);
+    }
 
     @Test
     @TestRailCases(testCasesId = TEST_ID)
@@ -50,7 +62,7 @@ public class TestRailTest implements ITestRailManager {
 
         Set<String> testRailUdids = getTestRailCasesUuid(result);
 
-        Assert.assertTrue(testRailUdids.contains(EXPECTED_TEST_ID), "TestRail should contain id=" + EXPECTED_TEST_ID);
+        Assert.assertTrue(testRailUdids.contains(VERIFICATION_PREFIX + EXPECTED_TEST_ID), "TestRail should contain id=" + EXPECTED_TEST_ID);
 
         Assert.assertEquals(testRailUdids.size(), 3);
 
@@ -65,7 +77,7 @@ public class TestRailTest implements ITestRailManager {
 
         Set<String> testRailUdids = getTestRailCasesUuid(result);
 
-        Assert.assertTrue(testRailUdids.contains(FIRST_TEST_ID), "TestRail should contain id=" + FIRST_TEST_ID);
+        Assert.assertTrue(testRailUdids.contains(VERIFICATION_PREFIX + FIRST_TEST_ID), "TestRail should contain id=" + FIRST_TEST_ID);
 
         Assert.assertEquals(testRailUdids.size(), 1);
     }
@@ -78,7 +90,7 @@ public class TestRailTest implements ITestRailManager {
 
         Set<String> testRailUdids = getTestRailCasesUuid(result);
 
-        Assert.assertTrue(testRailUdids.contains(FIRST_TEST_ID), "TestRail should contain id=" + FIRST_TEST_ID);
+        Assert.assertTrue(testRailUdids.contains(VERIFICATION_PREFIX + FIRST_TEST_ID), "TestRail should contain id=" + FIRST_TEST_ID);
 
         LOGGER.info("TestRail list: " + testRailUdids.toString());
 
@@ -93,9 +105,9 @@ public class TestRailTest implements ITestRailManager {
 
         Set<String> testRailUdids = getTestRailCasesUuid(result);
 
-        Assert.assertTrue(testRailUdids.contains(FIRST_TEST_ID), "TestRail should contain id=" + FIRST_TEST_ID);
+        Assert.assertTrue(testRailUdids.contains(VERIFICATION_PREFIX + FIRST_TEST_ID), "TestRail should contain id=" + FIRST_TEST_ID);
 
-        Assert.assertTrue(testRailUdids.contains(SECOND_TEST_ID), "TestRail should contain id=" + SECOND_TEST_ID);
+        Assert.assertTrue(testRailUdids.contains(VERIFICATION_PREFIX + SECOND_TEST_ID), "TestRail should contain id=" + SECOND_TEST_ID);
 
         Assert.assertEquals(testRailUdids.size(), 2);
     }
@@ -114,7 +126,7 @@ public class TestRailTest implements ITestRailManager {
 
         testRailUdids = getTestRailCasesUuid(result);
 
-        Assert.assertTrue(testRailUdids.contains(FIRST_TEST_ID), "TestRail should contain id=" + FIRST_TEST_ID);
+        Assert.assertTrue(testRailUdids.contains(VERIFICATION_PREFIX + FIRST_TEST_ID), "TestRail should contain id=" + FIRST_TEST_ID);
 
         Assert.assertEquals(testRailUdids.size(), 1);
 
@@ -122,7 +134,7 @@ public class TestRailTest implements ITestRailManager {
 
         testRailUdids = getTestRailCasesUuid(result);
 
-        Assert.assertTrue(testRailUdids.contains(SECOND_TEST_ID), "TestRail should contain id=" + SECOND_TEST_ID);
+        Assert.assertTrue(testRailUdids.contains(VERIFICATION_PREFIX + SECOND_TEST_ID), "TestRail should contain id=" + SECOND_TEST_ID);
 
         Assert.assertEquals(testRailUdids.size(), 1);
 
@@ -137,29 +149,12 @@ public class TestRailTest implements ITestRailManager {
 
         ITestResult result = Reporter.getCurrentTestResult();
 
-        Set<TagType> tags = new HashSet<TagType>();
-
         Set<String> testRailTags = getTestRailCasesUuid(result);
 
-        int projectID = getTestRailProjectId(result.getTestContext());
-        int suiteID = getTestRailSuiteId(result.getTestContext());
-
-        Set<TagType> finalTags = tags;
-        testRailTags.forEach((entry) -> {
-            TagType tagEntry = new TagType();
-            tagEntry.setName(SpecialKeywords.TESTRAIL_TESTCASE_UUID);
-            tagEntry.setValue(projectID + "-" + suiteID + "-" + entry);
-            finalTags.add(tagEntry);
-        });
-
-        tags.stream().forEachOrdered((entry) -> {
-            Object currentKey = entry.getName();
-            Object currentValue = entry.getValue();
-            LOGGER.info(currentKey + "=" + currentValue);
-        });
-
-        Assert.assertEquals(tags.size(), 3);
-
+        Assert.assertEquals(testRailTags.size(), 3);
+        Assert.assertTrue(testRailTags.contains(VERIFICATION_PREFIX + FIRST_TEST_ID), "TestRail should contain id=" + FIRST_TEST_ID);
+        Assert.assertTrue(testRailTags.contains(VERIFICATION_PREFIX + "3333"), "TestRail should contain id=" + "3333");
+        Assert.assertTrue(testRailTags.contains(VERIFICATION_PREFIX + "5555"), "TestRail should contain id=" + "5555");
     }
 
     @Test
@@ -170,35 +165,16 @@ public class TestRailTest implements ITestRailManager {
 
         Set<String> testRailUdids = getTestRailCasesUuid(result);
 
-        Assert.assertTrue(testRailUdids.contains(FIRST_TEST_ID), "TestRail should contain id=" + FIRST_TEST_ID);
+        Assert.assertTrue(testRailUdids.contains(VERIFICATION_PREFIX + FIRST_TEST_ID), "TestRail should contain id=" + FIRST_TEST_ID);
         Assert.assertEquals(testRailUdids.size(), 1);
 
         R.CONFIG.put(Parameter.LOCALE.getKey(), "fr");
         testRailUdids = getTestRailCasesUuid(result);
 
-        Assert.assertTrue(testRailUdids.contains(SECOND_TEST_ID), "TestRail should contain id=" + SECOND_TEST_ID);
+        Assert.assertTrue(testRailUdids.contains(VERIFICATION_PREFIX + SECOND_TEST_ID), "TestRail should contain id=" + SECOND_TEST_ID);
         Assert.assertEquals(testRailUdids.size(), 1);
         
         R.CONFIG.put(Parameter.LOCALE.getKey(), "en");
     }
 
-    @Test
-    @TestRailCases(testCasesId = FIRST_TEST_ID, language = "en")
-    @TestRailCases(testCasesId = SECOND_TEST_ID, language = "fr")
-    public void testTestRailBylanguage() {
-        ITestResult result = Reporter.getCurrentTestResult();
-
-        Set<String> testRailUdids = getTestRailCasesUuid(result);
-
-        Assert.assertTrue(testRailUdids.contains(FIRST_TEST_ID), "TestRail should contain id=" + FIRST_TEST_ID);
-        Assert.assertEquals(testRailUdids.size(), 1);
-
-        R.CONFIG.put(Parameter.LANGUAGE.getKey(), "fr");
-        testRailUdids = getTestRailCasesUuid(result);
-
-        Assert.assertTrue(testRailUdids.contains(SECOND_TEST_ID), "TestRail should contain id=" + SECOND_TEST_ID);
-        Assert.assertEquals(testRailUdids.size(), 1);
-        
-        R.CONFIG.put(Parameter.LANGUAGE.getKey(), "en");
-    }
 }

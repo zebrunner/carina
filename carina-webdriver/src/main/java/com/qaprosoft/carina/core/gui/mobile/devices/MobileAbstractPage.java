@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,10 @@ package com.qaprosoft.carina.core.gui.mobile.devices;
 import org.openqa.selenium.WebDriver;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.mobile.IMobileUtils;
 import com.qaprosoft.carina.core.gui.AbstractPage;
 
-public abstract class MobileAbstractPage extends AbstractPage {
+public abstract class MobileAbstractPage extends AbstractPage implements IMobileUtils {
 
     protected static final long DELAY = 10;
 

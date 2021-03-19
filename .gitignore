@@ -13,4 +13,5 @@ bin
 *.iml
 test-output
 *.log
-/reports
+*.bak
+reports

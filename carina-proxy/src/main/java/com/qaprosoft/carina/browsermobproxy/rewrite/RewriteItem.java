@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,10 +31,10 @@ public class RewriteItem {
     /**
      * Leave regexp empty in case you don't want to rewrite body
      * 
-     * @param host
-     * @param regexp
-     * @param replacement
-     * @param headers
+     * @param host String
+     * @param regexp String
+     * @param replacement String
+     * @param headers List
      */
     public RewriteItem(final String host, final String regexp, final String replacement, final List<HeaderItem> headers) {
         this.host = host;

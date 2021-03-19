@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,56 +16,24 @@
 package com.qaprosoft.carina.core.foundation.utils.tag;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.testng.ITestContext;
-import org.testng.ITestResult;
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.zebrunner.agent.core.registrar.domain.LabelDTO;
+import com.zebrunner.agent.core.registrar.label.LabelResolver;
 
-public class PriorityManager {
-    private static final Logger LOGGER = Logger.getLogger(PriorityManager.class);
+public class PriorityManager implements LabelResolver {
 
-    private PriorityManager() {
-    }
-
-    public static String getPriority(ITestResult result) {
-
-        // Get a handle to the class and method
-        Class<?> testClass;
-        String priority = getSuitePriority(result.getTestContext());
-
-        try {
-            testClass = Class.forName(result.getMethod().getTestClass().getName());
-
-            // We can't use getMethod() because we may have parameterized tests
-            // for which we won't know the matching signature
-            String methodName = result.getMethod().getMethodName();
-            Method testMethod = null;
-            Method[] possibleMethods = testClass.getMethods();
-            for (Method possibleMethod : possibleMethods) {
-                if (possibleMethod.getName().equals(methodName)) {
-                    testMethod = possibleMethod;
-                    break;
-                }
-            }
-
-            if (testMethod != null && testMethod.isAnnotationPresent(TestPriority.class)) {
-                TestPriority methodAnnotation = testMethod.getAnnotation(TestPriority.class);
-                priority = methodAnnotation.value().name();
-                LOGGER.debug("Method '" + testMethod + "' priority is: " + priority);
-            }
-        } catch (ClassNotFoundException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-        return priority;
-    }
-
-    private static String getSuitePriority(ITestContext context) {
-        String priority = context.getSuite().getParameter("suitePriority");
-        LOGGER.debug("suitePriority is: " + priority);
+    @Override
+    public List<LabelDTO> resolve(Class<?> clazz, Method method) {
+        TestPriority priority = method.getAnnotation(TestPriority.class);
         if (priority == null) {
-            priority = "";
+            priority = clazz.getAnnotation(TestPriority.class);
         }
-        return priority;
+        return priority != null
+                ? Collections.singletonList(new LabelDTO(SpecialKeywords.TEST_PRIORITY_TAG, priority.value().name()))
+                : Collections.emptyList();
     }
 
 }

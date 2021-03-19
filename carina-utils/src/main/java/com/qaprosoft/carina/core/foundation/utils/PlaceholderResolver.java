@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,14 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.exception.PlaceholderResolverException;
@@ -31,7 +33,7 @@ import com.qaprosoft.carina.core.foundation.exception.PlaceholderResolverExcepti
  * @author Alexey Khursevich (hursevich@gmail.com)
  */
 public class PlaceholderResolver {
-    private static final Logger LOGGER = Logger.getLogger(PlaceholderResolver.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final Pattern PATTERN = Pattern.compile(SpecialKeywords.PLACEHOLER);
 
@@ -55,9 +57,10 @@ public class PlaceholderResolver {
                 }
             }
         } else {
-			if (!key.startsWith(SpecialKeywords.CAPABILITIES) && !key.endsWith(Configuration.Parameter.URL.getKey())) {
-				LOGGER.warn("Value not resolved by key: " + key);
-			}
+            if (!key.startsWith(SpecialKeywords.CAPABILITIES) && !key.endsWith(Configuration.Parameter.URL.getKey())) {
+                // replaced LOGGER.warn usage by simple console output otherwise stackoverflow might happen
+                System.out.println("WARN! Value not resolved by key: " + key);
+            }
         }
         return value;
     }

@@ -2,7 +2,7 @@
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
 /*
- * Copyright 2013-2019 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2021 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ public class FooterMenu extends AbstractUIObject {
 
     @FindBy(linkText = "Compare")
     private ExtendedWebElement compareLink;
-
+    
     @FindBy(linkText = "News")
     private ExtendedWebElement newsLink;
 
@@ -51,7 +51,7 @@ public class FooterMenu extends AbstractUIObject {
         compareLink.click();
         return new CompareModelsPage(driver);
     }
-
+    
     public NewsPage openNewsPage() {
         newsLink.click();
         return new NewsPage(driver);

@@ -6,20 +6,14 @@
         <requiredProperty key="selenium_host">
             <defaultValue>http://localhost:4444/wd/hub</defaultValue>
         </requiredProperty>
-        <requiredProperty key="zafira_enabled">
-            <defaultValue>false</defaultValue>
-        </requiredProperty>
-        <requiredProperty key="zafira_service_url">
-            <defaultValue>http://localhost:8080/zafira-ws</defaultValue>
-        </requiredProperty>
-        <requiredProperty key="zafira_access_token">
-            <defaultValue>changeit</defaultValue>
-        </requiredProperty>
         <requiredProperty key="name">
             <defaultValue>CarinaDemo</defaultValue>
         </requiredProperty>
         <requiredProperty key="url">
             <defaultValue>https://qaprosoft.com</defaultValue>
+        </requiredProperty>
+        <requiredProperty key="demo">
+            <defaultValue>true</defaultValue>
         </requiredProperty>
   </requiredProperties>
   <fileSets>
@@ -45,6 +39,7 @@
       <directory>src/main/resources</directory>
       <includes>
         <include>**/*.properties</include>
+        <include>logback.xml</include>
       </includes>
     </fileSet>
     <fileSet encoding="UTF-8">
@@ -72,6 +67,7 @@
         <include>**/*.schema</include>
         <include>**/*.xlsx</include>
         <include>**/*.json</include>
+        <include>**/*.feature</include>
       </includes>
     </fileSet>
     <fileSet encoding="UTF-8">
@@ -85,6 +81,7 @@
       <includes>
         <include>.classpath</include>
         <include>.project</include>
+        <include>.sonarqube</include>
       </includes>
     </fileSet>
     <fileSet encoding="UTF-8">

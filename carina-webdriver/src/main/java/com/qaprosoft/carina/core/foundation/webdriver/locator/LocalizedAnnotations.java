@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,16 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.locator;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.pagefactory.Annotations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
@@ -33,7 +35,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Pred
 import io.appium.java_client.MobileBy;
 
 public class LocalizedAnnotations extends Annotations {
-    private static final Logger LOGGER = Logger.getLogger(LocalizedAnnotations.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static Pattern L10N_PATTERN = Pattern.compile(SpecialKeywords.L10N_PATTERN);
 
     public LocalizedAnnotations(Field field) {
@@ -67,6 +69,10 @@ public class LocalizedAnnotations extends Annotations {
             param = StringUtils.remove(param, "By.name: ");
             by = MobileBy.AccessibilityId(param);
         } else if (getField().isAnnotationPresent(ExtendedFindBy.class)) {
+            By extendedBy = createExtendedBy(param);
+            if (extendedBy != null) {
+                by = extendedBy;
+            }
             LOGGER.debug("Annotation ExtendedFindBy has been detected. Returning locator : " + by);
         } else {
             by = createBy(param);
@@ -114,5 +120,19 @@ public class LocalizedAnnotations extends Annotations {
         }       
 
         throw new RuntimeException(String.format("Unable to generate By using locator: '%s'!", locator));
+    }
+
+    private By createExtendedBy(String locator) {
+        if (locator.startsWith("By.AndroidUIAutomator: ")) {
+            return MobileBy.AndroidUIAutomator(StringUtils.remove(locator, "By.AndroidUIAutomator: "));
+        } else if (locator.startsWith("By.IosClassChain: ")) {
+            return MobileBy.iOSClassChain(StringUtils.remove(locator, "By.IosClassChain: "));
+        } else if (locator.startsWith("By.IosNsPredicate: ")) {
+            return MobileBy.iOSNsPredicateString(StringUtils.remove(locator, "By.IosNsPredicate: "));
+        } else if (locator.startsWith("By.xpath: ")) { // for @ExtendedFindBy 'text' attribute L10N supporting
+            return By.xpath(StringUtils.remove(locator, "By.xpath: "));
+        }
+
+        return null;
     }
 }

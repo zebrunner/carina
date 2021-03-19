@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver;
 
+import java.lang.invoke.MethodHandles;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,7 +27,6 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
@@ -40,15 +41,17 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.json.JsonException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
-import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
-import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.LogicUtils;
@@ -65,7 +68,7 @@ import com.qaprosoft.carina.core.gui.AbstractPage;
  * @author Alex Khursevich
  */
 public class DriverHelper {
-    private static final Logger LOGGER = Logger.getLogger(DriverHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
     
@@ -86,7 +89,8 @@ public class DriverHelper {
     }
 
     public DriverHelper(WebDriver driver) {
-        cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
+        this();
+        
         this.driver = driver;
 
         if (driver == null) {
@@ -365,28 +369,66 @@ public class DriverHelper {
     }
 
     /**
-     * Opens full or relative URL.
+     * Open URL.
      * 
      * @param url
      *            to open.
      */
-	public void openURL(String url) {
-		String decryptedURL = cryptoTool.decryptByPattern(url, CRYPTO_PATTERN);
+    public void openURL(String url) {
+        openURL(url, Configuration.getInt(Parameter.EXPLICIT_TIMEOUT));
+    }
+    
+    /**
+     * Open URL.
+     * 
+     * @param url
+     *            to open.
+     * @param timeout
+     */
+    public void openURL(String url, long timeout) {
+        final String decryptedURL = getEnvArgURL(cryptoTool.decryptByPattern(url, CRYPTO_PATTERN));
 
-		decryptedURL = getEnvArgURL(decryptedURL);
+        WebDriver drv = getDriver();
 
-		WebDriver drv = getDriver();
-
-		Messager.OPENING_URL.info(url);
-
-		DriverListener.setMessages(Messager.OPEN_URL.getMessage(url), Messager.NOT_OPEN_URL.getMessage(url));
+        DriverListener.setMessages(Messager.OPEN_URL.getMessage(url), Messager.NOT_OPEN_URL.getMessage(url));
         
+        // [VD] there is no sense to use fluent wait here as selenium just don't return something until page is ready!
         try {
+            Messager.OPENING_URL.info(url);
             drv.get(decryptedURL);
         } catch (UnhandledAlertException e) {
             drv.switchTo().alert().accept();
+        } catch (JsonException e) {
+            if (e.getMessage() != null && e.getMessage().contains("Expected to read a START_MAP but instead have: END. Last 0 characters read")) {
+                LOGGER.error("Selenium Hub couldn't handle request due to overloading or timeout!");
+            }
+            //re-throw original exception as we already put to the log important info
+            throw e;
         }
     }
+    
+    /*
+     * Get and return the source of the last loaded page.
+     * @return String
+     */
+    public String getPageSource() {
+        WebDriver drv = getDriver();
+
+        Messager.GET_PAGE_SOURCE.info();
+
+        DriverListener.setMessages(Messager.GET_PAGE_SOURCE.getMessage(), Messager.FAIL_GET_PAGE_SOURCE.getMessage());
+
+        Wait<WebDriver> wait = new FluentWait<WebDriver>(drv)
+                .pollingEvery(Duration.ofMillis(10000)) // there is no sense to refresh url address too often
+                .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
+                .ignoring(WebDriverException.class);
+
+        return wait.until(new Function<WebDriver, String>() {
+            public String apply(WebDriver driver) {
+                return drv.getPageSource();
+            }
+        });
+    }    
 
     /**
      * Checks that current URL is as expected.
@@ -713,6 +755,8 @@ public class DriverHelper {
      *            The script to execute
      * @param element
      *            The target of the script, referenced as arguments[0]
+     *            
+     * @return Object
      */
     public Object trigger(String script, WebElement element) {
         return ((JavascriptExecutor) getDriver()).executeScript(script, element);
@@ -917,7 +961,6 @@ public class DriverHelper {
 	public boolean waitUntil(ExpectedCondition<?> condition, long timeout) {
 		boolean result;
 		final WebDriver drv = getDriver();
-		Timer.start(ACTION_NAME.WAIT);
 		Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(WebDriverException.class)
 				.ignoring(NoSuchSessionException.class);
 		try {
@@ -932,7 +975,6 @@ public class DriverHelper {
 			LOGGER.error("waitUntil: " + condition.toString(), e);
 			result = false;
 		}
-		Timer.stop(ACTION_NAME.WAIT);
 		return result;
 	}
 	

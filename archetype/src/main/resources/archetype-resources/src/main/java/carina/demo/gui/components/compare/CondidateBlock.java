@@ -2,7 +2,7 @@
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
 /*
- * Copyright 2013-2019 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2021 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,19 +18,21 @@
  */
 package ${package}.carina.demo.gui.components.compare;
 
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
-import com.qaprosoft.carina.core.gui.AbstractUIObject;
+import java.util.List;
+
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
+import org.testng.Assert;
 
-import java.util.List;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
+import com.qaprosoft.carina.core.gui.AbstractUIObject;
 
 public class CondidateBlock extends AbstractUIObject {
     @FindBy(xpath = ".//input[contains(@id, 'sSearch')]")
     private ExtendedWebElement inputField;
 
-    @FindBy(xpath = ".//div[contains(@class, 'autocomplete-search')]//a[not(@class)]")
+    @FindBy(xpath = "./div[contains(@class, 'autocomplete-search')]//a[not(@class)]")
     private List<ExtendedWebElement> autocompleteSearchElements;
 
     public CondidateBlock(WebDriver driver, SearchContext searchContext) {
@@ -43,6 +45,9 @@ public class CondidateBlock extends AbstractUIObject {
     }
 
     public void getFirstPhone() {
+		pause(1);
+		Assert.assertTrue(autocompleteSearchElements.size() > 0, "No phones found!");
+		autocompleteSearchElements.get(0).assertElementPresent();
         autocompleteSearchElements.get(0).click();
     }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,13 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.android.recorder.utils;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Locale;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sun.jna.Pointer;
 
@@ -28,7 +30,7 @@ import com.sun.jna.Pointer;
  */
 public class Platform {
 
-    private static final Logger LOGGER = Logger.getLogger(Platform.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public static final String NAME = System.getProperty("os.name").toLowerCase(Locale.US);
     public static final boolean IS_WINDOWS = NAME.startsWith("windows");

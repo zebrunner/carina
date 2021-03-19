@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 package com.qaprosoft.carina.core.foundation.utils.resources;
 
 import java.io.File;
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -24,11 +26,12 @@ import java.security.CodeSource;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Resources {
 
-    private static final Logger LOGGER = Logger.getLogger(Resources.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static void collectURL(ResourceURLFilter f, Set<URL> s, URL u) {
         if (f == null || f.accept(u)) {
@@ -65,7 +68,7 @@ public class Resources {
     }
 
     // To scan the class path starting with the location from which a specific
-    // class was loaded, provide the getResourseURLs method with the root-class
+    // class was loaded, provide the getResourceURLs method with the root-class
     @SuppressWarnings("rawtypes")
     public static Set<URL> getResourceURLs(Class rootClass) {
         return getResourceURLs(rootClass, null);
@@ -73,14 +76,17 @@ public class Resources {
 
     public static Set<URL> getResourceURLs(ResourceURLFilter filter) {
         Set<URL> collectedURLs = new HashSet<>();
-        URLClassLoader ucl = (URLClassLoader) ClassLoader
-                .getSystemClassLoader();
-        for (URL url : ucl.getURLs()) {
-			try {
-				iterateEntry(new File(url.toURI()), filter, collectedURLs);
-			} catch (URISyntaxException e) {
-				LOGGER.debug(e.getMessage(), e);
-			}
+        try(URLClassLoader ucl = new URLClassLoader(new URL[] {(ClassLoader.getSystemClassLoader()).getResource("L10N")}, Resources.class.getClassLoader())) {
+            for (URL url : ucl.getURLs()) {
+                try {
+                    iterateEntry(new File(url.toURI()), filter, collectedURLs);
+                } catch (URISyntaxException e) {
+                    LOGGER.debug(e.getMessage(), e);
+                }
+            }
+            return collectedURLs;
+        } catch (IOException e) {
+            LOGGER.debug(e.getMessage(), e);
         }
         return collectedURLs;
     }

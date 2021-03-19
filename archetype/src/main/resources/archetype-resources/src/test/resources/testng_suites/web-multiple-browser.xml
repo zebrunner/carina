@@ -1,0 +1,23 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite verbose="1" name="Carina Demo Tests - Web Multiple Browser Sample" parallel="methods">
+
+    <parameter name="suiteOwner" value="qpsdemo"/>
+    <parameter name="zafira_project" value="UNKNOWN"/>
+    <parameter name="jenkinsJobName" value="Web-Multiple-Browser-Demo-Test"/>
+    <parameter name="jenkinsJobType" value="web"/>
+    <parameter name="jenkinsEnvironments" value="DEMO"/>
+    <parameter name="jenkinsEmail" value="demo@qaprosoft.com"/>
+
+    <parameter name="jenkinsRegressionPipeline" value="web_regression"/>
+    <parameter name="jenkinsPipelineEnvironments" value="DEMO"/>
+
+    <test name="Multiple Browser Test">
+        <classes>
+            <class name="${package}.carina.demo.WebMultipleBrowserTest"/>
+        </classes>
+    </test>
+
+</suite>

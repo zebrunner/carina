@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package com.qaprosoft.apitools.message;
 import java.util.Iterator;
 import java.util.Properties;
 
-import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration2.CompositeConfiguration;
 
 import com.qaprosoft.apitools.builder.MessageBuilder;
 import com.qaprosoft.apitools.builder.PropertiesProcessorMain;

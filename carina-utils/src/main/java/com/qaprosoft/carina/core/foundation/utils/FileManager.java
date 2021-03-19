@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,24 @@
 package com.qaprosoft.carina.core.foundation.utils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileManager {
 
-    private static final Logger LOGGER = Logger.getLogger(FileManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public static void removeDirRecurs(String directory) {
         File dir = new File(directory);
@@ -76,6 +83,27 @@ public class FileManager {
 
         } catch (IOException e) {
             LOGGER.debug(e.getMessage(), e.getCause());
+        }
+    }
+    
+    /**
+     * Archive list of files into the single zip archive.
+     *
+     * @param output
+     *          String zip file path.
+     * @param files 
+     *          List of files to archive
+     */
+    public static void zipFiles(String output, File... files) {
+        try (ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(output))) {
+            for (File fileToZip : files) {
+                zipOut.putNextEntry(new ZipEntry(fileToZip.getName()));
+                Files.copy(fileToZip.toPath(), zipOut);
+            }
+        } catch (FileNotFoundException e) {
+            LOGGER.error("Unable to find file for archive operation!", e);
+        } catch (IOException e) {
+            LOGGER.error("IO exception for archive operation!", e);
         }
     }
 

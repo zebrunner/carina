@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,17 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.report.email;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.testng.ITestResult;
 
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
-import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
+import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
 
 /**
  * EmailReportGenerator generates emailable report using data from test suite log.
@@ -42,7 +47,7 @@ public class EmailReportItemCollector {
     }
 
     public static synchronized TestResultItem pull(ITestResult result) {
-        return testResultsMap.get(TestNamingUtil.getCanonicalTestName(result));
+        return testResultsMap.get(TestNameResolverRegistry.get().resolve(result));
     }
 
     public static List<TestResultItem> getTestResults() {

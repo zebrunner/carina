@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.decorator;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.ParameterizedType;
@@ -33,9 +34,9 @@ import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
 import org.openqa.selenium.support.pagefactory.FieldDecorator;
 import org.openqa.selenium.support.pagefactory.internal.LocatingElementHandler;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.webdriver.ai.FindByAI;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocatorFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedFindBy;
@@ -45,7 +46,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.locator.internal.LocatingE
 import com.qaprosoft.carina.core.gui.AbstractUIObject;
 
 public class ExtendedFieldDecorator implements FieldDecorator {
-    private static final Logger LOGGER = Logger.getLogger(ExtendedFieldDecorator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     protected ElementLocatorFactory factory;
 
@@ -57,7 +58,7 @@ public class ExtendedFieldDecorator implements FieldDecorator {
     }
 
     public Object decorate(ClassLoader loader, Field field) {
-        if ((!field.isAnnotationPresent(FindBy.class) && !field.isAnnotationPresent(ExtendedFindBy.class) && !field.isAnnotationPresent(FindByAI.class))
+        if ((!field.isAnnotationPresent(FindBy.class) && !field.isAnnotationPresent(ExtendedFindBy.class))
                 /*
                  * Enable field decorator logic only in case of
                  * presence the FindBy/FindByCarina/FindByAI annotation in the
@@ -82,7 +83,6 @@ public class ExtendedFieldDecorator implements FieldDecorator {
             return null;
         }
 		if (((ExtendedElementLocatorFactory) factory).isRootElementUsed()) {
-			LOGGER.debug("Setting setShouldCache=false for locator: " + getLocatorBy(locator).toString());
 			((ExtendedElementLocator) locator).setShouldCache(false);
 		}
 
@@ -137,7 +137,6 @@ public class ExtendedFieldDecorator implements FieldDecorator {
     @SuppressWarnings("unchecked")
     protected <T extends AbstractUIObject> T proxyForAbstractUIObject(ClassLoader loader, Field field,
             ElementLocator locator) {
-    	LOGGER.debug("Setting setShouldCache=false for locator: " + getLocatorBy(locator).toString());
     	((ExtendedElementLocator) locator).setShouldCache(false);
         InvocationHandler handler = new LocatingElementHandler(locator);
         WebElement proxy = (WebElement) Proxy.newProxyInstance(loader, new Class[] { WebElement.class, WrapsElement.class, Locatable.class },
@@ -175,7 +174,6 @@ public class ExtendedFieldDecorator implements FieldDecorator {
     @SuppressWarnings("unchecked")
     protected <T extends AbstractUIObject> List<T> proxyForListUIObjects(ClassLoader loader, Field field,
             ElementLocator locator) {
-    	LOGGER.debug("Setting setShouldCache=false for locator: " + getLocatorBy(locator).toString());
     	((ExtendedElementLocator) locator).setShouldCache(false);
         InvocationHandler handler = new AbstractUIObjectListHandler<T>((Class<?>) getListType(field), webDriver,
                 locator, field.getName());

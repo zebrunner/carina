@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,10 @@ import java.io.File;
 import java.io.PrintStream;
 import java.util.UUID;
 
-import com.jayway.restassured.filter.log.RequestLoggingFilter;
-import com.jayway.restassured.filter.log.ResponseLoggingFilter;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
+
+import io.restassured.filter.log.RequestLoggingFilter;
+import io.restassured.filter.log.ResponseLoggingFilter;
 
 public class APIMethodBuilder {
     private File temp;

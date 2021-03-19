@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,13 +29,9 @@ public class AppManager {
     private AppManager() {
     }
 
-    public static AppManager getInstance() {
+    public synchronized static AppManager getInstance() {
         if (instance == null) {
-            synchronized (AppManager.class) {
-                if (instance == null) {
-                    instance = new AppManager();
-                }
-            }
+            instance = new AppManager();
         }
         return instance;
     }

@@ -21,14 +21,9 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<source.version>1.8</source.version>
-		<target.version>1.8</target.version>
-
 		<pdfbox.version>2.0.15</pdfbox.version>
 		<mongo-java-driver.version>2.11.3</mongo-java-driver.version>
 		<joda-time.version>2.9.9</joda-time.version>
-
-		<jira-client.version>0.5</jira-client.version>
 		
 		<common-net.version>3.3</common-net.version>
 	</properties>
@@ -40,12 +35,28 @@
 			<artifactId>carina-crypto</artifactId>
 		</dependency>
 
-		<!-- Other dependencies -->
+            <dependency>
+                <groupId>com.zebrunner</groupId>
+                <artifactId>agent-testng-pluggable</artifactId>
+            </dependency>
+
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 		</dependency>
 
+		<dependency>
+			<!-- 64 compilation failures without slf4j-log4j12 as we continue to use direct log4j -->
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+
+		<!-- Other dependencies -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
@@ -57,6 +68,7 @@
 		</dependency>
 
 		<dependency>
+			<!-- 8 compilation failures without it -->
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-support</artifactId>
 		</dependency>
@@ -75,12 +87,12 @@
 		</dependency>
 
 		<dependency>
-		    <groupId>com.jayway.restassured</groupId>
+		    <groupId>io.rest-assured</groupId>
 		    <artifactId>rest-assured</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>com.jayway.restassured</groupId>
+			<groupId>io.rest-assured</groupId>
 			<artifactId>json-path</artifactId>
 		</dependency>
 
@@ -131,46 +143,10 @@
     		<artifactId>commons-net</artifactId>
     		<version>${common-net.version}</version>
 		</dependency>
-
-		<!-- Jira -->
-		<dependency>
-			<groupId>net.rcarz</groupId>
-			<artifactId>jira-client</artifactId>
-			<version>${jira-client.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>junit</groupId>
-					<artifactId>junit</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>commons-codec</groupId>
-					<artifactId>commons-codec</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>commons-lang</groupId>
-					<artifactId>commons-lang</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>commons-logging</groupId>
-					<artifactId>commons-logging</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.mockito</groupId>
-					<artifactId>mockito-all</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
 	
 		<dependency>
 			<groupId>org.imgscalr</groupId>
 			<artifactId>imgscalr-lib</artifactId>
-		</dependency>
-
-		<!-- Zafira -->
-		<dependency>
-			<!-- Do not remove dependecy as it generates 11 compilation failures-->
-			<groupId>com.qaprosoft</groupId>
-			<artifactId>zafira-client</artifactId>
 		</dependency>
 
 		<dependency>
@@ -179,13 +155,14 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
 		</dependency>
 
 	</dependencies>
@@ -196,8 +173,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>${source.version}</source>
-					<target>${target.version}</target>
+					<release>${java.version}</release>
 				</configuration>
 			</plugin>
 			<plugin>

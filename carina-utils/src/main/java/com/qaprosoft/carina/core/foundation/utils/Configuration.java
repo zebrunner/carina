@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,15 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 
@@ -33,7 +34,7 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
  *         hursevich@gmail.com
  */
 public class Configuration {
-    private static final Logger LOGGER = Logger.getLogger(Configuration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static IEnvArgResolver envArgResolver;
 
     static {
@@ -72,9 +73,13 @@ public class Configuration {
 
         SELENIUM_HOST("selenium_host"),
 
+        DRIVER_RECORDER("driver_recorder"),
+        
         DRIVER_EVENT_LISTENERS("driver_event_listeners"),
 
         MAX_DRIVER_COUNT("max_driver_count"),
+        
+        FORCIBLY_DISABLE_DRIVER_QUIT("forcibly_disable_driver_quit"),
 
         CUSTOM_CAPABILITIES("custom_capabilities"),
         
@@ -88,6 +93,8 @@ public class Configuration {
         
         FIREFOX_PREFERENCES("firefox_preferences"),
 
+        HEADLESS("headless"),
+
         APP_VERSION("app_version"),
 
         PROXY_HOST("proxy_host"),
@@ -100,8 +107,6 @@ public class Configuration {
 
         BROWSERMOB_PROXY("browsermob_proxy"),
 
-        BROWSERMOB_HOST("browsermob_host"),
-
         BROWSERMOB_PORT("browsermob_port"),
 
         BROWSERMOB_PORTS_RANGE("browsermob_ports_range"),
@@ -112,12 +117,6 @@ public class Configuration {
 
         REPORT_URL("report_url"),
 
-        EMAIL_LIST("email_list"),
-
-        FAILURE_EMAIL_LIST("failure_email_list"),
-
-        TRACK_KNOWN_ISSUES("track_known_issues"),
-
         AUTO_SCREENSHOT("auto_screenshot"),
 
         EXPLICIT_TIMEOUT("explicit_timeout"),
@@ -125,6 +124,8 @@ public class Configuration {
         AUTO_DOWNLOAD("auto_download"),
 
         AUTO_DOWNLOAD_APPS("auto_download_apps"),
+
+        AUTO_DOWNLOAD_FOLDER("auto_download_folder"),
 
         CUSTOM_ARTIFACTS_FOLDER("custom_artifacts_folder"),
 
@@ -134,17 +135,11 @@ public class Configuration {
 
         MAX_SCREENSHOOT_HISTORY("max_screen_history"),
 
-        MAX_LOG_FILE_SIZE("max_log_file_size"),
-
         RESULT_SORTING("result_sorting"),
 
         BIG_SCREEN_WIDTH("big_screen_width"),
 
         BIG_SCREEN_HEIGHT("big_screen_height"),
-
-        SMALL_SCREEN_WIDTH("small_screen_width"),
-
-        SMALL_SCREEN_HEIGHT("small_screen_height"),
 
         INIT_RETRY_COUNT("init_retry_count"),
 
@@ -152,15 +147,7 @@ public class Configuration {
 
         RETRY_COUNT("retry_count"),
 
-        ENABLE_L10N("enable_l10n"),
-
-        L10N_ENCODING("l10n_encoding"),
-
         LOCALE("locale"),
-
-        ENABLE_I18N("enable_i18n"),
-
-        LANGUAGE("language"),
 
         THREAD_COUNT("thread_count"),
 
@@ -169,8 +156,6 @@ public class Configuration {
         CORE_LOG_LEVEL("core_log_level"),
 
         CORE_LOG_PACKAGES("core_log_packages"),
-
-        ARTIFACTS_EXPIRATION_SECONDS("artifacts_expiration_seconds"),
 
         LOG_ALL_JSON("log_all_json"),
 
@@ -182,36 +167,14 @@ public class Configuration {
 
         SUITE_NAME("suite_name"),
 
-        JIRA_UPDATER("jira_updater"),
-
-        JIRA_URL("jira_url"),
-
-        JIRA_USER("jira_user"),
-
-        JIRA_PASSWORD("jira_password"),
-
-        JIRA_SUITE_ID("jira_suite_id"),
-
-        JIRA_PROJECT("jira_project"),
-
-        JIRA_PROJECT_SHORT("jira_project_short"),
-
-        JIRA_CREATE_NEW_TICKET("jira_create_new_ticket"),
-
         TEST_NAMING_PATTERN("test_naming_pattern"),
+        
+        ELEMENT_LOADING_STRATEGY("element_loading_strategy"),
+        
+        PAGE_OPENING_STRATEGY("page_opening_strategy"),
 
-        // TestRail
-        TESTRAIL_RUN_NAME("testrail_run_name"),
-
-        TESTRAIL_MILESTONE("testrail_milestone"),
-
-        TESTRAIL_ASSIGNEE_USER("testrail_assignee"),
-
-        // qTest
-        QTEST_CYCLE_NAME("qtest_cycle_name"),
-
-        QTEST_SUITE_NAME("qtest_suite_name"),
-
+        APP_PRESIGN_URL("app_presign_url"),
+        
         // Amazon
         S3_BUCKET_NAME("s3_bucket_name"),
 
@@ -275,11 +238,7 @@ public class Configuration {
         IGNORE_SSL("ignore_ssl"),
 
         // Test Execution Filter rules
-        TEST_RUN_RULES("test_run_rules"),
-
-        HUB_MODE("hub_mode"),
-
-        EXTRACT_SYS_LOG("extract_sys_log");
+        TEST_RUN_RULES("test_run_rules");
 
         private final String key;
 
@@ -318,27 +277,18 @@ public class Configuration {
     }
 
     public static boolean getBoolean(Parameter param) {
-        return Boolean.valueOf(get(param).trim());
-    }
-
-    @Deprecated
-    public static Locale getLocale() {
-        Locale locale = null;
-        if (!StringUtils.isEmpty(get(Parameter.LOCALE))) {
-            if (Configuration.get(Parameter.LOCALE).contains("_")) {
-                locale = new Locale(get(Parameter.LOCALE).split("_")[0], get(Parameter.LOCALE).split("_")[1]);
-            } else {
-                locale = new Locale("", get(Parameter.LOCALE));
-            }
+        String value = get(param).trim();
+        if (value == null || value.equalsIgnoreCase(SpecialKeywords.NULL)) {
+            return false;
         }
-        return locale;
+        return Boolean.valueOf(value);
     }
 
     public static String asString() {
         StringBuilder asString = new StringBuilder();
         asString.append("\n============= Test configuration =============\n");
         for (Parameter param : Parameter.values()) {
-            if (!Parameter.CRYPTO_KEY_PATH.equals(param)) {
+            if (!Parameter.CRYPTO_KEY_PATH.equals(param) && !Configuration.get(param).isEmpty()) {
                 asString.append(String.format("%s=%s%n", param.getKey(), Configuration.get(param)));
             }
         }
@@ -385,7 +335,38 @@ public class Configuration {
         return get(param).isEmpty();
     }
 
+    /**
+     * Get capabilities.adbExecTimeout from configuration properties.
+     * if it is missing return the default value
+     * @return int capabilities.adbExecTimeout
+     */
+    public static int getAdbExecTimeout() {
+        // default "capabilities.adbExecTimeout=value" should be used to determine current platform
+        int adbExecTimeout = SpecialKeywords.DEFAULT_ADB_EXEC_TIMEOUT;
+
+        // redefine adb exec timeout if capabilities.AdbExecTimeout is available
+        if (!R.CONFIG.get(SpecialKeywords.ADB_EXEC_TIMEOUT).isEmpty()) {
+            adbExecTimeout = R.CONFIG.getInt(SpecialKeywords.ADB_EXEC_TIMEOUT);
+        }
+
+        return adbExecTimeout;
+    }
+
+    /**
+     * Get platform name from configuration properties.
+     * @return String platform name
+     */
     public static String getPlatform() {
+        return getPlatform(new DesiredCapabilities());
+    }
+
+    /**
+     * Get platform name from configuration properties or DesiredCapabilities.
+     * @param caps
+     *            DesiredCapabilities
+     * @return String platform name
+     */
+    public static String getPlatform(DesiredCapabilities caps) {
         // any platform by default
         String platform = "*";
 
@@ -398,6 +379,14 @@ public class Configuration {
         if (!R.CONFIG.get(SpecialKeywords.PLATFORM_NAME).isEmpty()) {
             platform = R.CONFIG.get(SpecialKeywords.PLATFORM_NAME);
         }
+        
+        if (caps != null && caps.getCapability("platform") != null) {
+            platform = caps.getCapability("platform").toString();
+        }
+
+        if (caps != null && caps.getCapability("platformName") != null) {
+            platform = caps.getCapability("platformName").toString();
+        }        
         
         //TODO: try to get actual platform name
         return platform;
@@ -454,11 +443,13 @@ public class Configuration {
 
         String platform = getPlatform();
         if (platform.equalsIgnoreCase(SpecialKeywords.ANDROID) || platform.equalsIgnoreCase(SpecialKeywords.IOS) || platform.equalsIgnoreCase(SpecialKeywords.TVOS)) {
-            LOGGER.debug("Detected MOBILE driver_type by platform: " + platform);
             return SpecialKeywords.MOBILE;
         }
+        
+        if (SpecialKeywords.WINDOWS.equalsIgnoreCase(platform)) {
+            return SpecialKeywords.WINDOWS;
+        }
 
-        LOGGER.debug("Return default DESKTOP driver_type");
         return SpecialKeywords.DESKTOP;
     }
 
@@ -468,7 +459,6 @@ public class Configuration {
             return getDriverType();
         }
 
-        LOGGER.debug("Detecting driver_type by capabilities: " + capabilities);
         String platform = "";
         if (capabilities.getCapability("platform") != null) {
             platform = capabilities.getCapability("platform").toString();
@@ -479,8 +469,11 @@ public class Configuration {
         }
 
         if (SpecialKeywords.ANDROID.equalsIgnoreCase(platform) || SpecialKeywords.IOS.equalsIgnoreCase(platform) || SpecialKeywords.TVOS.equalsIgnoreCase(platform)) {
-            LOGGER.debug("Detected MOBILE driver_type by platform: " + platform);
             return SpecialKeywords.MOBILE;
+        }
+        
+        if (SpecialKeywords.WINDOWS.equalsIgnoreCase(platform)) {
+            return SpecialKeywords.WINDOWS;
         }
 
         // handle use-case when we provide only uuid object among desired capabilities
@@ -489,7 +482,6 @@ public class Configuration {
             return SpecialKeywords.MOBILE;
         }
 
-        LOGGER.debug("Return default DESKTOP driver_type");
         return SpecialKeywords.DESKTOP;
     }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,18 @@
 package com.qaprosoft.carina.core.foundation.dataprovider.core;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 
@@ -36,7 +42,7 @@ import com.qaprosoft.carina.core.foundation.dataprovider.core.impl.BaseDataProvi
  */
 public class DataProviderFactory {
 
-    private static final Logger LOGGER = Logger.getLogger(DataProviderFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private DataProviderFactory() {
     }
@@ -44,12 +50,8 @@ public class DataProviderFactory {
     public static Object[][] getDataProvider(Annotation[] annotations, ITestContext context, ITestNGMethod m) {
 
         Map<String, String> testNameArgsMap = Collections.synchronizedMap(new HashMap<>());
-        Map<String, String> canonicalTestNameArgsMap = Collections.synchronizedMap(new LinkedHashMap<>());
-        Map<String, String> testMethodNameArgsMap = Collections.synchronizedMap(new HashMap<>());
         Map<String, String> testMethodOwnerArgsMap = Collections.synchronizedMap(new HashMap<>());
-        Map<String, String> jiraArgsMap = Collections.synchronizedMap(new HashMap<>());
         Map<String, String> testRailsArgsMap = Collections.synchronizedMap(new HashMap<>());
-        Map<String, String> bugArgsMap = Collections.synchronizedMap(new HashMap<>());
         List<String> doNotRunTests = Collections.synchronizedList(new ArrayList<>());
 
         Object[][] provider = new Object[][] {};
@@ -84,12 +86,8 @@ public class DataProviderFactory {
                     BaseDataProvider activeProvider = (BaseDataProvider) object;
                     provider = ArrayUtils.addAll(provider, activeProvider.getDataProvider(annotation, context, m));
                     testNameArgsMap.putAll(activeProvider.getTestNameArgsMap());
-                    canonicalTestNameArgsMap.putAll(activeProvider.getCanonicalTestNameArgsMap());
-                    testMethodNameArgsMap.putAll(activeProvider.getTestMethodNameArgsMap());
                     testMethodOwnerArgsMap.putAll(activeProvider.getTestMethodOwnerArgsMap());
-                    jiraArgsMap.putAll(activeProvider.getJiraArgsMap());
                     testRailsArgsMap.putAll(activeProvider.getTestRailsArgsMap());
-                    bugArgsMap.putAll(activeProvider.getBugArgsMap());
                     doNotRunTests.addAll(activeProvider.getDoNotRunRowsIDs());
                 }
 
@@ -103,14 +101,6 @@ public class DataProviderFactory {
         }
 
         context.setAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP, testNameArgsMap);
-        context.setAttribute(SpecialKeywords.CANONICAL_TEST_NAME_ARGS_MAP, canonicalTestNameArgsMap);
-        // TODO: analyze usage and remove TEST_METHOD_NAME_ARGS_MAP feature as soon as possible
-        context.setAttribute(SpecialKeywords.TEST_METHOD_NAME_ARGS_MAP, testMethodNameArgsMap);
-        context.setAttribute(SpecialKeywords.TEST_METHOD_OWNER_ARGS_MAP, testMethodOwnerArgsMap);
-        context.setAttribute(SpecialKeywords.JIRA_ARGS_MAP, jiraArgsMap);
-        context.setAttribute(SpecialKeywords.TESTRAIL_ARGS_MAP, testRailsArgsMap);
-        context.setAttribute(SpecialKeywords.BUG_ARGS_MAP, bugArgsMap);
-        context.setAttribute(SpecialKeywords.DO_NOT_RUN_TESTS, doNotRunTests);
 
         // clear group by settings
         GroupByMapper.getInstanceInt().clear();
@@ -137,24 +127,6 @@ public class DataProviderFactory {
         }
 
         return finalProvider;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static Object[][] getNeedRerunDataProvider(Annotation[] annotations, ITestContext context, ITestNGMethod m) {
-        Object[][] dp = getDataProvider(annotations, context, m);
-        List<String> doNotRunRowIDs = (List<String>) context.getAttribute(SpecialKeywords.DO_NOT_RUN_TESTS);
-        Map<String, String> testNameArgsMap = (Map<String, String>) context.getAttribute(SpecialKeywords.CANONICAL_TEST_NAME_ARGS_MAP);
-        if (!doNotRunRowIDs.isEmpty()) {
-            for (int i = dp.length - 1; i >= 0; i--) {
-                String testUniqueName = testNameArgsMap.get(testNameArgsMap.keySet().toArray()[i]);
-                if (testUniqueName != null) {
-                    if (doNotRunRowIDs.contains(testUniqueName)) {
-                        dp = ArrayUtils.remove(dp, i);
-                    }
-                }
-            }
-        }
-        return dp;
     }
 
 }

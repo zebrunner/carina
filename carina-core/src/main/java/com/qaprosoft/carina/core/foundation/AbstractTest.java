@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Listeners;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.nordstrom.automation.testng.LinkedListeners;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactory;
 import com.qaprosoft.carina.core.foundation.listeners.CarinaListener;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestCases;
@@ -34,18 +34,24 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.factory.ICustomTypePageFactory;
-import com.qaprosoft.carina.core.foundation.utils.naming.TestNamingUtil;
+import com.zebrunner.agent.core.registrar.CurrentTest;
+import com.zebrunner.agent.testng.listener.DataProviderInterceptor;
+import com.zebrunner.agent.testng.listener.TestRunListener;
 
 /*
  * AbstractTest - base test for UI and API tests.
- * 
- * @author Alex Khursevich
  */
-@Listeners({ CarinaListener.class })
+
+// https://github.com/qaprosoft/carina/issues/951
+// reused com.nordstrom.tools.testng-foundation to register ordered listeners
+
+// on start order is TestRunListener and CarinaListener
+// on finish reverse order, i.e. CarinaListener, TestRunListener
+@LinkedListeners({ CarinaListener.class, TestRunListener.class, DataProviderInterceptor.class })
+@Listeners({DataProviderInterceptor.class})
 public abstract class AbstractTest implements ICustomTypePageFactory, ITestCases {
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
-    
     
 	@BeforeSuite(alwaysRun = true)
 	private void onCarinaBeforeSuite() {
@@ -65,7 +71,7 @@ public abstract class AbstractTest implements ICustomTypePageFactory, ITestCases
     @DataProvider(name = "DataProvider", parallel = true)
     public Object[][] createData(final ITestNGMethod testMethod, ITestContext context) {
         Annotation[] annotations = testMethod.getConstructorOrMethod().getMethod().getDeclaredAnnotations();
-        Object[][] objects = DataProviderFactory.getNeedRerunDataProvider(annotations, context, testMethod);
+        Object[][] objects = DataProviderFactory.getDataProvider(annotations, context, testMethod);
         return objects;
     }
 
@@ -73,22 +79,15 @@ public abstract class AbstractTest implements ICustomTypePageFactory, ITestCases
     public Object[][] createDataSingleThread(final ITestNGMethod testMethod,
             ITestContext context) {
         Annotation[] annotations = testMethod.getConstructorOrMethod().getMethod().getDeclaredAnnotations();
-        Object[][] objects = DataProviderFactory.getNeedRerunDataProvider(annotations, context, testMethod);
+        Object[][] objects = DataProviderFactory.getDataProvider(annotations, context, testMethod);
         return objects;
     }
-
-    protected void setBug(String id) {
-        String test = TestNamingUtil.getTestNameByThread();
-        TestNamingUtil.associateBug(test, id);
-    }
-
     
     /**
      * Pause for specified timeout.
      *
      * @param timeout in seconds.
      */
-
     public void pause(long timeout) {
         CommonUtils.pause(timeout);
     }
@@ -98,6 +97,7 @@ public abstract class AbstractTest implements ICustomTypePageFactory, ITestCases
     }
     
     protected void skipExecution(String message) {
-        throw new SkipException(SpecialKeywords.SKIP_EXECUTION + ": " + message);
+        CurrentTest.revertRegistration();
+        throw new SkipException(message);
     }
 }

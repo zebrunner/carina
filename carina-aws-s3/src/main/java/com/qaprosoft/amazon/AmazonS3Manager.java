@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,13 @@
 package com.qaprosoft.amazon;
 
 import java.io.File;
+import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
@@ -46,30 +48,26 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 
 public class AmazonS3Manager {
-    private static final Logger LOGGER = Logger.getLogger(AmazonS3Manager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static volatile AmazonS3Manager instance = null;
     private static AmazonS3 s3client = null;
 
     private AmazonS3Manager() {
     }
 
-    public static AmazonS3Manager getInstance() {
+    public synchronized static AmazonS3Manager getInstance() {
         if (instance == null) {
-            synchronized (AmazonS3Manager.class) {
-                if (instance == null) {
-                    instance = new AmazonS3Manager();
-                    CryptoTool cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
-                    Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
+            instance = new AmazonS3Manager();
+            CryptoTool cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
+            Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
                     
-                    String accessKey = cryptoTool.decryptByPattern(Configuration.get(Parameter.ACCESS_KEY_ID), CRYPTO_PATTERN);
-                    String secretKey = cryptoTool.decryptByPattern(Configuration.get(Parameter.SECRET_KEY), CRYPTO_PATTERN);
+            String accessKey = cryptoTool.decryptByPattern(Configuration.get(Parameter.ACCESS_KEY_ID), CRYPTO_PATTERN);
+            String secretKey = cryptoTool.decryptByPattern(Configuration.get(Parameter.SECRET_KEY), CRYPTO_PATTERN);
 
-                    System.setProperty("aws.accessKeyId", accessKey);
-                    System.setProperty("aws.secretKey", secretKey);
+            System.setProperty("aws.accessKeyId", accessKey);
+            System.setProperty("aws.secretKey", secretKey);
 
-                    s3client = new AmazonS3Client(new SystemPropertiesCredentialsProvider());
-                }
-            }
+            s3client = new AmazonS3Client(new SystemPropertiesCredentialsProvider());
         }
         return instance;
     }

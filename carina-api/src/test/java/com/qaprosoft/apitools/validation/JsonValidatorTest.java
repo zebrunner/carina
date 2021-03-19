@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -247,5 +247,12 @@ public class JsonValidatorTest {
                     "Error message not as expected");
         }
         Assert.assertTrue(isErrorThrown, "Assertion Error not thrown");
+    }
+
+    // TODO: enable this test if org.json start supporting json like in test
+    // @Test
+    public void testInnerArray() {
+        JsonValidator.validateJson("{\"values\" : [[ 1, 1 ]]}", "{\"values\" : [[ 1, 1 ]]}",
+                JSONCompareMode.LENIENT);
     }
 }

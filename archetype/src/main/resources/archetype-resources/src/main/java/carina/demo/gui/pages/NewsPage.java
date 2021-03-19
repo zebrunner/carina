@@ -2,7 +2,7 @@
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
 /*
- * Copyright 2013-2019 QAPROSOFT (http://qaprosoft.com/).
+ * Copyright 2013-2021 QAPROSOFT (http://qaprosoft.com/).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,25 +28,25 @@ import com.qaprosoft.carina.core.gui.AbstractPage;
 import ${package}.carina.demo.gui.components.NewsItem;
 
 public class NewsPage extends AbstractPage {
-
+    
     @FindBy(className="searchFor")
     private ExtendedWebElement searchTextField;
-
+    
     @FindBy(xpath="//input[@value='Search']")
     private ExtendedWebElement searchButton;
-
+    
     @FindBy(xpath="//div[@class='news-item']")
     private List<NewsItem> news;
-
+    
     public NewsPage(WebDriver driver) {
         super(driver);
         setPageURL("/news.php3");
     }
-
+    
     public List<NewsItem> searchNews(String q) {
         searchTextField.type(q);
         searchButton.click();
         return news;
     }
-
+    
 }

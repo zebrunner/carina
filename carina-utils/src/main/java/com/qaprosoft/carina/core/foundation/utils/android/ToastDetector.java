@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,19 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.android;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.FluentWait;
-import org.apache.log4j.Logger;
-
-import com.google.common.base.Function;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ToastDetector implements Runnable {
 
-    private static final Logger LOGGER = Logger.getLogger(ToastDetector.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final String TOAST_PATTERN = "//*[@text='%s']";
 
@@ -71,17 +71,14 @@ public class ToastDetector implements Runnable {
         LOGGER.info("Wait for toast...");
         isPresent = false;
         FluentWait<WebDriver> fluentWait = new FluentWait<>(webDriver);
-        fluentWait.withTimeout(waitTimeout, TimeUnit.SECONDS).pollingEvery(300, TimeUnit.MILLISECONDS).until(new Function<WebDriver, Boolean>() {
-            @Override
-            public Boolean apply(WebDriver input) {
-                List<?> webElemenList = webDriver.findElements(By.xpath(String.format(TOAST_PATTERN, toastToWait)));
-                if (webElemenList.size() == 1) {
-                    LOGGER.info("Toast with text present: " + toastToWait);
-                    isPresent = true;
-                    return true;
-                } else {
-                    return false;
-                }
+        fluentWait.withTimeout(waitTimeout, TimeUnit.SECONDS).pollingEvery(300, TimeUnit.MILLISECONDS).until(input -> {
+            List<?> webElemenList = webDriver.findElements(By.xpath(String.format(TOAST_PATTERN, toastToWait)));
+            if (webElemenList.size() == 1) {
+                LOGGER.info("Toast with text present: " + toastToWait);
+                isPresent = true;
+                return true;
+            } else {
+                return false;
             }
         });
     }

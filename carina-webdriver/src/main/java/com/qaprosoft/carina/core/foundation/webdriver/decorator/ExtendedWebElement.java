@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package com.qaprosoft.carina.core.foundation.webdriver.decorator;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
@@ -23,15 +24,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
@@ -46,6 +46,7 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Locatable;
+import org.openqa.selenium.json.JsonException;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
@@ -56,12 +57,13 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
-import com.qaprosoft.carina.core.foundation.performance.Timer;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
@@ -77,7 +79,7 @@ import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 
 public class ExtendedWebElement {
-    private static final Logger LOGGER = Logger.getLogger(ExtendedWebElement.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
@@ -102,6 +104,8 @@ public class ExtendedWebElement {
     
     private boolean caseInsensitive;
     
+    private ElementLoadingStrategy loadingStrategy = ElementLoadingStrategy.valueOf(Configuration.get(Parameter.ELEMENT_LOADING_STRATEGY));
+
     public ExtendedWebElement(WebElement element, String name, By by) {
         this(element, name);
         this.by = by;
@@ -255,7 +259,9 @@ public class ExtendedWebElement {
     
     private WebElement getCachedElement() {
         if (element == null) {
-        	//TODO: why 1 sec?
+            LOGGER.debug("TODO: investigate why cached element might be null!");
+            
+            //TODO: why 1 sec?
             element = findElement(1);
         }
         return element;
@@ -307,37 +313,33 @@ public class ExtendedWebElement {
 		
 		final WebDriver drv = getDriver();
 		
-		Timer.start(ACTION_NAME.WAIT);
-		
 		Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(WebDriverException.class)
-				.ignoring(NoSuchSessionException.class);
+				.ignoring(NoSuchSessionException.class)
+				.ignoring(TimeoutException.class); //trying to avoid exception in driver as DriverListener capture it
+		
 		// StaleElementReferenceException is handled by selenium ExpectedConditions in many methods
 		try {
-			LOGGER.debug("waitUntil: starting..." + getNameWithLocator());
-			LOGGER.debug("waitUntil: starting condition: " + condition.toString());
 			wait.until(condition);
 			result = true;
-			LOGGER.debug("waitUntil: finished true..." + getNameWithLocator());
 		} catch (NoSuchElementException e) {
 			// don't write exception even in debug mode
-			LOGGER.debug("waitUntil: NoSuchElementException e..." + getNameWithLocator());
+			LOGGER.debug("waitUntil: NoSuchElementException: " + condition.toString());
 			result = false;
 			originalException = e;
 		} catch (TimeoutException e) { 
-			LOGGER.debug("waitUntil: TimeoutException e..." + getNameWithLocator());
+			LOGGER.debug("waitUntil: TimeoutException: " + condition.toString());
 			result = false;
 			originalException = e.getCause();
 		} catch (WebDriverException e) {
-            LOGGER.debug("waitUntil: WebDriverException e..." + getNameWithLocator());
+            LOGGER.debug("waitUntil: WebDriverException: " + condition.toString());
             result = false;
             originalException = e.getCause();
 		}
 		catch (Exception e) {
-			LOGGER.error("waitUntil: " + getNameWithLocator(), e);
+			LOGGER.error("waitUntil: undefined exception: " + condition.toString(), e);
 			result = false;
 			originalException = e;
 		}
-		Timer.stop(ACTION_NAME.WAIT);
 		return result;
 	}
 
@@ -357,31 +359,33 @@ public class ExtendedWebElement {
     }
     
     private WebElement refindElement() {
-        //do not return without element initialization!
-    	//TODO: if is added as part of a hotfix. Ideal solution should init searchContext everytime so we can remove getDriver usage from this class at all!
-    	try {
-    		if (searchContext != null) {
-    			//TODO: use-case when format method is used. Need investigate howto init context in this case as well
-    			element = searchContext.findElement(by);
-    		} else {
-    		    LOGGER.error("refindElement: searchContext is null for " + getNameWithLocator());
-    			element = getDriver().findElement(by);	
-    		}
-		} catch (StaleElementReferenceException | InvalidElementStateException e) {
-			LOGGER.debug("catched StaleElementReferenceException: ", e);
-			//use available driver to research again...
-			//TODO: handle case with rootBy to be able to refind also lists etc
+        // do not return without element initialization!
+        // TODO: if is added as part of a hotfix. Ideal solution should init searchContext everytime so we can remove getDriver usage from this class
+        // at all!
+        try {
             if (searchContext != null) {
-                //TODO: use-case when format method is used. Need investigate howto init context in this case as well
+                // TODO: use-case when format method is used. Need investigate howto init context in this case as well
                 element = searchContext.findElement(by);
             } else {
-                LOGGER.error("refindElement: searchContext is null for " + getNameWithLocator());
-                element = getDriver().findElement(by);  
+                LOGGER.debug("refindElement: searchContext is null for " + getNameWithLocator());
+                element = getDriver().findElement(by);
             }
-    	} catch (WebDriverException e) {
-    		// that's shouold fix use case when we switch between tabs and corrupt searchContext (mostly for Appium for mobile)
-    		element = getDriver().findElement(by);
-    	}
+        } catch (StaleElementReferenceException | InvalidElementStateException | JsonException e) {
+            LOGGER.debug("catched exception: ", e);
+            // use available driver to research again...
+            // TODO: handle case with rootBy to be able to refind also lists etc
+            if (searchContext != null) {
+                // TODO: use-case when format method is used. Need investigate howto init context in this case as well
+                element = searchContext.findElement(by);
+            } else {
+                LOGGER.debug("refindElement: searchContext is null for " + getNameWithLocator());
+                element = getDriver().findElement(by);
+            }
+        } catch (WebDriverException e) {
+            LOGGER.debug("refindElement catched WebDriverException: '" + e.getMessage() + "'", e);
+            // that's should fix use case when we switch between tabs and corrupt searchContext (mostly for Appium for mobile)
+            element = getDriver().findElement(by);
+        }
         return element;
     }
     
@@ -1081,24 +1085,6 @@ public class ExtendedWebElement {
         return extendedWebElements;
     }
 
-    /**
-     * @deprecated As of release 6.x, replaced by {@link #click()}. Can be used only for Web where JavascriptExecutor is supported.
-     * 
-     * @param x
-     * 			double x
-     * @param y
-     * 			double y
-     */
-    @Deprecated
-    public void tapWithCoordinates(double x, double y) {
-        HashMap<String, Double> tapObject = new HashMap<String, Double>();
-        tapObject.put("x", x);
-        tapObject.put("y", y);
-        final WebDriver drv = getDriver();
-        JavascriptExecutor js = (JavascriptExecutor) drv;
-        js.executeScript("mobile: tap", tapObject);
-    }
-    
     public boolean waitUntilElementDisappear(final long timeout) {
     	try {
         	//TODO: investigate maybe searchContext better to use here!
@@ -1107,7 +1093,7 @@ public class ExtendedWebElement {
                 //TODO: use-case when format method is used. Need investigate howto init context in this case as well
                 element = searchContext.findElement(by);
             } else {
-                LOGGER.error("waitUntilElementDisappear: searchContext is null for " + getNameWithLocator());
+                LOGGER.debug("waitUntilElementDisappear: searchContext is null for " + getNameWithLocator());
                 element = getDriver().findElement(by);  
             }
     	} catch (NoSuchElementException e) {
@@ -1376,7 +1362,6 @@ public class ExtendedWebElement {
 		// captureElements();
 
 		//handle invalid element state: Element is not currently interactable and may not be manipulated
-		Timer.start(actionName);
 		try {
 			element = getCachedElement();
 			output = overrideAction(actionName, inputArgs);
@@ -1388,12 +1373,13 @@ public class ExtendedWebElement {
 			output = overrideAction(actionName, inputArgs);
 		} catch (WebDriverException e) {
 			// TODO: move to error for snapshot build to detect different negative use-cse and move to debug for released versions!
-			LOGGER.debug("catched WebDriverException: ", e);
+			LOGGER.debug("doAction catched WebDriverException: '" + e.getMessage() + "'", e);
 			// try to find again using driver
 			try {
 				element = refindElement();
-			} catch (NoSuchElementException ex) {
-				//no sense to repeit action if refind element didn't help
+			} catch (NoSuchElementException | JsonException ex) {
+				//no sense to repeat action if refind element didn't help
+				// JsonException is captured to handle "Unable to determine type from: <. Last 1 characters read" use-case
 				throw new NoSuchElementException("Unable to detect element: " + getNameWithLocator(), ex);
 			}
 			output = overrideAction(actionName, inputArgs);
@@ -1403,7 +1389,7 @@ public class ExtendedWebElement {
 			e.printStackTrace();
 			throw e;
 		} finally {
-			Timer.stop(actionName);
+		    // do nothing
 		}
 
 		return output;
@@ -1418,16 +1404,15 @@ public class ExtendedWebElement {
 					DriverListener.setMessages(Messager.ELEMENT_CLICKED.getMessage(getName()),
 							Messager.ELEMENT_NOT_CLICKED.getMessage(getNameWithLocator()));
 
-					if (element.isDisplayed()) {
-						element.click();
-					} else {
-						// not visible so we can't interact using selenium or
-						// actions
-						LOGGER.warn("Trying to do click by JavascriptExecutor because element '" + getNameWithLocator()
-								+ "' is not visible...");
-						JavascriptExecutor executor = (JavascriptExecutor) getDriver();
-						executor.executeScript("arguments[0].click();", element);
-					}
+                    try {
+                        element.click();
+                    } catch (ElementNotInteractableException e) { //TODO: investigate if more exceptions should be catched
+                        // not visible so we can't interact using selenium or actions
+                        LOGGER.warn("Trying to do click by JavascriptExecutor because element '" + getNameWithLocator()
+                                + "' is not visible...");
+                        JavascriptExecutor executor = (JavascriptExecutor) getDriver();
+                        executor.executeScript("arguments[0].click();", element);
+                    }
 				} catch (WebDriverException e) {
 					if (e != null && (e.getMessage().contains("Other element would receive the click:"))) {
 						LOGGER.warn("Trying to do click by Actions due to the: " + e.getMessage());
@@ -1512,7 +1497,7 @@ public class ExtendedWebElement {
 						Messager.FILE_NOT_ATTACHED.getMessage(textLog, getNameWithLocator()));
 
 				((JavascriptExecutor) getDriver()).executeScript("arguments[0].style.display = 'block';", element);
-				((RemoteWebDriver) getDriver()).setFileDetector(new LocalFileDetector());
+				((RemoteWebDriver) castDriver(getDriver())).setFileDetector(new LocalFileDetector());
 				element.sendKeys(decryptedText);
 			}
 
@@ -1558,7 +1543,12 @@ public class ExtendedWebElement {
 			public void doCheck() {
 				DriverListener.setMessages(Messager.CHECKBOX_CHECKED.getMessage(getName()), null);
 				
-				if (!element.isSelected()) {
+                boolean isSelected = element.isSelected();
+                if (element.getAttribute("checked") != null) {
+                    isSelected |= element.getAttribute("checked").equalsIgnoreCase("true");
+                }
+                
+				if (!isSelected) {
 					click();
 				}
 			}
@@ -1566,7 +1556,13 @@ public class ExtendedWebElement {
 			@Override
 			public void doUncheck() {
 				DriverListener.setMessages(Messager.CHECKBOX_UNCHECKED.getMessage(getName()), null);
-				if (element.isSelected()) {
+				
+                boolean isSelected = element.isSelected();
+                if (element.getAttribute("checked") != null) {
+                    isSelected |= element.getAttribute("checked").equalsIgnoreCase("true");
+                }
+                
+				if (isSelected) {
 					click();
 				}
 			}
@@ -1586,11 +1582,13 @@ public class ExtendedWebElement {
 			public boolean doSelect(String text) {
 				final String decryptedSelectText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
 				
-				DriverListener.setMessages(Messager.SELECT_BY_TEXT_PERFORMED.getMessage(decryptedSelectText, getName()),
-						Messager.SELECT_BY_TEXT_NOT_PERFORMED.getMessage(decryptedSelectText, getNameWithLocator()));
+				String textLog = (!decryptedSelectText.equals(text) ? "********" : text);
+				
+				DriverListener.setMessages(Messager.SELECT_BY_TEXT_PERFORMED.getMessage(textLog, getName()),
+						Messager.SELECT_BY_TEXT_NOT_PERFORMED.getMessage(textLog, getNameWithLocator()));
 
 				
-				final Select s = new Select(element);
+				final Select s = new Select(getCachedElement());
 				// [VD] do not use selectByValue as modern controls could have only visible value without value
 				s.selectByVisibleText(decryptedSelectText);
 				return true;
@@ -1614,7 +1612,7 @@ public class ExtendedWebElement {
 						Messager.SELECT_BY_MATCHER_TEXT_NOT_PERFORMED.getMessage(matcher.toString(), getNameWithLocator()));
 
 				
-				final Select s = new Select(element);
+				final Select s = new Select(getCachedElement());
 				String fullTextValue = null;
 				for (WebElement option : s.getOptions()) {
 					if (matcher.matches(option.getText())) {
@@ -1633,7 +1631,7 @@ public class ExtendedWebElement {
 						Messager.SELECT_BY_TEXT_PERFORMED.getMessage(partialSelectText, getName()),
 						Messager.SELECT_BY_TEXT_NOT_PERFORMED.getMessage(partialSelectText, getNameWithLocator()));
 				
-				final Select s = new Select(element);
+				final Select s = new Select(getCachedElement());
 				String fullTextValue = null;
 				for (WebElement option : s.getOptions()) {
 					if (option.getText().contains(partialSelectText)) {
@@ -1652,20 +1650,20 @@ public class ExtendedWebElement {
 						Messager.SELECT_BY_INDEX_NOT_PERFORMED.getMessage(String.valueOf(index), getNameWithLocator()));
 				
 				
-				final Select s = new Select(element);
+				final Select s = new Select(getCachedElement());
 				s.selectByIndex(index);
 				return true;
 			}
 
 			@Override
 			public String doGetSelectedValue() {
-				final Select s = new Select(element);
+				final Select s = new Select(getCachedElement());
 				return s.getAllSelectedOptions().get(0).getText();
 			}
 
 			@Override
 			public List<String> doGetSelectedValues() {
-		        final Select s = new Select(getElement());
+		        final Select s = new Select(getCachedElement());
 		        List<String> values = new ArrayList<String>();
 		        for (WebElement we : s.getAllSelectedOptions()) {
 		            values.add(we.getText());
@@ -1684,6 +1682,13 @@ public class ExtendedWebElement {
 					"Driver isn't initialized. Review stacktrace to analyze why driver is not populated correctly via reflection!");
 		}
 		return driver;
+    }
+    
+    private WebDriver castDriver(WebDriver drv) {
+        if (drv instanceof EventFiringWebDriver) {
+            drv = ((EventFiringWebDriver) drv).getWrappedDriver();
+        }
+        return drv;
     }
     
 	//TODO: investigate how can we merge the similar functionality in ExtendedWebElement, DriverHelper and LocalizedAnnotations
@@ -1747,17 +1752,36 @@ public class ExtendedWebElement {
 
     // old functionality to remove completely after successfull testing
     private ExpectedCondition<?> getDefaultCondition(By myBy) {
-        // generate the most popular wiatCondition to check if element visible or present
+        // generate the most popular waitCondition to check if element visible or present
         ExpectedCondition<?> waitCondition = null;
-        if (element != null) {
-            waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
-                    ExpectedConditions.visibilityOfElementLocated(myBy),
-                    ExpectedConditions.visibilityOf(element));
-        } else {
-            waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
-                    ExpectedConditions.visibilityOfElementLocated(myBy));
+        switch (loadingStrategy) {
+        case BY_PRESENCE: {
+            if (element != null) {
+                waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy), ExpectedConditions.visibilityOf(element));
+            } else {
+                waitCondition = ExpectedConditions.presenceOfElementLocated(myBy);
+            }
+            break;
         }
-
+        case BY_VISIBILITY: {
+            if (element != null) {
+                waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(myBy), ExpectedConditions.visibilityOf(element));
+            } else {
+                waitCondition = ExpectedConditions.visibilityOfElementLocated(myBy);
+            }
+            break;
+        }
+        case BY_PRESENCE_OR_VISIBILITY:
+            if (element != null) {
+                waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
+                        ExpectedConditions.visibilityOfElementLocated(myBy),
+                        ExpectedConditions.visibilityOf(element));
+            } else {
+                waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
+                        ExpectedConditions.visibilityOfElementLocated(myBy));
+            }
+            break;
+        }
         return waitCondition;
     }
 }

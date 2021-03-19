@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ public enum PropertiesKeywords {
 
     GENERATE_WORD_REGEX("generate_word\\(\\d+\\)"),
     GENERATE_NUMBER_REGEX("generate_number\\(\\d+\\)"),
-    GENERATE_DATE_REGEX("generate_date\\(.+;-{0,1}\\d+\\)");
+    GENERATE_DATE_REGEX("generate_date\\((.*?);-?[0-9]{0,}\\)");
 
     private String key;
 

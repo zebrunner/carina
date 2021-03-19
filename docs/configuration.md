@@ -40,8 +40,23 @@ All the project configuration properties are located in a **_config.properties**
 		<td>chrome / firefox / safari / iexplore</td>
 	</tr>
 	<tr>
+		<td>headless</td>
+		<td>Run tests in headless browser mode. Enabled when headless=true. Default: false.</td>
+		<td>Boolean</td>
+	</tr>
+	<tr>
+		<td>browser_version</td>
+		<td>Browser version or an empty string if unknown for Selenium Grid</td>
+		<td>"87", "72"</td>
+	</tr>
+		<tr>
+		<td>browser_language</td>
+		<td>Browser language or nothing to use the English version by default.</td>
+		<td>"es", "fr"</td>
+	</tr>
+	<tr>
 		<td>selenium_host</td>
-		<td>Selenium server host</td>
+		<td>Selenium/Appium server host</td>
 		<td>http://localhost:4444/wd/hub</td>
 	</tr>
 	<tr>
@@ -51,22 +66,17 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>locale</td>
-		<td>Locale for using L10N feature. Enabled when enable_l10n=true</td>
-		<td>en_GB,de_DE,fr_FR</td>
-	</tr>
-	<tr>
-		<td>language</td>
-		<td>Language for i18n defeature. Enabled when enable_i18n=true</td>
+		<td>Locale for using L10N feature</td>
 		<td>en_GB,de_DE,fr_FR</td>
 	</tr>
 	<tr>
 		<td>retry_interval</td>
-		<td>Timeout interval between calling HTML DOM for the element.<br><b>Note:</b> in ms. For mobile automation specify a number from 500-1500 range</td>
+		<td>Timeout interval between calling HTML DOM for the element.<br><b>Note:</b> in ms. For mobile automation specify a number from 500-1000 range</td>
 		<td>Integer</td>
 	</tr>
 	<tr>
 		<td>auto_screenshot</td>
-		<td>Global switch for taking screenshots. When disabled, only failures will be captured</td>
+		<td>Global switch for taking screenshots. When disabled, screenshots will be captured only after failures</td>
 		<td>Boolean</td>
 	</tr>
 	<tr>
@@ -76,18 +86,8 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>max_screen_history</td>
-		<td>Max number of reports in history</td>
+		<td>Max number of reports artifacts saving in history. Default: 10</td>
 		<td>Integer</td>
-	</tr>
-	<tr>
-		<td>jira_url</td>
-		<td>JIRA base URL for direct links with bugs description</td>
-		<td>https://jira.carina.com/browse/</td>
-	</tr>
-	<tr>
-		<td>email_list</td>
-		<td>Comma-separated list of emails for reports</td>
-		<td>u1@gmail.com,u2@gmail.com</td>
 	</tr>
 	<tr>
 		<td>env</td>
@@ -95,31 +95,26 @@ All the project configuration properties are located in a **_config.properties**
 		<td>STAG, PROD, DEMO</td>
 	</tr>
 	<tr>
-		<td>env_arg_resolver</td>
-		<td>This parameter is optional, if it isn't set, the default value will be used. In most cases, <b> the default value is enough</b></td>
-		<td>java class </td>
-	</tr>
-		<tr>
-		<td>browser_version</td>
-		<td>Browser version or an empty string if unknown for Selenium Grid</td>
-		<td>"8.0", "52.1"</td>
-	</tr>
-		<tr>
-		<td>browser_language</td>
-		<td>Browser language or nothing to use the English version by default. <br><b>Note:</b> Only applicable for Chrome and Firefox!</td>
-		<td>"es", "fr"</td>
+		<td>driver_event_listeners</td>
+		<td>Comma-separated list of extra driver listeners listeners. Listeners provide extra custom actions for WebDriver and have to be the instances of WebDriverEventListener</td>
+		<td>com.some_company.core.EventListener</td>
 	</tr>
 	<tr>
-		<td>driver_event_listeners</td>
-		<td>Comma-separated list of listeners. Listeners provide more logs from WebDriver and have to be the instances of WebDriverEventListener</td>
-		<td>com.someCompane.core.EventListener</td>
-	</tr>
-		<tr>
 		<td>max_driver_count</td>
-		<td>Max number of drivers per thread</td>
+		<td>Max number of drivers per thread. Default: 3</td>
 		<td>Integer</td>
 	</tr>
-		<tr>
+	<tr>
+		<td>driver_recorder</td>
+		<td>Enable embedded carina recorder for driver session log/video artifacts generation. It is recommended to use for Selenium/Appium hubs which can't record such artifacts automatically. Default: false</td>
+		<td>Boolean</td>
+	</tr>
+	<tr>
+		<td>forcibly_disable_driver_quit</td>
+		<td>If enabled turns off webdriver shutdown after test finishing by any reason. Default: false</td>
+		<td>Boolean</td>
+	</tr>
+	<tr>
 		<td>custom_capabilities</td>
 		<td>Name of a properties file with custom capabilities (key-value)</td>
 		<td>custom.properties</td>
@@ -150,6 +145,11 @@ All the project configuration properties are located in a **_config.properties**
 		<td>Integer</td>
 	</tr>
 		<tr>
+		<td>browsermob_ports_range</td>
+		<td>Range of ports that will be used for starting of browsermob proxy. First available port from the range will be used. If all ports are used then test will wait for the first freed port.</td>
+		<td>8001:8003</td>
+	</tr>
+		<tr>
 		<td>proxy_set_to_system</td>
 		<td>Boolean parameter which enables or disables the setup of a proxy</td>
 		<td>true, false</td>
@@ -158,16 +158,6 @@ All the project configuration properties are located in a **_config.properties**
 		<td>no_proxy</td>
 		<td>Excluded hostname(s) for communication via proxy. Available only when proxy_host and proxy_port are declared!</td>
 		<td>localhost.example.com</td>
-	</tr>
-		<tr>
-		<td>failure_email_list</td>
-		<td>Comma-separated list of emails for failure reports</td>
-		<td>u1@mail.com,u2@mail.com</td>
-	</tr>
-		<tr>
-		<td>track_known_issues</td>
-		<td>Boolean parameter. If it is true and some Jira tickets are associated with the test, in case of failure Jira info will be added to the report</td>
-		<td>true,false</td>
 	</tr>
 	<tr>
 		<td>explicit_timeout</td>
@@ -185,35 +175,24 @@ All the project configuration properties are located in a **_config.properties**
 		<td>application/pdf, list of [values](https://freeformatter.com/mime-types-list.html)</td>
 	</tr>
 	<tr>
+		<td>auto_download_folder</td>
+		<td>Path to auto download folder for Chrome and Firefox browsers. If nothing specified custom_artifacts_folder or default artifacts folder is used</td>
+		<td>String</td>
+	</tr>
+	<tr>
 		<td>project_report_directory</td>
-		<td>Path to a folder where the reports will be saved</td>
-		<td>./reports/qa</td>
+		<td>Path to a folder where the testing report will be saved</td>
+		<td>./reports</td>
 	</tr>
 	<tr>
 		<td>big_screen_width</td>
-		<td>Screenshots will be resized according to this width if their own width is bigger</td>
-		<td>500, 1200, Integer</td>
-	</tr>
-	<tr>
-		<td>big_screen_height</td>
-		<td>Screenshots will be resized according to this height if their own height is bigger</td>
-		<td>500, 1200, Integer</td>
-	</tr>
-		<tr>
-		<td>small_screen_width</td>
-		<td>Thumbnails' width</td>
+		<td>Screenshots will be resized according to this width if their own width is bigger. Default: -1 to keep existing size.</td>
 		<td>Integer</td>
 	</tr>
 	<tr>
 		<td>big_screen_height</td>
-		<td>Thumbnails' height</td>
+		<td>Screenshots will be resized according to this height if their own height is bigger. Default: -1 to keep existing size.</td>
 		<td>Integer</td>
-	</tr>
-	<tr>
-		<td>big_screen_height</td>
-		<td>Thumbnails' height</td>
-		<td>Integer</td>
-	</tr>
 	<tr>
 		<td>init_retry_count</td>
 		<td>Number of attempts to create a driver. The default value 0 means that there will be only 1 attempt</td>
@@ -230,24 +209,9 @@ All the project configuration properties are located in a **_config.properties**
 		<td>Integer</td>
 	</tr>
 		<tr>
-		<td>enable_l10n</td>
-		<td>Enables L10N feature</td>
-		<td>false, true</td>
-	</tr>
-			<tr>
-		<td>l10n_encoding</td>
-		<td>Charset for l10n feature</td>
-		<td>ISO-8859-5, ISO-8859-6, UTF-8</td>
-	</tr>
-	<tr>
-		<td>enable_i18n</td>
-		<td>Enables i18n feature</td>
-		<td>false, true</td>
-	</tr>
-		<tr>
 		<td>thread_count</td>
-		<td>Default number of threads to use when running tests in parallel.</td>
-		<td>fInteger</td>
+		<td>Default number of threads to use when running tests in parallel. Set thread_count=custom to disable any updates on carina side.</td>
+		<td>Integer</td>
 	</tr>
 		<tr>
 		<td>data_provider_thread_count</td>
@@ -262,12 +226,12 @@ All the project configuration properties are located in a **_config.properties**
 		<tr>
 		<td>core_log_packages</td>
 		<td>Comma-separated list of core packages where you want to redefine the log level</td>
-		<td>com.qaprosoft.carina.core, ZafiraConfigurator etc</td>
+		<td>com.qaprosoft.carina.core, com.zebrunner etc</td>
 	</tr>
 		<tr>
 		<td>log_all_json</td>
 		<td>API response will be logged in JSON format</td>
-		<td>true, false</td>
+		<td>Boolean</td>
 	</tr>
 		<tr>
 		<td>date_format</td>
@@ -289,64 +253,19 @@ All the project configuration properties are located in a **_config.properties**
 		<td>Suite name for the report and TestRail. If this parameter is NULL, will be taken from TestNG xml (the parameter suite name) or _email.properties (the title)</td>
 		<td>Advanced Acceptance</td>
 	</tr>
-	<tr>
-		<td>jira_updater</td>
-		<td>Class contains logic to update Jira. <b>Note</b> Custom updater has to implement DefaultJiraUpdater, by default, the methods do nothing</td>
-		<td>Custom class</td>
-	</tr>
-	<tr>
-		<td>jira_url</td>
-		<td>URL to Jira</td>
-		<td>https://yourclass.atlassian.net</td>
-	</tr>
-		<tr>
-		<td>jira_user</td>
-		<td>Jira user email</td>
-		<td>admin@yourcompany.com</td>
-	</tr>
-		<tr>
-		<td>jira_password</td>
-		<td>Jira user password</td>
-		<td>admin123456</td>
-	</tr>
-		<tr>
-		<td>jira_suite_id</td>
-		<td>Jira suit id (if you have one)</td>
-		<td>Integer</td>
-	</tr>
-	<tr>
-		<td>jira_project</td>
-		<td>Jira project id</td>
-		<td>Integer</td>
-	</tr>
-		<tr>
-		<td>jira_create_new_ticket</td>
-		<td>If the feature is enabled, a new Jira ticket will be created after the test failure</td>
-		<td>true, false</td>
-	</tr>
-	<tr>
-		<td>testrail_milestone</td>
-		<td>Milestone to set on TestRail for run</td>
-		<td>some-milestone</td>
-	</tr>
-		<tr>
-		<td>testrail_assignee</td>
-		<td>User assigned for the suit</td>
-		<td>asignee_user@yuorcompany.com</td>
-	</tr>
 		<tr>
 		<td>access_key_id</td>
-		<td>Access key id for Amazon S3. More info [here](#https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)</td>
+		<td>Access key id for Amazon S3 build uploader. More info [here](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)</td>
 		<td>gkhcvdgvceUYF67897hbjsbdc</td>
 	</tr>
 		<tr>
 		<td>secret_key</td>
-		<td>Secret key for Amazon S3. More info [here](#https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)</td>
+		<td>Secret key for Amazon S3 build uploader. More info [here](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)</td>
 		<td>gkhcvdgvceUYF67897hbjsbdc</td>
 	</tr>
 		<tr>
 		<td>s3_local_storage</td>
-		<td>Directory for downloading artefacts</td>
+		<td>Local directory for downloading build artifacts</td>
 		<td>./s3</td>
 	</tr>
 		<tr>
@@ -362,22 +281,22 @@ All the project configuration properties are located in a **_config.properties**
 		<tr>
 		<td>add_new_localization</td>
 		<td>Should be set to 'true' if you want to create new localization files for the required Locale. Otherwise, there will be just the localization checking</td>
-		<td>false, true</td>
+		<td>Boolean</td>
 	</tr>
 		<tr>
 		<td>add_new_localization_encoding</td>
 		<td>Encoding for a new localization</td>
-		<td>utf-16, utf-32</td>
+		<td>UTF-8</td>
 	</tr>
 		<tr>
 		<td>add_new_localization_path</td>
 		<td>Path where created localization properties should be saved. If null, they will be added to an artifactory folder in the report</td>
-		<td>utf-16, utf-32</td>
+		<td>./src/main/resources/L10N</td>
 	</tr>
 		<tr>
 		<td>add_new_localization_property_name</td>
-		<td>Path where created localization properties should be saved. If null, they will be added to an artifactory folder in the report</td>
 		<td>Basic template for property name.</td>
+		<td>new_locale_file_</td>
 	</tr>
 		<tr>
 		<td>tls_keysecure_location</td>
@@ -399,12 +318,22 @@ All the project configuration properties are located in a **_config.properties**
 		<td>Executing rules logic: test_run_rules={RULE_NAME_ENUM}=>{RULE_VALUE1}&&{RULE_VALUE2};;...</td>
 		<td>test_run_rules=PRIORITY=>P1&amp;&amp;P2;;OWNER=>owner;;TAGS=>tag1=temp&amp;&amp;feature=reg</td>
 	</tr>
+	<tr>
+		<td>element_loading_strategy</td>
+		<td>Determines how carina detects appearing of web elements on page: by presence in DOM model or by visibility or by any of these conditions</td>
+		<td>BY_PRESENCE, BY_VISIBILITY, BY_PRESENCE_OR_VISIBILITY</td>
+	</tr>
+	<tr>
+		<td>page_opening_strategy</td>
+		<td>Determines how carina detects whether expected page is opened: by expected url pattern, by marker element loading state or by both these conditions</td>
+		<td>BY_ELEMENT, BY_URL, BY_URL_AND_ELEMENT</td>
+	</tr>
 </table>
 Most of the properties may be read in the following way:
 ```
 Configuration.get(Parameter.URL) // returns string value
 Configuration.getBoolean(Parameter.AUTO_SCREENSHOT) // returns boolean value
-Configuration.getInt(Parameter.SMALL_SCREEN_WIDTH) // returns integer value
+Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) //return int value
 Configuration.getDouble(Parameter.BROWSER_VERSION) // returns double value
 ```
 
@@ -422,41 +351,31 @@ Configuration.getEnvArg("url")
 ```
 As a result, you switch between the environments just changing the env argument in the _config.properties file.
 
-### [Zafira](https://github.com/qaprosoft/zafira) configuration
-[**zafira.properties**](https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/zafira.properties) are used for Zafira QA reporting integration, here you should specify some values for a proper integration:<table>
+### [Zebrunner Reporting](https://zebrunner.com/documentation/agents/testng) configuration
+[**agent.properties**](https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/agent.properties) file is used for Zebrunner Reporting integration, here you should specify some values for a proper integration:<table>
 	<tr>
 		<th>Attribute</th>
 		<th>Meaning</th>
 		<th>Example</th>
 	</tr>
 	<tr>
-		<td>zafira_enabled</td>
+		<td>reporting.enabled</td>
 		<td>Root switch</td>
 		<td>true/false</td>
 	</tr>
 	<tr>
-		<td>zafira_service_url</td>
-		<td>Webservice URL</td>
-		<td>http://localhost:8080/zafira-ws</td>
+		<td>reporting.server.hostname</td>
+		<td>Service URL</td>
+		<td>https://mycompany.zebrunner.com</td>
 	</tr>
 	<tr>
-		<td>zafira_project</td>
-		<td>Project name (created in Zafira)</td>
-		<td>empty or any created</td>
+		<td>reporting.server.access-token</td>
+		<td>Access Token</td>
+		<td>eyJhbGciOiJIUzUxMiJ9...</td>
 	</tr>
 	<tr>
-		<td>zafira_rerun_failures</td>
-		<td>Reruns only failures</td>
-		<td>true/false</td>
+		<td>reporting.projectKey</td>
+		<td>Project Name</td>
+		<td>empty or any existing name</td>
 	</tr>
-	<tr>
-		<td>zafira_report_emails</td>
-		<td>List of emails for report</td>
-		<td>user1@qps.com,user2@qps.com</td>
-	</tr>
-	<tr>
-		<td>zafira_configurator</td>
-		<td>Configurator class (used by default)</td>
-		<td>com.qaprosoft.carina.core.foundation.report.ZafiraConfigurator</td>
-	</tr>	
 </table>

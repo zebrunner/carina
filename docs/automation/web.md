@@ -173,17 +173,17 @@ It is good practice to implement all elements search logic of Page Object/UI Obj
 * Locate tests in src/test/java source folder
 
 ### Test configuration
-There are a few critical properties in a config.properties file which are required for web test execution:
+There are a few critical properties in a _config.properties file which are required for web test execution:
 
 * url=http://www.gsmarena.com
 * browser=chrome
 * browser_version=*
 
 The implemented test cases should be placed in a TestNG xml file according to the test group the test belongs to. You can find more details about TestNG configuration in the [official documentation](http://testng.org/doc/documentation-main.html).
-```
-<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+```xml
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
 
-<suite verbose="1" name="Carina Demo Tests - Web tests" skipfailedinvocationcounts="false" junit="false" parallel="tests" data-provider-thread-count="50" annotations="JDK">
+<suite verbose="1" name="Carina Demo Tests - Web Sample" parallel="methods">
 
 	<test name="GSM arena web tests">
 		<classes>
@@ -193,3 +193,111 @@ The implemented test cases should be placed in a TestNG xml file according to th
 	
 </suite>
 ```
+
+### Page opening strategy
+
+Determines how carina detects whether expected page is opened:
+
+* By Url. (by default)
+* By Element presence on the page
+* By URL and Element
+
+To check if page was opened is used: 
+```
+page.isPageOpened();
+//or
+page.assertPageOpened();  // equals Assert.assertTrue(page.isPageOpened(),"PageName not loaded: reason);
+```
+
+Page opening strategy configuration can be set in several places:
+
+1) in [_config.properties](http://qaprosoft.github.io/carina/configuration/). This determines whole project page open strategy.
+
+2) in page.class. This overrides global page open strategy for a specific page.
+
+```
+public class Page extends AbstractPage {
+
+    public Page(WebDriver driver){
+        super(driver);
+        setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
+    }
+}
+```
+3) in test.class. This also overrides global page open strategy for a specific page.
+```
+@Test
+public void test(){
+        HomePage homePage=new HomePage(getDriver());
+        homePage.open();
+        homePage.setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
+}
+```
+
+#### By URL
+
+This is a default value. To use it you need to set a real page urls into your page classes.
+```
+private final String specificPageUrl = "https://www.gsmarena.com/specific/url";
+
+public Page(WebDriver driver) {
+    super(driver);
+    setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
+        
+    setPageAbsoluteURL(specificPageUrl);    //Will set full url
+    //or
+    setPageURL("/specific/url");            //Will add passed String to your url in _config_properties
+}
+```
+
+#### By Element
+
+```
+@FindBy(id = "id")
+private ExtendedWebElement element;
+
+public Page(WebDriver driver) {
+    super(driver);
+
+    setPageOpeningStrategy(PageOpeningStrategy.BY_ELEMENT);
+    setUiLoadedMarker(element);
+}
+```
+
+#### By URL and Element
+```
+private final String specificPageUrl = "https://www.gsmarena.com/specific/url";
+
+@FindBy(id = "id")
+private ExtendedWebElement element;
+
+public Page(WebDriver driver) {
+    super(driver);
+
+    setPageOpeningStrategy(PageOpeningStrategy.BY_URL_AND_ELEMENT);
+    setUiLoadedMarker(element);
+    setPageAbsoluteURL(specificPageUrl);
+}
+```
+
+### Element loading strategy
+
+Determines how carina detects appearing of web elements on page
+
+* By presence. Carina waits for appearance of web elements in page DOM model.
+* By visibility. Carina waits until web elements would be visible in page.
+* By presence or visibility (default).
+
+> It is recommended to use _element_loading_strategy=BY_VISIBILITY_ because in some cases condition with presence happens faster but elements are still not accessible due to invisibility at this short period of time.
+
+Element loading strategy could be set at the same places as **Page opening strategy**.
+
+To check if element presence:
+```
+Component component = Page.getComponent();
+component.assertUIObjectPresent();      // equals to Assert.assertTrue(component.isUIObjectPresent(),"UI object componentName does not present!");
+
+component.assertUIObjectNotPresent();   // equals to Assert.assertTrue(!component.isUIObjectPresent(),"UI object componentName presents!");
+```
+>Dynamic elements loading. 
+**waitForJSToLoad()** method was introduced in AbstractPage class. It uses JS under the hood and helps to wait till all dynamic web elements on the page are getting loaded.

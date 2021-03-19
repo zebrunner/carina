@@ -6,16 +6,18 @@ pages:
     - Configuration: configuration.md
     - Execution: execution.md
     - Automation:
-      - Web automation: automation/web.md
-      - Mobile automation: automation/mobile.md
-      - API automation: automation/api.md
-    - Dataproviders: dataproviders.md
-    - Database usage: databases.md
-    - Security: security.md
+      - Web: automation/web.md
+      - Mobile: automation/mobile.md
+      - API: automation/api.md
+    - Advanced:
+      - Database: advanced/database.md
+      - DataProvider: advanced/dataprovider.md
+      - Driver: advanced/driver.md
+      - Localization: advanced/localization.md
+      - Proxy: advanced/proxy.md
+      - Security: advanced/security.md
+    - Cucumber: cucumber.md
     - Contribution: contribution.md
-    - Proxy: proxy.md
-    - Migration Steps: migration.md
-    - Release Notes: releases.md
 theme:
   name: 'material'
 repo_url: https://github.com/qaprosoft/carina

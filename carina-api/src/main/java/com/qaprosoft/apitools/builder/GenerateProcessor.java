@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,36 +32,40 @@ public class GenerateProcessor implements PropertiesProcessor {
             Matcher wordMatcher = Pattern.compile(PropertiesKeywords.GENERATE_WORD_REGEX.getKey()).matcher(entry.getValue().toString());
             Matcher numberMatcher = Pattern.compile(PropertiesKeywords.GENERATE_NUMBER_REGEX.getKey()).matcher(entry.getValue().toString());
             Matcher dateMatcher = Pattern.compile(PropertiesKeywords.GENERATE_DATE_REGEX.getKey()).matcher(entry.getValue().toString());
-            {
-                if (wordMatcher.find()) {
-                    String toReplace = wordMatcher.group();
-                    Matcher tmpMatcher = Pattern.compile("\\d+").matcher(toReplace);
-                    tmpMatcher.find();
-                    String length = tmpMatcher.group();
-                    out.put(entry.getKey(), entry.getValue().toString().replace(toReplace, GenerationUtil.generateWord(Integer.parseInt(length))));
-                } else if (numberMatcher.find()) {
-                    String toReplace = numberMatcher.group();
-                    Matcher tmpMatcher = Pattern.compile("\\d+").matcher(toReplace);
-                    tmpMatcher.find();
-                    String length = tmpMatcher.group();
-                    out.put(entry.getKey(), entry.getValue().toString().replace(toReplace, GenerationUtil.generateNumber(Integer.parseInt(length))));
-                } else if (dateMatcher.find()) {
-                    String toReplace = dateMatcher.group();
-                    // getting offset
-                    Matcher offsetMatcher = Pattern.compile("-{0,1}\\d+").matcher(entry.getValue().toString());
-                    offsetMatcher.find();
-                    String offset = offsetMatcher.group();
-                    // getting format
-                    Matcher formatMatcher = Pattern.compile("(?<=generate_date\\().*(?=;)").matcher(entry.getValue().toString());
-                    formatMatcher.find();
-                    String format = formatMatcher.group();
-                    // generating date
-                    out.put(entry.getKey(), entry.getValue().toString().replace(toReplace,
-                            GenerationUtil.generateTime(format, Integer.parseInt(offset), Calendar.DAY_OF_YEAR)));
-                } else {
-                    out.put(entry.getKey(), entry.getValue());
-                }
+            String tmp = entry.getValue().toString();
+
+            while (wordMatcher.find()) {
+                String toReplace = wordMatcher.group();
+                Matcher tmpMatcher = Pattern.compile("\\d+").matcher(toReplace);
+                tmpMatcher.find();
+                String length = tmpMatcher.group();
+                tmp = tmp.replace(toReplace, GenerationUtil.generateWord(Integer.parseInt(length)));
             }
+
+            while (numberMatcher.find()) {
+                String toReplace = numberMatcher.group();
+                Matcher tmpMatcher = Pattern.compile("\\d+").matcher(toReplace);
+                tmpMatcher.find();
+                String length = tmpMatcher.group();
+                tmp = tmp.replace(toReplace, GenerationUtil.generateNumber(Integer.parseInt(length)));
+            }
+
+            while (dateMatcher.find()) {
+                String toReplace = dateMatcher.group();
+                // getting offset
+                Matcher offsetMatcher = Pattern.compile("-{0,1}\\d+").matcher(toReplace);
+                offsetMatcher.find();
+                String offset = offsetMatcher.group();
+                // getting format
+                Matcher formatMatcher = Pattern.compile("(?<=generate_date\\().*?(?=;)").matcher(toReplace);
+                formatMatcher.find();
+                String format = formatMatcher.group();
+                // generating date
+                tmp = tmp.replace(toReplace,
+                        GenerationUtil.generateTime(format, Integer.parseInt(offset), Calendar.DAY_OF_YEAR));
+            }
+
+            out.put(entry.getKey(), tmp);
         }
         return out;
     }

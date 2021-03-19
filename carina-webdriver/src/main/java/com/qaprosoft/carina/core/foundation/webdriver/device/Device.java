@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2019 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,27 +18,23 @@ package com.qaprosoft.carina.core.foundation.webdriver.device;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.commons.models.RemoteDevice;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.performance.DRIVER_TYPE;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -50,40 +46,42 @@ import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 
-public class Device extends RemoteDevice implements IDriverPool {
-    private static final Logger LOGGER = Logger.getLogger(Device.class);
+public class Device implements IDriverPool {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    
+    private String name;
+    private String type;
+    private String os;
+    private String osVersion;
+    private String udid;
+    private String remoteURL;
+    private String vnc;
+    private String proxyPort;
+    
+    private AdbExecutor executor = new AdbExecutor();
+    private Capabilities capabilities;
 
     /**
      * ENABLED only in case of availability of parameter - 'uninstall_related_apps'.
      * Store udids of devices where related apps were uninstalled
      */
     private static List<String> clearedDeviceUdids = new ArrayList<>();
-    private boolean isStfEnabled;
-
-    AdbExecutor executor = new AdbExecutor();
+    private boolean isAdbEnabled;
 
     public Device() {
-        this("", "", "", "", "", "");
-        this.isStfEnabled = false;
+        this("", "", "", "", "", "", "", "");
+        this.isAdbEnabled = false;
     }
 
-    public Device(String name, String type, String os, String osVersion, String udid, String remoteURL) {
-        setName(name);
-        setType(type);
-        setOs(os);
-        setOsVersion(osVersion);
-        setUdid(udid);
-        setRemoteURL(remoteURL);
-    }
-
-    public Device(RemoteDevice remoteDevice) {
-        setName(remoteDevice.getName());
-        setType(remoteDevice.getType());
-        setOs(remoteDevice.getOs());
-        setOsVersion(remoteDevice.getOsVersion());
-        setUdid(remoteDevice.getUdid());
-        setRemoteURL(remoteDevice.getRemoteURL());
-        setProxyPort(remoteDevice.getProxyPort());
+    public Device(String name, String type, String os, String osVersion, String udid, String remoteURL, String vnc, String proxyPort) {
+        this.name = name;
+        this.type = type;
+        this.os = os;
+        this.osVersion = osVersion;
+        this.udid = udid;
+        this.remoteURL = remoteURL;
+        this.vnc = vnc;
+        this.proxyPort = proxyPort;        
     }
 
     public Device(Capabilities capabilities) {
@@ -112,7 +110,7 @@ public class Device extends RemoteDevice implements IDriverPool {
         }
         setType(deviceType);
 
-        setOs(Configuration.getPlatform());
+        setOs(Configuration.getPlatform(new DesiredCapabilities(capabilities)));
 
         String platformVersion = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_PLATFORM_VERSION);
         if (!R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_BROWSERSTACK_PLATFORM_VERSION).isEmpty()) {
@@ -121,24 +119,133 @@ public class Device extends RemoteDevice implements IDriverPool {
         if (capabilities.getCapability("platformVersion") != null) {
             platformVersion = capabilities.getCapability("platformVersion").toString();
         }
-
         setOsVersion(platformVersion);
 
         String deviceUdid = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_UDID);
         if (capabilities.getCapability("udid") != null) {
             deviceUdid = capabilities.getCapability("udid").toString();
         }
-
         setUdid(deviceUdid);
         
         String proxyPort = R.CONFIG.get(SpecialKeywords.MOBILE_PROXY_PORT);
         if (capabilities.getCapability(Parameter.PROXY_PORT.getKey()) != null) {
             proxyPort = capabilities.getCapability(Parameter.PROXY_PORT.getKey()).toString();
         }
-
         setProxyPort(proxyPort);
         
+        // try to read extra information from slot capabilities object
+        @SuppressWarnings("unchecked")
+        Map<String, Object> slotCap = (Map<String, Object>) capabilities.getCapability(SpecialKeywords.SLOT_CAPABILITIES);
+        try {
+            if (slotCap != null && slotCap.containsKey("udid")) {
+
+                // restore device information from custom slotCapabilities map
+                /*
+                 * {deviceType=Phone, proxy_port=9000,
+                 * server:CONFIG_UUID=24130dde-59d4-4310-95ba-6f57b9d265c3,
+                 * seleniumProtocol=WebDriver, adb_port=5038,
+                 * vnc=wss://stage.qaprosoft.com:7410/websockify,
+                 * deviceName=Nokia_6_1, version=8.1.0, platform=ANDROID,
+                 * platformVersion=8.1.0, automationName=uiautomator2,
+                 * browserName=Nokia_6_1, maxInstances=1, platformName=ANDROID,
+                 * udid=PL2GAR9822804910}
+                 */
+
+                // That's a trusted information from Zebrunner Device Farm so we can override all values
+                setName((String) slotCap.get("deviceName"));
+                setOs((String) slotCap.get("platformName"));
+                setOsVersion((String) slotCap.get("platformVersion"));
+                setType((String) slotCap.get("deviceType"));
+                setUdid((String) slotCap.get("udid"));
+                if (slotCap.containsKey("vnc")) {
+                    setVnc((String) slotCap.get("vnc"));
+                }
+                if (slotCap.containsKey(Parameter.PROXY_PORT.getKey())) {
+                    setProxyPort(String.valueOf(slotCap.get(Parameter.PROXY_PORT.getKey())));
+                }
+
+                if (slotCap.containsKey("remoteURL")) {
+                    setRemoteURL(String.valueOf(slotCap.get("remoteURL")));
+                }
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("Unable to get device info!", e);
+        }
+        
         setCapabilities(capabilities);
+    }
+    
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = (null == name) ? "" : name;
+    }
+
+    public String getOs() {
+        return os;
+    }
+
+    public void setOs(String os) {
+        this.os = os;
+    }
+
+    public String getOsVersion() {
+        return osVersion;
+    }
+
+    public void setOsVersion(String osVersion) {
+        this.osVersion = osVersion;
+    }
+
+    public String getUdid() {
+        return udid;
+    }
+
+    public void setUdid(String udid) {
+        this.udid = (null == udid) ? "" : udid;
+    }
+
+    public String getRemoteURL() {
+        return remoteURL;
+    }
+
+    public void setRemoteURL(String remoteURL) {
+        this.remoteURL = remoteURL;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getVnc() {
+        return vnc;
+    }
+
+    public void setVnc(String vnc) {
+        this.vnc = vnc;
+    }
+
+    public String getProxyPort() {
+        return proxyPort;
+    }
+
+    public void setProxyPort(String proxyPort) {
+        this.proxyPort = proxyPort;
+    }
+    
+    public Capabilities getCapabilities() {
+        return capabilities;
+    }
+
+    public void setCapabilities(Capabilities capabilities) {
+        this.capabilities = capabilities;
     }
 
     public boolean isPhone() {
@@ -180,8 +287,8 @@ public class Device extends RemoteDevice implements IDriverPool {
     }
 
     public String toString() {
-        return String.format("name: %s; type: %s; os: %s; osVersion: %s; udid: %s; remoteURL: %s", getName(),
-                getType(), getOs(), getOsVersion(), getUdid(), getRemoteURL());
+        return String.format("name: %s; type: %s; os: %s; osVersion: %s; udid: %s; remoteURL: %s; vnc: %s; proxyPort: %s", getName(),
+                getType(), getOs(), getOsVersion(), getUdid(), getRemoteURL(), getVnc(), getProxyPort());
     }
 
     public boolean isNull() {
@@ -198,20 +305,26 @@ public class Device extends RemoteDevice implements IDriverPool {
         if (isIOS())
             return;
         
-        isStfEnabled = true;
+        String connectUrl = getAdbName();
+        if (StringUtils.isEmpty(connectUrl)) {
+            LOGGER.error("Unable to use adb as ADB remote url is not available!");
+            return;
+        }
         
-        LOGGER.debug("adb connect " + getRemoteURL());
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "connect", getRemoteURL());
+        LOGGER.debug("adb connect " + connectUrl);
+        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "connect", connectUrl);
         executor.execute(cmd);
         CommonUtils.pause(1);
 
+        // TODO: verify that device connected and raise an error if not and disabled adb integration
         String[] cmd2 = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "devices");
         executor.execute(cmd2);
 
+        isAdbEnabled = true;
     }
 
     public void disconnectRemote() {
-        if (!isStfEnabled)
+        if (!isAdbEnabled)
             return;
         
         if (isNull())
@@ -223,15 +336,6 @@ public class Device extends RemoteDevice implements IDriverPool {
         String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "disconnect", getRemoteURL());
         executor.execute(cmd);
 
-    }
-
-    @Deprecated
-    public void dropFile(String pathToFile) {
-        if (this.isNull())
-            return;
-
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "shell", "rm", pathToFile);
-        executor.execute(cmd);
     }
 
     public String getFullPackageByName(final String name) {
@@ -264,15 +368,6 @@ public class Device extends RemoteDevice implements IDriverPool {
 
     public boolean isAppInstall(final String packageName) {
         return !getFullPackageByName(packageName).contains("not found");
-    }
-
-    @Deprecated
-    public void pullFile(String pathFrom, String pathTo) {
-        if (isNull())
-            return;
-
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "pull", pathFrom, pathTo);
-        executor.execute(cmd);
     }
 
     public void pressKey(int key) {
@@ -555,107 +650,6 @@ public class Device extends RemoteDevice implements IDriverPool {
     }
     
     /**
-     * Extract sys log using adb
-     * 
-     * @return sys log
-     */
-    public String getSysLog() {
-        int extractionTimeout = 15;
-        
-        if (isNull()) {
-            return "";
-        }
-        
-        if (!DeviceType.Type.ANDROID_PHONE.getFamily().equalsIgnoreCase(getOs())) {
-            LOGGER.debug("Logcat log is empty since device is not Android");
-            return "";
-        }
-        LOGGER.debug("Extraction of sys log: " + getAdbName());
-
-        // launch extractor in separate thread to avoid possible hang out
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        Future<String> future = executorService.submit(new Callable<String>() {
-
-         // adb -s UDID logcat -d
-            @Override
-            public String call() throws Exception {
-                LOGGER.debug("Start Syslog extraction");
-                String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "logcat", "-d");
-                LOGGER.debug("Logcat log has been extracted.");
-                StringBuilder tempStr = new StringBuilder();
-                executor.execute(cmd).stream().forEach((k) -> tempStr.append(k.concat("\n")));
-                return tempStr.toString();
-            }
-            
-        });
-
-        try {
-            String logs = future.get(extractionTimeout, TimeUnit.SECONDS);
-            LOGGER.debug("Logcat logs: ".concat(logs));
-            return logs;
-        } catch (TimeoutException e) {
-            LOGGER.warn(String.format("Sys log hasn't been extracted in %d seconds.", extractionTimeout));
-            future.cancel(true);
-            return "Syslog hasn't been extracted in seconds. Operation was interrupted.";
-        } catch (Exception e) {
-//            TODO: add custom handlers for each exceptions based on type
-            LOGGER.warn("Unknown issue was fired. Empty logs will be used.", e);
-            return "";
-        }
-       
-//        return tempStr.toString();
-    }
-    
-    /**
-     * Clear sys log
-     */
-    public void clearSysLog() {
-        if (isNull()) {
-            return;
-        }
-
-		if (!Configuration.getBoolean(Parameter.EXTRACT_SYS_LOG) && !isConnected()) {
-			//do not use new features if execution is not inside approved cloud
-			return;
-		}
-        
-        LOGGER.info(String.format("Test will be started on device: %s:%s", getName(), getAdbName()));
-        // adb -s UDID logcat -c
-        String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "-s", getAdbName(), "logcat", "-c");
-        executor.execute(cmd);
-        LOGGER.debug("Logcat logs were cleared.");
-    }
-    
-    /**
-     * Save logcat log for Android (logs will be uploaded in future as artifacts)
-     * TODO: for iOS
-     * 
-     * @return saved file
-     */
-    public File saveSysLog() {
-		if (!Configuration.getBoolean(Parameter.EXTRACT_SYS_LOG) && !isConnected()) {
-			//do not use new features if execution is not inside approved cloud
-			return null;
-		}
-		LOGGER.debug("Sys log will be extracted...");
-        String fileName = ReportContext.getTestDir() + "/logcat.log";
-        String log = getSysLog();
-        if (log.isEmpty()) {
-            return null;
-        }
-        
-        File file = null;
-        try {
-            file = new File(fileName);
-            FileUtils.writeStringToFile(file, log, Charset.defaultCharset());
-        } catch (IOException e) {
-            LOGGER.warn("Error has been occured during attempt to extract logcat log.", e);
-        }
-        LOGGER.debug("Logcat file path: ".concat(fileName));
-        return file;
-    }
-    
-    /**
      * Save xml layout of the application 
      * @param screenshotName - png file name to generate appropriate uix  
      * @return saved file
@@ -701,22 +695,6 @@ public class Device extends RemoteDevice implements IDriverPool {
         }
         
         return null;
-    }
-    
-    /**
-     * return unique ACTION_NAME for driver to measure selenium slave usage 
-     * @return WEB_DRIVER or MOBILE_DRIVER
-     */
-    public DRIVER_TYPE getMetricName() {
-        DRIVER_TYPE metricName = DRIVER_TYPE.WEB_DRIVER;
-        if (isMobile()) {
-            metricName = DRIVER_TYPE.MOBILE_DRIVER;
-        }
-        return metricName;
-    }
-    
-    private boolean isMobile() {
-        return SpecialKeywords.ANDROID.equalsIgnoreCase(getOs()) || SpecialKeywords.IOS.equalsIgnoreCase(getOs()) || SpecialKeywords.TVOS.equalsIgnoreCase(getOs());
     }
     
     private boolean isIOS() {
