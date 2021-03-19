@@ -23,6 +23,9 @@ public class EmailTest {
     private static final TestResultItem TEST_RESULT_ITEM3 = new TestResultItem("carina-reporting", "Test api 3", "", TestResultType.PASS,
             "", "", new ArrayList<>(), "");
 
+    private static final String CREATED_ITEM1 = "item 1";
+    private static final String CREATED_ITEM2 = "item 2";
+
 
     @Test
     public void testEmailValidator() {
@@ -30,7 +33,6 @@ public class EmailTest {
 
         Assert.assertTrue(emailValidator.validate(EMAIL), EMAIL + " is not validated email");
     }
-
 
     @Test
     public void testEmailReportCollector() {
@@ -46,6 +48,16 @@ public class EmailTest {
                 TEST_RESULT_ITEM3.getTest() + " wasn't added to email report results map");
     }
 
+    @Test
+    public void testPushStringEmailReportCollector() {
+        EmailReportItemCollector.push(CREATED_ITEM1);
+        EmailReportItemCollector.push(CREATED_ITEM2);
+
+        Assert.assertTrue(EmailReportItemCollector.getCreatedItems().contains(CREATED_ITEM1),
+                CREATED_ITEM1 + " wasn't added to email created items list");
+        Assert.assertTrue(EmailReportItemCollector.getCreatedItems().contains(CREATED_ITEM1),
+                CREATED_ITEM2 + " wasn't added to email created items list");
+    }
 
     @Test
     public void testEmailReportComparatorTheDifferentTestResultItems() {
