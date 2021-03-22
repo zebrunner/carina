@@ -238,11 +238,11 @@ Page opening strategy configuration can be set in several places:
 
 Strategy usage examples:
 
-* By URL *
-
-	This is a default value. To use it you need to set a real page urls into your page classes.
+By URL
 	
 	```
+	//This is a default value. To use it you need to set a real page urls into your page classes.
+	
 	private final String specificPageUrl = "https://www.gsmarena.com/specific/url";
 
 	public Page(WebDriver driver) {
@@ -255,11 +255,11 @@ Strategy usage examples:
 	}
 	```
 
-* By Element *
-
-	To use this strategy, you need to specify ui load marker.
+By Element
 
 	```
+	//To use this strategy, you need to specify ui load marker.
+	
 	@FindBy(id = "id")
 	private ExtendedWebElement element;
 
@@ -271,7 +271,7 @@ Strategy usage examples:
 	}
 	```
 
-* By URL and Element *
+By URL and Element
 
 	```
 	private final String specificPageUrl = "https://www.gsmarena.com/specific/url";
