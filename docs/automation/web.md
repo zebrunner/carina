@@ -213,72 +213,75 @@ Page opening strategy configuration can be set in several places:
 
 1) in [_config.properties](http://qaprosoft.github.io/carina/configuration/). This determines whole project page open strategy.
 
-2) in page.class. This overrides global page open strategy for a specific page.
+2) In page.class. This overrides global page opening strategy for a specific page.
 
-```
-public class Page extends AbstractPage {
+	```
+	public class Page extends AbstractPage {
 
-    public Page(WebDriver driver){
-        super(driver);
-        setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
-    }
-}
-```
-3) in test.class. This also overrides global page open strategy for a specific page.
-```
-@Test
-public void test(){
-        HomePage homePage=new HomePage(getDriver());
-        homePage.open();
-        homePage.setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
-}
-```
+	    public Page(WebDriver driver){
+		super(driver);
+		setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
+	    }
+	}
+	```
+3) In test.class. This also overrides global page opening strategy for a specific page.
+	```
+	@Test
+	public void test(){
+		HomePage homePage=new HomePage(getDriver());
+		homePage.open();
+		homePage.setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
+	}
+	```
 
-#### By URL
+* By URL
 
-This is a default value. To use it you need to set a real page urls into your page classes.
-```
-private final String specificPageUrl = "https://www.gsmarena.com/specific/url";
+	This is a default value. To use it you need to set a real page urls into your page classes.
+	```
+	private final String specificPageUrl = "https://www.gsmarena.com/specific/url";
 
-public Page(WebDriver driver) {
-    super(driver);
-    setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
-        
-    setPageAbsoluteURL(specificPageUrl);    //Will set full url
-    //or
-    setPageURL("/specific/url");            //Will add passed String to your url in _config_properties
-}
-```
+	public Page(WebDriver driver) {
+	    super(driver);
+	    setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
 
-#### By Element
+	    setPageAbsoluteURL(specificPageUrl);    //set's full url
+	    //or
+	    setPageURL("/specific/url");            //add's String to url from _config_properties
+	}
+	```
 
-```
-@FindBy(id = "id")
-private ExtendedWebElement element;
+* By Element
 
-public Page(WebDriver driver) {
-    super(driver);
+	To use this strategy, you need to specify ui load marker.
 
-    setPageOpeningStrategy(PageOpeningStrategy.BY_ELEMENT);
-    setUiLoadedMarker(element);
-}
-```
+	```
+	@FindBy(id = "id")
+	private ExtendedWebElement element;
 
-#### By URL and Element
-```
-private final String specificPageUrl = "https://www.gsmarena.com/specific/url";
+	public Page(WebDriver driver) {
+	    super(driver);
 
-@FindBy(id = "id")
-private ExtendedWebElement element;
+	    setPageOpeningStrategy(PageOpeningStrategy.BY_ELEMENT);
+	    setUiLoadedMarker(element);
+	}
+	```
 
-public Page(WebDriver driver) {
-    super(driver);
+* By URL and Element
 
-    setPageOpeningStrategy(PageOpeningStrategy.BY_URL_AND_ELEMENT);
-    setUiLoadedMarker(element);
-    setPageAbsoluteURL(specificPageUrl);
-}
-```
+	```
+	private final String specificPageUrl = "https://www.gsmarena.com/specific/url";
+
+	@FindBy(id = "id")
+	private ExtendedWebElement element;
+
+	public Page(WebDriver driver) {
+	    super(driver);
+
+	    setPageOpeningStrategy(PageOpeningStrategy.BY_URL_AND_ELEMENT);
+	    setUiLoadedMarker(element);
+	    setPageAbsoluteURL(specificPageUrl);
+	}
+	```
 
 ### Element loading strategy
 
