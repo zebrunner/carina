@@ -797,18 +797,22 @@ public class Page extends AbstractPage {
 }
 ```
 </code></pre>
-<p>3) In test.class. This also overrides global page opening strategy for a specific page.
-    <code>@Test
-    public void test(){
-        HomePage homePage=new HomePage(getDriver());
-        homePage.open();
-        homePage.setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
-    }</code></p>
+<p>3) In test.class. This also overrides global page opening strategy for a specific page.</p>
+<pre><code>```
+@Test
+public void test(){
+    HomePage homePage=new HomePage(getDriver());
+    homePage.open();
+    homePage.setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
+}
+```
+</code></pre>
+<p>Strategy usage examples:</p>
 <ul>
 <li>
 <p>By URL</p>
-<p>This is a default value. To use it you need to set a real page urls into your page classes.
-```
+<p>This is a default value. To use it you need to set a real page urls into your page classes.</p>
+<p>```
 private final String specificPageUrl = "https://www.gsmarena.com/specific/url";</p>
 <p>public Page(WebDriver driver) {
     super(driver);
