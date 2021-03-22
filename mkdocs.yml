@@ -9,6 +9,7 @@ pages:
       - Web: automation/web.md
       - Mobile: automation/mobile.md
       - API: automation/api.md
+      - Windows: automation/windows.md
     - Advanced:
       - Database: advanced/database.md
       - DataProvider: advanced/dataprovider.md
