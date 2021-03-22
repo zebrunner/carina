@@ -238,7 +238,7 @@ Page opening strategy configuration can be set in several places:
 
 Strategy usage examples:
 
-* By URL
+* By URL *
 
 	This is a default value. To use it you need to set a real page urls into your page classes.
 	
@@ -255,7 +255,7 @@ Strategy usage examples:
 	}
 	```
 
-* By Element
+* By Element *
 
 	To use this strategy, you need to specify ui load marker.
 
@@ -271,7 +271,7 @@ Strategy usage examples:
 	}
 	```
 
-* By URL and Element
+* By URL and Element *
 
 	```
 	private final String specificPageUrl = "https://www.gsmarena.com/specific/url";
