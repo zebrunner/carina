@@ -224,7 +224,9 @@ Page opening strategy configuration can be set in several places:
 	    }
 	}
 	```
+	
 3) In test.class. This also overrides global page opening strategy for a specific page.
+
 	```
 	@Test
 	public void test(){
@@ -234,9 +236,12 @@ Page opening strategy configuration can be set in several places:
 	}
 	```
 
+Strategy usage examples:
+
 * By URL
 
 	This is a default value. To use it you need to set a real page urls into your page classes.
+	
 	```
 	private final String specificPageUrl = "https://www.gsmarena.com/specific/url";
 
