@@ -808,52 +808,53 @@ public void test(){
 ```
 </code></pre>
 <p>Strategy usage examples:</p>
-<ul>
-<li>
-<p>By URL *</p>
-<p>This is a default value. To use it you need to set a real page urls into your page classes.</p>
-<p>```
-private final String specificPageUrl = "https://www.gsmarena.com/specific/url";</p>
-<p>public Page(WebDriver driver) {
+<p>By URL</p>
+<pre><code>```
+//This is a default value. To use it you need to set a real page urls into your page classes.
+
+private final String specificPageUrl = "https://www.gsmarena.com/specific/url";
+
+public Page(WebDriver driver) {
     super(driver);
-    setPageOpeningStrategy(PageOpeningStrategy.BY_URL);</p>
-<pre><code>setPageAbsoluteURL(specificPageUrl);    //set's full url
-//or
-setPageURL("/specific/url");            //add's String to url from _config_properties
+    setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
+
+    setPageAbsoluteURL(specificPageUrl);    //set's full url
+    //or
+    setPageURL("/specific/url");            //add's String to url from _config_properties
+}
+```
 </code></pre>
-<p>}
-```</p>
-</li>
-<li>
-<p>By Element *</p>
-<p>To use this strategy, you need to specify ui load marker.</p>
-<p>```
+<p>By Element</p>
+<pre><code>```
+//To use this strategy, you need to specify ui load marker.
+
 @FindBy(id = "id")
-private ExtendedWebElement element;</p>
-<p>public Page(WebDriver driver) {
-    super(driver);</p>
-<pre><code>setPageOpeningStrategy(PageOpeningStrategy.BY_ELEMENT);
-setUiLoadedMarker(element);
+private ExtendedWebElement element;
+
+public Page(WebDriver driver) {
+    super(driver);
+
+    setPageOpeningStrategy(PageOpeningStrategy.BY_ELEMENT);
+    setUiLoadedMarker(element);
+}
+```
 </code></pre>
-<p>}
-```</p>
-</li>
-<li>
-<p>By URL and Element *</p>
-<p>```
-private final String specificPageUrl = "https://www.gsmarena.com/specific/url";</p>
-<p>@FindBy(id = "id")
-private ExtendedWebElement element;</p>
-<p>public Page(WebDriver driver) {
-    super(driver);</p>
-<pre><code>setPageOpeningStrategy(PageOpeningStrategy.BY_URL_AND_ELEMENT);
-setUiLoadedMarker(element);
-setPageAbsoluteURL(specificPageUrl);
+<p>By URL and Element</p>
+<pre><code>```
+private final String specificPageUrl = "https://www.gsmarena.com/specific/url";
+
+@FindBy(id = "id")
+private ExtendedWebElement element;
+
+public Page(WebDriver driver) {
+    super(driver);
+
+    setPageOpeningStrategy(PageOpeningStrategy.BY_URL_AND_ELEMENT);
+    setUiLoadedMarker(element);
+    setPageAbsoluteURL(specificPageUrl);
+}
+```
 </code></pre>
-<p>}
-```</p>
-</li>
-</ul>
 <h3 id="element-loading-strategy">Element loading strategy</h3>
 <p>Determines how carina detects appearing of web elements on page</p>
 <ul>
