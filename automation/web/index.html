@@ -326,33 +326,6 @@
     Page opening strategy
   </a>
   
-    <nav class="md-nav" aria-label="Page opening strategy">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#by-url" class="md-nav__link">
-    By URL
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#by-element" class="md-nav__link">
-    By Element
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#by-url-and-element" class="md-nav__link">
-    By URL and Element
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -579,33 +552,6 @@
   <a href="#page-opening-strategy" class="md-nav__link">
     Page opening strategy
   </a>
-  
-    <nav class="md-nav" aria-label="Page opening strategy">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#by-url" class="md-nav__link">
-    By URL
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#by-element" class="md-nav__link">
-    By Element
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#by-url-and-element" class="md-nav__link">
-    By URL and Element
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -840,66 +786,70 @@ page.assertPageOpened();  // equals Assert.assertTrue(page.isPageOpened(),&quot;
 
 <p>Page opening strategy configuration can be set in several places:</p>
 <p>1) in <a href="http://qaprosoft.github.io/carina/configuration/">_config.properties</a>. This determines whole project page open strategy.</p>
-<p>2) in page.class. This overrides global page open strategy for a specific page.</p>
-<pre><code>public class Page extends AbstractPage {
+<p>2) In page.class. This overrides global page opening strategy for a specific page.</p>
+<pre><code>```
+public class Page extends AbstractPage {
 
     public Page(WebDriver driver){
-        super(driver);
-        setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
+    super(driver);
+    setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
     }
 }
+```
 </code></pre>
-
-<p>3) in test.class. This also overrides global page open strategy for a specific page.</p>
-<pre><code>@Test
-public void test(){
+<p>3) In test.class. This also overrides global page opening strategy for a specific page.
+    <code>@Test
+    public void test(){
         HomePage homePage=new HomePage(getDriver());
         homePage.open();
         homePage.setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
-}
-</code></pre>
-
-<h4 id="by-url">By URL</h4>
-<p>This is a default value. To use it you need to set a real page urls into your page classes.</p>
-<pre><code>private final String specificPageUrl = &quot;https://www.gsmarena.com/specific/url&quot;;
-
-public Page(WebDriver driver) {
+    }</code></p>
+<ul>
+<li>
+<p>By URL</p>
+<p>This is a default value. To use it you need to set a real page urls into your page classes.
+```
+private final String specificPageUrl = "https://www.gsmarena.com/specific/url";</p>
+<p>public Page(WebDriver driver) {
     super(driver);
-    setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
-
-    setPageAbsoluteURL(specificPageUrl);    //Will set full url
-    //or
-    setPageURL(&quot;/specific/url&quot;);            //Will add passed String to your url in _config_properties
-}
+    setPageOpeningStrategy(PageOpeningStrategy.BY_URL);</p>
+<pre><code>setPageAbsoluteURL(specificPageUrl);    //set's full url
+//or
+setPageURL("/specific/url");            //add's String to url from _config_properties
 </code></pre>
-
-<h4 id="by-element">By Element</h4>
-<pre><code>@FindBy(id = &quot;id&quot;)
-private ExtendedWebElement element;
-
-public Page(WebDriver driver) {
-    super(driver);
-
-    setPageOpeningStrategy(PageOpeningStrategy.BY_ELEMENT);
-    setUiLoadedMarker(element);
-}
+<p>}
+```</p>
+</li>
+<li>
+<p>By Element</p>
+<p>To use this strategy, you need to specify ui load marker.</p>
+<p>```
+@FindBy(id = "id")
+private ExtendedWebElement element;</p>
+<p>public Page(WebDriver driver) {
+    super(driver);</p>
+<pre><code>setPageOpeningStrategy(PageOpeningStrategy.BY_ELEMENT);
+setUiLoadedMarker(element);
 </code></pre>
-
-<h4 id="by-url-and-element">By URL and Element</h4>
-<pre><code>private final String specificPageUrl = &quot;https://www.gsmarena.com/specific/url&quot;;
-
-@FindBy(id = &quot;id&quot;)
-private ExtendedWebElement element;
-
-public Page(WebDriver driver) {
-    super(driver);
-
-    setPageOpeningStrategy(PageOpeningStrategy.BY_URL_AND_ELEMENT);
-    setUiLoadedMarker(element);
-    setPageAbsoluteURL(specificPageUrl);
-}
+<p>}
+```</p>
+</li>
+<li>
+<p>By URL and Element</p>
+<p>```
+private final String specificPageUrl = "https://www.gsmarena.com/specific/url";</p>
+<p>@FindBy(id = "id")
+private ExtendedWebElement element;</p>
+<p>public Page(WebDriver driver) {
+    super(driver);</p>
+<pre><code>setPageOpeningStrategy(PageOpeningStrategy.BY_URL_AND_ELEMENT);
+setUiLoadedMarker(element);
+setPageAbsoluteURL(specificPageUrl);
 </code></pre>
-
+<p>}
+```</p>
+</li>
+</ul>
 <h3 id="element-loading-strategy">Element loading strategy</h3>
 <p>Determines how carina detects appearing of web elements on page</p>
 <ul>
