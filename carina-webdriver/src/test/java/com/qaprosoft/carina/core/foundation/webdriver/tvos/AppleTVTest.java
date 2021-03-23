@@ -19,46 +19,46 @@ public class AppleTVTest {
 
 	private static final String PLATFORM_NAME = "platformName";
 
-	@Test
+	@Test(groups = {"AppleTVTestClass"})
 	public void getTvOSCapabilityTest() {
 		R.CONFIG.put(MOBILE_DEVICE_PLATFORM, TVOS);
 		Assert.assertEquals(R.CONFIG.get(MOBILE_DEVICE_PLATFORM), TVOS);
 	}
 
-	@Test
+	@Test(groups = {"AppleTVTestClass"})
 	public void getTvOSDriverTypeTest() {
 		DesiredCapabilities capability = new DesiredCapabilities();
 		capability.setCapability(PLATFORM_NAME, TVOS);
 		Assert.assertEquals(Configuration.getDriverType(capability), MOBILE);
 	}
 
-	@Test
+	@Test(groups = {"AppleTVTestClass"})
 	public void negativeTvOSDriverTypeTest() {
 		DesiredCapabilities capability = new DesiredCapabilities();
 		capability.setCapability(PLATFORM_NAME, TVOS);
 		Assert.assertNotEquals(Configuration.getDriverType(capability), DESKTOP);
 	}
 
-	@Test
+	@Test(groups = {"AppleTVTestClass"})
 	public void getTvOSPlatformTest() {
 		R.CONFIG.put(SpecialKeywords.PLATFORM_NAME, TVOS);
 		Assert.assertEquals(Configuration.getDriverType(), MOBILE);
 	}
 
-	@Test
+	@Test(groups = {"AppleTVTestClass"})
 	public void negativeTvOSPlatformTest() {
 		R.CONFIG.put(SpecialKeywords.PLATFORM_NAME, TVOS);
 		Assert.assertNotEquals(Configuration.getDriverType(), DESKTOP);
 	}
 
-	@Test
+	@Test(groups = {"AppleTVTestClass"})
 	public void isTvOSTvTest() {
 		DesiredCapabilities capability = new DesiredCapabilities();
 		capability.setCapability("deviceType", TVOS);
 		Assert.assertTrue(new Device(capability).isTv());
 	}
 
-	@Test
+	@Test(groups = {"AppleTVTestClass"})
 	public void getDeviceTypeTest() {
 		DesiredCapabilities capability = new DesiredCapabilities();
 		capability.setCapability("deviceType", TVOS);
