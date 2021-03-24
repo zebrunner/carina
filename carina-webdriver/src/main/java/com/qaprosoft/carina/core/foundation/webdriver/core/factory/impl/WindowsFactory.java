@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.windows.WindowsCapabilies;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.windows.WindowsCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 
 import io.appium.java_client.windows.WindowsDriver;
@@ -71,7 +71,7 @@ public class WindowsFactory extends AbstractFactory {
     }
 
     private DesiredCapabilities getCapabilities(String name) {
-        return new WindowsCapabilies().getCapability(name);
+        return new WindowsCapabilities().getCapability(name);
     }
 
     @Override

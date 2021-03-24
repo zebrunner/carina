@@ -19,46 +19,46 @@ public class AppleTVTest {
 
 	private static final String PLATFORM_NAME = "platformName";
 
-	@Test(groups = {"AppleTVTestClass"})
+	@Test(groups = {"AppleTVTestClass"}, dependsOnGroups = {"DesktopCapabilitiesTestClass"})
 	public void getTvOSCapabilityTest() {
 		R.CONFIG.put(MOBILE_DEVICE_PLATFORM, TVOS);
 		Assert.assertEquals(R.CONFIG.get(MOBILE_DEVICE_PLATFORM), TVOS);
 	}
 
-	@Test(groups = {"AppleTVTestClass"})
+	@Test(groups = {"AppleTVTestClass"}, dependsOnGroups = {"DesktopCapabilitiesTestClass"})
 	public void getTvOSDriverTypeTest() {
 		DesiredCapabilities capability = new DesiredCapabilities();
 		capability.setCapability(PLATFORM_NAME, TVOS);
 		Assert.assertEquals(Configuration.getDriverType(capability), MOBILE);
 	}
 
-	@Test(groups = {"AppleTVTestClass"})
+	@Test(groups = {"AppleTVTestClass"}, dependsOnGroups = {"DesktopCapabilitiesTestClass"})
 	public void negativeTvOSDriverTypeTest() {
 		DesiredCapabilities capability = new DesiredCapabilities();
 		capability.setCapability(PLATFORM_NAME, TVOS);
 		Assert.assertNotEquals(Configuration.getDriverType(capability), DESKTOP);
 	}
 
-	@Test(groups = {"AppleTVTestClass"})
+	@Test(groups = {"AppleTVTestClass"}, dependsOnGroups = {"DesktopCapabilitiesTestClass"})
 	public void getTvOSPlatformTest() {
 		R.CONFIG.put(SpecialKeywords.PLATFORM_NAME, TVOS);
 		Assert.assertEquals(Configuration.getDriverType(), MOBILE);
 	}
 
-	@Test(groups = {"AppleTVTestClass"})
+	@Test(groups = {"AppleTVTestClass"}, dependsOnGroups = {"DesktopCapabilitiesTestClass"})
 	public void negativeTvOSPlatformTest() {
 		R.CONFIG.put(SpecialKeywords.PLATFORM_NAME, TVOS);
 		Assert.assertNotEquals(Configuration.getDriverType(), DESKTOP);
 	}
 
-	@Test(groups = {"AppleTVTestClass"})
+	@Test(groups = {"AppleTVTestClass"}, dependsOnGroups = {"DesktopCapabilitiesTestClass"})
 	public void isTvOSTvTest() {
 		DesiredCapabilities capability = new DesiredCapabilities();
 		capability.setCapability("deviceType", TVOS);
 		Assert.assertTrue(new Device(capability).isTv());
 	}
 
-	@Test(groups = {"AppleTVTestClass"})
+	@Test(groups = {"AppleTVTestClass"}, dependsOnGroups = {"DesktopCapabilitiesTestClass"})
 	public void getDeviceTypeTest() {
 		DesiredCapabilities capability = new DesiredCapabilities();
 		capability.setCapability("deviceType", TVOS);

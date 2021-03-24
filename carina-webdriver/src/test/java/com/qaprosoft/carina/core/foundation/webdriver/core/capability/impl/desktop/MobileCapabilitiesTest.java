@@ -6,7 +6,6 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileCapabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 public class MobileCapabilitiesTest {
@@ -19,8 +18,7 @@ public class MobileCapabilitiesTest {
     private static final String LOCALE_LANGUAGE = "en_US";
     private static final String LANGUAGE = "en";
 
-
-    @Test
+    @Test(dependsOnGroups = {"AppleTVTestClass"})
     public void getCapabilityWithLocaleTest() {
         R.CONFIG.put(LOCALE_KEY, LOCALE, true);
         R.CONFIG.put(LANGUAGE_KEY, "", true);
@@ -34,7 +32,7 @@ public class MobileCapabilitiesTest {
         Assert.assertNull(capabilities.getCapability(LANGUAGE_KEY), "Language capability is not empty");
     }
 
-    @Test
+    @Test(dependsOnGroups = {"AppleTVTestClass"})
     public void getCapabilityWithLocaleAndLanguageSeparatelyTest() {
         R.CONFIG.put(LOCALE_KEY, LOCALE, true);
         R.CONFIG.put(LANGUAGE_KEY, LANGUAGE, true);
@@ -48,7 +46,7 @@ public class MobileCapabilitiesTest {
         Assert.assertEquals(capabilities.getCapability(LANGUAGE_KEY), LANGUAGE, "Language capability is not valid");
     }
 
-    @Test(dependsOnGroups = "AppleTVTestClass")
+    @Test(dependsOnGroups = {"AppleTVTestClass"})
     public void getAndroidCapabilityWithLocaleAndLanguageTogetherTest() {
         R.CONFIG.put(PLATFORM_NAME_KEY, "Android", true);
         R.CONFIG.put(LOCALE_KEY, LOCALE_LANGUAGE, true);
@@ -62,7 +60,7 @@ public class MobileCapabilitiesTest {
         Assert.assertEquals(capabilities.getCapability(LANGUAGE_KEY), LANGUAGE, "Language capability is not valid");
     }
 
-    @Test(dependsOnGroups = "AppleTVTestClass")
+    @Test(dependsOnGroups = {"AppleTVTestClass"})
     public void getIOSCapabilityWithLocaleAndLanguageTogetherTest() {
         R.CONFIG.put(PLATFORM_NAME_KEY, "IOS", true);
         R.CONFIG.put(LOCALE_KEY, LOCALE_LANGUAGE, true);
