@@ -65,12 +65,13 @@
         <!-- Zebrunner integrations -->
         <zebrunner-testng-pluggable.version>1.5.0.180-SNAPSHOT</zebrunner-testng-pluggable.version>
         <!-- Others -->
+        <azure-storage-blob.version>12.4.0</azure-storage-blob.version>
         <aws-java-sdk.version>1.11.923</aws-java-sdk.version>
         <rest-assured.version>4.3.0</rest-assured.version>
         <imgscalr-lib.version>4.2</imgscalr-lib.version>
         <commons-beanutils.version>1.9.2</commons-beanutils.version>
         <gson.version>2.8.5</gson.version>
-        <jackson-databind.version>2.9.10.7</jackson-databind.version>
+        <jackson-databind.version>2.11.0</jackson-databind.version>
         <jackson-annotations.version>2.9.9</jackson-annotations.version>
         <apache-poi.version>4.1.2</apache-poi.version>
         <guava.version>25.0-jre</guava.version>
@@ -96,6 +97,7 @@
         <module>carina-aws-s3</module>
         <module>carina-appcenter</module>
         <module>carina-core</module>
+        <module>carina-azure</module>
     </modules>
     <repositories>
         <repository>
@@ -352,6 +354,11 @@
             </dependency>
             <dependency>
                 <groupId>com.qaprosoft</groupId>
+                <artifactId>carina-azure</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.qaprosoft</groupId>
                 <artifactId>carina-appcenter</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>
@@ -521,6 +528,12 @@
                 <artifactId>aws-java-sdk-core</artifactId>
                 <version>${aws-java-sdk.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-storage-blob</artifactId>
+                <version>${azure-storage-blob.version}</version>
+            </dependency>
+
             <!-- Test utilities -->
             <dependency>
                 <groupId>org.testng</groupId>
