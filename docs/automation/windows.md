@@ -16,7 +16,57 @@ capabilities.platformName=Windows
 capabilities.automationName=Windows
 
 #path to application you want to test	
-capabilities.app=C:/Program Files (x86)/Microsoft/Skype for Desktop/Skype.exe
+capabilities.app=C:/Windows/system32/win32calc.exe
 ```
 
 That's all. To get access to the driver use getDriver(). Write and run tests as usual. If you want to pass specific parameters to WindowsDriver refer to Appium [documentation](https://github.com/appium/appium-windows-driver#windowsdriver-specific-capabilities).
+
+Code example:
+
+```
+//page.class example
+public class CalculatorHomePage extends AbstractPage {
+    @FindBy(xpath = "/Window/Pane/Button[10]")
+    ExtendedWebElement fiveButton;
+    
+    @FindBy(xpath = "/Window/Pane/Button[5]")
+    ExtendedWebElement oneButton;
+    
+    @FindBy(xpath = "/Window/Pane/Button[23]")
+    ExtendedWebElement plusButton;
+    
+    @FindBy(xpath = "/Window/Pane/Button[28]")
+    ExtendedWebElement resultButton;
+    
+    @FindBy(id = "/Window/Pane/Text[3]")
+    ExtendedWebElement resultField;
+    
+    public CalculatorHomePage(WebDriver driver) {
+        super(driver);
+    }
+    
+    public void sumOneAndFive(){
+        fiveButton.click();
+        plusButton.click();
+        oneButton.click();
+        resultButton.click();
+    }
+    
+    public String getResult(){
+        return resultField.getText();
+    }
+}
+```
+
+
+```
+//test.class example
+public class CalculatorTest extends AbstractTest {
+    @Test
+    public void calculatorSumTest(){
+        CalculatorHomePage calculator = new CalculatorHomePage(getDriver());
+        calculator.sumOneAndFive();
+        Assert.assertEquals(calculator.getResult().trim(),"6");
+    }
+}
+```
