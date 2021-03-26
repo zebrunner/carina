@@ -12,7 +12,7 @@ public class MobileCapabilitiesTest {
 
     private static final String PLATFORM_NAME_KEY = SpecialKeywords.PLATFORM_NAME;
     private static final String LOCALE_KEY = Configuration.Parameter.LOCALE.getKey();
-    private static final String LANGUAGE_KEY = Configuration.Parameter.LANGUAGE.getKey();
+    private static final String LANGUAGE_KEY = "language";
 
     private static final String LOCALE = "US";
     private static final String LOCALE_LANGUAGE = "en_US";

@@ -149,8 +149,6 @@ public class Configuration {
 
         LOCALE("locale"),
 
-        LANGUAGE("language"),
-
         THREAD_COUNT("thread_count"),
 
         DATA_PROVIDER_THREAD_COUNT("data_provider_thread_count"),
