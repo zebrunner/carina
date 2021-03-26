@@ -515,7 +515,7 @@ public class CalculatorHomePage extends AbstractPage {
     @FindBy(xpath = &quot;/Window/Pane/Button[28]&quot;)
     ExtendedWebElement resultButton;
 
-    @FindBy(id = &quot;/Window/Pane/Text[3]&quot;)
+    @FindBy(xpath = &quot;/Window/Pane/Text[3]&quot;)
     ExtendedWebElement resultField;
 
     public CalculatorHomePage(WebDriver driver) {
@@ -541,7 +541,7 @@ public class CalculatorTest extends AbstractTest {
     public void calculatorSumTest(){
         CalculatorHomePage calculator = new CalculatorHomePage(getDriver());
         calculator.sumOneAndFive();
-        Assert.assertEquals(calculator.getResult().trim(),&quot;6&quot;);
+        Assert.assertEquals(calculator.getResult().trim(), &quot;6&quot;);
     }
 }
 </code></pre>
