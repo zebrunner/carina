@@ -175,6 +175,10 @@ public class Device implements IDriverPool {
         
         setCapabilities(capabilities);
     }
+
+    public boolean isAdbEnabled() {
+        return isAdbEnabled;
+    }
     
     public String getName() {
         return name;
@@ -341,6 +345,7 @@ public class Device implements IDriverPool {
     public String getFullPackageByName(final String name) {
 
         List<String> packagesList = getInstalledPackages();
+        System.out.println(packagesList);
         LOGGER.debug("Found packages: ".concat(packagesList.toString()));
         String resultPackage = null;
         for (String packageStr : packagesList) {

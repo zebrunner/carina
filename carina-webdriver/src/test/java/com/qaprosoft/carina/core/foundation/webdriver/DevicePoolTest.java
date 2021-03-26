@@ -49,4 +49,91 @@ public class DevicePoolTest implements IDriverPool {
         Assert.assertEquals(IDriverPool.getDefaultDevice(), device, "Incorrect device has been returned");
     }
 
+    @Test()
+    public void getDeviceTypePhoneAndroidTest() {
+        String type = "phone";
+        String os = "android";
+        Device device = new Device("name", type, os, "10", "udid", "remoteUrl", "vnc", "proxyPort");
+        Assert.assertTrue(device.isPhone(), "Type parameter is not phone");
+        Assert.assertEquals(device.getOs(), os, "Os parameter is not valid");
+    }
+
+    @Test()
+    public void getDeviceTypeTabletAndroidTest() {
+        String type = "tablet";
+        String os = "android";
+        Device device = new Device("name", type, os, "10", "udid", "remoteUrl", "vnc", "proxyPort");
+        Assert.assertTrue(device.isTablet(), "Type parameter is not tablet");
+        Assert.assertEquals(device.getOs(), os, "Os parameter is not valid");
+    }
+
+    @Test()
+    public void getDeviceTypeTvAndroidTest() {
+        String type = "tv";
+        String os = "android";
+        Device device = new Device("name", type, os, "10", "udid", "remoteUrl", "vnc", "proxyPort");
+        Assert.assertTrue(device.isTv(), "Type parameter is not tv");
+        Assert.assertEquals(device.getOs(), os, "Os parameter is not valid");
+    }
+
+    @Test()
+    public void getDeviceTypePhoneIosTest() {
+        String type = "phone";
+        String os = "ios";
+        Device device = new Device("name", type, os, "10", "udid", "remoteUrl", "vnc", "proxyPort");
+        Assert.assertTrue(device.isPhone(), "Type parameter is not phone");
+        Assert.assertEquals(device.getOs(), os, "Os parameter is not valid");
+    }
+
+    @Test()
+    public void getDeviceTypeTabletIosTest() {
+        String type = "tablet";
+        String os = "ios";
+        Device device = new Device("name", type, os, "10", "udid", "remoteUrl", "vnc", "proxyPort");
+        Assert.assertTrue(device.isTablet(), "Type parameter is not tablet");
+        Assert.assertEquals(device.getOs(), os, "Os parameter is not valid");
+    }
+
+    @Test()
+    public void getDeviceTypeTvIosTest() {
+        String type = "tv";
+        String os = "ios";
+        Device device = new Device("name", type, os, "10", "udid", "remoteUrl", "vnc", "proxyPort");
+        Assert.assertTrue(device.isTv(), "Type parameter is not tv");
+        Assert.assertEquals(device.getOs(), os, "Os parameter is not valid");
+    }
+
+    @Test()
+    public void getDeviceNullTest() {
+        Device device = new Device("", "mobile", "android", "10", "udid", "remoteUrl", "vnc", "proxyPort");
+
+        Assert.assertTrue(device.isNull(), "Device is not null");
+    }
+
+    @Test()
+    public void connectRemoteTest() {
+        Device device = new Device("name", "mobile", "android", "10", "udid", "remoteUrl", "vnc", "proxyPort");
+
+        device.connectRemote();
+        Assert.assertTrue(device.isAdbEnabled(), "Adb commands is disabled");
+    }
+
+    @Test()
+    public void disconnectRemoteTest() {
+        Device device = new Device("name", "mobile", "android", "10", "udid", "remoteUrl", "vnc", "proxyPort");
+
+        device.connectRemote();
+        Assert.assertTrue(device.isAdbEnabled(), "Adb commands is disabled");
+
+        device.disconnectRemote();
+        Assert.assertTrue(device.isAdbEnabled(), "Adb commands is enabled");
+    }
+
+    @Test()
+    public void isAppUninstallTest() {
+        Device device = new Device("name", "mobile", "android", "10", "udid", "remoteUrl", "vnc", "proxyPort");
+
+        Assert.assertFalse(device.isAppInstall("packages"), "App is installed");
+    }
+
 }
