@@ -126,7 +126,7 @@ public class DevicePoolTest implements IDriverPool {
         Assert.assertTrue(device.isAdbEnabled(), "Adb commands is disabled");
 
         device.disconnectRemote();
-        Assert.assertTrue(device.isAdbEnabled(), "Adb commands is enabled");
+        Assert.assertFalse(device.isAdbEnabled(), "Adb commands is enabled");
     }
 
     @Test()

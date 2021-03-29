@@ -340,12 +340,12 @@ public class Device implements IDriverPool {
         String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "disconnect", getRemoteURL());
         executor.execute(cmd);
 
+        isAdbEnabled = false;
     }
 
     public String getFullPackageByName(final String name) {
 
         List<String> packagesList = getInstalledPackages();
-        System.out.println(packagesList);
         LOGGER.debug("Found packages: ".concat(packagesList.toString()));
         String resultPackage = null;
         for (String packageStr : packagesList) {
