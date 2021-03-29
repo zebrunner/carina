@@ -175,6 +175,10 @@ public class Device implements IDriverPool {
         
         setCapabilities(capabilities);
     }
+
+    public boolean isAdbEnabled() {
+        return isAdbEnabled;
+    }
     
     public String getName() {
         return name;
@@ -336,6 +340,7 @@ public class Device implements IDriverPool {
         String[] cmd = CmdLine.insertCommandsAfter(executor.getDefaultCmd(), "disconnect", getRemoteURL());
         executor.execute(cmd);
 
+        isAdbEnabled = false;
     }
 
     public String getFullPackageByName(final String name) {

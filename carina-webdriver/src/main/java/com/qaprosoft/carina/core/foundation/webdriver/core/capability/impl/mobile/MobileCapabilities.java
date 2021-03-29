@@ -27,7 +27,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
-public class MobileCapabilies extends AbstractCapabilities {
+public class MobileCapabilities extends AbstractCapabilities {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -73,7 +73,7 @@ public class MobileCapabilies extends AbstractCapabilities {
                 LOGGER.debug("Put language and locale to iOS capabilities. language: " + values[0] + "; locale: " + localeValue);
                 caps.setCapability("language", values[0]);
                 caps.setCapability("locale", localeValue);
-            }        
+            }
         } else {
             LOGGER.error("Undefined locale provided (ignoring for mobile capabilitites): " + localeValue);
         }

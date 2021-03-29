@@ -19,7 +19,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
-public class WindowsCapabilies extends AbstractCapabilities {
+public class WindowsCapabilities extends AbstractCapabilities {
     
 
     @Override
