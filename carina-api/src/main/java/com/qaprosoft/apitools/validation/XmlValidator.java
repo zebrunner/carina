@@ -15,11 +15,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-
 public class XmlValidator {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private XmlValidator() {
+    }
+
+    public static void validateXml(String actualXmlData, String expectedXmlPath, XmlCompareMode mode) {
+        try {
+            XmlComparator.compare(actualXmlData, expectedXmlPath, mode);
+        } catch (Exception e) {
+            throw new AssertionError("Validation of xml data failed: " + e.getMessage());
+        }
+        LOGGER.info("Validation of xml data successfully passed");
     }
 
     public static void validateXmlAgainstSchema(String xmlSchemaPath, String xmlData) {
@@ -36,6 +44,5 @@ public class XmlValidator {
         }
         LOGGER.info("Validation against Xml schema successfully passed");
     }
-
 }
 

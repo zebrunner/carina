@@ -24,6 +24,7 @@ import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.util.Properties;
 
+import com.qaprosoft.apitools.validation.*;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -32,9 +33,6 @@ import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.apitools.builder.PropertiesProcessorMain;
 import com.qaprosoft.apitools.message.TemplateMessage;
-import com.qaprosoft.apitools.validation.JsonKeywordsComparator;
-import com.qaprosoft.apitools.validation.JsonValidator;
-import com.qaprosoft.apitools.validation.XmlValidator;
 import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
 import com.qaprosoft.carina.core.foundation.api.annotation.RequestTemplatePath;
 import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePath;
@@ -42,10 +40,9 @@ import com.qaprosoft.carina.core.foundation.api.annotation.SuccessfulHttpStatus;
 
 import io.restassured.response.Response;
 
-
 public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    
+
     private Properties properties;
     private String rqPath;
     private String rsPath;
@@ -97,7 +94,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     /**
      * Sets path to freemarker template for request body
-     * 
+     *
      * @param path String
      */
     public void setRequestTemplate(String path) {
@@ -106,7 +103,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     /**
      * Sets path to freemarker template for expected response body
-     * 
+     *
      * @param path String
      */
     public void setResponseTemplate(String path) {
@@ -128,7 +125,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     /**
      * Calls API expecting http status in response taken from @SuccessfulHttpStatus value
-     * 
+     *
      * @return restassured Response object
      */
     public Response callAPIExpectSuccess() {
@@ -142,7 +139,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     /**
      * Sets path to .properties file which stores properties list for declared API method
-     * 
+     *
      * @param propertiesPath String path to properties file
      */
     public void setProperties(String propertiesPath) {
@@ -163,7 +160,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     /**
      * Sets properties list for declared API method
-     * 
+     *
      * @param properties Properties object with predefined properties for declared API method
      */
     public void setProperties(Properties properties) {
@@ -190,7 +187,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     /**
      * Validates JSON response using custom options
-     * 
+     *
      * @param mode
      *            - determines how to compare 2 JSONs. See type description for more details. Mode is not applied for
      *            arrays comparison
@@ -198,6 +195,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
      *            - used for JSON arrays validation when we need to check presence of some array items in result array.
      *            Use JsonCompareKeywords.ARRAY_CONTAINS.getKey() construction for that
      */
+
     public void validateResponse(JSONCompareMode mode, String... validationFlags) {
         if (rsPath == null) {
             throw new RuntimeException("Please specify rsPath to make Response body validation");
@@ -219,20 +217,39 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         }
     }
 
+    public void validateXmlResponse(XmlCompareMode mode) {
+        if (actualRsBody == null) {
+            throw new RuntimeException("Actual response body is null. Please make API call before validation response");
+        }
+        if (rsPath == null) {
+            throw new RuntimeException("Please specify rsPath to make Response body validation");
+        }
+        try {
+            XmlComparator.compare(actualRsBody, rsPath, mode);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * @param validationFlags
      *            parameter that specifies how to validate JSON response. Currently only array validation flag is supported.
      *            Use JsonCompareKeywords.ARRAY_CONTAINS enum value for that
      */
     public void validateResponse(String... validationFlags) {
-        validateResponse(JSONCompareMode.NON_EXTENSIBLE, validationFlags);
+        ContentType contentType = this.getClass().getAnnotation(ContentType.class);
+        if (contentType.type().equals(XML_CONTENT_TYPE.getHeaderValue())) {
+            validateXmlResponse(XmlCompareMode.STRICT);
+        } else {
+            validateResponse(JSONCompareMode.NON_EXTENSIBLE, validationFlags);
+        }
     }
 
     /**
      * Validates actual API response per schema (JSON or XML depending on response body type).
      * Annotation {@link ContentType} on your AbstractApiMethodV2 class is used to determine whether to validate JSON or XML.
      * If ContentType is not specified then JSON schema validation will be applied by default.
-     * 
+     *
      * @param schemaPath Path to schema file in resources
      */
     public void validateResponseAgainstSchema(String schemaPath) {
