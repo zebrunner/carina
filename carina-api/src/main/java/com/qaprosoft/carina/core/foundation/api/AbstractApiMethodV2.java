@@ -195,7 +195,6 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
      *            - used for JSON arrays validation when we need to check presence of some array items in result array.
      *            Use JsonCompareKeywords.ARRAY_CONTAINS.getKey() construction for that
      */
-
     public void validateResponse(JSONCompareMode mode, String... validationFlags) {
         if (rsPath == null) {
             throw new RuntimeException("Please specify rsPath to make Response body validation");
@@ -217,6 +216,12 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         }
     }
 
+    /**
+     * Validates Xml response using custom options
+     *
+     * @param mode
+     * - determines how to compare 2 XMLs. See type description for more details.
+     */
     public void validateXmlResponse(XmlCompareMode mode) {
         if (actualRsBody == null) {
             throw new RuntimeException("Actual response body is null. Please make API call before validation response");
@@ -224,11 +229,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         if (rsPath == null) {
             throw new RuntimeException("Please specify rsPath to make Response body validation");
         }
-        try {
-            XmlComparator.compare(actualRsBody, rsPath, mode);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        XmlValidator.validateXml(actualRsBody, rsPath, mode);
     }
 
     /**
@@ -240,8 +241,10 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         ContentType contentType = this.getClass().getAnnotation(ContentType.class);
         if (contentType.type().equals(XML_CONTENT_TYPE.getHeaderValue())) {
             validateXmlResponse(XmlCompareMode.STRICT);
-        } else {
+        } else if (contentType.type().equals(JSON_CONTENT_TYPE.getHeaderValue())) {
             validateResponse(JSONCompareMode.NON_EXTENSIBLE, validationFlags);
+        } else {
+            throw new RuntimeException("Unsupported argument of content type");
         }
     }
 

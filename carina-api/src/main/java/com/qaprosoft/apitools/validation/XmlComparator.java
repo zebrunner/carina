@@ -9,13 +9,9 @@ import org.xmlunit.assertj3.XmlAssert;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.*;
 
-import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class XmlComparator {
 
@@ -23,17 +19,7 @@ public class XmlComparator {
 
     private XmlComparator() {}
 
-    public static void compare(String actualXmlData, String expectedXmlPath, XmlCompareMode mode)
-            throws IOException {
-        String expectedXmlData = Files.lines(Path.of(expectedXmlPath))
-                .collect(Collectors.joining("\n"));
-        if (mode == XmlCompareMode.NON_STRICT) {
-            nonStrictOrderCompare(actualXmlData, expectedXmlData);
-        } else {
-            strictCompare(actualXmlData, expectedXmlData);
-        }
-    }
-
+    /** comparison with strict array ordering. */
     public static void strictCompare(String actualXmlData, String expectedXmlData) {
         XmlAssert.assertThat(actualXmlData).and(expectedXmlData)
                 .ignoreWhitespace()
@@ -41,6 +27,7 @@ public class XmlComparator {
                 .areIdentical();
     }
 
+    /** comparison with non-strict array ordering. */
     public static void nonStrictOrderCompare(String actualXmlData, String expectedXmlData) {
         Diff differences = DiffBuilder.compare(expectedXmlData).withTest(actualXmlData)
                 .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byName))
@@ -62,36 +49,33 @@ public class XmlComparator {
                 return ComparisonResult.SIMILAR;
             }
         }
-        LOGGER.info("Unable to find testNode '" + controlNode.getNodeName()
-                + "'. Leaving previous ComparisonResult.");
-        return outcome;
+        throw new AssertionError("Unable to find testNode '" + controlNode.getNodeName() + "'.");
     }
 
-    static boolean areNodesAtTheSameHierarchyLevel(Node controlNode, Node testNode) {
+    private static boolean areNodesAtTheSameHierarchyLevel(Node controlNode, Node testNode) {
         List<Node> parentControlNodes = constructParentNodesHierarchy(controlNode);
         List<Node> parentTestNodes = constructParentNodesHierarchy(testNode);
         if (parentControlNodes.size() != parentTestNodes.size()) {
             LOGGER.info("Size of parent test nodes: " + parentTestNodes.size() +
                     ", size of parent control nodes: " + parentControlNodes.size()
-                    + ". XML files are considered different because of different target nodes placement in the hierarchy.");
+                    + ". XML files are considered different because of different target nodes" +
+                    " placement in the hierarchy.");
             return false;
         }
         for (int i = 0; i < parentControlNodes.size(); ++i) {
             Node parentControlNode = parentControlNodes.get(i);
             Node parentTestNode = parentTestNodes.get(i);
-
             if (!parentControlNode.getNodeName().equals(parentTestNode.getNodeName())) {
-                LOGGER.info("Parent control node '" + parentControlNode.getNodeName()
+                throw new AssertionError(("Parent control node '" + parentControlNode.getNodeName()
                         + "' at URI: " + parentControlNode.getBaseURI() + " is different than parent test node '"
                         + parentTestNode.getNodeName() + "' at URI: " + parentTestNode.getBaseURI()
-                        + ". Comparison failed.");
-                return false;
+                        + ". Comparison failed."));
             }
         }
         return true;
     }
 
-    static Node findEqualNodeInHierarchy(Node controlNode, Node testNode) {
+    private static Node findEqualNodeInHierarchy(Node controlNode, Node testNode) {
         if (controlNode.isEqualNode(testNode)) {
             return testNode;
         }
@@ -109,7 +93,7 @@ public class XmlComparator {
         return null;
     }
 
-    static List<Node> constructParentNodesHierarchy(Node node) {
+    private static List<Node> constructParentNodesHierarchy(Node node) {
         List<Node> parentNodes = new ArrayList<>();
         Node localParentNode = node.getParentNode();
         while (localParentNode != null) {

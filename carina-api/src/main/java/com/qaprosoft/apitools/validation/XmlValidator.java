@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.invoke.MethodHandles;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.stream.Collectors;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.stream.StreamSource;
@@ -21,11 +24,21 @@ public class XmlValidator {
     private XmlValidator() {
     }
 
+    /**
+     * @param mode
+     * - determines how to compare 2 XMLs. See type description for more details.
+     */
     public static void validateXml(String actualXmlData, String expectedXmlPath, XmlCompareMode mode) {
         try {
-            XmlComparator.compare(actualXmlData, expectedXmlPath, mode);
-        } catch (Exception e) {
-            throw new AssertionError("Validation of xml data failed: " + e.getMessage());
+            String expectedXmlData = Files.lines(Path.of(expectedXmlPath))
+                    .collect(Collectors.joining("\n"));
+            if (mode == XmlCompareMode.NON_STRICT) {
+                XmlComparator.nonStrictOrderCompare(actualXmlData, expectedXmlData);
+            } else {
+                XmlComparator.strictCompare(actualXmlData, expectedXmlData);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         LOGGER.info("Validation of xml data successfully passed");
     }
