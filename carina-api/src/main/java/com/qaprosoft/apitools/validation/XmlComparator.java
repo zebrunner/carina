@@ -17,9 +17,12 @@ public class XmlComparator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private XmlComparator() {}
+    private XmlComparator() {
+    }
 
-    /** comparison with strict array ordering. */
+    /**
+     * comparison with strict array ordering.
+     */
     public static void strictCompare(String actualXmlData, String expectedXmlData) {
         XmlAssert.assertThat(actualXmlData).and(expectedXmlData)
                 .ignoreWhitespace()
@@ -27,7 +30,9 @@ public class XmlComparator {
                 .areIdentical();
     }
 
-    /** comparison with non-strict array ordering. */
+    /**
+     * comparison with non-strict array ordering.
+     */
     public static void nonStrictOrderCompare(String actualXmlData, String expectedXmlData) {
         Diff differences = DiffBuilder.compare(expectedXmlData).withTest(actualXmlData)
                 .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byName))

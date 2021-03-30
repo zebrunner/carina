@@ -219,8 +219,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     /**
      * Validates Xml response using custom options
      *
-     * @param mode
-     * - determines how to compare 2 XMLs. See type description for more details.
+     * @param mode - determines how to compare 2 XMLs. See type description for more details.
      */
     public void validateXmlResponse(XmlCompareMode mode) {
         if (actualRsBody == null) {
@@ -233,9 +232,8 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     }
 
     /**
-     * @param validationFlags
-     *            parameter that specifies how to validate JSON response. Currently only array validation flag is supported.
-     *            Use JsonCompareKeywords.ARRAY_CONTAINS enum value for that
+     * @param validationFlags parameter that specifies how to validate JSON response. Currently only array validation flag is supported.
+     *                        Use JsonCompareKeywords.ARRAY_CONTAINS enum value for that
      */
     public void validateResponse(String... validationFlags) {
         ContentType contentType = this.getClass().getAnnotation(ContentType.class);

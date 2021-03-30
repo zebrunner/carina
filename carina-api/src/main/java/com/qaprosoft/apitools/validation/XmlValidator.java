@@ -25,8 +25,7 @@ public class XmlValidator {
     }
 
     /**
-     * @param mode
-     * - determines how to compare 2 XMLs. See type description for more details.
+     * @param mode - determines how to compare 2 XMLs. See type description for more details.
      */
     public static void validateXml(String actualXmlData, String expectedXmlPath, XmlCompareMode mode) {
         try {
@@ -51,7 +50,7 @@ public class XmlValidator {
             Validator validator = schema.newValidator();
             validator.validate(new StreamSource(new StringReader(xmlData)));
         } catch (SAXException e) {
-            throw new AssertionError("Validation against Xml schema failed "  + e.getMessage(), e);
+            throw new AssertionError("Validation against Xml schema failed " + e.getMessage(), e);
         } catch (IOException e) {
             throw new RuntimeException("Can't read xml from String: " + e.getMessage(), e);
         }
