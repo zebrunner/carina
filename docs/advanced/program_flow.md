@@ -42,14 +42,14 @@ generated udid.
 Only after that TestRunner runs code described in your test.class. The next route depends on what you are doing in your test:
 
 1) UI (web, mobile)
-   ```
-   @Test @MethodOwner()
-   public void webTest() {
-      HomePage chromeHomePage = new HomePage(getDriver());
-      chromeHomePage.open();
-      Assert.assertTrue(chromeHomePage.isPageOpened(), "Chrome home page is not opened!"); 
-   } 
-   ```
+```
+@Test @MethodOwner()
+public void webTest() {
+   HomePage chromeHomePage = new HomePage(getDriver());
+   chromeHomePage.open();
+   Assert.assertTrue(chromeHomePage.isPageOpened(), "Chrome home page is not opened!"); 
+} 
+```
    Debug entry point at :
 [AbstractPage](https://github.com/qaprosoft/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/gui/AbstractPage.java)
    constructor and 
@@ -59,15 +59,16 @@ Only after that TestRunner runs code described in your test.class. The next rout
 
 2) API
 
-   ```
-   @Test()
-   public void testCreateUser() throws Exception {
-      PostUserMethod api = new PostUserMethod();
-      api.expectResponseStatus(HttpResponseStatusType.CREATED_201);
-      api.callAPI();
-      api.validateResponse();
-   }
-   ```
+```
+@Test()
+public void testCreateUser() throws Exception {
+   PostUserMethod api = new PostUserMethod();
+   api.expectResponseStatus(HttpResponseStatusType.CREATED_201);
+   api.callAPI();
+   api.validateResponse();
+}
+```
+   
    Debug entry point at :
    [AbstractApiMethodV2](https://github.com/qaprosoft/carina/blob/master/carina-api/src/main/java/com/qaprosoft/carina/core/foundation/api/AbstractApiMethodV2.java)
    constructor.
@@ -75,24 +76,25 @@ Only after that TestRunner runs code described in your test.class. The next rout
 
 3) Database
    
-   ```
-   @Test
-   public void createUser() {
-   
-      User USER = new User() {{
-                        setUsername("bmarley");
-                        setFirstName("Bob");
-                        setLastName("Marley");
-                        setStatus(Status.ACTIVE);
-      }};
-      
-      try (SqlSession session = ConnectionFactory.getSqlSessionFactory().openSession(true)) {
-        UserMapper userMapper = session.getMapper(UserMapper.class);
-        userMapper.create(USER);
-        checkUser(userMapper.findById(USER.getId()));
-      }
+```
+@Test
+public void createUser() {
+
+   User USER = new User() {{
+                     setUsername("bmarley");
+                     setFirstName("Bob");
+                     setLastName("Marley");
+                     setStatus(Status.ACTIVE);
+   }};
+
+   try (SqlSession session = ConnectionFactory.getSqlSessionFactory().openSession(true)) {
+     UserMapper userMapper = session.getMapper(UserMapper.class);
+     userMapper.create(USER);
+     checkUser(userMapper.findById(USER.getId()));
    }
-      ```
+}
+```
+   
    These are user's classes, samples at carina-demo:
    [UserMapper](https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/mappers/UserMapper.java), 
    [ConnectionFactory](https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/ConnectionFactory.java),
