@@ -7,11 +7,13 @@ It extends [ListenerChain.class](http://javadox.com/com.nordstrom.tools/testng-f
 which will create, sort and attach [AbstractTest.class](https://github.com/qaprosoft/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/AbstractTest.java) listeners. This whole sequence is described in [TestRunner.class](https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestRunner.java) init() method.
 
 [AbstractTest.class](https://github.com/qaprosoft/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/AbstractTest.java) listeners are:
+
 ```
 @LinkedListeners({ CarinaListener.class, TestRunListener.class, DataProviderInterceptor.class })
 ```
 
 Theese listeners being attached and created when transform(IListenersAnnotation annotation, Class testClass) method is called.
+
 * `TestRunListener.class` and `DataProviderInterceptor.class` are implemented in zebrunner. 
 
 * [CarinaListener.class](https://github.com/qaprosoft/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListener.java)
@@ -40,7 +42,8 @@ After that methods are called in appropriate order in the [ListenerChain.class](
 
 Next TestRunner.class runs code described in your test.class. The following route depends on what you are doing in your test:
 
-* UI (web, mobile)
+**UI (web, mobile)**
+
 ```
 @Test @MethodOwner()
 public void webTest() {
@@ -49,9 +52,11 @@ public void webTest() {
    Assert.assertTrue(chromeHomePage.isPageOpened(), "Chrome home page is not opened!"); 
 } 
 ```
+
 Debug entry point at : [AbstractPage](https://github.com/qaprosoft/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/gui/AbstractPage.java) constructor and [IDriverPool](https://github.com/qaprosoft/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/webdriver/IDriverPool.java) getDriver() method.
    
-* API
+**API**
+
 ```
 @Test()
 public void testCreateUser() throws Exception {
@@ -61,9 +66,11 @@ public void testCreateUser() throws Exception {
    api.validateResponse();
 }
 ```
+
 Debug entry point at : [AbstractApiMethodV2](https://github.com/qaprosoft/carina/blob/master/carina-api/src/main/java/com/qaprosoft/carina/core/foundation/api/AbstractApiMethodV2.java) constructor.
 
-* Database
+**Database**
+
 ```
 @Test
 public void createUser() {
@@ -81,5 +88,6 @@ public void createUser() {
      checkUser(userMapper.findById(USER.getId()));
    }
 }
-```   
+```  
+
 These are user's classes, samples at carina-demo: [UserMapper](https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/mappers/UserMapper.java), [ConnectionFactory](https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/ConnectionFactory.java), [User](https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/models/User.java).
