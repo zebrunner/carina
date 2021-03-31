@@ -17,7 +17,7 @@ Theese listeners being attached and created when transform(IListenersAnnotation 
 * `TestRunListener.class` and `DataProviderInterceptor.class` are implemented in zebrunner. 
 
 * [CarinaListener.class](https://github.com/qaprosoft/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListener.java)
-as it comes from a name is a Carina's listener.
+as it comes from the name is a Carina's listener.
 
 Because CarinaListener object created, the class static field is initialized in it. There are several important steps inside:
 
