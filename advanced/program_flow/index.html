@@ -493,10 +493,10 @@
                 
                 
                 <h1 id="program-flow">Program flow</h1>
-<p>Under the hood Carina use TestNG framework, so the first class to initialize is RemoteTestNGStarter.class. Program life cycle logic could be observed at <a href="https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestNG.java">TestNG.class</a> run() method.
-The initializing turn comes to Carina when <a href="https://github.com/qaprosoft/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListenerChain.java">CarinaListenerChain.class</a> object created.
+<p>Under the hood Carina use TestNG framework, so the first class to initialize is RemoteTestNGStarter.class. Program life cycle logic could be observed at <a href="https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestNG.java">TestNG.class</a> run() method.</p>
+<p>The initializing turn comes to Carina when <a href="https://github.com/qaprosoft/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListenerChain.java">CarinaListenerChain.class</a> object created.
 It extends <a href="http://javadox.com/com.nordstrom.tools/testng-foundation/1.10.0/com/nordstrom/automation/testng/package-summary.html">ListenerChain.class</a>
-which will create, sort and attach AbstractTest.class listeners. This whole sequence is described in <a href="https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestRunner.java">TestRunner.class</a> init() method.</p>
+which will create, sort and attach <a href="https://github.com/qaprosoft/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/AbstractTest.java">AbstractTest.class</a> listeners. This whole sequence is described in <a href="https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestRunner.java">TestRunner.class</a> init() method.</p>
 <p><a href="https://github.com/qaprosoft/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/AbstractTest.java">AbstractTest.class</a> listeners are:</p>
 <pre><code>@LinkedListeners({ CarinaListener.class, TestRunListener.class, DataProviderInterceptor.class })
 </code></pre>
@@ -519,12 +519,10 @@ as it comes from a name is a Carina's listener.</li>
 <p>After that methods are called in appropriate order in the <a href="http://javadox.com/com.nordstrom.tools/testng-foundation/1.10.0/com/nordstrom/automation/testng/package-summary.html">ListenerChain.class</a>:</p>
 <ul>
 <li>
-<p>onStart(ISuite suite). There is called every ISuiteListener's onStart() method that where
-mentioned in AbstractTest.class (CarinaListener and TestRunListener). In CarinaListener.class we'll get to the onStart(ISuite suite) method where configured
-logging level and thread count.</p>
+<p>onStart(ISuite suite). There is called every ISuiteListener's onStart() method that where mentioned in AbstractTest.class (CarinaListener and TestRunListener). CarinaListener.class onStart(ISuite suite) method will configure logging level and thread count.</p>
 </li>
 <li>
-<p>now your test class is considered initialized and onStart(ITestContext testContext) method is called in ListenerChain.class. Udid is generated there.</p>
+<p>now your test class is considered initialized and onStart(ITestContext testContext) method is called. Udid is generated there.</p>
 </li>
 <li>
 <p>onBeforeClass(ITestClass testClass). Complete steps described in @BeforeClass annotation from your test.</p>
@@ -533,23 +531,19 @@ logging level and thread count.</p>
 <p>onTestStart(ITestResult result) provide described data to test.</p>
 </li>
 </ul>
-<p>Next TestRunner runs code described in your test.class. The following route depends on what you are doing in your test:</p>
+<p>Next TestRunner.class runs code described in your test.class. The following route depends on what you are doing in your test:</p>
 <ul>
-<li>
-<p>UI (web, mobile)
-   <code>@Test @MethodOwner()
+<li>UI (web, mobile)</li>
+</ul>
+<p><code>@Test @MethodOwner()
    public void webTest() {
       HomePage chromeHomePage = new HomePage(getDriver());
       chromeHomePage.open();
       Assert.assertTrue(chromeHomePage.isPageOpened(), "Chrome home page is not opened!"); 
-   }</code>
-   Debug entry point at : <a href="https://github.com/qaprosoft/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/gui/AbstractPage.java">AbstractPage</a>
-   constructor and <a href="https://github.com/qaprosoft/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/webdriver/IDriverPool.java">IDriverPool</a>
-   getDriver() method.</p>
-</li>
-<li>
-<p>API</p>
-</li>
+   }</code></p>
+<p>Debug entry point at : <a href="https://github.com/qaprosoft/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/gui/AbstractPage.java">AbstractPage</a> constructor and <a href="https://github.com/qaprosoft/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/webdriver/IDriverPool.java">IDriverPool</a> getDriver() method.</p>
+<ul>
+<li>API</li>
 </ul>
 <p><code>@Test()
    public void testCreateUser() throws Exception {
@@ -558,9 +552,7 @@ logging level and thread count.</p>
       api.callAPI();
       api.validateResponse();
    }</code></p>
-<p>Debug entry point at :
-   <a href="https://github.com/qaprosoft/carina/blob/master/carina-api/src/main/java/com/qaprosoft/carina/core/foundation/api/AbstractApiMethodV2.java">AbstractApiMethodV2</a>
-   constructor.</p>
+<p>Debug entry point at : <a href="https://github.com/qaprosoft/carina/blob/master/carina-api/src/main/java/com/qaprosoft/carina/core/foundation/api/AbstractApiMethodV2.java">AbstractApiMethodV2</a> constructor.</p>
 <ul>
 <li>Database</li>
 </ul>
@@ -582,10 +574,7 @@ logging level and thread count.</p>
 </code></pre>
 <p>}
    ```   </p>
-<p>These are user's classes, samples at carina-demo:
-   <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/mappers/UserMapper.java">UserMapper</a>, 
-   <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/ConnectionFactory.java">ConnectionFactory</a>,
-   <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/models/User.java">User</a>.</p>
+<p>These are user's classes, samples at carina-demo: <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/mappers/UserMapper.java">UserMapper</a>, <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/ConnectionFactory.java">ConnectionFactory</a>, <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/models/User.java">User</a>.</p>
                 
               
               
