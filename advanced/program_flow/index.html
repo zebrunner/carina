@@ -501,11 +501,15 @@ which will create, sort and attach <a href="https://github.com/qaprosoft/carina/
 <pre><code>@LinkedListeners({ CarinaListener.class, TestRunListener.class, DataProviderInterceptor.class })
 </code></pre>
 
-<p>Theese listeners being attached and created when transform(IListenersAnnotation annotation, Class testClass) method is called.
-* <code>TestRunListener.class</code> and <code>DataProviderInterceptor.class</code> are implemented in zebrunner. </p>
+<p>Theese listeners being attached and created when transform(IListenersAnnotation annotation, Class testClass) method is called.</p>
 <ul>
-<li><a href="https://github.com/qaprosoft/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListener.java">CarinaListener.class</a>
-as it comes from a name is a Carina's listener.</li>
+<li>
+<p><code>TestRunListener.class</code> and <code>DataProviderInterceptor.class</code> are implemented in zebrunner. </p>
+</li>
+<li>
+<p><a href="https://github.com/qaprosoft/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListener.java">CarinaListener.class</a>
+as it comes from a name is a Carina's listener.</p>
+</li>
 </ul>
 <p>Because CarinaListener object created, the class static field is initialized in it. There are several important steps inside:</p>
 <ul>
@@ -532,9 +536,7 @@ as it comes from a name is a Carina's listener.</li>
 </li>
 </ul>
 <p>Next TestRunner.class runs code described in your test.class. The following route depends on what you are doing in your test:</p>
-<ul>
-<li>UI (web, mobile)</li>
-</ul>
+<p><strong>UI (web, mobile)</strong></p>
 <pre><code>@Test @MethodOwner()
 public void webTest() {
    HomePage chromeHomePage = new HomePage(getDriver());
@@ -544,9 +546,7 @@ public void webTest() {
 </code></pre>
 
 <p>Debug entry point at : <a href="https://github.com/qaprosoft/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/gui/AbstractPage.java">AbstractPage</a> constructor and <a href="https://github.com/qaprosoft/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/webdriver/IDriverPool.java">IDriverPool</a> getDriver() method.</p>
-<ul>
-<li>API</li>
-</ul>
+<p><strong>API</strong></p>
 <pre><code>@Test()
 public void testCreateUser() throws Exception {
    PostUserMethod api = new PostUserMethod();
@@ -557,9 +557,7 @@ public void testCreateUser() throws Exception {
 </code></pre>
 
 <p>Debug entry point at : <a href="https://github.com/qaprosoft/carina/blob/master/carina-api/src/main/java/com/qaprosoft/carina/core/foundation/api/AbstractApiMethodV2.java">AbstractApiMethodV2</a> constructor.</p>
-<ul>
-<li>Database</li>
-</ul>
+<p><strong>Database</strong></p>
 <pre><code>@Test
 public void createUser() {
 
