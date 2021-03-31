@@ -53,8 +53,9 @@ public abstract class AbstractCapabilities {
 
         // TODO: should use provide capabilities as an argument for getPlatform call below?
         String platform = Configuration.getPlatform();
-        if (!platform.equals("*")) {
-            capabilities.setCapability("platformName", platform);
+        // Don't use W3C key (platformName) alongside JWP key (platform)
+        // to prevent Mixed Capabilities Error. https://github.com/qaprosoft/carina/issues/1296
+        if (R.CONFIG.get(SpecialKeywords.PLATFORM_NAME).isEmpty() && !platform.equals("*")) {
             capabilities.setPlatform(Platform.extractFromSysProperty(platform));
         }
 
@@ -62,12 +63,10 @@ public abstract class AbstractCapabilities {
 
         // Selenium 3.4 doesn't support '*'. Only explicit or empty browser version should be provided
         String browserVersion = Configuration.get(Parameter.BROWSER_VERSION);
-        if ("*".equalsIgnoreCase(browserVersion)) {
-            browserVersion = "";
-        }
-        if (!browserVersion.isEmpty()) {
+        if (!"*".equalsIgnoreCase(browserVersion) && !browserVersion.isEmpty()) {
             capabilities.setVersion(browserVersion);
         }
+
         capabilities.setCapability("name", testName);
 
         Proxy proxy = setupProxy();
