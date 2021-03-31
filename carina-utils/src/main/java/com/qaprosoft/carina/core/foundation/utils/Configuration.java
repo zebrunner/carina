@@ -391,6 +391,27 @@ public class Configuration {
         //TODO: try to get actual platform name
         return platform;
     }
+
+    public static String getPlatformName() {
+        return getPlatformName(new DesiredCapabilities());
+    }
+
+    public static String getPlatformName(DesiredCapabilities caps) {
+        // any platform by default
+        String platform = "*";
+
+        // redefine platform if mobile.platformName is available
+        if (!R.CONFIG.get(SpecialKeywords.PLATFORM_NAME).isEmpty()) {
+            platform = R.CONFIG.get(SpecialKeywords.PLATFORM_NAME);
+        }
+
+        if (caps != null && caps.getCapability("platformName") != null) {
+            platform = caps.getCapability("platformName").toString();
+        }
+
+        //TODO: try to get actual platform name
+        return platform;
+    }
     
     public static String getPlatformVersion() {
         // default "os_version=value" should be used to determine current platform
