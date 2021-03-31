@@ -15,6 +15,7 @@ pages:
       - DataProvider: advanced/dataprovider.md
       - Driver: advanced/driver.md
       - Localization: advanced/localization.md
+      - Program flow: advanced/program_flow.md
       - Proxy: advanced/proxy.md
       - Security: advanced/security.md
     - Cucumber: cucumber.md
