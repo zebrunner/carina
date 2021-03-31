@@ -1,9 +1,10 @@
 # Program flow
 
 Under the hood Carina use TestNG framework, so the first class to initialize is RemoteTestNGStarter.class. Program life cycle logic could be observed at [TestNG.class](https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestNG.java) run() method.
+
 The initializing turn comes to Carina when [CarinaListenerChain.class](https://github.com/qaprosoft/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListenerChain.java) object created.
 It extends [ListenerChain.class](http://javadox.com/com.nordstrom.tools/testng-foundation/1.10.0/com/nordstrom/automation/testng/package-summary.html)
-which will create, sort and attach AbstractTest.class listeners. This whole sequence is described in [TestRunner.class](https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestRunner.java) init() method.
+which will create, sort and attach [AbstractTest.class](https://github.com/qaprosoft/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/AbstractTest.java) listeners. This whole sequence is described in [TestRunner.class](https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestRunner.java) init() method.
 
 [AbstractTest.class](https://github.com/qaprosoft/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/AbstractTest.java) listeners are:
 ```
@@ -29,19 +30,18 @@ Then listeners attached to different Lists according to their implementations in
 
 After that methods are called in appropriate order in the [ListenerChain.class](http://javadox.com/com.nordstrom.tools/testng-foundation/1.10.0/com/nordstrom/automation/testng/package-summary.html):
 
-* onStart(ISuite suite). There is called every ISuiteListener's onStart() method that where
-mentioned in AbstractTest.class (CarinaListener and TestRunListener). In CarinaListener.class we'll get to the onStart(ISuite suite) method where configured
-logging level and thread count.
+   * onStart(ISuite suite). There is called every ISuiteListener's onStart() method that where mentioned in AbstractTest.class (CarinaListener and TestRunListener). CarinaListener.class onStart(ISuite suite) method will configure logging level and thread count.
 
-* now your test class is considered initialized and onStart(ITestContext testContext) method is called in ListenerChain.class. Udid is generated there.
+* now your test class is considered initialized and onStart(ITestContext testContext) method is called. Udid is generated there.
 
 * onBeforeClass(ITestClass testClass). Complete steps described in @BeforeClass annotation from your test.
 
 * onTestStart(ITestResult result) provide described data to test.
 
-Next TestRunner runs code described in your test.class. The following route depends on what you are doing in your test:
+Next TestRunner.class runs code described in your test.class. The following route depends on what you are doing in your test:
 
 * UI (web, mobile)
+
    ```
    @Test @MethodOwner()
    public void webTest() {
@@ -50,11 +50,9 @@ Next TestRunner runs code described in your test.class. The following route depe
       Assert.assertTrue(chromeHomePage.isPageOpened(), "Chrome home page is not opened!"); 
    } 
    ```
-   Debug entry point at : [AbstractPage](https://github.com/qaprosoft/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/gui/AbstractPage.java)
-   constructor and [IDriverPool](https://github.com/qaprosoft/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/webdriver/IDriverPool.java)
-   getDriver() method.
    
-
+   Debug entry point at : [AbstractPage](https://github.com/qaprosoft/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/gui/AbstractPage.java) constructor and [IDriverPool](https://github.com/qaprosoft/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/webdriver/IDriverPool.java) getDriver() method.
+   
 * API
 
    ```
@@ -67,9 +65,7 @@ Next TestRunner runs code described in your test.class. The following route depe
    }
    ```
    
-   Debug entry point at :
-   [AbstractApiMethodV2](https://github.com/qaprosoft/carina/blob/master/carina-api/src/main/java/com/qaprosoft/carina/core/foundation/api/AbstractApiMethodV2.java)
-   constructor.
+   Debug entry point at : [AbstractApiMethodV2](https://github.com/qaprosoft/carina/blob/master/carina-api/src/main/java/com/qaprosoft/carina/core/foundation/api/AbstractApiMethodV2.java) constructor.
 
 
 * Database
@@ -93,7 +89,4 @@ Next TestRunner runs code described in your test.class. The following route depe
    }
    ```   
    
-   These are user's classes, samples at carina-demo:
-   [UserMapper](https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/mappers/UserMapper.java), 
-   [ConnectionFactory](https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/ConnectionFactory.java),
-   [User](https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/models/User.java).
+   These are user's classes, samples at carina-demo: [UserMapper](https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/mappers/UserMapper.java), [ConnectionFactory](https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/ConnectionFactory.java), [User](https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/models/User.java).
