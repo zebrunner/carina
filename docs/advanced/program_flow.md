@@ -41,7 +41,7 @@ logging level and thread count.
 
 Next TestRunner runs code described in your test.class. The following route depends on what you are doing in your test:
 
-   * UI (web, mobile)
+* UI (web, mobile)
    ```
    @Test @MethodOwner()
    public void webTest() {
@@ -50,10 +50,8 @@ Next TestRunner runs code described in your test.class. The following route depe
       Assert.assertTrue(chromeHomePage.isPageOpened(), "Chrome home page is not opened!"); 
    } 
    ```
-   Debug entry point at :
-[AbstractPage](https://github.com/qaprosoft/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/gui/AbstractPage.java)
-   constructor and 
-[IDriverPool](https://github.com/qaprosoft/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/webdriver/IDriverPool.java)
+   Debug entry point at : [AbstractPage](https://github.com/qaprosoft/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/gui/AbstractPage.java)
+   constructor and [IDriverPool](https://github.com/qaprosoft/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/webdriver/IDriverPool.java)
    getDriver() method.
    
 
