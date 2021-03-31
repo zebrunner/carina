@@ -94,7 +94,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.screenshot.AutoScreenshotR
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
 import com.zebrunner.agent.core.registrar.Artifact;
 import com.zebrunner.agent.core.registrar.CurrentTest;
-import com.zebrunner.agent.core.registrar.CurrentTestRun;
 import com.zebrunner.agent.core.registrar.Label;
 import com.zebrunner.agent.core.registrar.label.CompositeLabelResolver;
 import com.zebrunner.agent.core.registrar.maintainer.ChainedMaintainerResolver;
@@ -210,11 +209,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         }
         
         // register app_version/build as artifact if available...
-        String build = Configuration.get(Parameter.APP_VERSION);
-        if (!build.isEmpty()) {
-            LOGGER.debug("build: " + build);
-            CurrentTestRun.setBuild(build);
-        }
+        Configuration.setBuild(Configuration.get(Parameter.APP_VERSION));
         
         LOGGER.info("CARINA_CORE_VERSION: " + getCarinaVersion());
     }
@@ -596,7 +591,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             // try to redefine app_version if it's value is latest or empty
             String appVersion = Configuration.get(Parameter.APP_VERSION);
             if (appVersion.equals("latest") || appVersion.isEmpty()) {
-                R.CONFIG.put(Parameter.APP_VERSION.getKey(), file.getName());
+                Configuration.setBuild(file.getName());
             }
         }
 
@@ -668,7 +663,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 // try to redefine app_version if it's value is latest or empty
                 String appVersion = Configuration.get(Parameter.APP_VERSION);
                 if (appVersion.equals("latest") || appVersion.isEmpty()) {
-                    R.CONFIG.put(Parameter.APP_VERSION.getKey(), file.getName());
+                    Configuration.setBuild(file.getName());
                 }
             }
 

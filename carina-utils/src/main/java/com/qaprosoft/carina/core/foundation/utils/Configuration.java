@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.zebrunner.agent.core.registrar.CurrentTestRun;
 
 /**
  * Configuration utility.
@@ -502,5 +503,16 @@ public class Configuration {
 
     public static Object getCapability(String name) {
         return R.CONFIG.get("capabilities." + name);
+    }
+    
+    /**
+     * Register APP_VERSION number in CONFIG space and as Zebrunner Reporting build number if not empty.
+     */
+    public static void setBuild(String build) {
+        R.CONFIG.put(Parameter.APP_VERSION.getKey(), build);
+        if (!build.isEmpty()) {
+            LOGGER.debug("build: " + build);
+            CurrentTestRun.setBuild(build);
+        }
     }
 }
