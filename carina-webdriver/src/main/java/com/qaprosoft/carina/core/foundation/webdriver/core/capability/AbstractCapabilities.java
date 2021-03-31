@@ -51,13 +51,10 @@ public abstract class AbstractCapabilities {
 
     protected DesiredCapabilities initBaseCapabilities(DesiredCapabilities capabilities, String browser, String testName) {
 
-        String platformName = Configuration.getPlatformName();
-        if (!platformName.equals("*")) {
-            capabilities.setCapability("platformName", platformName);
-        }
         // TODO: should use provide capabilities as an argument for getPlatform call below?
         String platform = Configuration.getPlatform();
         if (!platform.equals("*")) {
+            capabilities.setCapability("platformName", platform);
             capabilities.setPlatform(Platform.extractFromSysProperty(platform));
         }
 
@@ -69,7 +66,6 @@ public abstract class AbstractCapabilities {
             browserVersion = "";
         }
         if (!browserVersion.isEmpty()) {
-            capabilities.setCapability(Parameter.BROWSER_VERSION.getKey(), browserVersion);
             capabilities.setVersion(browserVersion);
         }
         capabilities.setCapability("name", testName);
