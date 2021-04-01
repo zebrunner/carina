@@ -48,6 +48,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     private String rqPath;
     private String rsPath;
     private String actualRsBody;
+
     /**
      * When this constructor is called then paths to request and expected response templates are taken from @RequestTemplatePath
      * and @ResponseTemplatePath if present
@@ -125,7 +126,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     /**
      * Calls API expecting http status in response taken from @SuccessfulHttpStatus value
-     *
+     * 
      * @return restassured Response object
      */
     public Response callAPIExpectSuccess() {
@@ -250,7 +251,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
      * Validates actual API response per schema (JSON or XML depending on response body type).
      * Annotation {@link ContentType} on your AbstractApiMethodV2 class is used to determine whether to validate JSON or XML.
      * If ContentType is not specified then JSON schema validation will be applied by default.
-     * 
+     *
      * @param schemaPath Path to schema file in resources
      */
     public void validateResponseAgainstSchema(String schemaPath) {
