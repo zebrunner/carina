@@ -95,7 +95,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     /**
      * Sets path to freemarker template for request body
-     * 
+     *
      * @param path String
      */
     public void setRequestTemplate(String path) {
@@ -104,7 +104,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     /**
      * Sets path to freemarker template for expected response body
-     * 
+     *
      * @param path String
      */
     public void setResponseTemplate(String path) {
