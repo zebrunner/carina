@@ -147,7 +147,7 @@ public class EmailReportGenerator {
         if (testResultItem.getResult().name().equalsIgnoreCase("FAIL")) {
             if (INCLUDE_FAIL) {
                 if (testResultItem.isConfig()) {
-                    result = testResultItem.getLinkToScreenshots() != null ? FAIL_CONFIG_LOG_DEMO_TR : FAIL_CONFIG_LOG_TR;
+                    result = testResultItem.getLinkToScreenshots() != null && !"".equals(testResultItem.getLinkToScreenshots()) ? FAIL_CONFIG_LOG_DEMO_TR : FAIL_CONFIG_LOG_TR;
                     result = result.replace(TEST_NAME_PLACEHOLDER, testResultItem.getTest());
 
                     failReason = testResultItem.getFailReason();
@@ -159,7 +159,7 @@ public class EmailReportGenerator {
                         result = result.replace(FAIL_CONFIG_REASON_PLACEHOLDER, "Undefined failure: contact qa engineer!");
                     }
                 } else {
-                    result = testResultItem.getLinkToScreenshots() != null ? FAIL_TEST_LOG_DEMO_TR : FAIL_TEST_LOG_TR;
+                    result = testResultItem.getLinkToScreenshots() != null && !"".equals(testResultItem.getLinkToScreenshots()) ? FAIL_TEST_LOG_DEMO_TR : FAIL_TEST_LOG_TR;
                     result = result.replace(TEST_NAME_PLACEHOLDER, testResultItem.getTest());
 
                     failReason = testResultItem.getFailReason();
@@ -185,7 +185,7 @@ public class EmailReportGenerator {
             failReason = testResultItem.getFailReason();
             if (!testResultItem.isConfig()) {
                 if (INCLUDE_SKIP) {
-                    result = testResultItem.getLinkToScreenshots() != null ? SKIP_TEST_LOG_DEMO_TR : SKIP_TEST_LOG_TR;
+                    result = testResultItem.getLinkToScreenshots() != null && !"".equals(testResultItem.getLinkToScreenshots()) ? SKIP_TEST_LOG_DEMO_TR : SKIP_TEST_LOG_TR;
                     result = result.replace(TEST_NAME_PLACEHOLDER, testResultItem.getTest());
 
                     if (!StringUtils.isEmpty(failReason)) {
@@ -212,7 +212,7 @@ public class EmailReportGenerator {
             if (!testResultItem.isConfig()) {
                 passCount++;
                 if (INCLUDE_PASS) {
-                    result = testResultItem.getLinkToScreenshots() != null ? PASS_TEST_LOG_DEMO_TR : PASS_TEST_LOG_TR;
+                    result = testResultItem.getLinkToScreenshots() != null && !"".equals(testResultItem.getLinkToScreenshots()) ? PASS_TEST_LOG_DEMO_TR : PASS_TEST_LOG_TR;
                     result = result.replace(TEST_NAME_PLACEHOLDER, testResultItem.getTest());
                     result = result.replace(LOG_URL_PLACEHOLDER, testResultItem.getLinkToLog());
 
