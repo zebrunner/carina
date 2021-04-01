@@ -95,7 +95,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     /**
      * Sets path to freemarker template for request body
-     *
+     * 
      * @param path String
      */
     public void setRequestTemplate(String path) {
@@ -104,7 +104,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     /**
      * Sets path to freemarker template for expected response body
-     *
+     * 
      * @param path String
      */
     public void setResponseTemplate(String path) {
@@ -126,7 +126,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     /**
      * Calls API expecting http status in response taken from @SuccessfulHttpStatus value
-     * 
+     *
      * @return restassured Response object
      */
     public Response callAPIExpectSuccess() {
