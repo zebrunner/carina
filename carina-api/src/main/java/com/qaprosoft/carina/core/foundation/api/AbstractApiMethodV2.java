@@ -238,10 +238,10 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
      */
     public void validateResponse(String... validationFlags) {
         ContentType contentType = this.getClass().getAnnotation(ContentType.class);
-        if (contentType.type().equals(XML_CONTENT_TYPE.getHeaderValue())) {
-            validateXmlResponse(XmlCompareMode.STRICT);
-        } else if (contentType == null || contentType.type().equals(JSON_CONTENT_TYPE.getHeaderValue())) {
+        if (contentType == null || contentType.type().equals(JSON_CONTENT_TYPE.getHeaderValue())) {
             validateResponse(JSONCompareMode.NON_EXTENSIBLE, validationFlags);
+        } else if (contentType.type().equals(XML_CONTENT_TYPE.getHeaderValue())) {
+            validateXmlResponse(XmlCompareMode.STRICT);
         } else {
             throw new RuntimeException("Unsupported argument of content type");
         }
