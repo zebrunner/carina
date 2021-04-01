@@ -43,7 +43,7 @@ import io.restassured.response.Response;
 
 public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
+    
     private Properties properties;
     private String rqPath;
     private String rsPath;
@@ -95,7 +95,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     /**
      * Sets path to freemarker template for request body
-     *
+     * 
      * @param path String
      */
     public void setRequestTemplate(String path) {
@@ -104,7 +104,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     /**
      * Sets path to freemarker template for expected response body
-     *
+     * 
      * @param path String
      */
     public void setResponseTemplate(String path) {
@@ -126,7 +126,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     /**
      * Calls API expecting http status in response taken from @SuccessfulHttpStatus value
-     *
+     * 
      * @return restassured Response object
      */
     public Response callAPIExpectSuccess() {
@@ -140,7 +140,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     /**
      * Sets path to .properties file which stores properties list for declared API method
-     *
+     * 
      * @param propertiesPath String path to properties file
      */
     public void setProperties(String propertiesPath) {
@@ -161,7 +161,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     /**
      * Sets properties list for declared API method
-     *
+     * 
      * @param properties Properties object with predefined properties for declared API method
      */
     public void setProperties(Properties properties) {
@@ -188,7 +188,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     /**
      * Validates JSON response using custom options
-     *
+     * 
      * @param mode
      *            - determines how to compare 2 JSONs. See type description for more details. Mode is not applied for
      *            arrays comparison
@@ -219,7 +219,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     /**
      * Validates Xml response using custom options
-     *
+     * 
      * @param mode - determines how to compare 2 XMLs. See {@link XmlCompareMode} for more details.
      */
     public void validateXmlResponse(XmlCompareMode mode) {
@@ -251,7 +251,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
      * Validates actual API response per schema (JSON or XML depending on response body type).
      * Annotation {@link ContentType} on your AbstractApiMethodV2 class is used to determine whether to validate JSON or XML.
      * If ContentType is not specified then JSON schema validation will be applied by default.
-     *
+     * 
      * @param schemaPath Path to schema file in resources
      */
     public void validateResponseAgainstSchema(String schemaPath) {
