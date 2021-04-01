@@ -48,7 +48,6 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     private String rqPath;
     private String rsPath;
     private String actualRsBody;
-
     /**
      * When this constructor is called then paths to request and expected response templates are taken from @RequestTemplatePath
      * and @ResponseTemplatePath if present
@@ -220,7 +219,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     /**
      * Validates Xml response using custom options
      *
-     * @param mode - determines how to compare 2 XMLs. See type description for more details.
+     * @param mode - determines how to compare 2 XMLs. See {@link XmlCompareMode} for more details.
      */
     public void validateXmlResponse(XmlCompareMode mode) {
         if (actualRsBody == null) {
@@ -251,7 +250,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
      * Validates actual API response per schema (JSON or XML depending on response body type).
      * Annotation {@link ContentType} on your AbstractApiMethodV2 class is used to determine whether to validate JSON or XML.
      * If ContentType is not specified then JSON schema validation will be applied by default.
-     *
+     * 
      * @param schemaPath Path to schema file in resources
      */
     public void validateResponseAgainstSchema(String schemaPath) {
