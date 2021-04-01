@@ -24,6 +24,7 @@ import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.util.Properties;
 
+import com.qaprosoft.apitools.validation.*;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -32,9 +33,6 @@ import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.apitools.builder.PropertiesProcessorMain;
 import com.qaprosoft.apitools.message.TemplateMessage;
-import com.qaprosoft.apitools.validation.JsonKeywordsComparator;
-import com.qaprosoft.apitools.validation.JsonValidator;
-import com.qaprosoft.apitools.validation.XmlValidator;
 import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
 import com.qaprosoft.carina.core.foundation.api.annotation.RequestTemplatePath;
 import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePath;
@@ -220,12 +218,33 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     }
 
     /**
-     * @param validationFlags
-     *            parameter that specifies how to validate JSON response. Currently only array validation flag is supported.
-     *            Use JsonCompareKeywords.ARRAY_CONTAINS enum value for that
+     * Validates Xml response using custom options
+     * 
+     * @param mode - determines how to compare 2 XMLs. See {@link XmlCompareMode} for more details.
+     */
+    public void validateXmlResponse(XmlCompareMode mode) {
+        if (actualRsBody == null) {
+            throw new RuntimeException("Actual response body is null. Please make API call before validation response");
+        }
+        if (rsPath == null) {
+            throw new RuntimeException("Please specify rsPath to make Response body validation");
+        }
+        XmlValidator.validateXml(actualRsBody, rsPath, mode);
+    }
+
+    /**
+     * @param validationFlags parameter that specifies how to validate JSON response. Currently only array validation flag is supported.
+     *                        Use JsonCompareKeywords.ARRAY_CONTAINS enum value for that
      */
     public void validateResponse(String... validationFlags) {
-        validateResponse(JSONCompareMode.NON_EXTENSIBLE, validationFlags);
+        ContentType contentType = this.getClass().getAnnotation(ContentType.class);
+        if (contentType == null || contentType.type().equals(JSON_CONTENT_TYPE.getHeaderValue())) {
+            validateResponse(JSONCompareMode.NON_EXTENSIBLE, validationFlags);
+        } else if (contentType.type().equals(XML_CONTENT_TYPE.getHeaderValue())) {
+            validateXmlResponse(XmlCompareMode.STRICT);
+        } else {
+            throw new RuntimeException("Unsupported argument of content type");
+        }
     }
 
     /**

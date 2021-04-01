@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<app>
+    <url>
+        <name>RJ</name>
+        <score>10</score>
+    </url>
+    <url>
+        <name>ABC</name>
+    </url>
+</app>
