@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
+
 public class XmlValidator {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -50,11 +51,12 @@ public class XmlValidator {
             Validator validator = schema.newValidator();
             validator.validate(new StreamSource(new StringReader(xmlData)));
         } catch (SAXException e) {
-            throw new AssertionError("Validation against Xml schema failed " + e.getMessage(), e);
+            throw new AssertionError("Validation against Xml schema failed "  + e.getMessage(), e);
         } catch (IOException e) {
             throw new RuntimeException("Can't read xml from String: " + e.getMessage(), e);
         }
         LOGGER.info("Validation against Xml schema successfully passed");
     }
+
 }
 
