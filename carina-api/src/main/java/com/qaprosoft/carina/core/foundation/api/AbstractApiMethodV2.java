@@ -40,6 +40,7 @@ import com.qaprosoft.carina.core.foundation.api.annotation.SuccessfulHttpStatus;
 
 import io.restassured.response.Response;
 
+
 public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -239,7 +240,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         ContentType contentType = this.getClass().getAnnotation(ContentType.class);
         if (contentType.type().equals(XML_CONTENT_TYPE.getHeaderValue())) {
             validateXmlResponse(XmlCompareMode.STRICT);
-        } else if (contentType.type().equals(JSON_CONTENT_TYPE.getHeaderValue())) {
+        } else if (contentType == null || contentType.type().equals(JSON_CONTENT_TYPE.getHeaderValue())) {
             validateResponse(JSONCompareMode.NON_EXTENSIBLE, validationFlags);
         } else {
             throw new RuntimeException("Unsupported argument of content type");

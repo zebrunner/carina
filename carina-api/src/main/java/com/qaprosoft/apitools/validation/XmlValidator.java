@@ -37,7 +37,7 @@ public class XmlValidator {
                 XmlComparator.strictCompare(actualXmlData, expectedXmlData);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Can't read xml from String: " + e.getMessage(), e);
         }
         LOGGER.info("Validation of xml data successfully passed");
     }
