@@ -110,30 +110,4 @@ public class DevicePoolTest implements IDriverPool {
         Assert.assertTrue(device.isNull(), "Device is not null");
     }
 
-    @Test()
-    public void connectRemoteTest() {
-        Device device = new Device("name", "mobile", "android", "10", "udid", "remoteUrl", "vnc", "proxyPort");
-
-        device.connectRemote();
-        Assert.assertTrue(device.isAdbEnabled(), "Adb commands is disabled");
-    }
-
-    @Test()
-    public void disconnectRemoteTest() {
-        Device device = new Device("name", "mobile", "android", "10", "udid", "remoteUrl", "vnc", "proxyPort");
-
-        device.connectRemote();
-        Assert.assertTrue(device.isAdbEnabled(), "Adb commands is disabled");
-
-        device.disconnectRemote();
-        Assert.assertFalse(device.isAdbEnabled(), "Adb commands is enabled");
-    }
-
-    @Test()
-    public void isAppUninstallTest() {
-        Device device = new Device("name", "mobile", "android", "10", "udid", "remoteUrl", "vnc", "proxyPort");
-
-        Assert.assertFalse(device.isAppInstall("packages"), "App is installed");
-    }
-
 }

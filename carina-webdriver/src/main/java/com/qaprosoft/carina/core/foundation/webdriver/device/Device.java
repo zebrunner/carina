@@ -176,10 +176,6 @@ public class Device implements IDriverPool {
         setCapabilities(capabilities);
     }
 
-    public boolean isAdbEnabled() {
-        return isAdbEnabled;
-    }
-    
     public String getName() {
         return name;
     }
