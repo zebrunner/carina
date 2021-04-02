@@ -24,7 +24,6 @@ public class TestPhase {
     private static ThreadLocal<Phase> activePhase = new ThreadLocal<Phase>();
 
 	public static Phase getActivePhase() {
-		Phase phase = activePhase.get();
 	    return activePhase.get();
 	}
 
