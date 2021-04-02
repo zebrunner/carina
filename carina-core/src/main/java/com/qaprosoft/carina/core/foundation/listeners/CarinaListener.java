@@ -48,6 +48,8 @@ import org.testng.ITestResult;
 import org.testng.SkipException;
 import org.testng.TestListenerAdapter;
 import org.testng.TestNG;
+import org.testng.ITestClass;
+import org.testng.IClassListener;
 import org.testng.xml.XmlClass;
 import org.testng.xml.XmlInclude;
 import org.testng.xml.XmlSuite;
@@ -104,7 +106,7 @@ import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
  * 
  * @author Vadim Delendik
  */
-public class CarinaListener extends AbstractTestListener implements ISuiteListener, IQTestManager, ITestRailManager {
+public class CarinaListener extends AbstractTestListener implements ISuiteListener, IQTestManager, ITestRailManager, IClassListener {
     private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass());
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
@@ -231,6 +233,10 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             TestPhase.setActivePhase(Phase.BEFORE_SUITE);
         }
 
+        if(result.getMethod().isBeforeTestConfiguration()){
+            TestPhase.setActivePhase(Phase.BEFORE_TEST);
+        }
+
         if (result.getMethod().isBeforeClassConfiguration()) {
             TestPhase.setActivePhase(Phase.BEFORE_CLASS);
         }
@@ -245,6 +251,10 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
         if (result.getMethod().isAfterClassConfiguration()) {
             TestPhase.setActivePhase(Phase.AFTER_CLASS);
+        }
+
+        if (result.getMethod().isAfterTestConfiguration()){
+            TestPhase.setActivePhase(Phase.AFTER_TEST);
         }
 
         if (result.getMethod().isAfterSuiteConfiguration()) {
@@ -344,13 +354,20 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     }
 
     @Override
+    public void onAfterClass(ITestClass testClass){
+        LOGGER.debug("CarinaListener->onAfterClass(ITestClass testClass)");
+        quitDrivers(Phase.BEFORE_CLASS);
+    }
+
+    @Override
     public void onFinish(ITestContext context) {
         LOGGER.debug("CarinaListener->onFinish(ITestContext context)");
         super.onFinish(context);
 
         // [SZ] it's still needed to close driver from BeforeClass stage.
         // Otherwise it could be potentially used in other test classes 
-        quitDrivers(Phase.BEFORE_CLASS);
+//        quitDrivers(Phase.BEFORE_CLASS); already exited in onAfterClass() method
+        quitDrivers(Phase.BEFORE_TEST);
 
         LOGGER.debug("CarinaListener->onFinish(context): " + context.getName());
     }
