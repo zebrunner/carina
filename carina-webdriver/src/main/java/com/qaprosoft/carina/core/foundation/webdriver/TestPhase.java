@@ -18,12 +18,13 @@ package com.qaprosoft.carina.core.foundation.webdriver;
 //TODO: move into better module/package
 public class TestPhase {
     public enum Phase {
-    	BEFORE_SUITE, BEFORE_CLASS, BEFORE_METHOD, METHOD, AFTER_METHOD, AFTER_CLASS, AFTER_SUITE, ALL;
+    	BEFORE_SUITE, BEFORE_TEST, BEFORE_CLASS, BEFORE_METHOD, METHOD, AFTER_METHOD, AFTER_CLASS, AFTER_TEST, AFTER_SUITE, ALL;
     }
 
     private static ThreadLocal<Phase> activePhase = new ThreadLocal<Phase>();
 
 	public static Phase getActivePhase() {
+		Phase phase = activePhase.get();
 	    return activePhase.get();
 	}
 
