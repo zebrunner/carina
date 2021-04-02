@@ -1,0 +1,4 @@
+Expecting:
+ <control instance> and <test instance> to be identical
+Expected text value '34' but was '61' - comparing <age ...>34</age> at /users[1]/user[1]/age[1]/text()[1] to <age ...>61</age> at /users[1]/user[1]/age[1]/text()[1]
+expected:<<age>34</age>> but was:<<age>61</age>>>
