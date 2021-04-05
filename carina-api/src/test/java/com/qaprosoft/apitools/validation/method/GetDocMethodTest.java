@@ -1,7 +1,5 @@
 package com.qaprosoft.apitools.validation.method;
 
-import org.testng.annotations.AfterSuite;
-import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 import java.io.IOException;

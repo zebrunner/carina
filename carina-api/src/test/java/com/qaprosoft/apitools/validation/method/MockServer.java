@@ -1,8 +1,10 @@
 package com.qaprosoft.apitools.validation.method;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 public class MockServer {
@@ -10,7 +12,8 @@ public class MockServer {
     private WireMockServer wireMockServer;
 
     public MockServer() {
-        wireMockServer = new WireMockServer(wireMockConfig().port(8080));
+        WireMock.configureFor(Integer.parseInt(Configuration.getEnvArg("mockServer.port")));
+        wireMockServer = new WireMockServer(options().port(Integer.parseInt(Configuration.getEnvArg("mockServer.port"))));
     }
 
     public void start() {
