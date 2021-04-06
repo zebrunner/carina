@@ -1,4 +1,4 @@
-package com.qaprosoft.apitools.validation.method;
+package com.qaprosoft.apitools.validation.mock.method;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
