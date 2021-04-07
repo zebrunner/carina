@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<users>
+    <user>
+        <name>John</name>
+        <age>34</age>
+        <country>Canada</country>
+    </user>
+    <user>
+        <name>Alisa</name>
+        <age>22</age>
+        <country>Belarus</country>
+    </user>
+    <user>
+        <name>Kevin</name>
+        <age>62</age>
+        <country>Germany</country>
+    </user>
+</users>
