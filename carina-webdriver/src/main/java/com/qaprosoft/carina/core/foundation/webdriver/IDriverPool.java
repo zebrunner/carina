@@ -344,7 +344,7 @@ public interface IDriverPool {
                 }
             });
             
-            long wait = 120;
+            long wait = 30;
             try {
                 future.get(wait, TimeUnit.SECONDS);
             } catch (java.util.concurrent.TimeoutException e) {
