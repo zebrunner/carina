@@ -253,6 +253,7 @@ public class L10Nnew {
         return returnString;
     }
 
+    //Parser part
     /**
      * get Actual Locale
      *
@@ -308,30 +309,9 @@ public class L10Nnew {
      * @param locale - Locale
      */
     public static void setActualLocale(Locale locale) {
-        setActualLocale(locale, false);
-    }
-
-    /**
-     * set Actual Locale
-     *
-     * @param locale       - Locale
-     * @param updateConfig - can be useful for updating config file just with actual
-     *                     locale and be used separately on PageObject methods not only
-     *                     in test classes.
-     */
-    public static void setActualLocale(Locale locale, boolean updateConfig) {
         LOGGER.info("Set actual Locale to " + locale);
         actualLocale = locale;
 
-        if (updateConfig) {
-            R.CONFIG.put(Parameter.LOCALE.getKey(), actualLocale.toString());
-
-            String savedLocale = R.CONFIG.get(Parameter.LOCALE.getKey());
-            LOGGER.debug("Saved actualLocale in config =" + savedLocale);
-            List<Locale> locales = LocaleReader.init(Configuration.get(Parameter.LOCALE));
-            LOGGER.debug("First locale from LocaleReader=" + locales.get(0).toString());
-
-        }
         // Parser prop init
         if (getAddNewLocalization()) {
             try {
@@ -412,19 +392,7 @@ public class L10Nnew {
      * @return boolean
      */
     public static boolean checkLocalizationText(ExtendedWebElement elem) {
-        return checkLocalizationText(elem, true);
-    }
-
-    /**
-     * check Localization Text. Will work ONLY if locKey is equal to element
-     * Name and element is Public
-     *
-     * @param elem       ExtendedWebElement
-     * @param skipMissed - boolean - if true - will ignore missed elements.
-     * @return boolean
-     */
-    public static boolean checkLocalizationText(ExtendedWebElement elem, boolean skipMissed) {
-        return checkLocalizationText(elem, skipMissed, BASIC_WAIT_SHORT_TIMEOUT, false);
+        return checkLocalizationText(elem, true, BASIC_WAIT_SHORT_TIMEOUT , false);
     }
 
     /**
@@ -484,17 +452,7 @@ public class L10Nnew {
         return false;
     }
 
-    /**
-     * check Localization Text
-     *
-     * @param expectedText              String
-     * @param locKey                    String
-     * @param skipPunctuationAndNumbers - if true - there will be no numbers and
-     *                                  tricky punctuation in l10n values and in checking.
-     *                                  As well as validation will be case insensitive.
-     * @return boolean
-     */
-    public static boolean checkLocalizationText(String expectedText, String locKey, boolean skipPunctuationAndNumbers) {
+    private static boolean checkLocalizationText(String expectedText, String locKey, boolean skipPunctuationAndNumbers) {
         String l10n_default = L10Nnew.getText(locKey, actualLocale);
         boolean ret;
 
@@ -551,18 +509,6 @@ public class L10Nnew {
      * @return boolean
      */
     public static boolean checkMultipleLocalization(ExtendedWebElement[] localizationCheckList) {
-        return checkMultipleLocalization(localizationCheckList, BASIC_WAIT_SHORT_TIMEOUT, false);
-    }
-
-    /**
-     * check MultipleLocalization
-     *
-     * @param localizationCheckList     - ExtendedWebElement[] should be set on required page with all
-     *                                  needed public elements
-     * @param skipPunctuationAndNumbers - if true - there will be no numbers and tricky punctuation in l10n values
-     * @return boolean
-     */
-    public static boolean checkMultipleLocalization(ExtendedWebElement[] localizationCheckList, boolean skipPunctuationAndNumbers) {
         return checkMultipleLocalization(localizationCheckList, BASIC_WAIT_SHORT_TIMEOUT, false);
     }
 
