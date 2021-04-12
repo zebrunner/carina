@@ -61,7 +61,7 @@ public class L10Nnew {
 
     public static String propFileName = "";
 
-    private static String encoding = "ISO-8859-1";
+    private static String encoding = "UTF-8";
 
     protected static final int BASIC_WAIT_SHORT_TIMEOUT = 5;
 
@@ -350,32 +350,21 @@ public class L10Nnew {
 //    }
 
     /**
-     * ge tProperty FileName
+     * get Property FileName
      *
      * @param localName - String
      * @return String with path + PropertyFileName
      */
     private static String getPropertyFileName(String localName) {
-        String ret;
-        String add_new_loc_path = "null";
-        String add_new_loc_name = "null";
-        try {
-            add_new_loc_path = Configuration.get(Parameter.ADD_NEW_LOCALIZATION_PATH);
-            add_new_loc_name = Configuration.get(Parameter.ADD_NEW_LOCALIZATION_PROPERTY_NAME);
-        } catch (Exception e) {
-            LOGGER.debug("Using default parameters because of error: " + e);
-        }
-        if (add_new_loc_path.toLowerCase().contains("null")
-                || add_new_loc_path.toLowerCase().contains("{must_override}") || add_new_loc_path.isEmpty()) {
-            add_new_loc_path = ReportContext.getArtifactsFolder().getAbsolutePath();
+
+        String default_path = "./src/main/resources/L10N/";
+        File file = new File(default_path);
+
+        if (!file.exists()) {
+            file.mkdir();
         }
 
-        if (add_new_loc_name.toLowerCase().contains("null")
-                || add_new_loc_name.toLowerCase().contains("{must_override}") || add_new_loc_name.isEmpty()) {
-            add_new_loc_name = "new_localization_";
-        }
-
-        ret = add_new_loc_path + "/" + add_new_loc_name + localName + ".properties";
+        String ret = default_path + "new_locale_" + localName + ".properties";
 
         return ret;
     }
