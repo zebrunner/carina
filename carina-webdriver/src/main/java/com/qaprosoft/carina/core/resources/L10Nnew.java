@@ -420,38 +420,6 @@ public class L10Nnew {
         return false;
     }
 
-    /**
-     * check Localization Text. Will work ONLY if locKey is equal to element
-     * Name and element is Public
-     *
-     * @param elem   ExtendedWebElement
-     * @param locKey String
-     * @return boolean
-     */
-    public static boolean checkLocalizationText(ExtendedWebElement elem, String locKey) {
-        return checkLocalizationText(elem, locKey, BASIC_WAIT_SHORT_TIMEOUT, false);
-    }
-
-    /**
-     * check Localization Text. Will work ONLY if locKey is equal to element
-     * Name and element is Public
-     *
-     * @param elem                      ExtendedWebElement
-     * @param locKey                    String
-     * @param timeout                   - timeout for element presence waiting.
-     * @param skipPunctuationAndNumbers - if true - there will be no numbers and tricky punctuation in l10n values
-     * @return boolean
-     */
-    public static boolean checkLocalizationText(ExtendedWebElement elem, String locKey, int timeout, boolean skipPunctuationAndNumbers) {
-        if (elem.isElementPresent(timeout)) {
-            String elemText = elem.getText();
-            return checkLocalizationText(elemText, locKey, skipPunctuationAndNumbers);
-        } else {
-            LOGGER.info("Expected element not present. Please check:" + elem);
-        }
-        return false;
-    }
-
     private static boolean checkLocalizationText(String expectedText, String locKey, boolean skipPunctuationAndNumbers) {
         String l10n_default = L10Nnew.getText(locKey, actualLocale);
         boolean ret;
