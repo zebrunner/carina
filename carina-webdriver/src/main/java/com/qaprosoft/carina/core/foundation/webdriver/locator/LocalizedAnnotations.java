@@ -20,6 +20,7 @@ import java.lang.reflect.Field;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.qaprosoft.carina.core.resources.L10Nnew;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.pagefactory.Annotations;
@@ -38,6 +39,9 @@ public class LocalizedAnnotations extends Annotations {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static Pattern L10N_PATTERN = Pattern.compile(SpecialKeywords.L10N_PATTERN);
 
+    //should be deleted when l10n and l10n parser will be merged in one class
+    private static boolean l10nNewIsOn = false;
+
     public LocalizedAnnotations(Field field) {
         super(field);
     }
@@ -54,7 +58,11 @@ public class LocalizedAnnotations extends Annotations {
             int start = param.indexOf(SpecialKeywords.L10N + ":") + 5;
             int end = param.indexOf("}");
             String key = param.substring(start, end);
-			param = StringUtils.replace(param, matcher.group(), L10N.getText(key));
+            if (l10nNewIsOn) {
+                param = StringUtils.replace(param, matcher.group(), L10Nnew.getText(key));
+            } else {
+                param = StringUtils.replace(param, matcher.group(), L10N.getText(key));
+            }
         }
 
         if (getField().isAnnotationPresent(Predicate.class)) {

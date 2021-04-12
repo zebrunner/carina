@@ -19,6 +19,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.qaprosoft.carina.core.resources.L10Nnew;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +45,9 @@ public class ParameterGenerator {
     private static Matcher matcher;
 
     private static String UUID;
+
+    //should be deleted when l10n and l10n parser will be merged in one class
+    private static boolean l10nNewIsOn = false;
 
     public static Object process(String param) {
         try {
@@ -109,7 +113,11 @@ public class ParameterGenerator {
                 int start = param.indexOf(SpecialKeywords.L10N + ":") + 5;
                 int end = param.indexOf("}");
                 String key = param.substring(start, end);
-                param = StringUtils.replace(param, matcher.group(), L10N.getText(key));
+                if(l10nNewIsOn){
+                    param = StringUtils.replace(param, matcher.group(), L10Nnew.getText(key));
+                } else {
+                    param = StringUtils.replace(param, matcher.group(), L10N.getText(key));
+                }
             }
             // in case if L10N pattern was applied
             if (!initStrL10N.equalsIgnoreCase(param)) {
