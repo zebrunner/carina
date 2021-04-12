@@ -29,10 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.util.*;
@@ -57,8 +54,6 @@ public class L10Nnew {
     public static Locale actualLocale;
 
     public static String assertErrorMsg = "";
-
-    public static boolean newLocalization = false;
 
     public static LinkedList<String> newLocList = new LinkedList<String>();
 
@@ -272,14 +267,14 @@ public class L10Nnew {
         return assertErrorMsg;
     }
 
-    /**
-     * should we add New Localization - true or false
-     *
-     * @return boolean
-     */
-    public static boolean getNewLocalization() {
-        return newLocalization;
-    }
+//    /**
+//     * should we add New Localization - true or false
+//     *
+//     * @return boolean
+//     */
+//    public static boolean getNewLocalization() {
+//        return newLocalization;
+//    }
 
     /**
      * set Actual Locale
@@ -312,46 +307,47 @@ public class L10Nnew {
         LOGGER.info("Set actual Locale to " + locale);
         actualLocale = locale;
 
-        // Parser prop init
-        if (getAddNewLocalization()) {
+        propFileName = getPropertyFileName(actualLocale.toString());
+        LOGGER.info("propFileName:=" + propFileName);
+
+        boolean exists = new File(propFileName).exists();
+        if (exists) {
             try {
-                propFileName = getPropertyFileName(actualLocale.toString());
-                LOGGER.info("propFileName:=" + propFileName);
                 FileInputStream in = new FileInputStream(propFileName);
                 prop.load(in);
                 in.close();
-
             } catch (Exception e) {
                 LOGGER.debug(e.getMessage(), e);
             }
         }
-
     }
 
-    /**
-     * check should we add New Localization or not
-     *
-     * @return boolean
-     */
-    private static boolean getAddNewLocalization() {
-        boolean ret = false;
-        if (!newLocalization) {
-            try {
-                String add_new = Configuration.get(Parameter.ADD_NEW_LOCALIZATION);
-                if (add_new.toLowerCase().contains("true")) {
-                    LOGGER.info("New localization will be added.");
-                    newLocalization = true;
-                    return true;
-                }
-            } catch (Exception e) {
-                LOGGER.debug(e.getMessage(), e);
-            }
-        } else {
-            ret = true;
-        }
 
-        return ret;
-    }
+
+//    /**
+//     * check should we add New Localization or not
+//     *
+//     * @return boolean
+//     */
+//    private static boolean getAddNewLocalization() {
+//        boolean ret = false;
+//        if (!newLocalization) {
+//            try {
+//                String add_new = Configuration.get(Parameter.ADD_NEW_LOCALIZATION);
+//                if (add_new.toLowerCase().contains("true")) {
+//                    LOGGER.info("New localization will be added.");
+//                    newLocalization = true;
+//                    return true;
+//                }
+//            } catch (Exception e) {
+//                LOGGER.debug(e.getMessage(), e);
+//            }
+//        } else {
+//            ret = true;
+//        }
+//
+//        return ret;
+//    }
 
     /**
      * ge tProperty FileName
@@ -431,22 +427,19 @@ public class L10Nnew {
         }
 
         if (!ret) {
-            if (!newLocalization) {
-                LOGGER.error(
-                        "Actual text should be localized and be equal to: '" + l10n_default + "'. But currently it is '" + expectedText + "'.");
-                assertErrorMsg = "Expected: '" + l10n_default + "', length=" + l10n_default.length() + ". Actually: '" + expectedText + "', length="
-                        + expectedText.length() + ".";
-                return false;
-            } else {
-                if (skipPunctuationAndNumbers) {
-                    expectedText = removeNumbersAndPunctuation(expectedText);
-                }
-                String newItem = locKey + "=" + expectedText;
-                LOGGER.info("Making new localization string: " + newItem);
-                newLocList.add(newItem);
-                prop.setProperty(locKey, expectedText);
-                return true;
+            LOGGER.error(
+                    "Actual text should be localized and be equal to: '" + l10n_default + "'. But currently it is '" + expectedText + "'.");
+            assertErrorMsg = "Expected: '" + l10n_default + "', length=" + l10n_default.length() + ". Actually: '" + expectedText + "', length="
+                    + expectedText.length() + ".";
+
+            if (skipPunctuationAndNumbers) {
+                expectedText = removeNumbersAndPunctuation(expectedText);
             }
+            String newItem = locKey + "=" + expectedText;
+            LOGGER.info("Making new localization string: " + newItem);
+            newLocList.add(newItem);
+            prop.setProperty(locKey, expectedText);
+            return false;
         } else {
             LOGGER.debug("Found localization text '" + expectedText + "' in ISO-8859-1 encoding : " + l10n_default);
             return true;
@@ -507,43 +500,39 @@ public class L10Nnew {
      * Save Localization to property file
      */
     public static void saveLocalization() {
-        if (getAddNewLocalization()) {
-            try {
-                if (prop.size() == 0) {
-                    LOGGER.info("There are no new localization properties.");
-                    return;
-                }
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage(), e);
+        try {
+            if (prop.size() == 0) {
+                LOGGER.info("There are no new localization properties.");
+                return;
             }
-
-            LOGGER.info("New localization for '" + actualLocale + "'");
-            LOGGER.info(newLocList.toString());
-            LOGGER.info("Properties: " + prop.toString());
-            newLocList.clear();
-            try {
-                if (propFileName.isEmpty()) {
-                    propFileName = getPropertyFileName(actualLocale.toString());
-                    LOGGER.info("propFileName:=" + propFileName);
-                }
-
-                String encoding = getLocalizationSaveEncoding();
-                if (encoding.contains("UTF")) {
-                    prop.store(new OutputStreamWriter(
-                            new FileOutputStream(propFileName), "UTF-8"), null);
-                } else {
-                    OutputStream output = new FileOutputStream(propFileName);
-                    prop.store(output, null);
-                    output.close();
-                }
-
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage(), e);
-            }
-            prop.clear();
-        } else {
-            LOGGER.debug("There is no new localization for saving.");
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
         }
+
+        LOGGER.info("New localization for '" + actualLocale + "'");
+        LOGGER.info(newLocList.toString());
+        LOGGER.info("Properties: " + prop.toString());
+        newLocList.clear();
+        try {
+            if (propFileName.isEmpty()) {
+                propFileName = getPropertyFileName(actualLocale.toString());
+                LOGGER.info("propFileName:=" + propFileName);
+            }
+
+            String encoding = getLocalizationSaveEncoding();
+            if (encoding.contains("UTF")) {
+                prop.store(new OutputStreamWriter(
+                        new FileOutputStream(propFileName), "UTF-8"), null);
+            } else {
+                OutputStream output = new FileOutputStream(propFileName);
+                prop.store(output, null);
+                output.close();
+            }
+
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        prop.clear();
     }
 
     /**
