@@ -267,15 +267,6 @@ public class L10Nnew {
         return assertErrorMsg;
     }
 
-//    /**
-//     * should we add New Localization - true or false
-//     *
-//     * @return boolean
-//     */
-//    public static boolean getNewLocalization() {
-//        return newLocalization;
-//    }
-
     /**
      * set Actual Locale
      *
