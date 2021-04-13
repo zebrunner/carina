@@ -323,32 +323,6 @@ public class L10Nnew {
     }
 
 
-
-//    /**
-//     * check should we add New Localization or not
-//     *
-//     * @return boolean
-//     */
-//    private static boolean getAddNewLocalization() {
-//        boolean ret = false;
-//        if (!newLocalization) {
-//            try {
-//                String add_new = Configuration.get(Parameter.ADD_NEW_LOCALIZATION);
-//                if (add_new.toLowerCase().contains("true")) {
-//                    LOGGER.info("New localization will be added.");
-//                    newLocalization = true;
-//                    return true;
-//                }
-//            } catch (Exception e) {
-//                LOGGER.debug(e.getMessage(), e);
-//            }
-//        } else {
-//            ret = true;
-//        }
-//
-//        return ret;
-//    }
-
     /**
      * get Property FileName
      *
@@ -357,14 +331,13 @@ public class L10Nnew {
      */
     private static String getPropertyFileName(String localName) {
 
-        String default_path = "./src/main/resources/L10N/";
-        File file = new File(default_path);
+        File file = new File(SpecialKeywords.L10N_NEW_LOCALE_PATH);
 
         if (!file.exists()) {
             file.mkdir();
         }
 
-        String ret = default_path + "new_locale_" + localName + ".properties";
+        String ret = SpecialKeywords.L10N_NEW_LOCALE_PATH + "new_locale_" + localName + ".properties";
 
         return ret;
     }
