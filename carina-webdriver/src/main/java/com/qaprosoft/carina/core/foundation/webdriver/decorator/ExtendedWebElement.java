@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import com.qaprosoft.carina.core.resources.L10Nnew;
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
@@ -77,6 +78,7 @@ import com.sun.jersey.core.util.Base64;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
+import org.testng.asserts.SoftAssert;
 
 public class ExtendedWebElement {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -103,8 +105,17 @@ public class ExtendedWebElement {
     private By by;
     
     private boolean caseInsensitive;
-    
+
     private ElementLoadingStrategy loadingStrategy = ElementLoadingStrategy.valueOf(Configuration.get(Parameter.ELEMENT_LOADING_STRATEGY));
+
+    private boolean isL10nVerified = false;
+    private boolean isL10nElement = false;
+    private final SoftAssert localizationAssert = new SoftAssert();
+
+    public ExtendedWebElement(WebElement element, String name, By by, Boolean isL10nElement){
+        this(element, name, by);
+        this.isL10nElement = isL10nElement;
+    }
 
     public ExtendedWebElement(WebElement element, String name, By by) {
         this(element, name);
@@ -115,14 +126,12 @@ public class ExtendedWebElement {
     	this.by = by;
     	this.name = name;
     	this.element = null;
-    	
     }
     
     public ExtendedWebElement(By by, String name, WebDriver driver) {
     	this.by = by;
     	this.name = name;
     	this.driver = driver;
-    	
     }
     
     public ExtendedWebElement(WebElement element, String name) {
@@ -1397,6 +1406,15 @@ public class ExtendedWebElement {
 
 	// single place for all supported UI actions in carina core
 	private Object overrideAction(ACTION_NAME actionName, Object...inputArgs) {
+
+	    if (isL10nElement && !isL10nVerified){
+            String text = element.getText();
+            String expected = L10Nnew.getText(this.name);
+	        //localizationAssert.assertEquals(text, expected);
+            Assert.assertEquals(text, expected);
+	        isL10nVerified = true;
+        }
+
 		Object output = executeAction(actionName, new ActionSteps() {
 			@Override
 			public void doClick() {
