@@ -959,6 +959,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 carinaDriver.getDevice().disconnectRemote();
                 ProxyPool.stopProxy();
                 try {
+                    LOGGER.debug("Driver closing..." + name);
+                    carinaDriver.getDriver().close();                    
                     LOGGER.debug("Driver exiting..." + name);
                     carinaDriver.getDriver().quit();
                     LOGGER.debug("Driver exited..." + name);
