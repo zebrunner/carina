@@ -33,6 +33,11 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedFieldDec
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocatorFactory;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.List;
+
 public abstract class AbstractUIObject extends DriverHelper {
     protected String name;
 
@@ -178,4 +183,63 @@ public abstract class AbstractUIObject extends DriverHelper {
         return rootBy != null ? name + String.format(" (%s)", rootBy) : name + " (n/a)";
     }
 
+
+    public void assertAllL10n() {
+        Class<?> proxyIn = this.getClass();
+        Field[] fields = proxyIn.getDeclaredFields();
+
+        int i = 0;
+        boolean foundElement = false;
+        while(i < fields.length && !foundElement) {
+            fields[i].setAccessible(true);
+
+            if (ExtendedWebElement.class.isAssignableFrom(fields[i].getType())) {
+                ExtendedWebElement element = null;
+                try {
+                    element = (ExtendedWebElement) fields[i].get(this);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+                element.assertLocalization();
+                foundElement = true;
+            }
+
+//            if (List.class.isAssignableFrom(fields[i].getType())) {
+//                Type listType = getListType(fields[i]);
+//                if (ExtendedWebElement.class.isAssignableFrom((Class<?>) listType)) {
+//                    List<ExtendedWebElement> elList = null;
+//                    try {
+//                        elList = (List<ExtendedWebElement>) fields[i].get(this);
+//                    } catch (IllegalAccessException e) {
+//                        e.printStackTrace();
+//                    }
+//                    elList.get(0).assertLocalization();
+//                    foundElement = true;
+//                }
+//            }
+
+            i++;
+        }
+    }
+
+    private void callL10Nassert(Field field){
+        ExtendedWebElement el = null;
+        try {
+            el = (ExtendedWebElement) field.get(this);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        el.assertLocalization();
+    }
+    
+    private Type getListType(Field field) {
+        // Type erasure in Java isn't complete. Attempt to discover the generic
+        // type of the list.
+        Type genericType = field.getGenericType();
+        if (!(genericType instanceof ParameterizedType)) {
+            return null;
+        }
+
+        return ((ParameterizedType) genericType).getActualTypeArguments()[0];
+    }
 }
