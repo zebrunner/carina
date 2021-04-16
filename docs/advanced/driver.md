@@ -102,7 +102,7 @@ public void someTest() {
 Quit driver operation is executed automatically based on driver init phase, i.e. **no need to do it inside your test code**.
 
 * `@BeforeSuite` drivers belong to all tests/classes and will be closed in `@AfterSuite` only
-* `@BeforeTest` drivers belong to all `<test>` classes and will be closed in `@AfterTest`. To be imlemented in [#1250](https://github.com/qaprosoft/carina/issues/1250)
+* `@BeforeTest` drivers belong to all `<test>` classes and will be closed in `@AfterTest`.
 * `@BeforeClass` drivers belong to all tests inside current class and will be closed in `@AfterClass`
 * `@BeforeMethod` or inside `Test Method` drivers belong to current test method and will be closed in `@AfterMethod`
   > Also driver is saved for all dependent test methods inside test class by default.
