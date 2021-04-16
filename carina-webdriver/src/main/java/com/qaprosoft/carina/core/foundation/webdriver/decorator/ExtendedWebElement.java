@@ -78,7 +78,6 @@ import com.sun.jersey.core.util.Base64;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
-import org.testng.asserts.SoftAssert;
 
 public class ExtendedWebElement {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -108,7 +107,6 @@ public class ExtendedWebElement {
 
     private boolean isL10nVerified = false;
     private boolean isL10nElement = false;
-    private static SoftAssert localizationAssert = new SoftAssert();
 
     public ExtendedWebElement(WebElement element, String name, By by, Boolean isL10nElement){
         this(element, name, by);
@@ -1193,22 +1191,6 @@ public class ExtendedWebElement {
         return new ExtendedWebElement(by, name, getDriver());
     }
 
-    public static void assertLocalization(){
-        SoftAssert tmp1 = localizationAssert;
-        localizationAssert = new SoftAssert();
-
-        tmp1.assertAll();
-    }
-
-    private void checkElementLocalization(){
-        if (isL10nElement && !isL10nVerified){
-            String text = element.getText();
-            String expected = L10Nnew.getText(this.name);
-            localizationAssert.assertEquals(text, expected);
-            //Assert.assertEquals(text, expected);
-            isL10nVerified = true;
-        }
-    }
 
     /**
      * Pause for specified timeout.
@@ -1422,7 +1404,10 @@ public class ExtendedWebElement {
 	// single place for all supported UI actions in carina core
 	private Object overrideAction(ACTION_NAME actionName, Object...inputArgs) {
 
-	    checkElementLocalization();
+        if (isL10nElement && !isL10nVerified) {
+            isL10nVerified = true;
+            L10Nnew.checkLocalizationText(this);
+        }
 
 		Object output = executeAction(actionName, new ActionSteps() {
 			@Override

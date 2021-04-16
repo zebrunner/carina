@@ -457,6 +457,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 CommonUtils.pause(1);
             }
         }
+        if (l10nNewIsOn) {
+            L10Nnew.assertAll();
+        }
     }
     
     /**

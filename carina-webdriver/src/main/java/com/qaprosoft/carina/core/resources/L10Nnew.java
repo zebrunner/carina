@@ -16,10 +16,8 @@
 package com.qaprosoft.carina.core.resources;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.resources.LocaleReader;
 import com.qaprosoft.carina.core.foundation.utils.resources.ResourceURLFilter;
 import com.qaprosoft.carina.core.foundation.utils.resources.Resources;
@@ -28,6 +26,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.Assert;
 
 import java.io.*;
 import java.lang.invoke.MethodHandles;
@@ -267,6 +266,18 @@ public class L10Nnew {
         return assertErrorMsg;
     }
 
+    public static void assertAll(){
+        boolean isCorrect = true;
+        String tmp = assertErrorMsg;
+
+        if (assertErrorMsg.length() > 0){
+            assertErrorMsg = "";
+            isCorrect = false;
+        }
+
+        Assert.assertTrue(isCorrect, tmp);
+    }
+
     /**
      * set Actual Locale
      *
@@ -382,7 +393,7 @@ public class L10Nnew {
         if (!ret) {
             LOGGER.error(
                     "Actual text should be localized and be equal to: '" + l10n_default + "'. But currently it is '" + expectedText + "'.");
-            assertErrorMsg = "Expected: '" + l10n_default + "', length=" + l10n_default.length() + ". Actually: '" + expectedText + "', length="
+            assertErrorMsg = assertErrorMsg + '\n' + "Expected: '" + l10n_default + "', length=" + l10n_default.length() + ". Actually: '" + expectedText + "', length="
                     + expectedText.length() + ".";
 
             if (skipPunctuationAndNumbers) {
@@ -438,7 +449,6 @@ public class L10Nnew {
     public static boolean checkMultipleLocalization(ExtendedWebElement[] localizationCheckList, int timeout, boolean skipPunctuationAndNumbers) {
         boolean ret = true;
         String returnAssertErrorMsg = "";
-        assertErrorMsg = "";
         for (ExtendedWebElement elem : localizationCheckList) {
             if (!checkLocalizationText(elem, true, timeout, skipPunctuationAndNumbers)) {
                 ret = false;
