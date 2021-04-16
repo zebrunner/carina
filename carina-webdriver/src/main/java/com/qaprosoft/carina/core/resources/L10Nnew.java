@@ -391,10 +391,15 @@ public class L10Nnew {
         }
 
         if (!ret) {
-            LOGGER.error(
-                    "Actual text should be localized and be equal to: '" + l10n_default + "'. But currently it is '" + expectedText + "'.");
-            assertErrorMsg = assertErrorMsg + '\n' + "Expected: '" + l10n_default + "', length=" + l10n_default.length() + ". Actually: '" + expectedText + "', length="
-                    + expectedText.length() + ".";
+            LOGGER.error("Actual text should be localized and be equal to: '" + l10n_default + "'." +
+                            " But currently it is '" + expectedText + "'.");
+
+            String error = "Expected: '" + l10n_default + "', length=" + l10n_default.length() +
+                    ". Actually: '" + expectedText + "', length=" + expectedText.length() + ".";
+
+            if (!assertErrorMsg.contains(error) || assertErrorMsg.isEmpty()) {
+                assertErrorMsg = assertErrorMsg + '\n' + error;
+            }
 
             if (skipPunctuationAndNumbers) {
                 expectedText = removeNumbersAndPunctuation(expectedText);
