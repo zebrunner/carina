@@ -143,6 +143,8 @@ public class L10Nnew {
         } catch (IllegalArgumentException e) {
             LOGGER.debug("L10N folder with resources is missing!");
         }
+
+        L10Nnew.setActualLocale(Configuration.get(Configuration.Parameter.LOCALE));
     }
 
     /**
