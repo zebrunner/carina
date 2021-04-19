@@ -399,7 +399,7 @@ public class L10Nnew {
             String error = "Expected: '" + l10n_default + "', length=" + l10n_default.length() +
                     ". Actually: '" + expectedText + "', length=" + expectedText.length() + ".";
 
-            if (!assertErrorMsg.contains(error) || assertErrorMsg.isEmpty()) {
+            if (!assertErrorMsg.contains(error)) {
                 assertErrorMsg = assertErrorMsg + '\n' + error;
             }
 
@@ -455,14 +455,11 @@ public class L10Nnew {
      */
     public static boolean checkMultipleLocalization(ExtendedWebElement[] localizationCheckList, int timeout, boolean skipPunctuationAndNumbers) {
         boolean ret = true;
-        String returnAssertErrorMsg = "";
         for (ExtendedWebElement elem : localizationCheckList) {
             if (!checkLocalizationText(elem, true, timeout, skipPunctuationAndNumbers)) {
                 ret = false;
-                returnAssertErrorMsg = returnAssertErrorMsg + " \n" + assertErrorMsg;
             }
         }
-        assertErrorMsg = returnAssertErrorMsg;
         return ret;
     }
 
