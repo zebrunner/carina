@@ -147,11 +147,11 @@ public class L10Nnew {
         L10Nnew.setActualLocale(Configuration.get(Configuration.Parameter.LOCALE));
     }
 
-    public static void resourcesToProperties(Map resources) {
+    public static void resourcesToProperties(Map <String, String> resources) {
         resourcesToProperties(resources, actualLocale.toString());
     }
 
-    public static void resourcesToProperties(Map resources, String locale) {
+    public static void resourcesToProperties(Map<String, String> resources, String locale) {
 
         String localePath = String.format("./src/main/resources/%s/locale_%s.properties", SpecialKeywords.L10N, locale);
         boolean fileExists = new File(localePath).exists();
@@ -176,7 +176,7 @@ public class L10Nnew {
             }
         }
 
-        for (Object key : resources.keySet()) {
+        for (String key : resources.keySet()) {
             if (!properties.containsKey(key)) {
                 properties.put(key, resources.get(key));
             }
