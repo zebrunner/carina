@@ -22,7 +22,6 @@ import com.qaprosoft.carina.core.foundation.utils.resources.LocaleReader;
 import com.qaprosoft.carina.core.foundation.utils.resources.ResourceURLFilter;
 import com.qaprosoft.carina.core.foundation.utils.resources.Resources;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
