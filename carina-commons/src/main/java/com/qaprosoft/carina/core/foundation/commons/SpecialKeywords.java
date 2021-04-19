@@ -32,7 +32,6 @@ public class SpecialKeywords {
 
     public static final String L10N = "L10N";
     public static final String L10N_PATTERN = String.format("\\{(%s:.[^\\'\\\"]*)}", L10N);
-    public static final String L10N_NEW_LOCALE_PATH = String.format("./src/main/resources/%s/", L10N);
 
     public static final String EXCEL = "\\{excel:.*\\}";
     public static final String CRYPT = "\\{crypt:[^\\{\\}]*\\}";

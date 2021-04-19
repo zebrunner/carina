@@ -22,6 +22,7 @@ import com.qaprosoft.carina.core.foundation.utils.resources.LocaleReader;
 import com.qaprosoft.carina.core.foundation.utils.resources.ResourceURLFilter;
 import com.qaprosoft.carina.core.foundation.utils.resources.Resources;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -145,6 +146,57 @@ public class L10Nnew {
         }
 
         L10Nnew.setActualLocale(Configuration.get(Configuration.Parameter.LOCALE));
+    }
+
+    public static void resourcesToProperties(Map resources) {
+        resourcesToProperties(resources, actualLocale.toString());
+    }
+
+    public static void resourcesToProperties(Map resources, String locale) {
+
+        String localePath = String.format("./src/main/resources/%s/locale_%s.properties", SpecialKeywords.L10N, locale);
+        boolean fileExists = new File(localePath).exists();
+
+        Properties properties = new Properties();
+
+        InputStreamReader reader = null;
+        if (fileExists) {
+            try {
+                reader = new InputStreamReader(
+                        new FileInputStream(localePath), encoding);
+
+                properties.load(reader);
+            } catch (Exception e) {
+                LOGGER.debug(e.getMessage(), e);
+            } finally {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        for (Object key : resources.keySet()) {
+            if (!properties.containsKey(key)) {
+                properties.put(key, resources.get(key));
+            }
+        }
+
+        if (properties.size() < 1) {
+            LOGGER.debug("No key-value pairs were passed, returning...");
+            return;
+        } else {
+            try {
+                properties.store(
+                        new OutputStreamWriter(
+                                new FileOutputStream(localePath), encoding), null);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -315,13 +367,21 @@ public class L10Nnew {
         LOGGER.info("propFileName:=" + propFileName);
 
         boolean exists = new File(propFileName).exists();
+
         if (exists) {
+            InputStreamReader reader = null;
             try {
-                FileInputStream in = new FileInputStream(propFileName);
-                prop.load(in);
-                in.close();
+                 reader = new InputStreamReader(
+                    new FileInputStream(propFileName), encoding);
+                prop.load(reader);
             } catch (Exception e) {
                 LOGGER.debug(e.getMessage(), e);
+            } finally {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -334,14 +394,14 @@ public class L10Nnew {
      * @return String with path + PropertyFileName
      */
     private static String getPropertyFileName(String localName) {
+        final String L10N_NEW_LOCALE_PATH = String.format("./src/main/resources/%s/", SpecialKeywords.L10N);
 
-        File file = new File(SpecialKeywords.L10N_NEW_LOCALE_PATH);
-
+        File file = new File(L10N_NEW_LOCALE_PATH);
         if (!file.exists()) {
             file.mkdir();
         }
 
-        String ret = SpecialKeywords.L10N_NEW_LOCALE_PATH + "new_locale_" + localName + ".properties";
+        String ret = L10N_NEW_LOCALE_PATH + "new_locale_" + localName + ".properties";
 
         return ret;
     }
