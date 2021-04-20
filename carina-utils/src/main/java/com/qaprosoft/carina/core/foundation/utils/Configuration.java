@@ -194,7 +194,9 @@ public class Configuration {
 
         // For localization parser
 
-        ADD_NEW_LOCALIZATION_ENCODING("add_new_localization_encoding"),
+        LOCALIZATION_ENCODING("localization_encoding"),
+
+        LOCALIZATION_AUTO_VERIFICATION("localization_auto_verification"),
 
         // TLS
         TLS_KEYSECURE_LOCATION("tls_keysecure_location"),

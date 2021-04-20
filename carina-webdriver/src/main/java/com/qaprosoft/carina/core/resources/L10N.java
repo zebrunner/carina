@@ -61,6 +61,7 @@ public class L10N {
 
     public static void init() {
         L10NLoader.init();
+        getLocalizationSaveEncoding();
         L10N.setActualLocale(Configuration.get(Configuration.Parameter.LOCALE));
     }
 
@@ -385,36 +386,6 @@ public class L10N {
     }
 
     /**
-     * check MultipleLocalization
-     *
-     * @param localizationCheckList - ExtendedWebElement[] should be set on required page with all
-     *                              needed public elements
-     * @return boolean
-     */
-    public static boolean checkMultipleLocalization(ExtendedWebElement[] localizationCheckList) {
-        return checkMultipleLocalization(localizationCheckList, BASIC_WAIT_SHORT_TIMEOUT, false);
-    }
-
-    /**
-     * check MultipleLocalization
-     *
-     * @param localizationCheckList     - ExtendedWebElement[] should be set on required page with all
-     *                                  needed public elements
-     * @param timeout                   - timeout for element presence waiting.
-     * @param skipPunctuationAndNumbers - if true - there will be no numbers and tricky punctuation in l10n values
-     * @return boolean
-     */
-    public static boolean checkMultipleLocalization(ExtendedWebElement[] localizationCheckList, int timeout, boolean skipPunctuationAndNumbers) {
-        boolean ret = true;
-        for (ExtendedWebElement elem : localizationCheckList) {
-            if (!checkLocalizationText(elem, true, timeout, skipPunctuationAndNumbers)) {
-                ret = false;
-            }
-        }
-        return ret;
-    }
-
-    /**
      * Save Localization to property file
      */
     public static void saveLocalization() {
@@ -460,7 +431,7 @@ public class L10N {
      */
     private static String getLocalizationSaveEncoding() {
         try {
-            encoding = Configuration.get(Parameter.ADD_NEW_LOCALIZATION_ENCODING);
+            encoding = Configuration.get(Parameter.LOCALIZATION_ENCODING);
         } catch (Exception e) {
             LOGGER.error("There is no localization encoding parameter in config property.");
         }
