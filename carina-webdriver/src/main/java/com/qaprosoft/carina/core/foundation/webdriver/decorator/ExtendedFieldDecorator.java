@@ -52,6 +52,8 @@ public class ExtendedFieldDecorator implements FieldDecorator {
 
     protected ElementLocatorFactory factory;
 
+    private static boolean L10NVerificationIsOn = Configuration.getBoolean(Configuration.Parameter.LOCALE_AUTO_VERIFICATION);
+
     private WebDriver webDriver;
     
     public ExtendedFieldDecorator(ElementLocatorFactory factory, WebDriver webDriver) {
@@ -136,7 +138,6 @@ public class ExtendedFieldDecorator implements FieldDecorator {
         LocalizedAnnotations localizedAnnotations = field.isAnnotationPresent(FindBy.class) ||
                 field.isAnnotationPresent(ExtendedFindBy.class)? new LocalizedAnnotations(field) : null;
 
-        boolean L10NVerificationIsOn = Configuration.getBoolean(Configuration.Parameter.LOCALE_AUTO_VERIFICATION);
         if (L10NVerificationIsOn){
             return new ExtendedWebElement(proxy, field.getName(), localizedAnnotations.buildBy(), field.isAnnotationPresent(L10NElement.class));
         } else {
@@ -175,7 +176,13 @@ public class ExtendedFieldDecorator implements FieldDecorator {
 
     @SuppressWarnings("unchecked")
     protected List<ExtendedWebElement> proxyForListLocator(ClassLoader loader, Field field, ElementLocator locator) {
-        InvocationHandler handler = new LocatingElementListHandler(webDriver, locator, field.getName(), new LocalizedAnnotations(field).buildBy());
+        InvocationHandler handler = null;
+        if (L10NVerificationIsOn){
+            handler = new LocatingElementListHandler(webDriver, locator, field.getName(), new LocalizedAnnotations(field).buildBy(), field.isAnnotationPresent(L10NElement.class));
+        } else {
+            handler = new LocatingElementListHandler(webDriver, locator, field.getName(), new LocalizedAnnotations(field).buildBy());
+        }
+
         List<ExtendedWebElement> proxies = (List<ExtendedWebElement>) Proxy.newProxyInstance(loader, new Class[] { List.class }, handler);
 
         return proxies;
