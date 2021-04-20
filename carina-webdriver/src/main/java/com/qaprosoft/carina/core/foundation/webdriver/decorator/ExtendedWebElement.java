@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import com.qaprosoft.carina.core.resources.L10Nnew;
+import com.qaprosoft.carina.core.resources.L10N;
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
@@ -1406,7 +1406,7 @@ public class ExtendedWebElement {
 
         if (isL10nElement && !isL10nVerified) {
             isL10nVerified = true;
-            L10Nnew.checkLocalizationText(this);
+            L10N.checkLocalizationText(this);
         }
 
 		Object output = executeAction(actionName, new ActionSteps() {

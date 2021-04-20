@@ -1,8 +1,8 @@
-package com.qaprosoft.carina.core.utils;
+package com.qaprosoft.carina.core.foundation.webdriver.utils;
 
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.resources.LocaleReader;
+import com.qaprosoft.carina.core.resources.L10N;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;

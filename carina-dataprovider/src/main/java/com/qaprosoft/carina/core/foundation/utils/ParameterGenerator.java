@@ -19,7 +19,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.qaprosoft.carina.core.foundation.utils.resources.L10NpropsReader;
+import com.qaprosoft.carina.core.foundation.utils.resources.L10NLocalizationLoader;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSParser;
 import com.qaprosoft.carina.core.foundation.exception.InvalidArgsException;
-import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 
 public class ParameterGenerator {
 
@@ -45,9 +44,6 @@ public class ParameterGenerator {
     private static Matcher matcher;
 
     private static String UUID;
-
-    //should be deleted when l10n and l10n parser will be merged in one class
-    private static boolean l10nNewIsOn = false;
 
     public static Object process(String param) {
         try {
@@ -113,11 +109,7 @@ public class ParameterGenerator {
                 int start = param.indexOf(SpecialKeywords.L10N + ":") + 5;
                 int end = param.indexOf("}");
                 String key = param.substring(start, end);
-                if(l10nNewIsOn){
-                    param = StringUtils.replace(param, matcher.group(), L10NpropsReader.getText(key));
-                } else {
-                    param = StringUtils.replace(param, matcher.group(), L10N.getText(key));
-                }
+                param = StringUtils.replace(param, matcher.group(), L10NLocalizationLoader.getText(key));
             }
             // in case if L10N pattern was applied
             if (!initStrL10N.equalsIgnoreCase(param)) {

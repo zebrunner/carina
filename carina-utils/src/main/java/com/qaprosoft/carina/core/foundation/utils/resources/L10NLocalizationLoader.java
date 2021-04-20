@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.util.*;
 
-public class L10NpropsReader {
+public class L10NLocalizationLoader {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static ArrayList<ResourceBundle> resBoundles = new ArrayList<ResourceBundle>();

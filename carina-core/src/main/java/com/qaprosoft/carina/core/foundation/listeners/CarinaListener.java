@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import com.qaprosoft.carina.core.resources.L10N;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Category;
 import org.apache.log4j.Level;
@@ -81,9 +82,6 @@ import com.qaprosoft.carina.core.foundation.utils.ZebrunnerNameResolver;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.ftp.FtpUtils;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
-import com.qaprosoft.carina.core.resources.L10Nnew;
-import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
-import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
 import com.qaprosoft.carina.core.foundation.utils.tag.PriorityManager;
 import com.qaprosoft.carina.core.foundation.utils.tag.TagManager;
 import com.qaprosoft.carina.core.foundation.webdriver.CarinaDriver;
@@ -117,9 +115,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     
     protected static boolean automaticDriversCleanup = true;
 
-    //should be deleted when l10n and l10n parser will be merged in one class
-    private static boolean l10nNewIsOn = false;
-
     static {
         try {
             // Add shutdown hook
@@ -141,26 +136,10 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             LOGGER.info(Configuration.asString());
             // Configuration.validateConfiguration();
 
-            if (l10nNewIsOn) {
-                try {
-                    L10Nnew.init();
-                } catch (Exception e) {
-                    LOGGER.error("L10Nnew bundle is not initialized successfully!", e);
-                }
-            } else {
-                try {
-                    L10N.init();
-                } catch (Exception e) {
-                    LOGGER.error("L10N bundle is not initialized successfully!", e);
-                }
-
-                {
-                    try {
-                        L10Nparser.init();
-                    } catch (Exception e) {
-                        LOGGER.error("L10N parser bundle is not initialized successfully!", e);
-                    }
-                }
+            try {
+                L10N.init();
+            } catch (Exception e) {
+                LOGGER.error("L10Nnew bundle is not initialized successfully!", e);
             }
 
             // declare global capabilities in configuration if custom_capabilities is declared 
@@ -457,9 +436,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 CommonUtils.pause(1);
             }
         }
-        if (l10nNewIsOn) {
-            L10Nnew.assertAll();
-        }
+
+        L10N.assertAll();
     }
     
     /**

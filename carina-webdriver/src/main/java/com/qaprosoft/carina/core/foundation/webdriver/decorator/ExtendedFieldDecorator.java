@@ -23,7 +23,7 @@ import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.util.List;
 
-import com.qaprosoft.carina.core.resources.annotation.L10N;
+import com.qaprosoft.carina.core.resources.annotation.L10NElement;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -135,7 +135,7 @@ public class ExtendedFieldDecorator implements FieldDecorator {
         LocalizedAnnotations localizedAnnotations = field.isAnnotationPresent(FindBy.class) ||
                 field.isAnnotationPresent(ExtendedFindBy.class)? new LocalizedAnnotations(field) : null;
 
-        return new ExtendedWebElement(proxy, field.getName(), localizedAnnotations.buildBy(), field.isAnnotationPresent(L10N.class));
+        return new ExtendedWebElement(proxy, field.getName(), localizedAnnotations.buildBy(), field.isAnnotationPresent(L10NElement.class));
     }
 
     @SuppressWarnings("unchecked")

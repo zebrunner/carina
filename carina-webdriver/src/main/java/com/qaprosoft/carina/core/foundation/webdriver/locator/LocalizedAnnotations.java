@@ -20,7 +20,7 @@ import java.lang.reflect.Field;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.qaprosoft.carina.core.resources.L10Nnew;
+import com.qaprosoft.carina.core.resources.L10N;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.pagefactory.Annotations;
@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.AccessibilityId;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.ClassChain;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Predicate;
@@ -38,9 +37,6 @@ import io.appium.java_client.MobileBy;
 public class LocalizedAnnotations extends Annotations {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static Pattern L10N_PATTERN = Pattern.compile(SpecialKeywords.L10N_PATTERN);
-
-    //should be deleted when l10n and l10n parser will be merged in one class
-    private static boolean l10nNewIsOn = false;
 
     public LocalizedAnnotations(Field field) {
         super(field);
@@ -58,11 +54,7 @@ public class LocalizedAnnotations extends Annotations {
             int start = param.indexOf(SpecialKeywords.L10N + ":") + 5;
             int end = param.indexOf("}");
             String key = param.substring(start, end);
-            if (l10nNewIsOn) {
-                param = StringUtils.replace(param, matcher.group(), L10Nnew.getText(key));
-            } else {
-                param = StringUtils.replace(param, matcher.group(), L10N.getText(key));
-            }
+            param = StringUtils.replace(param, matcher.group(), L10N.getText(key));
         }
 
         if (getField().isAnnotationPresent(Predicate.class)) {

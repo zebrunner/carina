@@ -18,7 +18,7 @@ package com.qaprosoft.carina.core.resources;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.resources.L10NpropsReader;
+import com.qaprosoft.carina.core.foundation.utils.resources.L10NLocalizationLoader;
 import com.qaprosoft.carina.core.foundation.utils.resources.LocaleReader;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import org.apache.commons.lang3.StringUtils;
@@ -42,7 +42,7 @@ import java.util.*;
  * </configuration>
  */
 
-public class L10Nnew {
+public class L10N {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public static Locale actualLocale;
@@ -60,8 +60,8 @@ public class L10Nnew {
     protected static final int BASIC_WAIT_SHORT_TIMEOUT = 5;
 
     public static void init() {
-        L10NpropsReader.init();
-        L10Nnew.setActualLocale(Configuration.get(Configuration.Parameter.LOCALE));
+        L10NLocalizationLoader.init();
+        L10N.setActualLocale(Configuration.get(Configuration.Parameter.LOCALE));
     }
 
     public static void resourcesToProperties(Map <String, String> resources) {
@@ -125,7 +125,7 @@ public class L10Nnew {
      * @return String
      */
     public static String getText(String key) {
-        return L10NpropsReader.getText(key);
+        return L10NLocalizationLoader.getText(key);
     }
 
     /**
@@ -138,9 +138,12 @@ public class L10Nnew {
      * @return String
      */
     public static String getText(String key, Locale locale) {
-        return L10NpropsReader.getText(key, locale);
+        return L10NLocalizationLoader.getText(key, locale);
     }
 
+    public static Locale getDefaultLocale(){
+        return L10NLocalizationLoader.getDefaultLocale();
+    }
     /*
      * This method helps when translating strings that have single quote or other special characters that get omitted.
      */
@@ -331,7 +334,7 @@ public class L10Nnew {
     }
 
     private static boolean checkLocalizationText(String expectedText, String locKey, boolean skipPunctuationAndNumbers) {
-        String l10n_default = L10Nnew.getText(locKey, actualLocale);
+        String l10n_default = L10N.getText(locKey, actualLocale);
         boolean ret;
 
         if (skipPunctuationAndNumbers) {
