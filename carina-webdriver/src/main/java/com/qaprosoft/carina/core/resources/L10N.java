@@ -364,7 +364,7 @@ public class L10N {
             prop.setProperty(locKey, expectedText);
             return false;
         } else {
-            LOGGER.debug("Found localization text '" + expectedText + "' in ISO-8859-1 encoding : " + l10n_default);
+            LOGGER.debug("Found localization text '" + expectedText + " in +" + encoding + " encoding: " + l10n_default);
             return true;
         }
     }
