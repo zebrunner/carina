@@ -136,7 +136,7 @@ public class ExtendedFieldDecorator implements FieldDecorator {
         LocalizedAnnotations localizedAnnotations = field.isAnnotationPresent(FindBy.class) ||
                 field.isAnnotationPresent(ExtendedFindBy.class)? new LocalizedAnnotations(field) : null;
 
-        boolean L10NVerificationIsOn = Configuration.getBoolean(Configuration.Parameter.LOCALIZATION_AUTO_VERIFICATION);
+        boolean L10NVerificationIsOn = Configuration.getBoolean(Configuration.Parameter.LOCALE_AUTO_VERIFICATION);
         if (L10NVerificationIsOn){
             return new ExtendedWebElement(proxy, field.getName(), localizedAnnotations.buildBy(), field.isAnnotationPresent(L10NElement.class));
         } else {

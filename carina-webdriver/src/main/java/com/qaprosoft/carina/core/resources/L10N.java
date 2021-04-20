@@ -431,7 +431,7 @@ public class L10N {
      */
     private static String getLocalizationSaveEncoding() {
         try {
-            encoding = Configuration.get(Parameter.LOCALIZATION_ENCODING);
+            encoding = Configuration.get(Parameter.LOCALE_ENCODING);
         } catch (Exception e) {
             LOGGER.error("There is no localization encoding parameter in config property.");
         }
