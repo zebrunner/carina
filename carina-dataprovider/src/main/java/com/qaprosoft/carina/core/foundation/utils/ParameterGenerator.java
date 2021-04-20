@@ -19,7 +19,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.qaprosoft.carina.core.foundation.utils.resources.L10NLocalizationLoader;
+import com.qaprosoft.carina.core.foundation.utils.resources.L10NLoader;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,7 +109,7 @@ public class ParameterGenerator {
                 int start = param.indexOf(SpecialKeywords.L10N + ":") + 5;
                 int end = param.indexOf("}");
                 String key = param.substring(start, end);
-                param = StringUtils.replace(param, matcher.group(), L10NLocalizationLoader.getText(key));
+                param = StringUtils.replace(param, matcher.group(), L10NLoader.getText(key));
             }
             // in case if L10N pattern was applied
             if (!initStrL10N.equalsIgnoreCase(param)) {

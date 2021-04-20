@@ -18,7 +18,7 @@ package com.qaprosoft.carina.core.resources;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.resources.L10NLocalizationLoader;
+import com.qaprosoft.carina.core.foundation.utils.resources.L10NLoader;
 import com.qaprosoft.carina.core.foundation.utils.resources.LocaleReader;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import org.apache.commons.lang3.StringUtils;
@@ -60,7 +60,7 @@ public class L10N {
     protected static final int BASIC_WAIT_SHORT_TIMEOUT = 5;
 
     public static void init() {
-        L10NLocalizationLoader.init();
+        L10NLoader.init();
         L10N.setActualLocale(Configuration.get(Configuration.Parameter.LOCALE));
     }
 
@@ -125,7 +125,7 @@ public class L10N {
      * @return String
      */
     public static String getText(String key) {
-        return L10NLocalizationLoader.getText(key);
+        return L10NLoader.getText(key);
     }
 
     /**
@@ -138,11 +138,11 @@ public class L10N {
      * @return String
      */
     public static String getText(String key, Locale locale) {
-        return L10NLocalizationLoader.getText(key, locale);
+        return L10NLoader.getText(key, locale);
     }
 
     public static Locale getDefaultLocale(){
-        return L10NLocalizationLoader.getDefaultLocale();
+        return L10NLoader.getDefaultLocale();
     }
     /*
      * This method helps when translating strings that have single quote or other special characters that get omitted.
