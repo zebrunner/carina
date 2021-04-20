@@ -19,7 +19,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.qaprosoft.carina.core.resources.L10Nnew;
+import com.qaprosoft.carina.core.foundation.utils.resources.L10NpropsReader;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,7 +114,7 @@ public class ParameterGenerator {
                 int end = param.indexOf("}");
                 String key = param.substring(start, end);
                 if(l10nNewIsOn){
-                    param = StringUtils.replace(param, matcher.group(), L10Nnew.getText(key));
+                    param = StringUtils.replace(param, matcher.group(), L10NpropsReader.getText(key));
                 } else {
                     param = StringUtils.replace(param, matcher.group(), L10N.getText(key));
                 }
