@@ -48,13 +48,14 @@ Go to “Run configuration”, navigate to the arguments tab and execute the enc
 You may use encrypted values, both in test configuration and test data files; pay attention to the fact that there is no explicit BeforeTest listener for data decryption, so there is no way to find out later in the test if the data is sensitive or not. All the decryption logic is located in WebDriverHelper that wraps Selenium WebDriver methods for interaction with UI and encapsulates action logging logic. Every method that receives a text tests if the text contains {crypt:...} pattern, and if it does, decrypts it and passes it to UI- logging, and screenshots are populated with hidden characters:
 ![Security Config 11](../img/security-config-11.png)
 
-## Encryption for api/database/testdata content
-You may also use encrypted data in the api/database/testdata properties. But apart from UI logic, carina doesn't support decryption logic in reading from this files.
+Сarina also supports advanced decryption. This means that you can decrypt only the part of the string that you need. This the `decryptByPattern` method of the CryptoTool class:
+![decryptByPattern](../img/decryptByPattern.png)
+To decrypt your string use it like this:
 ```
-R.TESTDATA.get(key)
-``` 
-always return actual value which might be encrypted.
-So to prevent logging your sensitive data you should:
-1) Encrypt data and put it to properties file.
-2) Read the data and decrypt values at run-time:
-![Security Config 12](../img/security-config-12.png)
+String value = "test@gmail.com/{crypt:8O9iA4+f3nMzz85szmvKmQ==}"
+
+CryptoTool cryptoTool = new CryptoTool("path_to_your_crypto_key");
+Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
+String decryptedValue = cryptoTool.decryptByPattern(value, CRYPTO_PATTERN);
+```
+As a result `decryptedValue` will be `test@gmail.com/EncryptMe`.
