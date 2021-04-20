@@ -47,3 +47,14 @@ Go to “Run configuration”, navigate to the arguments tab and execute the enc
 ## Secured data usage
 You may use encrypted values, both in test configuration and test data files; pay attention to the fact that there is no explicit BeforeTest listener for data decryption, so there is no way to find out later in the test if the data is sensitive or not. All the decryption logic is located in WebDriverHelper that wraps Selenium WebDriver methods for interaction with UI and encapsulates action logging logic. Every method that receives a text tests if the text contains {crypt:...} pattern, and if it does, decrypts it and passes it to UI- logging, and screenshots are populated with hidden characters:
 ![Security Config 11](../img/security-config-11.png)
+
+## Encryption for api/database/testdata content
+You may also use encrypted data in the api/database/testdata properties. But apart from UI logic, carina doesn't support decryption logic in reading from this files.
+```
+R.TESTDATA.get(key)
+``` 
+always return actual value which might be encrypted.
+So to prevent logging your sensitive data you should:
+1) Encrypt data and put it to properties file.
+2) Read the data and decrypt values at run-time:
+![Security Config 12](../img/security-config-12.png)
