@@ -45,15 +45,15 @@ import java.util.*;
 public class L10N {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public static Locale actualLocale;
+    private static Locale actualLocale;
 
-    public static String assertErrorMsg = "";
+    private static String assertErrorMsg = "";
 
-    public static LinkedList<String> newLocList = new LinkedList<String>();
+    private static LinkedList<String> newLocList = new LinkedList<String>();
 
-    public static Properties prop = new Properties();
+    private static Properties prop = new Properties();
 
-    public static String propFileName = "";
+    private static String propFileName = "";
 
     private static String encoding = "UTF-8";
 

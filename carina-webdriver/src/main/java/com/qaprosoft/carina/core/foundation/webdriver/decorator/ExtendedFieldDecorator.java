@@ -52,7 +52,7 @@ public class ExtendedFieldDecorator implements FieldDecorator {
 
     protected ElementLocatorFactory factory;
 
-    private static boolean L10NVerificationIsOn = Configuration.getBoolean(Configuration.Parameter.LOCALE_AUTO_VERIFICATION);
+    private static boolean isLocalizationEnabled = Configuration.getBoolean(Configuration.Parameter.LOCALE_AUTO_VERIFICATION);
 
     private WebDriver webDriver;
     
@@ -138,7 +138,7 @@ public class ExtendedFieldDecorator implements FieldDecorator {
         LocalizedAnnotations localizedAnnotations = field.isAnnotationPresent(FindBy.class) ||
                 field.isAnnotationPresent(ExtendedFindBy.class)? new LocalizedAnnotations(field) : null;
 
-        if (L10NVerificationIsOn){
+        if (isLocalizationEnabled){
             return new ExtendedWebElement(proxy, field.getName(), localizedAnnotations.buildBy(), field.isAnnotationPresent(Localized.class));
         } else {
             return new ExtendedWebElement(proxy, field.getName(), localizedAnnotations.buildBy());
@@ -177,7 +177,7 @@ public class ExtendedFieldDecorator implements FieldDecorator {
     @SuppressWarnings("unchecked")
     protected List<ExtendedWebElement> proxyForListLocator(ClassLoader loader, Field field, ElementLocator locator) {
         InvocationHandler handler = null;
-        if (L10NVerificationIsOn){
+        if (isLocalizationEnabled){
             handler = new LocatingElementListHandler(webDriver, locator, field.getName(), new LocalizedAnnotations(field).buildBy(), field.isAnnotationPresent(Localized.class));
         } else {
             handler = new LocatingElementListHandler(webDriver, locator, field.getName(), new LocalizedAnnotations(field).buildBy());
