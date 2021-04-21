@@ -24,7 +24,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.resources.annotation.L10NElement;
+import com.qaprosoft.carina.core.resources.annotation.Localized;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -139,7 +139,7 @@ public class ExtendedFieldDecorator implements FieldDecorator {
                 field.isAnnotationPresent(ExtendedFindBy.class)? new LocalizedAnnotations(field) : null;
 
         if (L10NVerificationIsOn){
-            return new ExtendedWebElement(proxy, field.getName(), localizedAnnotations.buildBy(), field.isAnnotationPresent(L10NElement.class));
+            return new ExtendedWebElement(proxy, field.getName(), localizedAnnotations.buildBy(), field.isAnnotationPresent(Localized.class));
         } else {
             return new ExtendedWebElement(proxy, field.getName(), localizedAnnotations.buildBy());
         }
@@ -178,7 +178,7 @@ public class ExtendedFieldDecorator implements FieldDecorator {
     protected List<ExtendedWebElement> proxyForListLocator(ClassLoader loader, Field field, ElementLocator locator) {
         InvocationHandler handler = null;
         if (L10NVerificationIsOn){
-            handler = new LocatingElementListHandler(webDriver, locator, field.getName(), new LocalizedAnnotations(field).buildBy(), field.isAnnotationPresent(L10NElement.class));
+            handler = new LocatingElementListHandler(webDriver, locator, field.getName(), new LocalizedAnnotations(field).buildBy(), field.isAnnotationPresent(Localized.class));
         } else {
             handler = new LocatingElementListHandler(webDriver, locator, field.getName(), new LocalizedAnnotations(field).buildBy());
         }
