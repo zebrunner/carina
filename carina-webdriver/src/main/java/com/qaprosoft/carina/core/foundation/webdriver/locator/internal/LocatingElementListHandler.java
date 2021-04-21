@@ -40,8 +40,14 @@ public class LocatingElementListHandler implements InvocationHandler {
     private String name;
     private By by;
     private final WebDriver driver;
+    private boolean isL10NElement = false;
     
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+	public LocatingElementListHandler(WebDriver driver, ElementLocator locator, String name, By by, boolean isL10NElement){
+		this(driver, locator, name, by);
+		this.isL10NElement = isL10NElement;
+	}
 
     public LocatingElementListHandler(WebDriver driver, ElementLocator locator, String name, By by) {
     	this.driver = driver;
@@ -72,6 +78,7 @@ public class LocatingElementListHandler implements InvocationHandler {
 		}
     	
         List<ExtendedWebElement> extendedWebElements = null;
+    	int i = 0;
         if (elements != null) {
             extendedWebElements = new ArrayList<ExtendedWebElement>();
             
@@ -83,14 +90,18 @@ public class LocatingElementListHandler implements InvocationHandler {
 				} catch (Exception e) {
 					 //do nothing and keep 'undefined' for control name 
 				}
-
-				ExtendedWebElement tempElement = new ExtendedWebElement(element, tempName, by);
+				ExtendedWebElement tempElement= null;
+				if (isL10NElement){
+					tempElement = new ExtendedWebElement(element, name + i, by, true);
+				} else {
+					tempElement = new ExtendedWebElement(element, tempName, by);
+				}
 				Field searchContextField = locator.getClass().getDeclaredField("searchContext");
 				searchContextField.setAccessible(true);
 				tempElement.setSearchContext((SearchContext) searchContextField.get(locator));
 //				tempElement.setBy(tempElement.generateByForList(by, i));
 				extendedWebElements.add(tempElement);
-//				i++;
+				i++;
 			}
 
         }

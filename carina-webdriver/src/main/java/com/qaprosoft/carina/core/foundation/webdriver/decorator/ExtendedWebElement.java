@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import com.qaprosoft.carina.core.resources.L10N;
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
@@ -84,8 +85,6 @@ public class ExtendedWebElement {
     private static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
     private static final long RETRY_TIME = Configuration.getLong(Parameter.RETRY_INTERVAL);
-
-    
     
     // we should keep both properties: driver and searchContext obligatory
     // driver is used for actions, javascripts execution etc
@@ -103,8 +102,16 @@ public class ExtendedWebElement {
     private By by;
     
     private boolean caseInsensitive;
-    
+
     private ElementLoadingStrategy loadingStrategy = ElementLoadingStrategy.valueOf(Configuration.get(Parameter.ELEMENT_LOADING_STRATEGY));
+
+    private boolean isL10nVerified = false;
+    private boolean isL10nElement = false;
+
+    public ExtendedWebElement(WebElement element, String name, By by, Boolean isL10nElement){
+        this(element, name, by);
+        this.isL10nElement = isL10nElement;
+    }
 
     public ExtendedWebElement(WebElement element, String name, By by) {
         this(element, name);
@@ -115,14 +122,12 @@ public class ExtendedWebElement {
     	this.by = by;
     	this.name = name;
     	this.element = null;
-    	
     }
     
     public ExtendedWebElement(By by, String name, WebDriver driver) {
     	this.by = by;
     	this.name = name;
     	this.driver = driver;
-    	
     }
     
     public ExtendedWebElement(WebElement element, String name) {
@@ -1186,6 +1191,7 @@ public class ExtendedWebElement {
         return new ExtendedWebElement(by, name, getDriver());
     }
 
+
     /**
      * Pause for specified timeout.
      * 
@@ -1397,6 +1403,12 @@ public class ExtendedWebElement {
 
 	// single place for all supported UI actions in carina core
 	private Object overrideAction(ACTION_NAME actionName, Object...inputArgs) {
+
+        if (isL10nElement && !isL10nVerified) {
+            isL10nVerified = true;
+            L10N.checkLocalizationText(this);
+        }
+
 		Object output = executeAction(actionName, new ActionSteps() {
 			@Override
 			public void doClick() {

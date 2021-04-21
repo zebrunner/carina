@@ -23,6 +23,8 @@ import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.util.List;
 
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.resources.annotation.Localized;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -49,6 +51,8 @@ public class ExtendedFieldDecorator implements FieldDecorator {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     protected ElementLocatorFactory factory;
+
+    private static boolean L10NVerificationIsOn = Configuration.getBoolean(Configuration.Parameter.LOCALE_AUTO_VERIFICATION);
 
     private WebDriver webDriver;
     
@@ -130,8 +134,15 @@ public class ExtendedFieldDecorator implements FieldDecorator {
         InvocationHandler handler = new LocatingElementHandler(locator);
         WebElement proxy = (WebElement) Proxy.newProxyInstance(loader, new Class[] { WebElement.class, WrapsElement.class, Locatable.class },
                 handler);
-        return new ExtendedWebElement(proxy, field.getName(),
-                field.isAnnotationPresent(FindBy.class) || field.isAnnotationPresent(ExtendedFindBy.class)? new LocalizedAnnotations(field).buildBy() : null);
+
+        LocalizedAnnotations localizedAnnotations = field.isAnnotationPresent(FindBy.class) ||
+                field.isAnnotationPresent(ExtendedFindBy.class)? new LocalizedAnnotations(field) : null;
+
+        if (L10NVerificationIsOn){
+            return new ExtendedWebElement(proxy, field.getName(), localizedAnnotations.buildBy(), field.isAnnotationPresent(Localized.class));
+        } else {
+            return new ExtendedWebElement(proxy, field.getName(), localizedAnnotations.buildBy());
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -165,7 +176,13 @@ public class ExtendedFieldDecorator implements FieldDecorator {
 
     @SuppressWarnings("unchecked")
     protected List<ExtendedWebElement> proxyForListLocator(ClassLoader loader, Field field, ElementLocator locator) {
-        InvocationHandler handler = new LocatingElementListHandler(webDriver, locator, field.getName(), new LocalizedAnnotations(field).buildBy());
+        InvocationHandler handler = null;
+        if (L10NVerificationIsOn){
+            handler = new LocatingElementListHandler(webDriver, locator, field.getName(), new LocalizedAnnotations(field).buildBy(), field.isAnnotationPresent(Localized.class));
+        } else {
+            handler = new LocatingElementListHandler(webDriver, locator, field.getName(), new LocalizedAnnotations(field).buildBy());
+        }
+
         List<ExtendedWebElement> proxies = (List<ExtendedWebElement>) Proxy.newProxyInstance(loader, new Class[] { List.class }, handler);
 
         return proxies;
