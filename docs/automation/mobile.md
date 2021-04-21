@@ -162,7 +162,7 @@ protected ExtendedWebElement developerText;
 Carina framework uses TestNG for test organization. In general, test represents a manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:
 
 ```
-public class SampleTest implement IAbstractTest {
+public class SampleTest implements IAbstractTest {
 
     String name = "My name";
     String carName = "Mercedes";
