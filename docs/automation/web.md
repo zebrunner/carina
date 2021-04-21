@@ -141,7 +141,7 @@ public class HomePage extends AbstractPage {
 ### Implementation of tests
 Carina framework uses TestNG for test organization. In general, test represents a manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:
 ```
-public class WebSampleTest extends AbstractTest {
+public class WebSampleTest implement IAbstractTest {
     @Test(description = "JIRA#AUTO-0009")
     @MethodOwner(owner = "qpsdemo")
     public void testCompareModels() {
@@ -167,7 +167,7 @@ It is good practice to implement all elements search logic of Page Object/UI Obj
 
 **Important:**
 
-* Test class should extend **com.qaprosoft.carina.core.foundation.AbstractTest**
+* Test class should implement **com.qaprosoft.carina.core.foundation.IAbstractTest**
 * Test method should start with **org.testng.annotations.Test** annotation
 * Use **getDriver()** method to get driver instance in the test
 * Locate tests in src/test/java source folder
