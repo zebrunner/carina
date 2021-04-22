@@ -1,20 +1,7 @@
-/*******************************************************************************
- * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.resources;
 
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.util.ArrayList;
@@ -22,20 +9,22 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
+import java.util.Properties;
 import java.util.ResourceBundle;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.asserts.SoftAssert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.IWebElement;
 
 /*
  * http://maven.apache.org/surefire/maven-surefire-plugin/examples/class-loading.html
- * Need to set useSystemClassLoader=false for maven surefire plugin to receive access to classloader L10N files on CI
+ * Need to set useSystemClassLoader=false for maven surefire plugin to receive access to L10N files on CI by ClassLoader
  * <plugin>
  * <groupId>org.apache.maven.plugins</groupId>
  * <artifactId>maven-surefire-plugin</artifactId>
@@ -44,18 +33,20 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
  * <useSystemClassLoader>false</useSystemClassLoader>
  * </configuration>
  */
-
 public class L10N {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
+    
+    private static Locale locale = getLocale(Configuration.get(Configuration.Parameter.LOCALE));
     private static ArrayList<ResourceBundle> resBoundles = new ArrayList<ResourceBundle>();
+    private static Properties missedResources = new Properties();
+    
+    private static SoftAssert mistakes;
 
-    public static void init() {
-        List<Locale> locales = LocaleReader.init(Configuration
-                .get(Parameter.LOCALE));
-
+    /**
+     * Load L10N resource bundle.
+     */    
+    public static void load() {
         List<String> loadedResources = new ArrayList<String>();
-        
         try {
 
             for (URL u : Resources.getResourceURLs(new ResourceURLFilter() {
@@ -111,9 +102,8 @@ public class L10N {
                     try {
                         LOGGER.debug(String.format("Adding '%s' resource...",
                                 resource));
-                        for (Locale locale : locales) {
-                            resBoundles.add(ResourceBundle.getBundle(resource, locale));
-                        }
+                        
+                        resBoundles.add(ResourceBundle.getBundle(resource, locale));
                         LOGGER.debug(String
                                 .format("Resource '%s' added.", resource));
                     } catch (MissingResourceException e) {
@@ -130,46 +120,27 @@ public class L10N {
             LOGGER.debug("L10N folder with resources is missing!");
         }
     }
-
+    
     /**
-     * get Default Locale
-     * 
-     * @return Locale
-     */
-    public static Locale getDefaultLocale() {
-        List<Locale> locales = LocaleReader.init(Configuration
-                .get(Parameter.LOCALE));
-
-        if (locales.size() == 0) {
-            throw new RuntimeException("Undefined default locale specified! Review 'locale' setting in _config.properties.");
-        }
-
-        return locales.get(0);
+     * Replace default L10N resource bundle.
+     *
+     * @param resources
+     *            - ArrayList
+     *
+     */    
+    public static void load(ArrayList<ResourceBundle> resources) {
+        resBoundles = resources;
     }
-
+    
     /**
-     * getText by key for default locale.
-     * 
-     * @param key
-     *            - String
-     * 
+     * Return translated value by key for default locale.
+     *
+     * @param key String
+     *
      * @return String
      */
-    public static String getText(String key) {
-        return getText(key, getDefaultLocale());
-    }
-
-    /**
-     * getText for specified locale and key.
-     * 
-     * @param key
-     *            - String
-     * @param locale
-     *            - Locale
-     * @return String
-     */
-    public static String getText(String key, Locale locale) {
-//        LOGGER.debug("getText: L10N bundle size: " + resBoundles.size());
+    static public String getText(String key) {
+        LOGGER.debug("getText: L10N bundle size: " + resBoundles.size());
         Iterator<ResourceBundle> iter = resBoundles.iterator();
         while (iter.hasNext()) {
             ResourceBundle bundle = iter.next();
@@ -184,53 +155,100 @@ public class L10N {
         }
         return key;
     }
-
-    /*
-     * This method helps when translating strings that have single quote or other special characters that get omitted.
+    
+    /**
+     * Verify that ExtendedWebElement text is correctly localized.
+     *
+     * @param element IWebElement
+     * @return boolean
      */
-    public static String formatString(String resource, String... parameters) {
-        for (int i = 0; i < parameters.length; i++) {
-            resource = resource.replace("{" + i + "}", parameters[i]);
-            LOGGER.debug("Localized string value is: " + resource);
+    public static boolean verify(IWebElement element) {
+        if (!Configuration.getBoolean(Configuration.Parameter.LOCALIZATION_TESTING)) {
+            return true;
         }
-        return resource;
-    }
+        
+        String actualText = element.getText();
+        String key = element.getName();
 
-    /*
-     * Make sure you remove the single quotes around %s in xpath as string
-     * returned will either have it added for you or single quote won't be
-     * added as concat() doesn't need them.
-     */
-    public static String generateConcatForXPath(String xpathString) {
-        String returnString = "";
-        String searchString = xpathString;
-        char[] quoteChars = new char[] { '\'', '"' };
+        String expectedText = getText(key);
+        boolean isValid = actualText.contains(expectedText);
 
-        int quotePos = StringUtils.indexOfAny(searchString, quoteChars);
-        if (quotePos == -1) {
-            returnString = "'" + searchString + "'";
+        if (!isValid) {
+            LOGGER.error("Localized text should be '" + expectedText + "'. But currently it is '" + actualText + "'!");
+
+            String error = "Expected: '" + expectedText + "', length=" + expectedText.length() +
+                    ". Actual: '" + actualText + "', length=" + actualText.length() + ".";
+
+            mistakes.fail(error);
+
+            String newItem = key + "=" + actualText;
+            LOGGER.info("Making new localization string: " + newItem);
+            missedResources.setProperty(key, actualText);
         } else {
-            returnString = "concat(";
-            LOGGER.debug("Current concatenation: " + returnString);
-            while (quotePos != -1) {
-                String subString = searchString.substring(0, quotePos);
-                returnString += "'" + subString + "', ";
-                LOGGER.debug("Current concatenation: " + returnString);
-                if (searchString.substring(quotePos, quotePos + 1).equals("'")) {
-                    returnString += "\"'\", ";
-                    LOGGER.debug("Current concatenation: " + returnString);
-                } else {
-                    returnString += "'\"', ";
-                    LOGGER.debug("Current concatenation: " + returnString);
-                }
-                searchString = searchString.substring(quotePos + 1,
-                        searchString.length());
-                quotePos = StringUtils.indexOfAny(searchString, quoteChars);
-            }
-            returnString += "'" + searchString + "')";
-            LOGGER.debug("Concatenation result: " + returnString);
+            LOGGER.debug("Found localization text '" + actualText + " in +" + getEncoding() + " encoding: " + expectedText);
         }
-        return returnString;
+
+        return isValid;
     }
+
+    /**
+     * Raise summarized asserts for mistakes in localization  
+     */       
+    public static void assertAll() {
+        mistakes.assertAll();
+    }    
+    
+    /**
+     * Override default locale.
+     *
+     * @param loc String
+     *
+     */       
+    public static void setLocale(String loc) {
+        LOGGER.warn("Default locale: " + locale + " was overriden by " + loc);
+        locale = getLocale(loc);
+    }    
+    
+    /**
+     * Flush missed localization resources to property file.
+     */
+    public static void flush() {
+        try {
+            if (missedResources.size() == 0) {
+                LOGGER.info("There are no new localization properties.");
+                return;
+            }
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+
+        LOGGER.info("New localization for '" + locale + "'");
+        LOGGER.info("Properties: " + missedResources.toString());
+        
+
+        String missedResorceFile = "missed_" + locale + ".properties";
+        try {
+            missedResources.store(new OutputStreamWriter(
+                    new FileOutputStream(missedResorceFile), getEncoding()), null);            
+        } catch (Exception e) {
+            LOGGER.error("Unable to store missed resources: " + missedResorceFile + "!", e);
+        }
+        missedResources.clear();
+    }
+    
+    private static String getEncoding() {
+        return Configuration.get(Parameter.LOCALIZATION_ENCODING).toUpperCase();
+    }
+
+    static private Locale getLocale(String locale) {
+        String[] localeSetttings = locale.trim().split("_");
+        String lang, country = "";
+        lang = localeSetttings[0];
+        if (localeSetttings.length > 1) {
+            country = localeSetttings[1];
+        }
+        
+        return new Locale(lang, country);
+    }    
 
 }

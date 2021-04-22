@@ -72,27 +72,18 @@ public class LocatingElementListHandler implements InvocationHandler {
 		}
     	
         List<ExtendedWebElement> extendedWebElements = null;
+    	int i = 0;
         if (elements != null) {
             extendedWebElements = new ArrayList<ExtendedWebElement>();
-            
-//            int i = 1;
 			for (WebElement element : elements) {
-				String tempName = name;
-				try {
-					tempName = element.getText();
-				} catch (Exception e) {
-					 //do nothing and keep 'undefined' for control name 
-				}
+				ExtendedWebElement webElement = new ExtendedWebElement(element, name + i, by);
 
-				ExtendedWebElement tempElement = new ExtendedWebElement(element, tempName, by);
 				Field searchContextField = locator.getClass().getDeclaredField("searchContext");
 				searchContextField.setAccessible(true);
-				tempElement.setSearchContext((SearchContext) searchContextField.get(locator));
-//				tempElement.setBy(tempElement.generateByForList(by, i));
-				extendedWebElements.add(tempElement);
-//				i++;
+				webElement.setSearchContext((SearchContext) searchContextField.get(locator));
+				extendedWebElements.add(webElement);
+				i++;
 			}
-
         }
 
         try {
