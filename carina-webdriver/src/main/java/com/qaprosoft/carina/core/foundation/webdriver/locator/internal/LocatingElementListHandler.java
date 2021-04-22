@@ -90,17 +90,13 @@ public class LocatingElementListHandler implements InvocationHandler {
 				} catch (Exception e) {
 					 //do nothing and keep 'undefined' for control name 
 				}
-				ExtendedWebElement tempElement= null;
-				if (isL10NElement){
-					tempElement = new ExtendedWebElement(element, name + i, by, true);
-				} else {
-					tempElement = new ExtendedWebElement(element, tempName, by);
-				}
+				ExtendedWebElement webElement= new ExtendedWebElement(element, name + i, by, isL10NElement);
+
 				Field searchContextField = locator.getClass().getDeclaredField("searchContext");
 				searchContextField.setAccessible(true);
-				tempElement.setSearchContext((SearchContext) searchContextField.get(locator));
+				webElement.setSearchContext((SearchContext) searchContextField.get(locator));
 //				tempElement.setBy(tempElement.generateByForList(by, i));
-				extendedWebElements.add(tempElement);
+				extendedWebElements.add(webElement);
 				i++;
 			}
 

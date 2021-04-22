@@ -52,7 +52,7 @@ public class ExtendedFieldDecorator implements FieldDecorator {
 
     protected ElementLocatorFactory factory;
 
-    private static boolean isLocalizationEnabled = Configuration.getBoolean(Configuration.Parameter.LOCALE_AUTO_VERIFICATION);
+    private static boolean isLocalizationTestingEnabled = Configuration.getBoolean(Configuration.Parameter.LOCALIZATION_TESTING);
 
     private WebDriver webDriver;
     
@@ -138,12 +138,11 @@ public class ExtendedFieldDecorator implements FieldDecorator {
         LocalizedAnnotations localizedAnnotations = field.isAnnotationPresent(FindBy.class) ||
                 field.isAnnotationPresent(ExtendedFindBy.class)? new LocalizedAnnotations(field) : null;
 
-        if (isLocalizationEnabled){
-            return new ExtendedWebElement(proxy, field.getName(), localizedAnnotations.buildBy(), field.isAnnotationPresent(Localized.class));
-        } else {
-            return new ExtendedWebElement(proxy, field.getName(), localizedAnnotations.buildBy());
-        }
+        return isLocalizationTestingEnabled ?
+                new ExtendedWebElement(proxy, field.getName(), localizedAnnotations.buildBy(), field.isAnnotationPresent(Localized.class)):
+                new ExtendedWebElement(proxy, field.getName(), localizedAnnotations.buildBy());
     }
+
 
     @SuppressWarnings("unchecked")
     protected <T extends AbstractUIObject> T proxyForAbstractUIObject(ClassLoader loader, Field field,
@@ -176,12 +175,9 @@ public class ExtendedFieldDecorator implements FieldDecorator {
 
     @SuppressWarnings("unchecked")
     protected List<ExtendedWebElement> proxyForListLocator(ClassLoader loader, Field field, ElementLocator locator) {
-        InvocationHandler handler = null;
-        if (isLocalizationEnabled){
-            handler = new LocatingElementListHandler(webDriver, locator, field.getName(), new LocalizedAnnotations(field).buildBy(), field.isAnnotationPresent(Localized.class));
-        } else {
-            handler = new LocatingElementListHandler(webDriver, locator, field.getName(), new LocalizedAnnotations(field).buildBy());
-        }
+        InvocationHandler handler = isLocalizationTestingEnabled ?
+                new LocatingElementListHandler(webDriver, locator, field.getName(), new LocalizedAnnotations(field).buildBy(), field.isAnnotationPresent(Localized.class)):
+                new LocatingElementListHandler(webDriver, locator, field.getName(), new LocalizedAnnotations(field).buildBy());
 
         List<ExtendedWebElement> proxies = (List<ExtendedWebElement>) Proxy.newProxyInstance(loader, new Class[] { List.class }, handler);
 
