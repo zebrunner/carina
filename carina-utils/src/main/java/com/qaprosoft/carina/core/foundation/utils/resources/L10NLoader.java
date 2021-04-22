@@ -98,7 +98,7 @@ public class L10NLoader {
 
     public static String getText(String key) {
 
-        return getText(key, getDefaultLocale());
+        return getText(key, getLocale());
     }
 
     public static String getText(String key, Locale locale) {
@@ -118,7 +118,7 @@ public class L10NLoader {
         return key;
     }
 
-    public static Locale getDefaultLocale() {
+    public static Locale getLocale() {
         List<Locale> locales = LocaleReader.init(Configuration
                 .get(Configuration.Parameter.LOCALE));
 

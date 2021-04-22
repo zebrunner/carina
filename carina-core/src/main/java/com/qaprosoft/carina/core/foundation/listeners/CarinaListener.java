@@ -437,7 +437,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             }
         }
 
-        L10N.assertAll();
+        L10N.printErrorMsg();
     }
     
     /**

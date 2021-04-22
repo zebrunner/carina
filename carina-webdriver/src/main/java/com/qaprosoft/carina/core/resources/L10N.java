@@ -61,8 +61,10 @@ public class L10N {
 
     public static void init() {
         L10NLoader.init();
-        getLocalizationSaveEncoding();
-        L10N.setActualLocale(Configuration.get(Configuration.Parameter.LOCALE));
+        actualLocale = L10NLoader.getLocale();
+
+        L10N.getLocalizationSaveEncoding();
+        L10N.setLocale(actualLocale);
     }
 
     public static void resourcesToProperties(Map <String, String> resources) {
@@ -143,7 +145,7 @@ public class L10N {
     }
 
     public static Locale getDefaultLocale(){
-        return L10NLoader.getDefaultLocale();
+        return L10NLoader.getLocale();
     }
     /*
      * This method helps when translating strings that have single quote or other special characters that get omitted.
@@ -193,16 +195,6 @@ public class L10N {
         return returnString;
     }
 
-    //Parser part
-    /**
-     * get Actual Locale
-     *
-     * @return Locale
-     */
-    public static Locale getActualLocale() {
-        return actualLocale;
-    }
-
     /**
      * get AssertErrorMsg
      *
@@ -224,34 +216,18 @@ public class L10N {
         Assert.assertTrue(isCorrect, tmp);
     }
 
-    /**
-     * set Actual Locale
-     *
-     * @param countryCode String
-     */
-    public static void setActualLocale(String countryCode) {
-        List<Locale> locales = LocaleReader.init(Configuration.get(Parameter.LOCALE));
-        Locale locale = locales.get(0);
-        try {
-            String[] localeSetttings = countryCode.split("_");
-            String lang, country = "";
-            lang = localeSetttings[0];
-            if (localeSetttings.length > 1) {
-                country = localeSetttings[1];
-            }
-            locale = new Locale(lang, country);
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+    public static void printErrorMsg(){
+        if (!assertErrorMsg.isEmpty()){
+            LOGGER.info(L10N.getAssertErrorMsg());
         }
-        setActualLocale(locale);
     }
 
     /**
-     * set Actual Locale
+     * set Locale
      *
      * @param locale - Locale
      */
-    public static void setActualLocale(Locale locale) {
+    private static void setLocale(Locale locale) {
         LOGGER.info("Set actual Locale to " + locale);
         actualLocale = locale;
 
