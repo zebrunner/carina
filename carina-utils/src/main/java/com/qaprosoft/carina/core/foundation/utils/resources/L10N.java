@@ -40,7 +40,7 @@ public class L10N {
     private static ArrayList<ResourceBundle> resBoundles = new ArrayList<ResourceBundle>();
     private static Properties missedResources = new Properties();
     
-    private static SoftAssert mistakes;
+    private static SoftAssert mistakes = new SoftAssert();
 
     /**
      * Load L10N resource bundle.
@@ -171,14 +171,13 @@ public class L10N {
         String key = element.getName();
 
         String expectedText = getText(key);
-        boolean isValid = actualText.contains(expectedText);
+        boolean isValid = actualText.contains(expectedText) && !expectedText.isEmpty();
 
         if (!isValid) {
-            LOGGER.error("Localized text should be '" + expectedText + "'. But currently it is '" + actualText + "'!");
-
             String error = "Expected: '" + expectedText + "', length=" + expectedText.length() +
                     ". Actual: '" + actualText + "', length=" + actualText.length() + ".";
 
+            LOGGER.error(error);
             mistakes.fail(error);
 
             String newItem = key + "=" + actualText;

@@ -16,38 +16,40 @@
 package com.qaprosoft.carina.core.foundation.webdriver.locator.internal;
 
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.qaprosoft.carina.core.foundation.webdriver.locator.LocalizedAnnotations;
 import org.openqa.selenium.By;
 import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.internal.Locatable;
+import org.openqa.selenium.internal.WrapsElement;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 
-public class LocatingElementListHandler implements InvocationHandler {
+public class LocatingListHandler implements InvocationHandler {
     private final ElementLocator locator;
     private String name;
     private By by;
     private final WebDriver driver;
-    
+    private final ClassLoader loader;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public LocatingElementListHandler(WebDriver driver, ElementLocator locator, String name, By by) {
-    	this.driver = driver;
+    public LocatingListHandler(ClassLoader loader, WebDriver driver, ElementLocator locator, Field field){
+        this.driver = driver;
+        this.loader = loader;
         this.locator = locator;
-        this.name = name;
-        this.by = by;
+        this.name = field.getName();
+        this.by = new LocalizedAnnotations(field).buildBy();
     }
 
     public Object invoke(Object object, Method method, Object[] objects) throws Throwable {
@@ -70,20 +72,23 @@ public class LocatingElementListHandler implements InvocationHandler {
 			LOGGER.debug("catched StaleElementReferenceException: ", e);
 			elements = driver.findElements(by);
 		}
-    	
+
         List<ExtendedWebElement> extendedWebElements = null;
-    	int i = 0;
+        int i = 0;
         if (elements != null) {
             extendedWebElements = new ArrayList<ExtendedWebElement>();
-			for (WebElement element : elements) {
-				ExtendedWebElement webElement = new ExtendedWebElement(element, name + i, by);
+            for (WebElement element : elements) {
+                InvocationHandler handler = new LocatingListsElementHandler(element, locator);
+                WebElement proxy = (WebElement) Proxy.newProxyInstance(loader, new Class[]{WebElement.class, WrapsElement.class, Locatable.class},
+                        handler);
+                ExtendedWebElement webElement = new ExtendedWebElement(proxy, name + i, by);
 
-				Field searchContextField = locator.getClass().getDeclaredField("searchContext");
-				searchContextField.setAccessible(true);
-				webElement.setSearchContext((SearchContext) searchContextField.get(locator));
-				extendedWebElements.add(webElement);
-				i++;
-			}
+                Field searchContextField = locator.getClass().getDeclaredField("searchContext");
+                searchContextField.setAccessible(true);
+                webElement.setSearchContext((SearchContext) searchContextField.get(locator));
+                extendedWebElements.add(webElement);
+                i++;
+            }
         }
 
         try {
