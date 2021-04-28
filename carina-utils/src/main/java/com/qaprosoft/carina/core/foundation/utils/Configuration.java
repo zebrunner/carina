@@ -297,7 +297,7 @@ public class Configuration {
         }
 
         // write into the log extra information about selenium_url together with capabilities
-        asString.append(String.format("%s=%s%n", "selenium_url", getSelenium()));
+        asString.append(String.format("%s=%s%n", "selenium_url", getSeleniumUrl()));
         asString.append("\n------------- Driver capabilities -----------\n");
         // read all properties from config.properties and use "capabilities.*"
         final String prefix = SpecialKeywords.CAPABILITIES + ".";
@@ -518,12 +518,12 @@ public class Configuration {
         }
     }
 
-    public static String getSelenium(){
+    public static String getSeleniumUrl(){
         String seleniumUrl = Configuration.get(Parameter.SELENIUM_URL);
 
         if (seleniumUrl.isEmpty()){
             seleniumUrl = Configuration.get(Parameter.SELENIUM_HOST);
-            LOGGER.warn("selenium_host configuration parameter is deprecated. Please, start using selenium_url instead.");
+            LOGGER.warn("selenium_host configuration parameter is deprecated. Please, start using selenium_url instead!");
         }
 
         return seleniumUrl;

@@ -45,7 +45,7 @@ public class WindowsFactory extends AbstractFactory {
     public WebDriver create(String name, DesiredCapabilities capabilities, String seleniumHost) {
 
         if (seleniumHost == null) {
-            seleniumHost = Configuration.getSelenium();
+            seleniumHost = Configuration.getSeleniumUrl();
         }
         LOGGER.debug("selenium: " + seleniumHost);
 
