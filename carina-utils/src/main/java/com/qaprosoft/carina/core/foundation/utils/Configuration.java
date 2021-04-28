@@ -74,6 +74,8 @@ public class Configuration {
 
         SELENIUM_HOST("selenium_host"),
 
+        SELENIUM_URL("selenium_url"),
+
         DRIVER_RECORDER("driver_recorder"),
         
         DRIVER_EVENT_LISTENERS("driver_event_listeners"),
@@ -294,8 +296,8 @@ public class Configuration {
             }
         }
 
-        // write into the log extra information about selenium_host together with capabilities
-        asString.append(String.format("%s=%s%n", "selenium_host", R.CONFIG.get("selenium_host")));
+        // write into the log extra information about selenium_url together with capabilities
+        asString.append(String.format("%s=%s%n", "selenium_url", getSelenium()));
         asString.append("\n------------- Driver capabilities -----------\n");
         // read all properties from config.properties and use "capabilities.*"
         final String prefix = SpecialKeywords.CAPABILITIES + ".";
@@ -514,5 +516,16 @@ public class Configuration {
             LOGGER.debug("build: " + build);
             CurrentTestRun.setBuild(build);
         }
+    }
+
+    public static String getSelenium(){
+        String seleniumUrl = Configuration.get(Parameter.SELENIUM_URL);
+
+        if (seleniumUrl.isEmpty()){
+            seleniumUrl = Configuration.get(Parameter.SELENIUM_HOST);
+            LOGGER.warn("selenium_host configuration parameter is deprecated. Please, start using selenium_url instead.");
+        }
+
+        return seleniumUrl;
     }
 }

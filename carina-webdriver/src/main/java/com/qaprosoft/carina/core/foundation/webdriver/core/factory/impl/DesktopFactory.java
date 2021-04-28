@@ -54,7 +54,7 @@ public class DesktopFactory extends AbstractFactory {
     public WebDriver create(String name, DesiredCapabilities capabilities, String seleniumHost) {
         RemoteWebDriver driver = null;
         if (seleniumHost == null) {
-            seleniumHost = Configuration.get(Configuration.Parameter.SELENIUM_HOST);
+            seleniumHost = Configuration.getSelenium();
         }
 
         if (isCapabilitiesEmpty(capabilities)) {

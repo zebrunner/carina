@@ -60,7 +60,7 @@ public class MobileFactory extends AbstractFactory {
     public WebDriver create(String name, DesiredCapabilities capabilities, String seleniumHost) {
 
         if (seleniumHost == null) {
-            seleniumHost = Configuration.get(Configuration.Parameter.SELENIUM_HOST);
+            seleniumHost = Configuration.getSelenium();
         }
 
         String mobilePlatformName = Configuration.getPlatform(capabilities);
