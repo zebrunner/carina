@@ -22,7 +22,10 @@ import java.io.PrintStream;
 import java.lang.invoke.MethodHandles;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -40,6 +43,7 @@ import com.qaprosoft.carina.core.foundation.api.annotation.Endpoint;
 import com.qaprosoft.carina.core.foundation.api.http.HttpClient;
 import com.qaprosoft.carina.core.foundation.api.http.HttpMethodType;
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
+import com.qaprosoft.carina.core.foundation.api.log.CarinaResponseLoggingFilter;
 import com.qaprosoft.carina.core.foundation.api.log.LoggingOutputStream;
 import com.qaprosoft.carina.core.foundation.api.ssl.NullHostnameVerifier;
 import com.qaprosoft.carina.core.foundation.api.ssl.NullX509TrustManager;
@@ -51,6 +55,7 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import io.restassured.RestAssured;
 import io.restassured.config.RestAssuredConfig;
 import io.restassured.config.SSLConfig;
+import io.restassured.filter.log.LogDetail;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.response.Response;
@@ -204,11 +209,19 @@ public abstract class AbstractApiMethod extends HttpClient {
             ps = new PrintStream(new LoggingOutputStream(LOGGER, Level.INFO));
         }
 
+        Set<String> blacklistedHeaders = new HashSet<>();
+        blacklistedHeaders.add("Content-Type");
+        RequestLoggingFilter headersFilterRq = new RequestLoggingFilter(LogDetail.HEADERS, true, ps, true, blacklistedHeaders);
+
+        ResponseLoggingFilter responseLoggingFilter = new CarinaResponseLoggingFilter(LogDetail.ALL, true, ps, Matchers.any(Integer.class),
+                Collections.EMPTY_SET);
+
         if (logRequest)
-            request.filter(new RequestLoggingFilter(ps));
+            request.filters(new RequestLoggingFilter(ps), headersFilterRq);
 
         if (logResponse)
-            request.filter(new ResponseLoggingFilter(ps));
+            // request.filters(new ResponseLoggingFilter(ps));
+            request.filters(responseLoggingFilter);
         try {
             rs = HttpClient.send(request, methodPath, methodType);
         } finally {
