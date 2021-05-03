@@ -339,7 +339,8 @@ public interface IDriverPool {
             
             Future<?> future = Executors.newSingleThreadExecutor().submit(new Callable<Void>() {
                 public Void call() throws Exception {
-                    driver.close();
+                    //TODO: make close only for web drivers
+                    // driver.close();
                     driver.quit();
                     return null;
                 }
