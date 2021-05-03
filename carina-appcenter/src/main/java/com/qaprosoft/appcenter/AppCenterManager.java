@@ -178,7 +178,7 @@ public class AppCenterManager {
      * @return
      */
     private Map<String, String> getAppId(String appName, String platformName) {
-
+        disableRestTemplateSsl();
         Map<String, String> appMap = new HashMap<>();
 
         RequestEntity<String> retrieveApps = buildRequestEntity(
