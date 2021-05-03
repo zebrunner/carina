@@ -55,6 +55,12 @@
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.qaprosoft</groupId>
+			<artifactId>carina-appcenter</artifactId>
+			<version>7.0.4.1-SNAPSHOT</version>
+
+		</dependency>
 
 	</dependencies>
 

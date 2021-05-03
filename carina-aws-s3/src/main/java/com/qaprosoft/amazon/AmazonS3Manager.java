@@ -21,6 +21,7 @@ import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.qaprosoft.appcenter.AppCenterManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -402,4 +403,14 @@ public class AmazonS3Manager {
      * 
      * System.out.println("    " + line); } }
      */
+
+    public URL generatePreSignUrlForBuildInAppCenter(String folder, String appName, String platformName, String buildType, String version, String bucket, String key){
+        AppCenterManager manager = AppCenterManager.getInstance();
+        File file = manager.getBuild(folder, appName, platformName, buildType, version);
+
+        AmazonS3Manager amazonS3Manager = AmazonS3Manager.getInstance();
+        amazonS3Manager.put(bucket, key, file.getAbsolutePath());
+
+        return amazonS3Manager.generatePreSignUrl("bucket","key", 4);
+    }
 }
