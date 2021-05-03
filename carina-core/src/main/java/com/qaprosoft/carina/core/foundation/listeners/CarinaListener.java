@@ -595,23 +595,28 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             String buildType = matcher.group(3);
             String version = matcher.group(4);
 
-            String appCenterAppLocalStorage = Configuration.get(Parameter.APPCENTER_LOCAL_STORAGE);
-            // download file from AppCenter to local storage
-
-            File file = AppCenterManager.getInstance().getBuild(appCenterAppLocalStorage, appName, platformName, buildType,
-                    version);
-
-            Configuration.setMobileApp(file.getAbsolutePath());
-
-            LOGGER.info("Updated mobile app: " + Configuration.getMobileApp());
-
-            // try to redefine app_version if it's value is latest or empty
-            String appVersion = Configuration.get(Parameter.APP_VERSION);
-            if (appVersion.equals("latest") || appVersion.isEmpty()) {
-                Configuration.setBuild(file.getName());
+            //TODO: rename S3_USE_PRESIGN_URL to USE_PRESIGN_URL
+            //TODO: test if generated appcenter download url is valid
+            if (Configuration.getBoolean(Parameter.S3_USE_PRESIGN_URL)) {
+                // update app path using presign url only if S3_USE_PRESIGN_URL=true
+                String downloadUrl = AppCenterManager.getInstance().getDownloadUrl(appName, platformName, buildType,
+                        version);
+                Configuration.setMobileApp(downloadUrl);
+            } else {
+                String appCenterAppLocalStorage = Configuration.get(Parameter.APPCENTER_LOCAL_STORAGE);
+                // download file from AppCenter to local storage
+                
+                File file = AppCenterManager.getInstance().getBuild(appCenterAppLocalStorage, appName, platformName, buildType,
+                        version);
+                Configuration.setMobileApp(file.getAbsolutePath());
+                // try to redefine app_version if it's value is latest or empty
+                String appVersion = Configuration.get(Parameter.APP_VERSION);
+                if (appVersion.equals("latest") || appVersion.isEmpty()) {
+                    Configuration.setBuild(file.getName());
+                }
             }
+            LOGGER.info("Updated mobile app: " + Configuration.getMobileApp());
         }
-
     }
 
     /**
