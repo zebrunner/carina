@@ -33,6 +33,7 @@ public class GenerateProcessor implements PropertiesProcessor {
             Matcher numberMatcher = Pattern.compile(PropertiesKeywords.GENERATE_NUMBER_REGEX.getKey()).matcher(entry.getValue().toString());
             Matcher dateMatcher = Pattern.compile(PropertiesKeywords.GENERATE_DATE_REGEX.getKey()).matcher(entry.getValue().toString());
             String tmp = entry.getValue().toString();
+            boolean generated = false;
 
             while (wordMatcher.find()) {
                 String toReplace = wordMatcher.group();
@@ -40,6 +41,7 @@ public class GenerateProcessor implements PropertiesProcessor {
                 tmpMatcher.find();
                 String length = tmpMatcher.group();
                 tmp = tmp.replace(toReplace, GenerationUtil.generateWord(Integer.parseInt(length)));
+                generated = true;
             }
 
             while (numberMatcher.find()) {
@@ -48,6 +50,7 @@ public class GenerateProcessor implements PropertiesProcessor {
                 tmpMatcher.find();
                 String length = tmpMatcher.group();
                 tmp = tmp.replace(toReplace, GenerationUtil.generateNumber(Integer.parseInt(length)));
+                generated = true;
             }
 
             while (dateMatcher.find()) {
@@ -63,9 +66,11 @@ public class GenerateProcessor implements PropertiesProcessor {
                 // generating date
                 tmp = tmp.replace(toReplace,
                         GenerationUtil.generateTime(format, Integer.parseInt(offset), Calendar.DAY_OF_YEAR));
+                generated = true;
             }
 
-            out.put(entry.getKey(), tmp);
+            if (generated)
+                out.put(entry.getKey(), tmp);
         }
         return out;
     }

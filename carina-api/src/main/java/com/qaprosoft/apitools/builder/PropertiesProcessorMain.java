@@ -26,10 +26,12 @@ public class PropertiesProcessorMain {
     static {
         processors = new ArrayList<PropertiesProcessor>();
         processors.add(new GenerateProcessor());
+        processors.add(new CryptoProcessor());
     }
 
     public static Properties processProperties(Properties in) {
         Properties out = new Properties();
+        out.putAll(in);
         for (PropertiesProcessor processor : processors) {
             out.putAll(processor.process(in));
         }
