@@ -183,14 +183,8 @@ public class Configuration {
 
         SECRET_KEY("secret_key"),
 
-        S3_USE_PRESIGN_URL("s3_use_presign_url"),
-        
-        S3_LOCAL_STORAGE("s3_local_storage"),
-
         // AppCenter token
         APPCENTER_TOKEN("appcenter_token"),
-
-        APPCENTER_LOCAL_STORAGE("appcenter_local_storage"),
 
         // For localization parser
         ADD_NEW_LOCALIZATION("add_new_localization"),

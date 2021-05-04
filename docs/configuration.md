@@ -264,19 +264,9 @@ All the project configuration properties are located in a **_config.properties**
 		<td>gkhcvdgvceUYF67897hbjsbdc</td>
 	</tr>
 		<tr>
-		<td>s3_local_storage</td>
-		<td>Local directory for downloading build artifacts</td>
-		<td>./s3</td>
-	</tr>
-		<tr>
 		<td>appcenter_token</td>
 		<td>Token for authentication in Hockey App</td>
 		<td>gkhcvdgvceUYF67897hbjsbdc</td>
-	</tr>
-		<tr>
-		<td>appcenter_local_storage</td>
-		<td>Directory for AppCenter artifacts</td>
-		<td>./appcenter</td>
 	</tr>
 		<tr>
 		<td>add_new_localization</td>

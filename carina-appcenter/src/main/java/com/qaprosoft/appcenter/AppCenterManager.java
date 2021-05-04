@@ -218,8 +218,6 @@ public class AppCenterManager {
      * @return
      */
     private String scanAppForBuild(Map<String, String> apps, String buildType, String version) {
-        disableRestTemplateSsl();
-        
         for (String currentApp : apps.keySet()) {
             LOGGER.info("Scanning App " + currentApp);
             MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
