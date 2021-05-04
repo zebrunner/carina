@@ -79,6 +79,19 @@ public class AppCenterManager {
     private void disableRestTemplateSsl() {
         restTemplate = RestTemplateBuilder.newInstance().withDisabledSslChecking().withSpecificJsonMessageConverter().build();
     }
+    
+    /**
+    *
+    * @param appName takes in the AppCenter Name to look for.
+    * @param platformName takes in the platform we wish to download for.
+    * @param buildType takes in the particular build to download (i.e. Prod.AdHoc, QA.Debug, Prod-Release, QA-Internal etc...)
+    * @param version takes in either "latest" to take the first build that matches the criteria or allows to consume a version to download that
+    *            build.
+    * @return download url for build artifact.
+    */
+   public String getDownloadUrl(String appName, String platformName, String buildType, String version) {
+       return scanAppForBuild(getAppId(appName, platformName), buildType, version);
+   }    
 
     /**
      *
@@ -91,10 +104,9 @@ public class AppCenterManager {
      * @return file to the downloaded build artifact
      */
     public File getBuild(String folder, String appName, String platformName, String buildType, String version) {
-        disableRestTemplateSsl();
+        String buildToDownload = getDownloadUrl(appName, platformName, buildType, version);
 
-        String buildToDownload = scanAppForBuild(getAppId(appName, platformName), buildType, version);
-
+        //TODO: wrap below code into the public download method
         String fileName = folder + "/" + createFileName(appName, buildType, platformName);
         File fileToLocate = null;
 
@@ -166,7 +178,7 @@ public class AppCenterManager {
      * @return
      */
     private Map<String, String> getAppId(String appName, String platformName) {
-
+        disableRestTemplateSsl();
         Map<String, String> appMap = new HashMap<>();
 
         RequestEntity<String> retrieveApps = buildRequestEntity(
@@ -206,7 +218,6 @@ public class AppCenterManager {
      * @return
      */
     private String scanAppForBuild(Map<String, String> apps, String buildType, String version) {
-
         for (String currentApp : apps.keySet()) {
             LOGGER.info("Scanning App " + currentApp);
             MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
@@ -244,7 +255,6 @@ public class AppCenterManager {
                                 String.format(
                                         "Fetching Build ID (%s) Version: %s (%s)", latestBuildNumber, versionShort, versionLong));
                         String buildUrl = appBuild.get("download_url").asText();
-                        R.CONFIG.put(Parameter.APP_PRESIGN_URL.getKey(), buildUrl); //register app presign url to register in test run later
                         LOGGER.info("Download URL For Build: " + buildUrl);
 
                         return buildUrl;

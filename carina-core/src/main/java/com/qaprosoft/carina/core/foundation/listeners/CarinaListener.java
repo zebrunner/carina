@@ -178,13 +178,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         setThreadCount(suite);
         onHealthCheck(suite);
         
-        //register app link artifact if available...
-        String appUrl = Configuration.get(Parameter.APP_PRESIGN_URL);
-        if (!appUrl.isEmpty()) {
-            LOGGER.debug("app url: " + appUrl);
-            Artifact.attachReferenceToTestRun("app", appUrl);
-        }
-        
         // register app_version/build as artifact if available...
         Configuration.setBuild(Configuration.get(Parameter.APP_VERSION));
         
@@ -586,23 +579,17 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             String buildType = matcher.group(3);
             String version = matcher.group(4);
 
-            String appCenterAppLocalStorage = Configuration.get(Parameter.APPCENTER_LOCAL_STORAGE);
-            // download file from AppCenter to local storage
-
-            File file = AppCenterManager.getInstance().getBuild(appCenterAppLocalStorage, appName, platformName, buildType,
+            //TODO: test if generated appcenter download url is valid
+            String presignedAppUrl = AppCenterManager.getInstance().getDownloadUrl(appName, platformName, buildType,
                     version);
 
-            Configuration.setMobileApp(file.getAbsolutePath());
+            LOGGER.debug("app url: " + presignedAppUrl);
+            Artifact.attachReferenceToTestRun("app", presignedAppUrl);
+
+            Configuration.setMobileApp(presignedAppUrl);
 
             LOGGER.info("Updated mobile app: " + Configuration.getMobileApp());
-
-            // try to redefine app_version if it's value is latest or empty
-            String appVersion = Configuration.get(Parameter.APP_VERSION);
-            if (appVersion.equals("latest") || appVersion.isEmpty()) {
-                Configuration.setBuild(file.getName());
-            }
         }
-
     }
 
     /**
@@ -640,41 +627,11 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             // generate presign url explicitly to register link as run artifact
             long hours = 72L*1000*60*60; // generate presigned url for nearest 3 days
             String presignedAppUrl = AmazonS3Manager.getInstance().generatePreSignUrl(bucketName, key, hours).toString();
-            R.CONFIG.put(Parameter.APP_PRESIGN_URL.getKey(), presignedAppUrl);
 
-            if (Configuration.getBoolean(Parameter.S3_USE_PRESIGN_URL)) {
-                // update app path using presign url only if S3_USE_PRESIGN_URL=true
-                Configuration.setMobileApp(presignedAppUrl);
-            } else {
-                // download artifact into the local storage
-                S3Object objBuild = AmazonS3Manager.getInstance().get(bucketName, key);
-    
-                String s3LocalStorage = Configuration.get(Parameter.S3_LOCAL_STORAGE);
-    
-                // download file from AWS to local storage
-    
-                String fileName = s3LocalStorage + "/" + StringUtils.substringAfterLast(objBuild.getKey(), "/");
-                File file = new File(fileName);
-    
-                // verify maybe requested artifact with the same size was already
-                // download
-                if (file.exists() && file.length() == objBuild.getObjectMetadata().getContentLength()) {
-                    LOGGER.info("build artifact with the same size already downloaded: " + file.getAbsolutePath());
-                } else {
-                    LOGGER.info(String.format("Following data was extracted: bucket: %s, key: %s, local file: %s",
-                            bucketName, key, file.getAbsolutePath()));
-                    AmazonS3Manager.getInstance().download(bucketName, key, new File(fileName));
-                }
-    
-                Configuration.setMobileApp(file.getAbsolutePath());
+            LOGGER.debug("app url: " + presignedAppUrl);
+            Artifact.attachReferenceToTestRun("app", presignedAppUrl);
 
-                // try to redefine app_version if it's value is latest or empty
-                String appVersion = Configuration.get(Parameter.APP_VERSION);
-                if (appVersion.equals("latest") || appVersion.isEmpty()) {
-                    Configuration.setBuild(file.getName());
-                }
-            }
-
+            Configuration.setMobileApp(presignedAppUrl);
         }
     }
 
