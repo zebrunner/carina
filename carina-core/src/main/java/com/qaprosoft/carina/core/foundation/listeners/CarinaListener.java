@@ -589,9 +589,14 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             String version = matcher.group(4);
 
             //TODO: test if generated appcenter download url is valid
-            String downloadUrl = AppCenterManager.getInstance().getDownloadUrl(appName, platformName, buildType,
+            String presignedAppUrl = AppCenterManager.getInstance().getDownloadUrl(appName, platformName, buildType,
                     version);
-            Configuration.setMobileApp(downloadUrl);
+
+            if (!presignedAppUrl.isEmpty()) {
+                LOGGER.debug("app url: " + presignedAppUrl);
+                Artifact.attachReferenceToTestRun("app", presignedAppUrl);
+            }
+            Configuration.setMobileApp(presignedAppUrl);
 
             LOGGER.info("Updated mobile app: " + Configuration.getMobileApp());
         }
