@@ -279,24 +279,19 @@ All the project configuration properties are located in a **_config.properties**
 		<td>./appcenter</td>
 	</tr>
 		<tr>
-		<td>add_new_localization</td>
-		<td>Should be set to 'true' if you want to create new localization files for the required Locale. Otherwise, there will be just the localization checking</td>
-		<td>Boolean</td>
-	</tr>
-		<tr>
-		<td>add_new_localization_encoding</td>
+		<td>localization_encoding</td>
 		<td>Encoding for a new localization</td>
 		<td>UTF-8</td>
+	</tr>
+		<tr>
+		<td>localization_testing</td>
+		<td>Enables auto verification for elements that are marked with @Localized</td>
+		<td>true, false</td>
 	</tr>
 		<tr>
 		<td>add_new_localization_path</td>
 		<td>Path where created localization properties should be saved. If null, they will be added to an artifactory folder in the report</td>
 		<td>./src/main/resources/L10N</td>
-	</tr>
-		<tr>
-		<td>add_new_localization_property_name</td>
-		<td>Basic template for property name.</td>
-		<td>new_locale_file_</td>
 	</tr>
 		<tr>
 		<td>tls_keysecure_location</td>
