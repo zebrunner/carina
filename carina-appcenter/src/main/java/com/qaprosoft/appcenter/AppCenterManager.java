@@ -255,7 +255,6 @@ public class AppCenterManager {
                                 String.format(
                                         "Fetching Build ID (%s) Version: %s (%s)", latestBuildNumber, versionShort, versionLong));
                         String buildUrl = appBuild.get("download_url").asText();
-                        R.CONFIG.put(Parameter.APP_PRESIGN_URL.getKey(), buildUrl); //register app presign url to register in test run later
                         LOGGER.info("Download URL For Build: " + buildUrl);
 
                         return buildUrl;

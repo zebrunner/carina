@@ -203,13 +203,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         setThreadCount(suite);
         onHealthCheck(suite);
         
-        //register app link artifact if available...
-        String appUrl = Configuration.get(Parameter.APP_PRESIGN_URL);
-        if (!appUrl.isEmpty()) {
-            LOGGER.debug("app url: " + appUrl);
-            Artifact.attachReferenceToTestRun("app", appUrl);
-        }
-        
         // register app_version/build as artifact if available...
         Configuration.setBuild(Configuration.get(Parameter.APP_VERSION));
         
@@ -639,7 +632,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             // generate presign url explicitly to register link as run artifact
             long hours = 72L*1000*60*60; // generate presigned url for nearest 3 days
             String presignedAppUrl = AmazonS3Manager.getInstance().generatePreSignUrl(bucketName, key, hours).toString();
-            R.CONFIG.put(Parameter.APP_PRESIGN_URL.getKey(), presignedAppUrl);
 
             Configuration.setMobileApp(presignedAppUrl);
         }
