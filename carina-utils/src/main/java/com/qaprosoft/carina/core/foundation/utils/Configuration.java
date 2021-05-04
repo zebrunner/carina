@@ -74,6 +74,8 @@ public class Configuration {
 
         SELENIUM_HOST("selenium_host"),
 
+        SELENIUM_URL("selenium_url"),
+
         DRIVER_RECORDER("driver_recorder"),
         
         DRIVER_EVENT_LISTENERS("driver_event_listeners"),
@@ -181,17 +183,25 @@ public class Configuration {
 
         SECRET_KEY("secret_key"),
 
+        // Azure
+        AZURE_ACCOUNT_NAME("azure_account_name"),
+
+        AZURE_CONTAINER_NAME("azure_container_name"),
+
+        AZURE_BLOB_URL("azure_blob_url"),
+
+        AZURE_ACCESS_KEY_TOKEN("azure_access_key_token"),
+
+        AZURE_LOCAL_STORAGE("azure_local_storage"),
+
         // AppCenter token
         APPCENTER_TOKEN("appcenter_token"),
 
         // For localization parser
-        ADD_NEW_LOCALIZATION("add_new_localization"),
 
-        ADD_NEW_LOCALIZATION_ENCODING("add_new_localization_encoding"),
+        LOCALIZATION_ENCODING("localization_encoding"),
 
-        ADD_NEW_LOCALIZATION_PATH("add_new_localization_path"),
-
-        ADD_NEW_LOCALIZATION_PROPERTY_NAME("add_new_localization_property_name"),
+        LOCALIZATION_TESTING("localization_testing"),
 
         // TLS
         TLS_KEYSECURE_LOCATION("tls_keysecure_location"),
@@ -286,8 +296,8 @@ public class Configuration {
             }
         }
 
-        // write into the log extra information about selenium_host together with capabilities
-        asString.append(String.format("%s=%s%n", "selenium_host", R.CONFIG.get("selenium_host")));
+        // write into the log extra information about selenium_url together with capabilities
+        asString.append(String.format("%s=%s%n", "selenium_url", getSeleniumUrl()));
         asString.append("\n------------- Driver capabilities -----------\n");
         // read all properties from config.properties and use "capabilities.*"
         final String prefix = SpecialKeywords.CAPABILITIES + ".";
@@ -506,5 +516,16 @@ public class Configuration {
             LOGGER.debug("build: " + build);
             CurrentTestRun.setBuild(build);
         }
+    }
+
+    public static String getSeleniumUrl(){
+        String seleniumUrl = Configuration.get(Parameter.SELENIUM_URL);
+
+        if (seleniumUrl.isEmpty()){
+            seleniumUrl = Configuration.get(Parameter.SELENIUM_HOST);
+            LOGGER.warn("selenium_host configuration parameter is deprecated. Please, start using selenium_url instead!");
+        }
+
+        return seleniumUrl;
     }
 }
