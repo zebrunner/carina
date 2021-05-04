@@ -633,6 +633,11 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             long hours = 72L*1000*60*60; // generate presigned url for nearest 3 days
             String presignedAppUrl = AmazonS3Manager.getInstance().generatePreSignUrl(bucketName, key, hours).toString();
 
+            if (!presignedAppUrl.isEmpty()) {
+                LOGGER.debug("app url: " + presignedAppUrl);
+                Artifact.attachReferenceToTestRun("app", presignedAppUrl);
+            }
+
             Configuration.setMobileApp(presignedAppUrl);
         }
     }
