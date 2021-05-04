@@ -189,6 +189,17 @@ public class Configuration {
         
         S3_LOCAL_STORAGE("s3_local_storage"),
 
+        // Azure
+        AZURE_ACCOUNT_NAME("azure_account_name"),
+
+        AZURE_CONTAINER_NAME("azure_container_name"),
+
+        AZURE_BLOB_URL("azure_blob_url"),
+
+        AZURE_ACCESS_KEY_TOKEN("azure_access_key_token"),
+
+        AZURE_LOCAL_STORAGE("azure_local_storage"),
+
         // AppCenter token
         APPCENTER_TOKEN("appcenter_token"),
 

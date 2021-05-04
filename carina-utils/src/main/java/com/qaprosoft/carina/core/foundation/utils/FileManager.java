@@ -15,21 +15,22 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
 import java.lang.invoke.MethodHandles;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class FileManager {
 
@@ -107,4 +108,41 @@ public class FileManager {
         }
     }
 
+    /**
+     * Get file checksum.
+     *
+     * @param checksumType  Checksum hash type.
+     * @param file file path.
+     * @return hash as a String
+     */
+    public static String getFileChecksum(Checksum checksumType, File file) throws IOException, NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance(checksumType.value);
+
+        try (FileInputStream fileInputStream = new FileInputStream(file); FileChannel channel = fileInputStream.getChannel()) {
+            final ByteBuffer buf = ByteBuffer.allocateDirect(8192);
+            int buffer = channel.read(buf);
+
+            while (buffer != -1 && buffer != 0) {
+                buf.flip();
+                final byte[] bytes = new byte[buffer];
+                buf.get(bytes);
+                digest.update(bytes, 0, buffer);
+                buf.clear();
+                buffer = channel.read(buf);
+            }
+
+            return Base64.encodeBase64String(digest.digest());
+        }
+    }
+
+    public enum Checksum {
+        MD5("MD5"),
+        SHA_256("SHA-256");
+
+        public final String value;
+
+        private Checksum(String value) {
+            this.value = value;
+        }
+    }
 }

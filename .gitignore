@@ -17,3 +17,4 @@ test-output
 reports
 zipFile.zip
 textFile.txt
+.DS_Store
