@@ -9,6 +9,8 @@ We recommend to use lightweight Zebrunner [Selenoid](https://github.com/zebrunne
 
 [![Carina - Running tests](http://img.youtube.com/vi/QGHCezE-d-I/0.jpg)](https://youtu.be/QGHCezE-d-I)
 
+Note: Starting from 7.0.4 consider that instead of `extends AbstractTest` we have to `implements IAbstractTest` interface
+
 There are several options to execute a test: you may run test suite from Eclipse IDE or initiate test execution from the console using Maven Surefire plugin built into Carina framework.
 
 To run test suite from Eclipse IDE, just select the required TestNG xml file: Right click > Run As > TestNG suite

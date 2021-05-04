@@ -162,7 +162,7 @@ protected ExtendedWebElement developerText;
 Carina framework uses TestNG for test organization. In general, test represents a manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:
 
 ```
-public class SampleTest extends AbstractTest {
+public class SampleTest implements IAbstractTest {
 
     String name = "My name";
     String carName = "Mercedes";
@@ -186,7 +186,7 @@ public class SampleTest extends AbstractTest {
 ```
 
 <b>Important:</b>
-* Test class should extend com.qaprosoft.carina.core.foundation.AbstractTest
+* Test class should implement com.qaprosoft.carina.core.foundation.IAbstractTest
 * Test method should start with org.testng.annotations.Test annotation
 * Use getDriver() method to get driver instance in test
 * Locate tests in src/test/java source folder

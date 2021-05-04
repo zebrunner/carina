@@ -61,7 +61,7 @@ public class CalculatorHomePage extends AbstractPage {
 
 ```
 //test.class example
-public class CalculatorTest extends AbstractTest {
+public class CalculatorTest implements IAbstractTest {
     @Test
     public void calculatorSumTest(){
         CalculatorHomePage calculator = new CalculatorHomePage(getDriver());

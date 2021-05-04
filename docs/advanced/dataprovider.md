@@ -57,12 +57,12 @@ public void testSubstractOperation(int a, int b, int c) {
 ```
 
 ## XLS/CSV data-providers
-Carina test framework provides a possibility to write all tests with data providers in one place, including parametrization using external XLS/CSV spreadsheets. First of all, you need to declare a test class that extends `AbstractTest.java`.
+Carina test framework provides a possibility to write all tests with data providers in one place, including parametrization using external XLS/CSV spreadsheets. First of all, you need to declare a test class that implements `IAbstractTest.java`.
 
 After that, you can specify data provider tests as follows.
 
 ```
-public class DataprovidersSampleTest extends AbstractTest {
+public class DataprovidersSampleTest implements IAbstractTest {
 	@Test(dataProvider = "DataProvider")
 	@XlsDataSourceParameters(path = "xls/demo.xlsx", sheet = "Calculator", dsUid = "TUID", dsArgs = "a,b,c")
 	public void testSumOperation(String a, String b, String c) {
@@ -73,7 +73,7 @@ public class DataprovidersSampleTest extends AbstractTest {
 }
 ```
 
-This test uses XLS/CSV files as a data source. Every line in a spreadsheet is a set of arguments for a test. You should specify the `dataProvider` parameter for TestNG annotation `@Test` . Carina test framework initially defines several data provider methods in `AbstractTest.java`, which you've extended earlier:
+This test uses XLS/CSV files as a data source. Every line in a spreadsheet is a set of arguments for a test. You should specify the `dataProvider` parameter for TestNG annotation `@Test` . Carina test framework initially defines several data provider methods in `IAbstractTest.java`, which you've extended earlier:
 
 * createData method (data provider name = "DataProvider") for common use cases
 
@@ -95,7 +95,7 @@ In the TUID column, you should specify some unique test identifier that will be 
 ## DataProvider with huge number of columns
 In some cases, we have to provide 10+ columns into a test. In this case, there is one tricky point. Just removing dsArgs dataprovider parameter will collect all the lines into a single HashMap<String, String> object, so you can dynamically get any column in a test using the column name.
 ```
-public class DataprovidersSampleTest extends AbstractTest {
+public class DataprovidersSampleTest implements IAbstractTest {
 	@Test(dataProvider = "DataProvider")
 	@XlsDataSourceParameters(path = "xls/demo.xlsx", sheet = "Calculator", dsUid = "TUID")
 	public void testSumOperation(HashMap<String, String> args) {
