@@ -640,9 +640,9 @@ public void testSubstractOperation(int a, int b, int c) {
 </code></pre>
 
 <h2 id="xlscsv-data-providers">XLS/CSV data-providers</h2>
-<p>Carina test framework provides a possibility to write all tests with data providers in one place, including parametrization using external XLS/CSV spreadsheets. First of all, you need to declare a test class that extends <code>AbstractTest.java</code>.</p>
+<p>Carina test framework provides a possibility to write all tests with data providers in one place, including parametrization using external XLS/CSV spreadsheets. First of all, you need to declare a test class that implements <code>IAbstractTest.java</code>.</p>
 <p>After that, you can specify data provider tests as follows.</p>
-<pre><code>public class DataprovidersSampleTest extends AbstractTest {
+<pre><code>public class DataprovidersSampleTest implements IAbstractTest {
     @Test(dataProvider = &quot;DataProvider&quot;)
     @XlsDataSourceParameters(path = &quot;xls/demo.xlsx&quot;, sheet = &quot;Calculator&quot;, dsUid = &quot;TUID&quot;, dsArgs = &quot;a,b,c&quot;)
     public void testSumOperation(String a, String b, String c) {
@@ -653,7 +653,7 @@ public void testSubstractOperation(int a, int b, int c) {
 }
 </code></pre>
 
-<p>This test uses XLS/CSV files as a data source. Every line in a spreadsheet is a set of arguments for a test. You should specify the <code>dataProvider</code> parameter for TestNG annotation <code>@Test</code> . Carina test framework initially defines several data provider methods in <code>AbstractTest.java</code>, which you've extended earlier:</p>
+<p>This test uses XLS/CSV files as a data source. Every line in a spreadsheet is a set of arguments for a test. You should specify the <code>dataProvider</code> parameter for TestNG annotation <code>@Test</code> . Carina test framework initially defines several data provider methods in <code>IAbstractTest.java</code>, which you've extended earlier:</p>
 <ul>
 <li>
 <p>createData method (data provider name = "DataProvider") for common use cases</p>
@@ -674,7 +674,7 @@ public void testSubstractOperation(int a, int b, int c) {
 <p>In the TUID column, you should specify some unique test identifier that will be set at the beginning of the test name in a test result report. In the next columns, you can specify arguments for a test and their values in the bottom lines. They will be used as parameters in <code>@XlsDataSourceParameters</code>. In this example, the values of a, b, c arguments were defined in 3 sets of values with different TUID.</p>
 <h2 id="dataprovider-with-huge-number-of-columns">DataProvider with huge number of columns</h2>
 <p>In some cases, we have to provide 10+ columns into a test. In this case, there is one tricky point. Just removing dsArgs dataprovider parameter will collect all the lines into a single HashMap<String, String> object, so you can dynamically get any column in a test using the column name.</p>
-<pre><code>public class DataprovidersSampleTest extends AbstractTest {
+<pre><code>public class DataprovidersSampleTest implements IAbstractTest {
     @Test(dataProvider = &quot;DataProvider&quot;)
     @XlsDataSourceParameters(path = &quot;xls/demo.xlsx&quot;, sheet = &quot;Calculator&quot;, dsUid = &quot;TUID&quot;)
     public void testSumOperation(HashMap&lt;String, String&gt; args) {

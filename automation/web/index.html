@@ -609,6 +609,7 @@
                   <h1>Web</h1>
                 
                 <p><a href="https://youtu.be/Wgyffk7hJQw"><img alt="Carina - Web automation" src="https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png" /></a></p>
+<p>Note: Starting from 7.0.4 consider that instead of <code>extends AbstractTest</code> we have to <code>implements IAbstractTest</code> interface</p>
 <p>Carina framework follows Selenium best practices for web test automation. If you are familiar with Selenium WebDriver and have already implemented a few tests with the Page Object Pattern, the following guide will be much easier for understanding. We have chosen <a href="https://www.gsmarena.com/">GSM Arena</a> public web site for demonstration purposes, the whole test source code is located in <a href="https://github.com/qaprosoft/carina-demo">carina-demo</a> Github repo.</p>
 <h3 id="implementation-of-page-objects">Implementation of Page Objects</h3>
 <p>When you are writing functional tests using Selenium, the major part of your code will consist of interactions with the web interface you are testing through the WebDriver API. After fetching elements, you will verify some state of an element through various assertions and move on to fetching the next element. You may find WebElements directly in your tests:</p>
@@ -743,7 +744,7 @@ assertEquals(&quot;MyCityName&quot;, city.getText());
 </ul>
 <h3 id="implementation-of-tests">Implementation of tests</h3>
 <p>Carina framework uses TestNG for test organization. In general, test represents a manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:</p>
-<pre><code>public class WebSampleTest extends AbstractTest {
+<pre><code>public class WebSampleTest implements IAbstractTest {
     @Test(description = &quot;JIRA#AUTO-0009&quot;)
     @MethodOwner(owner = &quot;qpsdemo&quot;)
     public void testCompareModels() {
@@ -769,7 +770,7 @@ assertEquals(&quot;MyCityName&quot;, city.getText());
 <p>It is good practice to implement all elements search logic of Page Object/UI Object side and perform assertions and validations in the test, do not mix this logic.</p>
 <p><strong>Important:</strong></p>
 <ul>
-<li>Test class should extend <strong>com.qaprosoft.carina.core.foundation.AbstractTest</strong></li>
+<li>Test class should implement <strong>com.qaprosoft.carina.core.foundation.IAbstractTest</strong></li>
 <li>Test method should start with <strong>org.testng.annotations.Test</strong> annotation</li>
 <li>Use <strong>getDriver()</strong> method to get driver instance in the test</li>
 <li>Locate tests in src/test/java source folder</li>

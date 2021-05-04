@@ -846,7 +846,7 @@ protected ExtendedWebElement developerText;
 
 <h3 id="implementation-of-tests">Implementation of tests</h3>
 <p>Carina framework uses TestNG for test organization. In general, test represents a manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:</p>
-<pre><code>public class SampleTest extends AbstractTest {
+<pre><code>public class SampleTest implements IAbstractTest {
 
     String name = &quot;My name&quot;;
     String carName = &quot;Mercedes&quot;;
@@ -870,7 +870,7 @@ protected ExtendedWebElement developerText;
 </code></pre>
 
 <p><b>Important:</b>
-* Test class should extend com.qaprosoft.carina.core.foundation.AbstractTest
+* Test class should implement com.qaprosoft.carina.core.foundation.IAbstractTest
 * Test method should start with org.testng.annotations.Test annotation
 * Use getDriver() method to get driver instance in test
 * Locate tests in src/test/java source folder</p>
