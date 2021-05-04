@@ -1,5 +1,7 @@
 [![Carina - Web automation](https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png)](https://youtu.be/Wgyffk7hJQw)
 
+Note: Starting from 7.0.4 consider that instead of `extends AbstractTest` we have to `implements IAbstractTest` interface
+
 Carina framework follows Selenium best practices for web test automation. If you are familiar with Selenium WebDriver and have already implemented a few tests with the Page Object Pattern, the following guide will be much easier for understanding. We have chosen [GSM Arena](https://www.gsmarena.com/) public web site for demonstration purposes, the whole test source code is located in [carina-demo](https://github.com/qaprosoft/carina-demo) Github repo.
 
 
@@ -141,7 +143,7 @@ public class HomePage extends AbstractPage {
 ### Implementation of tests
 Carina framework uses TestNG for test organization. In general, test represents a manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:
 ```
-public class WebSampleTest extends AbstractTest {
+public class WebSampleTest implements IAbstractTest {
     @Test(description = "JIRA#AUTO-0009")
     @MethodOwner(owner = "qpsdemo")
     public void testCompareModels() {
@@ -167,7 +169,7 @@ It is good practice to implement all elements search logic of Page Object/UI Obj
 
 **Important:**
 
-* Test class should extend **com.qaprosoft.carina.core.foundation.AbstractTest**
+* Test class should implement **com.qaprosoft.carina.core.foundation.IAbstractTest**
 * Test method should start with **org.testng.annotations.Test** annotation
 * Use **getDriver()** method to get driver instance in the test
 * Locate tests in src/test/java source folder

@@ -55,8 +55,8 @@ All the project configuration properties are located in a **_config.properties**
 		<td>"es", "fr"</td>
 	</tr>
 	<tr>
-		<td>selenium_host</td>
-		<td>Selenium/Appium server host</td>
+		<td>selenium_url</td>
+		<td>Selenium/Appium server url</td>
 		<td>http://localhost:4444/wd/hub</td>
 	</tr>
 	<tr>

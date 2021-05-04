@@ -1,5 +1,7 @@
 [![Carina - API automation](https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png)](https://youtu.be/oJL5y8Ovta0)
 
+Note: Starting from 7.0.4 consider that instead of `extends AbstractTest` we have to `implements IAbstractTest` interface
+
 ### Introduction
 Rest API testing is a vital part of integration testing process, it may be used separately or together with web, mobile or DB testing. The general process may be described by the following steps:
 
@@ -93,25 +95,41 @@ PatchPostsMethod=PATCH:${base_url}/posts/1
 ```
 
 #### API test
-API test is a general TestNG test, a class should extend APITest, in our case, the test extends it over AbstractTest that encapsulates some test data and login method. The test is located in /carina-demo/src/test/java/com/qaprosoft/carina/demo.
+API test is a general TestNG test, a class should extend APITest, in our case, the test implements IAbstractTest that encapsulates some test data and login method. The test is located in /carina-demo/src/test/java/com/qaprosoft/carina/demo.
 ```
 package com.qaprosoft.carina.demo;
 
+import java.lang.invoke.MethodHandles;
+
+import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import org.skyscreamer.jsonassert.JSONCompareMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 import com.qaprosoft.apitools.validation.JsonCompareKeywords;
-import com.qaprosoft.carina.core.foundation.AbstractTest;
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
 import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
+import com.qaprosoft.carina.core.foundation.utils.tag.Priority;
+import com.qaprosoft.carina.core.foundation.utils.tag.TestPriority;
 import com.qaprosoft.carina.demo.api.DeleteUserMethod;
 import com.qaprosoft.carina.demo.api.GetUserMethods;
 import com.qaprosoft.carina.demo.api.PostUserMethod;
 
-public class APISampleTest extends AbstractTest {
+/**
+ * This sample shows how create REST API tests.
+ *
+ * @author qpsdemo
+ */
+public class APISampleTest implements IAbstractTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    
+
     @Test(description = "JIRA#DEMO-0001")
     @MethodOwner(owner = "qpsdemo")
     public void testCreateUser() throws Exception {
+        LOGGER.info("test");
+        setCases("4555,54545");
         PostUserMethod api = new PostUserMethod();
         api.expectResponseStatus(HttpResponseStatusType.CREATED_201);
         api.callAPI();
@@ -136,8 +154,19 @@ public class APISampleTest extends AbstractTest {
         getUsersMethods.expectResponseStatus(HttpResponseStatusType.OK_200);
         getUsersMethods.callAPI();
         getUsersMethods.validateResponse(JSONCompareMode.STRICT, JsonCompareKeywords.ARRAY_CONTAINS.getKey());
-        getUsersMethods.validateResponseAgainstJSONSchema("api/users/_get/rs.schema");
+        getUsersMethods.validateResponseAgainstSchema("api/users/_get/rs.schema");
     }
+
+    @Test(description = "JIRA#DEMO-0004")
+    @MethodOwner(owner = "qpsdemo")
+    @TestPriority(Priority.P1)
+    public void testDeleteUsers() {
+        DeleteUserMethod deleteUserMethod = new DeleteUserMethod();
+        deleteUserMethod.expectResponseStatus(HttpResponseStatusType.OK_200);
+        deleteUserMethod.callAPI();
+        deleteUserMethod.validateResponse();
+    }
+
 }
 ```
 
