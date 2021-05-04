@@ -9,7 +9,7 @@ To do Windows application automation, you need to:
 
 ```
 #path to your Appium/WinAppDriver server
-selenium_host=http://localhost:4723/wd/hub
+selenium_url=http://localhost:4723/wd/hub
 
 #Should be set to specify windows automation session
 capabilities.platformName=Windows

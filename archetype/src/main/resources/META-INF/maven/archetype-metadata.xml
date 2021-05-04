@@ -3,7 +3,7 @@
     xmlns="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
    <requiredProperties>
-        <requiredProperty key="selenium_host">
+        <requiredProperty key="selenium_url">
             <defaultValue>http://localhost:4444/wd/hub</defaultValue>
         </requiredProperty>
         <requiredProperty key="name">

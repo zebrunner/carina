@@ -97,7 +97,7 @@ Actual list of Appium capabilities can be found [here](https://appium.io/docs/en
 
 ### Example for Android of _config.properties:
 ```
-selenium_host=http://localhost:4723/wd/hub
+selenium_url=http://localhost:4723/wd/hub
 #============ Android Local Mobile ===================#
 capabilities.platformName=ANDROID
 capabilities.deviceName=Nexus_6
@@ -109,7 +109,7 @@ capabilities.autoGrantPermissions=true
 
 ### Example for iOS of _config.properties:
 ```
-selenium_host=http://localhost:4723/wd/hub
+selenium_url=http://localhost:4723/wd/hub
 #======== Local Run for iOS Mobile ===============#
 capabilities.platformName=iOS
 capabilities.deviceName=iPhone X
