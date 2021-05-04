@@ -16,16 +16,17 @@
 package com.qaprosoft.carina.core.foundation.api;
 
 import static com.qaprosoft.carina.core.foundation.api.http.Headers.JSON_CONTENT_TYPE;
+import static com.qaprosoft.carina.core.foundation.api.http.Headers.XML_CONTENT_TYPE;
 import static io.restassured.RestAssured.given;
 
 import java.io.PrintStream;
 import java.lang.invoke.MethodHandles;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -40,10 +41,14 @@ import org.hamcrest.xml.HasXPath;
 
 import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
 import com.qaprosoft.carina.core.foundation.api.annotation.Endpoint;
+import com.qaprosoft.carina.core.foundation.api.annotation.HideRequestBodyPartsInLogs;
+import com.qaprosoft.carina.core.foundation.api.annotation.HideRequestHeadersInLogs;
+import com.qaprosoft.carina.core.foundation.api.annotation.HideResponseBodyPartsInLogs;
 import com.qaprosoft.carina.core.foundation.api.http.HttpClient;
 import com.qaprosoft.carina.core.foundation.api.http.HttpMethodType;
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
-import com.qaprosoft.carina.core.foundation.api.log.CarinaResponseLoggingFilter;
+import com.qaprosoft.carina.core.foundation.api.log.CarinaRequestBodyLoggingFilter;
+import com.qaprosoft.carina.core.foundation.api.log.CarinaResponseBodyLoggingFilter;
 import com.qaprosoft.carina.core.foundation.api.log.LoggingOutputStream;
 import com.qaprosoft.carina.core.foundation.api.ssl.NullHostnameVerifier;
 import com.qaprosoft.carina.core.foundation.api.ssl.NullX509TrustManager;
@@ -209,19 +214,55 @@ public abstract class AbstractApiMethod extends HttpClient {
             ps = new PrintStream(new LoggingOutputStream(LOGGER, Level.INFO));
         }
 
-        Set<String> blacklistedHeaders = new HashSet<>();
-        blacklistedHeaders.add("Content-Type");
-        RequestLoggingFilter headersFilterRq = new RequestLoggingFilter(LogDetail.HEADERS, true, ps, true, blacklistedHeaders);
+        ContentType contentTypeA = this.getClass().getAnnotation(ContentType.class);
+        io.restassured.http.ContentType contentTypeEnum;
+        if (contentTypeA == null || contentTypeA.type().equals(JSON_CONTENT_TYPE.getHeaderValue())) {
+            contentTypeEnum = io.restassured.http.ContentType.JSON;
+        } else if (contentTypeA.type().equals(XML_CONTENT_TYPE.getHeaderValue())) {
+            contentTypeEnum = io.restassured.http.ContentType.XML;
+        } else {
+            throw new RuntimeException("Unsupported argument of content type");
+        }
 
-        ResponseLoggingFilter responseLoggingFilter = new CarinaResponseLoggingFilter(LogDetail.ALL, true, ps, Matchers.any(Integer.class),
-                Collections.EMPTY_SET);
+        if (logRequest) {
+            HideRequestHeadersInLogs hideHeaders = this.getClass().getAnnotation(HideRequestHeadersInLogs.class);
+            RequestLoggingFilter fHeaders = new RequestLoggingFilter(LogDetail.HEADERS, true, ps, true,
+                    hideHeaders == null ? Collections.emptySet() : new HashSet<String>(Arrays.asList(hideHeaders.headers())));
 
-        if (logRequest)
-            request.filters(new RequestLoggingFilter(ps), headersFilterRq);
+            RequestLoggingFilter fCookies = new RequestLoggingFilter(LogDetail.COOKIES, ps);
+            RequestLoggingFilter fParams = new RequestLoggingFilter(LogDetail.PARAMS, ps);
+            RequestLoggingFilter fMethod = new RequestLoggingFilter(LogDetail.METHOD, ps);
+            RequestLoggingFilter fUri = new RequestLoggingFilter(LogDetail.URI, ps);
 
-        if (logResponse)
-            // request.filters(new ResponseLoggingFilter(ps));
-            request.filters(responseLoggingFilter);
+            RequestLoggingFilter fBody;
+            HideRequestBodyPartsInLogs hideRqBody = this.getClass().getAnnotation(HideRequestBodyPartsInLogs.class);
+
+            if (hideRqBody != null) {
+                fBody = new CarinaRequestBodyLoggingFilter(true, ps, new HashSet<String>(Arrays.asList(hideRqBody.paths())), contentTypeEnum);
+            } else {
+                fBody = new RequestLoggingFilter(LogDetail.BODY, ps);
+            }
+
+            request.filters(fMethod, fUri, fParams, fCookies, fHeaders, fBody);
+        }
+
+        if (logResponse) {
+            ResponseLoggingFilter fStatus = new ResponseLoggingFilter(LogDetail.STATUS, ps);
+            ResponseLoggingFilter fHeaders = new ResponseLoggingFilter(LogDetail.HEADERS, ps);
+            ResponseLoggingFilter fCookies = new ResponseLoggingFilter(LogDetail.COOKIES, ps);
+
+            ResponseLoggingFilter fBody;
+            HideResponseBodyPartsInLogs a = this.getClass().getAnnotation(HideResponseBodyPartsInLogs.class);
+            if (a != null) {
+                fBody = new CarinaResponseBodyLoggingFilter(true, ps, Matchers.any(Integer.class), new HashSet<String>(Arrays.asList(a.paths())),
+                        contentTypeEnum);
+            } else {
+                fBody = new ResponseLoggingFilter(LogDetail.BODY, ps);
+            }
+
+            request.filters(fBody, fCookies, fHeaders, fStatus);
+        }
+
         try {
             rs = HttpClient.send(request, methodPath, methodType);
         } finally {

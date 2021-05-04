@@ -9,35 +9,30 @@ import org.hamcrest.Matcher;
 
 import io.restassured.builder.ResponseBuilder;
 import io.restassured.filter.FilterContext;
-import io.restassured.filter.log.LogDetail;
 import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.http.ContentType;
 import io.restassured.internal.RestAssuredResponseImpl;
 import io.restassured.response.Response;
 import io.restassured.specification.FilterableRequestSpecification;
 import io.restassured.specification.FilterableResponseSpecification;
 
-public class CarinaResponseLoggingFilter extends ResponseLoggingFilter {
+public class CarinaResponseBodyLoggingFilter extends ResponseLoggingFilter {
 
     private final PrintStream stream;
     private final Matcher<?> matcher;
-    private final LogDetail logDetail;
     private final boolean shouldPrettyPrint;
-    private final Set<String> blacklistedHeaders;
+    private final Set<String> hiddenPaths;
+    private final ContentType contentType;
 
-    public CarinaResponseLoggingFilter(LogDetail logDetail, boolean prettyPrint, PrintStream stream, Matcher<? super Integer> matcher,
-            Set<String> blacklistedHeaders) {
-        Validate.notNull(logDetail, "Log details cannot be null");
+    public CarinaResponseBodyLoggingFilter(boolean prettyPrint, PrintStream stream, Matcher<? super Integer> matcher, Set<String> hiddenPaths,
+            ContentType contentType) {
         Validate.notNull(stream, "Print stream cannot be null");
         Validate.notNull(matcher, "Matcher cannot be null");
-        Validate.notNull(blacklistedHeaders, "Blacklisted headers cannot be null");
-        if (logDetail == LogDetail.PARAMS || logDetail == LogDetail.URI || logDetail == LogDetail.METHOD) {
-            throw new IllegalArgumentException(String.format("%s is not a valid %s for a response.", logDetail, LogDetail.class.getSimpleName()));
-        }
         this.shouldPrettyPrint = prettyPrint;
-        this.logDetail = logDetail;
         this.stream = stream;
         this.matcher = matcher;
-        this.blacklistedHeaders = new HashSet<>(blacklistedHeaders);
+        this.hiddenPaths = new HashSet<>(hiddenPaths);
+        this.contentType = contentType;
     }
 
     @Override
@@ -45,13 +40,9 @@ public class CarinaResponseLoggingFilter extends ResponseLoggingFilter {
         Response response = ctx.next(requestSpec, responseSpec);
         final int statusCode = response.statusCode();
         if (matcher.matches(statusCode)) {
-            CarinaResponsePrinter.print(response, response, stream, logDetail, shouldPrettyPrint, blacklistedHeaders);
+            CarinaBodyPrinter.printResponseBody(response, stream, shouldPrettyPrint, hiddenPaths, contentType);
             final byte[] responseBody;
-            if (logDetail == LogDetail.BODY || logDetail == LogDetail.ALL) {
-                responseBody = response.asByteArray();
-            } else {
-                responseBody = null;
-            }
+            responseBody = response.asByteArray();
             response = cloneResponseIfNeeded(response, responseBody);
         }
 
