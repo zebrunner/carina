@@ -4,6 +4,7 @@ import com.azure.storage.blob.models.BlobProperties;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.FileManager;
 import org.apache.commons.codec.binary.Base64;
+import org.junit.rules.ExpectedException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -18,108 +19,69 @@ public class AzureClientTest {
         Assert.assertNotNull(AzureManager.getInstance(), "Singleton for AzureManager is null!");
     }
 
-    @Test()
+    @Test(expectedExceptions = RuntimeException.class)
     public void testPutKeyNull() {
-        try {
-            AzureManager.getInstance().put("", null, null);
-            Assert.fail("Key verification doesn't work!");
-        } catch (RuntimeException e) {
-            // Expected failure
-        }
+        AzureManager.getInstance().put("", null, null);
+        Assert.fail("Key verification doesn't work!");
     }
 
-    @Test()
+    @Test(expectedExceptions = RuntimeException.class)
     public void testPutKeyEmpty() {
-        try {
-            AzureManager.getInstance().put("", "", null);
-            Assert.fail("Key verification doesn't work!");
-        } catch (RuntimeException e) {
-            // Expected failure
-        }
+        AzureManager.getInstance().put("", "", null);
+        Assert.fail("Key verification doesn't work!");
     }
 
-    @Test()
+    @Test(expectedExceptions = RuntimeException.class)
     public void testPutFilePathNull() {
-        try {
-            AzureManager.getInstance().put("", "test", null);
-            Assert.fail("FilePath verification doesn't work!");
-        } catch (RuntimeException e) {
-            // Expected failure
-        }
+        AzureManager.getInstance().put("", "test", null);
+        Assert.fail("FilePath verification doesn't work!");
     }
 
-    @Test()
+    @Test(expectedExceptions = RuntimeException.class)
     public void testPutFilePathEmpty() {
-        try {
-            AzureManager.getInstance().put("", "test", "");
-            Assert.fail("FilePath verification doesn't work!");
-        } catch (RuntimeException e) {
-            // Expected failure
-        }
+        AzureManager.getInstance().put("", "test", "");
+        Assert.fail("FilePath verification doesn't work!");
     }
 
-    @Test()
+    @Test(expectedExceptions = RuntimeException.class)
     public void testPutFilePathNotExist() {
-        try {
-            AzureManager.getInstance().put("", "test", "test");
-            Assert.fail("File existence verification doesn't work!");
-        } catch (RuntimeException e) {
-            // Expected failure
-        }
+        AzureManager.getInstance().put("", "test", "test");
+        Assert.fail("File existence verification doesn't work!");
     }
 
-    @Test()
+    @Test(expectedExceptions = RuntimeException.class)
     public void testGetKeyNull() {
-        try {
-            String localPath = Configuration.get(Configuration.Parameter.AZURE_LOCAL_STORAGE);
-            AzureManager.getInstance().download( "resources", "apk-StableDev.apk", new File(localPath + "/apk-StableDev.apk"));
-            Assert.fail("Key verification doesn't work!");
-        } catch (RuntimeException e) {
-            // Expected failure
-        }
+        String localPath = Configuration.get(Configuration.Parameter.AZURE_LOCAL_STORAGE);
+        AzureManager.getInstance().download("resources", "apk-StableDev.apk", new File(localPath + "/apk-StableDev.apk"));
+        Assert.fail("Key verification doesn't work!");
     }
 
-    @Test()
+    @Test(expectedExceptions = RuntimeException.class)
     public void testDeleteKeyNull() {
-        try {
-            AzureManager.getInstance().delete("", null);
-            Assert.fail("Key verification doesn't work!");
-        } catch (RuntimeException e) {
-            // Expected failure
-        }
+        AzureManager.getInstance().delete("", null);
+        Assert.fail("Key verification doesn't work!");
     }
 
-    @Test()
+    @Test(expectedExceptions = RuntimeException.class)
     public void testDeleteKeyEmpty() {
-        try {
-            AzureManager.getInstance().delete("", "");
-            Assert.fail("Key verification doesn't work!");
-        } catch (RuntimeException e) {
-            // Expected failure
-        }
+        AzureManager.getInstance().delete("", "");
+        Assert.fail("Key verification doesn't work!");
     }
 
-    @Test()
-    public void testGetPropsNull() {
-        try {
-            String localPath = Configuration.get(Configuration.Parameter.AZURE_LOCAL_STORAGE);
-            BlobProperties value = AzureManager.getInstance().get("resources", "apk-StableDev.apk");
+    @Test(expectedExceptions = {RuntimeException.class, IOException.class, NoSuchAlgorithmException.class})
+    public void testGetPropsNull() throws IOException, NoSuchAlgorithmException {
+        String localPath = Configuration.get(Configuration.Parameter.AZURE_LOCAL_STORAGE);
+        BlobProperties value = AzureManager.getInstance().get("resources", "apk-StableDev.apk");
 
-            String remoteFileMD5 = Base64.encodeBase64String(value.getContentMd5());
+        String remoteFileMD5 = Base64.encodeBase64String(value.getContentMd5());
 
-            File file = new File("./apk-StableDev.apk");
-            String localFileMD5 = FileManager.getFileChecksum(FileManager.Checksum.MD5, file);
+        File file = new File("./apk-StableDev.apk");
+        String localFileMD5 = FileManager.getFileChecksum(FileManager.Checksum.MD5, file);
 
-            System.out.println(remoteFileMD5);
-            System.out.println(localFileMD5);
-            System.out.println(remoteFileMD5.equals(localFileMD5));
+        System.out.println(remoteFileMD5);
+        System.out.println(localFileMD5);
+        System.out.println(remoteFileMD5.equals(localFileMD5));
 
-            Assert.fail("Key verification doesn't work!");
-        } catch (RuntimeException e) {
-            // Expected failure
-        } catch (IOException | NoSuchAlgorithmException e) {
-            // Expected failure
-            // e.printStackTrace();
-        }
+        Assert.fail("Key verification doesn't work!");
     }
 }
