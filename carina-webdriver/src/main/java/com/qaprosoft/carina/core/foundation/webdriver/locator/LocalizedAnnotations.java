@@ -54,7 +54,7 @@ public class LocalizedAnnotations extends Annotations {
             int start = param.indexOf(SpecialKeywords.L10N + ":") + 5;
             int end = param.indexOf("}");
             String key = param.substring(start, end);
-			param = StringUtils.replace(param, matcher.group(), L10N.getText(key));
+            param = StringUtils.replace(param, matcher.group(), L10N.getText(key));
         }
 
         if (getField().isAnnotationPresent(Predicate.class)) {

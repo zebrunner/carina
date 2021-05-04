@@ -66,9 +66,11 @@ import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.IWebElement;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
+import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
@@ -78,14 +80,12 @@ import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 
-public class ExtendedWebElement {
+public class ExtendedWebElement implements IWebElement {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
     private static final long RETRY_TIME = Configuration.getLong(Parameter.RETRY_INTERVAL);
-
-    
     
     // we should keep both properties: driver and searchContext obligatory
     // driver is used for actions, javascripts execution etc
@@ -103,8 +103,10 @@ public class ExtendedWebElement {
     private By by;
     
     private boolean caseInsensitive;
-    
+
     private ElementLoadingStrategy loadingStrategy = ElementLoadingStrategy.valueOf(Configuration.get(Parameter.ELEMENT_LOADING_STRATEGY));
+
+    private boolean isLocalized = false;
 
     public ExtendedWebElement(WebElement element, String name, By by) {
         this(element, name);
@@ -115,14 +117,12 @@ public class ExtendedWebElement {
     	this.by = by;
     	this.name = name;
     	this.element = null;
-    	
     }
     
     public ExtendedWebElement(By by, String name, WebDriver driver) {
     	this.by = by;
     	this.name = name;
     	this.driver = driver;
-    	
     }
     
     public ExtendedWebElement(WebElement element, String name) {
@@ -166,6 +166,7 @@ public class ExtendedWebElement {
 				locatorField.setAccessible(true);
 
 				ExtendedElementLocator locator = (ExtendedElementLocator) locatorField.get(innerProxy);
+				this.isLocalized = locator.isLocalized();
 
 				searchContextField = locator.getClass().getDeclaredField("searchContext");
 				searchContextField.setAccessible(true);
@@ -190,6 +191,7 @@ public class ExtendedWebElement {
 					locatorField.setAccessible(true);
 
 					locator = (ExtendedElementLocator) locatorField.get(innerProxy);
+					this.isLocalized = locator.isLocalized();
 
 					searchContextField = locator.getClass().getDeclaredField("searchContext");
 					searchContextField.setAccessible(true);
@@ -1186,6 +1188,7 @@ public class ExtendedWebElement {
         return new ExtendedWebElement(by, name, getDriver());
     }
 
+
     /**
      * Pause for specified timeout.
      * 
@@ -1357,6 +1360,11 @@ public class ExtendedWebElement {
 				LOGGER.error(Messager.ELEMENT_CONDITION_NOT_VERIFIED.getMessage(actionName.getKey(), getNameWithLocator()));
 			}
 		}
+		
+        if (isLocalized) {
+            isLocalized = false; // single verification is enough for this particular element
+            L10N.verify(this);
+        }
 
 		Object output = null;
 		// captureElements();

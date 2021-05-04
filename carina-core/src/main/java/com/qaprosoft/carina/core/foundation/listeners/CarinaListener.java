@@ -40,16 +40,16 @@ import org.apache.log4j.PropertyConfigurator;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.testng.Assert;
+import org.testng.IClassListener;
 import org.testng.ISuite;
 import org.testng.ISuiteListener;
+import org.testng.ITestClass;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.SkipException;
 import org.testng.TestListenerAdapter;
 import org.testng.TestNG;
-import org.testng.ITestClass;
-import org.testng.IClassListener;
 import org.testng.xml.XmlClass;
 import org.testng.xml.XmlInclude;
 import org.testng.xml.XmlSuite;
@@ -82,7 +82,6 @@ import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.ftp.FtpUtils;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
-import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
 import com.qaprosoft.carina.core.foundation.utils.tag.PriorityManager;
 import com.qaprosoft.carina.core.foundation.utils.tag.TagManager;
 import com.qaprosoft.carina.core.foundation.webdriver.CarinaDriver;
@@ -115,7 +114,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     protected static final String XML_SUITE_NAME = " (%s)";
     
     protected static boolean automaticDriversCleanup = true;
-    
+
     static {
         try {
             // Add shutdown hook
@@ -138,15 +137,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             // Configuration.validateConfiguration();
 
             try {
-                L10N.init();
+                L10N.load();
             } catch (Exception e) {
                 LOGGER.error("L10N bundle is not initialized successfully!", e);
-            }
-
-            try {
-                L10Nparser.init();
-            } catch (Exception e) {
-                LOGGER.error("L10N parser bundle is not initialized successfully!", e);
             }
 
             // declare global capabilities in configuration if custom_capabilities is declared 

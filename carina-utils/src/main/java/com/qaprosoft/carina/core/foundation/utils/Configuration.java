@@ -193,13 +193,10 @@ public class Configuration {
         APPCENTER_LOCAL_STORAGE("appcenter_local_storage"),
 
         // For localization parser
-        ADD_NEW_LOCALIZATION("add_new_localization"),
 
-        ADD_NEW_LOCALIZATION_ENCODING("add_new_localization_encoding"),
+        LOCALIZATION_ENCODING("localization_encoding"),
 
-        ADD_NEW_LOCALIZATION_PATH("add_new_localization_path"),
-
-        ADD_NEW_LOCALIZATION_PROPERTY_NAME("add_new_localization_property_name"),
+        LOCALIZATION_TESTING("localization_testing"),
 
         // TLS
         TLS_KEYSECURE_LOCATION("tls_keysecure_location"),
