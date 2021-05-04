@@ -360,7 +360,7 @@ public class ReportContext {
      * @return String
      */
     private static String getUrl(WebDriver driver, String name) {
-        String seleniumHost = Configuration.get(Parameter.SELENIUM_HOST).replace("wd/hub", "download/");
+        String seleniumHost = Configuration.getSeleniumUrl().replace("wd/hub", "download/");
         WebDriver drv = (driver instanceof EventFiringWebDriver) ? ((EventFiringWebDriver) driver).getWrappedDriver() : driver;
         String sessionId = ((RemoteWebDriver) drv).getSessionId().toString();
         String url = seleniumHost + sessionId + "/" + name;

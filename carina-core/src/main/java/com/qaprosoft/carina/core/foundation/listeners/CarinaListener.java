@@ -15,53 +15,12 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.listeners;
 
-import java.io.File;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Category;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
-import org.testng.Assert;
-import org.testng.ISuite;
-import org.testng.ISuiteListener;
-import org.testng.ITestContext;
-import org.testng.ITestNGMethod;
-import org.testng.ITestResult;
-import org.testng.SkipException;
-import org.testng.TestListenerAdapter;
-import org.testng.TestNG;
-import org.testng.ITestClass;
-import org.testng.IClassListener;
-import org.testng.xml.XmlClass;
-import org.testng.xml.XmlInclude;
-import org.testng.xml.XmlSuite;
-import org.testng.xml.XmlTest;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.azure.storage.blob.models.BlobProperties;
 import com.qaprosoft.amazon.AmazonS3Manager;
 import com.qaprosoft.appcenter.AppCenterManager;
+import com.qaprosoft.azure.AzureManager;
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
@@ -72,17 +31,12 @@ import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollecto
 import com.qaprosoft.carina.core.foundation.report.qtest.IQTestManager;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestRailManager;
 import com.qaprosoft.carina.core.foundation.skip.ExpectedSkipManager;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.*;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.DateUtils;
-import com.qaprosoft.carina.core.foundation.utils.Messager;
-import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.ZebrunnerNameResolver;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.ftp.FtpUtils;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
-import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
 import com.qaprosoft.carina.core.foundation.utils.tag.PriorityManager;
 import com.qaprosoft.carina.core.foundation.utils.tag.TagManager;
 import com.qaprosoft.carina.core.foundation.webdriver.CarinaDriver;
@@ -100,6 +54,33 @@ import com.zebrunner.agent.core.registrar.Label;
 import com.zebrunner.agent.core.registrar.label.CompositeLabelResolver;
 import com.zebrunner.agent.core.registrar.maintainer.ChainedMaintainerResolver;
 import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Category;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.testng.*;
+import org.testng.xml.XmlClass;
+import org.testng.xml.XmlInclude;
+import org.testng.xml.XmlSuite;
+import org.testng.xml.XmlTest;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.File;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /*
  * CarinaListener - base carin-core TestNG Listener.
@@ -115,7 +96,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     protected static final String XML_SUITE_NAME = " (%s)";
     
     protected static boolean automaticDriversCleanup = true;
-    
+
     static {
         try {
             // Add shutdown hook
@@ -138,15 +119,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             // Configuration.validateConfiguration();
 
             try {
-                L10N.init();
+                L10N.load();
             } catch (Exception e) {
                 LOGGER.error("L10N bundle is not initialized successfully!", e);
-            }
-
-            try {
-                L10Nparser.init();
-            } catch (Exception e) {
-                LOGGER.error("L10N parser bundle is not initialized successfully!", e);
             }
 
             // declare global capabilities in configuration if custom_capabilities is declared 
@@ -559,6 +534,14 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         return getS3Artifact(Configuration.get(Parameter.S3_BUCKET_NAME), key);
     }
 
+    protected void putAzureArtifact(String remotePath, String localPath) {
+        AzureManager.getInstance().put(Configuration.get(Parameter.AZURE_CONTAINER_NAME), remotePath, localPath);
+    }
+
+    protected void getAzureArtifact(String bucket, String remotePath, File localPath) {
+        AzureManager.getInstance().download(bucket, remotePath, localPath);
+    }
+
     private static void updateAppPath() {
         try {
             if (!Configuration.get(Parameter.ACCESS_KEY_ID).isEmpty()) {
@@ -566,6 +549,14 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             }
         } catch (Exception e) {
             LOGGER.error("AWS S3 manager exception detected!", e);
+        }
+
+        try {
+            if (!Configuration.get(Parameter.AZURE_ACCESS_KEY_TOKEN).isEmpty()) {
+                updateAzureAppPath();
+            }
+        } catch (Exception e) {
+            LOGGER.error("Azure manager exception detected!", e);
         }
 
         try {
@@ -684,6 +675,63 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 }
             }
 
+        }
+    }
+
+    /**
+     * Method to update MOBILE_APP path in case if apk is located in Azure storage.
+     */
+    private static void updateAzureAppPath() {
+        Pattern AZURE_CONTAINER_PATTERN = Pattern.compile("\\/\\/([a-z0-9]{3,24})\\.blob.core.windows.net\\/(?:(\\$root|(?:[a-z0-9](?!.*--)[a-z0-9-]{1,61}[a-z0-9]))\\/)?(.{1,1024})");
+
+        String mobileAppPath = Configuration.getMobileApp();
+        Matcher matcher = AZURE_CONTAINER_PATTERN.matcher(mobileAppPath);
+
+        LOGGER.info("Analyzing if mobile app is located on Azure...");
+
+        if (matcher.find()) {
+            LOGGER.info("app artifact is located on Azure...");
+            String accountName = matcher.group(1);
+            String containerName = matcher.group(2) == null ? "$root" : matcher.group(2);
+            String remoteFilePath = matcher.group(3);
+
+            LOGGER.info(
+                    "Account: " + accountName + "\n" +
+                    "Container: " + containerName + "\n" +
+                    "RemotePath: " + remoteFilePath + "\n"
+            );
+
+            R.CONFIG.put(Parameter.AZURE_ACCOUNT_NAME.getKey(), accountName);
+
+            BlobProperties blobProperties = AzureManager.getInstance().get(containerName, remoteFilePath);
+            String azureLocalStorage = Configuration.get(Parameter.AZURE_LOCAL_STORAGE);
+            String localFilePath = azureLocalStorage + "/" + StringUtils.substringAfterLast(remoteFilePath, "/");
+
+            File file = new File(localFilePath);
+
+            try {
+                // verify requested artifact by checking the checksum
+                if (file.exists() && FileManager.getFileChecksum(FileManager.Checksum.MD5, file).equals(Base64.encodeBase64String(blobProperties.getContentMd5()))) {
+                    LOGGER.info("build artifact with the same checksum already downloaded: " + file.getAbsolutePath());
+                } else {
+                    LOGGER.info(
+                            String.format("Following data was extracted: container: %s, remotePath: %s, local file: %s",
+                            containerName, remoteFilePath, file.getAbsolutePath())
+                    );
+                    AzureManager.getInstance().download(containerName, remoteFilePath, file);
+                }
+
+            } catch (Exception exception) {
+                LOGGER.error("Azure app path update exception detected!", exception);
+            }
+
+            Configuration.setMobileApp(file.getAbsolutePath());
+
+            // try to redefine app_version if it's value is latest or empty
+            String appVersion = Configuration.get(Parameter.APP_VERSION);
+            if (appVersion.equals("latest") || appVersion.isEmpty()) {
+                Configuration.setBuild(file.getName());
+            }
         }
     }
 
