@@ -47,7 +47,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.qaprosoft.appcenter.http.resttemplate.RestTemplateBuilder;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.R;
 
 /**
  * Created by boyle on 8/16/17.
@@ -55,7 +54,7 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 public class AppCenterManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     
-    protected RestTemplate restTemplate;
+    protected RestTemplate restTemplate = RestTemplateBuilder.newInstance().withDisabledSslChecking().withSpecificJsonMessageConverter().build();
 
     private String ownerName;
     private String versionLong;
@@ -76,10 +75,6 @@ public class AppCenterManager {
         return instance;
     }
 
-    private void disableRestTemplateSsl() {
-        restTemplate = RestTemplateBuilder.newInstance().withDisabledSslChecking().withSpecificJsonMessageConverter().build();
-    }
-    
     /**
     *
     * @param appName takes in the AppCenter Name to look for.
@@ -178,7 +173,6 @@ public class AppCenterManager {
      * @return
      */
     private Map<String, String> getAppId(String appName, String platformName) {
-        disableRestTemplateSsl();
         Map<String, String> appMap = new HashMap<>();
 
         RequestEntity<String> retrieveApps = buildRequestEntity(

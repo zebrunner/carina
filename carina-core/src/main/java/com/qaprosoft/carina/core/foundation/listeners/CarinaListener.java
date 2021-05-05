@@ -178,6 +178,11 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         setThreadCount(suite);
         onHealthCheck(suite);
         
+        String mobileApp = Configuration.getMobileApp();
+        if (!mobileApp.isEmpty()) {
+            // [VD] do not move into the static block as Zebrunner reporting need registered test run!
+            Artifact.attachReferenceToTestRun("app", mobileApp);
+        }
         // register app_version/build as artifact if available...
         Configuration.setBuild(Configuration.get(Parameter.APP_VERSION));
         
@@ -537,28 +542,30 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     private static void updateAppPath() {
         try {
-            if (!Configuration.get(Parameter.ACCESS_KEY_ID).isEmpty()) {
-                updateS3AppPath();
-            }
-        } catch (Exception e) {
-            LOGGER.error("AWS S3 manager exception detected!", e);
-        }
-
-        try {
             if (!Configuration.get(Parameter.AZURE_ACCESS_KEY_TOKEN).isEmpty()) {
                 updateAzureAppPath();
             }
         } catch (Exception e) {
             LOGGER.error("Azure manager exception detected!", e);
         }
-
+        
         try {
             if (!Configuration.get(Parameter.APPCENTER_TOKEN).isEmpty()) {
                 updateAppCenterAppPath();
             }
         } catch (Exception e) {
             LOGGER.error("AppCenter manager exception detected!", e);
-        }
+        }        
+
+        // AWS S3 is preferable and has higher priority
+        try {
+            if (!Configuration.get(Parameter.ACCESS_KEY_ID).isEmpty()) {
+                updateS3AppPath();
+            }
+        } catch (Exception e) {
+            LOGGER.error("AWS S3 manager exception detected!", e);
+        }        
+
     }
 
     /**
@@ -583,12 +590,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             String presignedAppUrl = AppCenterManager.getInstance().getDownloadUrl(appName, platformName, buildType,
                     version);
 
-            LOGGER.debug("app url: " + presignedAppUrl);
-            Artifact.attachReferenceToTestRun("app", presignedAppUrl);
-
             Configuration.setMobileApp(presignedAppUrl);
 
-            LOGGER.info("Updated mobile app: " + Configuration.getMobileApp());
         }
     }
 
@@ -627,10 +630,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             // generate presign url explicitly to register link as run artifact
             long hours = 72L*1000*60*60; // generate presigned url for nearest 3 days
             String presignedAppUrl = AmazonS3Manager.getInstance().generatePreSignUrl(bucketName, key, hours).toString();
-
-            LOGGER.debug("app url: " + presignedAppUrl);
-            Artifact.attachReferenceToTestRun("app", presignedAppUrl);
-
             Configuration.setMobileApp(presignedAppUrl);
         }
     }
