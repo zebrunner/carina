@@ -289,11 +289,6 @@ All the project configuration properties are located in a **_config.properties**
 		<td>true, false</td>
 	</tr>
 		<tr>
-		<td>add_new_localization_path</td>
-		<td>Path where created localization properties should be saved. If null, they will be added to an artifactory folder in the report</td>
-		<td>./src/main/resources/L10N</td>
-	</tr>
-		<tr>
 		<td>tls_keysecure_location</td>
 		<td>Path to a directory with tls secure keys</td>
 		<td>./tls/keysecure</td>
