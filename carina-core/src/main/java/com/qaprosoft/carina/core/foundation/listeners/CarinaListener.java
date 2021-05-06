@@ -97,7 +97,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     
     protected static boolean automaticDriversCleanup = true;
 
-    static {
+    public CarinaListener(){
         try {
             // Add shutdown hook
             Runtime.getRuntime().addShutdownHook(new ShutdownHook());
@@ -124,7 +124,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 LOGGER.error("L10N bundle is not initialized successfully!", e);
             }
 
-            // declare global capabilities in configuration if custom_capabilities is declared 
+            // declare global capabilities in configuration if custom_capabilities is declared
             String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
             if (!customCapabilities.isEmpty()) {
                 // redefine core CONFIG properties using global custom capabilities file
