@@ -397,3 +397,51 @@ ObjectMapper mapper = new ObjectMapper();
 Clients clients = mapper.readValue(rs, Clients.class);
 ```
 Then you can use POJO object for any kind of validation or for easy retrieving of the required properties.
+
+### Security
+Carina provides some security features that could be used to hide/protect sensitive data in your API calls.  
+
+#### Encryption of API method properties
+It's possible to use default carina crypto logic for automatic decription of sensitive data.  
+In order to encrypt the data you can use carina's [CryptoConsole](../advanced/security.md)  
+Then you can save your encrypted properties using default pattern: "{crypt:ENCRYPTED_TXT}"  
+During properties parsing process carina-api module will automatically decrypt the text and put decrypted value into request body.  
+
+#### Hiding of API request headers
+In order to hide the value of API request header you need to annotate your API method with @HideRequestHeadersInLogs annotation.
+Usage sample:
+```
+@HideRequestHeadersInLogs(headers = "Content-Type")
+public class YourAPIMethod extends AbstractApiMethodV2 {
+    public YourAPIMethod() {    
+    }
+}
+```  
+Then in your test logs for mentioned headers you'll get "[ BLACKLISTED ]" mask
+
+#### Hiding of API call body parts
+If you want not to show some sensitive data in body of your api calls in test logs then you'll need to annotate your API method with @HideRequestBodyPartsInLogs/@HideResponseBodyPartsInLogs annotations.  
+These annotations support both json and xml content type.  
+As the value of annotation you need to pass array of JSON or XML paths you want to hide.  
+Once done in test logs you'll get "\*\*\*\*\*\*\*\*" mask instead of actual values.  
+Example for json:  
+```
+@HideRequestBodyPartsInLogs(paths = { "$.[*].username", "$.[*].id" })
+@HideResponseBodyPartsInLogs(paths = { "$.[*].address.zipcode", "$.[*].address.geo.lat", "$.[*].id" })
+public class YourAPIMethod extends AbstractApiMethodV2 {
+    public YourAPIMethod() {
+    }
+}
+```  
+Example for xml:
+```
+@HideRequestBodyPartsInLogs(paths = { "//root/city/text()" })
+@HideResponseBodyPartsInLogs(paths = { "//root/state/text()" })
+@ContentType(type = "application/xml")
+public class XmlPostMethod extends AbstractApiMethodV2 {
+    public XmlPostMethod() {
+    }
+}
+```  
+Important: for XML content type it's obligatory to pass @ContentType annotation to your API method indicating actual header value.  
+If @ContentType is not specified then data will be automatically considered as JSON.  
