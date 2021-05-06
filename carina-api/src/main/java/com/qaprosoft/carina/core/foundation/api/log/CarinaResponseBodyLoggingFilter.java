@@ -7,10 +7,11 @@ import java.util.Set;
 import org.apache.commons.lang3.Validate;
 import org.hamcrest.Matcher;
 
+import com.qaprosoft.carina.core.foundation.api.http.ContentTypeEnum;
+
 import io.restassured.builder.ResponseBuilder;
 import io.restassured.filter.FilterContext;
 import io.restassured.filter.log.ResponseLoggingFilter;
-import io.restassured.http.ContentType;
 import io.restassured.internal.RestAssuredResponseImpl;
 import io.restassured.response.Response;
 import io.restassured.specification.FilterableRequestSpecification;
@@ -22,10 +23,10 @@ public class CarinaResponseBodyLoggingFilter extends ResponseLoggingFilter {
     private final Matcher<?> matcher;
     private final boolean shouldPrettyPrint;
     private final Set<String> hiddenPaths;
-    private final ContentType contentType;
+    private final ContentTypeEnum contentType;
 
     public CarinaResponseBodyLoggingFilter(boolean prettyPrint, PrintStream stream, Matcher<? super Integer> matcher, Set<String> hiddenPaths,
-            ContentType contentType) {
+            ContentTypeEnum contentType) {
         Validate.notNull(stream, "Print stream cannot be null");
         Validate.notNull(matcher, "Matcher cannot be null");
         this.shouldPrettyPrint = prettyPrint;

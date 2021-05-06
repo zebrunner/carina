@@ -1,23 +1,36 @@
 package com.qaprosoft.carina.core.foundation.api.log;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
 import java.io.PrintStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.Set;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
+import com.qaprosoft.carina.core.foundation.api.http.ContentTypeEnum;
 
-import io.restassured.http.ContentType;
+import groovy.xml.XmlParser;
+import io.restassured.internal.path.json.JsonPrettifier;
+import io.restassured.internal.path.xml.XmlPrettifier;
 import io.restassured.response.ResponseBody;
 import io.restassured.specification.FilterableRequestSpecification;
 
@@ -39,7 +52,7 @@ public class CarinaBodyPrinter {
      * @return A string of representing the response
      */
     public static String printResponseBody(ResponseBody<?> responseBody, PrintStream stream, boolean shouldPrettyPrint, Set<String> hiddenPaths,
-            ContentType contentType) {
+            ContentTypeEnum contentType) {
         final StringBuilder builder = new StringBuilder();
         String responseBodyToAppend = new String(responseBody.asString());
 
@@ -48,14 +61,11 @@ public class CarinaBodyPrinter {
 
         // pretty print
         if (shouldPrettyPrint) {
-            builder.append(prettyPrint(responseBodyToAppend));
+            builder.append(prettify(responseBodyToAppend, contentType));
         } else {
             builder.append(responseBodyToAppend);
         }
 
-        if (!isBlank(responseBodyToAppend)) {
-            builder.append(SystemUtils.LINE_SEPARATOR).append(SystemUtils.LINE_SEPARATOR);
-        }
         String response = builder.toString();
         stream.println(response);
         return response;
@@ -65,7 +75,7 @@ public class CarinaBodyPrinter {
      * Prints the request to the print stream
      */
     public static void printRequestBody(FilterableRequestSpecification requestSpec, PrintStream stream, boolean shouldPrettyPrint,
-            Set<String> hiddenPaths, ContentType contentType) {
+            Set<String> hiddenPaths, ContentTypeEnum contentType) {
         final StringBuilder builder = new StringBuilder();
         builder.append("Body:");
         if (requestSpec.getBody() != null) {
@@ -76,7 +86,7 @@ public class CarinaBodyPrinter {
 
             // pretty print
             if (shouldPrettyPrint) {
-                body = prettyPrint(body);
+                body = prettify(body, contentType);
             }
             builder.append(SystemUtils.LINE_SEPARATOR).append(body);
         } else {
@@ -86,28 +96,69 @@ public class CarinaBodyPrinter {
         stream.println(response);
     }
 
-    private static String replaceValues(String body, Set<String> hiddenPaths, ContentType contentType) {
+    private static String replaceValues(String body, Set<String> hiddenPaths, ContentTypeEnum contentType) {
         if(!hiddenPaths.isEmpty()) {
-            if (ContentType.JSON.equals(contentType)) {
+            switch (contentType) {
+            case JSON:
                 for (String p : hiddenPaths) {
                     body = JsonPath.using(JSON_PARSE_CFG).parse(body).set(p, HIDDEN_PATTERN).jsonString();
                 }
-            } else {
-                LOGGER.warn(String.format("Only content type '%s' is supported for body parts hiding in logs", ContentType.JSON.toString()));
+                break;
+            case XML:
+                for (String p : hiddenPaths) {
+                    try {
+                        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+                        DocumentBuilder builder;
+                        builder = builderFactory.newDocumentBuilder();
+
+                        InputSource is = new InputSource(new StringReader(body));
+                        Document xmlDocument = builder.parse(is);
+                        XPath xpath = XPathFactory.newInstance().newXPath();
+                        NodeList myNodeList = (NodeList) xpath.compile(p).evaluate(xmlDocument, XPathConstants.NODESET);
+                        for (int i = 0; i < myNodeList.getLength(); i++) {
+                            myNodeList.item(i).setNodeValue(HIDDEN_PATTERN);
+                        }
+
+                        TransformerFactory tf = TransformerFactory.newInstance();
+                        Transformer transformer = tf.newTransformer();
+                        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+                        StringWriter writer = new StringWriter();
+                        transformer.transform(new DOMSource(xmlDocument), new StreamResult(writer));
+                        body = writer.getBuffer().toString().replaceAll("\n|\r", "");
+                    } catch (Exception e) {
+                        LOGGER.warn("Exception during parsing XML", e);
+                    }
+                }
+                break;
+            default:
+                LOGGER.warn(String.format("Content type '%s' is not supported for body parts hiding in logs", contentType));
             }
         }
         
         return body;
     }
 
-    private static String prettyPrint(String json) {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        JsonParser jp = new JsonParser();
-        JsonElement je = jp.parse(json);
-        String prettyJsonString = gson.toJson(je);
-        return prettyJsonString;
+    private static String prettify(String body, ContentTypeEnum contentType) {
+        String prettifiedBody;
+        try {
+            switch (contentType) {
+            case JSON:
+                prettifiedBody = JsonPrettifier.prettifyJson(body);
+                break;
+            case XML:
+                prettifiedBody = XmlPrettifier.prettify(new XmlParser(false, false), body);
+                break;
+            default:
+                prettifiedBody = body;
+                break;
+            }
+        } catch (Exception e) {
+            // Parsing failed, probably because the content was not of expected type.
+            prettifiedBody = body;
+        }
+        return prettifiedBody;
     }
-    
+
     private static StringBuilder appendTab(StringBuilder builder) {
         return builder.append(TAB);
     }

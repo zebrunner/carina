@@ -15,8 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.api;
 
-import static com.qaprosoft.carina.core.foundation.api.http.Headers.JSON_CONTENT_TYPE;
-import static com.qaprosoft.carina.core.foundation.api.http.Headers.XML_CONTENT_TYPE;
 import static io.restassured.RestAssured.given;
 
 import java.io.PrintStream;
@@ -31,6 +29,7 @@ import java.util.Map;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.log4j.Level;
@@ -44,6 +43,7 @@ import com.qaprosoft.carina.core.foundation.api.annotation.Endpoint;
 import com.qaprosoft.carina.core.foundation.api.annotation.HideRequestBodyPartsInLogs;
 import com.qaprosoft.carina.core.foundation.api.annotation.HideRequestHeadersInLogs;
 import com.qaprosoft.carina.core.foundation.api.annotation.HideResponseBodyPartsInLogs;
+import com.qaprosoft.carina.core.foundation.api.http.ContentTypeEnum;
 import com.qaprosoft.carina.core.foundation.api.http.HttpClient;
 import com.qaprosoft.carina.core.foundation.api.http.HttpMethodType;
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
@@ -73,6 +73,7 @@ public abstract class AbstractApiMethod extends HttpClient {
     protected HttpMethodType methodType = null;
     protected Object response;
     public RequestSpecification request;
+    protected ContentTypeEnum contentTypeEnum;
     private boolean logRequest = Configuration.getBoolean(Parameter.LOG_ALL_JSON);
     private boolean logResponse = Configuration.getBoolean(Parameter.LOG_ALL_JSON);
     private boolean ignoreSSL = Configuration.getBoolean(Parameter.IGNORE_SSL);
@@ -107,12 +108,21 @@ public abstract class AbstractApiMethod extends HttpClient {
     }
 
     private void initContentTypeFromAnnotation() {
-        ContentType contentType = this.getClass().getAnnotation(ContentType.class);
-        if (contentType != null) {
-            this.request.contentType(contentType.type());
-        } else {
-            this.request.contentType(JSON_CONTENT_TYPE.getHeaderValue());
+        ContentType contentTypeA = this.getClass().getAnnotation(ContentType.class);
+        if (contentTypeA == null) {
+            contentTypeEnum = ContentTypeEnum.JSON;
+            this.request.contentType(ContentTypeEnum.JSON.getStringValues()[0]);
+            return;
         }
+
+        if (ArrayUtils.contains(ContentTypeEnum.JSON.getStringValues(), contentTypeA.type())) {
+            contentTypeEnum = ContentTypeEnum.JSON;
+        } else if (ArrayUtils.contains(ContentTypeEnum.XML.getStringValues(), contentTypeA.type())) {
+            contentTypeEnum = ContentTypeEnum.XML;
+        } else {
+            contentTypeEnum = ContentTypeEnum.NA;
+        }
+        this.request.contentType(contentTypeA.type());
     }
 
     public void setHeaders(String... headerKeyValues) {
@@ -198,31 +208,7 @@ public abstract class AbstractApiMethod extends HttpClient {
         request.expect().body(HasXPath.hasXPath(xPath));
     }
 
-    public Response callAPI() {
-
-        if(ignoreSSL) {
-            ignoreSSLCerts();
-        }
-
-        if (bodyContent.length() != 0)
-            request.body(bodyContent.toString());
-
-        Response rs = null;
-
-        PrintStream ps = null;
-        if (logRequest || logResponse) {
-            ps = new PrintStream(new LoggingOutputStream(LOGGER, Level.INFO));
-        }
-
-        ContentType contentTypeA = this.getClass().getAnnotation(ContentType.class);
-        io.restassured.http.ContentType contentTypeEnum;
-        if (contentTypeA == null || contentTypeA.type().equals(JSON_CONTENT_TYPE.getHeaderValue())) {
-            contentTypeEnum = io.restassured.http.ContentType.JSON;
-        } else if (contentTypeA.type().equals(XML_CONTENT_TYPE.getHeaderValue())) {
-            contentTypeEnum = io.restassured.http.ContentType.XML;
-        } else {
-            throw new RuntimeException("Unsupported argument of content type");
-        }
+    private void initLogging(PrintStream ps) {
 
         if (logRequest) {
             HideRequestHeadersInLogs hideHeaders = this.getClass().getAnnotation(HideRequestHeadersInLogs.class);
@@ -261,6 +247,24 @@ public abstract class AbstractApiMethod extends HttpClient {
             }
 
             request.filters(fBody, fCookies, fHeaders, fStatus);
+        }
+    }
+
+    public Response callAPI() {
+
+        if (ignoreSSL) {
+            ignoreSSLCerts();
+        }
+
+        if (bodyContent.length() != 0)
+            request.body(bodyContent.toString());
+
+        Response rs = null;
+
+        PrintStream ps = null;
+        if (logRequest || logResponse) {
+            ps = new PrintStream(new LoggingOutputStream(LOGGER, Level.INFO));
+            initLogging(ps);
         }
 
         try {
