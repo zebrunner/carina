@@ -13,6 +13,6 @@ import java.util.List;
 
 public interface IFilter {
 
-    public boolean isPerform(ITestNGMethod testMethod, List<String> expectedData);
+    public boolean isPerform(ITestNGMethod testMethod, List<String> ruleExpression);
 
 }

@@ -17,7 +17,7 @@ public class TagFilter implements IFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public boolean isPerform(ITestNGMethod testMethod, List<String> expectedData) {
+    public boolean isPerform(ITestNGMethod testMethod, List<String> ruleExpression) {
         String tagName;
         String tagValue;
 
@@ -29,8 +29,8 @@ public class TagFilter implements IFilter {
                     tagName = methodAnnotation.name();
                     tagValue = methodAnnotation.value();
                     String tag = tagName + "=" + tagValue;
-                    LOGGER.info(String.format("Test: [%s]. Tag: [%s]. Expected tag: [%s]", testMethod.getMethodName(), tag, expectedData.toString()));
-                    return expectedData.parallelStream().anyMatch(d -> d.equalsIgnoreCase(tag));
+//                    LOGGER.info(String.format("Test: [%s]. Tag: [%s]. Expected tag: [%s]", testMethod.getMethodName(), tag, expectedData.toString()));
+//                    return expectedData.parallelStream().anyMatch(d -> d.equalsIgnoreCase(tag));
                 }
             }
 
@@ -44,9 +44,9 @@ public class TagFilter implements IFilter {
                         String fullTag = tagName + "=" + tagValue;
                         tags.add(fullTag.toLowerCase());
                     }
-                    LOGGER.info(
-                            String.format("Test: [%s]. Tag: [%s]. Expected tag: [%s]", testMethod.getMethodName(), tags, expectedData.toString()));
-                    return expectedData.parallelStream().anyMatch(d -> tags.stream().anyMatch( tag -> tag.equalsIgnoreCase(d)));
+//                    LOGGER.info(
+//                            String.format("Test: [%s]. Tag: [%s]. Expected tag: [%s]", testMethod.getMethodName(), tags, expectedData.toString()));
+//                    return expectedData.parallelStream().anyMatch(d -> tags.stream().anyMatch( tag -> tag.equalsIgnoreCase(d)));
                     }
                 }
             }
