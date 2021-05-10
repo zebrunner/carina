@@ -175,8 +175,6 @@ public class Configuration {
         ELEMENT_LOADING_STRATEGY("element_loading_strategy"),
         
         PAGE_OPENING_STRATEGY("page_opening_strategy"),
-
-        APP_PRESIGN_URL("app_presign_url"),
         
         // Amazon
         S3_BUCKET_NAME("s3_bucket_name"),
@@ -184,10 +182,6 @@ public class Configuration {
         ACCESS_KEY_ID("access_key_id"),
 
         SECRET_KEY("secret_key"),
-
-        S3_USE_PRESIGN_URL("s3_use_presign_url"),
-        
-        S3_LOCAL_STORAGE("s3_local_storage"),
 
         // Azure
         AZURE_ACCOUNT_NAME("azure_account_name"),
@@ -202,8 +196,6 @@ public class Configuration {
 
         // AppCenter token
         APPCENTER_TOKEN("appcenter_token"),
-
-        APPCENTER_LOCAL_STORAGE("appcenter_local_storage"),
 
         // For localization parser
 
