@@ -339,7 +339,10 @@ public interface IDriverPool {
             
             Future<?> future = Executors.newSingleThreadExecutor().submit(new Callable<Void>() {
                 public Void call() throws Exception {
-                    driver.close();
+                    if ("chrome".equalsIgnoreCase(Configuration.getBrowser())) {
+                        // workaround to not cleaned chrome profiles on hard drive
+                        driver.close();
+                    }
                     driver.quit();
                     return null;
                 }
