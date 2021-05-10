@@ -1,8 +1,10 @@
 package com.qaprosoft.carina.core.foundation.filter.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.List;
 
+import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestNGMethod;
@@ -34,18 +36,20 @@ public class TagFilter implements IFilter {
 
             if (testMethod.getConstructorOrMethod().getMethod().isAnnotationPresent(TestTag.List.class)) {
                 TestTag.List methodAnnotation = testMethod.getConstructorOrMethod().getMethod().getAnnotation(TestTag.List.class);
-                for (TestTag tagLocal : methodAnnotation.value()) {
-                    if (tagLocal != null) {
-                        tagName = tagLocal.name();
-                        tagValue = tagLocal.value();
-                        String tag = tagName + "=" + tagValue;
-                        LOGGER.info(
-                                String.format("Test: [%s]. Tag: [%s]. Expected tag: [%s]", testMethod.getMethodName(), tag, expectedData.toString()));
-                        return expectedData.parallelStream().anyMatch(d -> d.equalsIgnoreCase(tag));
+                if (methodAnnotation!=null) {
+                    List<String> tags = new ArrayList<String>();
+                    for (TestTag tag : methodAnnotation.value()) {
+                        tagName = tag.name();
+                        tagValue = tag.value();
+                        String fullTag = tagName + "=" + tagValue;
+                        tags.add(fullTag.toLowerCase());
+                    }
+                    LOGGER.info(
+                            String.format("Test: [%s]. Tag: [%s]. Expected tag: [%s]", testMethod.getMethodName(), tags, expectedData.toString()));
+                    return expectedData.parallelStream().anyMatch(d -> tags.stream().anyMatch( tag -> tag.equalsIgnoreCase(d)));
                     }
                 }
             }
-        }
         return false;
     }
 
