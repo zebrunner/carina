@@ -420,6 +420,40 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#security" class="md-nav__link">
+    Security
+  </a>
+  
+    <nav class="md-nav" aria-label="Security">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#encryption-of-api-method-properties" class="md-nav__link">
+    Encryption of API method properties
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hiding-of-api-request-headers" class="md-nav__link">
+    Hiding of API request headers
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hiding-of-api-call-body-parts" class="md-nav__link">
+    Hiding of API call body parts
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -705,6 +739,40 @@
   <a href="#deserialization-of-json" class="md-nav__link">
     Deserialization of JSON
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security" class="md-nav__link">
+    Security
+  </a>
+  
+    <nav class="md-nav" aria-label="Security">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#encryption-of-api-method-properties" class="md-nav__link">
+    Encryption of API method properties
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hiding-of-api-request-headers" class="md-nav__link">
+    Hiding of API request headers
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hiding-of-api-call-body-parts" class="md-nav__link">
+    Hiding of API call body parts
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1146,6 +1214,50 @@ Clients clients = mapper.readValue(rs, Clients.class);
 </code></pre>
 
 <p>Then you can use POJO object for any kind of validation or for easy retrieving of the required properties.</p>
+<h3 id="security">Security</h3>
+<p>Carina provides some security features that could be used to hide/protect sensitive data in your API calls.  </p>
+<h4 id="encryption-of-api-method-properties">Encryption of API method properties</h4>
+<p>It's possible to use default carina crypto logic for automatic decription of sensitive data.<br />
+In order to encrypt the data you can use carina's <a href="../../advanced/security/">CryptoConsole</a><br />
+Then you can save your encrypted properties using default pattern: "{crypt:ENCRYPTED_TXT}"<br />
+During properties parsing process carina-api module will automatically decrypt the text and put decrypted value into request body.  </p>
+<h4 id="hiding-of-api-request-headers">Hiding of API request headers</h4>
+<p>In order to hide the value of API request header you need to annotate your API method with @HideRequestHeadersInLogs annotation.
+Usage sample:</p>
+<pre><code>@HideRequestHeadersInLogs(headers = &quot;Content-Type&quot;)
+public class YourAPIMethod extends AbstractApiMethodV2 {
+    public YourAPIMethod() {    
+    }
+}
+</code></pre>
+
+<p>Then in your test logs for mentioned headers you'll get "[ BLACKLISTED ]" mask</p>
+<h4 id="hiding-of-api-call-body-parts">Hiding of API call body parts</h4>
+<p>If you want not to show some sensitive data in body of your api calls in test logs then you'll need to annotate your API method with @HideRequestBodyPartsInLogs/@HideResponseBodyPartsInLogs annotations.<br />
+These annotations support both json and xml content type.<br />
+As the value of annotation you need to pass array of JSON or XML paths you want to hide.<br />
+Once done in test logs you'll get "********" mask instead of actual values.<br />
+Example for json:  </p>
+<pre><code>@HideRequestBodyPartsInLogs(paths = { &quot;$.[*].username&quot;, &quot;$.[*].id&quot; })
+@HideResponseBodyPartsInLogs(paths = { &quot;$.[*].address.zipcode&quot;, &quot;$.[*].address.geo.lat&quot;, &quot;$.[*].id&quot; })
+public class YourAPIMethod extends AbstractApiMethodV2 {
+    public YourAPIMethod() {
+    }
+}
+</code></pre>
+
+<p>Example for xml:</p>
+<pre><code>@HideRequestBodyPartsInLogs(paths = { &quot;//root/city/text()&quot; })
+@HideResponseBodyPartsInLogs(paths = { &quot;//root/state/text()&quot; })
+@ContentType(type = &quot;application/xml&quot;)
+public class XmlPostMethod extends AbstractApiMethodV2 {
+    public XmlPostMethod() {
+    }
+}
+</code></pre>
+
+<p>Important: for XML content type it's obligatory to pass @ContentType annotation to your API method indicating actual header value.<br />
+If @ContentType is not specified then data will be automatically considered as JSON.  </p>
                 
               
               
