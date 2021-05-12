@@ -15,18 +15,21 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.api;
 
-import static com.qaprosoft.carina.core.foundation.api.http.Headers.JSON_CONTENT_TYPE;
 import static io.restassured.RestAssured.given;
 
 import java.io.PrintStream;
 import java.lang.invoke.MethodHandles;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.log4j.Level;
@@ -37,9 +40,15 @@ import org.hamcrest.xml.HasXPath;
 
 import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
 import com.qaprosoft.carina.core.foundation.api.annotation.Endpoint;
+import com.qaprosoft.carina.core.foundation.api.annotation.HideRequestBodyPartsInLogs;
+import com.qaprosoft.carina.core.foundation.api.annotation.HideRequestHeadersInLogs;
+import com.qaprosoft.carina.core.foundation.api.annotation.HideResponseBodyPartsInLogs;
+import com.qaprosoft.carina.core.foundation.api.http.ContentTypeEnum;
 import com.qaprosoft.carina.core.foundation.api.http.HttpClient;
 import com.qaprosoft.carina.core.foundation.api.http.HttpMethodType;
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
+import com.qaprosoft.carina.core.foundation.api.log.CarinaRequestBodyLoggingFilter;
+import com.qaprosoft.carina.core.foundation.api.log.CarinaResponseBodyLoggingFilter;
 import com.qaprosoft.carina.core.foundation.api.log.LoggingOutputStream;
 import com.qaprosoft.carina.core.foundation.api.ssl.NullHostnameVerifier;
 import com.qaprosoft.carina.core.foundation.api.ssl.NullX509TrustManager;
@@ -51,6 +60,7 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import io.restassured.RestAssured;
 import io.restassured.config.RestAssuredConfig;
 import io.restassured.config.SSLConfig;
+import io.restassured.filter.log.LogDetail;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.response.Response;
@@ -63,6 +73,7 @@ public abstract class AbstractApiMethod extends HttpClient {
     protected HttpMethodType methodType = null;
     protected Object response;
     public RequestSpecification request;
+    protected ContentTypeEnum contentTypeEnum;
     private boolean logRequest = Configuration.getBoolean(Parameter.LOG_ALL_JSON);
     private boolean logResponse = Configuration.getBoolean(Parameter.LOG_ALL_JSON);
     private boolean ignoreSSL = Configuration.getBoolean(Parameter.IGNORE_SSL);
@@ -97,12 +108,21 @@ public abstract class AbstractApiMethod extends HttpClient {
     }
 
     private void initContentTypeFromAnnotation() {
-        ContentType contentType = this.getClass().getAnnotation(ContentType.class);
-        if (contentType != null) {
-            this.request.contentType(contentType.type());
-        } else {
-            this.request.contentType(JSON_CONTENT_TYPE.getHeaderValue());
+        ContentType contentTypeA = this.getClass().getAnnotation(ContentType.class);
+        if (contentTypeA == null) {
+            contentTypeEnum = ContentTypeEnum.JSON;
+            this.request.contentType(ContentTypeEnum.JSON.getStringValues()[0]);
+            return;
         }
+
+        if (ArrayUtils.contains(ContentTypeEnum.JSON.getStringValues(), contentTypeA.type())) {
+            contentTypeEnum = ContentTypeEnum.JSON;
+        } else if (ArrayUtils.contains(ContentTypeEnum.XML.getStringValues(), contentTypeA.type())) {
+            contentTypeEnum = ContentTypeEnum.XML;
+        } else {
+            contentTypeEnum = ContentTypeEnum.NA;
+        }
+        this.request.contentType(contentTypeA.type());
     }
 
     public void setHeaders(String... headerKeyValues) {
@@ -188,9 +208,51 @@ public abstract class AbstractApiMethod extends HttpClient {
         request.expect().body(HasXPath.hasXPath(xPath));
     }
 
+    private void initLogging(PrintStream ps) {
+
+        if (logRequest) {
+            HideRequestHeadersInLogs hideHeaders = this.getClass().getAnnotation(HideRequestHeadersInLogs.class);
+            RequestLoggingFilter fHeaders = new RequestLoggingFilter(LogDetail.HEADERS, true, ps, true,
+                    hideHeaders == null ? Collections.emptySet() : new HashSet<String>(Arrays.asList(hideHeaders.headers())));
+
+            RequestLoggingFilter fCookies = new RequestLoggingFilter(LogDetail.COOKIES, ps);
+            RequestLoggingFilter fParams = new RequestLoggingFilter(LogDetail.PARAMS, ps);
+            RequestLoggingFilter fMethod = new RequestLoggingFilter(LogDetail.METHOD, ps);
+            RequestLoggingFilter fUri = new RequestLoggingFilter(LogDetail.URI, ps);
+
+            RequestLoggingFilter fBody;
+            HideRequestBodyPartsInLogs hideRqBody = this.getClass().getAnnotation(HideRequestBodyPartsInLogs.class);
+
+            if (hideRqBody != null) {
+                fBody = new CarinaRequestBodyLoggingFilter(true, ps, new HashSet<String>(Arrays.asList(hideRqBody.paths())), contentTypeEnum);
+            } else {
+                fBody = new RequestLoggingFilter(LogDetail.BODY, ps);
+            }
+
+            request.filters(fMethod, fUri, fParams, fCookies, fHeaders, fBody);
+        }
+
+        if (logResponse) {
+            ResponseLoggingFilter fStatus = new ResponseLoggingFilter(LogDetail.STATUS, ps);
+            ResponseLoggingFilter fHeaders = new ResponseLoggingFilter(LogDetail.HEADERS, ps);
+            ResponseLoggingFilter fCookies = new ResponseLoggingFilter(LogDetail.COOKIES, ps);
+
+            ResponseLoggingFilter fBody;
+            HideResponseBodyPartsInLogs a = this.getClass().getAnnotation(HideResponseBodyPartsInLogs.class);
+            if (a != null) {
+                fBody = new CarinaResponseBodyLoggingFilter(true, ps, Matchers.any(Integer.class), new HashSet<String>(Arrays.asList(a.paths())),
+                        contentTypeEnum);
+            } else {
+                fBody = new ResponseLoggingFilter(LogDetail.BODY, ps);
+            }
+
+            request.filters(fBody, fCookies, fHeaders, fStatus);
+        }
+    }
+
     public Response callAPI() {
 
-        if(ignoreSSL) {
+        if (ignoreSSL) {
             ignoreSSLCerts();
         }
 
@@ -202,13 +264,9 @@ public abstract class AbstractApiMethod extends HttpClient {
         PrintStream ps = null;
         if (logRequest || logResponse) {
             ps = new PrintStream(new LoggingOutputStream(LOGGER, Level.INFO));
+            initLogging(ps);
         }
 
-        if (logRequest)
-            request.filter(new RequestLoggingFilter(ps));
-
-        if (logResponse)
-            request.filter(new ResponseLoggingFilter(ps));
         try {
             rs = HttpClient.send(request, methodPath, methodType);
         } finally {
