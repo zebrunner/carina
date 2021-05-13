@@ -100,39 +100,5 @@ public class FilterTestsListener implements ISuiteListener {
             values.remove(0);
         }
         return values;
-
-//        StringBuffer expression = new StringBuffer(ruleStr);
-//        expression.insert(0,"(");
-//        expression.insert(expression.length(),")");
-//        int closedBrackets = 0;
-//        for (int i = 0; i < expression.length(); i++) {
-//            char el = expression.charAt(i);
-//            if (el == '(') {
-//                openBracketsIndex.add(i);
-//            } else if (el == (')')) {
-//                closedBrackets++;
-//                int exprBeginIndex = openBracketsIndex.pollLast();
-//                String priorityPart = expression.substring(exprBeginIndex + 1, i);
-//                if (priorityPart.contains(SpecialKeywords.RULE_FILTER_OR_CONDITION) &&
-//                        priorityPart.contains(SpecialKeywords.RULE_FILTER_AND_CONDITION)) {
-//                    List<String> values = new ArrayList<>(Arrays.asList(priorityPart.split("(?=&&)|(?=\\|\\|)")));
-//                    if (priority.isEmpty()){
-//                        values.set(1, values.get(0) + values.get(1));
-//                        values.remove(0);
-//                    }
-//                    priority.addAll(values);
-//                } else {
-//                    priority.add(priorityPart);
-//                }
-//                expression.delete(exprBeginIndex, i + 1);
-//                i -= (i - exprBeginIndex);
-//            }
-//        }
-//
-//        if (expression.length() != 0) {
-//            priority.add(expression.substring(1,expression.length()-1));
-//        }
-//
-//        return priority;
     }
 }
