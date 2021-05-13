@@ -97,7 +97,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     
     protected static boolean automaticDriversCleanup = true;
 
-    static {
+    @Override
+    public void onStart(ISuite suite) {
+        LOGGER.debug("CarinaListener->onStart(ISuite suite)");
         try {
             // Add shutdown hook
             Runtime.getRuntime().addShutdownHook(new ShutdownHook());
@@ -124,7 +126,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 LOGGER.error("L10N bundle is not initialized successfully!", e);
             }
 
-            // declare global capabilities in configuration if custom_capabilities is declared 
+            // declare global capabilities in configuration if custom_capabilities is declared
             String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
             if (!customCapabilities.isEmpty()) {
                 // redefine core CONFIG properties using global custom capabilities file
@@ -133,21 +135,16 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
             IScreenshotRule autoScreenshotsRule = (IScreenshotRule) new AutoScreenshotRule();
             Screenshot.addScreenshotRule(autoScreenshotsRule);
-            
+
             updateAppPath();
-            
+
             TestNameResolverRegistry.set(new ZebrunnerNameResolver());
             CompositeLabelResolver.addResolver(new TagManager());
             CompositeLabelResolver.addResolver(new PriorityManager());
 
         } catch (Exception e) {
-            LOGGER.error("Undefined failure during static carina listener init!", e);
+            LOGGER.error("Undefined failure during carina features init!", e);
         }
-    }
-
-    @Override
-    public void onStart(ISuite suite) {
-        LOGGER.debug("CarinaListener->onStart(ISuite suite)");
         
         // first means that ownership/maintainer resolver from carina has higher priority
         ChainedMaintainerResolver.addFirst(new Ownership(suite.getParameter("suiteOwner")));
@@ -540,7 +537,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         AzureManager.getInstance().download(bucket, remotePath, localPath);
     }
 
-    private static void updateAppPath() {
+    private void updateAppPath() {
         try {
             if (!Configuration.get(Parameter.AZURE_ACCESS_KEY_TOKEN).isEmpty()) {
                 updateAzureAppPath();
@@ -571,7 +568,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     /**
      * Method to update MOBILE_APP path in case if apk is located in Hockey App.
      */
-    private static void updateAppCenterAppPath() {
+    private void updateAppCenterAppPath() {
         // appcenter://appName/platformName/buildType/version
         Pattern APPCENTER_PATTERN = Pattern.compile(
                 "appcenter:\\/\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)");
@@ -598,7 +595,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     /**
      * Method to update MOBILE_APP path in case if apk is located in s3 bucket.
      */
-    private static void updateS3AppPath() {
+    private void updateS3AppPath() {
         Pattern S3_BUCKET_PATTERN = Pattern.compile("s3:\\/\\/([a-zA-Z-0-9][^\\/]*)\\/(.*)");
         // get app path to be sure that we need(do not need) to download app
         // from s3 bucket
@@ -637,7 +634,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     /**
      * Method to update MOBILE_APP path in case if apk is located in Azure storage.
      */
-    private static void updateAzureAppPath() {
+    private void updateAzureAppPath() {
         Pattern AZURE_CONTAINER_PATTERN = Pattern.compile("\\/\\/([a-z0-9]{3,24})\\.blob.core.windows.net\\/(?:(\\$root|(?:[a-z0-9](?!.*--)[a-z0-9-]{1,61}[a-z0-9]))\\/)?(.{1,1024})");
 
         String mobileAppPath = Configuration.getMobileApp();
