@@ -29,15 +29,14 @@ public class TagFilter implements IFilter {
                     tagName = methodAnnotation.name();
                     tagValue = methodAnnotation.value();
                     String tag = tagName + "=" + tagValue;
-//                    LOGGER.info(String.format("Test: [%s]. Tag: [%s]. Expected tag: [%s]", testMethod.getMethodName(), tag, expectedData.toString()));
-//                    return expectedData.parallelStream().anyMatch(d -> d.equalsIgnoreCase(tag));
+                    LOGGER.info(String.format("Test: [%s]. Tag: [%s]. Expected tag: [%s]", testMethod.getMethodName(), tag, rules.toString()));
                     return ruleCheck(rules, tag);
                 }
             }
 
             if (testMethod.getConstructorOrMethod().getMethod().isAnnotationPresent(TestTag.List.class)) {
                 TestTag.List methodAnnotation = testMethod.getConstructorOrMethod().getMethod().getAnnotation(TestTag.List.class);
-                if (methodAnnotation!=null) {
+                if (methodAnnotation != null) {
                     List<String> tags = new ArrayList<String>();
                     for (TestTag tag : methodAnnotation.value()) {
                         tagName = tag.name();
@@ -45,14 +44,12 @@ public class TagFilter implements IFilter {
                         String fullTag = tagName + "=" + tagValue;
                         tags.add(fullTag.toLowerCase());
                     }
+                    LOGGER.info(
+                            String.format("Test: [%s]. Tag: [%s]. Expected tag: [%s]", testMethod.getMethodName(), tags, rules.toString()));
                     return ruleCheck(rules, tags);
-//                    LOGGER.info(
-//                            String.format("Test: [%s]. Tag: [%s]. Expected tag: [%s]", testMethod.getMethodName(), tags, expectedData.toString()));
-//                    return expectedData.parallelStream().anyMatch(d -> tags.stream().anyMatch( tag -> tag.equalsIgnoreCase(d)));
-                    }
                 }
             }
+        }
         return false;
     }
-
 }
