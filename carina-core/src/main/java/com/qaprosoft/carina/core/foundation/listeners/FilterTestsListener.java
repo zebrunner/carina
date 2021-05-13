@@ -57,7 +57,7 @@ public class FilterTestsListener implements ISuiteListener {
 
     /**
      * Method to disable test
-     * 
+     *
      * @param testMethod
      */
     private void disableTest(ITestNGMethod testMethod) {
@@ -67,7 +67,7 @@ public class FilterTestsListener implements ISuiteListener {
 
     /**
      * Method that is responsible for rules and filters parsing
-     * 
+     *
      * @param ruleStr String
      * @return list of rules
      */
@@ -82,86 +82,50 @@ public class FilterTestsListener implements ISuiteListener {
 
             for (String ruleItem : ruleStr.split(SpecialKeywords.RULE_FILTER_SPLITTER)) {
                 ruleStructure = ruleItem.split(SpecialKeywords.RULE_FILTER_VALUE_SPLITTER);
-//                if (ruleStructure[1].contains("(") && ruleStructure[1].contains(")")) {
-                    List<String> priority = prioritize(ruleStructure[1]);
-                    rules = splitRuleExpression(priority, ruleStructure[0]);
-//                }
+                List<String> priority = prioritize(ruleStructure[1]);
+                IFilter filter = Filter.getRuleByName(ruleStructure[0]).getFilter();
+                rules.add(new Rule(ruleStructure[0], filter, priority));
             }
         }
         return rules;
     }
 
-    public List<String> prioritize(String expression) {
+    public List<String> prioritize(String ruleStr) {
         Deque<Integer> openBracketsIndex = new ArrayDeque<>();
         List<String> priority = new ArrayList<>();
 
+        StringBuffer expression = new StringBuffer(ruleStr);
+        expression.insert(0,"(");
+        expression.insert(expression.length(),")");
+        int closedBrackets = 0;
         for (int i = 0; i < expression.length(); i++) {
             char el = expression.charAt(i);
             if (el == '(') {
                 openBracketsIndex.add(i);
             } else if (el == (')')) {
+                closedBrackets++;
                 int exprBeginIndex = openBracketsIndex.pollLast();
-                priority.add(expression.substring(exprBeginIndex + 1, i));
-                expression = expression.substring(0, exprBeginIndex) + expression.substring(i + 1);
+                String priorityPart = expression.substring(exprBeginIndex + 1, i);
+                if (priorityPart.contains(SpecialKeywords.RULE_FILTER_OR_CONDITION) &&
+                        priorityPart.contains(SpecialKeywords.RULE_FILTER_AND_CONDITION)) {
+                    List<String> values = new ArrayList<>(Arrays.asList(priorityPart.split("(?=&&)|(?=\\|\\|)")));
+                    if (priority.isEmpty()){
+                        values.set(1, values.get(0) + values.get(1));
+                        values.remove(0);
+                    }
+                    priority.addAll(values);
+                } else {
+                    priority.add(priorityPart);
+                }
+                expression.delete(exprBeginIndex, i + 1);
                 i -= (i - exprBeginIndex);
             }
         }
+
+        if (expression.length() != 0) {
+            priority.add(expression.substring(1,expression.length()-1));
+        }
+
         return priority;
     }
-
-    private List<Rule> splitRuleExpression(List<String> priority, String ruleName) {
-        List<String> ruleValues = new ArrayList<>();
-        IFilter filter = Filter.getRuleByName(ruleName).getFilter();
-        String expression = priority.get(0);
-
-        if (expression.contains(SpecialKeywords.RULE_FILTER_OR_CONDITION)) {
-            ruleValues.addAll(Arrays.asList(expression.split("\\|\\|")));
-        } else if (expression.contains(SpecialKeywords.RULE_FILTER_AND_CONDITION)) {
-            this.createRules(ruleName, filter, ruleValues, expression, rules);
-        }
-
-        for (int i = 1; i < priority.size(); i++) {
-            expression = priority.get(i);
-            if (expression.contains(SpecialKeywords.RULE_FILTER_OR_CONDITION)) {
-                ruleValues.add(expression.replace(SpecialKeywords.RULE_FILTER_OR_CONDITION, ""));
-            } else if (expression.contains(SpecialKeywords.RULE_FILTER_AND_CONDITION)) {
-                this.createRules(ruleName, filter, ruleValues, expression, rules);
-                ruleValues = new ArrayList<>();
-            }
-        }
-
-        if (!ruleValues.isEmpty()) {
-            Rule rule = new Rule(ruleName, filter, ruleValues);
-            LOGGER.info("Following rule will be added: ".concat(rule.toString()));
-            rules.add(rule);
-        }
-        return rules;
-    }
-
-    private void createRules(String ruleName, IFilter filter, List<String> ruleValues, String expression, List<Rule> rules) {
-        String[] values = expression.split(SpecialKeywords.RULE_FILTER_AND_CONDITION);
-
-        if (!values[0].isEmpty()) {
-            ruleValues.add(values[1]);
-            Rule rule = new Rule(ruleName, filter, ruleValues);
-            rules.add(rule);
-        } else if (!values[1].isEmpty()) {
-            ruleValues.add(values[0]);
-            Rule rule = new Rule(ruleName, filter, ruleValues);
-            rules.add(rule);
-        } else {
-            ruleValues.add(values[0]);
-            Rule rule1 = new Rule(ruleName, filter, ruleValues);
-
-            ruleValues.remove(ruleValues.size() - 1);
-            ruleValues.add(values[1]);
-            Rule rule2 = new Rule(ruleName, filter, ruleValues);
-
-            LOGGER.info("Following rule will be added: ".concat(rule1.toString()));
-            LOGGER.info("Following rule will be added: ".concat(rule2.toString()));
-            rules.add(rule1);
-            rules.add(rule2);
-        }
-    }
-
 }

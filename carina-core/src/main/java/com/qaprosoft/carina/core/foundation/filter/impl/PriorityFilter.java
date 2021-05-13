@@ -23,12 +23,7 @@ public class PriorityFilter implements IFilter {
             String actualTestPriority = testPriority.toString();
             LOGGER.info(String.format("Test: [%s]. Priority: [%s]. Expected priority: [%s]", testMethod.getMethodName(), actualTestPriority,
                     ruleExpression.toString()));
-
-
-
-            for (int i = 1; i < ruleExpression.size(); i++) {
-
-            }
+            return ruleCheck(ruleExpression, actualTestPriority);
 //            return expectedData.parallelStream().anyMatch(d -> d.equals(actualTestPriority));
         }
         return false;

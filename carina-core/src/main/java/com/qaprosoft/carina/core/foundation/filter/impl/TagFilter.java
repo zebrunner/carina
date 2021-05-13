@@ -31,6 +31,7 @@ public class TagFilter implements IFilter {
                     String tag = tagName + "=" + tagValue;
 //                    LOGGER.info(String.format("Test: [%s]. Tag: [%s]. Expected tag: [%s]", testMethod.getMethodName(), tag, expectedData.toString()));
 //                    return expectedData.parallelStream().anyMatch(d -> d.equalsIgnoreCase(tag));
+                    return ruleCheck(ruleExpression, tag);
                 }
             }
 
@@ -44,6 +45,7 @@ public class TagFilter implements IFilter {
                         String fullTag = tagName + "=" + tagValue;
                         tags.add(fullTag.toLowerCase());
                     }
+                    return ruleCheck(ruleExpression, tags);
 //                    LOGGER.info(
 //                            String.format("Test: [%s]. Tag: [%s]. Expected tag: [%s]", testMethod.getMethodName(), tags, expectedData.toString()));
 //                    return expectedData.parallelStream().anyMatch(d -> tags.stream().anyMatch( tag -> tag.equalsIgnoreCase(d)));

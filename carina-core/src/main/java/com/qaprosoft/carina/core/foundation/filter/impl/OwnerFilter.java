@@ -23,6 +23,7 @@ public class OwnerFilter implements IFilter {
                 if (ownerAnnotation != null) {
                     String owner = ownerAnnotation.owner().toLowerCase();
 
+                    return ruleCheck(ruleExpression, owner);
 //                    LOGGER.info(String.format("Test: [%s]. Owners: %s. Expected ownerAnnotation: [%s]", testMethod.getMethodName(), owner,
 //                            expectedData.toString()));
 //                    return expectedData.parallelStream().anyMatch(d -> owner.contains(d.toLowerCase()));
@@ -36,6 +37,8 @@ public class OwnerFilter implements IFilter {
                     for (MethodOwner methodOwner : ownerAnnotations.value()) {
                         owners.add(methodOwner.owner().toLowerCase());
                     }
+
+                    return ruleCheck(ruleExpression, owners);
 //                    LOGGER.info(String.format("Test: [%s]. Owners: %s. Expected owner: [%s]", testMethod.getMethodName(), owners.toString(),
 //                            expectedData.toString()));
 //                    return expectedData.parallelStream().anyMatch(d -> owners.stream().anyMatch(owner -> owner.equalsIgnoreCase(d)));
