@@ -17,7 +17,7 @@ public class TagFilter implements IFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public boolean isPerform(ITestNGMethod testMethod, List<String> ruleExpression) {
+    public boolean isPerform(ITestNGMethod testMethod, List<String> rules) {
         String tagName;
         String tagValue;
 
@@ -31,7 +31,7 @@ public class TagFilter implements IFilter {
                     String tag = tagName + "=" + tagValue;
 //                    LOGGER.info(String.format("Test: [%s]. Tag: [%s]. Expected tag: [%s]", testMethod.getMethodName(), tag, expectedData.toString()));
 //                    return expectedData.parallelStream().anyMatch(d -> d.equalsIgnoreCase(tag));
-                    return ruleCheck(ruleExpression, tag);
+                    return ruleCheck(rules, tag);
                 }
             }
 
@@ -45,7 +45,7 @@ public class TagFilter implements IFilter {
                         String fullTag = tagName + "=" + tagValue;
                         tags.add(fullTag.toLowerCase());
                     }
-                    return ruleCheck(ruleExpression, tags);
+                    return ruleCheck(rules, tags);
 //                    LOGGER.info(
 //                            String.format("Test: [%s]. Tag: [%s]. Expected tag: [%s]", testMethod.getMethodName(), tags, expectedData.toString()));
 //                    return expectedData.parallelStream().anyMatch(d -> tags.stream().anyMatch( tag -> tag.equalsIgnoreCase(d)));
