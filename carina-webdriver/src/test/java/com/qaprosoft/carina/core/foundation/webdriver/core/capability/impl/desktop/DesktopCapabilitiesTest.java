@@ -1,10 +1,9 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.windows.WindowsCapabilities;
-import org.openqa.selenium.Platform;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.ie.InternetExplorerDriver;
@@ -14,7 +13,8 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.util.*;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.R;
 
 public class DesktopCapabilitiesTest {
 
@@ -155,21 +155,6 @@ public class DesktopCapabilitiesTest {
     }
 
     @Test(groups = {"DesktopCapabilitiesTestClass"})
-    public static void getHTMLUnitCapabilityWithUnixPlatformTest() {
-        R.CONFIG.put(SpecialKeywords.PLATFORM_NAME, Platform.UNIX.name(), true);
-
-        String testName = "htmlUnit - getHTMLUnitCapabilityTest";
-
-        HTMLUnitCapabilities htmlUnitCapabilities = new HTMLUnitCapabilities();
-        DesiredCapabilities capabilities = htmlUnitCapabilities.getCapability(testName);
-
-        Assert.assertEquals(capabilities.getPlatform(), Platform.UNIX, "Returned platform is not valid!");
-
-        Assert.assertTrue((Boolean) capabilities.getCapability("javascriptEnabled"), "Returned capability value is not valid!");
-    }
-
-
-    @Test(groups = {"DesktopCapabilitiesTestClass"})
     public static void getChromeCapabilityHeadlessTest() {
         R.CONFIG.put(Configuration.Parameter.HEADLESS.getKey(), "true");
 
@@ -240,14 +225,4 @@ public class DesktopCapabilitiesTest {
                 "chromeOptionsPref lugins.always_open_pdf_externally wasn't set!");
     }
 
-    @Test(groups = {"DesktopCapabilitiesTestClass"})
-    public static void getWindowsCapabilityTest() {
-        String windowsPlatform = "WINDOWS";
-        R.CONFIG.put(SpecialKeywords.PLATFORM_NAME, windowsPlatform, true);
-
-        WindowsCapabilities windowsCapabilities = new WindowsCapabilities();
-        DesiredCapabilities capabilities = windowsCapabilities.getCapability("windows - getWindowsCapabilityTest");
-
-        Assert.assertEquals(capabilities.getPlatform().name(), windowsPlatform, "Returned platform is not valid!");
-    }
 }
