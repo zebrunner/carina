@@ -167,6 +167,7 @@ public class SpecialKeywords {
     public static final String RULE_FILTER_SPLITTER = ";;";
     public static final String RULE_FILTER_AND_CONDITION = "&&";
     public static final String RULE_FILTER_OR_CONDITION = "||";
+    public static final String RULE_FILTER_EXCLUDE_CONDITION = "!!";
 
 
     // ------------- Mobile screenshots cutting strategies configuration  ---------------

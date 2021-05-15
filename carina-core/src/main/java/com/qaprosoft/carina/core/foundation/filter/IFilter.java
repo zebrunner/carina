@@ -17,51 +17,17 @@ public interface IFilter {
 
     default boolean ruleCheck(List<String> ruleExpression, List<String> actualValues) {
         String expression = ruleExpression.get(0);
-
         boolean match;
 
-//        if (expression.contains(SpecialKeywords.RULE_FILTER_OR_CONDITION)) {
-//            List<String> values = List.of(expression.split("\\|\\|"));
-//            if (expression.contains("!!")) {
-//                List<Boolean> booleanList = new ArrayList<>();
-//                for (int i = 0; i<values.size();i++){
-//                    String value = values.get(i);
-//                    if (values.get(i).contains("!!")){
-//                        booleanList.add(actualValues.stream().anyMatch(actualValue -> !actualValue.equalsIgnoreCase(value)));
-//                    } else {
-//                        booleanList.add(actualValues.stream().anyMatch(actualValue -> actualValue.equalsIgnoreCase(value)));
-//                    }
-//                    match
-//                }
-//
-//            } else{
-//                match = values.stream().anyMatch(ruleValue -> actualValues.stream().anyMatch(ruleValue::equalsIgnoreCase));
-//            }
-//        } else if (expression.contains(SpecialKeywords.RULE_FILTER_AND_CONDITION)) {
-//            List<String> values = List.of(expression.split(SpecialKeywords.RULE_FILTER_AND_CONDITION));
-//            if (expression.contains("!!")){
-//
-//            } else {
-//                match = values.stream().allMatch(ruleValue -> actualValues.stream().anyMatch(ruleValue::equalsIgnoreCase));
-//            }
-//        } else if (ruleExpression.size() == 1){
-//            String finalExpression = expression;
-//            boolean tmp = actualValues.stream().anyMatch(actualValue -> actualValue.equalsIgnoreCase(finalExpression));
-//            if (finalExpression.contains("!!")){
-//                return !tmp;
-//            }
-//            return tmp;
-//        }
-
-        if (expression.contains("!!")){
-            String finalExpression = expression.substring(expression.indexOf("!!")+2);
+        if (expression.contains(SpecialKeywords.RULE_FILTER_EXCLUDE_CONDITION)) {
+            String finalExpression = expression.substring(expression.indexOf(SpecialKeywords.RULE_FILTER_EXCLUDE_CONDITION) + 2);
             match = actualValues.stream().allMatch(actualValue -> !actualValue.equalsIgnoreCase(finalExpression));
         } else {
             String finalExpression = expression;
             match = actualValues.stream().anyMatch(actualValue -> actualValue.equalsIgnoreCase(finalExpression));
         }
 
-        if (ruleExpression.size()==1){
+        if (ruleExpression.size() == 1) {
             return match;
         }
 
@@ -71,22 +37,22 @@ public interface IFilter {
                 if (match) {
                     continue;
                 }
-                String value = expression.substring(expression.indexOf(SpecialKeywords.RULE_FILTER_OR_CONDITION)+2);
-                if (value.contains("!!")){
-                    String finalValue = value.substring(value.indexOf("!!")+2);
+                String value = expression.substring(expression.indexOf(SpecialKeywords.RULE_FILTER_OR_CONDITION) + 2);
+                if (value.contains(SpecialKeywords.RULE_FILTER_EXCLUDE_CONDITION)) {
+                    String finalValue = value.substring(value.indexOf(SpecialKeywords.RULE_FILTER_EXCLUDE_CONDITION) + 2);
                     match = actualValues.stream().allMatch(actualValue -> !actualValue.equalsIgnoreCase(finalValue));
-                } else  {
+                } else {
                     match = actualValues.stream().anyMatch(actualValue -> actualValue.equalsIgnoreCase(value));
                 }
             } else if (expression.contains(SpecialKeywords.RULE_FILTER_AND_CONDITION)) {
                 if (!match) {
                     continue;
                 }
-                String value = expression.substring(expression.indexOf(SpecialKeywords.RULE_FILTER_AND_CONDITION)+2);
-                if (value.contains("!!")){
-                    String finalValue = value.substring(value.indexOf("!!")+2);
+                String value = expression.substring(expression.indexOf(SpecialKeywords.RULE_FILTER_AND_CONDITION) + 2);
+                if (value.contains(SpecialKeywords.RULE_FILTER_EXCLUDE_CONDITION)) {
+                    String finalValue = value.substring(value.indexOf(SpecialKeywords.RULE_FILTER_EXCLUDE_CONDITION) + 2);
                     match = actualValues.stream().allMatch(actualValue -> !actualValue.equalsIgnoreCase(finalValue));
-                } else  {
+                } else {
                     match = actualValues.stream().anyMatch(actualValue -> actualValue.equalsIgnoreCase(value));
                 }
             }
@@ -96,7 +62,6 @@ public interface IFilter {
     }
 
     default boolean ruleCheck(List<String> ruleExpression, String actualValue) {
-
         return ruleCheck(ruleExpression, Arrays.asList(actualValue));
     }
 }
