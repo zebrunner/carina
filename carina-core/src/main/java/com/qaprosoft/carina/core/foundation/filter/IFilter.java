@@ -18,17 +18,51 @@ public interface IFilter {
     default boolean ruleCheck(List<String> ruleExpression, List<String> actualValues) {
         String expression = ruleExpression.get(0);
 
-        boolean match = false;
+        boolean match;
 
-        if (expression.contains(SpecialKeywords.RULE_FILTER_OR_CONDITION)) {
-            List<String> values = List.of(expression.split("\\|\\|"));
-            match = values.stream().anyMatch(ruleValue -> actualValues.stream().anyMatch(ruleValue::equalsIgnoreCase));
-        } else if (expression.contains(SpecialKeywords.RULE_FILTER_AND_CONDITION)) {
-            List<String> values = List.of(expression.split(SpecialKeywords.RULE_FILTER_AND_CONDITION));
-            match = values.stream().allMatch(ruleValue -> actualValues.stream().anyMatch(ruleValue::equalsIgnoreCase));
-        } else if (ruleExpression.size() == 1){
+//        if (expression.contains(SpecialKeywords.RULE_FILTER_OR_CONDITION)) {
+//            List<String> values = List.of(expression.split("\\|\\|"));
+//            if (expression.contains("!!")) {
+//                List<Boolean> booleanList = new ArrayList<>();
+//                for (int i = 0; i<values.size();i++){
+//                    String value = values.get(i);
+//                    if (values.get(i).contains("!!")){
+//                        booleanList.add(actualValues.stream().anyMatch(actualValue -> !actualValue.equalsIgnoreCase(value)));
+//                    } else {
+//                        booleanList.add(actualValues.stream().anyMatch(actualValue -> actualValue.equalsIgnoreCase(value)));
+//                    }
+//                    match
+//                }
+//
+//            } else{
+//                match = values.stream().anyMatch(ruleValue -> actualValues.stream().anyMatch(ruleValue::equalsIgnoreCase));
+//            }
+//        } else if (expression.contains(SpecialKeywords.RULE_FILTER_AND_CONDITION)) {
+//            List<String> values = List.of(expression.split(SpecialKeywords.RULE_FILTER_AND_CONDITION));
+//            if (expression.contains("!!")){
+//
+//            } else {
+//                match = values.stream().allMatch(ruleValue -> actualValues.stream().anyMatch(ruleValue::equalsIgnoreCase));
+//            }
+//        } else if (ruleExpression.size() == 1){
+//            String finalExpression = expression;
+//            boolean tmp = actualValues.stream().anyMatch(actualValue -> actualValue.equalsIgnoreCase(finalExpression));
+//            if (finalExpression.contains("!!")){
+//                return !tmp;
+//            }
+//            return tmp;
+//        }
+
+        if (expression.contains("!!")){
+            String finalExpression = expression.substring(expression.indexOf("!!")+2);
+            match = actualValues.stream().allMatch(actualValue -> !actualValue.equalsIgnoreCase(finalExpression));
+        } else {
             String finalExpression = expression;
-            return actualValues.stream().anyMatch(actualValue -> actualValue.equalsIgnoreCase(finalExpression));
+            match = actualValues.stream().anyMatch(actualValue -> actualValue.equalsIgnoreCase(finalExpression));
+        }
+
+        if (ruleExpression.size()==1){
+            return match;
         }
 
         for (int i = 1; i < ruleExpression.size(); i++) {
@@ -37,18 +71,24 @@ public interface IFilter {
                 if (match) {
                     continue;
                 }
-                List<String> values = new ArrayList<>(Arrays.asList(expression.split("\\|\\|")));
-                values.removeAll(Collections.singleton(""));
-                match = values.stream().anyMatch(ruleValue -> ruleValue.isEmpty() ||
-                        actualValues.stream().anyMatch(ruleValue::equalsIgnoreCase));
+                String value = expression.substring(expression.indexOf(SpecialKeywords.RULE_FILTER_OR_CONDITION)+2);
+                if (value.contains("!!")){
+                    String finalValue = value.substring(value.indexOf("!!")+2);
+                    match = actualValues.stream().allMatch(actualValue -> !actualValue.equalsIgnoreCase(finalValue));
+                } else  {
+                    match = actualValues.stream().anyMatch(actualValue -> actualValue.equalsIgnoreCase(value));
+                }
             } else if (expression.contains(SpecialKeywords.RULE_FILTER_AND_CONDITION)) {
                 if (!match) {
                     continue;
                 }
-                List<String> values = new ArrayList<>(Arrays.asList(expression.split(SpecialKeywords.RULE_FILTER_AND_CONDITION)));
-                values.removeAll(Collections.singleton(""));
-                match = values.stream().allMatch(ruleValue -> ruleValue.isEmpty() ||
-                        actualValues.stream().anyMatch(ruleValue::equalsIgnoreCase));
+                String value = expression.substring(expression.indexOf(SpecialKeywords.RULE_FILTER_AND_CONDITION)+2);
+                if (value.contains("!!")){
+                    String finalValue = value.substring(value.indexOf("!!")+2);
+                    match = actualValues.stream().allMatch(actualValue -> !actualValue.equalsIgnoreCase(finalValue));
+                } else  {
+                    match = actualValues.stream().anyMatch(actualValue -> actualValue.equalsIgnoreCase(value));
+                }
             }
         }
 

@@ -92,13 +92,8 @@ public class FilterTestsListener implements ISuiteListener {
         return rules;
     }
 
-    public List<String> prioritize(String ruleStr) {
-
+    private List<String> prioritize(String ruleStr) {
         List<String> values = new ArrayList<>(Arrays.asList(ruleStr.split("(?=&&)|(?=\\|\\|)")));
-        if (values.size()>1) {
-            values.set(1, values.get(0) + values.get(1));
-            values.remove(0);
-        }
         return values;
     }
 }
