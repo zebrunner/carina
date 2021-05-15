@@ -89,7 +89,7 @@ public class ConfigurationTest {
 
     @Test
     public void testBrowserVersion() {
-        R.CONFIG.put(Parameter.BROWSER_VERSION.getKey(), "88.0.0");
+        R.CONFIG.put("capabilities.browserVersion", "88.0.0");
 
         Assert.assertEquals(Configuration.getBrowserVersion(), "88.0.0", "capabilities.browserVersion wasn't set");
     }

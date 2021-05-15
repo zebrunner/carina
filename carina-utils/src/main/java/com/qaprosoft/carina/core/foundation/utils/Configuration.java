@@ -68,8 +68,6 @@ public class Configuration {
 
         BROWSER("browser"),
 
-        BROWSER_VERSION("browser_version"),
-
         BROWSER_LANGUAGE("browser_language"),
 
         SELENIUM_HOST("selenium_host"),
@@ -415,19 +413,10 @@ public class Configuration {
     
     public static String getBrowserVersion() {
         String browserVersion = "";
-        if (!Configuration.get(Parameter.BROWSER_VERSION).isEmpty()) {
-            // default "browser_version=value" should be used to determine current browser
-            browserVersion = Configuration.get(Parameter.BROWSER_VERSION);
-        }
 
         // redefine browserVersion if capabilities.browserVersion is available
         if (!R.CONFIG.get("capabilities.browserVersion").isEmpty()  && !"null".equalsIgnoreCase(R.CONFIG.get("capabilities.browserVersion"))) {
             browserVersion = R.CONFIG.get("capabilities.browserVersion");
-        }
-        
-        // read from actual_browser_version if specified
-        if (R.CONFIG.containsKey(SpecialKeywords.ACTUAL_BROWSER_VERSION)) {
-            browserVersion = R.CONFIG.get(SpecialKeywords.ACTUAL_BROWSER_VERSION);
         }
         
         return browserVersion;
