@@ -135,7 +135,6 @@ public class SpecialKeywords {
     public static final String ADB_EXEC_TIMEOUT = "capabilities.adbExecTimeout";
     public static final String MOBILE_DEVICE_UDID = "capabilities.udid";
     public static final String MOBILE_DEVICE_NAME = "capabilities.deviceName";
-    public static final String MOBILE_DEVICE_BROWSERSTACK_NAME = "capabilities.device";
     public static final String MOBILE_DEVICE_TYPE = "capabilities.deviceType";
     //TODO: switch into the PLATFORM_NAME later
     public static final String MOBILE_DEVICE_PLATFORM = "capabilities.platformName";

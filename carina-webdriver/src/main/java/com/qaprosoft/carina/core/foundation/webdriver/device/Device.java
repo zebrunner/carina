@@ -85,12 +85,9 @@ public class Device implements IDriverPool {
     }
 
     public Device(Capabilities capabilities) {
-        // 1. read from CONFIG and specify if any: capabilities.deviceName, capabilities.device (browserstack notation)
+        // 1. read from CONFIG and specify if any: capabilities.deviceName
         // 2. read from capabilities object and set if if it is not null
         String deviceName = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_NAME);
-        if (!R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_BROWSERSTACK_NAME).isEmpty()) {
-            deviceName = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_BROWSERSTACK_NAME);
-        }
         if (capabilities.getCapability("deviceName") != null) {
             deviceName = capabilities.getCapability("deviceName").toString();
         }
