@@ -374,19 +374,10 @@ public class Configuration {
         String platform = "*";
 
         // redefine platform if mobile.platformName is available
-        if (!R.CONFIG.get(SpecialKeywords.PLATFORM).isEmpty()) {
-            platform = R.CONFIG.get(SpecialKeywords.PLATFORM);
-        }
-        
-        // redefine platform if mobile.platformName is available
         if (!R.CONFIG.get(SpecialKeywords.PLATFORM_NAME).isEmpty()) {
             platform = R.CONFIG.get(SpecialKeywords.PLATFORM_NAME);
         }
         
-        if (caps != null && caps.getCapability("platform") != null) {
-            platform = caps.getCapability("platform").toString();
-        }
-
         if (caps != null && caps.getCapability("platformName") != null) {
             platform = caps.getCapability("platformName").toString();
         }        
@@ -463,10 +454,6 @@ public class Configuration {
         }
 
         String platform = "";
-        if (capabilities.getCapability("platform") != null) {
-            platform = capabilities.getCapability("platform").toString();
-        }
-
         if (capabilities.getCapability("platformName") != null) {
             platform = capabilities.getCapability("platformName").toString();
         }

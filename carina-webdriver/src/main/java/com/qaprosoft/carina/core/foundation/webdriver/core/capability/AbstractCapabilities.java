@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxOptions;
@@ -50,14 +49,6 @@ public abstract class AbstractCapabilities {
     public abstract DesiredCapabilities getCapability(String testName);
 
     protected DesiredCapabilities initBaseCapabilities(DesiredCapabilities capabilities, String browser, String testName) {
-
-        // TODO: should use provide capabilities as an argument for getPlatform call below?
-        String platform = Configuration.getPlatform();
-        // Don't use W3C key (platformName) alongside JWP key (platform)
-        // to prevent Mixed Capabilities Error. https://github.com/qaprosoft/carina/issues/1296
-        if (R.CONFIG.get(SpecialKeywords.PLATFORM_NAME).isEmpty() && !platform.equals("*")) {
-            capabilities.setPlatform(Platform.extractFromSysProperty(platform));
-        }
 
         capabilities.setBrowserName(browser);
 

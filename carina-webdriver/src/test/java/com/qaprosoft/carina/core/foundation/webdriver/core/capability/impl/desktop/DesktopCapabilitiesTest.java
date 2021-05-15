@@ -156,7 +156,7 @@ public class DesktopCapabilitiesTest {
 
     @Test(groups = {"DesktopCapabilitiesTestClass"})
     public static void getHTMLUnitCapabilityWithUnixPlatformTest() {
-        R.CONFIG.put(SpecialKeywords.PLATFORM, Platform.UNIX.name(), true);
+        R.CONFIG.put(SpecialKeywords.PLATFORM_NAME, Platform.UNIX.name(), true);
 
         String testName = "htmlUnit - getHTMLUnitCapabilityTest";
 
@@ -243,7 +243,7 @@ public class DesktopCapabilitiesTest {
     @Test(groups = {"DesktopCapabilitiesTestClass"})
     public static void getWindowsCapabilityTest() {
         String windowsPlatform = "WINDOWS";
-        R.CONFIG.put(SpecialKeywords.PLATFORM, windowsPlatform, true);
+        R.CONFIG.put(SpecialKeywords.PLATFORM_NAME, windowsPlatform, true);
 
         WindowsCapabilities windowsCapabilities = new WindowsCapabilities();
         DesiredCapabilities capabilities = windowsCapabilities.getCapability("windows - getWindowsCapabilityTest");
