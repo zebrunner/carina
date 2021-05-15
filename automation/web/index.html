@@ -779,8 +779,7 @@ assertEquals(&quot;MyCityName&quot;, city.getText());
 <p>There are a few critical properties in a _config.properties file which are required for web test execution:</p>
 <ul>
 <li>url=http://www.gsmarena.com</li>
-<li>browser=chrome</li>
-<li>browser_version=*</li>
+<li>capabilities.browserName=chrome</li>
 </ul>
 <p>The implemented test cases should be placed in a TestNG xml file according to the test group the test belongs to. You can find more details about TestNG configuration in the <a href="http://testng.org/doc/documentation-main.html">official documentation</a>.</p>
 <pre><code class="xml">&lt;!DOCTYPE suite SYSTEM &quot;https://testng.org/testng-1.0.dtd&quot;&gt;
