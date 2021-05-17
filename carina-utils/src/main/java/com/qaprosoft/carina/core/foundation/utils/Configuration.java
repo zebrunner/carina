@@ -39,11 +39,7 @@ public class Configuration {
     private static IEnvArgResolver envArgResolver;
 
     static {
-        String envArgResolverClass = Configuration.get(Parameter.ENV_ARG_RESOLVER);
-        if (envArgResolverClass.isEmpty()) {
-            // redefine using default class
-            envArgResolverClass = "com.qaprosoft.carina.core.foundation.utils.DefaultEnvArgResolver";
-        }
+        String envArgResolverClass = "com.qaprosoft.carina.core.foundation.utils.DefaultEnvArgResolver";
 
         try {
             Class<?> cl = Class.forName(envArgResolverClass);
@@ -63,8 +59,6 @@ public class Configuration {
         URL("url"),
 
         ENV("env"),
-
-        ENV_ARG_RESOLVER("env_arg_resolver"),
 
         BROWSER("browser"),
 
