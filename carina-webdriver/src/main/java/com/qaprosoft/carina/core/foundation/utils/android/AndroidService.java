@@ -936,6 +936,7 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
      * @param timeZone String
      * @param settingsTZ String
      * @param timeFormat TimeFormat
+     * @param gmtStamp String
      */
     private void setDeviceTimeZoneBySetting(String timeZone, String settingsTZ, TimeFormat timeFormat, String gmtStamp) {
 

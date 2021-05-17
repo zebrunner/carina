@@ -144,7 +144,6 @@ public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements 
      * Wait until any condition happens.
      *
      * @param condition - ExpectedCondition.
-     * @param timeout - timeout.
      * @return true if condition happen.
      */
 	@SuppressWarnings("unchecked")
