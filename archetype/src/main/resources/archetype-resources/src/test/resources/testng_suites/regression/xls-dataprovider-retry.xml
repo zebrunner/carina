@@ -5,7 +5,6 @@
 <suite verbose="1" name="XLS DataProvider Test With Retry (33% pass rate)" parallel="methods">
 
 	<parameter name="suiteOwner" value="qpsdemo"/>
-	<parameter name="zafira_project" value="UNKNOWN"/>
 	<parameter name="jenkinsJobName" value="API-XlsDataProvider-Retry"/>
 	<parameter name="jenkinsJobType" value="api"/>
 	<parameter name="jenkinsEnvironments" value="DEMO"/>

@@ -5,7 +5,6 @@
 <suite verbose="1" name="Carina Demo Tests - Web Multiple Browser Sample" parallel="methods">
 
     <parameter name="suiteOwner" value="qpsdemo"/>
-    <parameter name="zafira_project" value="UNKNOWN"/>
     <parameter name="jenkinsJobName" value="Web-Multiple-Browser-Demo-Test"/>
     <parameter name="jenkinsJobType" value="web"/>
     <parameter name="jenkinsEnvironments" value="DEMO"/>
@@ -13,6 +12,7 @@
 
     <parameter name="jenkinsRegressionPipeline" value="web_regression"/>
     <parameter name="jenkinsPipelineEnvironments" value="DEMO"/>
+    <parameter name="jenkinsAutoScreenshot" value="true"/>
 
     <test name="Multiple Browser Test">
         <classes>

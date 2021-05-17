@@ -5,7 +5,6 @@
 <suite verbose="1" name="Carina Demo Tests - Web Single Driver Sample" parallel="tests">
 
 	<parameter name="suiteOwner" value="qpsdemo"/>
-	<parameter name="zafira_project" value="UNKNOWN"/>
 	<parameter name="jenkinsJobName" value="Web-Demo-Single-Driver-Test"/>
 	<parameter name="jenkinsJobType" value="web"/>
 	<parameter name="jenkinsEnvironments" value="DEMO"/>
@@ -17,6 +16,7 @@
 	<parameter name="jenkinsRegressionMatrix_full_regression" value="browser: chrome; browser: firefox; browser: opera"/>
 	<parameter name="jenkinsJobExecutionOrder" value="2"/>
 	<parameter name="jenkinsJobExecutionMode" value="continue"/>
+	<parameter name="jenkinsAutoScreenshot" value="true"/>
 
 	<test name="GSM arena web tests using single driver between tests">
 		<classes>

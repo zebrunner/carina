@@ -5,7 +5,6 @@
 <suite verbose="1" name="Carina Demo Tests - Web Localization Sample" parallel="methods">
 
     <parameter name="suiteOwner" value="qpsdemo"/>
-    <parameter name="zafira_project" value="UNKNOWN"/>
     <parameter name="jenkinsJobName" value="Web-Localization-Demo-Test"/>
     <parameter name="jenkinsJobType" value="web"/>
     <parameter name="jenkinsEnvironments" value="DEMO"/>
@@ -14,15 +13,20 @@
     <parameter name="jenkinsRegressionPipeline" value="web_regression, full_regression"/>
     <parameter name="jenkinsPipelineEnvironments" value="DEMO"/>
 
-    <parameter name="jenkinsRegressionMatrix_full_regression" value="browser: chrome, locale: en_US; browser: chrome, locale: es_ES; browser: chrome, locale: de_DE; browser: chrome, locale: ja_JP; browser: chrome, locale: zh_CN"/>
+    <parameter name="jenkinsRegressionMatrix_full_regression" value="browser: chrome, locale: en_US; browser: chrome, locale: es_ES; browser: chrome, locale: de_DE; browser: chrome, locale: ja_JP; browser: chrome, locale: zh_CN; browser: chrome, locale: ru_RU; browser: chrome, locale: hu_HU"/>
     <parameter name="jenkinsJobExecutionOrder" value="1"/>
     <parameter name="jenkinsJobExecutionMode" value="continue"/>
 
-    <parameter name="choiceParam::locale::supported locales in example" value="en_US, es_ES, de_DE, ja_JP, zh_CN" />
+    <parameter name="choiceParam::locale::supported locales in example" value="en_US,es_ES,de_DE,ja_JP,zh_CN,ru_RU,hu_HU" />
+    <parameter name="jenkinsAutoScreenshot" value="true"/>
 
     <test name="Wikipedia Localization Test">
         <classes>
-            <class name="${package}.carina.demo.WebLocalizationSample" />
+            <class name="${package}.carina.demo.WebLocalizationSample" >
+                <methods>
+                    <include name="testLanguages" />
+                </methods>
+            </class>
         </classes>
     </test>
 

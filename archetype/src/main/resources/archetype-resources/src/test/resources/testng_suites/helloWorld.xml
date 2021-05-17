@@ -5,7 +5,6 @@
 <suite verbose="1" name="Carina Demo Tests - Hello World" parallel="methods">
 
 	<parameter name="suiteOwner" value="qpsdemo"/>
-	<parameter name="zafira_project" value="UNKNOWN"/>
 	<parameter name="jenkinsJobName" value="Hello-World-Test"/>
 	<parameter name="jenkinsJobType" value="api"/>
 

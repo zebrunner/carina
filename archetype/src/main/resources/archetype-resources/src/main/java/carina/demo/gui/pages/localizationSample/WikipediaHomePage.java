@@ -18,13 +18,15 @@
  */
 package ${package}.carina.demo.gui.pages.localizationSample;
 
-import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
-import com.qaprosoft.carina.core.gui.AbstractPage;
+import java.util.List;
+import java.util.Locale;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 
-import java.util.List;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
+import com.qaprosoft.carina.core.gui.AbstractPage;
 
 public class WikipediaHomePage extends AbstractPage {
 
@@ -34,24 +36,38 @@ public class WikipediaHomePage extends AbstractPage {
     @FindBy(id = "js-lang-list-button")
     private ExtendedWebElement langListBtn;
 
-    @FindBy(id = "{L10N:HomePage.welcomeTextId}")
-    private ExtendedWebElement welcomeText;
-
     public WikipediaHomePage(WebDriver driver) {
         super(driver);
         setPageAbsoluteURL("https://www.wikipedia.org/");
     }
 
-    public String getWelcomeText() {
-        langListBtn.clickIfPresent();
+    public WikipediaLocalePage goToWikipediaLocalePage(WebDriver driver) {
+        openLangList();
         if (!langList.isEmpty()) {
             for (ExtendedWebElement languageBtn : langList) {
-                if (languageBtn.getAttribute("lang").equals(L10N.getDefaultLocale().getLanguage())) {
+                String localeStr = Configuration.get(Configuration.Parameter.LOCALE);
+                Locale locale = parseLocale(localeStr);
+                if (languageBtn.getAttribute("lang").equals(locale.getLanguage())) {
                     languageBtn.click();
-                    return welcomeText.getText();
+                    return new WikipediaLocalePage(driver);
                 }
             }
         }
-        return null;
+        throw new RuntimeException("No language ref was found");
+    }
+
+    public void openLangList() {
+        langListBtn.clickIfPresent();
+    }
+
+    private Locale parseLocale(String localeToParse) {
+        String[] localeSetttings = localeToParse.trim().split("_");
+        String lang, country = "";
+        lang = localeSetttings[0];
+        if (localeSetttings.length > 1) {
+            country = localeSetttings[1];
+        }
+
+        return new Locale(lang, country);
     }
 }
