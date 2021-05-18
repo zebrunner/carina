@@ -26,7 +26,11 @@ public class XmlValidator {
     }
 
     /**
-     * @param mode - determines how to compare 2 XMLs. See type description for more details.
+     * @param actualXmlData String
+     *
+     * @param expectedXmlPath String
+     *
+     * @param mode XmlCompareMode, determines how to compare 2 XMLs. See type description for more details.
      */
     public static void validateXml(String actualXmlData, String expectedXmlPath, XmlCompareMode mode) {
         try {

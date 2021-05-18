@@ -40,8 +40,8 @@ public class CustomRsFilter implements ResponseFilter {
 
     /**
      * Update response headers
-     * @param rs
-     * @param headers
+     * @param rs HttpResponse
+     * @param headers List&lt;HeaderItem&gt;
      */
     private void applyHeaders(HttpResponse rs, List<HeaderItem> headers) {
         for (HeaderItem headerItem : headers) {

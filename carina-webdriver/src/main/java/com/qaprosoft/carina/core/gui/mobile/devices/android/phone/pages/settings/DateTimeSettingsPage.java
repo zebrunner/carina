@@ -130,7 +130,7 @@ public class DateTimeSettingsPage extends MobileAbstractPage implements IAndroid
     }
 
     /**
-     * setup timezone region (this method is responsible for setting up timezone region, req. for OS version > 8)
+     * setup timezone region (this method is responsible for setting up timezone region, req. for OS version &gt; 8)
      *
      * @param timezoneRegion         String
      * @param deviceOsVersion  int

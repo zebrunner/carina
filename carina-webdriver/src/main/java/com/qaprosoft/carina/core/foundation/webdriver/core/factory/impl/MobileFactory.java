@@ -214,7 +214,7 @@ public class MobileFactory extends AbstractFactory {
     /**
      * Method to extract debug info in case exception has been thrown during app installation
      * 
-     * @param exceptionMsg
+     * @param exceptionMsg List&lt;WebElement&gt;
      * @return debug info
      */
     private String getDebugInfo(String exceptionMsg) {
@@ -242,8 +242,8 @@ public class MobileFactory extends AbstractFactory {
      * /data/local/tmp/appium_cache/642637a49a85a430df0f3c4c1b2dd36022c83df4.apk --udid 4d002c7f5b328095 --name Samsung_Galaxy_Note3]]]
      * Example: --{paramName} {paramValue}
      * 
-     * @param debugInfo
-     * @param paramName
+     * @param debugInfo String
+     * @param paramName String
      * @return paramValue
      */
     private String getParamFromDebugInfo(String debugInfo, String paramName) {

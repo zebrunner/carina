@@ -453,7 +453,7 @@ public class Screenshot {
      *            - webDriver.
      * @param augmentedDriver
      *            - webDriver.
-     * @exception IOException
+     * @exception Exception can be cause by read() or getScreenshotAs() methods
      *
      * @return screenshot image
      */
@@ -512,7 +512,7 @@ public class Screenshot {
      *
      * @param augmentedDriver
      *            - webDriver.
-     * @exception IOException
+     * @exception Exception can be cause by read() or getScreenshotAs() methods
      *
      * @return screenshot image
      */
@@ -673,6 +673,8 @@ public class Screenshot {
 
     /**
      * Cast Carina driver to WebDriver removing all extra listeners (use it in problematic places where you handle all exceptions)
+     *
+     * @param drv WebDriver
      *
      * @return WebDriver
      */

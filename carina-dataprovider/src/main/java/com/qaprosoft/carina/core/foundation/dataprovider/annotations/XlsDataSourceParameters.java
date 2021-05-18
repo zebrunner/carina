@@ -27,11 +27,15 @@ public @interface XlsDataSourceParameters {
 
     /**
      * Is mutually exclusive with spreadsheetId
+     *
+     * @return String
      */
     String path() default "";
 
     /**
      * Is mutually exclusive with path
+     *
+     * @return String
      */
     String spreadsheetId() default "";
 

@@ -170,7 +170,7 @@ public class AppCenterManager {
      *
      * @param appName takes in the AppCenter Name to look for.
      * @param platformName takes in the platform we wish to download for.
-     * @return
+     * @return Map&lt;String, String&gt;
      */
     private Map<String, String> getAppId(String appName, String platformName) {
         Map<String, String> appMap = new HashMap<>();
@@ -209,7 +209,7 @@ public class AppCenterManager {
      * @param buildType takes in the particular build to download (i.e. Prod.AdHoc, QA.Debug, Prod-Release, QA-Internal etc...)
      * @param version takes in either "latest" to take the first build that matches the criteria or allows to consume a version to download that
      *            build.
-     * @return
+     * @return String
      */
     private String scanAppForBuild(Map<String, String> apps, String buildType, String version) {
         for (String currentApp : apps.keySet()) {

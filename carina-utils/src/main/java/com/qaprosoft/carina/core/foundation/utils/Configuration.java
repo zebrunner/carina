@@ -510,6 +510,8 @@ public class Configuration {
     
     /**
      * Register APP_VERSION number in CONFIG space and as Zebrunner Reporting build number if not empty.
+     *
+     * @param build String
      */
     public static void setBuild(String build) {
         R.CONFIG.put(Parameter.APP_VERSION.getKey(), build);
