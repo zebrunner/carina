@@ -108,15 +108,8 @@ public class Device implements IDriverPool {
         setType(deviceType);
 
         setOs(Configuration.getPlatform(new DesiredCapabilities(capabilities)));
-
-        String platformVersion = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_PLATFORM_VERSION);
-        if (!R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_BROWSERSTACK_PLATFORM_VERSION).isEmpty()) {
-            platformVersion = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_BROWSERSTACK_PLATFORM_VERSION);
-        }
-        if (capabilities.getCapability("platformVersion") != null) {
-            platformVersion = capabilities.getCapability("platformVersion").toString();
-        }
-        setOsVersion(platformVersion);
+        
+        setOsVersion(Configuration.getPlatformVersion(new DesiredCapabilities(capabilities)));
 
         String deviceUdid = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_UDID);
         if (capabilities.getCapability("udid") != null) {

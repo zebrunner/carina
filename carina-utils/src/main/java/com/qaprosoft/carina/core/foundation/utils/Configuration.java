@@ -370,30 +370,55 @@ public class Configuration {
     public static String getPlatform(DesiredCapabilities caps) {
         // any platform by default
         String platform = "*";
+        
+        
+        // redefine platform if os caps is available
+        if (!R.CONFIG.get(SpecialKeywords.BROWSERSTACK_PLATFORM_NAME).isEmpty()) {
+            platform = R.CONFIG.get(SpecialKeywords.BROWSERSTACK_PLATFORM_NAME);
+        }
 
-        // redefine platform if mobile.platformName is available
+        // redefine platform if platformName caps is available
         if (!R.CONFIG.get(SpecialKeywords.PLATFORM_NAME).isEmpty()) {
             platform = R.CONFIG.get(SpecialKeywords.PLATFORM_NAME);
         }
+
+        if (caps != null && caps.getCapability("os") != null) {
+            platform = caps.getCapability("os").toString();
+        }   
         
         if (caps != null && caps.getCapability("platformName") != null) {
             platform = caps.getCapability("platformName").toString();
         }        
         
-        //TODO: try to get actual platform name
         return platform;
     }
     
     public static String getPlatformVersion() {
+        return getPlatformVersion(new DesiredCapabilities());
+    }
+    
+    public static String getPlatformVersion(DesiredCapabilities caps) {
         // default "os_version=value" should be used to determine current platform
         String platformVersion = "";
 
-        // redefine platform if mobile.platformVersion is available
+        // redefine platform if os_version caps is available
+        if (!R.CONFIG.get(SpecialKeywords.BROWSERSTACK_PLATFORM_VERSION).isEmpty()) {
+            platformVersion = R.CONFIG.get(SpecialKeywords.BROWSERSTACK_PLATFORM_VERSION);
+        }
+        
+        // redefine platform if platformVersion caps is available
         if (!R.CONFIG.get(SpecialKeywords.PLATFORM_VERSION).isEmpty()) {
             platformVersion = R.CONFIG.get(SpecialKeywords.PLATFORM_VERSION);
         }
         
-        //TODO: try to get actual platform version
+        if (caps != null && caps.getCapability("os_version") != null) {
+            platformVersion = caps.getCapability("os_version").toString();
+        }           
+        
+        if (caps.getCapability("platformVersion") != null) {
+            platformVersion = caps.getCapability("platformVersion").toString();
+        }        
+        
         return platformVersion;
     }
 
