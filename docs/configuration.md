@@ -45,6 +45,11 @@ All the project configuration properties are located in a **_config.properties**
 		<td>Boolean</td>
 	</tr>
 	<tr>
+		<td>browser_version</td>
+		<td>Browser version or an empty string if unknown for Selenium Grid</td>
+		<td>"87", "72"</td>
+	</tr>
+	<tr>
 		<td>browser_language</td>
 		<td>Browser language or nothing to use the English version by default.</td>
 		<td>"es", "fr"</td>
