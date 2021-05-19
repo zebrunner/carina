@@ -354,14 +354,12 @@ test_run_rules parameter parse logic:
 ```
 test_run_rules=OWNER=>Josh
 #Where OWNER is tag, and "=>" split's tag and rule part.
-#Because of the "Josh" rule, test will be executed if it has
-#@MethodOwner(owner = "Josh")
+#Because of the "Josh" rule, test will be executed if it has Josh as owner
 ```
 2) With negative logic:
 ```
 test_run_rules=OWNER=>!!Josh
-#Test will be executed if it hasn't got tag
-#@MethodOwner(owner = "Josh")
+#Test will be executed if it hasn't got Josh as owner
 ```
 3) With boolean logic:
 ```
