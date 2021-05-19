@@ -45,11 +45,6 @@ All the project configuration properties are located in a **_config.properties**
 		<td>Boolean</td>
 	</tr>
 	<tr>
-		<td>browser_version</td>
-		<td>Browser version or an empty string if unknown for Selenium Grid</td>
-		<td>"87", "72"</td>
-	</tr>
-		<tr>
 		<td>browser_language</td>
 		<td>Browser language or nothing to use the English version by default.</td>
 		<td>"es", "fr"</td>
@@ -309,6 +304,7 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 </table>
 Most of the properties may be read in the following way:
+
 ```
 Configuration.get(Parameter.URL) // returns string value
 Configuration.getBoolean(Parameter.AUTO_SCREENSHOT) // returns boolean value
@@ -369,42 +365,40 @@ test_run_rules=OWNER=>!!Josh
 ```
 3) With boolean logic:
 ```
-#Use || or && to create more difficulte rules.
-#|| == OR; && == AND.
+#Use || or && to create more difficult rules
+#where || == OR; && == AND.
 
 test_run_rules=OWNER=>Josh||Jake
-#Test will be executed if it has at least
-#@MethodOwner(owner = "Josh") or @MethodOwner(owner = "Jake").
+#Test will be executed if it has at least Josh or Jake as owner.
 
 test_run_rules=OWNER=>Josh&&Jake
-#Test will be executed if it has at least
-#@MethodOwner(owner = "Josh") and @MethodOwner(owner = "Jake").
+#Test will be executed if it has at least Jish and Jake as owner
 
 test_run_rules=OWNER=>Josh&&Jake||Peter
-#Will be parsed as 
+#Expression will be processed in sequential priority, like
 #test_run_rules=OWNER=>((Josh&&Jake)||Peter)
-#So test will be executed if it has at least
-#@MethodOwner(owner = "Josh") and @MethodOwner(owner = "Jake")
-#or
-#@MethodOwner(owner = "Peter")
+#So test will be executed if it has at least (Josh and Jake) or (Peter) as owner
 ```
-4) To add more tags to rule use ";;", example:
+4) To add more tags to the rule use ";;", example:
 ```
 #;; works as && (AND) but for tags
 
 test_run_rules=PRIORITY=>!!P1;;OWNER=>Josh&&!!Jake;;TAGS=>feature=web&&!!type=smoke||feature=android
 
 #Test will be executed if it has
-# 1) no @TestPriority(Priority.P1)
-# AND
-# 2) @MethodOwner(owner = "Josh") without @MethodOwner(owner = "Jake")
-# AND
-# 3) (@TestTag(name = "feature", value = "web") without @TestTag(name = "type", value = "smoke"))
-	 	or @TestTag(name = "feature", value = "android")
+#1) no @TestPriority(Priority.P1)
+#AND
+#2) @MethodOwner(owner = "Josh") without @MethodOwner(owner = "Jake")
+#AND
+#3) (@TestTag(name = "feature", value = "web") without @TestTag(name = "type", value = "smoke"))
+	 	or @TestTag(name = "feature", value = "android")	 	
+
+#In other words, will be executed tests with Priority that differs from P1, with Josh as owner if there no Jake 
+#and if they are for not smoke web or if they are for android.
 ```
 
 ### [Zebrunner Reporting](https://zebrunner.com/documentation/agents/testng) configuration
-[**agent.properties**](https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/agent.properties) file is used for Zebrunner Reporting integration, here you should specify some values for a proper integration:<table>
+[**agent.properties**](https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/agent.properties) file is used for Zebrunner Reporting integration, here you should specify some values for a proper integration:
 <table>	
 	<tr>
 		<th>Attribute</th>
