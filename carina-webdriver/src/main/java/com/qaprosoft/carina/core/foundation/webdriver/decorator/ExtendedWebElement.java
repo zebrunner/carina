@@ -127,11 +127,7 @@ public class ExtendedWebElement implements IWebElement {
     }
     
     public ExtendedWebElement(WebElement element, String name) {
-    	this(element);
     	this.name = name;
-    }
-    
-    private ExtendedWebElement(WebElement element) {
         this.element = element;
         
         //read searchContext from not null elements only
@@ -168,6 +164,10 @@ public class ExtendedWebElement implements IWebElement {
 
 				ExtendedElementLocator locator = (ExtendedElementLocator) locatorField.get(innerProxy);
 				this.isLocalized = locator.isLocalized();
+
+				if (isLocalized){
+    			    this.name = locator.getClassName() + "." + name;
+                }
 
 				searchContextField = locator.getClass().getDeclaredField("searchContext");
 				searchContextField.setAccessible(true);
