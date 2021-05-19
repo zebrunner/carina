@@ -18,6 +18,7 @@ public class OwnerFilter implements IFilter {
     @Override
     public boolean isPerform(ITestNGMethod testMethod, List<String> rules) {
         if (testMethod != null) {
+            //if test was described only by one TagFilters
             if (testMethod.getConstructorOrMethod().getMethod().isAnnotationPresent(MethodOwner.class)) {
                 MethodOwner ownerAnnotation = testMethod.getConstructorOrMethod().getMethod().getAnnotation(MethodOwner.class);
                 if (ownerAnnotation != null) {
@@ -28,6 +29,7 @@ public class OwnerFilter implements IFilter {
                 }
             }
 
+            //if test was described by several TagFilters
             if (testMethod.getConstructorOrMethod().getMethod().isAnnotationPresent(MethodOwner.List.class)) {
                 MethodOwner.List ownerAnnotations = testMethod.getConstructorOrMethod().getMethod().getAnnotation(MethodOwner.List.class);
                 if (ownerAnnotations != null) {

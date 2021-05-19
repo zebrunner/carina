@@ -80,7 +80,9 @@ public class FilterTestsListener implements ISuiteListener {
                 ruleStr = ruleStr.replaceAll("&amp;&amp;", SpecialKeywords.RULE_FILTER_AND_CONDITION);
             }
 
+            //parsing each rule
             for (String ruleItem : ruleStr.split(SpecialKeywords.RULE_FILTER_SPLITTER)) {
+                //ruleStructure[0] contains type of the rule, ruleStructure[1] contains the rule description
                 ruleStructure = ruleItem.split(SpecialKeywords.RULE_FILTER_VALUE_SPLITTER);
                 if (ruleStructure.length == 2) {
                     List<String> priority = prioritize(ruleStructure[1]);
@@ -92,6 +94,12 @@ public class FilterTestsListener implements ISuiteListener {
         return rules;
     }
 
+    /**
+     * Method that is responsible for parsing rule String into prioritized sequence.
+     *
+     * @param ruleStr String
+     * @return prioritized sequence
+     */
     private List<String> prioritize(String ruleStr) {
         List<String> values = new ArrayList<>(Arrays.asList(ruleStr.split("(?=&&)|(?=\\|\\|)")));
         return values;

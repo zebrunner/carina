@@ -19,6 +19,7 @@ public interface IFilter {
         String expression = ruleExpression.get(0);
         boolean match;
 
+        //checking value with the highest priority ([0] element of ruleExpression)
         if (expression.contains(SpecialKeywords.RULE_FILTER_EXCLUDE_CONDITION)) {
             String finalExpression = expression.substring(expression.indexOf(SpecialKeywords.RULE_FILTER_EXCLUDE_CONDITION) + 2);
             match = actualValues.stream().allMatch(actualValue -> !actualValue.equalsIgnoreCase(finalExpression));
@@ -27,13 +28,10 @@ public interface IFilter {
             match = actualValues.stream().anyMatch(actualValue -> actualValue.equalsIgnoreCase(finalExpression));
         }
 
-        if (ruleExpression.size() == 1) {
-            return match;
-        }
-
         for (int i = 1; i < ruleExpression.size(); i++) {
             expression = ruleExpression.get(i);
             if (expression.contains(SpecialKeywords.RULE_FILTER_OR_CONDITION)) {
+                //if previous expression is true, we don't need to check this because of (true || false) == true
                 if (match) {
                     continue;
                 }
@@ -45,6 +43,7 @@ public interface IFilter {
                     match = actualValues.stream().anyMatch(actualValue -> actualValue.equalsIgnoreCase(value));
                 }
             } else if (expression.contains(SpecialKeywords.RULE_FILTER_AND_CONDITION)) {
+                //if previous expression is false, we don't need to check this because of (false && true) = false
                 if (!match) {
                     continue;
                 }

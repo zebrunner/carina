@@ -22,6 +22,7 @@ public class TagFilter implements IFilter {
         String tagValue;
 
         if (testMethod != null) {
+            //if test was described only by one TagFilter
             if (testMethod.getConstructorOrMethod().getMethod().isAnnotationPresent(TestTag.class)) {
                 TestTag methodAnnotation = testMethod.getConstructorOrMethod().getMethod().getAnnotation(TestTag.class);
 
@@ -34,6 +35,7 @@ public class TagFilter implements IFilter {
                 }
             }
 
+            //if test was described by several TagFilters
             if (testMethod.getConstructorOrMethod().getMethod().isAnnotationPresent(TestTag.List.class)) {
                 TestTag.List methodAnnotation = testMethod.getConstructorOrMethod().getMethod().getAnnotation(TestTag.List.class);
                 if (methodAnnotation != null) {
