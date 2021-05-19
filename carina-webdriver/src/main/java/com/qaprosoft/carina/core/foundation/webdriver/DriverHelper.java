@@ -384,6 +384,7 @@ public class DriverHelper {
      * @param url
      *            to open.
      * @param timeout
+     *            long
      */
     public void openURL(String url, long timeout) {
         final String decryptedURL = getEnvArgURL(cryptoTool.decryptByPattern(url, CRYPTO_PATTERN));
@@ -456,7 +457,7 @@ public class DriverHelper {
 	/**
 	 * Get full or relative URL considering Env argument
 	 * 
-	 * @param decryptedURL
+	 * @param decryptedURL String
 	 * @return url
 	 */
 	private String getEnvArgURL(String decryptedURL) {

@@ -45,11 +45,6 @@ All the project configuration properties are located in a **_config.properties**
 		<td>Boolean</td>
 	</tr>
 	<tr>
-		<td>browser_version</td>
-		<td>Browser version or an empty string if unknown for Selenium Grid</td>
-		<td>"87", "72"</td>
-	</tr>
-	<tr>
 		<td>browser_language</td>
 		<td>Browser language or nothing to use the English version by default.</td>
 		<td>"es", "fr"</td>
@@ -314,7 +309,7 @@ Most of the properties may be read in the following way:
 Configuration.get(Parameter.URL) // returns string value
 Configuration.getBoolean(Parameter.AUTO_SCREENSHOT) // returns boolean value
 Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) //return int value
-Configuration.getDouble(Parameter.BROWSER_VERSION) // returns double value
+Configuration.getDouble(Parameter.MAX_DRIVER_COUNT) // returns double value
 ```
 
 ### Environment specific configuration

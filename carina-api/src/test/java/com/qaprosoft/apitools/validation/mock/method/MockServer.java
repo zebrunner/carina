@@ -29,7 +29,11 @@ public class MockServer {
 
     /**
      * The following code will configure a response with a status of 200 to be returned
-     * when the relative URL exactly matches {@param testUrl} with response body {@param response}
+     * when the relative URL exactly matches testUrl with response body response
+     *
+     * @param testUrl String
+     *
+     * @param response String
      */
     public void createResponse(String testUrl, String response) {
         stubFor(get(urlEqualTo(testUrl))
