@@ -68,8 +68,6 @@ public class Configuration {
 
         BROWSER("browser"),
 
-        BROWSER_VERSION("browser_version"),
-
         BROWSER_LANGUAGE("browser_language"),
 
         SELENIUM_HOST("selenium_host"),
@@ -372,39 +370,55 @@ public class Configuration {
     public static String getPlatform(DesiredCapabilities caps) {
         // any platform by default
         String platform = "*";
-
-        // redefine platform if mobile.platformName is available
-        if (!R.CONFIG.get(SpecialKeywords.PLATFORM).isEmpty()) {
-            platform = R.CONFIG.get(SpecialKeywords.PLATFORM);
-        }
         
-        // redefine platform if mobile.platformName is available
+        
+        // redefine platform if os caps is available
+        if (!R.CONFIG.get(SpecialKeywords.BROWSERSTACK_PLATFORM_NAME).isEmpty()) {
+            platform = R.CONFIG.get(SpecialKeywords.BROWSERSTACK_PLATFORM_NAME);
+        }
+
+        // redefine platform if platformName caps is available
         if (!R.CONFIG.get(SpecialKeywords.PLATFORM_NAME).isEmpty()) {
             platform = R.CONFIG.get(SpecialKeywords.PLATFORM_NAME);
         }
-        
-        if (caps != null && caps.getCapability("platform") != null) {
-            platform = caps.getCapability("platform").toString();
-        }
 
+        if (caps != null && caps.getCapability("os") != null) {
+            platform = caps.getCapability("os").toString();
+        }   
+        
         if (caps != null && caps.getCapability("platformName") != null) {
             platform = caps.getCapability("platformName").toString();
         }        
         
-        //TODO: try to get actual platform name
         return platform;
     }
     
     public static String getPlatformVersion() {
+        return getPlatformVersion(new DesiredCapabilities());
+    }
+    
+    public static String getPlatformVersion(DesiredCapabilities caps) {
         // default "os_version=value" should be used to determine current platform
         String platformVersion = "";
 
-        // redefine platform if mobile.platformVersion is available
+        // redefine platform if os_version caps is available
+        if (!R.CONFIG.get(SpecialKeywords.BROWSERSTACK_PLATFORM_VERSION).isEmpty()) {
+            platformVersion = R.CONFIG.get(SpecialKeywords.BROWSERSTACK_PLATFORM_VERSION);
+        }
+        
+        // redefine platform if platformVersion caps is available
         if (!R.CONFIG.get(SpecialKeywords.PLATFORM_VERSION).isEmpty()) {
             platformVersion = R.CONFIG.get(SpecialKeywords.PLATFORM_VERSION);
         }
         
-        //TODO: try to get actual platform version
+        if (caps != null && caps.getCapability("os_version") != null) {
+            platformVersion = caps.getCapability("os_version").toString();
+        }           
+        
+        if (caps.getCapability("platformVersion") != null) {
+            platformVersion = caps.getCapability("platformVersion").toString();
+        }        
+        
         return platformVersion;
     }
 
@@ -424,19 +438,10 @@ public class Configuration {
     
     public static String getBrowserVersion() {
         String browserVersion = "";
-        if (!Configuration.get(Parameter.BROWSER_VERSION).isEmpty()) {
-            // default "browser_version=value" should be used to determine current browser
-            browserVersion = Configuration.get(Parameter.BROWSER_VERSION);
-        }
 
         // redefine browserVersion if capabilities.browserVersion is available
         if (!R.CONFIG.get("capabilities.browserVersion").isEmpty()  && !"null".equalsIgnoreCase(R.CONFIG.get("capabilities.browserVersion"))) {
             browserVersion = R.CONFIG.get("capabilities.browserVersion");
-        }
-        
-        // read from actual_browser_version if specified
-        if (R.CONFIG.containsKey(SpecialKeywords.ACTUAL_BROWSER_VERSION)) {
-            browserVersion = R.CONFIG.get(SpecialKeywords.ACTUAL_BROWSER_VERSION);
         }
         
         return browserVersion;
@@ -463,10 +468,6 @@ public class Configuration {
         }
 
         String platform = "";
-        if (capabilities.getCapability("platform") != null) {
-            platform = capabilities.getCapability("platform").toString();
-        }
-
         if (capabilities.getCapability("platformName") != null) {
             platform = capabilities.getCapability("platformName").toString();
         }
@@ -509,6 +510,8 @@ public class Configuration {
     
     /**
      * Register APP_VERSION number in CONFIG space and as Zebrunner Reporting build number if not empty.
+     *
+     * @param build String
      */
     public static void setBuild(String build) {
         R.CONFIG.put(Parameter.APP_VERSION.getKey(), build);

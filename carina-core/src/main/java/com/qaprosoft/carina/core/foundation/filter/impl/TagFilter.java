@@ -51,7 +51,6 @@ public class TagFilter implements IFilter {
                     return ruleCheck(rules, tags);
                 }
             }
-        }
         return false;
     }
 }

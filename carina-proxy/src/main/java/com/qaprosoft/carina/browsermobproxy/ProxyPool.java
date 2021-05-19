@@ -247,7 +247,7 @@ public final class ProxyPool {
     
     /**
      * Stop single proxy instance by id
-     * @param threadId
+     * @param threadId long
      */
     private static void stopProxyByThread(long threadId) {
         if (proxies.containsKey(threadId)) {
@@ -338,7 +338,7 @@ public final class ProxyPool {
     /**
      * Method to kill process by port. It is used before start of new proxy instance
      * 
-     * @param port
+     * @param port int
      */
     private static void killProcessByPort(int port) {
         if (port == 0) {

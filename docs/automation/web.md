@@ -178,8 +178,7 @@ It is good practice to implement all elements search logic of Page Object/UI Obj
 There are a few critical properties in a _config.properties file which are required for web test execution:
 
 * url=http://www.gsmarena.com
-* browser=chrome
-* browser_version=*
+* capabilities.browserName=chrome
 
 The implemented test cases should be placed in a TestNG xml file according to the test group the test belongs to. You can find more details about TestNG configuration in the [official documentation](http://testng.org/doc/documentation-main.html).
 ```xml

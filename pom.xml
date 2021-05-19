@@ -63,7 +63,7 @@
         <selenium.version>3.141.59</selenium.version>
         <appium.version>7.4.1</appium.version>
         <!-- Zebrunner integrations -->
-        <zebrunner-testng-pluggable.version>1.5.0.180-SNAPSHOT</zebrunner-testng-pluggable.version>
+        <zebrunner-testng-pluggable.version>1.5.0</zebrunner-testng-pluggable.version>
         <!-- Others -->
         <azure-storage-blob.version>12.4.0</azure-storage-blob.version>
         <aws-java-sdk.version>1.11.923</aws-java-sdk.version>
@@ -72,7 +72,7 @@
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
         <gson.version>2.8.5</gson.version>
         <jackson-databind.version>2.11.0</jackson-databind.version>
-        <jackson-annotations.version>2.9.9</jackson-annotations.version>
+        <jackson-annotations.version>2.11.0</jackson-annotations.version>
         <apache-poi.version>4.1.2</apache-poi.version>
         <guava.version>29.0-jre</guava.version>
         <jaxb-api.version>2.2.2</jaxb-api.version>

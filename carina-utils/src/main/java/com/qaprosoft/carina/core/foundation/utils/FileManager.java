@@ -113,7 +113,9 @@ public class FileManager {
      *
      * @param checksumType  Checksum hash type.
      * @param file file path.
-     * @return hash as a String
+     * @return hash as a StringF
+     * @throws NoSuchAlgorithmException can be caused by read() method
+     * @throws IOException can be caused by read() method MessageDigest.getInstance() method
      */
     public static String getFileChecksum(Checksum checksumType, File file) throws IOException, NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance(checksumType.value);

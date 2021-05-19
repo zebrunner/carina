@@ -22,6 +22,11 @@ public class XmlComparator {
 
     /**
      * comparison with strict array ordering.
+     *
+     * @param actualXmlData String
+     *
+     * @param expectedXmlData String
+     *
      */
     public static void strictCompare(String actualXmlData, String expectedXmlData) {
         XmlAssert.assertThat(actualXmlData).and(expectedXmlData)
@@ -32,6 +37,10 @@ public class XmlComparator {
 
     /**
      * comparison with non-strict array ordering.
+     *
+     * @param actualXmlData String
+     *
+     * @param expectedXmlData String
      */
     public static void nonStrictOrderCompare(String actualXmlData, String expectedXmlData) {
         Diff differences = DiffBuilder.compare(expectedXmlData).withTest(actualXmlData)
