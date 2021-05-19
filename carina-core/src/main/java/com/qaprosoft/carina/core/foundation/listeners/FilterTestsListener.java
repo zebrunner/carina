@@ -60,7 +60,7 @@ public class FilterTestsListener implements ISuiteListener {
     /**
      * Method to disable test
      * 
-     * @param testMethod
+     * @param testMethod ITestNGMethod
      */
     private void disableTest(ITestNGMethod testMethod) {
         LOGGER.info(String.format("Disable test: [%s]", testMethod.getMethodName()));

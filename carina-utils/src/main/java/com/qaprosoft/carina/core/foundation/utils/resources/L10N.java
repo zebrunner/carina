@@ -120,12 +120,11 @@ public class L10N {
             LOGGER.debug("L10N folder with resources is missing!");
         }
     }
-    
+
     /**
      * Replace default L10N resource bundle.
      *
-     * @param resources
-     *            - ArrayList
+     * @param resources ArrayList
      *
      */    
     public static void load(ArrayList<ResourceBundle> resources) {

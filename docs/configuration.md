@@ -309,7 +309,7 @@ Most of the properties may be read in the following way:
 Configuration.get(Parameter.URL) // returns string value
 Configuration.getBoolean(Parameter.AUTO_SCREENSHOT) // returns boolean value
 Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) //return int value
-Configuration.getDouble(Parameter.BROWSER_VERSION) // returns double value
+Configuration.getDouble(Parameter.MAX_DRIVER_COUNT) // returns double value
 ```
 
 ### Environment specific configuration

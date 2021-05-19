@@ -341,6 +341,8 @@ public class DriverListener implements WebDriverEventListener {
     /**
      * Cast Carina driver to WebDriver removing all extra listeners (try to avoid direct operations via WebDriver as it doesn't support logging etc)
      *
+     * @param drv WebDriver
+     *
      * @return WebDriver
      */
     private WebDriver castDriver(WebDriver drv) {

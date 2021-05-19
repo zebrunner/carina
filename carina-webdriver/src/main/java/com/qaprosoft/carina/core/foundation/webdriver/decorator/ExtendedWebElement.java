@@ -1335,10 +1335,15 @@ public class ExtendedWebElement implements IWebElement {
 
 	/**
 	 * doAction on element.
-	 *
+     *
+	 * @param actionName
+     *            ACTION_NAME
 	 * @param timeout
+     *            long
 	 * @param waitCondition
 	 *            to check element conditions before action
+     * @return
+     *            Object
 	 */
 	private Object doAction(ACTION_NAME actionName, long timeout, ExpectedCondition<?> waitCondition) {
 		// [VD] do not remove null args otherwise all actions without arguments will be broken!

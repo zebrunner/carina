@@ -34,7 +34,6 @@ public class ConfigurationTest {
     @AfterClass
     public void tearDown() {
         R.CONFIG.put(SpecialKeywords.PLATFORM_NAME, "");
-        R.CONFIG.put(SpecialKeywords.PLATFORM, "");
         R.CONFIG.put(Parameter.BROWSER.getKey(), "chrome");
     }
 
@@ -56,7 +55,7 @@ public class ConfigurationTest {
 
     @Test(expectedExceptions = { RuntimeException.class })
     public void testInvalidConfigValidation() {
-        R.CONFIG.put("platform", "{must_override}");
+        R.CONFIG.put("selenium_url", "{must_override}");
         Configuration.validateConfiguration();
     }
 
@@ -90,7 +89,7 @@ public class ConfigurationTest {
 
     @Test
     public void testBrowserVersion() {
-        R.CONFIG.put(Parameter.BROWSER_VERSION.getKey(), "88.0.0");
+        R.CONFIG.put("capabilities.browserVersion", "88.0.0");
 
         Assert.assertEquals(Configuration.getBrowserVersion(), "88.0.0", "capabilities.browserVersion wasn't set");
     }

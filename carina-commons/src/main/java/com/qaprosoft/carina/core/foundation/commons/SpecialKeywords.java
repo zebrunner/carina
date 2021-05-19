@@ -104,8 +104,6 @@ public class SpecialKeywords {
     public static final String SKIPPED = "SKIPPED";
 
     public static final String ZAFIRA_PROJECT = "zafira_project";
-    public static final String ACTUAL_BROWSER_VERSION = "actual_browser_version";
-    
 
     public static final String COMMENT = "comment";
     
@@ -131,19 +129,18 @@ public class SpecialKeywords {
     public static final String CAPABILITIES = "capabilities";
     public static final String ENABLE_VIDEO = "capabilities.enableVideo";
     public static final String ENABLE_LOG = "capabilities.enableLog";
-    public static final String PLATFORM = "capabilities.platform";
     public static final String PLATFORM_NAME = "capabilities.platformName";
     public static final String PLATFORM_VERSION = "capabilities.platformVersion";
+    public static final String BROWSERSTACK_PLATFORM_NAME = "capabilities.os";
+    public static final String BROWSERSTACK_PLATFORM_VERSION = "capabilities.os_version";
 
     public static final String ADB_EXEC_TIMEOUT = "capabilities.adbExecTimeout";
     public static final String MOBILE_DEVICE_UDID = "capabilities.udid";
     public static final String MOBILE_DEVICE_NAME = "capabilities.deviceName";
-    public static final String MOBILE_DEVICE_BROWSERSTACK_NAME = "capabilities.device";
     public static final String MOBILE_DEVICE_TYPE = "capabilities.deviceType";
     //TODO: switch into the PLATFORM_NAME later
     public static final String MOBILE_DEVICE_PLATFORM = "capabilities.platformName";
     public static final String MOBILE_DEVICE_PLATFORM_VERSION = "capabilities.platformVersion";
-    public static final String MOBILE_DEVICE_BROWSERSTACK_PLATFORM_VERSION = "capabilities.os_version";
     public static final String MOBILE_DEVICE_REMOTE_URL = "capabilities.remoteURL";
     public static final String MOBILE_APP_ACITIVTY = "capabilities.appActivity";
     public static final String MOBILE_APP_PACKAGE = "capabilities.appPackage";

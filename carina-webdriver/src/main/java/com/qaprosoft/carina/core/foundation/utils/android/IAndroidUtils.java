@@ -140,7 +140,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * change Android Device Language
      * <p>
      * Url: <a href=
-     * "http://play.google.com/store/apps/details?id=net.sanapeli.adbchangelanguage&hl=ru&rdid=net.sanapeli.adbchangelanguage">
+     * "http://play.google.com/store/apps/details?id=net.sanapeli.adbchangelanguage">
      * ADBChangeLanguage apk </a> Change locale (language) of your device via ADB
      * (on Android OS version 6.0, 5.0, 4.4, 4.3, 4.2 and older). No need to root
      * your device! With ADB (Android Debug Bridge) on your computer, you can fast
@@ -170,7 +170,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * change Android Device Language
      * <p>
      * Url: <a href=
-     * "http://play.google.com/store/apps/details?id=net.sanapeli.adbchangelanguage&hl=ru&rdid=net.sanapeli.adbchangelanguage">
+     * "http://play.google.com/store/apps/details?id=net.sanapeli.adbchangelanguage">
      * ADBChangeLanguage apk </a> Change locale (language) of your device via ADB
      * (on Android OS version 6.0, 5.0, 4.4, 4.3, 4.2 and older). No need to root
      * your device! With ADB (Android Debug Bridge) on your computer, you can fast
