@@ -387,7 +387,6 @@ public class DriverHelper {
      *            long
      */
     public void openURL(String url, long timeout) {
-        //TODO: implement timeout waiter and several attempts if needed
         final String decryptedURL = getEnvArgURL(cryptoTool.decryptByPattern(url, CRYPTO_PATTERN));
 
         WebDriver drv = getDriver();
@@ -402,10 +401,7 @@ public class DriverHelper {
             drv.switchTo().alert().accept();
         } catch (JsonException e) {
             if (e.getMessage() != null && e.getMessage().contains("Expected to read a START_MAP but instead have: END. Last 0 characters read")) {
-                LOGGER.error(e.getMessage(), e);
-                pause(0.1);
-                LOGGER.info("trying to open one more time!");
-                drv.get(decryptedURL);
+                LOGGER.error("Selenium Hub couldn't handle request due to overloading or timeout!");
             }
             //re-throw original exception as we already put to the log important info
             throw e;
