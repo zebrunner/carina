@@ -48,6 +48,7 @@ public class ExtendedElementLocator implements ElementLocator {
     private final SearchContext searchContext;
     private By by;
     private WebElement cachedElement;
+    private String className;
     
     private boolean shouldCache = true;
     private boolean caseInsensitive = false;
@@ -62,6 +63,8 @@ public class ExtendedElementLocator implements ElementLocator {
      */
     public ExtendedElementLocator(SearchContext searchContext, Field field) {
         this.searchContext = searchContext;
+        String[] classPath = field.getDeclaringClass().toString().split("\\.");
+        this.className = classPath[classPath.length-1];
 
         if (field.isAnnotationPresent(FindBy.class) || field.isAnnotationPresent(ExtendedFindBy.class)) {
             LocalizedAnnotations annotations = new LocalizedAnnotations(field);
@@ -193,6 +196,10 @@ public class ExtendedElementLocator implements ElementLocator {
     
     public boolean isLocalized() {
         return localized;
+    }
+
+    public String getClassName(){
+        return className;
     }
 
 }
