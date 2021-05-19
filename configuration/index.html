@@ -257,6 +257,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#tests-execution-filter-configuration" class="md-nav__link">
+    Tests execution filter configuration
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#zebrunner-reporting-configuration" class="md-nav__link">
     Zebrunner Reporting configuration
   </a>
@@ -531,6 +538,13 @@
         <li class="md-nav__item">
   <a href="#environment-specific-configuration" class="md-nav__link">
     Environment specific configuration
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tests-execution-filter-configuration" class="md-nav__link">
+    Tests execution filter configuration
   </a>
   
 </li>
@@ -854,7 +868,7 @@ R.TESTDATA.get(&quot;user.email&quot;)
     <tr>
         <td>test_run_rules</td>
         <td>Executing rules logic: test_run_rules={RULE_NAME_ENUM}=&gt;{RULE_VALUE1}&amp;&amp;{RULE_VALUE2};;...</td>
-        <td>test_run_rules=PRIORITY=&gt;P1&amp;&amp;P2;;OWNER=&gt;owner;;TAGS=&gt;tag1=temp&amp;&amp;feature=reg</td>
+        <td>test_run_rules=PRIORITY=&gt;P1&amp;&amp;P2&amp;&P4;;OWNER=&gt;owner;;TAGS=&gt;tag1=temp||!!feature=reg</td>
     </tr>
     <tr>
         <td>element_loading_strategy</td>
@@ -886,8 +900,74 @@ PROD.url=http://prod-app-server.com
 </code></pre>
 
 <p>As a result, you switch between the environments just changing the env argument in the _config.properties file.</p>
+<h3 id="tests-execution-filter-configuration">Tests execution filter configuration</h3>
+<p>The test_run_rules parameter is responsible for filtering tests.
+There are 3 filter types:
+1) PRIORITY - enum field (from P0 to P6)
+2) OWNER - the test owner
+3) TAGS - custom label</p>
+<p>Example of how to attach labels in code:</p>
+<pre><code>@Test
+@TestPriority(Priority.P3)
+@MethodOwner(owner = &quot;Josh&quot;)
+@MethodOwner(owner = &quot;Jake&quot;)
+@TestTag(name = &quot;feature&quot;, value = &quot;web&quot;)
+@TestTag(name = &quot;type&quot;, value = &quot;regression&quot;)
+public void t4(){
+    ...
+    some code
+    ...
+}
+</code></pre>
+
+<p>test_run_rules parameter parse logic:</p>
+<p>1) A simple filter:</p>
+<pre><code>test_run_rules=OWNER=&gt;Josh
+#Where OWNER is tag, and &quot;=&gt;&quot; split's tag and rule part.
+#Because of the &quot;Josh&quot; rule, test will be executed if it has Josh as owner
+</code></pre>
+
+<p>2) With negative logic:</p>
+<pre><code>test_run_rules=OWNER=&gt;!!Josh
+#Test will be executed if it hasn't got Josh as owner
+</code></pre>
+
+<p>3) With boolean logic:</p>
+<pre><code>#Use || or &amp;&amp; to create more difficult rules
+#where || == OR; &amp;&amp; == AND.
+
+test_run_rules=OWNER=&gt;Josh||Jake
+#Test will be executed if it has at least Josh or Jake as owner.
+
+test_run_rules=OWNER=&gt;Josh&amp;&amp;Jake
+#Test will be executed if it has at least Jish and Jake as owner
+
+test_run_rules=OWNER=&gt;Josh&amp;&amp;Jake||Peter
+#Expression will be processed in sequential priority, like
+#test_run_rules=OWNER=&gt;((Josh&amp;&amp;Jake)||Peter)
+#So test will be executed if it has at least (Josh and Jake) or (Peter) as owner
+</code></pre>
+
+<p>4) To add more tags to the rule use ";;", example:</p>
+<pre><code>#;; works as &amp;&amp; (AND) but for tags
+
+test_run_rules=PRIORITY=&gt;!!P1;;OWNER=&gt;Josh&amp;&amp;!!Jake;;TAGS=&gt;feature=web&amp;&amp;!!type=smoke||feature=android
+
+#Test will be executed if it has
+#1) no @TestPriority(Priority.P1)
+#AND
+#2) @MethodOwner(owner = &quot;Josh&quot;) without @MethodOwner(owner = &quot;Jake&quot;)
+#AND
+#3) (@TestTag(name = &quot;feature&quot;, value = &quot;web&quot;) without @TestTag(name = &quot;type&quot;, value = &quot;smoke&quot;))
+        or @TestTag(name = &quot;feature&quot;, value = &quot;android&quot;)        
+
+#In other words, will be executed tests with Priority that differs from P1, with Josh as owner if there no Jake 
+#and if they are for not smoke web or if they are for android.
+</code></pre>
+
 <h3 id="zebrunner-reporting-configuration"><a href="https://zebrunner.com/documentation/agents/testng">Zebrunner Reporting</a> configuration</h3>
-<p><a href="https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/agent.properties"><strong>agent.properties</strong></a> file is used for Zebrunner Reporting integration, here you should specify some values for a proper integration:<table>
+<p><a href="https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/agent.properties"><strong>agent.properties</strong></a> file is used for Zebrunner Reporting integration, here you should specify some values for a proper integration:
+<table> 
     <tr>
         <th>Attribute</th>
         <th>Meaning</th>
