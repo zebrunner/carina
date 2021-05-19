@@ -16,7 +16,6 @@
 package com.qaprosoft.carina.core.foundation.utils;
 
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,21 +35,7 @@ import com.zebrunner.agent.core.registrar.CurrentTestRun;
  */
 public class Configuration {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static IEnvArgResolver envArgResolver;
-
-    static {
-        String envArgResolverClass = "com.qaprosoft.carina.core.foundation.utils.DefaultEnvArgResolver";
-
-        try {
-            Class<?> cl = Class.forName(envArgResolverClass);
-            Constructor<?> ct = cl.getConstructor();
-            Configuration.setEnvArgResolver((IEnvArgResolver) ct.newInstance());
-        } catch (Exception e) {
-            throw new RuntimeException(
-                    "Configuration failure: can not initiate EnvArgResolver - '" + envArgResolverClass + "'", e);
-        }
-
-    }
+    private static IEnvArgResolver envArgResolver = new DefaultEnvArgResolver();
 
     /**
      * All available configuration parameter keys along with default values.
@@ -319,10 +304,6 @@ public class Configuration {
 
     public static IEnvArgResolver getEnvArgResolver() {
         return envArgResolver;
-    }
-
-    public static void setEnvArgResolver(IEnvArgResolver envArgResolver) {
-        Configuration.envArgResolver = envArgResolver;
     }
 
     public static boolean isNull(Parameter param) {
