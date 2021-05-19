@@ -17,6 +17,7 @@ package com.qaprosoft.carina.core.foundation;
 
 import java.lang.annotation.Annotation;
 
+import com.qaprosoft.carina.core.foundation.listeners.FilterTestsListener;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.SkipException;
@@ -47,7 +48,7 @@ import com.zebrunner.agent.testng.listener.TestRunListener;
 
 // on start order is TestRunListener and CarinaListener
 // on finish reverse order, i.e. CarinaListener, TestRunListener
-@LinkedListeners({ CarinaListener.class, TestRunListener.class, DataProviderInterceptor.class })
+@LinkedListeners({ CarinaListener.class, TestRunListener.class, DataProviderInterceptor.class, FilterTestsListener.class })
 @Listeners({DataProviderInterceptor.class})
 public interface IAbstractTest extends ICustomTypePageFactory, ITestCases {
 

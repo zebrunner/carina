@@ -16,19 +16,20 @@ public class OwnerFilter implements IFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public boolean isPerform(ITestNGMethod testMethod, List<String> expectedData) {
+    public boolean isPerform(ITestNGMethod testMethod, List<String> rules) {
         if (testMethod != null) {
+            //if test was described only by one OwnerFilter
             if (testMethod.getConstructorOrMethod().getMethod().isAnnotationPresent(MethodOwner.class)) {
                 MethodOwner ownerAnnotation = testMethod.getConstructorOrMethod().getMethod().getAnnotation(MethodOwner.class);
                 if (ownerAnnotation != null) {
                     String owner = ownerAnnotation.owner().toLowerCase();
-
                     LOGGER.info(String.format("Test: [%s]. Owners: %s. Expected ownerAnnotation: [%s]", testMethod.getMethodName(), owner,
-                            expectedData.toString()));
-                    return expectedData.parallelStream().anyMatch(d -> owner.contains(d.toLowerCase()));
+                            rules.toString()));
+                    return ruleCheck(rules, owner);
                 }
             }
 
+            //if test was described by several OwnerFilters
             if (testMethod.getConstructorOrMethod().getMethod().isAnnotationPresent(MethodOwner.List.class)) {
                 MethodOwner.List ownerAnnotations = testMethod.getConstructorOrMethod().getMethod().getAnnotation(MethodOwner.List.class);
                 if (ownerAnnotations != null) {
@@ -37,9 +38,9 @@ public class OwnerFilter implements IFilter {
                         owners.add(methodOwner.owner().toLowerCase());
                     }
                     LOGGER.info(String.format("Test: [%s]. Owners: %s. Expected owner: [%s]", testMethod.getMethodName(), owners.toString(),
-                            expectedData.toString()));
-                    return expectedData.parallelStream().anyMatch(d -> owners.stream().anyMatch(owner -> owner.equalsIgnoreCase(d)));
-                }
+                            rules.toString()));
+                    return ruleCheck(rules, owners);
+              }
             }
         }
         return false;

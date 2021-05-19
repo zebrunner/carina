@@ -17,11 +17,12 @@ public class TagFilter implements IFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public boolean isPerform(ITestNGMethod testMethod, List<String> expectedData) {
+    public boolean isPerform(ITestNGMethod testMethod, List<String> rules) {
         String tagName;
         String tagValue;
 
         if (testMethod != null) {
+            //if test was described only by one TagFilter
             if (testMethod.getConstructorOrMethod().getMethod().isAnnotationPresent(TestTag.class)) {
                 TestTag methodAnnotation = testMethod.getConstructorOrMethod().getMethod().getAnnotation(TestTag.class);
 
@@ -29,14 +30,15 @@ public class TagFilter implements IFilter {
                     tagName = methodAnnotation.name();
                     tagValue = methodAnnotation.value();
                     String tag = tagName + "=" + tagValue;
-                    LOGGER.info(String.format("Test: [%s]. Tag: [%s]. Expected tag: [%s]", testMethod.getMethodName(), tag, expectedData.toString()));
-                    return expectedData.parallelStream().anyMatch(d -> d.equalsIgnoreCase(tag));
+                    LOGGER.info(String.format("Test: [%s]. Tag: [%s]. Expected tag: [%s]", testMethod.getMethodName(), tag, rules.toString()));
+                    return ruleCheck(rules, tag);
                 }
             }
 
+            //if test was described by several TagFilters
             if (testMethod.getConstructorOrMethod().getMethod().isAnnotationPresent(TestTag.List.class)) {
                 TestTag.List methodAnnotation = testMethod.getConstructorOrMethod().getMethod().getAnnotation(TestTag.List.class);
-                if (methodAnnotation!=null) {
+                if (methodAnnotation != null) {
                     List<String> tags = new ArrayList<String>();
                     for (TestTag tag : methodAnnotation.value()) {
                         tagName = tag.name();
@@ -45,12 +47,10 @@ public class TagFilter implements IFilter {
                         tags.add(fullTag.toLowerCase());
                     }
                     LOGGER.info(
-                            String.format("Test: [%s]. Tag: [%s]. Expected tag: [%s]", testMethod.getMethodName(), tags, expectedData.toString()));
-                    return expectedData.parallelStream().anyMatch(d -> tags.stream().anyMatch( tag -> tag.equalsIgnoreCase(d)));
-                    }
+                            String.format("Test: [%s]. Tag: [%s]. Expected tag: [%s]", testMethod.getMethodName(), tags, rules.toString()));
+                    return ruleCheck(rules, tags);
                 }
             }
         return false;
     }
-
 }

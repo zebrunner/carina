@@ -15,12 +15,12 @@ public class Rule {
     
     private IFilter testFilter;
 
-    private List<String> ruleValues;
+    private List<String> ruleExpression;
 
-    public Rule(String ruleName, IFilter filter, List<String> ruleValues) {
+    public Rule(String ruleName, IFilter filter, List<String> ruleExpression) {
         this.ruleName = ruleName;
         this.testFilter = filter;
-        this.ruleValues = ruleValues;
+        this.ruleExpression = ruleExpression;
     }
 
     public String getRuleName() {
@@ -31,14 +31,6 @@ public class Rule {
         this.ruleName = ruleName;
     }
 
-    public List<String> getRuleValues() {
-        return ruleValues;
-    }
-
-    public void setRuleValues(List<String> ruleValues) {
-        this.ruleValues = ruleValues;
-    }
-
     public IFilter getTestFilter() {
         return testFilter;
     }
@@ -47,9 +39,17 @@ public class Rule {
         this.testFilter = testFilter;
     }
 
+    public List<String> getRuleExpression() {
+        return ruleExpression;
+    }
+
+    public void setRuleExpression(List<String> ruleExpression) {
+        this.ruleExpression = ruleExpression;
+    }
+
     @Override
     public String toString() {
-        return "Rule [ruleName=" + ruleName + ", testFilter=" + testFilter + ", ruleValues=" + ruleValues + "]";
+        return "Rule [ruleName=" + ruleName + ", testFilter=" + testFilter + ", ruleExpression=" + ruleExpression + "]";
     }
 
 }
