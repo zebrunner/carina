@@ -15,6 +15,46 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.listeners;
 
+import java.io.File;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Category;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+import org.testng.Assert;
+import org.testng.IClassListener;
+import org.testng.ISuite;
+import org.testng.ISuiteListener;
+import org.testng.ITestClass;
+import org.testng.ITestContext;
+import org.testng.ITestNGMethod;
+import org.testng.ITestResult;
+import org.testng.SkipException;
+import org.testng.TestListenerAdapter;
+import org.testng.TestNG;
+import org.testng.xml.XmlClass;
+import org.testng.xml.XmlInclude;
+import org.testng.xml.XmlSuite;
+import org.testng.xml.XmlTest;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.azure.storage.blob.models.BlobProperties;
@@ -31,8 +71,13 @@ import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollecto
 import com.qaprosoft.carina.core.foundation.report.qtest.IQTestManager;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestRailManager;
 import com.qaprosoft.carina.core.foundation.skip.ExpectedSkipManager;
-import com.qaprosoft.carina.core.foundation.utils.*;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.DateUtils;
+import com.qaprosoft.carina.core.foundation.utils.FileManager;
+import com.qaprosoft.carina.core.foundation.utils.Messager;
+import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.utils.ZebrunnerNameResolver;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.ftp.FtpUtils;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
@@ -54,33 +99,6 @@ import com.zebrunner.agent.core.registrar.Label;
 import com.zebrunner.agent.core.registrar.label.CompositeLabelResolver;
 import com.zebrunner.agent.core.registrar.maintainer.ChainedMaintainerResolver;
 import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Category;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
-import org.testng.*;
-import org.testng.xml.XmlClass;
-import org.testng.xml.XmlInclude;
-import org.testng.xml.XmlSuite;
-import org.testng.xml.XmlTest;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.File;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /*
  * CarinaListener - base carin-core TestNG Listener.
@@ -238,9 +256,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     @Override
     public void onConfigurationFailure(ITestResult result) {
         LOGGER.debug("CarinaListener->onConfigurationFailure");
-        String errorMessage = getFailureReason(result);
-        takeScreenshot(result, "CONFIGURATION FAILED - " + errorMessage);
-
         super.onConfigurationFailure(result);
     }
 
@@ -268,8 +283,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     @Override
     public void onTestFailure(ITestResult result) {
         LOGGER.debug("CarinaListener->onTestFailure");
-        String errorMessage = getFailureReason(result);
-        takeScreenshot(result, "TEST FAILED - " + errorMessage);
         onTestFinish(result);
         super.onTestFailure(result);
     }
@@ -277,8 +290,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     @Override
     public void onTestSkipped(ITestResult result) {
         LOGGER.debug("CarinaListener->onTestSkipped");
-        String errorMessage = getFailureReason(result);
-        takeScreenshot(result, "TEST FAILED - " + errorMessage);
         onTestFinish(result);
         super.onTestSkipped(result);
     }
@@ -783,30 +794,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             includes.add(new XmlInclude(eachMethod));
         }
         return includes;
-    }
-    
-    private String takeScreenshot(ITestResult result, String msg) {
-        String screenId = "";
-
-        ConcurrentHashMap<String, CarinaDriver> drivers = getDrivers();
-
-        try {
-            for (Map.Entry<String, CarinaDriver> entry : drivers.entrySet()) {
-                String driverName = entry.getKey();
-                WebDriver drv = entry.getValue().getDriver();
-    
-                if (drv instanceof EventFiringWebDriver) {
-                    drv = ((EventFiringWebDriver) drv).getWrappedDriver();
-                }
-                
-                if (Screenshot.isEnabled()) {
-                    screenId = Screenshot.capture(drv, driverName + ": " + msg, true); // in case of failure
-                }
-            }
-        } catch (Throwable thr) {
-            LOGGER.error("Failure detected on screenshot generation after failure: ", thr);
-        }
-        return screenId;
     }
     
     /*
