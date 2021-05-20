@@ -5,7 +5,6 @@
 <suite verbose="1" name="Carina Demo Tests - API Sample" parallel="methods" thread-count="5">
 
 	<parameter name="suiteOwner" value="qpsdemo"/>
-	<parameter name="zafira_project" value="UNKNOWN"/>
 	<parameter name="jenkinsJobName" value="API-Demo-Test"/>
 	<parameter name="jenkinsJobType" value="api"/>
 

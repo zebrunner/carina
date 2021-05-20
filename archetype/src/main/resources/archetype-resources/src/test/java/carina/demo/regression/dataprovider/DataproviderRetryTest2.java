@@ -23,7 +23,7 @@ import java.util.Random;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.AbstractTest;
+import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
 
 /**
@@ -32,7 +32,7 @@ import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
  *
  * @author qpsdemo
  */
-public class DataproviderRetryTest2 extends AbstractTest {
+public class DataproviderRetryTest2 implements IAbstractTest {
 
     @Test(dataProvider = "DP1", dataProviderClass=DataproviderRetryTest.class)
     @MethodOwner(owner = "qpsdemo")

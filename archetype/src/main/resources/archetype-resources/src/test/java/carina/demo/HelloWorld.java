@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.AbstractTest;
+import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
 
 /**
@@ -32,7 +32,7 @@ import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
  *
  * @author qpsdemo
  */
-public class HelloWorld extends AbstractTest {
+public class HelloWorld implements IAbstractTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Test()

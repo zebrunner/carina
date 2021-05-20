@@ -25,11 +25,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.AbstractTest;
+import com.qaprosoft.carina.core.foundation.IAbstractTest;
+import com.zebrunner.agent.core.annotation.TestLabel;
 import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
 import com.qaprosoft.carina.core.foundation.utils.tag.Priority;
 import com.qaprosoft.carina.core.foundation.utils.tag.TestPriority;
-import com.qaprosoft.carina.core.foundation.utils.tag.TestTag;
 import ${package}.carina.demo.gui.components.FooterMenu;
 import ${package}.carina.demo.gui.components.NewsItem;
 import ${package}.carina.demo.gui.components.compare.ModelSpecs;
@@ -42,13 +42,14 @@ import ${package}.carina.demo.gui.pages.NewsPage;
 
 /**
  * This sample shows how create Web test.
- * 
+ *
  * @author qpsdemo
  */
-public class WebSampleTest extends AbstractTest {
+public class WebSampleTest implements IAbstractTest {
     @Test(description = "JIRA${symbol_pound}AUTO-0008")
     @MethodOwner(owner = "qpsdemo")
     @TestPriority(Priority.P3)
+    @TestLabel(name = "feature", value = {"web", "regression"})
     public void testModelSpecs() {
         // Open GSM Arena home page and verify page is opened
         HomePage homePage = new HomePage(getDriver());
@@ -62,19 +63,19 @@ public class WebSampleTest extends AbstractTest {
         homePage = new HomePage(getDriver());
         BrandModelsPage productsPage = homePage.selectBrand("Samsung");
         // Select phone model
-        ModelInfoPage productInfoPage = productsPage.selectModel("Galaxy S10+");
+        ModelInfoPage productInfoPage = productsPage.selectModel("Galaxy A52 5G");
         // Verify phone specifications
-        Assert.assertEquals(productInfoPage.readDisplay(), "6.4\"", "Invalid display info!");
-        Assert.assertEquals(productInfoPage.readCamera(), "16MP", "Invalid camera info!");
-        Assert.assertEquals(productInfoPage.readRam(), "8/12GB RAM", "Invalid ram info!");
-        Assert.assertEquals(productInfoPage.readBattery(), "4100mAh", "Invalid battery info!");
+        Assert.assertEquals(productInfoPage.readDisplay(), "6.5\"", "Invalid display info!");
+        Assert.assertEquals(productInfoPage.readCamera(), "64MP", "Invalid camera info!");
+        Assert.assertEquals(productInfoPage.readRam(), "6/8GB RAM", "Invalid ram info!");
+        Assert.assertEquals(productInfoPage.readBattery(), "4500mAh", "Invalid battery info!");
     }
 
 
     @Test(description = "JIRA${symbol_pound}AUTO-0009")
     @MethodOwner(owner = "qpsdemo")
     @TestPriority(Priority.P1)
-    @TestTag(name = "area test", value = "web")
+    @TestLabel(name = "feature", value = {"web", "acceptance"})
     public void testCompareModels() {
         // Open GSM Arena home page and verify page is opened
         HomePage homePage = new HomePage(getDriver());
@@ -94,6 +95,7 @@ public class WebSampleTest extends AbstractTest {
     
     @Test(description = "JIRA${symbol_pound}AUTO-0010")
     @MethodOwner(owner = "qpsdemo")
+    @TestLabel(name = "feature", value = {"web", "acceptance"})
     public void testNewsSearch() {
         HomePage homePage = new HomePage(getDriver());
         homePage.open();

@@ -5,7 +5,6 @@
 <suite verbose="1" name="DataProvider Test With Retry (50% pass rate)" parallel="methods" data-provider-thread-count="5">
 
 	<parameter name="suiteOwner" value="qpsdemo"/>
-	<parameter name="zafira_project" value="UNKNOWN"/>
 	<parameter name="jenkinsJobName" value="API-DataProvider-Retry"/>
 	<parameter name="jenkinsJobType" value="api"/>
 	<parameter name="jenkinsEnvironments" value="DEMO"/>

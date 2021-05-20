@@ -1,15 +1,32 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
+/*
+ * Copyright 2013-2021 QAPROSOFT (http://qaprosoft.com/).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package ${package}.carina.demo;
 
+import com.zebrunner.agent.core.annotation.TestLabel;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.AbstractTest;
+import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import com.qaprosoft.carina.core.foundation.utils.mobile.IMobileUtils;
 import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
+
 import ${package}.carina.demo.mobile.gui.pages.common.CarinaDescriptionPageBase;
 import ${package}.carina.demo.mobile.gui.pages.common.ContactUsPageBase;
 import ${package}.carina.demo.mobile.gui.pages.common.LoginPageBase;
@@ -20,10 +37,11 @@ import ${package}.carina.demo.utils.MobileContextUtils;
 import ${package}.carina.demo.utils.MobileContextUtils.View;
 
 
-public class MobileSampleTest extends AbstractTest implements IMobileUtils {
+public class MobileSampleTest implements IAbstractTest, IMobileUtils {
 
     @Test(description = "JIRA${symbol_pound}DEMO-0011")
     @MethodOwner(owner = "qpsdemo")
+    @TestLabel(name = "feature", value = {"mobile", "regression"})
     public void testLoginUser() {
         String username = "Test user";
         String password = RandomStringUtils.randomAlphabetic(10);
@@ -41,6 +59,7 @@ public class MobileSampleTest extends AbstractTest implements IMobileUtils {
 
 	@Test(description = "JIRA${symbol_pound}DEMO-0011")
     @MethodOwner(owner = "qpsdemo")
+    @TestLabel(name = "feature", value = {"mobile", "regression"})
     public void testWebView() {
         WelcomePageBase welcomePage = initPage(getDriver(), WelcomePageBase.class);
         LoginPageBase loginPage = welcomePage.clickNextBtn();
@@ -61,6 +80,7 @@ public class MobileSampleTest extends AbstractTest implements IMobileUtils {
 
     @Test(description = "JIRA${symbol_pound}DEMO-0011")
     @MethodOwner(owner = "qpsdemo")
+    @TestLabel(name = "feature", value = {"mobile", "acceptance"})
     public void testUIElements() {
         WelcomePageBase welcomePage = initPage(getDriver(), WelcomePageBase.class);
         LoginPageBase loginPage = welcomePage.clickNextBtn();

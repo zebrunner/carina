@@ -25,11 +25,11 @@ import java.lang.invoke.MethodHandles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
-import com.qaprosoft.carina.core.foundation.AbstractTest;
+import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
 import ${package}.carina.demo.gui.pages.HomePage;
@@ -41,15 +41,15 @@ import net.lightbody.bmp.proxy.CaptureType;
 
 /**
  * This sample shows how generate har file with proxied Web test content.
- * 
+ *
  * @author qpsdemo
  */
-public class ProxySampleTest extends AbstractTest {
+public class ProxySampleTest implements IAbstractTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    
+
     BrowserMobProxy proxy;
-    
-    @BeforeTest(alwaysRun = true)
+
+    @BeforeMethod(alwaysRun = true)
     public void startProxy()
     {
         R.CONFIG.put("browsermob_proxy", "true");
@@ -58,17 +58,17 @@ public class ProxySampleTest extends AbstractTest {
         proxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT);
         proxy.newHar();
     }
-    
+
     @Test()
     @MethodOwner(owner = "qpsdemo")
     public void testNewsSearch() {
         HomePage homePage = new HomePage(getDriver());
         homePage.open();
         Assert.assertTrue(homePage.isPageOpened(), "Home page is not opened!");
-        
+
         NewsPage newsPage = homePage.getFooterMenu().openNewsPage();
         Assert.assertTrue(newsPage.isPageOpened(), "News page is not opened!");
-        
+
         // Saving har to a file...
         String name = "ProxyReport.har";
         File file = new File(name);

@@ -32,7 +32,7 @@ public class FooterMenu extends AbstractUIObject {
     @FindBy(linkText = "Home")
     private ExtendedWebElement homeLink;
 
-    @FindBy(linkText = "Compare")
+    @FindBy(xpath = "//div[@class='footer-inner']//a[contains(text(),'Compare')]")
     private ExtendedWebElement compareLink;
     
     @FindBy(linkText = "News")

@@ -5,7 +5,6 @@
 <suite verbose="1" name="Carina Demo Tests - Proxy Sample" parallel="methods">
 
 	<parameter name="suiteOwner" value="qpsdemo"/>
-	<parameter name="zafira_project" value="UNKNOWN"/>
 	<parameter name="jenkinsJobName" value="Proxy-Demo-Test"/>
 	<parameter name="jenkinsJobType" value="web"/>
 	<parameter name="jenkinsEnvironments" value="DEMO"/>
@@ -16,6 +15,7 @@
 
 	<parameter name="jenkinsJobExecutionOrder" value="1"/>
 	<parameter name="jenkinsJobExecutionMode" value="continue"/>
+	<parameter name="jenkinsAutoScreenshot" value="true"/>
 
 	<test name="GSM arena proxy web test">
 		<classes>
