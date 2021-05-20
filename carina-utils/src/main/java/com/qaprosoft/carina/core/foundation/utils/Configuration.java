@@ -129,9 +129,13 @@ public class Configuration {
 
         LOCALE("locale"),
 
-        THREAD_COUNT("thread_count"),
+        THREAD_COUNT_OLD("thread_count"),
 
-        DATA_PROVIDER_THREAD_COUNT("data_provider_thread_count"),
+        THREAD_COUNT("thread-count"),
+
+        DATA_PROVIDER_THREAD_COUNT_OLD("data_provider_thread_count"),
+
+        DATA_PROVIDER_THREAD_COUNT("data-provider-thread-count"),
 
         CORE_LOG_LEVEL("core_log_level"),
 
@@ -497,13 +501,27 @@ public class Configuration {
     }
 
     public static String getSeleniumUrl(){
-        String seleniumUrl = Configuration.get(Parameter.SELENIUM_URL);
+        return getDeprecatedParam(Parameter.SELENIUM_URL, Parameter.SELENIUM_HOST);
+    }
 
-        if (seleniumUrl.isEmpty()){
-            seleniumUrl = Configuration.get(Parameter.SELENIUM_HOST);
-            LOGGER.warn("selenium_host configuration parameter is deprecated. Please, start using selenium_url instead!");
+    public static String getThreadCount(){
+        return getDeprecatedParam(Parameter.THREAD_COUNT, Parameter.THREAD_COUNT_OLD);
+    }
+
+    public static String getDataProviderThreadCount(){
+        return getDeprecatedParam(Parameter.DATA_PROVIDER_THREAD_COUNT, Parameter.DATA_PROVIDER_THREAD_COUNT_OLD);
+    }
+
+    private static String getDeprecatedParam(Parameter newParam, Parameter oldParam){
+        String value = Configuration.get(newParam);
+
+        if (value.isEmpty()){
+            value = Configuration.get(oldParam);
+            LOGGER.warn(oldParam + "configuration parameter is deprecated. " +
+                    "Please, start using " + newParam +" instead!");
         }
 
-        return seleniumUrl;
+        return value;
     }
+
 }

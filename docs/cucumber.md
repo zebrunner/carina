@@ -85,5 +85,5 @@ Here is the sample of the report:
 
 ### Parallel execution
 
-You can execute cucumber tests in parallel. You can control it by `data_provider_thread_count` property from carina properties list.   
+You can execute cucumber tests in parallel. You can control it by `data-provider-thread-count` property from carina properties list.   
 The value of that parameter will define maximum amount of parallel threads for your cucumber tests.
