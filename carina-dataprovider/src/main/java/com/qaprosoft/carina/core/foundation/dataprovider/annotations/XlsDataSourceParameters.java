@@ -53,8 +53,6 @@ public @interface XlsDataSourceParameters {
 
     String groupColumn() default "";
 
-    String jiraColumn() default "";
-
     String testRailColumn() default "";
 
     String qTestColumn() default "";

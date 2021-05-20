@@ -56,7 +56,7 @@ public class DataprovidersSampleTest implements IAbstractTest {
      *
      * @param c String
      */
-    @Test(dataProvider = "DataProvider", description = "JIRA${symbol_pound}DEMO-0005")
+    @Test(dataProvider = "DataProvider")
     @MethodOwner(owner = "qpsdemo")
     @TestRailCases(testCasesId = "1")
     @XlsDataSourceParameters(path = "xls/demo.xlsx", sheet = "Calculator", dsUid = "TUID", dsArgs = "a,b,c", testRailColumn = "a")
@@ -81,7 +81,7 @@ public class DataprovidersSampleTest implements IAbstractTest {
      *
      * @param args HashMap&lt;String, String&gt;
      */
-    @Test(dataProvider = "DataProvider", description = "JIRA${symbol_pound}DEMO-0005")
+    @Test(dataProvider = "DataProvider")
     @MethodOwner(owner = "qpsdemo")
     @TestRailCases(testCasesId = "1")
     @XlsDataSourceParameters(path = "xls/demo.xlsx", sheet = "Calculator", dsUid = "TUID", testRailColumn = "a")
@@ -107,7 +107,7 @@ public class DataprovidersSampleTest implements IAbstractTest {
      *
      * @param c int
      */
-    @Test(dataProvider = "DP1", description = "JIRA${symbol_pound}DEMO-0006")
+    @Test(dataProvider = "DP1")
     @MethodOwner(owner = "qpsdemo")
     @TestPriority(Priority.P3)
     @TestRailCases(testCasesId = "44")
@@ -137,7 +137,7 @@ public class DataprovidersSampleTest implements IAbstractTest {
      *
      * @param c int
      */
-    @Test(description = "JIRA${symbol_pound}DEMO-0007")
+    @Test()
     @MethodOwner(owner = "qpsdemo")
     @Parameters({"a", "b", "c"})
     @TestRailCases(testCasesId = "55")

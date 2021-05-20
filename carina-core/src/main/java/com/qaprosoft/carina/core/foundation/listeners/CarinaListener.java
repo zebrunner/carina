@@ -386,8 +386,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
             ReportContext.getTempDir().delete();
 
-            // // Update JIRA
-            // Jira.updateAfterSuite(context,
             // EmailReportItemCollector.getTestResults());
 
             LOGGER.debug("Generating email report...");

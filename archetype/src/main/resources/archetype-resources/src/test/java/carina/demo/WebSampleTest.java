@@ -46,7 +46,7 @@ import ${package}.carina.demo.gui.pages.NewsPage;
  * @author qpsdemo
  */
 public class WebSampleTest implements IAbstractTest {
-    @Test(description = "JIRA${symbol_pound}AUTO-0008")
+    @Test()
     @MethodOwner(owner = "qpsdemo")
     @TestPriority(Priority.P3)
     @TestLabel(name = "feature", value = {"web", "regression"})
@@ -72,7 +72,7 @@ public class WebSampleTest implements IAbstractTest {
     }
 
 
-    @Test(description = "JIRA${symbol_pound}AUTO-0009")
+    @Test()
     @MethodOwner(owner = "qpsdemo")
     @TestPriority(Priority.P1)
     @TestLabel(name = "feature", value = {"web", "acceptance"})
@@ -93,7 +93,7 @@ public class WebSampleTest implements IAbstractTest {
         Assert.assertEquals(specs.get(2).readSpec(SpecType.ANNOUNCED), "2017, June");
     }
     
-    @Test(description = "JIRA${symbol_pound}AUTO-0010")
+    @Test()
     @MethodOwner(owner = "qpsdemo")
     @TestLabel(name = "feature", value = {"web", "acceptance"})
     public void testNewsSearch() {
