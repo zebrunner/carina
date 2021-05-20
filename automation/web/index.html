@@ -745,7 +745,7 @@ assertEquals(&quot;MyCityName&quot;, city.getText());
 <h3 id="implementation-of-tests">Implementation of tests</h3>
 <p>Carina framework uses TestNG for test organization. In general, test represents a manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:</p>
 <pre><code>public class WebSampleTest implements IAbstractTest {
-    @Test(description = &quot;JIRA#AUTO-0009&quot;)
+    @Test()
     @MethodOwner(owner = &quot;qpsdemo&quot;)
     public void testCompareModels() {
         // Open GSM Arena home page and verify page is opened
