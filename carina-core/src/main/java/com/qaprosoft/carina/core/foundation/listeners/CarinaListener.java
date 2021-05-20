@@ -102,7 +102,7 @@ import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
 
 /*
  * CarinaListener - base carin-core TestNG Listener.
- * 
+ *
  * @author Vadim Delendik
  */
 public class CarinaListener extends AbstractTestListener implements ISuiteListener, IQTestManager, ITestRailManager, IClassListener {
@@ -112,7 +112,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     protected static final String SUITE_TITLE = "%s%s%s - %s (%s%s)";
     protected static final String XML_SUITE_NAME = " (%s)";
-    
+
     protected static boolean automaticDriversCleanup = true;
 
     static {
@@ -151,9 +151,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
             IScreenshotRule autoScreenshotsRule = (IScreenshotRule) new AutoScreenshotRule();
             Screenshot.addScreenshotRule(autoScreenshotsRule);
-            
+
             updateAppPath();
-            
+
             TestNameResolverRegistry.set(new ZebrunnerNameResolver());
             CompositeLabelResolver.addResolver(new TagManager());
             CompositeLabelResolver.addResolver(new PriorityManager());
@@ -166,7 +166,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     @Override
     public void onStart(ISuite suite) {
         LOGGER.debug("CarinaListener->onStart(ISuite suite)");
-        
+
         // first means that ownership/maintainer resolver from carina has higher priority
         ChainedMaintainerResolver.addFirst(new Ownership(suite.getParameter("suiteOwner")));
 
@@ -195,7 +195,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
         setThreadCount(suite);
         onHealthCheck(suite);
-        
+
         String mobileApp = Configuration.getMobileApp();
         if (!mobileApp.isEmpty()) {
             // [VD] do not move into the static block as Zebrunner reporting need registered test run!
@@ -203,7 +203,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         }
         // register app_version/build as artifact if available...
         Configuration.setBuild(Configuration.get(Parameter.APP_VERSION));
-        
+
         LOGGER.info("CARINA_CORE_VERSION: " + getCarinaVersion());
     }
 
@@ -252,7 +252,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             TestPhase.setActivePhase(Phase.AFTER_SUITE);
         }
     }
-    
+
     @Override
     public void onConfigurationFailure(ITestResult result) {
         LOGGER.debug("CarinaListener->onConfigurationFailure");
@@ -322,7 +322,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             R.EMAIL.clearTestProperties();
             R.REPORT.clearTestProperties();
             R.ZAFIRA.clearTestProperties();
-            
+
             LOGGER.debug("Test result is : " + result.getStatus());
             // result status == 2 means failure, status == 3 means skip. We need to quit driver anyway for failure and skip
             if ((automaticDriversCleanup && !hasDependencies(result)) || result.getStatus() == 2 || result.getStatus() == 3) {
@@ -428,7 +428,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             }
         }
     }
-    
+
     /**
      * Disable automatic drivers cleanup after each TestMethod and switch to controlled by tests itself.
      * But anyway all drivers will be closed forcibly as only suite is finished or aborted 
@@ -559,14 +559,14 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         } catch (Exception e) {
             LOGGER.error("Azure manager exception detected!", e);
         }
-        
+
         try {
             if (!Configuration.get(Parameter.APPCENTER_TOKEN).isEmpty()) {
                 updateAppCenterAppPath();
             }
         } catch (Exception e) {
             LOGGER.error("AppCenter manager exception detected!", e);
-        }        
+        }
 
         // AWS S3 is preferable and has higher priority
         try {
@@ -575,7 +575,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             }
         } catch (Exception e) {
             LOGGER.error("AWS S3 manager exception detected!", e);
-        }        
+        }
 
     }
 
@@ -637,7 +637,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 }
 
             }
-            
+
             // generate presign url explicitly to register link as run artifact
             long hours = 72L*1000*60*60; // generate presigned url for nearest 3 days
             String presignedAppUrl = AmazonS3Manager.getInstance().generatePreSignUrl(bucketName, key, hours).toString();
@@ -795,14 +795,14 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         }
         return includes;
     }
-    
+
     /*
      * Parse TestNG <suite ...> tag and return any attribute
      * @param ISuite suite
      * @param IString attribute
      * @return String attribute value or empty string
-     * 
-    */    
+     *
+    */
     private String getAttributeValue(ISuite suite, String attribute) {
         String res = "";
         File file = new File(suite.getXmlSuite().getFileName());
@@ -850,53 +850,53 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     }
     private void setThreadCount(ISuite suite) {
         //Reuse default thread-count value from suite TestNG file if it is not overridden in _config.properties
-        
+
         /*
          * WARNING! We coudn't override default thread-count="5" and data-provider-thread-count="10"!
          * suite.getXmlSuite().toXml() add those default values anyway even if the absent in suite xml file declaraton.
-         * To make possible to parse correctly we had to reuse external parser and private getAttributeValue  
+         * To make possible to parse correctly we had to reuse external parser and private getAttributeValue
         */
-        if (SpecialKeywords.CUSTOM.equalsIgnoreCase(Configuration.get(Parameter.THREAD_COUNT))) {
+        if (SpecialKeywords.CUSTOM.equalsIgnoreCase(Configuration.getThreadCount())) {
             LOGGER.info("Custom thread count manipulation is enabled. Carina will skip any updates with thread count...");
             return;
         }
-        
-        if (Configuration.getInt(Parameter.THREAD_COUNT) >= 1) {
+
+        if (Integer.parseInt(Configuration.getThreadCount())>= 1) {
             // use thread-count from config.properties
-            suite.getXmlSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
-            LOGGER.debug("Updated thread_count=" + suite.getXmlSuite().getThreadCount());
+            suite.getXmlSuite().setThreadCount(Integer.parseInt(Configuration.getThreadCount()));
+            LOGGER.debug("Updated thread-count=" + suite.getXmlSuite().getThreadCount());
         } else {
             String suiteThreadCount = getAttributeValue(suite, "thread-count");
             LOGGER.debug("thread-count from suite: " + suiteThreadCount);
             if (suiteThreadCount.isEmpty()) {
-                LOGGER.info("Set thread_count=1");
+                LOGGER.info("Set thread-count=1");
                 R.CONFIG.put(Parameter.THREAD_COUNT.getKey(), "1");
                 suite.getXmlSuite().setThreadCount(1);
             } else {
                 // reuse value from suite xml file
-                LOGGER.debug("Synching thread_count with values from suite xml file...");
+                LOGGER.debug("Synching thread-count with values from suite xml file...");
                 R.CONFIG.put(Parameter.THREAD_COUNT.getKey(), suiteThreadCount);
-                LOGGER.info("Use thread_count='" + suite.getXmlSuite().getThreadCount() + "' from suite file.");                
+                LOGGER.info("Use thread-count='" + suite.getXmlSuite().getThreadCount() + "' from suite file.");
             }
         }
-        
-        if (Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) >= 1) {
+
+        if (Integer.parseInt(Configuration.getDataProviderThreadCount()) >= 1) {
             // use thread-count from config.properties
-            suite.getXmlSuite().setDataProviderThreadCount(Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT));
-            LOGGER.debug("Updated data_provider_thread_count=" + suite.getXmlSuite().getDataProviderThreadCount());            
+            suite.getXmlSuite().setDataProviderThreadCount(Integer.parseInt(Configuration.getDataProviderThreadCount()));
+            LOGGER.debug("Updated data-provider-thread-count=" + suite.getXmlSuite().getDataProviderThreadCount());
         } else {
-            String suiteDataProviderThreadCount = getAttributeValue(suite, "data-provider-thread-count");        
+            String suiteDataProviderThreadCount = getAttributeValue(suite, "data-provider-thread-count");
             LOGGER.debug("data-provider-thread-count from suite: " + suiteDataProviderThreadCount);
-            
+
             if (suiteDataProviderThreadCount.isEmpty()) {
-                LOGGER.info("Set data_provider_thread_count=1");
+                LOGGER.info("Set data-provider-thread-count=1");
                 R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(), "1");
-                suite.getXmlSuite().setDataProviderThreadCount(1);                
+                suite.getXmlSuite().setDataProviderThreadCount(1);
             } else {
                 // reuse value from suite xml file
-                LOGGER.debug("Synching data_provider_thread_count with values from suite xml file...");
+                LOGGER.debug("Synching data-provider-thread-count with values from suite xml file...");
                 R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(), suiteDataProviderThreadCount);
-                LOGGER.info("Use data_provider_thread_count='" + suite.getXmlSuite().getDataProviderThreadCount() + "' from suite file.");                
+                LOGGER.info("Use data-provider-thread-count='" + suite.getXmlSuite().getDataProviderThreadCount() + "' from suite file.");
             }
         }
     }
@@ -922,7 +922,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
         return carinaVersion;
     }
-    
+
     private void attachLabels(ITestResult result) {
         // register testrail cases...
         Set<String> trCases = getTestRailCasesUuid(result);
@@ -936,7 +936,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             Label.attachToTest(SpecialKeywords.QTEST_TESTCASE_UUID, Arrays.copyOf(qtestCases.toArray(), qtestCases.size(), String[].class));
         }
     }
-    
+
     public static class ShutdownHook extends Thread {
 
         private static final Logger LOGGER = Logger.getLogger(ShutdownHook.class);
@@ -951,7 +951,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 ProxyPool.stopProxy();
                 try {
                     LOGGER.debug("Driver closing..." + name);
-                    carinaDriver.getDriver().close();                    
+                    carinaDriver.getDriver().close();
                     LOGGER.debug("Driver exiting..." + name);
                     carinaDriver.getDriver().quit();
                     LOGGER.debug("Driver exited..." + name);

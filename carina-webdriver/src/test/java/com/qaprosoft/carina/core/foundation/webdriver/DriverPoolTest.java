@@ -61,8 +61,8 @@ public class DriverPoolTest implements IDriverPool {
     public void beforeSuite() {
         TestPhase.setActivePhase(Phase.BEFORE_SUITE);
         R.CONFIG.put("driver_type", "desktop");
-        R.CONFIG.put("thread_count", "1");
-        R.CONFIG.put("data_provider_thread_count", "1");
+        R.CONFIG.put("thread-count", "1");
+        R.CONFIG.put("data-provider-thread-count", "1");
 
         this.mockDriverSuite = mock(WebDriver.class);
         registerDriver(mockDriverSuite, BEFORE_SUITE_DRIVER_NAME);
