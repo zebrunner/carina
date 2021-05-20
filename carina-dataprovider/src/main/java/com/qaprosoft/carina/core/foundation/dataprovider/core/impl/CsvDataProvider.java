@@ -48,7 +48,6 @@ public class CsvDataProvider extends BaseDataProvider {
 
     private String executeColumn;
     private String executeValue;
-    private String jiraColumn;
     private String testRailColumn;
     private String testMethodColumn;
     private String testMethodOwnerColumn;
@@ -70,7 +69,6 @@ public class CsvDataProvider extends BaseDataProvider {
         separator = parameters.separator();
         quote = parameters.quote();
 
-        jiraColumn = parameters.jiraColumn();
         testRailColumn = parameters.testRailColumn();
 
         if (!parameters.qTestColumn().isEmpty() && testRailColumn.isEmpty())
@@ -197,7 +195,6 @@ public class CsvDataProvider extends BaseDataProvider {
     /*
      * obligatory add to mapper all columns for DataProvider artifacts like:
      * executeColumn - filter column
-     * jiraColumn
      * testRailColumn
      * testMethodColumn
      * testMethodOwnerColumn
@@ -217,7 +214,6 @@ public class CsvDataProvider extends BaseDataProvider {
         }
 
         mapper.put(executeColumn, getIndex(executeColumn, headers));
-        mapper.put(jiraColumn, getIndex(jiraColumn, headers));
         mapper.put(testRailColumn, getIndex(testRailColumn, headers));
         mapper.put(testMethodColumn, getIndex(testMethodColumn, headers));
         mapper.put(testMethodOwnerColumn, getIndex(testMethodOwnerColumn, headers));
