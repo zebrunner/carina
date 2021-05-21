@@ -467,8 +467,6 @@ public class DriverHelper {
     public void addCookie(Cookie cookie) {
         WebDriver drv = getDriver();
 
-        Messager.ADD_COOKIE.info();
-
         DriverListener.setMessages(Messager.ADD_COOKIE.getMessage(cookie.getName()), 
                 Messager.FAIL_ADD_COOKIE.getMessage(cookie.getName()));
 
