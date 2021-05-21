@@ -159,6 +159,8 @@ public class DriverListener implements WebDriverEventListener {
                 || thr.getMessage().contains("Method has not yet been implemented")                        
                 || thr.getMessage().contains("Expected to read a START_MAP but instead have: END. Last 0 characters read")
                 || thr.getMessage().contains("script timeout")
+                || thr.getMessage().contains("javascript error: Cannot read property 'outerHTML' of null")
+                || thr.getMessage().contains("javascript error: Cannot read property 'scrollHeight' of null")
                 || thr.getMessage().contains("Method is not implemented")
                 || thr.getMessage().contains("An element could not be located on the page using the given search parameters")
                 || thr.getMessage().contains("no such element: Unable to locate element")
