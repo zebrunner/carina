@@ -469,17 +469,30 @@ public class DriverHelper {
      */
     public boolean isUrlAsExpected(String expectedURL) {
         String decryptedURL = cryptoTool.decryptByPattern(expectedURL, CRYPTO_PATTERN);
-        
         decryptedURL = getEnvArgURL(decryptedURL);
-        
         WebDriver drv = getDriver();
-        if (LogicUtils.isURLEqual(decryptedURL, drv.getCurrentUrl())) {
-            Messager.EXPECTED_URL.info(drv.getCurrentUrl());
+        
+        DriverListener.setMessages(Messager.EXPECTED_URL.getMessage(), Messager.UNEXPECTED_URL.getMessage());
+        Wait<WebDriver> wait = new FluentWait<WebDriver>(drv)
+                .pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)))
+                .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
+                .ignoring(WebDriverException.class)
+                .ignoring(JsonException.class); // org.openqa.selenium.json.JsonException: Expected to read a START_MAP but instead have: END. Last 0 characters rea
+
+        String actualUrl = wait.until(new Function<WebDriver, String>() {
+            public String apply(WebDriver driver) {
+                return drv.getCurrentUrl();
+            }
+        });
+        
+        if (LogicUtils.isURLEqual(decryptedURL, actualUrl)) {
+            Messager.EXPECTED_URL.info(actualUrl);
             return true;
         } else {
-            Messager.UNEXPECTED_URL.error(expectedURL, drv.getCurrentUrl());
+            Messager.UNEXPECTED_URL.error(expectedURL, actualUrl);
             return false;
-        }
+        }        
+        
     }
     
     
