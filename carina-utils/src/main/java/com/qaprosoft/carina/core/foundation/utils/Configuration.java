@@ -49,7 +49,8 @@ public class Configuration {
 
         BROWSER_LANGUAGE("browser_language"),
 
-        SELENIUM_HOST_DEPRECATED("selenium_host"),
+        @Deprecated
+        SELENIUM_HOST("selenium_host"),
 
         SELENIUM_URL("selenium_url"),
 
@@ -129,10 +130,12 @@ public class Configuration {
 
         LOCALE("locale"),
 
+        @Deprecated
         THREAD_COUNT_DEPRECATED("thread_count"),
 
         THREAD_COUNT("thread-count"),
 
+        @Deprecated
         DATA_PROVIDER_THREAD_COUNT_DEPRECATED("data_provider_thread_count"),
 
         DATA_PROVIDER_THREAD_COUNT("data-provider-thread-count"),
@@ -501,7 +504,7 @@ public class Configuration {
     }
 
     public static String getSeleniumUrl(){
-        return getDeprecatedParam(Parameter.SELENIUM_URL, Parameter.SELENIUM_HOST_DEPRECATED, "");
+        return getDeprecatedParam(Parameter.SELENIUM_URL, Parameter.SELENIUM_HOST, "");
     }
 
     public static String getThreadCount(){
@@ -518,7 +521,7 @@ public class Configuration {
         if (value.equalsIgnoreCase(defaultValue)){
             String deprecatedValue = Configuration.get(oldParam);
 
-            if (!deprecatedValue.isEmpty()) {
+            if (!deprecatedValue.isEmpty() && !deprecatedValue.equalsIgnoreCase(defaultValue)) {
                 LOGGER.warn(oldParam.getKey() + " configuration parameter is deprecated. " +
                         "Please, start using " + newParam.getKey() + " instead!");
                 value = deprecatedValue;
