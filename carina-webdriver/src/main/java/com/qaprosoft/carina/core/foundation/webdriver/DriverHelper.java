@@ -438,19 +438,26 @@ public class DriverHelper {
 
         Messager.GET_PAGE_SOURCE.info();
 
-        DriverListener.setMessages(Messager.GET_PAGE_SOURCE.getMessage(), Messager.FAIL_GET_PAGE_SOURCE.getMessage());
-
         Wait<WebDriver> wait = new FluentWait<WebDriver>(drv)
                 .pollingEvery(Duration.ofMillis(5000)) // there is no sense to refresh url address too often
                 .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
                 .ignoring(WebDriverException.class)
-                .ignoring(JavascriptException.class); //org.openqa.selenium.JavascriptException: javascript error: Cannot read property 'outerHTML' of null
+                .ignoring(JavascriptException.class) //org.openqa.selenium.JavascriptException: javascript error: Cannot read property 'outerHTML' of null
+                .ignoring(TimeoutException.class);
 
-        return wait.until(new Function<WebDriver, String>() {
+        String res = wait.until(new Function<WebDriver, String>() {
             public String apply(WebDriver driver) {
                 return drv.getPageSource();
             }
         });
+        
+        if (res == null) {
+            Messager.FAIL_GET_PAGE_SOURCE.error();
+            res = "";
+        }
+        
+        Messager.GET_PAGE_SOURCE.info();
+        return res;
     }
     
     /*
