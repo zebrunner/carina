@@ -333,20 +333,21 @@ public class ExtendedWebElement implements IWebElement {
 			result = true;
 		} catch (NoSuchElementException e) {
 			// don't write exception even in debug mode
-			LOGGER.debug("waitUntil: NoSuchElementException: " + condition.toString());
+		    // [VD] don't operate with condition.toString() etc as it might generate org.openqa.selenium.json.JsonException xpected to read a START_MAP but instead have: END. Last 0 characters read
+			LOGGER.debug("waitUntil: NoSuchElementException: " + e.getMessage());
 			result = false;
 			originalException = e;
 		} catch (TimeoutException e) { 
-			LOGGER.debug("waitUntil: TimeoutException: " + condition.toString());
+			LOGGER.debug("waitUntil: TimeoutException: " + e.getMessage());
 			result = false;
 			originalException = e.getCause();
 		} catch (WebDriverException e) {
-            LOGGER.debug("waitUntil: WebDriverException: " + condition.toString());
+            LOGGER.debug("waitUntil: WebDriverException: " + e.getMessage());
             result = false;
             originalException = e.getCause();
 		}
 		catch (Exception e) {
-			LOGGER.error("waitUntil: undefined exception: " + condition.toString(), e);
+			LOGGER.error("waitUntil: undefined exception: " + e.getMessage(), e);
 			result = false;
 			originalException = e;
 		}
