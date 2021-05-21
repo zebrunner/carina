@@ -452,7 +452,7 @@ public class DriverHelper {
                     return drv.getPageSource();
                 }
             });
-        } catch (ScriptTimeoutException e) {
+        } catch (ScriptTimeoutException | TimeoutException e) {
             Messager.FAIL_GET_PAGE_SOURCE.error();
         }
 
