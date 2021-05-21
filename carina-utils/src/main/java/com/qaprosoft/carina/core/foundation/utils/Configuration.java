@@ -49,7 +49,7 @@ public class Configuration {
 
         BROWSER_LANGUAGE("browser_language"),
 
-        SELENIUM_HOST("selenium_host"),
+        SELENIUM_HOST_DEPRECATED("selenium_host"),
 
         SELENIUM_URL("selenium_url"),
 
@@ -129,11 +129,11 @@ public class Configuration {
 
         LOCALE("locale"),
 
-        THREAD_COUNT_OLD("thread_count"),
+        THREAD_COUNT_DEPRECATED("thread_count"),
 
         THREAD_COUNT("thread-count"),
 
-        DATA_PROVIDER_THREAD_COUNT_OLD("data_provider_thread_count"),
+        DATA_PROVIDER_THREAD_COUNT_DEPRECATED("data_provider_thread_count"),
 
         DATA_PROVIDER_THREAD_COUNT("data-provider-thread-count"),
 
@@ -501,24 +501,28 @@ public class Configuration {
     }
 
     public static String getSeleniumUrl(){
-        return getDeprecatedParam(Parameter.SELENIUM_URL, Parameter.SELENIUM_HOST);
+        return getDeprecatedParam(Parameter.SELENIUM_URL, Parameter.SELENIUM_HOST_DEPRECATED, "");
     }
 
     public static String getThreadCount(){
-        return getDeprecatedParam(Parameter.THREAD_COUNT, Parameter.THREAD_COUNT_OLD);
+        return getDeprecatedParam(Parameter.THREAD_COUNT, Parameter.THREAD_COUNT_DEPRECATED, "-1");
     }
 
     public static String getDataProviderThreadCount(){
-        return getDeprecatedParam(Parameter.DATA_PROVIDER_THREAD_COUNT, Parameter.DATA_PROVIDER_THREAD_COUNT_OLD);
+        return getDeprecatedParam(Parameter.DATA_PROVIDER_THREAD_COUNT, Parameter.DATA_PROVIDER_THREAD_COUNT_DEPRECATED, "-1");
     }
 
-    private static String getDeprecatedParam(Parameter newParam, Parameter oldParam){
+    private static String getDeprecatedParam(Parameter newParam, Parameter oldParam, String defaultValue){
         String value = Configuration.get(newParam);
 
-        if (value.isEmpty()){
-            value = Configuration.get(oldParam);
-            LOGGER.warn(oldParam + "configuration parameter is deprecated. " +
-                    "Please, start using " + newParam +" instead!");
+        if (value.equalsIgnoreCase(defaultValue)){
+            String deprecatedValue = Configuration.get(oldParam);
+
+            if (!deprecatedValue.isEmpty()) {
+                LOGGER.warn(oldParam.getKey() + " configuration parameter is deprecated. " +
+                        "Please, start using " + newParam.getKey() + " instead!");
+                value = deprecatedValue;
+            }
         }
 
         return value;
