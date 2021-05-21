@@ -40,7 +40,6 @@ import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.NoSuchWindowException;
-import org.openqa.selenium.ScriptTimeoutException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
@@ -398,7 +397,7 @@ public class DriverHelper {
 
         WebDriver drv = getDriver();
 
-        DriverListener.setMessages(Messager.OPEN_URL.getMessage(url), Messager.NOT_OPEN_URL.getMessage(url));
+        DriverListener.setMessages(Messager.OPENED_URL.getMessage(url), Messager.NOT_OPENED_URL.getMessage(url));
         
         // [VD] there is no sense to use fluent wait here as selenium just don't return something until page is ready!
         // explicitly limit time for the getCurrentUrl operation
@@ -428,12 +427,6 @@ public class DriverHelper {
             LOGGER.error("Undefined error on open url detected!", e);
         }    
         
-        
-        // automatically wait until page is in readyState
-        if (!waitUntil(ExpectedConditions.jsReturnsValue("return document.readyState=='complete';"), timeout)) {
-            LOGGER.warn("Unable to detect page readines state after '" + timeout +"' sec!");
-        }
-
     }
     
     /*
@@ -469,7 +462,8 @@ public class DriverHelper {
 
         Messager.ADD_COOKIE.info();
 
-        DriverListener.setMessages(Messager.ADD_COOKIE.getMessage(), Messager.FAIL_ADD_COOKIE.getMessage());
+        DriverListener.setMessages(Messager.ADD_COOKIE.getMessage(cookie.getName()), 
+                Messager.FAIL_ADD_COOKIE.getMessage(cookie.getName()));
 
         Wait<WebDriver> wait = new FluentWait<WebDriver>(drv)
                 .pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)))
@@ -479,7 +473,6 @@ public class DriverHelper {
 
         wait.until(new Function<WebDriver, Boolean>() {
             public Boolean apply(WebDriver driver) {
-                LOGGER.debug("Adding cookie: " + cookie.getName());
                 drv.manage().addCookie(cookie);
                 return true;
             }

@@ -56,15 +56,15 @@ public enum Messager implements IMessager {
     
     FAIL_GET_PAGE_SOURCE("FAIL: getting page source"),
     
-    ADD_COOKIE("INFO: adding cookie"),
+    ADD_COOKIE("INFO: adding cookie '%s'"),
     
-    FAIL_ADD_COOKIE("FAIL: adding cookie"),
+    FAIL_ADD_COOKIE("FAIL: adding cookie '%s'"),
     
     OPENING_URL("INFO: opening url '%s'"),
     
-    OPEN_URL("INFO: url '%s' is opened."),
+    OPENED_URL("INFO: url '%s' is opened."),
     
-    NOT_OPEN_URL("FAIL: url '%s' is not opened!"),
+    NOT_OPENED_URL("FAIL: url '%s' is not opened!"),
 
     VALIDATION_FAIL("FAIL: '%s' !"),
 
