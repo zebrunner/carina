@@ -287,7 +287,7 @@ public interface IDriverPool {
     /**
      * Set custom capabilities.
      * 
-     * @param custom capabilities
+     * @param caps capabilities
      */
     default public void setCapabilities(DesiredCapabilities caps) {
         customCapabilities.set(caps);
