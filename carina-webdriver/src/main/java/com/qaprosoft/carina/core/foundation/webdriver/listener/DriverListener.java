@@ -156,7 +156,9 @@ public class DriverListener implements WebDriverEventListener {
         // most suspicious are capture screenshots, generating dumps etc
         if (thr == null
                 || thr.getMessage() == null
-                || thr.getMessage().contains("Method has not yet been implemented")
+                || thr.getMessage().contains("Method has not yet been implemented")                        
+                || thr.getMessage().contains("Expected to read a START_MAP but instead have: END. Last 0 characters read")
+                || thr.getMessage().contains("script timeout")
                 || thr.getMessage().contains("Method is not implemented")
                 || thr.getMessage().contains("An element could not be located on the page using the given search parameters")
                 || thr.getMessage().contains("no such element: Unable to locate element")
