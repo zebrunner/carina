@@ -72,7 +72,9 @@ public interface IDriverPool {
 
     static final ThreadLocal<Device> currentDevice = new ThreadLocal<Device>();
     static final Device nullDevice = new Device();
-
+    
+    static final ThreadLocal<DesiredCapabilities> customCapabilities = new ThreadLocal<>();
+    
     /**
      * Get default driver. If no default driver discovered it will be created.
      * 
@@ -91,7 +93,8 @@ public interface IDriverPool {
      * @return WebDriver
      */
     default public WebDriver getDriver(String name) {
-        return getDriver(name, null, null);
+        //customCapabilities.get() return registered custom capabilities or null as earlier
+        return getDriver(name, customCapabilities.get(), null);
     }
 
     /**
@@ -275,10 +278,27 @@ public interface IDriverPool {
             }
         }
         driversPool.removeAll(drivers4Remove);
+        removeCapabilities();
 
         // don't use modern removeIf as it uses iterator!
         // driversPool.removeIf(carinaDriver -> phase.equals(carinaDriver.getPhase()) && threadId.equals(carinaDriver.getThreadId()));
     }
+    
+    /**
+     * Set custom capabilities.
+     * 
+     * @param custom capabilities
+     */
+    default public void setCapabilities(DesiredCapabilities caps) {
+        customCapabilities.set(caps);
+    }
+    
+    /**
+     * Remove custom capabilities.
+     */
+    default public void removeCapabilities() {
+        customCapabilities.remove();
+    }    
     
     private void quitDriver(CarinaDriver carinaDriver, boolean keepProxyDuring) {
         try {
