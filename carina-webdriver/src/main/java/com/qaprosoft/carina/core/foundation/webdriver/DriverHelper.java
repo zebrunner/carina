@@ -401,7 +401,7 @@ public class DriverHelper {
         DriverListener.setMessages(Messager.OPENED_URL.getMessage(url), Messager.NOT_OPENED_URL.getMessage(url));
         
         // [VD] there is no sense to use fluent wait here as selenium just don't return something until page is ready!
-        // explicitly limit time for the getCurrentUrl operation
+        // explicitly limit time for the openURL operation
         Future<?> future = Executors.newSingleThreadExecutor().submit(new Callable<Void>() {
             public Void call() {
                 try {
@@ -521,13 +521,12 @@ public class DriverHelper {
         });
         
         String url = "";
-        long wait = timeout;
         try {
-            url = (String) future.get(wait, TimeUnit.SECONDS);
+            url = (String) future.get(timeout, TimeUnit.SECONDS);
         } catch (java.util.concurrent.TimeoutException e) {
-            LOGGER.debug("Unable to get driver url during " + wait + "sec!", e);
+            LOGGER.debug("Unable to get driver url during " + timeout + "sec!", e);
         } catch (InterruptedException e) {
-            LOGGER.debug("Unable to get driver url during " + wait + "sec!", e);
+            LOGGER.debug("Unable to get driver url during " + timeout + "sec!", e);
             Thread.currentThread().interrupt();
         } catch (ExecutionException e) {
             LOGGER.error("ExecutionException error on get driver url!", e);
