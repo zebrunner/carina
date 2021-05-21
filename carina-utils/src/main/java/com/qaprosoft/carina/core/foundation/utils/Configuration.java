@@ -513,12 +513,13 @@ public class Configuration {
     }
 
     private static String getDeprecatedParam(Parameter newParam, Parameter oldParam){
-        String value = Configuration.get(newParam);
+        String value = Configuration.get(oldParam);
 
         if (value.isEmpty()){
-            value = Configuration.get(oldParam);
-            LOGGER.warn(oldParam + "configuration parameter is deprecated. " +
-                    "Please, start using " + newParam +" instead!");
+            value = Configuration.get(newParam);
+        } else {
+            LOGGER.warn(oldParam.getKey() + " configuration parameter is deprecated. " +
+                    "Please, start using " + newParam.getKey() +" instead!");
         }
 
         return value;
