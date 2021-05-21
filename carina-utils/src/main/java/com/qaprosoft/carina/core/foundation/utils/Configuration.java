@@ -130,9 +130,9 @@ public class Configuration {
 
         LOCALE("locale"),
 
-        THREAD_COUNT("thread-count"),
+        THREAD_COUNT("thread_count"),
 
-        DATA_PROVIDER_THREAD_COUNT("data-provider-thread-count"),
+        DATA_PROVIDER_THREAD_COUNT("data_provider_thread_count"),
 
         CORE_LOG_LEVEL("core_log_level"),
 
@@ -510,30 +510,12 @@ public class Configuration {
         return value;
     }
 
-    public static String getThreadCount() {
-        String value = Configuration.get(Parameter.THREAD_COUNT);
-        if ("-1".equals(value)) {
-            String deprecatedValue = R.CONFIG.get("thread_count");
-            if (!"-1".equals(deprecatedValue)) {
-                LOGGER.warn(" thread_count configuration parameter is deprecated. " +
-                        "Please, start using " + Parameter.THREAD_COUNT + " instead!");
-                value = deprecatedValue;
-            }
-        }
-        return value;
+    public static int getThreadCount() {
+        return Configuration.getInt(Parameter.THREAD_COUNT);
     }
 
-    public static String getDataProviderThreadCount() {
-        String value = Configuration.get(Parameter.DATA_PROVIDER_THREAD_COUNT);
-        if ("-1".equals(value)){
-            String deprecatedValue = R.CONFIG.get("data_provider_thread_count");
-            if (!"-1".equals(deprecatedValue)) {
-                LOGGER.warn(" data_provider_thread_count configuration parameter is deprecated. " +
-                        "Please, start using " + Parameter.DATA_PROVIDER_THREAD_COUNT + " instead!");
-                value = deprecatedValue;
-            }
-        }
-        return value;
+    public static int getDataProviderThreadCount() {
+        return Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT);
     }
 
 }

@@ -854,14 +854,15 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
          * suite.getXmlSuite().toXml() add those default values anyway even if the absent in suite xml file declaraton.
          * To make possible to parse correctly we had to reuse external parser and private getAttributeValue
         */
-        if (SpecialKeywords.CUSTOM.equalsIgnoreCase(Configuration.getThreadCount())) {
+        
+        if (SpecialKeywords.CUSTOM.equalsIgnoreCase(R.CONFIG.get(Parameter.THREAD_COUNT.getKey()))) {
             LOGGER.info("Custom thread count manipulation is enabled. Carina will skip any updates with thread count...");
             return;
         }
 
-        if (Integer.parseInt(Configuration.getThreadCount())>= 1) {
+        if (Configuration.getThreadCount()>= 1) {
             // use thread-count from config.properties
-            suite.getXmlSuite().setThreadCount(Integer.parseInt(Configuration.getThreadCount()));
+            suite.getXmlSuite().setThreadCount(Configuration.getThreadCount());
             LOGGER.debug("Updated thread-count=" + suite.getXmlSuite().getThreadCount());
         } else {
             String suiteThreadCount = getAttributeValue(suite, "thread-count");
@@ -878,9 +879,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             }
         }
 
-        if (Integer.parseInt(Configuration.getDataProviderThreadCount()) >= 1) {
+        if (Configuration.getDataProviderThreadCount() >= 1) {
             // use thread-count from config.properties
-            suite.getXmlSuite().setDataProviderThreadCount(Integer.parseInt(Configuration.getDataProviderThreadCount()));
+            suite.getXmlSuite().setDataProviderThreadCount(Configuration.getDataProviderThreadCount());
             LOGGER.debug("Updated data-provider-thread-count=" + suite.getXmlSuite().getDataProviderThreadCount());
         } else {
             String suiteDataProviderThreadCount = getAttributeValue(suite, "data-provider-thread-count");
