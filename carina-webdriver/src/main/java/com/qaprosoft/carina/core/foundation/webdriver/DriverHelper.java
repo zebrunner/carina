@@ -28,6 +28,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Cookie;
+import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
@@ -420,16 +422,43 @@ public class DriverHelper {
         DriverListener.setMessages(Messager.GET_PAGE_SOURCE.getMessage(), Messager.FAIL_GET_PAGE_SOURCE.getMessage());
 
         Wait<WebDriver> wait = new FluentWait<WebDriver>(drv)
-                .pollingEvery(Duration.ofMillis(10000)) // there is no sense to refresh url address too often
+                .pollingEvery(Duration.ofMillis(5000)) // there is no sense to refresh url address too often
                 .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
-                .ignoring(WebDriverException.class);
+                .ignoring(WebDriverException.class)
+                .ignoring(JavascriptException.class); //org.openqa.selenium.JavascriptException: javascript error: Cannot read property 'outerHTML' of null
 
         return wait.until(new Function<WebDriver, String>() {
             public String apply(WebDriver driver) {
                 return drv.getPageSource();
             }
         });
+    }
+    
+    /*
+     * Add cookie object into the driver
+     * @param Cookie
+     */
+    public void addCookie(Cookie cookie) {
+        WebDriver drv = getDriver();
+
+        Messager.ADD_COOKIE.info();
+
+        DriverListener.setMessages(Messager.ADD_COOKIE.getMessage(), Messager.FAIL_ADD_COOKIE.getMessage());
+
+        Wait<WebDriver> wait = new FluentWait<WebDriver>(drv)
+                .pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)))
+                .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
+                .ignoring(WebDriverException.class)
+                .ignoring(JsonException.class); // org.openqa.selenium.json.JsonException: Expected to read a START_MAP but instead have: END. Last 0 characters rea
+
+        wait.until(new Function<WebDriver, Boolean>() {
+            public Boolean apply(WebDriver driver) {
+                drv.manage().addCookie(cookie);
+                return true;
+            }
+        });
     }    
+    
 
     /**
      * Checks that current URL is as expected.
