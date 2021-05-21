@@ -484,6 +484,58 @@ public class DriverHelper {
                 return true;
             }
         });
+    }
+    
+    /**
+     * Get a string representing the current URL that the browser is looking at.
+     * @return url.
+     */
+    public String getCurrentUrl() {
+        return getCurrentUrl(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT));
+    }
+    
+    /**
+     * Get a string representing the current URL that the browser is looking at.
+     * @param timeout
+     * @return validation result.
+     */
+    public String getCurrentUrl(long timeout) {
+        WebDriver drv = getDriver();
+        
+        // explicitly limit time for the getCurrentUrl operation
+        Future<?> future = Executors.newSingleThreadExecutor().submit(new Callable<String>() {
+            public String call() throws Exception {
+                //organize fluent waiter for getting url
+                Wait<WebDriver> wait = new FluentWait<WebDriver>(drv)
+                        .pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)))
+                        .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
+                        .ignoring(WebDriverException.class)
+                        .ignoring(JsonException.class); // org.openqa.selenium.json.JsonException: Expected to read a START_MAP but instead have: END. Last 0 characters rea
+
+                return wait.until(new Function<WebDriver, String>() {
+                    public String apply(WebDriver driver) {
+                        return drv.getCurrentUrl();
+                    }
+                });
+            }
+        });
+        
+        String url = "";
+        long wait = timeout;
+        try {
+            url = (String) future.get(wait, TimeUnit.SECONDS);
+        } catch (java.util.concurrent.TimeoutException e) {
+            LOGGER.debug("Unable to get driver url during " + wait + "sec!", e);
+        } catch (InterruptedException e) {
+            LOGGER.debug("Unable to get driver url during " + wait + "sec!", e);
+            Thread.currentThread().interrupt();
+        } catch (ExecutionException e) {
+            LOGGER.error("ExecutionException error on get driver url!", e);
+        } catch (Exception e) {
+            LOGGER.error("Undefined error on get driver url detected!", e);
+        }
+        
+        return url;
     }    
 
     /**
@@ -508,41 +560,9 @@ public class DriverHelper {
     public boolean isUrlAsExpected(String expectedURL, long timeout) {
         String decryptedURL = cryptoTool.decryptByPattern(expectedURL, CRYPTO_PATTERN);
         decryptedURL = getEnvArgURL(decryptedURL);
-        WebDriver drv = getDriver();
         
-        // explicitly limit time for the getCurrentUrl operation
-        Future<?> future = Executors.newSingleThreadExecutor().submit(new Callable<String>() {
-            public String call() throws Exception {
-                //organize fluent waiter for getting url
-                Wait<WebDriver> wait = new FluentWait<WebDriver>(drv)
-                        .pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)))
-                        .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
-                        .ignoring(WebDriverException.class)
-                        .ignoring(JsonException.class); // org.openqa.selenium.json.JsonException: Expected to read a START_MAP but instead have: END. Last 0 characters rea
-
-                return wait.until(new Function<WebDriver, String>() {
-                    public String apply(WebDriver driver) {
-                        return drv.getCurrentUrl();
-                    }
-                });
-            }
-        });
+        String actualUrl = getCurrentUrl(timeout);
         
-        String actualUrl = "";
-        long wait = timeout;
-        try {
-            actualUrl = (String) future.get(wait, TimeUnit.SECONDS);
-        } catch (java.util.concurrent.TimeoutException e) {
-            LOGGER.debug("Unable to get driver url during " + wait + "sec!", e);
-        } catch (InterruptedException e) {
-            LOGGER.debug("Unable to get driver url during " + wait + "sec!", e);
-            Thread.currentThread().interrupt();
-        } catch (ExecutionException e) {
-            LOGGER.error("ExecutionException error on get driver url!", e);
-        } catch (Exception e) {
-            LOGGER.error("Undefined error on get driver url detected!", e);
-        }        
-
         if (LogicUtils.isURLEqual(decryptedURL, actualUrl)) {
             Messager.EXPECTED_URL.info(actualUrl);
             return true;
