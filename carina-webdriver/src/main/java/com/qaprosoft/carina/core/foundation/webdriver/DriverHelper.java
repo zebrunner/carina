@@ -472,7 +472,6 @@ public class DriverHelper {
         decryptedURL = getEnvArgURL(decryptedURL);
         WebDriver drv = getDriver();
         
-        DriverListener.setMessages(Messager.EXPECTED_URL.getMessage(), Messager.UNEXPECTED_URL.getMessage());
         Wait<WebDriver> wait = new FluentWait<WebDriver>(drv)
                 .pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)))
                 .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
@@ -481,7 +480,12 @@ public class DriverHelper {
 
         String actualUrl = wait.until(new Function<WebDriver, String>() {
             public String apply(WebDriver driver) {
-                return drv.getCurrentUrl();
+                String url = drv.getCurrentUrl();
+                while (url.isEmpty() || url.equals("data:,")) {
+                    // we should wait while selenium tries to open site
+                    url = drv.getCurrentUrl();
+                }
+                return url;
             }
         });
         
