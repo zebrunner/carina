@@ -40,6 +40,7 @@ import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.NoSuchWindowException;
+import org.openqa.selenium.ScriptTimeoutException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
@@ -1034,8 +1035,10 @@ public class DriverHelper {
 	public boolean waitUntil(ExpectedCondition<?> condition, long timeout) {
 		boolean result;
 		final WebDriver drv = getDriver();
-		Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(WebDriverException.class)
-				.ignoring(NoSuchSessionException.class);
+		Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME)
+		        .ignoring(WebDriverException.class)
+				.ignoring(NoSuchSessionException.class)
+				.ignoring(ScriptTimeoutException.class);
 		try {
 			wait.until(condition);
 			result = true;
