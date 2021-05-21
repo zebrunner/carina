@@ -401,18 +401,33 @@ public class DriverHelper {
         DriverListener.setMessages(Messager.OPEN_URL.getMessage(url), Messager.NOT_OPEN_URL.getMessage(url));
         
         // [VD] there is no sense to use fluent wait here as selenium just don't return something until page is ready!
-        try {
-            Messager.OPENING_URL.info(url);
-            drv.get(decryptedURL);
-        } catch (UnhandledAlertException e) {
-            drv.switchTo().alert().accept();
-        } catch (JsonException e) {
-            if (e.getMessage() != null && e.getMessage().contains("Expected to read a START_MAP but instead have: END. Last 0 characters read")) {
-                LOGGER.error("Selenium Hub couldn't handle request due to overloading or timeout!");
+        // explicitly limit time for the getCurrentUrl operation
+        Future<?> future = Executors.newSingleThreadExecutor().submit(new Callable<Void>() {
+            public Void call() {
+                try {
+                    Messager.OPENING_URL.info(url);
+                    drv.get(decryptedURL);
+                } catch (UnhandledAlertException e) {
+                    drv.switchTo().alert().accept();
+                }
+                return null;
             }
-            //re-throw original exception as we already put to the log important info
-            throw e;
-        }
+        });
+        
+        long wait = timeout;
+        try {
+            future.get(wait, TimeUnit.SECONDS);
+        } catch (java.util.concurrent.TimeoutException e) {
+            LOGGER.error("Unable to open url during " + wait + "sec!", e);
+        } catch (InterruptedException e) {
+            LOGGER.error("Unable to open url during " + wait + "sec!", e);
+            Thread.currentThread().interrupt();
+        } catch (ExecutionException e) {
+            LOGGER.error("ExecutionException error on open url!", e);
+        } catch (Exception e) {
+            LOGGER.error("Undefined error on open url detected!", e);
+        }    
+        
         
         // automatically wait until page is in readyState
         if (!waitUntil(ExpectedConditions.jsReturnsValue("return document.readyState=='complete';"), timeout)) {
@@ -1037,8 +1052,7 @@ public class DriverHelper {
 		final WebDriver drv = getDriver();
 		Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME)
 		        .ignoring(WebDriverException.class)
-				.ignoring(NoSuchSessionException.class)
-				.ignoring(ScriptTimeoutException.class);
+				.ignoring(NoSuchSessionException.class);
 		try {
 			wait.until(condition);
 			result = true;
