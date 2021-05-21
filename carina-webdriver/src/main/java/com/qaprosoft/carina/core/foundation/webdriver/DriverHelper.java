@@ -21,6 +21,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -408,6 +412,16 @@ public class DriverHelper {
             //re-throw original exception as we already put to the log important info
             throw e;
         }
+        
+        // automatically wait until page is in readyState
+        try {
+            WebDriverWait wait = new WebDriverWait(drv, timeout, Configuration.getInt(Parameter.RETRY_INTERVAL));
+            wait.until(ExpectedConditions.jsReturnsValue("return document.readyState=='complete';"));
+        } catch (Exception e) {
+            LOGGER.error("Unable to detect page readines state", e);
+        }
+
+
     }
     
     /*
@@ -453,12 +467,12 @@ public class DriverHelper {
 
         wait.until(new Function<WebDriver, Boolean>() {
             public Boolean apply(WebDriver driver) {
+                LOGGER.debug("Adding cookie: " + cookie.getName());
                 drv.manage().addCookie(cookie);
                 return true;
             }
         });
     }    
-    
 
     /**
      * Checks that current URL is as expected.
@@ -468,27 +482,44 @@ public class DriverHelper {
      * @return validation result.
      */
     public boolean isUrlAsExpected(String expectedURL) {
+        return isUrlAsExpected(expectedURL, Configuration.getInt(Parameter.EXPLICIT_TIMEOUT));      
+    }
+
+    /**
+     * Checks that current URL is as expected.
+     * 
+     * @param expectedURL
+     *            Expected Url
+     * @param timeout
+     * @return validation result.
+     */
+    public boolean isUrlAsExpected(String expectedURL, long timeout) {
         String decryptedURL = cryptoTool.decryptByPattern(expectedURL, CRYPTO_PATTERN);
         decryptedURL = getEnvArgURL(decryptedURL);
         WebDriver drv = getDriver();
         
-        Wait<WebDriver> wait = new FluentWait<WebDriver>(drv)
-                .pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)))
-                .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
-                .ignoring(WebDriverException.class)
-                .ignoring(JsonException.class); // org.openqa.selenium.json.JsonException: Expected to read a START_MAP but instead have: END. Last 0 characters rea
-
-        String actualUrl = wait.until(new Function<WebDriver, String>() {
-            public String apply(WebDriver driver) {
-                String url = drv.getCurrentUrl();
-                while (url.isEmpty() || url.equals("data:,")) {
-                    // we should wait while selenium tries to open site
-                    url = drv.getCurrentUrl();
-                }
-                return url;
+        // explicitly limit time for the getCurrentUrl operation
+        Future<?> future = Executors.newSingleThreadExecutor().submit(new Callable<String>() {
+            public String call() throws Exception {
+                return drv.getCurrentUrl();
             }
         });
         
+        String actualUrl = "";
+        long wait = timeout;
+        try {
+            actualUrl = (String) future.get(wait, TimeUnit.SECONDS);
+        } catch (java.util.concurrent.TimeoutException e) {
+            LOGGER.error("Unable to get driver url during " + wait + "sec!", e);
+        } catch (InterruptedException e) {
+            LOGGER.error("Unable to get driver url during " + wait + "sec!", e);
+            Thread.currentThread().interrupt();
+        } catch (ExecutionException e) {
+            LOGGER.error("ExecutionException error on get driver url!", e);
+        } catch (Exception e) {
+            LOGGER.error("Undefined error on get driver url detected!", e);
+        }        
+
         if (LogicUtils.isURLEqual(decryptedURL, actualUrl)) {
             Messager.EXPECTED_URL.info(actualUrl);
             return true;
@@ -496,7 +527,6 @@ public class DriverHelper {
             Messager.UNEXPECTED_URL.error(expectedURL, actualUrl);
             return false;
         }        
-        
     }
     
     
