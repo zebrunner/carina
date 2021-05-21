@@ -663,19 +663,36 @@ public class DriverHelper {
      * Refresh browser.
      */
     public void refresh() {
-        getDriver().navigate().refresh();
-        Messager.REFRESH.info();
+        refresh(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT));
     }
 
     /**
-     * Refresh browser after timeout.
+     * Refresh browser.
      * 
-     * @param timeout
-     *            before refresh.
+     * @param timeout.
      */
     public void refresh(long timeout) {
-        CommonUtils.pause(timeout);
-        refresh();
+        WebDriver drv = getDriver();
+        Wait<WebDriver> wait = new FluentWait<WebDriver>(drv)
+                .pollingEvery(Duration.ofMillis(5000)) // there is no sense to refresh url address too often
+                .withTimeout(Duration.ofSeconds(timeout))
+                .ignoring(WebDriverException.class)
+                .ignoring(JsonException.class); // org.openqa.selenium.json.JsonException: Expected to read a START_MAP but instead have: END. Last 0 characters read
+        
+        try {
+            wait.until(new Function<WebDriver, Void>() {
+                public Void apply(WebDriver driver) {
+                    drv.navigate().refresh();
+                    return null;
+                }
+            });
+        } catch (ScriptTimeoutException | TimeoutException e) {
+            Messager.FAIL_REFRESH.error();
+        }
+
+        
+        getDriver().navigate().refresh();
+        Messager.REFRESH.info();
     }
 
     public void pressTab() {

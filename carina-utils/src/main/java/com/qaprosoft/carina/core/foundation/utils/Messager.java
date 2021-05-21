@@ -76,7 +76,9 @@ public enum Messager implements IMessager {
 
     BACK("INFO: navigate to previous page performed."),
 
-    REFRESH("INFO: refresh performed."),
+    REFRESH("INFO: refresh page."),
+
+    FAIL_REFRESH("FAIL: refresh page."),
 
     EXPECTED_URL("PASS: url '%s' is correct."),
 
