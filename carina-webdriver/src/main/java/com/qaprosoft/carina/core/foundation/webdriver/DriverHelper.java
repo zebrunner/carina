@@ -418,9 +418,9 @@ public class DriverHelper {
         try {
             future.get(wait, TimeUnit.SECONDS);
         } catch (java.util.concurrent.TimeoutException e) {
-            LOGGER.error("Unable to open url during " + wait + "sec!", e);
+            LOGGER.debug("Unable to open url during " + wait + "sec!", e);
         } catch (InterruptedException e) {
-            LOGGER.error("Unable to open url during " + wait + "sec!", e);
+            LOGGER.debug("Unable to open url during " + wait + "sec!", e);
             Thread.currentThread().interrupt();
         } catch (ExecutionException e) {
             LOGGER.error("ExecutionException error on open url!", e);
@@ -431,7 +431,7 @@ public class DriverHelper {
         
         // automatically wait until page is in readyState
         if (!waitUntil(ExpectedConditions.jsReturnsValue("return document.readyState=='complete';"), timeout)) {
-            LOGGER.error("Unable to detect page readines state after '" + timeout +"' sec!");
+            LOGGER.warn("Unable to detect page readines state after '" + timeout +"' sec!");
         }
 
     }
@@ -513,7 +513,18 @@ public class DriverHelper {
         // explicitly limit time for the getCurrentUrl operation
         Future<?> future = Executors.newSingleThreadExecutor().submit(new Callable<String>() {
             public String call() throws Exception {
-                return drv.getCurrentUrl();
+                //organize fluent waiter for getting url
+                Wait<WebDriver> wait = new FluentWait<WebDriver>(drv)
+                        .pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)))
+                        .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
+                        .ignoring(WebDriverException.class)
+                        .ignoring(JsonException.class); // org.openqa.selenium.json.JsonException: Expected to read a START_MAP but instead have: END. Last 0 characters rea
+
+                return wait.until(new Function<WebDriver, String>() {
+                    public String apply(WebDriver driver) {
+                        return drv.getCurrentUrl();
+                    }
+                });
             }
         });
         
@@ -522,9 +533,9 @@ public class DriverHelper {
         try {
             actualUrl = (String) future.get(wait, TimeUnit.SECONDS);
         } catch (java.util.concurrent.TimeoutException e) {
-            LOGGER.error("Unable to get driver url during " + wait + "sec!", e);
+            LOGGER.debug("Unable to get driver url during " + wait + "sec!", e);
         } catch (InterruptedException e) {
-            LOGGER.error("Unable to get driver url during " + wait + "sec!", e);
+            LOGGER.debug("Unable to get driver url during " + wait + "sec!", e);
             Thread.currentThread().interrupt();
         } catch (ExecutionException e) {
             LOGGER.error("ExecutionException error on get driver url!", e);
