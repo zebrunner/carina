@@ -49,7 +49,8 @@ public class Configuration {
 
         BROWSER_LANGUAGE("browser_language"),
 
-        SELENIUM_HOST_DEPRECATED("selenium_host"),
+        @Deprecated
+        SELENIUM_HOST("selenium_host"),
 
         SELENIUM_URL("selenium_url"),
 
@@ -129,11 +130,7 @@ public class Configuration {
 
         LOCALE("locale"),
 
-        THREAD_COUNT_DEPRECATED("thread_count"),
-
         THREAD_COUNT("thread-count"),
-
-        DATA_PROVIDER_THREAD_COUNT_DEPRECATED("data_provider_thread_count"),
 
         DATA_PROVIDER_THREAD_COUNT("data-provider-thread-count"),
 
@@ -500,31 +497,42 @@ public class Configuration {
         }
     }
 
-    public static String getSeleniumUrl(){
-        return getDeprecatedParam(Parameter.SELENIUM_URL, Parameter.SELENIUM_HOST_DEPRECATED, "");
-    }
-
-    public static String getThreadCount(){
-        return getDeprecatedParam(Parameter.THREAD_COUNT, Parameter.THREAD_COUNT_DEPRECATED, "-1");
-    }
-
-    public static String getDataProviderThreadCount(){
-        return getDeprecatedParam(Parameter.DATA_PROVIDER_THREAD_COUNT, Parameter.DATA_PROVIDER_THREAD_COUNT_DEPRECATED, "-1");
-    }
-
-    private static String getDeprecatedParam(Parameter newParam, Parameter oldParam, String defaultValue){
-        String value = Configuration.get(newParam);
-
-        if (value.equalsIgnoreCase(defaultValue)){
-            String deprecatedValue = Configuration.get(oldParam);
-
+    public static String getSeleniumUrl() {
+        String value = Configuration.get(Parameter.SELENIUM_URL);
+        if (value.isEmpty()) {
+            String deprecatedValue = Configuration.get(Parameter.SELENIUM_HOST);
             if (!deprecatedValue.isEmpty()) {
-                LOGGER.warn(oldParam.getKey() + " configuration parameter is deprecated. " +
-                        "Please, start using " + newParam.getKey() + " instead!");
+                LOGGER.warn(Parameter.SELENIUM_HOST.getKey() + " configuration parameter is deprecated. " +
+                        "Please, start using " + Parameter.SELENIUM_URL + " instead!");
                 value = deprecatedValue;
             }
         }
+        return value;
+    }
 
+    public static String getThreadCount() {
+        String value = Configuration.get(Parameter.THREAD_COUNT);
+        if ("-1".equals(value)) {
+            String deprecatedValue = R.CONFIG.get("thread_count");
+            if (!"-1".equals(deprecatedValue)) {
+                LOGGER.warn(" thread_count configuration parameter is deprecated. " +
+                        "Please, start using " + Parameter.THREAD_COUNT + " instead!");
+                value = deprecatedValue;
+            }
+        }
+        return value;
+    }
+
+    public static String getDataProviderThreadCount() {
+        String value = Configuration.get(Parameter.DATA_PROVIDER_THREAD_COUNT);
+        if ("-1".equals(value)){
+            String deprecatedValue = R.CONFIG.get("data_provider_thread_count");
+            if (!"-1".equals(deprecatedValue)) {
+                LOGGER.warn(" data_provider_thread_count configuration parameter is deprecated. " +
+                        "Please, start using " + Parameter.DATA_PROVIDER_THREAD_COUNT + " instead!");
+                value = deprecatedValue;
+            }
+        }
         return value;
     }
 
