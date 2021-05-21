@@ -443,20 +443,19 @@ public class DriverHelper {
                 .pollingEvery(Duration.ofMillis(5000)) // there is no sense to refresh url address too often
                 .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
                 .ignoring(WebDriverException.class)
-                .ignoring(JavascriptException.class) //org.openqa.selenium.JavascriptException: javascript error: Cannot read property 'outerHTML' of null
-                .ignoring(ScriptTimeoutException.class);
+                .ignoring(JavascriptException.class); // org.openqa.selenium.JavascriptException: javascript error: Cannot read property 'outerHTML' of null
 
-        String res = wait.until(new Function<WebDriver, String>() {
-            public String apply(WebDriver driver) {
-                return drv.getPageSource();
-            }
-        });
-        
-        if (res == null) {
+        String res = "";
+        try {
+            res = wait.until(new Function<WebDriver, String>() {
+                public String apply(WebDriver driver) {
+                    return drv.getPageSource();
+                }
+            });
+        } catch (ScriptTimeoutException e) {
             Messager.FAIL_GET_PAGE_SOURCE.error();
-            res = "";
         }
-        
+
         Messager.GET_PAGE_SOURCE.info();
         return res;
     }
