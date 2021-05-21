@@ -40,6 +40,7 @@ import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.NoSuchWindowException;
+import org.openqa.selenium.ScriptTimeoutException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
@@ -443,7 +444,7 @@ public class DriverHelper {
                 .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
                 .ignoring(WebDriverException.class)
                 .ignoring(JavascriptException.class) //org.openqa.selenium.JavascriptException: javascript error: Cannot read property 'outerHTML' of null
-                .ignoring(TimeoutException.class);
+                .ignoring(ScriptTimeoutException.class);
 
         String res = wait.until(new Function<WebDriver, String>() {
             public String apply(WebDriver driver) {
