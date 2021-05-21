@@ -125,7 +125,7 @@ public class APISampleTest implements IAbstractTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     
 
-    @Test(description = "JIRA#DEMO-0001")
+    @Test()
     @MethodOwner(owner = "qpsdemo")
     public void testCreateUser() throws Exception {
         LOGGER.info("test");
@@ -136,7 +136,7 @@ public class APISampleTest implements IAbstractTest {
         api.validateResponse();
     }
 
-    @Test(description = "JIRA#DEMO-0002")
+    @Test()
     @MethodOwner(owner = "qpsdemo")
     public void testCreateUserMissingSomeFields() throws Exception {
         PostUserMethod api = new PostUserMethod();
@@ -147,7 +147,7 @@ public class APISampleTest implements IAbstractTest {
         api.validateResponse();
     }
 
-    @Test(description = "JIRA#DEMO-0003")
+    @Test()
     @MethodOwner(owner = "qpsdemo")
     public void testGetUsers() {
         GetUserMethods getUsersMethods = new GetUserMethods();
@@ -157,7 +157,7 @@ public class APISampleTest implements IAbstractTest {
         getUsersMethods.validateResponseAgainstSchema("api/users/_get/rs.schema");
     }
 
-    @Test(description = "JIRA#DEMO-0004")
+    @Test()
     @MethodOwner(owner = "qpsdemo")
     @TestPriority(Priority.P1)
     public void testDeleteUsers() {

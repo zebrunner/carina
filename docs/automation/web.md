@@ -144,7 +144,7 @@ public class HomePage extends AbstractPage {
 Carina framework uses TestNG for test organization. In general, test represents a manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:
 ```
 public class WebSampleTest implements IAbstractTest {
-    @Test(description = "JIRA#AUTO-0009")
+    @Test()
     @MethodOwner(owner = "qpsdemo")
     public void testCompareModels() {
         // Open GSM Arena home page and verify page is opened

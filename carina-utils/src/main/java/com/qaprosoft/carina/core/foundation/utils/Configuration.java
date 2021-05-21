@@ -527,8 +527,15 @@ public class Configuration {
                 value = deprecatedValue;
             }
         }
-
         return value;
+    }
+
+    public static int getThreadCount() {
+        return Configuration.getInt(Parameter.THREAD_COUNT);
+    }
+
+    public static int getDataProviderThreadCount() {
+        return Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT);
     }
 
 }
