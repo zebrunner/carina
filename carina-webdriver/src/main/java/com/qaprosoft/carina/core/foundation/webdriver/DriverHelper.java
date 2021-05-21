@@ -414,13 +414,9 @@ public class DriverHelper {
         }
         
         // automatically wait until page is in readyState
-        try {
-            WebDriverWait wait = new WebDriverWait(drv, timeout, Configuration.getInt(Parameter.RETRY_INTERVAL));
-            wait.until(ExpectedConditions.jsReturnsValue("return document.readyState=='complete';"));
-        } catch (Exception e) {
-            LOGGER.error("Unable to detect page readines state", e);
+        if (!waitUntil(ExpectedConditions.jsReturnsValue("return document.readyState=='complete';"), timeout)) {
+            LOGGER.error("Unable to detect page readines state after '" + timeout +"' sec!");
         }
-
 
     }
     
