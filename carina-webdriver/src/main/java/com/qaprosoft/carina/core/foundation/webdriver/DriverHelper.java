@@ -688,8 +688,6 @@ public class DriverHelper {
             Messager.FAIL_REFRESH.error();
         }
 
-        
-        getDriver().navigate().refresh();
         Messager.REFRESH.info();
     }
 
