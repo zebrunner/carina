@@ -51,37 +51,9 @@ public abstract class AbstractPage extends AbstractUIObject implements ICustomTy
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private PageOpeningStrategy pageOpeningStrategy = PageOpeningStrategy.valueOf(Configuration.get(Parameter.PAGE_OPENING_STRATEGY));
     
-	protected String pageURL = getUrl();
-
 	public AbstractPage(WebDriver driver) {
 		super(driver);
 	}
-
-    /**
-     * Opens page according to specified in constructor URL.
-     */
-    public void open() {
-        openURL(pageURL);
-    }
-
-    protected void setPageURL(String relURL) {
-        String baseURL;
-        // if(!"NULL".equalsIgnoreCase(Configuration.get(Parameter.ENV)))
-        if (!Configuration.get(Parameter.ENV).isEmpty()) {
-            baseURL = Configuration.getEnvArg("base");
-        } else {
-            baseURL = Configuration.get(Parameter.URL);
-        }
-        pageURL = baseURL + relURL;
-    }
-
-    protected void setPageAbsoluteURL(String url) {
-        this.pageURL = url;
-    }
-
-    public String getPageURL() {
-        return pageURL;
-    }
 
     public PageOpeningStrategy getPageOpeningStrategy() {
         return pageOpeningStrategy;
@@ -206,16 +178,6 @@ public abstract class AbstractPage extends AbstractUIObject implements ICustomTy
     public String savePageAsPdf() throws IOException, DocumentException {
         return savePageAsPdf(true);
     }
-
-	private String getUrl() {
-		String url = "";
-		if (Configuration.getEnvArg(Parameter.URL.getKey()).isEmpty()) {
-			url = Configuration.get(Parameter.URL);
-		} else {
-			url = Configuration.getEnvArg(Parameter.URL.getKey());
-		}
-		return url;
-	}
 
     /**
      * Waits till JS and jQuery (if applicable for the page) are completely processed on the page

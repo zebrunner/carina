@@ -86,6 +86,8 @@ public class DriverHelper {
     protected long timer;
 
     protected WebDriver driver;
+    
+    protected String pageURL = getUrl();
 
     protected CryptoTool cryptoTool;
 
@@ -105,6 +107,88 @@ public class DriverHelper {
         }
 
     }
+    
+    /**
+     * Opens page according to specified in constructor URL.
+     */
+    public void open() {
+        openURL(this.pageURL);
+    }
+    
+    /**
+     * Open URL.
+     * 
+     * @param url
+     *            to open.
+     */
+    public void openURL(String url) {
+        openURL(url, Configuration.getInt(Parameter.EXPLICIT_TIMEOUT));
+    }
+    
+    /**
+     * Open URL.
+     * 
+     * @param url
+     *            to open.
+     * @param timeout
+     *            long
+     */
+    public void openURL(String url, long timeout) {
+        final String decryptedURL = getEnvArgURL(cryptoTool.decryptByPattern(url, CRYPTO_PATTERN));
+        this.pageURL = decryptedURL;
+
+        WebDriver drv = getDriver();
+
+        DriverListener.setMessages(Messager.OPENED_URL.getMessage(url), Messager.NOT_OPENED_URL.getMessage(url));
+        
+        // [VD] there is no sense to use fluent wait here as selenium just don't return something until page is ready!
+        // explicitly limit time for the openURL operation
+        Future<?> future = Executors.newSingleThreadExecutor().submit(new Callable<Void>() {
+            public Void call() {
+                try {
+                    Messager.OPENING_URL.info(url);
+                    drv.get(decryptedURL);
+                } catch (UnhandledAlertException e) {
+                    drv.switchTo().alert().accept();
+                }
+                return null;
+            }
+        });
+        
+        long wait = timeout;
+        try {
+            future.get(wait, TimeUnit.SECONDS);
+        } catch (java.util.concurrent.TimeoutException e) {
+            LOGGER.debug("Unable to open url during " + wait + "sec!", e);
+        } catch (InterruptedException e) {
+            LOGGER.debug("Unable to open url during " + wait + "sec!", e);
+            Thread.currentThread().interrupt();
+        } catch (ExecutionException e) {
+            LOGGER.error("ExecutionException error on open url!", e);
+        } catch (Exception e) {
+            LOGGER.error("Undefined error on open url detected!", e);
+        }    
+        
+    }    
+
+    protected void setPageURL(String relURL) {
+        String baseURL;
+        // if(!"NULL".equalsIgnoreCase(Configuration.get(Parameter.ENV)))
+        if (!Configuration.get(Parameter.ENV).isEmpty()) {
+            baseURL = Configuration.getEnvArg("base");
+        } else {
+            baseURL = Configuration.get(Parameter.URL);
+        }
+        this.pageURL = baseURL + relURL;
+    }
+
+    protected void setPageAbsoluteURL(String url) {
+        this.pageURL = url;
+    }
+
+    public String getPageURL() {
+        return this.pageURL;
+    }    
 
     // --------------------------------------------------------------------------
     // Base UI interaction operations
@@ -373,61 +457,6 @@ public class DriverHelper {
         if (!clicked) {
             throw new RuntimeException("Unable to click onto any elements from array: " + Arrays.toString(elements));
         }
-    }
-
-    /**
-     * Open URL.
-     * 
-     * @param url
-     *            to open.
-     */
-    public void openURL(String url) {
-        openURL(url, Configuration.getInt(Parameter.EXPLICIT_TIMEOUT));
-    }
-    
-    /**
-     * Open URL.
-     * 
-     * @param url
-     *            to open.
-     * @param timeout
-     *            long
-     */
-    public void openURL(String url, long timeout) {
-        final String decryptedURL = getEnvArgURL(cryptoTool.decryptByPattern(url, CRYPTO_PATTERN));
-
-        WebDriver drv = getDriver();
-
-        DriverListener.setMessages(Messager.OPENED_URL.getMessage(url), Messager.NOT_OPENED_URL.getMessage(url));
-        
-        // [VD] there is no sense to use fluent wait here as selenium just don't return something until page is ready!
-        // explicitly limit time for the openURL operation
-        Future<?> future = Executors.newSingleThreadExecutor().submit(new Callable<Void>() {
-            public Void call() {
-                try {
-                    Messager.OPENING_URL.info(url);
-                    drv.get(decryptedURL);
-                } catch (UnhandledAlertException e) {
-                    drv.switchTo().alert().accept();
-                }
-                return null;
-            }
-        });
-        
-        long wait = timeout;
-        try {
-            future.get(wait, TimeUnit.SECONDS);
-        } catch (java.util.concurrent.TimeoutException e) {
-            LOGGER.debug("Unable to open url during " + wait + "sec!", e);
-        } catch (InterruptedException e) {
-            LOGGER.debug("Unable to open url during " + wait + "sec!", e);
-            Thread.currentThread().interrupt();
-        } catch (ExecutionException e) {
-            LOGGER.error("ExecutionException error on open url!", e);
-        } catch (Exception e) {
-            LOGGER.error("Undefined error on open url detected!", e);
-        }    
-        
     }
     
     /*
@@ -1130,6 +1159,16 @@ public class DriverHelper {
             return supplier.get();
         }
         
+    }
+	
+    private String getUrl() {
+        String url = "";
+        if (Configuration.getEnvArg(Parameter.URL.getKey()).isEmpty()) {
+            url = Configuration.get(Parameter.URL);
+        } else {
+            url = Configuration.getEnvArg(Parameter.URL.getKey());
+        }
+        return url;
     }
 	
 }
