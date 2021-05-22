@@ -312,8 +312,6 @@ public interface IDriverPool {
             if (drv instanceof EventFiringWebDriver) {
                 drv = ((EventFiringWebDriver) drv).getWrappedDriver();
             }
-            SessionId sessionId = ((RemoteWebDriver) drv).getSessionId();
-
             // removed by default logs generator in 7.0 after making independent logs/video upload from device to s3 compatible storage
             // https://github.com/qaprosoft/carina/issues/1174
             if (R.CONFIG.getBoolean(SpecialKeywords.ENABLE_LOG) && Configuration.getBoolean(Parameter.DRIVER_RECORDER)) {
@@ -328,6 +326,7 @@ public interface IDriverPool {
                             // unrecognized exception on this phase for iOS which block below execution
                             continue;
                         }
+                        SessionId sessionId = ((RemoteWebDriver) drv).getSessionId();
                         String fileName = ReportContext.getArtifactsFolder().getAbsolutePath() + File.separator + logType + File.separator + sessionId.toString() + ".log";
                         StringBuilder tempStr = new StringBuilder();
                         LogEntries logcatEntries = getDriverLogs(carinaDriver.getDriver(), logType);
