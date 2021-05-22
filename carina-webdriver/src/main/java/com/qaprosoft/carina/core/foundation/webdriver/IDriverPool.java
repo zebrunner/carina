@@ -353,24 +353,30 @@ public interface IDriverPool {
             WebDriver driver = carinaDriver.getDriver();
             POOL_LOGGER.debug("start driver quit: " + carinaDriver.getName());
             
-            Future<?> future = Executors.newSingleThreadExecutor().submit(new Callable<Void>() {
+            Future<?> futureClose = Executors.newSingleThreadExecutor().submit(new Callable<Void>() {
                 public Void call() throws Exception {
                     if ("chrome".equalsIgnoreCase(Configuration.getBrowser())) {
                         // workaround to not cleaned chrome profiles on hard drive
                         driver.close();
                     }
+                    return null;
+                }
+            });
+            
+            Future<?> futureQuit = Executors.newSingleThreadExecutor().submit(new Callable<Void>() {
+                public Void call() throws Exception {
                     driver.quit();
                     return null;
                 }
             });
             
-            long wait = 30;
+            long wait = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT);
             try {
-                future.get(wait, TimeUnit.SECONDS);
+                futureClose.get(wait, TimeUnit.SECONDS);
+                futureQuit.get(wait, TimeUnit.SECONDS);
             } catch (ExecutionException e) {
-                POOL_LOGGER.error("ExecutionException error on driver quit detected! Enable DEBUG log level for details.");
+                POOL_LOGGER.error("ExecutionException error on driver quit detected!", e);
                 e.printStackTrace();
-                future.get(wait, TimeUnit.SECONDS);
             } catch (java.util.concurrent.TimeoutException e) {
                 POOL_LOGGER.error("Unable to quit driver for " + wait + "sec!", e);
             } catch (InterruptedException e) {
@@ -380,15 +386,13 @@ public interface IDriverPool {
                 POOL_LOGGER.warn("Undefined error on driver quit detected!");
                 POOL_LOGGER.debug(e.getMessage(), e);
             }
-            
-            
-            POOL_LOGGER.debug("finished driver quit: " + carinaDriver.getName());
         } catch (WebDriverException e) {
             POOL_LOGGER.debug("Error message detected during driver quit: " + e.getMessage(), e);
             // do nothing
         } catch (Exception e) {
             POOL_LOGGER.error("Error discovered during driver quit: " + e.getMessage(), e);
         } finally {
+            POOL_LOGGER.debug("finished driver quit: " + carinaDriver.getName());            
             if (!keepProxyDuring) {
                 ProxyPool.stopProxy();
             }            
