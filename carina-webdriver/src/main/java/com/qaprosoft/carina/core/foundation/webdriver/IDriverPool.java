@@ -303,9 +303,6 @@ public interface IDriverPool {
     private void quitDriver(CarinaDriver carinaDriver, boolean keepProxyDuring) {
         try {
             carinaDriver.getDevice().disconnectRemote();
-            if (!keepProxyDuring) {
-                ProxyPool.stopProxy();
-            }
             
             // Collect all possible logs and put them as artifacts
             WebDriver drv = carinaDriver.getDriver();
@@ -378,6 +375,9 @@ public interface IDriverPool {
         } catch (Exception e) {
             POOL_LOGGER.error("Error discovered during driver quit: " + e.getMessage(), e);
         } finally {
+            if (!keepProxyDuring) {
+                ProxyPool.stopProxy();
+            }            
             MDC.remove("device");
         }
     }
