@@ -19,28 +19,28 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.nio.charset.Charset;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.MDC;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.json.JsonException;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Wait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -354,35 +354,23 @@ public interface IDriverPool {
                 }
             }
             
-            WebDriver driver = carinaDriver.getDriver();
             POOL_LOGGER.debug("start driver quit: " + carinaDriver.getName());
-            
-            Future<?> future = Executors.newSingleThreadExecutor().submit(new Callable<Void>() {
-                public Void call() throws Exception {
+            Wait<WebDriver> wait = new FluentWait<WebDriver>(drv)
+                    .pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)))
+                    .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
+                    .ignoring(WebDriverException.class)
+                    .ignoring(JsonException.class); // org.openqa.selenium.json.JsonException: Expected to read a START_MAP but instead have: END. Last 0 characters rea
+
+            wait.until(new Function<WebDriver, Boolean>() {
+                public Boolean apply(WebDriver driver) {
                     if ("chrome".equalsIgnoreCase(Configuration.getBrowser())) {
                         // workaround to not cleaned chrome profiles on hard drive
                         driver.close();
                     }
                     driver.quit();
-                    return null;
+                    return true;
                 }
             });
-            
-            long wait = 30;
-            try {
-                future.get(wait, TimeUnit.SECONDS);
-            } catch (java.util.concurrent.TimeoutException e) {
-                POOL_LOGGER.error("Unable to quit driver for " + wait + "sec!", e);
-            } catch (InterruptedException e) {
-                POOL_LOGGER.error("Unable to quit driver for " + wait + "sec!", e);
-                Thread.currentThread().interrupt();
-            } catch (ExecutionException e) {
-                POOL_LOGGER.warn("ExecutionException error on driver quit detected! Enable DEBUG log level for details.");
-                POOL_LOGGER.debug(e.getMessage(), e);
-            } catch (Exception e) {
-                POOL_LOGGER.warn("Undefined error on driver quit detected!");
-                POOL_LOGGER.debug(e.getMessage(), e);
-            }
             
             POOL_LOGGER.debug("finished driver quit: " + carinaDriver.getName());
         } catch (WebDriverException e) {
