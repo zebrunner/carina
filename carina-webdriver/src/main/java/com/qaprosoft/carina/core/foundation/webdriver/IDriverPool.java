@@ -355,7 +355,7 @@ public interface IDriverPool {
             
             POOL_LOGGER.debug("start driver quit: " + carinaDriver.getName());
             Wait<WebDriver> wait = new FluentWait<WebDriver>(drv)
-                    .pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)))
+                    .pollingEvery(Duration.ofMillis(5000))
                     .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
                     .ignoring(WebDriverException.class)
                     .ignoring(JsonException.class); // org.openqa.selenium.json.JsonException: Expected to read a START_MAP but instead have: END. Last 0 characters rea
