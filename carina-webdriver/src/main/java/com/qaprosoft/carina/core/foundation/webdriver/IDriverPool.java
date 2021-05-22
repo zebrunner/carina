@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.nio.charset.Charset;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,16 +32,21 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.MDC;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.json.JsonException;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Wait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -370,22 +376,35 @@ public interface IDriverPool {
                 }
             });
             
-            long wait = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT);
+            
+            Wait<WebDriver> wait = new FluentWait<WebDriver>(drv)
+                    .pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)))
+                    .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
+                    .ignoring(WebDriverException.class)
+                    .ignoring(JsonException.class); // org.openqa.selenium.json.JsonException: Expected to read a START_MAP but instead have: END. Last 0 characters read:
+
+            long timeout = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT);
             try {
-                futureClose.get(wait, TimeUnit.SECONDS);
-                futureQuit.get(wait, TimeUnit.SECONDS);
-            } catch (ExecutionException e) {
-                POOL_LOGGER.error("ExecutionException error on driver quit detected!", e);
-                e.printStackTrace();
-            } catch (java.util.concurrent.TimeoutException e) {
-                POOL_LOGGER.error("Unable to quit driver for " + wait + "sec!", e);
-            } catch (InterruptedException e) {
-                POOL_LOGGER.error("Unable to quit driver for " + wait + "sec!", e);
-                Thread.currentThread().interrupt();
-            } catch (Exception e) {
-                POOL_LOGGER.warn("Undefined error on driver quit detected!");
-                POOL_LOGGER.debug(e.getMessage(), e);
+                wait.until(new Function<WebDriver, Boolean>() {
+                    public Boolean apply(WebDriver driver) {
+                        try {
+                            futureClose.get(timeout / 10, TimeUnit.SECONDS);
+                            futureQuit.get(timeout / 10, TimeUnit.SECONDS);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                            Thread.currentThread().interrupt();
+                            return false;                            
+                        } catch (ExecutionException | java.util.concurrent.TimeoutException e) {
+                            e.printStackTrace();
+                            return false;
+                        }
+                        return true;                        
+                    }
+                });
+            } catch (TimeoutException e) {
+                POOL_LOGGER.error("Unable to quit driver for " + timeout + "sec!", e);
             }
+            
         } catch (WebDriverException e) {
             POOL_LOGGER.debug("Error message detected during driver quit: " + e.getMessage(), e);
             // do nothing
