@@ -328,7 +328,6 @@ public class ExtendedWebElement implements IWebElement {
 		
 		Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(WebDriverException.class)
 				.ignoring(NoSuchSessionException.class)
-				.ignoring(TimeoutException.class)
 				.ignoring(JsonException.class); //trying to avoid exception in driver as DriverListener capture it
 		
 		// StaleElementReferenceException is handled by selenium ExpectedConditions in many methods
