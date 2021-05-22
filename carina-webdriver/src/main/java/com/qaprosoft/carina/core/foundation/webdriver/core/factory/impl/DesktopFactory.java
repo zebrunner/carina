@@ -65,6 +65,8 @@ public class DesktopFactory extends AbstractFactory {
             LOGGER.info("Static DesiredCapabilities will be merged to basic driver capabilities");
             capabilities.merge(staticCapabilities);
         }
+        
+        LOGGER.debug("capabilities: " + capabilities);
 
         try {
             driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);

@@ -87,6 +87,8 @@ public class MobileFactory extends AbstractFactory {
             LOGGER.debug("Appended udid to cpabilities: " + capabilities);
         }
 
+        LOGGER.debug("capabilities: " + capabilities);
+        
         try {
             // TODO: investigate possibility to move this custom listeners logic onto the selenium hub layer
             // So mcloud can support video recording for any framework 
