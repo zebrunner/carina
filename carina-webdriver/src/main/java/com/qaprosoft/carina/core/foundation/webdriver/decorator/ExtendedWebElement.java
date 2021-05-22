@@ -1364,13 +1364,14 @@ public class ExtendedWebElement implements IWebElement {
 		if (waitCondition != null) {
 			//do verification only if waitCondition is fine
 			//TODO: [VD] find another way to test waitCondition as TimeoutException in DEBUG logs are displayed!
-			boolean tmpResult = waitUntil(waitCondition, 0);
-			if (!tmpResult && originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
-				LOGGER.debug("StaleElementReferenceException detected in doAction!");
-				refindElement();
-			}
+//			boolean tmpResult = waitUntil(waitCondition, 0);
+//			if (!tmpResult && originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
+//				LOGGER.debug("StaleElementReferenceException detected in doAction!");
+//				refindElement();
+//			}
 			
-			if (!tmpResult && !waitUntil(waitCondition, timeout)) {
+//		    if (!tmpResult && !waitUntil(waitCondition, timeout)) {
+			if (!waitUntil(waitCondition, timeout)) {
 				LOGGER.error(Messager.ELEMENT_CONDITION_NOT_VERIFIED.getMessage(actionName.getKey(), getNameWithLocator()));
 			}
 		}
