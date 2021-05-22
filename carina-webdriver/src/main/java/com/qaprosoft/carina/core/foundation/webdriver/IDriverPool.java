@@ -36,7 +36,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.MDC;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.json.JsonException;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -358,19 +357,9 @@ public interface IDriverPool {
                 public Void call() throws Exception {
                     if ("chrome".equalsIgnoreCase(Configuration.getBrowser())) {
                         // workaround to not cleaned chrome profiles on hard drive
-                        try {
-                            driver.close();
-                        } catch (JsonException e) {
-                            CommonUtils.pause(0.1);
-                            driver.close();
-                        }
+                        driver.close();
                     }
-                    try {
-                        driver.quit();
-                    } catch (JsonException e) {
-                        CommonUtils.pause(0.1);
-                        driver.quit();
-                    }                    
+                    driver.quit();
                     return null;
                 }
             });
@@ -378,14 +367,15 @@ public interface IDriverPool {
             long wait = 30;
             try {
                 future.get(wait, TimeUnit.SECONDS);
+            } catch (ExecutionException e) {
+                POOL_LOGGER.error("ExecutionException error on driver quit detected! Enable DEBUG log level for details.");
+                e.printStackTrace();
+                future.get(wait, TimeUnit.SECONDS);
             } catch (java.util.concurrent.TimeoutException e) {
                 POOL_LOGGER.error("Unable to quit driver for " + wait + "sec!", e);
             } catch (InterruptedException e) {
                 POOL_LOGGER.error("Unable to quit driver for " + wait + "sec!", e);
                 Thread.currentThread().interrupt();
-            } catch (ExecutionException e) {
-                POOL_LOGGER.warn("ExecutionException error on driver quit detected! Enable DEBUG log level for details.");
-                POOL_LOGGER.debug(e.getMessage(), e);
             } catch (Exception e) {
                 POOL_LOGGER.warn("Undefined error on driver quit detected!");
                 POOL_LOGGER.debug(e.getMessage(), e);
