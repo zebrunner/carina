@@ -317,7 +317,11 @@ public class ExtendedWebElement implements IWebElement {
      * @return true if condition happen.
      */
 	private boolean waitUntil(ExpectedCondition<?> condition, long timeout) {
-		boolean result;
+        if (timeout <= 0) {
+            LOGGER.error("Fluent wait with 0 and less timeout might hangs! Updating to 1 sec.");
+            timeout = 1;
+        }
+        boolean result;
 		originalException = null;
 		
 		final WebDriver drv = getDriver();
@@ -851,7 +855,7 @@ public class ExtendedWebElement implements IWebElement {
         // has a height and width greater than 0.
     	
         waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
-		boolean tmpResult = waitUntil(waitCondition, 0);
+		boolean tmpResult = waitUntil(waitCondition, 1);
 
 		if (tmpResult) {
 			return true;
@@ -959,7 +963,7 @@ public class ExtendedWebElement implements IWebElement {
 		ExpectedCondition<Boolean> textCondition;
 		if (element != null) {
 			ExpectedCondition<Boolean>  tmpCondition = ExpectedConditions.and(ExpectedConditions.visibilityOf(element));
-			boolean tmpResult = waitUntil(tmpCondition, 0);
+			boolean tmpResult = waitUntil(tmpCondition, 1);
 			
 			if (!tmpResult && originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
 				LOGGER.debug("StaleElementReferenceException detected in isElementWithTextPresent!");
