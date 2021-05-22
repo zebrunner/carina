@@ -334,7 +334,7 @@ public class ExtendedWebElement implements IWebElement {
 		// StaleElementReferenceException is handled by selenium ExpectedConditions in many methods
 		// do not ignore TimeoutException or NoSuchSessionException otherwise you can wait for minutes instead of timeout!
 		
-		LOGGER.debug("waitUntil: starting...");		
+		LOGGER.debug("waitUntil: starting... timeout: " + timeout);		
 		try {
 			wait.until(condition);
 			result = true;
