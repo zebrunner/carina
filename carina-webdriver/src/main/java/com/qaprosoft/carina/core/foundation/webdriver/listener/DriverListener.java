@@ -158,6 +158,7 @@ public class DriverListener implements WebDriverEventListener {
                 || thr.getMessage() == null
                 || thr.getMessage().contains("Method has not yet been implemented")                        
                 || thr.getMessage().contains("Expected to read a START_MAP but instead have: END. Last 0 characters read")
+                || thr.getMessage().contains("Unable to determine type from: <. Last 1 characters read")
                 || thr.getMessage().contains("script timeout")
                 || thr.getMessage().contains("javascript error: Cannot read property 'outerHTML' of null")
                 || thr.getMessage().contains("javascript error: Cannot read property 'scrollHeight' of null")
