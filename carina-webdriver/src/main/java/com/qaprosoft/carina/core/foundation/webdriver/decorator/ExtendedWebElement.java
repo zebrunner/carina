@@ -326,11 +326,15 @@ public class ExtendedWebElement implements IWebElement {
 		
 		final WebDriver drv = getDriver();
 		
-		Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(WebDriverException.class)
-				.ignoring(NoSuchSessionException.class)
+		Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME)
+				.ignoring(WebDriverException.class)
 				.ignoring(JsonException.class); //trying to avoid exception in driver as DriverListener capture it
-		
+
+		// [VD] Notes:
 		// StaleElementReferenceException is handled by selenium ExpectedConditions in many methods
+		// do not ignore TimeoutException or NoSuchSessionException otherwise you can wait for minutes instead of timeout!
+		
+		LOGGER.debug("waitUntil: starting...");		
 		try {
 			wait.until(condition);
 			result = true;
@@ -340,6 +344,10 @@ public class ExtendedWebElement implements IWebElement {
 			LOGGER.debug("waitUntil: NoSuchElementException: " + e.getMessage());
 			result = false;
 			originalException = e;
+        } catch (NoSuchSessionException e) { 
+            LOGGER.debug("waitUntil: NoSuchSessionException: " + e.getMessage());
+            result = false;
+            originalException = e.getCause();			
 		} catch (TimeoutException e) { 
 			LOGGER.debug("waitUntil: TimeoutException: " + e.getMessage());
 			result = false;
@@ -352,6 +360,7 @@ public class ExtendedWebElement implements IWebElement {
 		catch (Exception e) {
 			LOGGER.error("waitUntil: undefined exception: " + e.getMessage(), e);
 			result = false;
+			//TODO: e or e.getCause()?
 			originalException = e;
 		}
 		return result;
