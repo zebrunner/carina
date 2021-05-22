@@ -36,6 +36,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.MDC;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.json.JsonException;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -357,9 +358,19 @@ public interface IDriverPool {
                 public Void call() throws Exception {
                     if ("chrome".equalsIgnoreCase(Configuration.getBrowser())) {
                         // workaround to not cleaned chrome profiles on hard drive
-                        driver.close();
+                        try {
+                            driver.close();
+                        } catch (JsonException e) {
+                            CommonUtils.pause(0.1);
+                            driver.close();
+                        }
                     }
-                    driver.quit();
+                    try {
+                        driver.quit();
+                    } catch (JsonException e) {
+                        CommonUtils.pause(0.1);
+                        driver.quit();
+                    }                    
                     return null;
                 }
             });
