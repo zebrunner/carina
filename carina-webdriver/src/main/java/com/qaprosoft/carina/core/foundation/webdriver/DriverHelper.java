@@ -21,11 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
@@ -76,6 +72,8 @@ import com.qaprosoft.carina.core.gui.AbstractPage;
  */
 public class DriverHelper {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+    private static final Semaphore concurrent = new Semaphore(Configuration.getInt(Parameter.OPEN_URL_THROUGHPUT), true);
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
     
@@ -134,13 +132,29 @@ public class DriverHelper {
      *            long
      */
     public void openURL(String url, long timeout) {
+        if (Configuration.getInt(Parameter.OPEN_URL_THROUGHPUT) == -1) {
+            doOpenURL(url, timeout);
+        } else {
+            try {
+                if (concurrent.availablePermits() == 0){
+                    LOGGER.info("Waiting for available permit to open url. Current capacity is " +
+                            Configuration.getInt(Parameter.OPEN_URL_THROUGHPUT));
+                }
+                concurrent.acquire();
+                doOpenURL(url, timeout);
+                concurrent.release();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void doOpenURL(String url, long timeout) {
         final String decryptedURL = getEnvArgURL(cryptoTool.decryptByPattern(url, CRYPTO_PATTERN));
         this.pageURL = decryptedURL;
-
         WebDriver drv = getDriver();
-
         DriverListener.setMessages(Messager.OPENED_URL.getMessage(url), Messager.NOT_OPENED_URL.getMessage(url));
-        
+
         // [VD] there is no sense to use fluent wait here as selenium just don't return something until page is ready!
         // explicitly limit time for the openURL operation
         Future<?> future = Executors.newSingleThreadExecutor().submit(new Callable<Void>() {
@@ -154,7 +168,7 @@ public class DriverHelper {
                 return null;
             }
         });
-        
+
         long wait = timeout;
         try {
             future.get(wait, TimeUnit.SECONDS);
@@ -167,9 +181,8 @@ public class DriverHelper {
             LOGGER.error("ExecutionException error on open url!", e);
         } catch (Exception e) {
             LOGGER.error("Undefined error on open url detected!", e);
-        }    
-        
-    }    
+        }
+    }
 
     protected void setPageURL(String relURL) {
         String baseURL;
