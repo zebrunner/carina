@@ -45,7 +45,7 @@ public class Configuration {
 
         ENV("env"),
 
-        MAX_URL_CONCURRENCY("open_url_throughput"),
+        OPEN_URL_THROUGHPUT("open_url_throughput"),
 
         BROWSER("browser"),
 
