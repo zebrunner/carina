@@ -136,50 +136,17 @@ public class DriverHelper {
             openUrlInSimpleMode(url, timeout);
         } else {
             try {
-                openUrlInConcurrencyMode(url, timeout);
+                if (concurrent.availablePermits() == 0){
+                    LOGGER.info("available permits to open url == 0, waiting for releases" );
+                }
+                concurrent.acquire();
+                openUrlInSimpleMode(url, timeout);
+                LOGGER.info("Releasing place for opening an url to another threads");
+                concurrent.release();
+
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    private void openUrlInConcurrencyMode(String url, long timeout) throws InterruptedException {
-        concurrent.acquire();
-        LOGGER.info("Trying to open url with " + concurrent.availablePermits() + " available places for threads left");
-        final String decryptedURL = getEnvArgURL(cryptoTool.decryptByPattern(url, CRYPTO_PATTERN));
-        this.pageURL = decryptedURL;
-        WebDriver drv = getDriver();
-        DriverListener.setMessages(Messager.OPENED_URL.getMessage(url), Messager.NOT_OPENED_URL.getMessage(url));
-
-        // [VD] there is no sense to use fluent wait here as selenium just don't return something until page is ready!
-        // explicitly limit time for the openURL operation
-        Future<?> future = Executors.newSingleThreadExecutor().submit(new Callable<Void>() {
-            public Void call() {
-                try {
-                    Messager.OPENING_URL.info(url);
-                    drv.get(decryptedURL);
-                } catch (UnhandledAlertException e) {
-                    drv.switchTo().alert().accept();
-                } finally {
-                    LOGGER.info("Releasing place for another thread");
-                    concurrent.release();
-                }
-                return null;
-            }
-        });
-
-        long wait = timeout;
-        try {
-            future.get(wait, TimeUnit.SECONDS);
-        } catch (java.util.concurrent.TimeoutException e) {
-            LOGGER.debug("Unable to open url during " + wait + "sec!", e);
-        } catch (InterruptedException e) {
-            LOGGER.debug("Unable to open url during " + wait + "sec!", e);
-            Thread.currentThread().interrupt();
-        } catch (ExecutionException e) {
-            LOGGER.error("ExecutionException error on open url!", e);
-        } catch (Exception e) {
-            LOGGER.error("Undefined error on open url detected!", e);
         }
     }
 
