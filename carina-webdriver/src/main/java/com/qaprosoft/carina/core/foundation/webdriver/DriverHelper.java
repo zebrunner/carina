@@ -52,6 +52,7 @@ import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
@@ -173,14 +174,14 @@ public class DriverHelper {
         try {
             future.get(wait, TimeUnit.SECONDS);
         } catch (java.util.concurrent.TimeoutException e) {
-            LOGGER.debug("Unable to open url during " + wait + "sec!", e);
+            Assert.fail("Unable to open url during " + wait + "sec!", e);
         } catch (InterruptedException e) {
-            LOGGER.debug("Unable to open url during " + wait + "sec!", e);
+            Assert.fail("Unable to open url during " + wait + "sec!", e);
             Thread.currentThread().interrupt();
         } catch (ExecutionException e) {
-            LOGGER.error("ExecutionException error on open url!", e);
+            Assert.fail("ExecutionException error on open url!", e);
         } catch (Exception e) {
-            LOGGER.error("Undefined error on open url detected!", e);
+            Assert.fail("Undefined error on open url detected!", e);
         }
     }
 
