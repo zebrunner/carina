@@ -45,6 +45,8 @@ public class Configuration {
 
         ENV("env"),
 
+        MAX_URL_CONCURRENCY("max_url_concurrency"),
+
         BROWSER("browser"),
 
         BROWSER_LANGUAGE("browser_language"),
