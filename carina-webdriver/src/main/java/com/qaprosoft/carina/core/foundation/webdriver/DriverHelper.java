@@ -74,8 +74,6 @@ import com.qaprosoft.carina.core.gui.AbstractPage;
 public class DriverHelper {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static final Semaphore concurrent = new Semaphore(Configuration.getInt(Parameter.OPEN_URL_THROUGHPUT), true);
-
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
     
     protected static final long SHORT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT) / 3;
@@ -133,24 +131,6 @@ public class DriverHelper {
      *            long
      */
     public void openURL(String url, long timeout) {
-        if (Configuration.getInt(Parameter.OPEN_URL_THROUGHPUT) == -1) {
-            doOpenURL(url, timeout);
-        } else {
-            try {
-                if (concurrent.availablePermits() == 0){
-                    LOGGER.info("Waiting for available permit to open url. Current capacity is " +
-                            Configuration.getInt(Parameter.OPEN_URL_THROUGHPUT));
-                }
-                concurrent.acquire();
-                doOpenURL(url, timeout);
-                concurrent.release();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void doOpenURL(String url, long timeout) {
         final String decryptedURL = getEnvArgURL(cryptoTool.decryptByPattern(url, CRYPTO_PATTERN));
         this.pageURL = decryptedURL;
         WebDriver drv = getDriver();

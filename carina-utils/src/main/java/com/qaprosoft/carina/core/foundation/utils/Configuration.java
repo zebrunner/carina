@@ -45,8 +45,6 @@ public class Configuration {
 
         ENV("env"),
 
-        OPEN_URL_THROUGHPUT("open_url_throughput"),
-
         BROWSER("browser"),
 
         BROWSER_LANGUAGE("browser_language"),
