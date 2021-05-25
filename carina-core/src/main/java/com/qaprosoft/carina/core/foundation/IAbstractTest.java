@@ -49,7 +49,7 @@ import com.zebrunner.agent.testng.listener.TestRunListener;
 // on start order is TestRunListener and CarinaListener
 // on finish reverse order, i.e. CarinaListener, TestRunListener
 @LinkedListeners({ TestRunListener.class, DataProviderInterceptor.class, FilterTestsListener.class })
-@Listeners({ CarinaListener.class, DataProviderInterceptor.class})
+@Listeners({ CarinaListener.class})
 public interface IAbstractTest extends ICustomTypePageFactory, ITestCases {
 
     long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
