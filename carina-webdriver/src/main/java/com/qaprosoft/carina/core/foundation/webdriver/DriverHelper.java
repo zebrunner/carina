@@ -690,7 +690,7 @@ public class DriverHelper {
     /**
      * Refresh browser.
      * 
-     * @param timeout.
+     * @param timeout long
      */
     public void refresh(long timeout) {
         WebDriver drv = getDriver();
@@ -1123,11 +1123,9 @@ public class DriverHelper {
 		    long startMillis = System.currentTimeMillis();
 			wait.until(condition);
 			result = true;
-
-            if ((System.currentTimeMillis() - startMillis) / 60000 > 2 * timeout) {
+            if ((System.currentTimeMillis() - startMillis) > 2 * RETRY_TIME) {
                 LOGGER.debug("Your retry_interval is too low! Increase it or improve your hardware");
             }
-
 			LOGGER.debug("waitUntil: finished true...");
 		} catch (NoSuchElementException | TimeoutException e) {
 			// don't write exception even in debug mode
