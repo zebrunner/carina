@@ -147,14 +147,6 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <version>${maven-surefire-plugin.version}</version>
-                        <configuration>
-                            <properties>
-                                <property>
-                                    <name>listener</name>
-                                    <value>com.qaprosoft.carina.core.foundation.listeners.CarinaListener</value>
-                                </property>
-                            </properties>
-                        </configuration>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -235,14 +227,6 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <version>${maven-surefire-plugin.version}</version>
-                        <configuration>
-                            <properties>
-                                <property>
-                                    <name>listener</name>
-                                    <value>com.qaprosoft.carina.core.foundation.listeners.CarinaListener</value>
-                                </property>
-                            </properties>
-                        </configuration>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>

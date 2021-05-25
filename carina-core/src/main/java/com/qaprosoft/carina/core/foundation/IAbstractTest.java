@@ -47,7 +47,7 @@ import com.zebrunner.agent.testng.listener.TestRunListener;
 
 // on start order is TestRunListener and CarinaListener
 // on finish reverse order, i.e. CarinaListener, TestRunListener
-@LinkedListeners({ TestRunListener.class, DataProviderInterceptor.class })
+@LinkedListeners({ CarinaListener.class, TestRunListener.class, DataProviderInterceptor.class })
 @Listeners({DataProviderInterceptor.class})
 public interface IAbstractTest extends ICustomTypePageFactory, ITestCases {
 
