@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.openqa.selenium.JavascriptException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -488,8 +489,13 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
                 LOGGER.info(String.format("Status bar isn't opened after %d seconds. One more attempt.", (int) INIT_TIMEOUT));
                 expandStatusBar();
             }
-            LOGGER.debug("Page source [expand status bar]: ".concat(getDriver().getPageSource()));
-            Screenshot.captureByRule(getDriver(), "Clear notification - screenshot. Status bar should be opened. Attempt: " + i);
+            try {
+                LOGGER.debug("Page source [expand status bar]: ".concat(getDriver().getPageSource()));
+                Screenshot.captureByRule(getDriver(), "Clear notification - screenshot. Status bar should be opened. Attempt: " + i);
+            } catch (JavascriptException ex) {
+                ex.printStackTrace();
+
+            }
             try {
                 notificationPage.clearNotifications();
             } catch (Exception e) {
