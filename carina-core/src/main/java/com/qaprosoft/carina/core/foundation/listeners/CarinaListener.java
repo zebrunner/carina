@@ -115,7 +115,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     protected static boolean automaticDriversCleanup = true;
 
-    static {
+    public CarinaListener() {
         try {
             // Add shutdown hook
             Runtime.getRuntime().addShutdownHook(new ShutdownHook());
