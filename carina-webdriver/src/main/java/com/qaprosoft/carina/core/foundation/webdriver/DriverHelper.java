@@ -1133,8 +1133,9 @@ public class DriverHelper {
 			LOGGER.error("waitUntil: " + condition.toString(), e);
 			result = false;
 		} finally {
-            if ((System.currentTimeMillis() - startMillis) > 2 * timeout) {
-                LOGGER.error("Your retry_interval is too low! Increase it or improve your hardware");
+		    long timePassed = System.currentTimeMillis() - startMillis;
+            if (timePassed > 2 * timeout) {
+                LOGGER.error("Your retry_interval is too low: " + timePassed + " ms! Increase it or improve your hardware");
             }
         }
 		return result;
