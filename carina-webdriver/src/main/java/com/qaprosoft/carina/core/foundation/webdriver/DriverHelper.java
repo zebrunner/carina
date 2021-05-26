@@ -690,7 +690,7 @@ public class DriverHelper {
     /**
      * Refresh browser.
      * 
-     * @param timeout.
+     * @param timeout long
      */
     public void refresh(long timeout) {
         WebDriver drv = getDriver();
@@ -1115,11 +1115,13 @@ public class DriverHelper {
      */
 	public boolean waitUntil(ExpectedCondition<?> condition, long timeout) {
 		boolean result;
+        long startMillis = 0;
 		final WebDriver drv = getDriver();
 		Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME)
 		        .ignoring(WebDriverException.class)
 				.ignoring(NoSuchSessionException.class);
 		try {
+		    startMillis = System.currentTimeMillis();
 			wait.until(condition);
 			result = true;
 			LOGGER.debug("waitUntil: finished true...");
@@ -1130,7 +1132,12 @@ public class DriverHelper {
 		} catch (Exception e) {
 			LOGGER.error("waitUntil: " + condition.toString(), e);
 			result = false;
-		}
+		} finally {
+		    long timePassed = System.currentTimeMillis() - startMillis;
+            if (timePassed > 2 * timeout) {
+                LOGGER.error("Your retry_interval is too low: " + timePassed + " ms! Increase it or improve your hardware");
+            }
+        }
 		return result;
 	}
 	
