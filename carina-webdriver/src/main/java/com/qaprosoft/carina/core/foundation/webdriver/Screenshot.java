@@ -572,8 +572,9 @@ public class Screenshot {
 				|| message.contains("An unknown error has occurred") //
 				|| message.contains("Unable to find element with")
 				|| message.contains("Unable to locate element")
-				|| message.contains("Illegal base64 character 2e");
-		
+				|| message.contains("Illegal base64 character 2e")
+                || message.contains("javascript error: Cannot read property 'outerHTML' of null");
+
 		if (!isContains) {
 		    // for released builds put below message to debug  
 		    LOGGER.debug("isCaptured->message: '" + message + "'");
