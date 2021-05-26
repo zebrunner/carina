@@ -52,16 +52,13 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     private void startItem(ITestResult result, Messager messager) {
         String test = TestNameResolverRegistry.get().resolve(result);
-        String deviceName = getDeviceName();
-        messager.info(deviceName, test, DateUtils.now());
+        messager.info(test, DateUtils.now());
     }
 
     private void passItem(ITestResult result, Messager messager) {
         String test = TestNameResolverRegistry.get().resolve(result);
 
-        String deviceName = getDeviceName();
-
-        messager.info(deviceName, test, DateUtils.now());
+        messager.info(test, DateUtils.now());
 
         EmailReportItemCollector
                 .push(createTestResult(result, TestResultType.PASS, null, result.getMethod().getDescription()));
@@ -73,11 +70,10 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         String test = TestNameResolverRegistry.get().resolve(result);
 
         String errorMessage = getFailureReason(result);
-        String deviceName = getDeviceName();
 
         // TODO: remove hard-coded text
         if (!errorMessage.contains("All tests were skipped! Analyze logs to determine possible configuration issues.")) {
-            messager.error(deviceName, test, DateUtils.now(), errorMessage);
+            messager.error(test, DateUtils.now(), errorMessage);
             if (!R.EMAIL.getBoolean("fail_full_stacktrace_in_report") && result.getThrowable() != null
                     && result.getThrowable().getMessage() != null
                     && !StringUtils.isEmpty(result.getThrowable().getMessage())) {
