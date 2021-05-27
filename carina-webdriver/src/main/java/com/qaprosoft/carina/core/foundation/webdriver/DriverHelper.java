@@ -152,16 +152,27 @@ public class DriverHelper {
 
         long wait = timeout;
         try {
+            LOGGER.debug("starting driver.get call...");
             future.get(wait, TimeUnit.SECONDS);
         } catch (java.util.concurrent.TimeoutException e) {
-            Assert.fail("Unable to open url during " + wait + "sec!", e);
+            String message = "Unable to open url during " + wait + "sec!";
+            LOGGER.error(message);
+            Assert.fail(message, e);
         } catch (InterruptedException e) {
-            Assert.fail("Unable to open url during " + wait + "sec!", e);
+            String message = "Unable to open url during " + wait + "sec!";
+            LOGGER.error(message);
+            Assert.fail(message, e);
             Thread.currentThread().interrupt();
         } catch (ExecutionException e) {
-            Assert.fail("ExecutionException error on open url!", e);
+            String message = "ExecutionException error on open url: " + e.getMessage();
+            LOGGER.error(message);
+            Assert.fail(message, e);
         } catch (Exception e) {
-            Assert.fail("Undefined error on open url detected!", e);
+            String message = "Undefined error on open url detected: " + e.getMessage();
+            LOGGER.error(message);
+            Assert.fail(message, e);
+        } finally {
+            LOGGER.debug("finished driver.get call.");
         }
     }
 
