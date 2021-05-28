@@ -23,7 +23,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,6 +38,8 @@ import org.apache.log4j.Category;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.testng.Assert;
 import org.testng.IClassListener;
 import org.testng.ISuite;
@@ -283,6 +287,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     @Override
     public void onTestFailure(ITestResult result) {
         LOGGER.debug("CarinaListener->onTestFailure");
+        String errorMessage = getFailureReason(result);
+        takeScreenshot(result, "TEST FAILED - " + errorMessage);
         onTestFinish(result);
         super.onTestFailure(result);
     }
@@ -935,6 +941,30 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             Label.attachToTest(SpecialKeywords.QTEST_TESTCASE_UUID, Arrays.copyOf(qtestCases.toArray(), qtestCases.size(), String[].class));
         }
     }
+    
+    private String takeScreenshot(ITestResult result, String msg) {
+        String screenId = "";
+
+        ConcurrentHashMap<String, CarinaDriver> drivers = getDrivers();
+
+        try {
+            for (Map.Entry<String, CarinaDriver> entry : drivers.entrySet()) {
+                String driverName = entry.getKey();
+                WebDriver drv = entry.getValue().getDriver();
+
+                if (drv instanceof EventFiringWebDriver) {
+                    drv = ((EventFiringWebDriver) drv).getWrappedDriver();
+                }
+
+                if (Screenshot.isEnabled()) {
+                    screenId = Screenshot.capture(drv, driverName + ": " + msg, true); // in case of failure
+                }
+            }
+        } catch (Throwable thr) {
+            LOGGER.error("Failure detected on screenshot generation after failure: ", thr);
+        }
+        return screenId;
+    }    
 
     public static class ShutdownHook extends Thread {
 
