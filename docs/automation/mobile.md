@@ -319,4 +319,34 @@ The list of actions with image elements and related driver settings is available
 Basically, all you need is to create an image template of the element in .png format and place it to your project. We suggest using ```src/main/resources/``` folder to store images. 
 Be sure your image size is less than the real screen size. Real iOS screen sizes are listed [here](https://developer.apple.com/library/archive/documentation/DeviceInformation/Reference/iOSDeviceCompatibility/Displays/Displays.html) in 'UIKit Size (Points)' column. You can also find the ultimate guide to iPhone resolutions [here](https://www.paintcodeapp.com/news/ultimate-guide-to-iphone-resolutions).
 
+### How to change context of application
 
+In carina-demo there is an example of a [tool](https://github.com/DimaGrinevich/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/MobileContextUtils.java),
+that can change context of application. Just add needed context as a field in [View](https://github.com/DimaGrinevich/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/MobileContextUtils.java#L51) enum.
+```
+// for example
+NATIVE("NATIVE_APP"),
+WEB1("WEBVIEW_chromeapp"),
+WEB2("WEBVIEW_opera");
+```
+
+Then change context in your test/page class where needed.
+```
+public void testWebView() {
+    WelcomePageBase welcomePage = initPage(getDriver(), WelcomePageBase.class);
+    LoginPageBase loginPage = welcomePage.clickNextBtn();
+    loginPage.login();
+    WebViewPageBase webViewPageBase = initPage(getDriver(), WebViewPageBase.class);
+    
+    MobileContextUtils contextHelper = new MobileContextUtils();
+    contextHelper.switchMobileContext(View.WEB);
+    
+    ContactUsPageBase contactUsPage = webViewPageBase.goToContactUsPage();
+    contactUsPage.typeName("John Doe");
+    contactUsPage.typeEmail("some@email.com");
+    contactUsPage.typeQuestion("This is a message");
+    contactUsPage.submit();
+    Assert.assertTrue(contactUsPage.isErrorMessagePresent() || contactUsPage.isRecaptchaPresent(),
+        "Error message or captcha was not displayed");
+}
+```
