@@ -970,12 +970,14 @@ public interface IAndroidUtils extends IMobileUtils {
      * 
      * @param link
      *            - URL to trigger
+     * @return empty String
      */
-    default public void openURL(String link) {
-        //TODO: make openURL call from this mobile interface in DriverHelper
+    default public String openURL(String link) {
+        //TODO: #1380 make openURL call from this mobile interface in DriverHelper
         UTILS_LOGGER.info("Following link will be triggered via ADB: " + link);
         String command = String.format(SHELL_OPEN_URL_CMD.concat(" %s"), link);
         executeShell(command);
+        return ""; //there is no way to get title in mobile
     }
     
     /**
