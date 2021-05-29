@@ -172,6 +172,9 @@ public class DriverHelper {
             LOGGER.error(message);
             Assert.fail(message, e);
         } finally {
+            if (SpecialKeywords.BAD_GATEWAY_502.equals(drv.getTitle())) {
+                Assert.fail(SpecialKeywords.BAD_GATEWAY_502 + " detected!");
+            }
             LOGGER.debug("finished driver.get call.");
         }
     }

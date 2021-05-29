@@ -188,6 +188,8 @@ public class SpecialKeywords {
     public static final String CUCUMBER_REPORT_SUBFOLDER = "cucumber-html-reports";
     public static final String CUCUMBER_REPORT_FILE_NAME = "overview-features.html";
     
+    public static final String DEFAULT_VIDEO_FILENAME = "%s.mp4";
     
-    public final static String DEFAULT_VIDEO_FILENAME = "%s.mp4";
+    // ------------- Browsers titles ---------------
+    public static final String BAD_GATEWAY_502 = "502 Bad Gateway"; 
 }
