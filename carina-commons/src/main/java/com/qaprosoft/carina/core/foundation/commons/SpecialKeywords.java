@@ -190,6 +190,4 @@ public class SpecialKeywords {
     
     public static final String DEFAULT_VIDEO_FILENAME = "%s.mp4";
     
-    // ------------- Browsers titles ---------------
-    public static final String BAD_GATEWAY_502 = "502 Bad Gateway"; 
 }
