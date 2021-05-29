@@ -150,16 +150,15 @@ public class DriverHelper {
             }
         });
 
-        long wait = timeout;
         try {
             LOGGER.debug("starting driver.get call...");
-            future.get(wait, TimeUnit.SECONDS);
+            future.get(timeout, TimeUnit.SECONDS);
         } catch (java.util.concurrent.TimeoutException e) {
-            String message = "Unable to open url during " + wait + "sec!";
+            String message = "Unable to open url during " + timeout + "sec!";
             LOGGER.error(message);
             Assert.fail(message, e);
         } catch (InterruptedException e) {
-            String message = "Unable to open url during " + wait + "sec!";
+            String message = "Unable to open url during " + timeout + "sec!";
             LOGGER.error(message);
             Assert.fail(message, e);
             Thread.currentThread().interrupt();
@@ -172,7 +171,8 @@ public class DriverHelper {
             LOGGER.error(message);
             Assert.fail(message, e);
         } finally {
-            if (SpecialKeywords.BAD_GATEWAY_502.equals(drv.getTitle())) {
+            String title = getTitle(timeout / 10);
+            if (SpecialKeywords.BAD_GATEWAY_502.equals(title)) {
                 String message = SpecialKeywords.BAD_GATEWAY_502 + " detected!";
                 LOGGER.error(message);
                 Assert.fail(message);
@@ -640,6 +640,46 @@ public class DriverHelper {
     public void pause(Double timeout) {
         CommonUtils.pause(timeout);
     }
+    
+    /**
+     * Return page title.
+     * 
+     * @return title String.
+     */
+    public String getTitle() {
+        return getTitle(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT));
+    }
+    
+    /**
+     * Return page title.
+     * 
+     * @param timeout long
+     * @return title String.
+     */
+    public String getTitle(long timeout) {
+        
+        WebDriver drv = getDriver();
+
+        Wait<WebDriver> wait = new FluentWait<WebDriver>(drv)
+                .pollingEvery(Duration.ofMillis(RETRY_TIME))
+                .withTimeout(Duration.ofSeconds(timeout))
+                .ignoring(WebDriverException.class)
+                .ignoring(JavascriptException.class); // org.openqa.selenium.JavascriptException: javascript error: Cannot read property 'outerHTML' of null
+
+        String res = "";
+        try {
+            res = wait.until(new Function<WebDriver, String>() {
+                public String apply(WebDriver driver) {
+                    return drv.getTitle();
+                }
+            });
+        } catch (ScriptTimeoutException | TimeoutException e) {
+            Messager.FAIL_GET_TITLE.error();
+        }
+
+        return res;
+
+    }    
 
     /**
      * Checks that page title is as expected.
@@ -649,18 +689,15 @@ public class DriverHelper {
      * @return validation result.
      */
     public boolean isTitleAsExpected(final String expectedTitle) {
-        boolean result;
         final String decryptedExpectedTitle = cryptoTool.decryptByPattern(expectedTitle, CRYPTO_PATTERN);
-        final WebDriver drv = getDriver();
-        Wait<WebDriver> wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
-        try {
-            wait.until((Function<WebDriver, Object>) dr -> drv.getTitle().contains(decryptedExpectedTitle));
-            result = true;
-            Messager.TITLE_CORERECT.info(drv.getCurrentUrl(), expectedTitle);
-        } catch (Exception e) {
-            result = false;
-            Messager.TITLE_NOT_CORERECT.error(drv.getCurrentUrl(), expectedTitle, drv.getTitle());
+        String title = getTitle(EXPLICIT_TIMEOUT);
+        boolean result = title.contains(decryptedExpectedTitle);
+        if (result) {
+            Messager.TITLE_CORRECT.info(expectedTitle);
+        } else {
+            Messager.TITLE_NOT_CORRECT.error(expectedTitle, title);
         }
+        
         return result;
     }
 
@@ -672,19 +709,18 @@ public class DriverHelper {
      * @return validation result.
      */
     public boolean isTitleAsExpectedPattern(String expectedPattern) {
-        boolean result;
         final String decryptedExpectedPattern = cryptoTool.decryptByPattern(expectedPattern, CRYPTO_PATTERN);
-        WebDriver drv = getDriver();
-        String actual = drv.getTitle();
+        
+        String actual = getTitle(EXPLICIT_TIMEOUT);
         Pattern p = Pattern.compile(decryptedExpectedPattern);
         Matcher m = p.matcher(actual);
-        if (m.find()) {
-            Messager.TITLE_CORERECT.info(drv.getCurrentUrl(), actual);
-            result = true;
+        boolean result = m.find();
+        if (result) {
+            Messager.TITLE_CORRECT.info(actual);
         } else {
-            Messager.TITLE_DOES_NOT_MATCH_TO_PATTERN.error(drv.getCurrentUrl(), expectedPattern, actual);
-            result = false;
+            Messager.TITLE_NOT_CORRECT.error(expectedPattern, actual);   
         }
+        
         return result;
     }
 
