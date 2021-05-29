@@ -107,9 +107,11 @@ public class DriverHelper {
     
     /**
      * Opens page according to specified in constructor URL.
+     * 
+     * @return page title
      */
-    public void open() {
-        openURL(this.pageURL);
+    public String open() {
+        return openURL(this.pageURL);
     }
     
     /**
@@ -117,9 +119,10 @@ public class DriverHelper {
      * 
      * @param url
      *            to open.
+     * @return page title
      */
-    public void openURL(String url) {
-        openURL(url, Configuration.getInt(Parameter.EXPLICIT_TIMEOUT));
+    public String openURL(String url) {
+        return openURL(url, Configuration.getInt(Parameter.EXPLICIT_TIMEOUT));
     }
     
     /**
@@ -129,12 +132,15 @@ public class DriverHelper {
      *            to open.
      * @param timeout
      *            long
+     * @return page title
      */
-    public void openURL(String url, long timeout) {
+    public String openURL(String url, long timeout) {
         final String decryptedURL = getEnvArgURL(cryptoTool.decryptByPattern(url, CRYPTO_PATTERN));
         this.pageURL = decryptedURL;
         WebDriver drv = getDriver();
         DriverListener.setMessages(Messager.OPENED_URL.getMessage(url), Messager.NOT_OPENED_URL.getMessage(url));
+        
+        String title = "";
 
         // [VD] there is no sense to use fluent wait here as selenium just don't return something until page is ready!
         // explicitly limit time for the openURL operation
@@ -171,14 +177,13 @@ public class DriverHelper {
             LOGGER.error(message);
             Assert.fail(message, e);
         } finally {
-            String title = getTitle(timeout / 10);
+            LOGGER.debug("finished driver.get call.");            
+            title = getTitle(timeout / 10);
             if (SpecialKeywords.BAD_GATEWAY_502.equals(title)) {
-                String message = SpecialKeywords.BAD_GATEWAY_502 + " detected!";
-                LOGGER.error(message);
-                Assert.fail(message);
+                LOGGER.error(SpecialKeywords.BAD_GATEWAY_502 + " detected!");
             }
-            LOGGER.debug("finished driver.get call.");
         }
+        return title;
     }
 
     protected void setPageURL(String relURL) {
