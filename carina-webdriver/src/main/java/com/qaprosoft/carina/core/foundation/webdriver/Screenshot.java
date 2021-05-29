@@ -572,7 +572,10 @@ public class Screenshot {
 				|| message.contains("An unknown error has occurred") //
 				|| message.contains("Unable to find element with")
 				|| message.contains("Unable to locate element")
-				|| message.contains("Illegal base64 character 2e");
+				|| message.contains("Illegal base64 character 2e")
+				// carina based errors which means that driver is not ready for screenshoting
+				|| message.contains("Unable to open url during")
+				;
 		
 		if (!isContains) {
 		    // for released builds put below message to debug  
