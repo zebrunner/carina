@@ -389,6 +389,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#how-to-change-context-of-application" class="md-nav__link">
+    How to change context of application
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -666,6 +673,13 @@
         <li class="md-nav__item">
   <a href="#how-to-use-find-by-image-strategy" class="md-nav__link">
     How to use Find by Image strategy
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-change-context-of-application" class="md-nav__link">
+    How to change context of application
   </a>
   
 </li>
@@ -987,6 +1001,34 @@ private ExtendedWebElement signUpBtn;
 <p>The list of actions with image elements and related driver settings is available <a href="http://appium.io/docs/en/advanced-concepts/image-elements/">here</a>.</p>
 <p>Basically, all you need is to create an image template of the element in .png format and place it to your project. We suggest using <code>src/main/resources/</code> folder to store images. 
 Be sure your image size is less than the real screen size. Real iOS screen sizes are listed <a href="https://developer.apple.com/library/archive/documentation/DeviceInformation/Reference/iOSDeviceCompatibility/Displays/Displays.html">here</a> in 'UIKit Size (Points)' column. You can also find the ultimate guide to iPhone resolutions <a href="https://www.paintcodeapp.com/news/ultimate-guide-to-iphone-resolutions">here</a>.</p>
+<h3 id="how-to-change-context-of-application">How to change context of application</h3>
+<p>In carina-demo there is an example of a <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/MobileContextUtils.java">tool</a>,
+that can change context of application. Just add needed context as a field in <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/MobileContextUtils.java#L51">View</a> enum.</p>
+<pre><code>// for example
+NATIVE(&quot;NATIVE_APP&quot;),
+WEB1(&quot;WEBVIEW_chromeapp&quot;),
+WEB2(&quot;WEBVIEW_opera&quot;);
+</code></pre>
+
+<p>Then change context in your test/page class where needed.</p>
+<pre><code>public void testWebView() {
+    WelcomePageBase welcomePage = initPage(getDriver(), WelcomePageBase.class);
+    LoginPageBase loginPage = welcomePage.clickNextBtn();
+    loginPage.login();
+    WebViewPageBase webViewPageBase = initPage(getDriver(), WebViewPageBase.class);
+
+    MobileContextUtils contextHelper = new MobileContextUtils();
+    contextHelper.switchMobileContext(View.WEB);
+
+    ContactUsPageBase contactUsPage = webViewPageBase.goToContactUsPage();
+    contactUsPage.typeName(&quot;John Doe&quot;);
+    contactUsPage.typeEmail(&quot;some@email.com&quot;);
+    contactUsPage.typeQuestion(&quot;This is a message&quot;);
+    contactUsPage.submit();
+    Assert.assertTrue(contactUsPage.isErrorMessagePresent() || contactUsPage.isRecaptchaPresent(),
+        &quot;Error message or captcha was not displayed&quot;);
+}
+</code></pre>
                 
               
               
