@@ -489,13 +489,8 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
                 LOGGER.info(String.format("Status bar isn't opened after %d seconds. One more attempt.", (int) INIT_TIMEOUT));
                 expandStatusBar();
             }
-            try {
-                LOGGER.debug("Page source [expand status bar]: ".concat(getDriver().getPageSource()));
-                Screenshot.captureByRule(getDriver(), "Clear notification - screenshot. Status bar should be opened. Attempt: " + i);
-            } catch (JavascriptException ex) {
-                ex.printStackTrace();
-
-            }
+            LOGGER.debug("Page source [expand status bar]: ".concat(getDriver().getPageSource()));
+            Screenshot.captureByRule(getDriver(), "Clear notification - screenshot. Status bar should be opened. Attempt: " + i);
             try {
                 notificationPage.clearNotifications();
             } catch (Exception e) {
