@@ -74,8 +74,8 @@ public class MobileSampleTest implements IAbstractTest, IMobileUtils {
         //TODO: [VD] move page driver related action outside from test class!
         hideKeyboard();
         contactUsPage.submit();
-        Assert.assertTrue(contactUsPage.isSuccessMessagePresent() || contactUsPage.isRecaptchaPresent(),
-            "message was not sent or captcha was not displayed");
+        Assert.assertTrue(contactUsPage.isErrorMessagePresent() || contactUsPage.isRecaptchaPresent(),
+                "Error message or captcha was not displayed");
     }
 
     @Test()

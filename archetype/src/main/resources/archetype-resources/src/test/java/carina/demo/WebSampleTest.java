@@ -24,6 +24,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
 
 import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import com.zebrunner.agent.core.annotation.TestLabel;
@@ -65,10 +66,12 @@ public class WebSampleTest implements IAbstractTest {
         // Select phone model
         ModelInfoPage productInfoPage = productsPage.selectModel("Galaxy A52 5G");
         // Verify phone specifications
-        Assert.assertEquals(productInfoPage.readDisplay(), "6.5\"", "Invalid display info!");
-        Assert.assertEquals(productInfoPage.readCamera(), "64MP", "Invalid camera info!");
-        Assert.assertEquals(productInfoPage.readRam(), "6/8GB RAM", "Invalid ram info!");
-        Assert.assertEquals(productInfoPage.readBattery(), "4500mAh", "Invalid battery info!");
+        SoftAssert softAssert = new SoftAssert();
+        softAssert.assertEquals(productInfoPage.readDisplay(), "6.5\"", "Invalid display info!");
+        softAssert.assertEquals(productInfoPage.readCamera(), "64MP", "Invalid camera info!");
+        softAssert.assertEquals(productInfoPage.readRam(), "6/8GB RAM", "Invalid ram info!");
+        softAssert.assertEquals(productInfoPage.readBattery(), "4500mAh", "Invalid battery info!");
+        softAssert.assertAll();
     }
 
 
@@ -88,9 +91,11 @@ public class WebSampleTest implements IAbstractTest {
         // Compare 3 models
         List<ModelSpecs> specs = comparePage.compareModels("Samsung Galaxy J3", "Samsung Galaxy J5", "Samsung Galaxy J7 Pro");
         // Verify model announced dates
-        Assert.assertEquals(specs.get(0).readSpec(SpecType.ANNOUNCED), "2016, March 31");
-        Assert.assertEquals(specs.get(1).readSpec(SpecType.ANNOUNCED), "2015, June 19");
-        Assert.assertEquals(specs.get(2).readSpec(SpecType.ANNOUNCED), "2017, June");
+        SoftAssert softAssert = new SoftAssert();
+        softAssert.assertEquals(specs.get(0).readSpec(SpecType.ANNOUNCED), "2016, March 31");
+        softAssert.assertEquals(specs.get(1).readSpec(SpecType.ANNOUNCED), "2015, June 19");
+        softAssert.assertEquals(specs.get(2).readSpec(SpecType.ANNOUNCED), "2017, June");
+        softAssert.assertAll();
     }
     
     @Test()
@@ -107,10 +112,13 @@ public class WebSampleTest implements IAbstractTest {
         final String searchQ = "iphone";
         List<NewsItem> news = newsPage.searchNews(searchQ);
         Assert.assertFalse(CollectionUtils.isEmpty(news), "News not found!");
+        SoftAssert softAssert = new SoftAssert();
         for(NewsItem n : news) {
             System.out.println(n.readTitle());
-            Assert.assertTrue(StringUtils.containsIgnoreCase(n.readTitle(), searchQ), "Invalid search results!");
+            softAssert.assertTrue(StringUtils.containsIgnoreCase(n.readTitle(), searchQ),
+                    "Invalid search results for " + n.readTitle());
         }
+        softAssert.assertAll();
     }
 
 }
