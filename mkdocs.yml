@@ -20,7 +20,6 @@ pages:
       - Security: advanced/security.md
     - Cucumber: cucumber.md
     - Contribution: contribution.md
-    - Best practice: best_practice.md
 theme:
   name: 'material'
 repo_url: https://github.com/qaprosoft/carina
