@@ -113,14 +113,12 @@ public enum R {
                     // no need to read env variables using System.getenv()
                     final String prefix = SpecialKeywords.CAPABILITIES + ".";
                     // read all java arguments and redefine capabilities.* items
-                    @SuppressWarnings({ "unchecked", "rawtypes" })
-                    Map<String, String> javaProperties = new HashMap(System.getProperties());
-                    for (Map.Entry<String, String> entry : javaProperties.entrySet()) {
-                        String key = entry.getKey();
+                    for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+                        String key = (String) entry.getKey();
                         if (key.toLowerCase().startsWith(prefix)) {
-                            String value = entry.getValue();
-                            if (!StringUtils.isEmpty(value)) {
-                                properties.put(key, value);
+                            String value = (String) entry.getValue();
+                            if (StringUtils.isEmpty(value) || value.equalsIgnoreCase("NULL")) {
+                                properties.remove(key, value);
                             }
                         }
                     }
