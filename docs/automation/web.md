@@ -317,25 +317,25 @@ Correct example:
 ```
 //Right way to write tests:
 public class WebSampleTest implements IAbstractTest {
-	@Test()
-	public void testCompareModels() {
-		// Open GSM Arena home page and verify page is opened
-		HomePage homePage = new HomePage(getDriver());
-		homePage.open();
-		Assert.assertTrue(homePage.isPageOpened(), "Home page is not opened");
-		// Open model compare page
-		FooterMenu footerMenu = homePage.getFooterMenu();
-		Assert.assertTrue(footerMenu.isUIObjectPresent(2), "Footer menu wasn't found!");
-		CompareModelsPage comparePage = footerMenu.openComparePage();
-		// Compare 3 models
-		List<ModelSpecs> specs = comparePage.compareModels("Samsung Galaxy J3", "Samsung Galaxy J5", "Samsung Galaxy J7 Pro");
-		// Verify model announced dates
-		SoftAssert softAssert = new SoftAssert();
-		softAssert.assertEquals(specs.get(0).readSpec(SpecType.ANNOUNCED), "2016, March 31");
-		softAssert.assertEquals(specs.get(1).readSpec(SpecType.ANNOUNCED), "2015, June 19");
-		softAssert.assertEquals(specs.get(2).readSpec(SpecType.ANNOUNCED), "2017, June");
-		softAssert.assertAll();
-	}
+    @Test()
+    public void testCompareModels() {
+	// Open GSM Arena home page and verify page is opened
+	HomePage homePage = new HomePage(getDriver());
+	homePage.open();
+	Assert.assertTrue(homePage.isPageOpened(), "Home page is not opened");
+	// Open model compare page
+	FooterMenu footerMenu = homePage.getFooterMenu();
+	Assert.assertTrue(footerMenu.isUIObjectPresent(2), "Footer menu wasn't found!");
+	CompareModelsPage comparePage = footerMenu.openComparePage();
+	// Compare 3 models
+	List<ModelSpecs> specs = comparePage.compareModels("Samsung Galaxy J3", "Samsung Galaxy J5", "Samsung Galaxy J7 Pro");
+	// Verify model announced dates
+	SoftAssert softAssert = new SoftAssert();
+	softAssert.assertEquals(specs.get(0).readSpec(SpecType.ANNOUNCED), "2016, March 31");
+	softAssert.assertEquals(specs.get(1).readSpec(SpecType.ANNOUNCED), "2015, June 19");
+	softAssert.assertEquals(specs.get(2).readSpec(SpecType.ANNOUNCED), "2017, June");
+	softAssert.assertAll();
+    }
 }
 ```
 If there is no way to do so, make sure you use @Test(dependsOnMethods=XXX) tag:
