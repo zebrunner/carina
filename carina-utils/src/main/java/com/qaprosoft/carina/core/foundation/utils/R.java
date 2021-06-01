@@ -117,7 +117,7 @@ public enum R {
                         String key = (String) entry.getKey();
                         if (key.toLowerCase().startsWith(prefix)) {
                             String value = (String) entry.getValue();
-                            if (StringUtils.isEmpty(value) || value.equalsIgnoreCase("NULL")) {
+                            if (StringUtils.isEmpty(value) || value.equalsIgnoreCase(SpecialKeywords.NULL)) {
                                 properties.remove(key, value);
                             }
                         }
