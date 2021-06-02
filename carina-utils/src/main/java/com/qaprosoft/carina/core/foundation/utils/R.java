@@ -119,8 +119,18 @@ public enum R {
                         String key = entry.getKey();
                         if (key.toLowerCase().startsWith(prefix)) {
                             String value = entry.getValue();
-                            if (!StringUtils.isEmpty(value)) {
+                            if (!StringUtils.isEmpty(value) && !value.equalsIgnoreCase(SpecialKeywords.NULL)) {
                                 properties.put(key, value);
+                            }
+                        }
+                    }
+                    // delete all empty or null capabilites.* items from properties
+                    for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+                        String key = (String) entry.getKey();
+                        if (key.toLowerCase().startsWith(prefix)) {
+                            String value = (String) entry.getValue();
+                            if (StringUtils.isEmpty(value) || value.equalsIgnoreCase(SpecialKeywords.NULL)) {
+                                properties.remove(key, value);
                             }
                         }
                     }
