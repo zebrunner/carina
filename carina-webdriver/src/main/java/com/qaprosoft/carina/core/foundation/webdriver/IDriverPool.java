@@ -292,22 +292,17 @@ public interface IDriverPool {
         try {
             carinaDriver.getDevice().disconnectRemote();
             
-            // Collect all possible logs and put them as artifacts
-            WebDriver drv = carinaDriver.getDriver();
-            if (drv instanceof EventFiringWebDriver) {
-                drv = ((EventFiringWebDriver) drv).getWrappedDriver();
-            }
-            
-            WebDriver driver = carinaDriver.getDriver();
+            // castDriver to disable DriverListener operations on quit
+            WebDriver drv = castDriver(carinaDriver.getDriver());
             POOL_LOGGER.debug("start driver quit: " + carinaDriver.getName());
             
             Future<?> future = Executors.newSingleThreadExecutor().submit(new Callable<Void>() {
                 public Void call() throws Exception {
                     if (Configuration.getBoolean(Parameter.CHROME_CLOSURE)) {
                         // workaround to not cleaned chrome profiles on hard drive
-                        driver.close();
+                        drv.close();
                     }
-                    driver.quit();                    
+                    drv.quit();
                     return null;
                 }
             });
@@ -337,6 +332,13 @@ public interface IDriverPool {
             MDC.remove("device");
         }
     }
+    
+    private WebDriver castDriver(WebDriver drv) {
+        if (drv instanceof EventFiringWebDriver) {
+            drv = ((EventFiringWebDriver) drv).getWrappedDriver();
+        }
+        return drv;        
+    }    
     
     /**
      * Create driver with custom capabilities
