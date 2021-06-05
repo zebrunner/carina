@@ -24,21 +24,18 @@ public class TestResultItem {
     private String description = null;    
     private String linkToLog = null;
     private String linkToScreenshots = null;
-    private List<String> linksToVideo = null;
     private String failReason = null;
     private TestResultType result = null;
 
     private boolean config = false;
 
-    public TestResultItem(String group, String test, String desc, TestResultType result, String linkToScreenshots, String linkToLog, List<String> linksToVideo,
-            String failReason) {
+    public TestResultItem(String group, String test, String desc, TestResultType result, String linkToScreenshots, String linkToLog, String failReason) {
         this.pack = group;
         this.test = test;
         this.description = desc;
         this.result = result;
         this.linkToLog = linkToLog;
         this.linkToScreenshots = linkToScreenshots;
-        this.linksToVideo = linksToVideo;
         this.failReason = failReason;
     }
 
@@ -64,14 +61,6 @@ public class TestResultItem {
 
     public String getLinkToScreenshots() {
         return linkToScreenshots;
-    }
-
-    public List<String> getLinksToVideo() {
-        return linksToVideo;
-    }
-
-    public void setLinksToVideo(List<String> linksToVideo) {
-        this.linksToVideo = linksToVideo;
     }
 
     public String getFailReason() {
