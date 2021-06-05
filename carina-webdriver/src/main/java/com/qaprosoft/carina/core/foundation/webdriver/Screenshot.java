@@ -515,7 +515,8 @@ public class Screenshot {
         
 
         BufferedImage screenShot = null;
-        long timeout = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT);
+        // default timeout for driver quit 1/3 of explicit
+        long timeout = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / 3;
         try {
             LOGGER.debug("starting full size screenshot capturing...");
             screenShot = (BufferedImage) future.get(timeout, TimeUnit.SECONDS);
@@ -555,7 +556,8 @@ public class Screenshot {
         }); 
         
         BufferedImage screenShot = null;
-        long timeout = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT);
+        // default timeout for driver quit 1/3 of explicit
+        long timeout = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / 3;
         try {
             LOGGER.debug("starting screenshot capturing...");
             screenShot = (BufferedImage) future.get(timeout, TimeUnit.SECONDS);

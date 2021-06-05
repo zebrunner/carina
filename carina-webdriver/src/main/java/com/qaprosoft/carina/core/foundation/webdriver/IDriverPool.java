@@ -312,7 +312,8 @@ public interface IDriverPool {
                 }
             });
             
-            long timeout = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT);
+            // default timeout for driver quit 1/3 of explicit
+            long timeout = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / 3;
             try {
                 future.get(timeout, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
