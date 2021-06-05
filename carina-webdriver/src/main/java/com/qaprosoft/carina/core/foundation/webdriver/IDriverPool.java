@@ -303,7 +303,7 @@ public interface IDriverPool {
             
             Future<?> future = Executors.newSingleThreadExecutor().submit(new Callable<Void>() {
                 public Void call() throws Exception {
-                    if ("chrome".equalsIgnoreCase(Configuration.getBrowser())) {
+                    if (Configuration.getBoolean(Parameter.CHROME_CLOSURE)) {
                         // workaround to not cleaned chrome profiles on hard drive
                         driver.close();
                     }
@@ -317,10 +317,10 @@ public interface IDriverPool {
             try {
                 future.get(timeout, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
-                POOL_LOGGER.error("InterruptedException: Unable to quit driver!", e);
+                POOL_LOGGER.error("InterruptedException: Unable to quit driver: " + e.getMessage(), e);
                 Thread.currentThread().interrupt();
             } catch (ExecutionException e) {
-                POOL_LOGGER.error("ExecutionException: Unable to quit driver!", e);
+                POOL_LOGGER.error("ExecutionException: Unable to quit driver: " + e.getMessage(), e);
             } catch (java.util.concurrent.TimeoutException e) {
                 POOL_LOGGER.error("Unable to quit driver for " + timeout + "sec!", e);
             }
