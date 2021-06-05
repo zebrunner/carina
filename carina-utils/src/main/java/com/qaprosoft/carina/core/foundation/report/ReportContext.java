@@ -645,29 +645,6 @@ public class ReportContext {
     }
 
     /**
-     * Returns list of links to video in local file system for recorded driver sessions
-     * 
-     * @param sessionIds
-     *            String list of session Ids to find video files for
-     * @return
-     *         String list of generated links
-     */
-    public static List<String> getTestVideoLinks(List<String> sessionIds) {
-        List<String> links = new ArrayList<>();
-        for (String sessionId : sessionIds) {
-            String videoFileName = String.format(SpecialKeywords.DEFAULT_VIDEO_FILENAME, sessionId);
-            File videoFile = new File(ReportContext.getArtifactsFolder() + File.separator + videoFileName);
-            if (!videoFile.exists()) {
-                // no video file at all
-                continue;
-            }
-
-            links.add(getTestArtifactsLink() + File.separator + videoFileName);
-        }
-        return links;
-    }
-
-    /**
      * Returns URL for test log.
      * @return - URL to test log folder.
      */

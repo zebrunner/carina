@@ -54,8 +54,6 @@ public class Configuration {
 
         SELENIUM_URL("selenium_url"),
 
-        DRIVER_RECORDER("driver_recorder"),
-        
         DRIVER_EVENT_LISTENERS("driver_event_listeners"),
 
         MAX_DRIVER_COUNT("max_driver_count"),
@@ -197,23 +195,6 @@ public class Configuration {
         DEFAULT_DEVICE_TIME_FORMAT("default_device_time_format"),
 
         DEFAULT_DEVICE_LANGUAGE("default_device_language"),
-
-        // For screen recording
-        ANDROID_SCREEN_RECORDING_SIZE("android_screen_record_size"),
-
-        ANDROID_SCREEN_RECORDING_BITRATE("android_screen_record_bitrate"),
-
-        ANDROID_ENABLE_BUG_REPORT("android_enable_bug_report"),
-
-        IOS_SCREEN_RECORDING_QUALITY("ios_screen_record_quality"),
-
-        IOS_SCREEN_RECORDING_CODEC("ios_screen_record_codec"),
-
-        IOS_SCREEN_RECORDING_FPS("ios_screen_record_fps"),
-
-        SCREEN_RECORD_DURATION("screen_record_duration"),
-
-        VIDEO_SCALE("video_scale"),
 
         // Ignore SSL
         IGNORE_SSL("ignore_ssl"),
