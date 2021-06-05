@@ -300,9 +300,13 @@ public interface IDriverPool {
                 public Void call() throws Exception {
                     if (Configuration.getBoolean(Parameter.CHROME_CLOSURE)) {
                         // workaround to not cleaned chrome profiles on hard drive
+                        POOL_LOGGER.debug("Starting drv.close()");
                         drv.close();
+                        POOL_LOGGER.debug("Finished drv.close()");
                     }
+                    POOL_LOGGER.debug("Starting drv.quit()");
                     drv.quit();
+                    POOL_LOGGER.debug("Finished drv.quit()");
                     return null;
                 }
             });
