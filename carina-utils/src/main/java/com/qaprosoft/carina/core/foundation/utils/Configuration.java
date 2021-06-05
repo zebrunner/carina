@@ -68,6 +68,8 @@ public class Configuration {
         
         CHROME_MOBILE_EMULATION_OPTS("chrome_mobile_emulation_opts"),
         
+        CHROME_CLOSURE("chrome_closure"),
+        
         FIREFOX_ARGS("firefox_args"),
         
         FIREFOX_PREFERENCES("firefox_preferences"),
