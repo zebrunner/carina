@@ -34,8 +34,8 @@ public class LogicUtils {
         url1 = StringUtils.replace(url1, "https://", "http://");
         url2 = StringUtils.replace(url2, "https://", "http://");
 
-        //url1 = StringUtils.removeEnd(url1, "/");
-        //url2 = StringUtils.removeEnd(url2, "/");
+        url1 = StringUtils.removeEnd(url1, "/");
+        url2 = StringUtils.removeEnd(url2, "/");
 
         url1 = url1.contains("?") ? url1.substring(0, url1.indexOf("?")) : url1;
         url2 = url2.contains("?") ? url2.substring(0, url2.indexOf("?")) : url2;

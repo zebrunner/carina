@@ -135,7 +135,7 @@ public class DriverHelper {
         this.pageURL = decryptedURL;
         WebDriver drv = getDriver();
         DriverListener.setMessages(Messager.OPENED_URL.getMessage(url), Messager.NOT_OPENED_URL.getMessage(url));
-
+        
         // [VD] there is no sense to use fluent wait here as selenium just don't return something until page is ready!
         // explicitly limit time for the openURL operation
         Future<?> future = Executors.newSingleThreadExecutor().submit(new Callable<Void>() {
@@ -150,18 +150,28 @@ public class DriverHelper {
             }
         });
 
-        long wait = timeout;
         try {
-            future.get(wait, TimeUnit.SECONDS);
+            LOGGER.debug("starting driver.get call...");
+            future.get(timeout, TimeUnit.SECONDS);
         } catch (java.util.concurrent.TimeoutException e) {
-            Assert.fail("Unable to open url during " + wait + "sec!", e);
+            String message = "Unable to open url during " + timeout + "sec!";
+            LOGGER.error(message);
+            Assert.fail(message, e);
         } catch (InterruptedException e) {
-            Assert.fail("Unable to open url during " + wait + "sec!", e);
+            String message = "Unable to open url during " + timeout + "sec!";
+            LOGGER.error(message);
+            Assert.fail(message, e);
             Thread.currentThread().interrupt();
         } catch (ExecutionException e) {
-            Assert.fail("ExecutionException error on open url!", e);
+            String message = "ExecutionException error on open url: " + e.getMessage();
+            LOGGER.error(message);
+            Assert.fail(message, e);
         } catch (Exception e) {
-            Assert.fail("Undefined error on open url detected!", e);
+            String message = "Undefined error on open url detected: " + e.getMessage();
+            LOGGER.error(message);
+            Assert.fail(message, e);
+        } finally {
+            LOGGER.debug("finished driver.get call.");            
         }
     }
 
@@ -624,6 +634,46 @@ public class DriverHelper {
     public void pause(Double timeout) {
         CommonUtils.pause(timeout);
     }
+    
+    /**
+     * Return page title.
+     * 
+     * @return title String.
+     */
+    public String getTitle() {
+        return getTitle(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT));
+    }
+    
+    /**
+     * Return page title.
+     * 
+     * @param timeout long
+     * @return title String.
+     */
+    public String getTitle(long timeout) {
+        
+        WebDriver drv = getDriver();
+
+        Wait<WebDriver> wait = new FluentWait<WebDriver>(drv)
+                .pollingEvery(Duration.ofMillis(RETRY_TIME))
+                .withTimeout(Duration.ofSeconds(timeout))
+                .ignoring(WebDriverException.class)
+                .ignoring(JavascriptException.class); // org.openqa.selenium.JavascriptException: javascript error: Cannot read property 'outerHTML' of null
+
+        String res = "";
+        try {
+            res = wait.until(new Function<WebDriver, String>() {
+                public String apply(WebDriver driver) {
+                    return drv.getTitle();
+                }
+            });
+        } catch (ScriptTimeoutException | TimeoutException e) {
+            Messager.FAIL_GET_TITLE.error();
+        }
+
+        return res;
+
+    }    
 
     /**
      * Checks that page title is as expected.
@@ -633,18 +683,15 @@ public class DriverHelper {
      * @return validation result.
      */
     public boolean isTitleAsExpected(final String expectedTitle) {
-        boolean result;
         final String decryptedExpectedTitle = cryptoTool.decryptByPattern(expectedTitle, CRYPTO_PATTERN);
-        final WebDriver drv = getDriver();
-        Wait<WebDriver> wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
-        try {
-            wait.until((Function<WebDriver, Object>) dr -> drv.getTitle().contains(decryptedExpectedTitle));
-            result = true;
-            Messager.TITLE_CORERECT.info(drv.getCurrentUrl(), expectedTitle);
-        } catch (Exception e) {
-            result = false;
-            Messager.TITLE_NOT_CORERECT.error(drv.getCurrentUrl(), expectedTitle, drv.getTitle());
+        String title = getTitle(EXPLICIT_TIMEOUT);
+        boolean result = title.contains(decryptedExpectedTitle);
+        if (result) {
+            Messager.TITLE_CORRECT.info(expectedTitle);
+        } else {
+            Messager.TITLE_NOT_CORRECT.error(expectedTitle, title);
         }
+        
         return result;
     }
 
@@ -656,19 +703,18 @@ public class DriverHelper {
      * @return validation result.
      */
     public boolean isTitleAsExpectedPattern(String expectedPattern) {
-        boolean result;
         final String decryptedExpectedPattern = cryptoTool.decryptByPattern(expectedPattern, CRYPTO_PATTERN);
-        WebDriver drv = getDriver();
-        String actual = drv.getTitle();
+        
+        String actual = getTitle(EXPLICIT_TIMEOUT);
         Pattern p = Pattern.compile(decryptedExpectedPattern);
         Matcher m = p.matcher(actual);
-        if (m.find()) {
-            Messager.TITLE_CORERECT.info(drv.getCurrentUrl(), actual);
-            result = true;
+        boolean result = m.find();
+        if (result) {
+            Messager.TITLE_CORRECT.info(actual);
         } else {
-            Messager.TITLE_DOES_NOT_MATCH_TO_PATTERN.error(drv.getCurrentUrl(), expectedPattern, actual);
-            result = false;
+            Messager.TITLE_NOT_CORRECT.error(expectedPattern, actual);   
         }
+        
         return result;
     }
 
@@ -690,7 +736,7 @@ public class DriverHelper {
     /**
      * Refresh browser.
      * 
-     * @param timeout.
+     * @param timeout long
      */
     public void refresh(long timeout) {
         WebDriver drv = getDriver();
@@ -1115,11 +1161,13 @@ public class DriverHelper {
      */
 	public boolean waitUntil(ExpectedCondition<?> condition, long timeout) {
 		boolean result;
+        long startMillis = 0;
 		final WebDriver drv = getDriver();
 		Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME)
 		        .ignoring(WebDriverException.class)
 				.ignoring(NoSuchSessionException.class);
 		try {
+		    startMillis = System.currentTimeMillis();
 			wait.until(condition);
 			result = true;
 			LOGGER.debug("waitUntil: finished true...");
@@ -1130,7 +1178,13 @@ public class DriverHelper {
 		} catch (Exception e) {
 			LOGGER.error("waitUntil: " + condition.toString(), e);
 			result = false;
-		}
+		} finally {
+		    long timePassed = System.currentTimeMillis() - startMillis;
+		    // timePassed is time in ms timeout in sec so we have to adjust
+            if (timePassed > 2 * timeout * 1000) {
+                LOGGER.error("Your retry_interval is too low: " + RETRY_TIME + " ms! Increase it or upgrade your hardware");
+            }
+        }
 		return result;
 	}
 	

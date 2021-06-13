@@ -71,7 +71,6 @@ public class EmailReportGenerator {
     private static final String SKIP_REASON_PLACEHOLDER = "${skip_reason}";
     private static final String FAIL_CONFIG_REASON_PLACEHOLDER = "${fail_config_reason}";
     private static final String SCREENSHOTS_URL_PLACEHOLDER = "${screenshots_url}";
-    private static final String VIDEO_URL_PLACEHOLDER = "${video_url_html}";
     private static final String LOG_URL_PLACEHOLDER = "${log_url}";
     private static final String CREATED_ITEMS_LIST_PLACEHOLDER = "${created_items_list}";
     private static final String CREATED_ITEM_PLACEHOLDER = "${created_item}";
@@ -222,15 +221,6 @@ public class EmailReportGenerator {
                 }
             }
         }
-
-        // putting of video URLs
-        String videoHTML = "";
-        List<String> videoLinks = testResultItem.getLinksToVideo();
-        for (int i = 0; i < videoLinks.size(); i++) {
-            videoHTML = videoHTML.concat(String.format("<span> | </span><a target='_blank' href='%s' style='color: white'>%s</a>", videoLinks.get(i),
-                    (videoLinks.size() > 1) ? "Video_" + (i + 1) : "Video"));
-        }
-        result = result.replace(VIDEO_URL_PLACEHOLDER, videoHTML);
         return result;
     }
 

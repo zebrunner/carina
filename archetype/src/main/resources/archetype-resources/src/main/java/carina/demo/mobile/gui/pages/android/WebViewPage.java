@@ -13,7 +13,7 @@ import org.openqa.selenium.support.FindBy;
 @DeviceType(pageType = DeviceType.Type.ANDROID_PHONE, parentClass = WebViewPageBase.class)
 public class WebViewPage extends WebViewPageBase {
 
-    @FindBy(className = "t708__btn")
+    @FindBy(xpath = "//*[@class='t708__icon']")
     private ExtendedWebElement contactUsLink;
 
     public WebViewPage(WebDriver driver) {

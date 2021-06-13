@@ -17,7 +17,6 @@ package com.qaprosoft.carina.core.foundation.listeners;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -233,11 +232,9 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         
         String linkToLog = ReportContext.getTestLogLink();
         String linkToScreenshots = ReportContext.getTestScreenshotsLink();
-        List<String> linksToVideo = ReportContext.getTestVideoLinks(getSessionsForCurrentTest());
 
         String test = StringEscapeUtils.escapeHtml4(TestNameResolverRegistry.get().resolve(result));
-        TestResultItem testResultItem = new TestResultItem(group, test, description, resultType, linkToScreenshots, linkToLog, linksToVideo,
-                failReason);
+        TestResultItem testResultItem = new TestResultItem(group, test, description, resultType, linkToScreenshots, linkToLog, failReason);
         return testResultItem;
     }
 

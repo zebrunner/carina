@@ -127,8 +127,6 @@ public class SpecialKeywords {
 
     // ------------- CAPABILITIES PROPERTIES --------------------------
     public static final String CAPABILITIES = "capabilities";
-    public static final String ENABLE_VIDEO = "capabilities.enableVideo";
-    public static final String ENABLE_LOG = "capabilities.enableLog";
     public static final String PLATFORM_NAME = "capabilities.platformName";
     public static final String PLATFORM_VERSION = "capabilities.platformVersion";
     public static final String BROWSERSTACK_PLATFORM_NAME = "capabilities.os";
@@ -188,6 +186,4 @@ public class SpecialKeywords {
     public static final String CUCUMBER_REPORT_SUBFOLDER = "cucumber-html-reports";
     public static final String CUCUMBER_REPORT_FILE_NAME = "overview-features.html";
     
-    
-    public final static String DEFAULT_VIDEO_FILENAME = "%s.mp4";
 }

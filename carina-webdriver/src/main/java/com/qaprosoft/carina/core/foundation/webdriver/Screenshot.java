@@ -27,6 +27,11 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 
@@ -458,52 +463,79 @@ public class Screenshot {
      * @return screenshot image
      */
     private static BufferedImage takeFullScreenshot(WebDriver driver, WebDriver augmentedDriver) throws Exception {
-        BufferedImage screenShot;
-        
-        if (driver.getClass().toString().contains("windows")) {
-            File screenshot = ((WindowsDriver<?>) driver).getScreenshotAs(OutputType.FILE);
-            screenShot = ImageIO.read(screenshot);
-        } else if (driver.getClass().toString().contains("java_client")) {
-            // Mobile Native app
-            File screenshot = ((AppiumDriver<?>) driver).getScreenshotAs(OutputType.FILE);
-            screenShot = ImageIO.read(screenshot);
-        } else if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
-            ru.yandex.qatools.ashot.Screenshot screenshot;
-            if (Configuration.getPlatform().equals("ANDROID")) {
-                String pixelRatio = String.valueOf(((EventFiringWebDriver) augmentedDriver).getCapabilities().getCapability("pixelRatio"));
-                if (!pixelRatio.equals("null")) {
-                    float dpr = Float.parseFloat(pixelRatio);
-                    screenshot = (new AShot()).shootingStrategy(ShootingStrategies
-                            .viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_BLOCK, SpecialKeywords.DEFAULT_BLOCK,
-                                    dpr))
-                            .takeScreenshot(augmentedDriver);
-                    screenShot = screenshot.getImage();
+        Future<?> future = Executors.newSingleThreadExecutor().submit(new Callable<BufferedImage>() {
+            public BufferedImage call() throws IOException {
+                BufferedImage screenShot;
+                if (driver.getClass().toString().contains("windows")) {
+                    File screenshot = ((WindowsDriver<?>) driver).getScreenshotAs(OutputType.FILE);
+                    screenShot = ImageIO.read(screenshot);
+                } else if (driver.getClass().toString().contains("java_client")) {
+                    // Mobile Native app
+                    File screenshot = ((AppiumDriver<?>) driver).getScreenshotAs(OutputType.FILE);
+                    screenShot = ImageIO.read(screenshot);
+                } else if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
+                    ru.yandex.qatools.ashot.Screenshot screenshot;
+                    if (Configuration.getPlatform().equals("ANDROID")) {
+                        String pixelRatio = String.valueOf(((EventFiringWebDriver) augmentedDriver).getCapabilities().getCapability("pixelRatio"));
+                        if (!pixelRatio.equals("null")) {
+                            float dpr = Float.parseFloat(pixelRatio);
+                            screenshot = (new AShot()).shootingStrategy(ShootingStrategies
+                                    .viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_BLOCK, SpecialKeywords.DEFAULT_BLOCK,
+                                            dpr))
+                                    .takeScreenshot(augmentedDriver);
+                            screenShot = screenshot.getImage();
+                        } else {
+                            screenshot = (new AShot()).shootingStrategy(ShootingStrategies
+                                    .viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_BLOCK, SpecialKeywords.DEFAULT_BLOCK,
+                                            SpecialKeywords.DEFAULT_DPR))
+                                    .takeScreenshot(augmentedDriver);
+                            screenShot = screenshot.getImage();
+                        }
+                    } else {
+                        int deviceWidth = augmentedDriver.manage().window().getSize().getWidth();
+                        String deviceName = "";
+                        if (augmentedDriver instanceof EventFiringWebDriver) {
+                            deviceName = String.valueOf(((EventFiringWebDriver) augmentedDriver).getCapabilities().getCapability("deviceName"));
+                        } else if (augmentedDriver instanceof RemoteWebDriver) {
+                            deviceName = String.valueOf(((RemoteWebDriver) augmentedDriver).getCapabilities().getCapability("deviceName"));
+                        }
+                        screenshot = new AShot().shootingStrategy(getScreenshotShuttingStrategy(deviceWidth, deviceName)).takeScreenshot(augmentedDriver);
+                        screenShot = screenshot.getImage();
+                    }
                 } else {
-                    screenshot = (new AShot()).shootingStrategy(ShootingStrategies
-                            .viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_BLOCK, SpecialKeywords.DEFAULT_BLOCK,
-                                    SpecialKeywords.DEFAULT_DPR))
-                            .takeScreenshot(augmentedDriver);
-                    screenShot = screenshot.getImage();
+                    // regular web
+                    ru.yandex.qatools.ashot.Screenshot screenshot;
+                        screenshot = (new AShot()).shootingStrategy(ShootingStrategies.viewportPasting(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT))
+                                .takeScreenshot(augmentedDriver);
+                        screenShot = screenshot.getImage();
                 }
-            } else {
-                int deviceWidth = augmentedDriver.manage().window().getSize().getWidth();
-                String deviceName = "";
-                if (augmentedDriver instanceof EventFiringWebDriver) {
-                    deviceName = String.valueOf(((EventFiringWebDriver) augmentedDriver).getCapabilities().getCapability("deviceName"));
-                } else if (augmentedDriver instanceof RemoteWebDriver) {
-                    deviceName = String.valueOf(((RemoteWebDriver) augmentedDriver).getCapabilities().getCapability("deviceName"));
-                }
-                screenshot = new AShot().shootingStrategy(getScreenshotShuttingStrategy(deviceWidth, deviceName)).takeScreenshot(augmentedDriver);
-                screenShot = screenshot.getImage();
+                return screenShot;
             }
-        } else {
-            // regular web
-            ru.yandex.qatools.ashot.Screenshot screenshot;
-                screenshot = (new AShot()).shootingStrategy(ShootingStrategies.viewportPasting(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT))
-                        .takeScreenshot(augmentedDriver);
-                screenShot = screenshot.getImage();
-        }
+        });        
+        
 
+        BufferedImage screenShot = null;
+        // default timeout for driver quit 1/3 of explicit
+        long timeout = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / 3;
+        try {
+            LOGGER.debug("starting full size screenshot capturing...");
+            screenShot = (BufferedImage) future.get(timeout, TimeUnit.SECONDS);
+        } catch (java.util.concurrent.TimeoutException e) {
+            String message = "Unable to capture full screenshot during " + timeout + "sec!";
+            LOGGER.error(message);
+        } catch (InterruptedException e) {
+            String message = "Unable to capture full screenshot during " + timeout + "sec!";
+            LOGGER.error(message);
+            Thread.currentThread().interrupt();
+        } catch (ExecutionException e) {
+            String message = "ExecutionException error on capture full screenshot: " + e.getMessage();
+            LOGGER.error(message);
+        } catch (Exception e) {
+            String message = "Undefined error on capture full screenshot detected: " + e.getMessage();
+            LOGGER.error(message);
+        } finally {
+            LOGGER.debug("finished full size screenshot call.");            
+        }
         return screenShot;
     }
 
@@ -517,7 +549,36 @@ public class Screenshot {
      * @return screenshot image
      */
     private static BufferedImage takeVisibleScreenshot(WebDriver augmentedDriver) throws Exception {
-    	return ImageIO.read(((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE));
+        Future<?> future = Executors.newSingleThreadExecutor().submit(new Callable<BufferedImage>() {
+            public BufferedImage call() throws IOException {
+                return ImageIO.read(((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE));
+            }
+        }); 
+        
+        BufferedImage screenShot = null;
+        // default timeout for driver quit 1/3 of explicit
+        long timeout = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / 3;
+        try {
+            LOGGER.debug("starting screenshot capturing...");
+            screenShot = (BufferedImage) future.get(timeout, TimeUnit.SECONDS);
+        } catch (java.util.concurrent.TimeoutException e) {
+            String message = "Unable to capture screenshot during " + timeout + "sec!";
+            LOGGER.error(message);
+        } catch (InterruptedException e) {
+            String message = "Unable to capture screenshot during " + timeout + "sec!";
+            LOGGER.error(message);
+            Thread.currentThread().interrupt();
+        } catch (ExecutionException e) {
+            String message = "ExecutionException error on capture screenshot: " + e.getMessage();
+            LOGGER.error(message);
+        } catch (Exception e) {
+            String message = "Undefined error on capture screenshot detected: " + e.getMessage();
+            LOGGER.error(message);
+        } finally {
+            LOGGER.debug("finished screenshot call.");            
+        }
+        return screenShot;        
+    	
     }
 
 
@@ -572,8 +633,11 @@ public class Screenshot {
 				|| message.contains("An unknown error has occurred") //
 				|| message.contains("Unable to find element with")
 				|| message.contains("Unable to locate element")
-				|| message.contains("Illegal base64 character 2e");
-		
+				|| message.contains("Illegal base64 character 2e")
+        || message.contains("javascript error: Cannot read property 'outerHTML' of null")
+				// carina based errors which means that driver is not ready for screenshoting
+				|| message.contains("Unable to open url during");
+
 		if (!isContains) {
 		    // for released builds put below message to debug  
 		    LOGGER.debug("isCaptured->message: '" + message + "'");
