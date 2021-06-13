@@ -776,16 +776,6 @@ public interface IAndroidUtils extends IMobileUtils {
     }
     
     /**
-     * The application that has its package name set to current driver's
-     * capabilities will be closed to background IN CASE IT IS CURRENTLY IN
-     * FOREGROUND. Will be in recent app's list;
-     */
-    default public void closeApp() {
-        UTILS_LOGGER.info("Application will be closed to background");
-        ((AndroidDriver<?>) castDriver()).closeApp();
-    }
-
-    /**
      * Tapping at native 'Home' button will be emulated. All applications will be
      * closed to background.
      */

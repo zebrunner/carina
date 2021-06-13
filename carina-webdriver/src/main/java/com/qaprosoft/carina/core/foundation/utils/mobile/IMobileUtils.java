@@ -18,12 +18,12 @@ package com.qaprosoft.carina.core.foundation.utils.mobile;
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
@@ -38,11 +38,11 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebEleme
 
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileDriver;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.MultiTouchAction;
 import io.appium.java_client.TouchAction;
+import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.appmanagement.ApplicationState;
+import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.touch.LongPressOptions;
 import io.appium.java_client.touch.WaitOptions;
 import io.appium.java_client.touch.offset.ElementOption;
@@ -838,6 +838,17 @@ public interface IMobileUtils extends IDriverPool {
     default public void terminateApp(String bundleId) {
         ((MobileDriver<?>) castDriver()).terminateApp(bundleId);
     }
+    
+    /**
+     * The application that has its package name set to current driver's
+     * capabilities will be closed to background IN CASE IT IS CURRENTLY IN
+     * FOREGROUND. Will be in recent app's list;
+     */
+    default public void closeApp() {
+        UTILS_LOGGER.info("Application will be closed to background");
+        ((MobileDriver<?>) castDriver()).closeApp();
+    }
+
 
     /**
      * Cast Carina driver to WebDriver removing all extra listeners (try to avoid direct operations via WebDriver as it doesn't support logging etc)
