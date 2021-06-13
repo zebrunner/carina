@@ -89,17 +89,6 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         return errorMessage;
     }
 
-    private String getDeviceName() {
-        String deviceName = IDriverPool.getDefaultDevice().getName();
-        String deviceUdid = IDriverPool.getDefaultDevice().getUdid();
-
-        if (!deviceName.isEmpty() && !deviceUdid.isEmpty()) {
-            deviceName = deviceName + " - " + deviceUdid;
-        }
-
-        return deviceName;
-    }
-
     private void afterTest(ITestResult result) {
         // do not publish log/demo anymore
         //Artifacts.add("Logs", ReportContext.getTestLogLink(test));
