@@ -27,7 +27,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.MDC;
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -332,8 +332,7 @@ public interface IDriverPool {
             POOL_LOGGER.debug("finished driver quit: " + carinaDriver.getName());            
             if (!keepProxyDuring) {
                 ProxyPool.stopProxy();
-            }            
-            MDC.remove("device");
+            }
         }
     }
     
@@ -388,10 +387,6 @@ public interface IDriverPool {
                     // During driver creation we choose device and assign it to
                     // the test thread
                     device = getDefaultDevice();
-                }
-                // push custom device name for log4j default messages
-                if (!device.isNull()) {
-                    MDC.put("device", "[" + device.getName() + "] ");
                 }
                 
                 // moved proxy start logic here since device will be initialized here only

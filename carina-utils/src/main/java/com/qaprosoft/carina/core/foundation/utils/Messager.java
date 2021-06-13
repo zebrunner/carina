@@ -32,23 +32,23 @@ import com.qaprosoft.carina.core.foundation.utils.messager.IMessager;
 // TODO: move to messager package
 public enum Messager implements IMessager {
 	
-    TEST_STARTED("%s TEST [%s] STARTED at [%s]"),
+    TEST_STARTED("TEST [%s] STARTED at [%s]"),
 
-    TEST_PASSED("%s TEST [%s] PASSED at [%s]"),
+    TEST_PASSED("TEST [%s] PASSED at [%s]"),
 
-    TEST_SKIPPED("%s TEST [%s] SKIPPED at [%s] - %s"),
+    TEST_SKIPPED("TEST [%s] SKIPPED at [%s] - %s"),
 
-    TEST_FAILED("%s TEST [%s] FAILED at [%s] - %s"),
+    TEST_FAILED("TEST [%s] FAILED at [%s] - %s"),
 
-    RETRY_FAILED("%s TEST [%s] RETRY %s of %s FAILED - %s"),
+    RETRY_FAILED("TEST [%s] RETRY %s of %s FAILED - %s"),
 
-    CONFIG_STARTED("%s CONFIG [%s] START at [%s]"),
+    CONFIG_STARTED("CONFIG [%s] START at [%s]"),
 
-    CONFIG_PASSED("%s CONFIG [%s] PASS at [%s]"),
+    CONFIG_PASSED("CONFIG [%s] PASS at [%s]"),
 
-    CONFIG_SKIPPED("%s CONFIG [%s] SKIP at [%s] - %s"),
+    CONFIG_SKIPPED("CONFIG [%s] SKIP at [%s] - %s"),
 
-    CONFIG_FAILED("%s CONFIG [%s] FAIL at [%s] - %s"),
+    CONFIG_FAILED("CONFIG [%s] FAIL at [%s] - %s"),
 
     TEST_RESULT("RESULT #%s: TEST [%s] %s [%s]"),
 
