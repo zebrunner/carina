@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
@@ -196,8 +197,6 @@ public interface IAndroidUtils extends IMobileUtils {
     default public boolean setDeviceLanguage(String language, int waitTime) {
         boolean status = false;
 
-        String currentAndroidVersion = IDriverPool.getDefaultDevice().getOsVersion();
-
         UTILS_LOGGER.info("Do not concat language for Android. Keep: " + language);
         language = language.replace("_", "-");
         UTILS_LOGGER.info("Refactor language to : " + language);
@@ -217,8 +216,9 @@ public interface IAndroidUtils extends IMobileUtils {
 
         UTILS_LOGGER.info("Try set localization change permission with following cmd:" + setLocalizationChangePermissionCmd);
         String expandOutput = executeAdbCommand(setLocalizationChangePermissionCmd);
-
-        if (expandOutput.contains("Unknown package: net.sanapeli.adbchangelanguage")) {
+        String pathToInstalledAppCmd = "shell pm path net.sanapeli.adbchangelanguage";
+        String pathToInstalledApp = executeAdbCommand(pathToInstalledAppCmd);
+        if (expandOutput.contains("Unknown package: net.sanapeli.adbchangelanguage") || pathToInstalledApp.isEmpty()) {
             UTILS_LOGGER.info("Looks like 'ADB Change Language apk' is not installed. Install it and try again.");
             installApk(LANGUAGE_CHANGE_APP_PATH, true);
             expandOutput = executeAdbCommand(setLocalizationChangePermissionCmd);
@@ -246,7 +246,7 @@ public interface IAndroidUtils extends IMobileUtils {
                 UTILS_LOGGER.info("Adb return empty response without errors.");
                 status = true;
             } else {
-                currentAndroidVersion = IDriverPool.getDefaultDevice().getOsVersion();
+                String currentAndroidVersion = IDriverPool.getDefaultDevice().getOsVersion();
                 UTILS_LOGGER.info("currentAndroidVersion=" + currentAndroidVersion);
                 if (currentAndroidVersion.contains("7.")) {
                     UTILS_LOGGER.info("Adb return language command do not work on some Android 7+ devices."
