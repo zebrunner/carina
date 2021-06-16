@@ -15,28 +15,19 @@
  *******************************************************************************/
 package com.qaprosoft.apitools.builder;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map.Entry;
 import java.util.Properties;
 
-public class PropertiesProcessorMain {
+public class NotStringValuesProcessor implements PropertiesProcessor {
 
-    private static List<PropertiesProcessor> processors;
-
-    static {
-        processors = new ArrayList<PropertiesProcessor>();
-        processors.add(new GenerateProcessor());
-        processors.add(new CryptoProcessor());
-		processors.add(new NotStringValuesProcessor());
-    }
-
-    public static Properties processProperties(Properties in) {
-        Properties out = new Properties();
-        out.putAll(in);
-        for (PropertiesProcessor processor : processors) {
-            out.putAll(processor.process(in));
-        }
-        return out;
-    }
-
+	@Override
+	public Properties process(Properties in) {
+		Properties out = new Properties();
+		for (Entry<Object, Object> entry : in.entrySet()) {
+			if (!(entry.getValue() instanceof String)) {
+				out.put(entry.getKey(), entry.getValue().toString());
+			}
+		}
+		return out;
+	}
 }
