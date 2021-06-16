@@ -18,13 +18,13 @@ package com.qaprosoft.apitools.builder;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-public class BooleanProcessor implements PropertiesProcessor {
+public class NotStringValuesProcessor implements PropertiesProcessor {
 
 	@Override
 	public Properties process(Properties in) {
 		Properties out = new Properties();
 		for (Entry<Object, Object> entry : in.entrySet()) {
-			if (entry.getValue() instanceof Boolean) {
+			if (!(entry.getValue() instanceof String)) {
 				out.put(entry.getKey(), entry.getValue().toString());
 			}
 		}
