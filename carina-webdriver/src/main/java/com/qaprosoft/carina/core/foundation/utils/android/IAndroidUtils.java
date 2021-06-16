@@ -52,12 +52,10 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebEleme
 
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileBy;
-import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.nativekey.AndroidKey;
 import io.appium.java_client.android.nativekey.KeyEvent;
 import io.appium.java_client.android.nativekey.KeyEventFlag;
-import io.appium.java_client.touch.offset.PointOption;
 
 public interface IAndroidUtils extends IMobileUtils {
 
@@ -114,24 +112,6 @@ public interface IAndroidUtils extends IMobileUtils {
 
     default public void pressNextKey() {
         pressBottomRightKey();
-    }
-
-    // TODO Update this method using findByImage strategy
-    /**
-     * Pressing bottom right button on the keyboard by coordinates: "search", "ok",
-     * "next", etc. - various keys appear at this position. Tested at Nexus 6P
-     * Android 8.0.0 standard keyboard. Coefficients of coordinates for other
-     * devices and custom keyboards could be different.
-     */
-    @SuppressWarnings("rawtypes")
-    default public void pressBottomRightKey() {
-        WebDriver driver = castDriver();
-        Dimension size = helper.performIgnoreException(() -> driver.manage().window().getSize());
-        int height = size.getHeight();
-        int width = size.getWidth();
-
-        PointOption<?> option = PointOption.point((int) (width * 0.915), (int) (height * 0.945));
-        new TouchAction((AndroidDriver<?>) castDriver()).tap(option).perform();
     }
 
     // Change Device Language section
@@ -320,12 +300,6 @@ public interface IAndroidUtils extends IMobileUtils {
         }
 
         executeAdbCommand("install " + filePath);
-    }
-
-    default public boolean isChecked(final ExtendedWebElement element) {
-        // TODO: SZ migrate to FluentWaits
-        return element.isElementPresent(5)
-                && (element.getElement().isSelected() || element.getAttribute("checked").equals("true"));
     }
 
     public enum SelectorType {
@@ -863,17 +837,6 @@ public interface IAndroidUtils extends IMobileUtils {
     }
 
     /**
-     * Method to reset test application.
-     * 
-     * App's settings will be reset. User will be logged out. Application will be
-     * closed to background.
-     */
-    default public void clearAppCache() {
-        UTILS_LOGGER.info("Initiation application reset...");
-        ((AndroidDriver<?>) castDriver()).resetApp();
-    }
-
-    /**
      * To open Android device native settings
      */
     default public void openDeviceSettings() {
@@ -897,57 +860,6 @@ public interface IAndroidUtils extends IMobileUtils {
         if (!response.contains("Success")) {
             UTILS_LOGGER.warn(String.format("App data was not cleared for %s app", packageName));
         }
-    }
-
-    /**
-     * If the application you're interested about is installed - returns "true".
-     * Otherwise, returns "false".
-     * 
-     * @param packageName String
-     * @return boolean
-     */
-    default public boolean isApplicationInstalled(String packageName) {
-        boolean installed = ((AndroidDriver<?>) castDriver()).isAppInstalled(packageName);
-        UTILS_LOGGER.info(String.format("Application by package name (%s) installed: ", packageName) + installed);
-        return installed;
-    }
-
-    /**
-     * Method to launch Android application by its package name.
-     * 
-     * Application should be installed to device.
-     * 
-     * Application might not be running in background, but will be launched anyway.
-     * 
-     * @param packageName
-     *            - app's package name
-     */
-    default public void startApp(String packageName) {
-        UTILS_LOGGER.info("Starting " + packageName);
-        ((AndroidDriver<?>) castDriver()).activateApp(packageName);
-    }
-
-    /**
-     * Will install application if path to apk-file on working machine is set.
-     * 
-     * @param apkPath String
-     */
-    default public void installApp(String apkPath) {
-        UTILS_LOGGER.info("Will install application with apk-file from " + apkPath);
-        ((AndroidDriver<?>) castDriver()).installApp(apkPath);
-    }
-
-    /**
-     * To remove installed application by provided package name
-     * 
-     * @param packageName String
-     * 
-     * @return true if succeed
-     */
-    default public boolean removeApp(String packageName) {
-        boolean removed = ((AndroidDriver<?>) castDriver()).removeApp(packageName);
-        UTILS_LOGGER.info(String.format("Application (%s) is successfuly removed: ", packageName) + removed);
-        return removed;
     }
 
     /**
