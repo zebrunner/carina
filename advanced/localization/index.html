@@ -625,17 +625,17 @@ private List&lt;ExtendedWebElement&gt; pageLinks;
 </code></pre>
 
 <p>Add to the project resources that corresponds to @Localized elements:</p>
-<pre><code>#!The key from locale file should have the same name as the name of variable that needs to be compared.
-createAccountElem=fiók létrehozása
-contribElem=közreműködések
+<pre><code>#!The key from locale file should have Page name + name of variable that needs to be compared.
+WikipediaLocalePage.createAccountElem=fiók létrehozása
+WikipediaLocalePage.contribElem=közreműködések
 
 #!Elements from List should have the same name of a variable + current element's number
-pageLinks0=Kezdőlap
-pageLinks1=Tartalom
-pageLinks2=Kiemelt szócikkek
-pageLinks3=Friss változtatások
-pageLinks4=Lap találomra
-pageLinks5=Tudakozó
+WikipediaLocalePage.pageLinks0=Kezdőlap
+WikipediaLocalePage.pageLinks1=Tartalom
+WikipediaLocalePage.pageLinks2=Kiemelt szócikkek
+WikipediaLocalePage.pageLinks3=Friss változtatások
+WikipediaLocalePage.pageLinks4=Lap találomra
+WikipediaLocalePage.pageLinks5=Tudakozó
 </code></pre>
 
 <p>For elements that are operated in test and marked with <code>@Localized</code> annotation 
@@ -653,7 +653,7 @@ Assert.assertEquals(welcomeText, expectedWelcomeText.trim(), &quot;Wikipedia wel
 
 <h2 id="resources-generation">Resources generation</h2>
 <p>To generate resources with Carina, you need to enable <code>localization_testing</code> parameter.For elements that are need localization, you need to mark them with <code>@Localized</code> and operate with them.
-In test call <code>L10N.saveLocalization()</code> to create new locale file in your project directory.
+In test call <code>L10N.flush()</code> to create new locale file in your project directory.
 Example:</p>
 <pre><code>public void testAddNewLanguages() {
     WikipediaHomePage wikipediaHomePage = new WikipediaHomePage(getDriver());
@@ -669,7 +669,7 @@ Example:</p>
 
     wikipediaLocalePage.clickDiscussionBtn();
 
-    L10N.saveLocalization();
+    L10N.flush();
     L10N.assertAll(); // not necessary for resources generation
 }
 </code></pre>
