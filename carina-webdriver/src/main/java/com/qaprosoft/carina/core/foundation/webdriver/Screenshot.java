@@ -681,7 +681,11 @@ public class Screenshot {
                 ImageIO.write(screen, "PNG", screenshot);
 
                 // Uploading comparative screenshot to Amazon S3
-                com.zebrunner.agent.core.registrar.Screenshot.upload(Files.readAllBytes(screenshot.toPath()), Instant.now().toEpochMilli());
+                if (artifact){
+                    com.zebrunner.agent.core.registrar.Artifact.attachToTest(comment + ".png", screenshot);
+                } else {
+                    com.zebrunner.agent.core.registrar.Screenshot.upload(Files.readAllBytes(screenshot.toPath()), Instant.now().toEpochMilli());
+                }
             }
             else {
                 LOGGER.info("Unable to create comparative screenshot, there is no difference between images!");
