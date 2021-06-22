@@ -42,17 +42,17 @@ private List<ExtendedWebElement> pageLinks;
 ```
 Add to the project resources that corresponds to @Localized elements:
 ```
-#!The key from locale file should have the same name as the name of variable that needs to be compared.
-createAccountElem=fiók létrehozása
-contribElem=közreműködések
+#!The key from locale file should have Page name + name of variable that needs to be compared.
+WikipediaLocalePage.createAccountElem=fiók létrehozása
+WikipediaLocalePage.contribElem=közreműködések
 
 #!Elements from List should have the same name of a variable + current element's number
-pageLinks0=Kezdőlap
-pageLinks1=Tartalom
-pageLinks2=Kiemelt szócikkek
-pageLinks3=Friss változtatások
-pageLinks4=Lap találomra
-pageLinks5=Tudakozó
+WikipediaLocalePage.pageLinks0=Kezdőlap
+WikipediaLocalePage.pageLinks1=Tartalom
+WikipediaLocalePage.pageLinks2=Kiemelt szócikkek
+WikipediaLocalePage.pageLinks3=Friss változtatások
+WikipediaLocalePage.pageLinks4=Lap találomra
+WikipediaLocalePage.pageLinks5=Tudakozó
 ```
 For elements that are operated in test and marked with `@Localized` annotation 
 Carina will automatically compare text from the page with text from your locale_xx_XX.properties file.
@@ -68,7 +68,7 @@ Assert.assertEquals(welcomeText, expectedWelcomeText.trim(), "Wikipedia welcome 
 ```
 ## Resources generation
 To generate resources with Carina, you need to enable `localization_testing` parameter.For elements that are need localization, you need to mark them with `@Localized` and operate with them.
-In test call `L10N.saveLocalization()` to create new locale file in your project directory.
+In test call `L10N.flush()` to create new locale file in your project directory.
 Example:
 ```
 public void testAddNewLanguages() {
@@ -85,7 +85,7 @@ public void testAddNewLanguages() {
 
     wikipediaLocalePage.clickDiscussionBtn();
 
-    L10N.saveLocalization();
+    L10N.flush();
     L10N.assertAll(); // not necessary for resources generation
 }
 ```
