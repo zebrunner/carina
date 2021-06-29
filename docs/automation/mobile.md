@@ -1,4 +1,4 @@
-Carina framework provides a useful and elegant way of Mobile (Android and iOS) Test Automation. The best practices have a lot in common with web automation, so it's highly recommended to look through [Web automation article](http://qaprosoft.github.io/carina/automation/web/).
+Carina framework provides a useful and elegant way of Mobile (Android and iOS) Test Automation. The best practices have a lot in common with web automation, so it's highly recommended to look through [Web automation article](http://zebrunner.github.io/carina/automation/web/).
 
 ### Mobile special requirements:
 To run mobile tests, [Appium](http://appium.io/) is used instead of Selenium. There are 2 versions of Appium: desktop and console ones, and both are good for Carina. <b>Appium must be running every time before the test run.</b>
@@ -118,7 +118,7 @@ capabilities.app=https://qaprosoft.s3-us-west-2.amazonaws.com/carinademoexample.
 ```
 
 ### Implementation of Page Objects:
-The main idea is the same as in [web-testing](http://qaprosoft.github.io/carina/automation/web/#implementation-of-page-objects). 
+The main idea is the same as in [web-testing](http://zebrunner.github.io/carina/automation/web/#implementation-of-page-objects). 
 
 ### How to find locators for Android application
 To obtain the locators of elements from an Android app different programs are used such as Appium itself or convenient Android SDK tool: `uiautomatorviewer`.

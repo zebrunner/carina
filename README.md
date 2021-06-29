@@ -19,7 +19,7 @@ Carina is a Java-based test automation framework that unites all testing layers:
 [<b>Try it out for free.</b>](https://zebrunner.com)
 
 ## Documentation and free support
-* [User Manual](http://qaprosoft.github.io/carina)
+* [User Manual](http://zebrunner.github.io/carina)
 * [Demo Project](https://github.com/qaprosoft/carina-demo)
 * [Telegram Channel](https://t.me/qps_carina)
 

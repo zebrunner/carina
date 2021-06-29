@@ -105,7 +105,7 @@ import com.zebrunner.agent.core.registrar.maintainer.ChainedMaintainerResolver;
 import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
 
 /*
- * CarinaListener - base carin-core TestNG Listener.
+ * CarinaListener - base carina-core TestNG Listener.
  *
  * @author Vadim Delendik
  */
