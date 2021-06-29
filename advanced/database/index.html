@@ -116,7 +116,7 @@
     
       <div class="md-header-nav__source">
         
-<a href="https://github.com/qaprosoft/carina/" title="Go to repository" class="md-source">
+<a href="https://github.com/zebrunner/carina/" title="Go to repository" class="md-source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
@@ -157,7 +157,7 @@
   
     <div class="md-nav__source">
       
-<a href="https://github.com/qaprosoft/carina/" title="Go to repository" class="md-source">
+<a href="https://github.com/zebrunner/carina/" title="Go to repository" class="md-source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
@@ -590,7 +590,7 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/qaprosoft/carina/edit/master/docs/advanced/database.md" title="Edit this page" class="md-content__button md-icon">
+                  <a href="https://github.com/zebrunner/carina/edit/master/docs/advanced/database.md" title="Edit this page" class="md-content__button md-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
                   </a>
                 
@@ -624,7 +624,7 @@ We will implement mapping for Users and UserPreferences tables.</p>
 </code></pre>
 
 <h2 id="mappers">Mappers</h2>
-<p>The next step is MyBatis mappers implementation, read <a href="http://www.mybatis.org/mybatis-3/sqlmap-xml.html">the official documentation</a> to understand all the details. Let's place all the mappers into <strong>src/main/resources/mappers</strong>. Here is a <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/mappers/UserMapper.xml">UserMapper.xml</a> sample:</p>
+<p>The next step is MyBatis mappers implementation, read <a href="http://www.mybatis.org/mybatis-3/sqlmap-xml.html">the official documentation</a> to understand all the details. Let's place all the mappers into <strong>src/main/resources/mappers</strong>. Here is a <a href="https://github.com/zebrunner/carina-demo/blob/master/src/main/resources/mappers/UserMapper.xml">UserMapper.xml</a> sample:</p>
 <pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
 &lt;!DOCTYPE mapper PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot; &quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
 
@@ -743,7 +743,7 @@ We will implement mapping for Users and UserPreferences tables.</p>
 &lt;/mapper&gt;
 </code></pre>
 
-<p>Now we have to implement a DB domain object <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/models/User.java">User class</a> which reflects the DB table structure:</p>
+<p>Now we have to implement a DB domain object <a href="https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/models/User.java">User class</a> which reflects the DB table structure:</p>
 <pre><code>package com.qaprosoft.carina.demo.db.models;
 
 import java.util.ArrayList;
@@ -833,7 +833,7 @@ public class User {
 }
 </code></pre>
 
-<p>Also, we have to describe the mapper interface, <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/mappers/UserMapper.java">UserMapper interface</a>:</p>
+<p>Also, we have to describe the mapper interface, <a href="https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/mappers/UserMapper.java">UserMapper interface</a>:</p>
 <pre><code>package com.qaprosoft.carina.demo.db.mappers;
 
 import com.qaprosoft.carina.demo.db.models.User;
@@ -898,7 +898,7 @@ db.pass=postgres
 </code></pre>
 
 <h2 id="connection-factory">Connection factory</h2>
-<p>Connection factory is responsible for MyBatis context initialization and creation of mapper instances, take a look at the sample implementation of <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/ConnectionFactory.java">ConnectionFactory</a>:</p>
+<p>Connection factory is responsible for MyBatis context initialization and creation of mapper instances, take a look at the sample implementation of <a href="https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/ConnectionFactory.java">ConnectionFactory</a>:</p>
 <pre><code>package com.qaprosoft.carina.demo.utils;
 
 import java.io.IOException;
@@ -939,7 +939,7 @@ public class ConnectionFactory {
 </code></pre>
 
 <h2 id="usage-sample">Usage sample</h2>
-<p>Finally, <a href="https://github.com/qaprosoft/carina-demo/blob/master/src/test/java/com/qaprosoft/carina/demo/DBSampleTest.java">DBSampleTest</a> illustrates the usage of MyBatis in tests:</p>
+<p>Finally, <a href="https://github.com/zebrunner/carina-demo/blob/master/src/test/java/com/qaprosoft/carina/demo/DBSampleTest.java">DBSampleTest</a> illustrates the usage of MyBatis in tests:</p>
 <pre><code>package com.qaprosoft.carina.demo;
 
 import static org.testng.Assert.assertEquals;

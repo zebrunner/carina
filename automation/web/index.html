@@ -116,7 +116,7 @@
     
       <div class="md-header-nav__source">
         
-<a href="https://github.com/qaprosoft/carina/" title="Go to repository" class="md-source">
+<a href="https://github.com/zebrunner/carina/" title="Go to repository" class="md-source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
@@ -157,7 +157,7 @@
   
     <div class="md-nav__source">
       
-<a href="https://github.com/qaprosoft/carina/" title="Go to repository" class="md-source">
+<a href="https://github.com/zebrunner/carina/" title="Go to repository" class="md-source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
@@ -598,7 +598,7 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/qaprosoft/carina/edit/master/docs/automation/web.md" title="Edit this page" class="md-content__button md-icon">
+                  <a href="https://github.com/zebrunner/carina/edit/master/docs/automation/web.md" title="Edit this page" class="md-content__button md-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
                   </a>
                 
@@ -610,7 +610,7 @@
                 
                 <p><a href="https://youtu.be/Wgyffk7hJQw"><img alt="Carina - Web automation" src="https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png" /></a></p>
 <p>Note: Starting from 7.0.4 consider that instead of <code>extends AbstractTest</code> we have to <code>implements IAbstractTest</code> interface</p>
-<p>Carina framework follows Selenium best practices for web test automation. If you are familiar with Selenium WebDriver and have already implemented a few tests with the Page Object Pattern, the following guide will be much easier for understanding. We have chosen <a href="https://www.gsmarena.com/">GSM Arena</a> public web site for demonstration purposes, the whole test source code is located in <a href="https://github.com/qaprosoft/carina-demo">carina-demo</a> Github repo.</p>
+<p>Carina framework follows Selenium best practices for web test automation. If you are familiar with Selenium WebDriver and have already implemented a few tests with the Page Object Pattern, the following guide will be much easier for understanding. We have chosen <a href="https://www.gsmarena.com/">GSM Arena</a> public web site for demonstration purposes, the whole test source code is located in <a href="https://github.com/zebrunner/carina-demo">carina-demo</a> Github repo.</p>
 <h3 id="implementation-of-page-objects">Implementation of Page Objects</h3>
 <p>When you are writing functional tests using Selenium, the major part of your code will consist of interactions with the web interface you are testing through the WebDriver API. After fetching elements, you will verify some state of an element through various assertions and move on to fetching the next element. You may find WebElements directly in your tests:</p>
 <pre><code>List&lt;WebElement&gt; zipCodes = driver.findElements(By.id(&quot;zipCodes&quot;));
@@ -809,7 +809,7 @@ page.assertPageOpened();  // equals Assert.assertTrue(page.isPageOpened(),&quot;
 </code></pre>
 
 <p>Page opening strategy configuration can be set in several places:</p>
-<p>1) in <a href="http://qaprosoft.github.io/carina/configuration/">_config.properties</a>. This determines whole project page open strategy.</p>
+<p>1) in <a href="http://zebrunner.github.io/carina/configuration/">_config.properties</a>. This determines whole project page open strategy.</p>
 <p>2) In page.class. This overrides global page opening strategy for a specific page.</p>
 <pre><code>```
 public class Page extends AbstractPage {
