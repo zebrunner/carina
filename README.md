@@ -1,4 +1,4 @@
-![Alt text](./docs/img/carina.png "Carina Logo")
+![Alt text](https://github.com/zebrunner/carina/raw/master/docs/img/carina.png "Carina Logo")
 
 Carina is a Java-based test automation framework that unites all testing layers: Mobile applications (web, native, hybrid), WEB applications, REST services, Databases.
 
@@ -12,11 +12,11 @@ Carina is a Java-based test automation framework that unites all testing layers:
 
 * API testing is based on Freemarker template engine. It enables great flexibility in generating REST requests and responses are dynamically changed by incoming arguments. 
 
-![Alt text](./docs/img/carina_space.png "Carina Overview")
+![Alt text](https://github.com/zebrunner/carina/raw/master/docs/img/carina_space.png "Carina Overview")
 
 ## Sponsor
 <p align="center">
-  <a href="https://zebrunner.com/"><img alt="Zebrunner" src="./docs/img/zebrunner_intro.png"></a>
+  <a href="https://zebrunner.com/"><img alt="Zebrunner" src="https://github.com/zebrunner/carina/raw/master/docs/img/zebrunner_intro.png"></a>
 </p>
 
 ## Documentation and free support
