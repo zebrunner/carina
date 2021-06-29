@@ -15,16 +15,17 @@ Carina is a Java-based test automation framework that unites all testing layers:
 ![Alt text](./docs/img/carina_space.png "Carina Overview")
 
 ## Sponsor
-[Zebrunner](https://zebrunner.com) The first cloud-based Selenium hub with by-minute pricing. No limitations by threads number!<br>
-[<b>Try it out for free.</b>](https://zebrunner.com)
+<p align="center">
+  <a href="https://zebrunner.com/"><img alt="Zebrunner" src="./docs/img/zebrunner_intro.png"></a>
+</p>
 
 ## Documentation and free support
-* [User Manual](http://zebrunner.github.io/carina)
-* [Demo Project](https://github.com/qaprosoft/carina-demo)
+* [User Guide](http://zebrunner.github.io/carina)
+* [Demo Project](https://github.com/zebrunner/carina-demo)
 * [Telegram Channel](https://t.me/qps_carina)
 
 ## Code formatter
-We propose to use our configured [**Java code formatter for Eclipse**](https://github.com/qaprosoft/carina/blob/master/carina_formatter.xml). To use same formatter in IntelliJ IDEA you should install and configure [**Eclipse Code Formatter**](https://plugins.jetbrains.com/plugin/6546-eclipse-code-formatter).
+We offer to use our configured [**Java code formatter for Eclipse**](https://github.com/zebrunner/carina/blob/master/carina_formatter.xml). To use the same formatter in IntelliJ IDEA you should install and configure [**Eclipse Code Formatter**](https://plugins.jetbrains.com/plugin/6546-eclipse-code-formatter).
 
 ## License
 Code - [Apache Software License v2.0](http://www.apache.org/licenses/LICENSE-2.0)

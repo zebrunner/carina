@@ -43,7 +43,7 @@ import com.zebrunner.agent.testng.listener.TestRunListener;
  * IAbstractTest - base test for UI and API tests.
  */
 
-// https://github.com/qaprosoft/carina/issues/951
+// https://github.com/zebrunner/carina/issues/951
 // reused com.nordstrom.tools.testng-foundation to register ordered listeners
 
 // on start order is TestRunListener and CarinaListener

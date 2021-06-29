@@ -1,7 +1,7 @@
 # Contributing to carina
 
 ## Git configuration 
-1). **Fork repository** `https://github.com/qaprosoft/carina` to your own user.
+1). **Fork repository** `https://github.com/zebrunner/carina` to your own user.
 
 2). **Clone your fork to your local machine**:
 
@@ -21,4 +21,4 @@ And then after adding files (`git add` ...) use `git commit` (add description) a
 
     git push origin work_local_branch:work_remote_branch
     
-And on [https://github.com/qaprosoft/carina](https://github.com/qaprosoft/carina) you will see possibility to "Compare & Pull Request"
+And on [https://github.com/zebrunner/carina](https://github.com/zebrunner/carina) you will see possibility to "Compare & Pull Request"

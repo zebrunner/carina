@@ -30,7 +30,7 @@
         </developer>
     </developers>
     <scm>
-        <url>https://github.com/qaprosoft/carina.git</url>
+        <url>https://github.com/zebrunner/carina.git</url>
     </scm>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -5,13 +5,13 @@ There is an enhanced L10N utility to support localized (L10N)  test automation t
 
 ## Prerequisites
 
-Localized resources should be located in [**src/main/resources/L10N**](https://github.com/qaprosoft/carina-demo/tree/master/src/main/resources/L10N) folder.
+Localized resources should be located in [**src/main/resources/L10N**](https://github.com/zebrunner/carina-demo/tree/master/src/main/resources/L10N) folder.
 Each localized resource file has unique keys with translated values.
-> Verify that there is a must have file without any postfix like [locale.properties](https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/L10N/locale.properties). This file will be considered as a default localization.
+> Verify that there is a must have file without any postfix like [locale.properties](https://github.com/zebrunner/carina-demo/blob/master/src/main/resources/L10N/locale.properties). This file will be considered as a default localization.
 
 ## Implementation
 
-Define parameters in [_config.properties](https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/_config.properties).
+Define parameters in [_config.properties](https://github.com/zebrunner/carina-demo/blob/master/src/main/resources/_config.properties).
 ```
 #Localization language
 locale=de_DE
@@ -59,7 +59,7 @@ Carina will automatically compare text from the page with text from your locale_
 Every mismatch will be collected in L10N.class. 
 >To assert collected assertions use `L10N.assertAll()` method.
 
-If you want to do it manually use [`L10N.getText(key)`](https://github.com/qaprosoft/carina-demo/blob/64b63927e8c3a1a76d5e567e28f837be82797d56/src/test/java/com/qaprosoft/carina/demo/WebLocalizationSample.java#L53)
+If you want to do it manually use [`L10N.getText(key)`](https://github.com/zebrunner/carina-demo/blob/64b63927e8c3a1a76d5e567e28f837be82797d56/src/test/java/com/qaprosoft/carina/demo/WebLocalizationSample.java#L53)
 to get expected translations from resources:
 ```
 String welcomeText = wikipediaLocalePage.getWelcomeText();
@@ -91,7 +91,7 @@ public void testAddNewLanguages() {
 ```
 ## Finding elements with a help of locales
 
-Declare elements with [L10N](https://github.com/qaprosoft/carina-demo/blob/64b63927e8c3a1a76d5e567e28f837be82797d56/src/main/java/com/qaprosoft/carina/demo/gui/pages/localizationSample/WikipediaLocalePage.java#L26) 
+Declare elements with [L10N](https://github.com/zebrunner/carina-demo/blob/64b63927e8c3a1a76d5e567e28f837be82797d56/src/main/java/com/qaprosoft/carina/demo/gui/pages/localizationSample/WikipediaLocalePage.java#L26) 
 prefix where needed.
 Use key after the ":" sign in @FindBy annotations which will be replaced by actual localized translations.
 

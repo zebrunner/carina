@@ -2,7 +2,7 @@
 
 Note: Starting from 7.0.4 consider that instead of `extends AbstractTest` we have to `implements IAbstractTest` interface
 
-Carina framework follows Selenium best practices for web test automation. If you are familiar with Selenium WebDriver and have already implemented a few tests with the Page Object Pattern, the following guide will be much easier for understanding. We have chosen [GSM Arena](https://www.gsmarena.com/) public web site for demonstration purposes, the whole test source code is located in [carina-demo](https://github.com/qaprosoft/carina-demo) Github repo.
+Carina framework follows Selenium best practices for web test automation. If you are familiar with Selenium WebDriver and have already implemented a few tests with the Page Object Pattern, the following guide will be much easier for understanding. We have chosen [GSM Arena](https://www.gsmarena.com/) public web site for demonstration purposes, the whole test source code is located in [carina-demo](https://github.com/zebrunner/carina-demo) Github repo.
 
 
 ### Implementation of Page Objects

@@ -396,7 +396,7 @@ test_run_rules=PRIORITY=>!!P1;;OWNER=>Josh&&!!Jake;;TAGS=>feature=web&&!!type=sm
 ```
 
 ### [Zebrunner Reporting](https://zebrunner.com/documentation/agents/testng) configuration
-[**agent.properties**](https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/agent.properties) file is used for Zebrunner Reporting integration, here you should specify some values for a proper integration:
+[**agent.properties**](https://github.com/zebrunner/carina-demo/blob/master/src/main/resources/agent.properties) file is used for Zebrunner Reporting integration, here you should specify some values for a proper integration:
 <table>	
 	<tr>
 		<th>Attribute</th>

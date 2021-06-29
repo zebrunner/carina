@@ -1,6 +1,6 @@
 Configure ssh connection based on git documentation [https://help.github.com/articles/connecting-to-github-with-ssh](https://help.github.com/articles/connecting-to-github-with-ssh).
 
-1) **Fork repository** `https://github.com/qaprosoft/carina` to your own user.
+1) **Fork repository** `https://github.com/zebrunner/carina` to your own user.
 
 2) **Clone your fork to your local machine**:
 
@@ -20,4 +20,4 @@ And then, after adding the files (`git add` ...), use `git commit` (add descript
 
     git push origin work_local_branch:work_remote_branch
     
-And on [https://github.com/qaprosoft/carina](https://github.com/qaprosoft/carina) you will see the possibility to "Compare & Pull Request"
+And on [https://github.com/zebrunner/carina](https://github.com/zebrunner/carina) you will see the possibility to "Compare & Pull Request"

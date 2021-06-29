@@ -22,5 +22,5 @@ pages:
     - Contribution: contribution.md
 theme:
   name: 'material'
-repo_url: https://github.com/qaprosoft/carina
+repo_url: https://github.com/zebrunner/carina
 repo_name: Github
