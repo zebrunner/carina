@@ -556,31 +556,18 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     }
 
     private static void updateAppPath() {
-        try {
-            if (!Configuration.get(Parameter.AZURE_ACCESS_KEY_TOKEN).isEmpty()) {
-                updateAzureAppPath();
-            }
-        } catch (Exception e) {
-            LOGGER.error("Azure manager exception detected!", e);
+        if (!Configuration.get(Parameter.AZURE_ACCESS_KEY_TOKEN).isEmpty()) {
+            updateAzureAppPath();
         }
 
-        try {
-            if (!Configuration.get(Parameter.APPCENTER_TOKEN).isEmpty()) {
-                updateAppCenterAppPath();
-            }
-        } catch (Exception e) {
-            LOGGER.error("AppCenter manager exception detected!", e);
+        if (!Configuration.get(Parameter.APPCENTER_TOKEN).isEmpty()) {
+            updateAppCenterAppPath();
         }
 
         // AWS S3 is preferable and has higher priority
-        try {
-            if (!Configuration.get(Parameter.ACCESS_KEY_ID).isEmpty()) {
-                updateS3AppPath();
-            }
-        } catch (Exception e) {
-            LOGGER.error("AWS S3 manager exception detected!", e);
+        if (!Configuration.get(Parameter.ACCESS_KEY_ID).isEmpty()) {
+            updateS3AppPath();
         }
-
     }
 
     /**
