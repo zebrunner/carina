@@ -120,51 +120,47 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     protected static boolean automaticDriversCleanup = true;
 
     public CarinaListener(){
+        // Add shutdown hook
+        Runtime.getRuntime().addShutdownHook(new ShutdownHook());
+
+        // Zebrunner core java agent is user for capturing events of RemoteDriverSession instances.
+        // Internally, the agent uses java instrumentation agent for its purposes.
+        // The instrumentation agent implicitly triggers initialization of the R class because it uses logger.
+        // Carina has the ThreadLogAppender class which is closely related to logging and internally uses the R class.
+        // Technically, this happen when the maven-surefire-plugin has not set inherited program arguments (passed to mvn process).
+        // That is why it is necessary to reinit R class here when TestNG loads the CarinaListener class.
+        R.reinit();
+
+        // Set log4j properties
+        URL log4jUrl = ClassLoader.getSystemResource("carina-log4j.properties");
+        LOGGER.debug("carina-log4j.properties: " + log4jUrl);
+        PropertyConfigurator.configure(log4jUrl);
+
+        LOGGER.info(Configuration.asString());
+        // Configuration.validateConfiguration();
+
         try {
-            // Add shutdown hook
-            Runtime.getRuntime().addShutdownHook(new ShutdownHook());
-
-            // Zebrunner core java agent is user for capturing events of RemoteDriverSession instances.
-            // Internally, the agent uses java instrumentation agent for its purposes.
-            // The instrumentation agent implicitly triggers initialization of the R class because it uses logger.
-            // Carina has the ThreadLogAppender class which is closely related to logging and internally uses the R class.
-            // Technically, this happen when the maven-surefire-plugin has not set inherited program arguments (passed to mvn process).
-            // That is why it is necessary to reinit R class here when TestNG loads the CarinaListener class.
-            R.reinit();
-
-            // Set log4j properties
-            URL log4jUrl = ClassLoader.getSystemResource("carina-log4j.properties");
-            LOGGER.debug("carina-log4j.properties: " + log4jUrl);
-            PropertyConfigurator.configure(log4jUrl);
-
-            LOGGER.info(Configuration.asString());
-            // Configuration.validateConfiguration();
-
-            try {
-                L10N.load();
-            } catch (Exception e) {
-                LOGGER.error("L10N bundle is not initialized successfully!", e);
-            }
-
-            // declare global capabilities in configuration if custom_capabilities is declared
-            String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
-            if (!customCapabilities.isEmpty()) {
-                // redefine core CONFIG properties using global custom capabilities file
-                new CapabilitiesLoader().loadCapabilities(customCapabilities);
-            }
-
-            IScreenshotRule autoScreenshotsRule = (IScreenshotRule) new AutoScreenshotRule();
-            Screenshot.addScreenshotRule(autoScreenshotsRule);
-
-            updateAppPath();
-
-            TestNameResolverRegistry.set(new ZebrunnerNameResolver());
-            CompositeLabelResolver.addResolver(new TagManager());
-            CompositeLabelResolver.addResolver(new PriorityManager());
-
+            L10N.load();
         } catch (Exception e) {
-            LOGGER.error("Undefined failure during static carina listener init!", e);
+            LOGGER.error("L10N bundle is not initialized successfully!", e);
         }
+
+        // declare global capabilities in configuration if custom_capabilities is declared
+        String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
+        if (!customCapabilities.isEmpty()) {
+            // redefine core CONFIG properties using global custom capabilities file
+            new CapabilitiesLoader().loadCapabilities(customCapabilities);
+        }
+
+        IScreenshotRule autoScreenshotsRule = (IScreenshotRule) new AutoScreenshotRule();
+        Screenshot.addScreenshotRule(autoScreenshotsRule);
+
+        updateAppPath();
+
+        TestNameResolverRegistry.set(new ZebrunnerNameResolver());
+        CompositeLabelResolver.addResolver(new TagManager());
+        CompositeLabelResolver.addResolver(new PriorityManager());
+
     }
 
     @Override
