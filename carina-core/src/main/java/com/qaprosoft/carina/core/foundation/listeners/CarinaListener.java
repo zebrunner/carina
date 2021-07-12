@@ -160,7 +160,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         TestNameResolverRegistry.set(new ZebrunnerNameResolver());
         CompositeLabelResolver.addResolver(new TagManager());
         CompositeLabelResolver.addResolver(new PriorityManager());
-
     }
 
     @Override
@@ -333,7 +332,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 }
             }
 
-            attachLabels(result);
+            attachTestLabels(result);
         } catch (Exception e) {
             LOGGER.error("Exception in CarinaListener->onTestFinish!", e);
         }
@@ -361,6 +360,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     @Override
     public void onFinish(ISuite suite) {
         LOGGER.debug("CarinaListener->onFinish(ISuite suite)");
+        attachTestRunLabels(suite);
         try {
             // TODO: quitAllDivers forcibly
             ReportContext.removeTempDir(); // clean temp artifacts directory
@@ -911,7 +911,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         return carinaVersion;
     }
 
-    private void attachLabels(ITestResult result) {
+    private void attachTestLabels(ITestResult result) {
         // register testrail cases...
         Set<String> trCases = getTestRailCasesUuid(result);
         if (trCases.size() > 0) {
@@ -922,6 +922,21 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         Set<String> qtestCases = getQTestCasesUuid(result);
         if (qtestCases.size() > 0) {
             Label.attachToTest(SpecialKeywords.QTEST_TESTCASE_UUID, Arrays.copyOf(qtestCases.toArray(), qtestCases.size(), String[].class));
+        }
+    }
+
+    private void attachTestRunLabels(ISuite suite) {
+        String trProject = getTestRailProjectId(suite);
+        String trSuite = getTestRailSuiteId(suite);
+
+        if (!trSuite.isEmpty() && !trProject.isEmpty()) {
+            Label.attachToTestRun(SpecialKeywords.TESTRAIL_PROJECT_ID, trProject);
+            Label.attachToTestRun(SpecialKeywords.TESTRAIL_SUITE_ID, trSuite);
+        }
+
+        String qtestProject = getQTestProjectId(suite);
+        if (!qtestProject.isEmpty()){
+            Label.attachToTestRun(SpecialKeywords.QTEST_PROJECT_ID, qtestProject);
         }
     }
     
