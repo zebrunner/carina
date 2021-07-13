@@ -66,6 +66,7 @@ public interface ITestRailManager extends ITestCases {
                     if (isValidPlatform(platform) && isValidLocale(locale)) {
                         String[] testCaseList = methodAnnotation.testCasesId().split(",");
                         for (String tcase : testCaseList) {
+                            tcase = tcase.trim();
                             if (!tcase.isEmpty()) {
                                 testCases.add(tcase);
                                 TESTRAIL_LOGGER.debug("TestRail test case uuid '" + tcase + "' is registered.");

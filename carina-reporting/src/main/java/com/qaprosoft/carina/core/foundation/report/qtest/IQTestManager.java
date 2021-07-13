@@ -68,9 +68,9 @@ public interface IQTestManager extends ITestCases {
                             tcase = tcase.trim();
                             if (!tcase.isEmpty()) {
                                 testCases.add(tcase);
-                                QTEST_LOGGER.debug("Qtest test case uuid '" + tcase + "' is registered.");
+                                QTEST_LOGGER.debug("qTest test case uuid '" + tcase + "' is registered.");
                             } else {
-                                QTEST_LOGGER.error("Qtest test case uuid was not registered because of an empty value");
+                                QTEST_LOGGER.error("qTest test case uuid was not registered because of an empty value");
                             }
                         }
 
@@ -88,9 +88,9 @@ public interface IQTestManager extends ITestCases {
                                 tcase = tcase.trim();
                                 if (!tcase.isEmpty()) {
                                     testCases.add(tcase);
-                                    QTEST_LOGGER.debug("Qtest test case uuid '" + tcase + "' is registered.");
+                                    QTEST_LOGGER.debug("qTest test case uuid '" + tcase + "' is registered.");
                                 } else {
-                                    QTEST_LOGGER.error("Qtest test case uuid was not registered because of an empty value");
+                                    QTEST_LOGGER.error("qTest test case uuid was not registered because of an empty value");
                                 }
                             }
                         }
