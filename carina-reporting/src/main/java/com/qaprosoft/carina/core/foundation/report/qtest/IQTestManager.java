@@ -33,7 +33,7 @@ public interface IQTestManager extends ITestCases {
 
     default Set<String> getQTestCasesUuid(ITestResult result) {
         Set<String> testCases = new HashSet<String>();
-        
+
         int projectID = getQTestProjectIdFromSuite(result.getTestContext().getSuite());
         if (projectID == -1) {
             // no sense to return something as integration data not provided
@@ -65,8 +65,13 @@ public interface IQTestManager extends ITestCases {
                     if (isValidPlatform(platform) && isValidLocale(locale)) {
                         String[] testCaseList = methodAnnotation.id().split(",");
                         for (String tcase : testCaseList) {
-                            testCases.add(tcase);
-                            QTEST_LOGGER.debug("qTest test case uuid '" + tcase + "' is registered.");
+                            tcase = tcase.trim();
+                            if (!tcase.isEmpty()) {
+                                testCases.add(tcase);
+                                QTEST_LOGGER.debug("Qtest test case uuid '" + tcase + "' is registered.");
+                            } else {
+                                QTEST_LOGGER.error("Qtest test case uuid was not registered because of an empty value");
+                            }
                         }
 
                     }
@@ -80,8 +85,13 @@ public interface IQTestManager extends ITestCases {
                         if (isValidPlatform(platform) && isValidLocale(locale)) {
                             String[] testCaseList = tcLocal.id().split(",");
                             for (String tcase : testCaseList) {
-                                testCases.add(tcase);
-                                QTEST_LOGGER.debug("qTest test case uuid '" + tcase + "' is registered.");
+                                tcase = tcase.trim();
+                                if (!tcase.isEmpty()) {
+                                    testCases.add(tcase);
+                                    QTEST_LOGGER.debug("Qtest test case uuid '" + tcase + "' is registered.");
+                                } else {
+                                    QTEST_LOGGER.error("Qtest test case uuid was not registered because of an empty value");
+                                }
                             }
                         }
                     }
@@ -92,18 +102,21 @@ public interface IQTestManager extends ITestCases {
         }
 
         // append cases id values from ITestCases map (custom TestNG provider)
-        for (String entry: getCases()) {
-            testCases.add(projectID + "-" + entry);
+        for (String entry : getCases()) {
+            entry=entry.trim();
+            if (!entry.isEmpty()){
+                testCases.add(entry);
+            }
         }
         clearCases();
-        
+
         return testCases;
     }
 
-    default String getQTestProjectId(ISuite suite){
+    default String getQTestProjectId(ISuite suite) {
         int projectId = getQTestProjectIdFromSuite(suite);
 
-        if (projectId == -1){
+        if (projectId == -1) {
             return "";
         } else {
             return String.valueOf(projectId);
@@ -113,13 +126,13 @@ public interface IQTestManager extends ITestCases {
 
     private int getQTestProjectIdFromSuite(ISuite suite) {
         if (suite.getParameter(SpecialKeywords.QTEST_PROJECT_ID) != null) {
-            return Integer.valueOf(suite.getParameter(SpecialKeywords.QTEST_PROJECT_ID).trim());
+            return Integer.parseInt(suite.getParameter(SpecialKeywords.QTEST_PROJECT_ID).trim());
         } else if (suite.getAttribute(SpecialKeywords.QTEST_PROJECT_ID) != null) {
             //use-case to support unit tests
-            return Integer.valueOf(suite.getAttribute(SpecialKeywords.QTEST_PROJECT_ID).toString());
+            return Integer.parseInt(suite.getAttribute(SpecialKeywords.QTEST_PROJECT_ID).toString().trim());
         } else {
             return -1;
         }
     }
-    
+
 }
