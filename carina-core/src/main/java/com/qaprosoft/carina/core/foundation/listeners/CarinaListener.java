@@ -623,7 +623,10 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                     key = lastBuild.getKey();
                 }
 
+            } else {
+                key = AmazonS3Manager.getInstance().get(bucketName, key).getKey();
             }
+            LOGGER.info("next s3 app key will be used: " + key);
 
             // generate presign url explicitly to register link as run artifact
             long hours = 72L*1000*60*60; // generate presigned url for nearest 3 days
