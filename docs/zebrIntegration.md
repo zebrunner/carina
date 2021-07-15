@@ -9,11 +9,15 @@ installed together with the [Reporting service](https://github.com/zebrunner/rep
 follow the [User Guide](https://zebrunner.github.io/zebrunner/) with the steps on installation and configuration. 
 Let’s begin the integration!
 
-![Zebrunner dashboards](./img/zebrDashboards.jpg)
+[![Zebrunner dashboards](./img/zebrDashboards.jpg)](https://www.qps-infra.io/)
 
->Note: If you already use the Carina framework in your testing, you can skip Steps 1-2 and begin with Step 3. 
+> **Note** : If you already use the Carina framework in your testing, you can skip Steps 1-2 and begin with Step 3. 
 
-###Step 1. Generate the [carina-demo project](https://zebrunner.github.io/carina/getting_started/)
+###Step 1. Generate the carina-demo project
+
+Learn how to generate the carina-demo project in the [User Guide](https://zebrunner.github.io/carina/getting_started/).
+
+> **Note**: If you already have a carina-demo based project, then update to the latest [carina-core](https://github.com/zebrunner/carina/releases) version.
 ###Step 2. Generate Zebrunner agent
 
 If the generation is completed successfully, you will see a new project folder with a name equal to the artifactId attribute specified during the generation, so navigate to this folder (where pom.xml is located) and execute the following Maven task:
@@ -24,7 +28,7 @@ mvn clean compile
 
 After executing this command, the Zebrunner agent will be generated.
 
->Note: In case you start running tests without executing this command, you’ll get the following message: Error opening zip file or JAR manifest missing : /Users/…/carina-demo/target/agent/zebrunner-agent.jar
+>**Note**: In case you start running tests without executing this command, you’ll get the following message: Error opening zip file or JAR manifest missing : /Users/…/carina-demo/target/agent/zebrunner-agent.jar
 
 ###Step 3. Create agent.yaml or agent.properties file
 
@@ -63,7 +67,7 @@ Possible parameters in agent.yaml:
 More details and examples of Environment variables, Program arguments, Properties file can be found in the 
 [Documentation](https://zebrunner.com/documentation/agents/testng) in the section ‘Tracking of test results’. 
 
-###The integration is in place!
+###The integration with zebrunner is in place!
 
 **Now you can:**
 
