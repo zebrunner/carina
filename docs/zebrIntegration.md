@@ -67,7 +67,7 @@ Possible parameters in agent.yaml:
 More details and examples of Environment variables, Program arguments, Properties file can be found in the 
 [Documentation](https://zebrunner.com/documentation/agents/testng) in the section ‘Tracking of test results’. 
 
-###The integration with zebrunner is in place!
+###The integration with Zebrunner is in place!
 
 **Now you can:**
 
