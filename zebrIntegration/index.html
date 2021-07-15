@@ -263,8 +263,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-integration-is-in-place" class="md-nav__link">
-    The integration is in place!
+  <a href="#the-integration-with-zebrunner-is-in-place" class="md-nav__link">
+    The integration with zebrunner is in place!
   </a>
   
 </li>
@@ -582,8 +582,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-integration-is-in-place" class="md-nav__link">
-    The integration is in place!
+  <a href="#the-integration-with-zebrunner-is-in-place" class="md-nav__link">
+    The integration with zebrunner is in place!
   </a>
   
 </li>
@@ -615,11 +615,15 @@
 installed together with the <a href="https://github.com/zebrunner/reporting">Reporting service</a>. If you haven’t yet used Zebrunner CE, 
 follow the <a href="https://zebrunner.github.io/zebrunner/">User Guide</a> with the steps on installation and configuration. 
 Let’s begin the integration!</p>
-<p><img alt="Zebrunner dashboards" src="../img/zebrDashboards.jpg" /></p>
+<p><a href="https://www.qps-infra.io/"><img alt="Zebrunner dashboards" src="../img/zebrDashboards.jpg" /></a></p>
 <blockquote>
-<p>Note: If you already use the Carina framework in your testing, you can skip Steps 1-2 and begin with Step 3. </p>
+<p><strong>Note</strong> : If you already use the Carina framework in your testing, you can skip Steps 1-2 and begin with Step 3. </p>
 </blockquote>
-<h3 id="step-1-generate-the-carina-demo-project">Step 1. Generate the <a href="https://zebrunner.github.io/carina/getting_started/">carina-demo project</a></h3>
+<h3 id="step-1-generate-the-carina-demo-project">Step 1. Generate the carina-demo project</h3>
+<p>Learn how to generate the carina-demo project in the <a href="https://zebrunner.github.io/carina/getting_started/">User Guide</a>.</p>
+<blockquote>
+<p><strong>Note</strong>: If you already have a carina-demo based project, then update to the latest <a href="https://github.com/zebrunner/carina/releases">carina-core</a> version.</p>
+</blockquote>
 <h3 id="step-2-generate-zebrunner-agent">Step 2. Generate Zebrunner agent</h3>
 <p>If the generation is completed successfully, you will see a new project folder with a name equal to the artifactId attribute specified during the generation, so navigate to this folder (where pom.xml is located) and execute the following Maven task:</p>
 <pre><code>mvn clean compile
@@ -627,7 +631,7 @@ Let’s begin the integration!</p>
 
 <p>After executing this command, the Zebrunner agent will be generated.</p>
 <blockquote>
-<p>Note: In case you start running tests without executing this command, you’ll get the following message: Error opening zip file or JAR manifest missing : /Users/…/carina-demo/target/agent/zebrunner-agent.jar</p>
+<p><strong>Note</strong>: In case you start running tests without executing this command, you’ll get the following message: Error opening zip file or JAR manifest missing : /Users/…/carina-demo/target/agent/zebrunner-agent.jar</p>
 </blockquote>
 <h3 id="step-3-create-agentyaml-or-agentproperties-file">Step 3. Create agent.yaml or agent.properties file</h3>
 <p>Navigate to the folder <code>src/main/resources</code> and create agent.yaml or agent.properties file (if not already created).</p>
@@ -658,7 +662,7 @@ Let’s begin the integration!</p>
 <p><img alt="agent configuration" src="../img/agentConfiguration.png" /></p>
 <p>More details and examples of Environment variables, Program arguments, Properties file can be found in the 
 <a href="https://zebrunner.com/documentation/agents/testng">Documentation</a> in the section ‘Tracking of test results’. </p>
-<h3 id="the-integration-is-in-place">The integration is in place!</h3>
+<h3 id="the-integration-with-zebrunner-is-in-place">The integration with zebrunner is in place!</h3>
 <p><strong>Now you can:</strong></p>
 <ul>
 <li>Report tests from Carina into Zebrunner CE</li>
