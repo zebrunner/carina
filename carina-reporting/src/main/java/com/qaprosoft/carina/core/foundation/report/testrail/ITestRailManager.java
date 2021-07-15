@@ -33,7 +33,7 @@ public interface ITestRailManager extends ITestCases {
     default Set<String> getTestRailCasesUuid(ITestResult result) {
         Set<String> testCases = new HashSet<String>();
 
-        int projectID = this.getTestRailProjectIdFromSuite(result.getTestContext().getSuite());
+        int projectID = getTestRailProjectIdFromSuite(result.getTestContext().getSuite());
         int suiteID = getTestRailSuiteIdFromSuite(result.getTestContext().getSuite());
 
         if (projectID == -1 || suiteID == -1) {
@@ -115,7 +115,7 @@ public interface ITestRailManager extends ITestCases {
     }
 
     default String getTestRailProjectId(ISuite suite) {
-        int projectID = this.getTestRailProjectIdFromSuite(suite);
+        int projectID = getTestRailProjectIdFromSuite(suite);
         int suiteID = getTestRailSuiteIdFromSuite(suite);
 
         if (projectID == -1 || suiteID == -1) {
@@ -126,7 +126,7 @@ public interface ITestRailManager extends ITestCases {
     }
 
     default String getTestRailSuiteId(ISuite suite) {
-        int projectID = this.getTestRailProjectIdFromSuite(suite);
+        int projectID = getTestRailProjectIdFromSuite(suite);
         int suiteID = getTestRailSuiteIdFromSuite(suite);
 
         if (projectID == -1 || suiteID == -1) {
@@ -139,6 +139,10 @@ public interface ITestRailManager extends ITestCases {
     private int getTestRailProjectIdFromSuite(ISuite suite) {
         if (suite.getParameter(SpecialKeywords.TESTRAIL_PROJECT_ID) != null) {
             return Integer.parseInt(suite.getParameter(SpecialKeywords.TESTRAIL_PROJECT_ID).trim());
+        } else if (suite.getParameter(SpecialKeywords.TESTRAIL_PROJECT_ID_OLD) != null) {
+            TESTRAIL_LOGGER.warn(SpecialKeywords.TESTRAIL_PROJECT_ID_OLD + " special key parameter is deprecated. " +
+                    "Please, start using " + SpecialKeywords.TESTRAIL_PROJECT_ID + " instead!");
+            return Integer.parseInt(suite.getParameter(SpecialKeywords.TESTRAIL_PROJECT_ID_OLD).trim());
         } else if (suite.getAttribute(SpecialKeywords.TESTRAIL_PROJECT_ID) != null) {
             //use-case to support unit tests
             return Integer.parseInt(suite.getAttribute(SpecialKeywords.TESTRAIL_PROJECT_ID).toString().trim());
@@ -151,6 +155,10 @@ public interface ITestRailManager extends ITestCases {
     private int getTestRailSuiteIdFromSuite(ISuite suite) {
         if (suite.getParameter(SpecialKeywords.TESTRAIL_SUITE_ID) != null) {
             return Integer.parseInt(suite.getParameter(SpecialKeywords.TESTRAIL_SUITE_ID).trim());
+        } else if (suite.getParameter(SpecialKeywords.TESTRAIL_SUITE_ID_OLD) != null) {
+            TESTRAIL_LOGGER.warn(SpecialKeywords.TESTRAIL_SUITE_ID_OLD + " special key parameter is deprecated. " +
+                    "Please, start using " + SpecialKeywords.TESTRAIL_SUITE_ID + " instead!");
+            return Integer.parseInt(suite.getParameter(SpecialKeywords.TESTRAIL_SUITE_ID_OLD).trim());
         } else if (suite.getAttribute(SpecialKeywords.TESTRAIL_SUITE_ID) != null) {
             //use-case to support unit tests
             return Integer.parseInt(suite.getAttribute(SpecialKeywords.TESTRAIL_SUITE_ID).toString().trim());

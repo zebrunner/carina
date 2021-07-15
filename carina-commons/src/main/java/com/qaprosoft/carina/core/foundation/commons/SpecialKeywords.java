@@ -69,7 +69,11 @@ public class SpecialKeywords {
     public static final String METHOD_THREAD_POOL_SIZE = "{method_thread_pool_size}";
 
     public static final String TEST_NAME_ARGS_MAP = "testNameArgsMap";
-    
+
+    @Deprecated
+    public static final String TESTRAIL_SUITE_ID_OLD = "TestRailSuiteId";
+    @Deprecated
+    public static final String TESTRAIL_PROJECT_ID_OLD = "TestRailProjectId";
     public static final String TESTRAIL_SUITE_ID = "com.zebrunner.app/tcm.testrail.suite-id";
     public static final String TESTRAIL_PROJECT_ID = "com.zebrunner.app/tcm.testrail.project-id";
     public static final String TESTRAIL_TESTCASE_UUID = "com.zebrunner.app/tcm.testrail.testcase-id";
@@ -154,6 +158,8 @@ public class SpecialKeywords {
     
     // ------------- qTEST PROPERTIES -------------------------------
     public static final String QTEST_TESTCASE_UUID = "com.zebrunner.app/tcm.qtest.testcase-id";
+    @Deprecated
+    public static final String QTEST_PROJECT_ID_OLD = "qTestProjectId";
     public static final String QTEST_PROJECT_ID = "com.zebrunner.app/tcm.qtest.project-id";
 
 
