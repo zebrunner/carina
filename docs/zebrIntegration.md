@@ -48,14 +48,14 @@ reporting:
         environment: DEV
 ```
 Possible parameters in agent.yaml:
-```
-reporting.enabled - enables or disables reporting. The default value is false. If disabled, the agent will use no op component implementations that will simply log output for tracing purposes with the trace level;
-reporting.server.hostname - mandatory if reporting is enabled. Zebrunner server hostname. Can be obtained in Zebrunner on the 'Account & profile' page under the 'Service URL' section;
-reporting.server.access-token - mandatory if reporting is enabled. Access token must be used to perform API calls. Can be obtained in Zebrunner on the 'Account & profile' page under the 'Token' section;
-reporting.run.display-name - optional value. The display name of the test run. The default value is Default Suite;
-reporting.run.build - optional value. The build number that is associated with the test run. It can depict either the test build number or the application build number;
-reporting.run.environment - optional value. The environment in which the tests will run.
-```
+
+- `reporting.enabled` - enables or disables reporting. The default value is false. If disabled, the agent will use no op component implementations that will simply log output for tracing purposes with the trace level;
+- `reporting.server.hostname` - mandatory if reporting is enabled. Zebrunner server hostname. Can be obtained in Zebrunner on the 'Account & profile' page under the 'Service URL' section;
+- `reporting.server.access-token` - mandatory if reporting is enabled. Access token must be used to perform API calls. Can be obtained in Zebrunner on the 'Account & profile' page under the 'Token' section;
+- `reporting.run.display-name` - optional value. The display name of the test run. The default value is Default Suite;
+- `reporting.run.build` - optional value. The build number that is associated with the test run. It can depict either the test build number or the application build number;
+- `reporting.run.environment` - optional value. The environment in which the tests will run.
+
 
 ![agent configuration](./img/agentConfiguration.png)
 
@@ -66,32 +66,31 @@ More details and examples of Environment variables, Program arguments, Propertie
 
 ####Now you can:
 
-
 <table>
   <tr>
     <td>
       <b>Report tests from Carina into Zebrunner CE</b>
-      <img src="./img/report_tests_to_Zebrunner.png">
+      <img src="./docs/img/report_tests_to_Zebrunner.png">
     </td>
     <td>
       <b>Track test results in real-time</b>
-      <img src="./img/track_test_results.png">
+      <img src="/docs/img/track_test_results.png">
     </td>
   </tr>
   <tr>
     <td>
       <b>Perform smart test analysis with logs, videos and screenshots</b>
-      <img src="./img/perform_smart_analysis.png">
+      <img src="/img/perform_smart_analysis.png">
     </td>
     <td>
       <b>Create quality trends’ reports with dozens of metrics</b>
-      <img src="./img/feature_live_streaming.jpg">
+      <img src="../docs/img/feature_live_streaming.jpg">
     </td>
   </tr>
   <tr>
     <td>
       <b>Test issues tracking</b>
-      <img src="./img/zebrDashboards.jpg">
+      <img src="/Users/dhrynevich/projects/carina/docs/img/zebrDashboards.jpg">
     </td>
   </tr>
 </table>
