@@ -2,6 +2,7 @@ site_name: Carina
 pages:
     - Overview: index.md
     - Getting started: getting_started.md
+    - Integration with Zebrunner: zebrIntegration.md
     - Project structure: project_structure.md
     - Configuration: configuration.md
     - Execution: execution.md
