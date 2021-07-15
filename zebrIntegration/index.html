@@ -10,16 +10,16 @@
       
       
       
-      <link rel="shortcut icon" href="../../assets/images/favicon.png">
+      <link rel="shortcut icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-5.2.2">
     
     
       
-        <title>Proxy - Carina</title>
+        <title>Integration with Zebrunner - Carina</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.a2408e81.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.a2408e81.min.css">
       
       
     
@@ -48,7 +48,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#proxy-usage" class="md-skip">
+        <a href="#how-to-integrate-carina-framework-with-zebrunner-community-edition" class="md-skip">
           Skip to content
         </a>
       
@@ -59,7 +59,7 @@
     
       <header class="md-header" data-md-component="header">
   <nav class="md-header-nav md-grid" aria-label="Header">
-    <a href="../.." title="Carina" class="md-header-nav__button md-logo" aria-label="Carina">
+    <a href=".." title="Carina" class="md-header-nav__button md-logo" aria-label="Carina">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -76,7 +76,7 @@
           </span>
           <span class="md-header-nav__topic md-ellipsis">
             
-              Proxy
+              Integration with Zebrunner
             
           </span>
         </div>
@@ -146,7 +146,7 @@
                   <div class="md-sidebar__inner">
                     <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="Carina" class="md-nav__button md-logo" aria-label="Carina">
+    <a href=".." title="Carina" class="md-nav__button md-logo" aria-label="Carina">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -176,7 +176,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../.." title="Overview" class="md-nav__link">
+    <a href=".." title="Overview" class="md-nav__link">
       Overview
     </a>
   </li>
@@ -188,7 +188,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../getting_started/" title="Getting started" class="md-nav__link">
+    <a href="../getting_started/" title="Getting started" class="md-nav__link">
       Getting started
     </a>
   </li>
@@ -198,11 +198,94 @@
       
       
 
+  
 
-  <li class="md-nav__item">
-    <a href="../../zebrIntegration/" title="Integration with Zebrunner" class="md-nav__link">
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Integration with Zebrunner
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9h14V7H3v2m0 4h14v-2H3v2m0 4h14v-2H3v2m16 0h2v-2h-2v2m0-10v2h2V7h-2m0 6h2v-2h-2v2z"/></svg>
+        </span>
+      </label>
+    
+    <a href="./" title="Integration with Zebrunner" class="md-nav__link md-nav__link--active">
       Integration with Zebrunner
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-generate-the-carina-demo-project" class="md-nav__link">
+    Step 1. Generate the carina-demo project
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-generate-zebrunner-agent" class="md-nav__link">
+    Step 2. Generate Zebrunner agent
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-create-agentyaml-or-agentproperties-file" class="md-nav__link">
+    Step 3. Create agent.yaml or agent.properties file
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-4-configure-zebrunner-agent" class="md-nav__link">
+    Step 4. Configure Zebrunner agent
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-integration-is-in-place" class="md-nav__link">
+    The integration is in place!
+  </a>
+  
+    <nav class="md-nav" aria-label="The integration is in place!">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#now-you-can" class="md-nav__link">
+    Now you can:
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+    
   </li>
 
     
@@ -212,7 +295,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../project_structure/" title="Project structure" class="md-nav__link">
+    <a href="../project_structure/" title="Project structure" class="md-nav__link">
       Project structure
     </a>
   </li>
@@ -224,7 +307,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../configuration/" title="Configuration" class="md-nav__link">
+    <a href="../configuration/" title="Configuration" class="md-nav__link">
       Configuration
     </a>
   </li>
@@ -236,7 +319,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../execution/" title="Execution" class="md-nav__link">
+    <a href="../execution/" title="Execution" class="md-nav__link">
       Execution
     </a>
   </li>
@@ -273,7 +356,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../automation/web/" title="Web" class="md-nav__link">
+    <a href="../automation/web/" title="Web" class="md-nav__link">
       Web
     </a>
   </li>
@@ -285,7 +368,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../automation/mobile/" title="Mobile" class="md-nav__link">
+    <a href="../automation/mobile/" title="Mobile" class="md-nav__link">
       Mobile
     </a>
   </li>
@@ -297,7 +380,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../automation/api/" title="API" class="md-nav__link">
+    <a href="../automation/api/" title="API" class="md-nav__link">
       API
     </a>
   </li>
@@ -309,7 +392,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../automation/windows/" title="Windows" class="md-nav__link">
+    <a href="../automation/windows/" title="Windows" class="md-nav__link">
       Windows
     </a>
   </li>
@@ -324,12 +407,10 @@
       
       
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+  <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-8" type="checkbox" id="nav-8" checked>
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-8" type="checkbox" id="nav-8">
     
     <label class="md-nav__link" for="nav-8">
       Advanced
@@ -353,7 +434,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../database/" title="Database" class="md-nav__link">
+    <a href="../advanced/database/" title="Database" class="md-nav__link">
       Database
     </a>
   </li>
@@ -365,7 +446,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../dataprovider/" title="DataProvider" class="md-nav__link">
+    <a href="../advanced/dataprovider/" title="DataProvider" class="md-nav__link">
       DataProvider
     </a>
   </li>
@@ -377,7 +458,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../driver/" title="Driver" class="md-nav__link">
+    <a href="../advanced/driver/" title="Driver" class="md-nav__link">
       Driver
     </a>
   </li>
@@ -389,7 +470,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../localization/" title="Localization" class="md-nav__link">
+    <a href="../advanced/localization/" title="Localization" class="md-nav__link">
       Localization
     </a>
   </li>
@@ -401,7 +482,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../program_flow/" title="Program flow" class="md-nav__link">
+    <a href="../advanced/program_flow/" title="Program flow" class="md-nav__link">
       Program flow
     </a>
   </li>
@@ -411,106 +492,11 @@
           
           
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-    
-      
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="__toc">
-        Proxy
-        <span class="md-nav__icon md-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9h14V7H3v2m0 4h14v-2H3v2m0 4h14v-2H3v2m16 0h2v-2h-2v2m0-10v2h2V7h-2m0 6h2v-2h-2v2z"/></svg>
-        </span>
-      </label>
-    
-    <a href="./" title="Proxy" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../advanced/proxy/" title="Proxy" class="md-nav__link">
       Proxy
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
-      </span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#raising-inbuilt-proxy-server-browsermob" class="md-nav__link">
-    Raising inbuilt proxy-server (BrowserMob)
-  </a>
-  
-    <nav class="md-nav" aria-label="Raising inbuilt proxy-server (BrowserMob)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#using-proxy-server-in-java-code" class="md-nav__link">
-    Using proxy-server in Java code:
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#dealing-with-mitm-and-installing-ssl-certificate-into-your-system" class="md-nav__link">
-    Dealing with MITM and installing SSL certificate into your system:
-  </a>
-  
-    <nav class="md-nav" aria-label="Dealing with MITM and installing SSL certificate into your system:">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#for-mac-users" class="md-nav__link">
-    For Mac users:
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#adding-ssl-certificate-into-java-keystore" class="md-nav__link">
-    Adding SSL certificate into Java keystore:
-  </a>
-  
-    <nav class="md-nav" aria-label="Adding SSL certificate into Java keystore:">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#for-mac-and-linux-users" class="md-nav__link">
-    For Mac and Linux users:
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-    
   </li>
 
         
@@ -520,7 +506,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../security/" title="Security" class="md-nav__link">
+    <a href="../advanced/security/" title="Security" class="md-nav__link">
       Security
     </a>
   </li>
@@ -537,7 +523,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../cucumber/" title="Cucumber" class="md-nav__link">
+    <a href="../cucumber/" title="Cucumber" class="md-nav__link">
       Cucumber
     </a>
   </li>
@@ -549,7 +535,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../contribution/" title="Contribution" class="md-nav__link">
+    <a href="../contribution/" title="Contribution" class="md-nav__link">
       Contribution
     </a>
   </li>
@@ -581,57 +567,45 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#raising-inbuilt-proxy-server-browsermob" class="md-nav__link">
-    Raising inbuilt proxy-server (BrowserMob)
+  <a href="#step-1-generate-the-carina-demo-project" class="md-nav__link">
+    Step 1. Generate the carina-demo project
   </a>
   
-    <nav class="md-nav" aria-label="Raising inbuilt proxy-server (BrowserMob)">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-generate-zebrunner-agent" class="md-nav__link">
+    Step 2. Generate Zebrunner agent
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-create-agentyaml-or-agentproperties-file" class="md-nav__link">
+    Step 3. Create agent.yaml or agent.properties file
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-4-configure-zebrunner-agent" class="md-nav__link">
+    Step 4. Configure Zebrunner agent
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-integration-is-in-place" class="md-nav__link">
+    The integration is in place!
+  </a>
+  
+    <nav class="md-nav" aria-label="The integration is in place!">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#using-proxy-server-in-java-code" class="md-nav__link">
-    Using proxy-server in Java code:
+  <a href="#now-you-can" class="md-nav__link">
+    Now you can:
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#dealing-with-mitm-and-installing-ssl-certificate-into-your-system" class="md-nav__link">
-    Dealing with MITM and installing SSL certificate into your system:
-  </a>
-  
-    <nav class="md-nav" aria-label="Dealing with MITM and installing SSL certificate into your system:">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#for-mac-users" class="md-nav__link">
-    For Mac users:
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#adding-ssl-certificate-into-java-keystore" class="md-nav__link">
-    Adding SSL certificate into Java keystore:
-  </a>
-  
-    <nav class="md-nav" aria-label="Adding SSL certificate into Java keystore:">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#for-mac-and-linux-users" class="md-nav__link">
-    For Mac and Linux users:
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -652,7 +626,7 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/zebrunner/carina/edit/master/docs/advanced/proxy.md" title="Edit this page" class="md-content__button md-icon">
+                  <a href="https://github.com/zebrunner/carina/edit/master/docs/zebrIntegration.md" title="Edit this page" class="md-content__button md-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
                   </a>
                 
@@ -660,128 +634,91 @@
                   
                 
                 
-                <h1 id="proxy-usage">Proxy usage</h1>
-<p>There is a possibility to send all test traffic via proxy including the embedded light-weight BrowserMob proxy server.
-There are several properties available to manage all kinds of proxy usage:</p>
-<pre><code>proxy_host=NULL
-proxy_port=NULL
-proxy_protocols=http,https,ftp
-proxy_set_to_system=true
-browsermob_proxy=false
-browsermob_disabled_mitm=false
-browsermob_port=0
+                <h1 id="how-to-integrate-carina-framework-with-zebrunner-community-edition">How to integrate Carina Framework with Zebrunner Community Edition</h1>
+<p><img alt="Zebrunner + Carina logo" src="../img/carinaPlusZebrunner.png" /></p>
+<p>Integrating the Carina framework with Zebrunner Community Edition is easy!</p>
+<p>Before the start, make sure you have <a href="https://github.com/zebrunner/zebrunner">Zebrunner Community Edition</a>
+installed together with the <a href="https://github.com/zebrunner/reporting">Reporting service</a>. If you haven’t yet used Zebrunner CE, 
+follow the <a href="https://zebrunner.github.io/zebrunner/">User Guide</a> with the steps on installation and configuration. 
+Let’s begin the integration!</p>
+<p><img alt="Zebrunner dashboards" src="../img/zebrDashboards.jpg" /></p>
+<blockquote>
+<p>Note: If you already use the Carina framework in your testing, you can skip Steps 1-2 and begin with Step 3. </p>
+</blockquote>
+<h3 id="step-1-generate-the-carina-demo-project">Step 1. Generate the <a href="https://zebrunner.github.io/carina/getting_started/">carina-demo project</a></h3>
+<h3 id="step-2-generate-zebrunner-agent">Step 2. Generate Zebrunner agent</h3>
+<p>If the generation is completed successfully, you will see a new project folder with a name equal to the artifactId attribute specified during the generation, so navigate to this folder (where pom.xml is located) and execute the following Maven task:</p>
+<pre><code>mvn clean compile
 </code></pre>
 
-<p>Declare proxy_host, proxy_port and proxy_protocols to send all Web and API test traffic via your static network proxy.
-Also, to enable proxy for TestNG Java process, <strong>proxy_set_to_system</strong> must be specifed to <strong>true</strong>, otherwise only WebDrivers and API clients will be proxied.</p>
-<p>Note: The above settings are mostly required to get public internet access through corporate proxies.</p>
-<h2 id="raising-inbuilt-proxy-server-browsermob">Raising inbuilt proxy-server (BrowserMob)</h2>
-<p>Also, Carina can start an embedded proxy to proxy/view/filter requests/responses. There is an inbuilt library BrowserMobProxy in Carina-proxy module. Below you can find BrowserMob proxy related parameters in your <strong>config.properties</strong> file:</p>
-<pre><code>browsermob_proxy=true
-browsermob_disabled_mitm=false
-browsermob_port=0
-browsermob_ports_range=NULL
+<p>After executing this command, the Zebrunner agent will be generated.</p>
+<blockquote>
+<p>Note: In case you start running tests without executing this command, you’ll get the following message: Error opening zip file or JAR manifest missing : /Users/…/carina-demo/target/agent/zebrunner-agent.jar</p>
+</blockquote>
+<h3 id="step-3-create-agentyaml-or-agentproperties-file">Step 3. Create agent.yaml or agent.properties file</h3>
+<p>Navigate to the folder src/main/resources and create agent.yaml or agent.properties file (if not already created).
+<img alt="Agent Folder" src="../img/agentFolder.png" /></p>
+<h3 id="step-4-configure-zebrunner-agent">Step 4. Configure Zebrunner agent</h3>
+<p>In this example, let’s perform the configuration on the basis of file extension YAML.</p>
+<p>Below is a sample configuration file:</p>
+<pre><code>reporting:
+    enabled: true
+    server:
+        hostname: localhost:8080
+        access-token: &lt;token&gt;
+    run:
+        display-name: Nightly Regression Suite
+        build: 1.12.1.96-SNAPSHOT
+        environment: DEV
 </code></pre>
 
-<p>With the enabled <strong>browsermob_proxy</strong>, Carina will start the dedicated proxy instance on every test method. </p>
-<p>Carina automatically detects an IP address for your local browsermob proxy and puts it into the capabilities in case if <strong>proxy_host=NULL</strong>. If you want to map some publicly available IP address for your browsermob proxy instance then you'll need to override it via <strong>proxy_host</strong> property.
-E.g. <strong>proxy_host=myhostname</strong> is useful in case of running maven process inside a docker container. Override the hostname, and it will be available from Selenium instance.</p>
-<p><strong>browsermob_port=0</strong> means that Carina dynamically identifies a free port for a proxy session.</p>
-<p><strong>browsermob_ports_range=8001:8003</strong> means that Carina will use only ports from given range for starting of browsermob sessions. That's reasonable for cases when only several ports are shared at environment and can be accessed from other machines within the network. If all ports are used then test will wait for the first freed port.</p>
-<p><strong>browsermob_disabled_mitm</strong> is disabled by default. </p>
-<p><strong>Important!</strong> If you have troubles with  SSL traffic sniffing, the first thing you should do is to change <strong>browsermob_disabled_mitm</strong> property value!</p>
-<h3 id="using-proxy-server-in-java-code">Using proxy-server in Java code:</h3>
-<ol>
-<li>Make sure the driver instance is already started:</li>
-</ol>
-<pre><code>getDriver();
+<p>Possible parameters in agent.yaml:</p>
+<pre><code>reporting.enabled - enables or disables reporting. The default value is false. If disabled, the agent will use no op component implementations that will simply log output for tracing purposes with the trace level;
+reporting.server.hostname - mandatory if reporting is enabled. Zebrunner server hostname. Can be obtained in Zebrunner on the 'Account &amp; profile' page under the 'Service URL' section;
+reporting.server.access-token - mandatory if reporting is enabled. Access token must be used to perform API calls. Can be obtained in Zebrunner on the 'Account &amp; profile' page under the 'Token' section;
+reporting.run.display-name - optional value. The display name of the test run. The default value is Default Suite;
+reporting.run.build - optional value. The build number that is associated with the test run. It can depict either the test build number or the application build number;
+reporting.run.environment - optional value. The environment in which the tests will run.
 </code></pre>
 
-<p>Note: During the driver startup, Carina automatically starts proxy and adjusts browser capabilities to track the desired protocols. To get proxy instance for the current test/thread, you can call:</p>
-<pre><code>BrowserMobProxy proxy = ProxyPool.getProxy();
-</code></pre>
+<p><img alt="agent configuration" src="../img/agentConfiguration.png" /></p>
+<p>More details and examples of Environment variables, Program arguments, Properties file can be found in the 
+<a href="https://zebrunner.com/documentation/agents/testng">Documentation</a> in the section ‘Tracking of test results’. </p>
+<h3 id="the-integration-is-in-place">The integration is in place!</h3>
+<h4 id="now-you-can">Now you can:</h4>
+<table>
+  <tr>
+    <td>
+      <b>Report tests from Carina into Zebrunner CE</b>
+      <img src="./img/report_tests_to_Zebrunner.png">
+    </td>
+    <td>
+      <b>Track test results in real-time</b>
+      <img src="./img/track_test_results.png">
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <b>Perform smart test analysis with logs, videos and screenshots</b>
+      <img src="./img/perform_smart_analysis.png">
+    </td>
+    <td>
+      <b>Create quality trends’ reports with dozens of metrics</b>
+      <img src="./img/feature_live_streaming.jpg">
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <b>Test issues tracking</b>
+      <img src="./img/zebrDashboards.jpg">
+    </td>
+  </tr>
+</table>
 
-<ol>
-<li>Enable the required Har capture type using:</li>
-</ol>
-<pre><code>proxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT);
-</code></pre>
-
-<p>There are a lot of possible content types:</p>
-<pre><code>CaptureType.RESPONSE_COOKIES
-CaptureType.RESPONSE_HEADERS
-CaptureType.REQUEST_HEADERS
-CaptureType.RESPONSE_CONTENT
-CaptureType.REQUEST_CONTENT
-...
-</code></pre>
-
-<p>They all can be set as comma-separated parameters.</p>
-<ol>
-<li>You may want to save the captured content into a .har file:</li>
-</ol>
-<pre><code>proxy.newHar(HAR_NAME);
-
-//Some testing activity...
-
-//Saving har to a file...
-File file = new File(HAR_NAME + &quot;.har&quot;);
-Assert.assertNotNull(proxy.getHar(), &quot;Har is NULL!&quot;);
-
-try {
-    proxy.getHar().writeTo(file);
-} catch (IOException e) {
-    e.printStackTrace();
-}
-</code></pre>
-
-<p>Your .har file will be created in the project root folder</p>
-<ol>
-<li>
-<p>There are four methods to support request and response interception:</p>
-</li>
-<li>
-<p>addRequestFilter</p>
-</li>
-<li>addResponseFilter</li>
-<li>addFirstHttpFilterFactory</li>
-<li>addLastHttpFilterFactory</li>
-</ol>
-<p>To add and configure content filters, look <a href="https://github.com/lightbody/browsermob-proxy#http-request-manipulation">here</a>.</p>
-<h3 id="dealing-with-mitm-and-installing-ssl-certificate-into-your-system">Dealing with MITM and installing SSL certificate into your system:</h3>
-<h4 id="for-mac-users">For Mac users:</h4>
-<ol>
-<li>Go <a href="https://github.com/lightbody/browsermob-proxy/blob/master/browsermob-core/src/main/resources/sslSupport/ca-certificate-rsa.cer">here</a> and save it as <strong>ca-certificate-rsa.cer</strong>.</li>
-<li>A double click creates a file. The next window should appear:</li>
-</ol>
-<p><img alt="Adding ssl certificate" src="../../img/SSLInstallStep1.png" /></p>
-<ol>
-<li>After authorization, the certificate will be added into your system certificates,  but it's still untrusted:</li>
-</ol>
-<p><img alt="Adding ssl certificate" src="../../img/SSLInstallStep2.png" /></p>
-<ol>
-<li>To make it trusted, double click on it. The following window should appear:</li>
-</ol>
-<p><img alt="Adding ssl certificate" src="../../img/SSLInstallStep3.png" /></p>
-<ol>
-<li>First, click the drop-down menu and select <strong>Always Trust</strong> option. Then close the window (a second authorization will be required):</li>
-</ol>
-<p><img alt="Adding ssl certificate" src="../../img/SSLInstallStep4.png" /></p>
-<ol>
-<li>Make sure the red cross on your certificate turned into a blue one:</li>
-</ol>
-<p><img alt="Adding ssl certificate" src="../../img/SSLInstallStep5.png" /></p>
-<h3 id="adding-ssl-certificate-into-java-keystore">Adding SSL certificate into Java keystore:</h3>
-<p>If you are still receiving the following exception:</p>
-<pre><code>javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
-</code></pre>
-
-<p>you may need to set up <strong>ca-certificate-rsa.cer</strong> into your Java keystore.</p>
-<h4 id="for-mac-and-linux-users">For Mac and Linux users:</h4>
-<pre><code>sudo keytool -importcert -alias browsermob -file pathToYourCertificateLocation/BrowserMobCertificate.crt -keystore /Library/Java/JavaVirtualMachines/jdk1.8.0_181.jdk/Contents/Home/jre/lib/security/cacerts
-</code></pre>
-
-<p>You will be asked to enter your Mac profile password and a Java keystore password (by default: changeit).</p>
+<p>Join us in our support <a href="https://t.me/zebrunner">Telegram channel</a>
+for more updates in Carina and Zebrunner Community Edition!</p>
+<p>Want to get the advanced test execution and reporting for your testing? Sign up for a FREE 30-day trial in
+<a href="https://zebrunner.com/">Zebrunner PRO</a>.</p>
                 
               
               
@@ -800,7 +737,7 @@ try {
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
         
-          <a href="../program_flow/" title="Program flow" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../getting_started/" title="Getting started" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-footer-nav__button md-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
             </div>
@@ -809,19 +746,19 @@ try {
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Program flow
+                Getting started
               </div>
             </div>
           </a>
         
         
-          <a href="../security/" title="Security" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../project_structure/" title="Project structure" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-footer-nav__title">
               <div class="md-ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Security
+                Project structure
               </div>
             </div>
             <div class="md-footer-nav__button md-icon">
@@ -848,15 +785,15 @@ try {
       
     </div>
     
-      <script src="../../assets/javascripts/vendor.d710d30a.min.js"></script>
-      <script src="../../assets/javascripts/bundle.5f27aba8.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents"}</script>
+      <script src="../assets/javascripts/vendor.d710d30a.min.js"></script>
+      <script src="../assets/javascripts/bundle.5f27aba8.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents"}</script>
       
       <script>
         app = initialize({
-          base: "../..",
+          base: "..",
           features: [],
           search: Object.assign({
-            worker: "../../assets/javascripts/worker/search.27c6a5e6.min.js"
+            worker: "../assets/javascripts/worker/search.27c6a5e6.min.js"
           }, typeof search !== "undefined" && search)
         })
       </script>
