@@ -1,6 +1,6 @@
 #How to integrate Carina Framework with Zebrunner Community Edition
 
-![Zebrunner + Carina logo](./img/carinaPlusZebrunner.png)
+[![Zebrunner + Carina logo](./img/carinaPlusZebrunner.png)](https://www.qps-infra.io/)
 
 **Integrating the Carina framework with Zebrunner Community Edition is easy!**
 
@@ -9,7 +9,7 @@ installed together with the [Reporting service](https://github.com/zebrunner/rep
 follow the [User Guide](https://zebrunner.github.io/zebrunner/) with the steps on installation and configuration. 
 Let’s begin the integration!
 
-[![Zebrunner dashboards](./img/zebrDashboards.jpg)](https://www.qps-infra.io/)
+![Zebrunner dashboards](./img/zebrDashboards.jpg)
 
 > **Note** : If you already use the Carina framework in your testing, you can skip Steps 1-2 and begin with Step 3. 
 
