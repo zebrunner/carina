@@ -67,34 +67,21 @@ More details and examples of Environment variables, Program arguments, Propertie
 
 **Now you can:**
 
-<table>
-  <tr>
-    <td>
-      <b>Report tests from Carina into Zebrunner CE</b>
-      <img src="./img/report_tests_to_Zebrunner.png">
-    </td>
-    <td>
-      <b>Track test results in real-time</b>
-      <img src="../img/track_test_results.png">
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <b>Perform smart test analysis with logs, videos and screenshots</b>
-      <img src="/img/perform_smart_analysis.png">
-    </td>
-    <td>
-      <b>Create quality trends’ reports with dozens of metrics</b>
-      <img src="./docs/img/feature_live_streaming.jpg">
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <b>Test issues tracking</b>
-      <img src="../docs/img/zebrDashboards.jpg">
-    </td>
-  </tr>
-</table>
+* Report tests from Carina into Zebrunner CE
+
+![Zebrunner Report](./img/report_tests_to_Zebrunner.png)
+
+* Track test results in real-time
+
+![Zebrunner Test Results](./img/track_test_results.png)
+
+* Perform smart test analysis with logs, videos and screenshots
+
+![Zebrunner analysis](./img/perform_smart_analysis.png)
+  
+* Create quality trends’ reports with dozens of metrics
+
+![Zebrunner dashborads](./img/zebrDashboards.jpg)
 
 Join us in our support [Telegram channel](https://t.me/zebrunner)
 for more updates in Carina and Zebrunner Community Edition!
