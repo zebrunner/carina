@@ -2,7 +2,7 @@
 
 ![Zebrunner + Carina logo](./img/carinaPlusZebrunner.png)
 
-Integrating the Carina framework with Zebrunner Community Edition is easy!
+**Integrating the Carina framework with Zebrunner Community Edition is easy!**
 
 Before the start, make sure you have [Zebrunner Community Edition](https://github.com/zebrunner/zebrunner)
 installed together with the [Reporting service](https://github.com/zebrunner/reporting). If you haven’t yet used Zebrunner CE, 
@@ -28,7 +28,8 @@ After executing this command, the Zebrunner agent will be generated.
 
 ###Step 3. Create agent.yaml or agent.properties file
 
-Navigate to the folder src/main/resources and create agent.yaml or agent.properties file (if not already created).
+Navigate to the folder `src/main/resources` and create agent.yaml or agent.properties file (if not already created).
+
 ![Agent Folder](./img/agentFolder.png)
 
 ###Step 4. Configure Zebrunner agent
@@ -64,17 +65,17 @@ More details and examples of Environment variables, Program arguments, Propertie
 
 ###The integration is in place!
 
-####Now you can:
+**Now you can:**
 
 <table>
   <tr>
     <td>
       <b>Report tests from Carina into Zebrunner CE</b>
-      <img src="./docs/img/report_tests_to_Zebrunner.png">
+      <img src="./img/report_tests_to_Zebrunner.png">
     </td>
     <td>
       <b>Track test results in real-time</b>
-      <img src="/docs/img/track_test_results.png">
+      <img src="../img/track_test_results.png">
     </td>
   </tr>
   <tr>
@@ -84,13 +85,13 @@ More details and examples of Environment variables, Program arguments, Propertie
     </td>
     <td>
       <b>Create quality trends’ reports with dozens of metrics</b>
-      <img src="../docs/img/feature_live_streaming.jpg">
+      <img src="./docs/img/feature_live_streaming.jpg">
     </td>
   </tr>
   <tr>
     <td>
       <b>Test issues tracking</b>
-      <img src="/Users/dhrynevich/projects/carina/docs/img/zebrDashboards.jpg">
+      <img src="../docs/img/zebrDashboards.jpg">
     </td>
   </tr>
 </table>
