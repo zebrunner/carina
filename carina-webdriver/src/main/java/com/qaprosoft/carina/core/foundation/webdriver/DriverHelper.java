@@ -628,48 +628,46 @@ public class DriverHelper {
 
     public String getClipboardText() {
         String clipboardText = "";
-
         try {
-            clipboardText = (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
-        } catch (Exception ex) {
-            LOGGER.debug("Can't copy clipboard from local java machine, trying to copy it from selenoid...");
+            LOGGER.info("Trying to copy it from selenoid...");
 
             String url = getSelenoidClipboardUrl(driver);
             String username = getField(url, 1);
             String password = getField(url, 2);
+            HttpURLConnection.setFollowRedirects(false);
+            HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
+            con.setRequestMethod("GET");
 
+            if (!username.isEmpty() && !password.isEmpty()) {
+                String usernameColonPassword = username + ":" + password;
+                String basicAuthPayload = "Basic " + Base64.getEncoder().encodeToString(usernameColonPassword.getBytes());
+                con.addRequestProperty("Authorization", basicAuthPayload);
+            }
+
+            LOGGER.info(con.getHeaderField("Content-Type"));
+            con.setRequestProperty("Content-Type", "application/json");
+            LOGGER.info(con.getHeaderField("Content-Type"));
+            con.setConnectTimeout(5000);
+            con.setReadTimeout(5000);
+            int status = con.getResponseCode();
+            LOGGER.info("Response code: " + status);
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer content = new StringBuffer();
+            while ((inputLine = in.readLine()) != null) {
+                content.append(inputLine);
+            }
+            in.close();
+            clipboardText = content.toString();
+        } catch (Exception exception) {
             try {
-                HttpURLConnection.setFollowRedirects(false);
-                HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
-                con.setRequestMethod("GET");
-
-                if (!username.isEmpty() && !password.isEmpty()) {
-                    String usernameColonPassword = username + ":" + password;
-                    String basicAuthPayload = "Basic " + Base64.getEncoder().encodeToString(usernameColonPassword.getBytes());
-                    con.addRequestProperty("Authorization", basicAuthPayload);
-                }
-
-                LOGGER.info(con.getHeaderField("Content-Type"));
-                con.setRequestProperty("Content-Type", "application/json");
-                LOGGER.info(con.getHeaderField("Content-Type"));
-                con.setConnectTimeout(5000);
-                con.setReadTimeout(5000);
-                int status = con.getResponseCode();
-                LOGGER.info("Response code: " + status);
-                BufferedReader in = new BufferedReader(
-                        new InputStreamReader(con.getInputStream()));
-                String inputLine;
-                StringBuffer content = new StringBuffer();
-                while ((inputLine = in.readLine()) != null) {
-                    content.append(inputLine);
-                }
-                in.close();
-                clipboardText = content.toString();
-            } catch (Exception exception) {
-                exception.printStackTrace();
+                LOGGER.debug("Can't copy clipboard from selenoid, trying to copy it from local java machine...");
+                clipboardText = (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
+            } catch (Exception ex){
+                ex.printStackTrace();
             }
         }
-
         LOGGER.info("Copied: " + clipboardText);
         return clipboardText;
     }
