@@ -626,14 +626,18 @@ public class DriverHelper {
 		return decryptedURL;
 	}
 
+    /**
+     *
+     * @return String saved in clipboard
+     */
     public String getClipboardText() {
         String clipboardText = "";
         try {
-            LOGGER.info("Trying to copy it from selenoid...");
-
+            LOGGER.debug("Trying to copy it from selenoid...");
             String url = getSelenoidClipboardUrl(driver);
             String username = getField(url, 1);
             String password = getField(url, 2);
+
             HttpURLConnection.setFollowRedirects(false);
             HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
             con.setRequestMethod("GET");
@@ -644,27 +648,27 @@ public class DriverHelper {
                 con.addRequestProperty("Authorization", basicAuthPayload);
             }
 
-            LOGGER.info(con.getHeaderField("Content-Type"));
-            con.setRequestProperty("Content-Type", "application/json");
-            LOGGER.info(con.getHeaderField("Content-Type"));
-            con.setConnectTimeout(5000);
-            con.setReadTimeout(5000);
+            BufferedReader br;
             int status = con.getResponseCode();
-            LOGGER.info("Response code: " + status);
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(con.getInputStream()));
+            if (100 <= status && status <= 399) {
+                br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            } else {
+                br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+            }
+
             String inputLine;
             StringBuffer content = new StringBuffer();
-            while ((inputLine = in.readLine()) != null) {
+            while ((inputLine = br.readLine()) != null) {
                 content.append(inputLine);
             }
-            in.close();
+            br.close();
             clipboardText = content.toString();
         } catch (Exception exception) {
+            exception.printStackTrace();
             try {
                 LOGGER.debug("Can't copy clipboard from selenoid, trying to copy it from local java machine...");
                 clipboardText = (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
-            } catch (Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
