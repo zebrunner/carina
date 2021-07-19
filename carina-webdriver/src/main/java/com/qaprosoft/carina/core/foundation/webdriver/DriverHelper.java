@@ -18,9 +18,11 @@ package com.qaprosoft.carina.core.foundation.webdriver;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.invoke.MethodHandles;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
 import java.util.*;
@@ -652,6 +654,8 @@ public class DriverHelper {
             int status = con.getResponseCode();
             if (100 <= status && status <= 399) {
                 br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            } else if (status == 404) {
+                throw new MalformedURLException("Can't find resource in selenoid, exiting with 404 code");
             } else {
                 br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
             }
@@ -663,10 +667,10 @@ public class DriverHelper {
             }
             br.close();
             clipboardText = content.toString();
-        } catch (Exception exception) {
-            exception.printStackTrace();
+        } catch (IOException e) {
+            LOGGER.info(e.getMessage());
             try {
-                LOGGER.debug("Can't copy clipboard from selenoid, trying to copy it from local java machine...");
+                LOGGER.info("Trying to get clipboard from local java machine...");
                 clipboardText = (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
             } catch (Exception ex) {
                 ex.printStackTrace();
