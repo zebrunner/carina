@@ -635,7 +635,7 @@ public class DriverHelper {
     public String getClipboardText() {
         String clipboardText = "";
         try {
-            LOGGER.debug("Trying to copy it from selenoid...");
+            LOGGER.debug("Trying to copy it from remote machine with esg...");
             String url = getSelenoidClipboardUrl(driver);
             String username = getField(url, 1);
             String password = getField(url, 2);
@@ -655,7 +655,7 @@ public class DriverHelper {
             if (100 <= status && status <= 399) {
                 br = new BufferedReader(new InputStreamReader(con.getInputStream()));
             } else if (status == 404) {
-                throw new MalformedURLException("Can't find resource in selenoid, exiting with 404 code");
+                throw new MalformedURLException("Can't find resource in remote machine, exiting with 404 code");
             } else {
                 br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
             }
