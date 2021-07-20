@@ -690,7 +690,6 @@ public class DriverHelper {
         Matcher matcher = pattern.matcher(url);
 
         return matcher.find() ? matcher.group(position) : "";
-
     }
 
     /**
