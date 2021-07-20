@@ -635,7 +635,7 @@ public class DriverHelper {
     public String getClipboardText() {
         String clipboardText = "";
         try {
-            LOGGER.debug("Trying to copy it from remote machine with esg...");
+            LOGGER.debug("Trying to get clipboard from remote machine with hub...");
             String url = getSelenoidClipboardUrl(driver);
             String username = getField(url, 1);
             String password = getField(url, 2);
@@ -650,34 +650,25 @@ public class DriverHelper {
                 con.addRequestProperty("Authorization", basicAuthPayload);
             }
 
-            BufferedReader br;
             int status = con.getResponseCode();
-            if (100 <= status && status <= 399) {
-                br = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            } else if (status == 404) {
-                throw new MalformedURLException("Can't find resource in remote machine, exiting with 404 code");
+            if (200 <= status && status <= 299) {
+                BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                String inputLine;
+                StringBuffer content = new StringBuffer();
+                while ((inputLine = br.readLine()) != null) {
+                    content.append(inputLine);
+                }
+                br.close();
+                clipboardText = content.toString();
             } else {
-                br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
-            }
-
-            String inputLine;
-            StringBuffer content = new StringBuffer();
-            while ((inputLine = br.readLine()) != null) {
-                content.append(inputLine);
-            }
-            br.close();
-            clipboardText = content.toString();
-        } catch (IOException e) {
-            LOGGER.info(e.getMessage());
-            try {
-                LOGGER.info("Trying to get clipboard from local java machine...");
+                LOGGER.debug("Trying to get clipboard from local java machine...");
                 clipboardText = (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
-            } catch (Exception ex) {
-                ex.printStackTrace();
             }
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
         clipboardText = clipboardText.replaceAll("\n", "");
-        LOGGER.info("Copied: " + clipboardText);
+        LOGGER.info("Clipboard: " + clipboardText);
         return clipboardText;
     }
 
