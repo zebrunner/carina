@@ -685,7 +685,7 @@ public class DriverHelper {
     private String getSelenoidClipboardUrl(WebDriver driver) {
         String seleniumHost = Configuration.getSeleniumUrl().replace("wd/hub", "clipboard/");
         if (seleniumHost.isEmpty()){
-            seleniumHost = Configuration.getEnvArg(Parameter.URL.getKey());
+            seleniumHost = Configuration.getEnvArg(Parameter.URL.getKey()).replace("wd/hub", "clipboard/");
         }
         WebDriver drv = (driver instanceof EventFiringWebDriver) ? ((EventFiringWebDriver) driver).getWrappedDriver() : driver;
         String sessionId = ((RemoteWebDriver) drv).getSessionId().toString();
