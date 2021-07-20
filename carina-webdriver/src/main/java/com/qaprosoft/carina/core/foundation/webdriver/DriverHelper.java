@@ -676,6 +676,7 @@ public class DriverHelper {
                 ex.printStackTrace();
             }
         }
+        clipboardText = clipboardText.replaceAll("\n", "");
         LOGGER.info("Copied: " + clipboardText);
         return clipboardText;
     }
@@ -683,6 +684,9 @@ public class DriverHelper {
 
     private String getSelenoidClipboardUrl(WebDriver driver) {
         String seleniumHost = Configuration.getSeleniumUrl().replace("wd/hub", "clipboard/");
+        if (seleniumHost.isEmpty()){
+            seleniumHost = Configuration.getEnvArg(Parameter.URL.getKey());
+        }
         WebDriver drv = (driver instanceof EventFiringWebDriver) ? ((EventFiringWebDriver) driver).getWrappedDriver() : driver;
         String sessionId = ((RemoteWebDriver) drv).getSessionId().toString();
         String url = seleniumHost + sessionId;
