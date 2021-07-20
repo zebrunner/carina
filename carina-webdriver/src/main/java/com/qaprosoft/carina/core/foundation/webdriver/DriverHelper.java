@@ -133,7 +133,7 @@ public class DriverHelper {
      *            long
      */
     public void openURL(String url, long timeout) {
-        if (Configuration.getPlatform().equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+        if (SpecialKeywords.ANDROID.equalsIgnoreCase(Configuration.getPlatform())) {
             openAndroidUrl(url);
         } else {
             openDesktopUrl(url, timeout);
