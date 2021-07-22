@@ -135,13 +135,13 @@ All the project configuration properties are located in a **_config.properties**
 		<td>http, https, ftp, socks</td>
 	</tr>
 		<tr>
-		<td>browsermob_proxy</td>
-		<td>Boolean parameter which enables or disables the automatic BrowserMob proxy launch</td>
+		<td>browserup_proxy</td>
+		<td>Boolean parameter which enables or disables the automatic BrowserUp proxy launch</td>
 		<td>true, false</td>
 	</tr>
 		<tr>
-		<td>browsermob_port</td>
-		<td>Port number for BrowserMob proxy (if nothing or 0 specified, then any free port will be reused)</td>
+		<td>browserup_port</td>
+		<td>Port number for BrowserUp proxy (if nothing or 0 specified, then any free port will be reused)</td>
 		<td>Integer</td>
 	</tr>
 		<tr>

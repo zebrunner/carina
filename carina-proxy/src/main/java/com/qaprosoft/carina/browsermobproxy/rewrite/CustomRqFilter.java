@@ -22,9 +22,9 @@ import org.apache.log4j.Logger;
 
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
-import net.lightbody.bmp.filters.RequestFilter;
-import net.lightbody.bmp.util.HttpMessageContents;
-import net.lightbody.bmp.util.HttpMessageInfo;
+import com.browserup.bup.filters.RequestFilter;
+import com.browserup.bup.util.HttpMessageContents;
+import com.browserup.bup.util.HttpMessageInfo;
 
 /**
  * Class wrapper for RequestFilter. Rewrite rules can be configured as separate

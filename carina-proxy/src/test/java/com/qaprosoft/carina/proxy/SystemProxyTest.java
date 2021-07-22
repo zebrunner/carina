@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.proxy;
 
+import com.qaprosoft.carina.browsermobproxy.ProxyPool;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -31,11 +32,10 @@ public class SystemProxyTest {
     public void beforeClass() {
         // do nothing
 
-        R.CONFIG.put("browsermob_proxy", "false");
+        R.CONFIG.put("browserup_proxy", "false");
         R.CONFIG.put("proxy_set_to_system", "true");
         R.CONFIG.put("proxy_host", host);
         R.CONFIG.put(Parameter.PROXY_PORT.getKey(), port);
-
     }
 
     @BeforeMethod
