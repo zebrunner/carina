@@ -84,7 +84,7 @@ public class DesktopFactory extends AbstractFactory {
 
         if (BrowserType.FIREFOX.equalsIgnoreCase(browser)) {
             return new FirefoxCapabilities().getCapability(name);
-        } else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || browser.equalsIgnoreCase("ie")) {
+        } else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || "ie".equalsIgnoreCase(browser)) {
             return new IECapabilities().getCapability(name);
         } else if (BrowserType.SAFARI.equalsIgnoreCase(browser)) {
             return new SafariCapabilities().getCapability(name);
@@ -92,7 +92,7 @@ public class DesktopFactory extends AbstractFactory {
             return new ChromeCapabilities().getCapability(name);
         } else if (BrowserType.OPERA_BLINK.equalsIgnoreCase(browser) || BrowserType.OPERA.equalsIgnoreCase(browser)) {
             return new OperaCapabilities().getCapability(name);
-        } else if (BrowserType.EDGE.toLowerCase().contains(browser.toLowerCase())) {
+        } else if (BrowserType.EDGE.equalsIgnoreCase(browser) || "edge".equalsIgnoreCase(browser)) {
             return new EdgeCapabilities().getCapability(name);
         } else {
             throw new RuntimeException("Unsupported browser: " + browser);
