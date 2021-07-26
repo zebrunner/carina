@@ -16,6 +16,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
@@ -97,7 +98,7 @@ public class CarinaBodyPrinter {
     }
 
     private static String replaceValues(String body, Set<String> hiddenPaths, ContentTypeEnum contentType) {
-        if(!hiddenPaths.isEmpty()) {
+        if (!hiddenPaths.isEmpty() && body != null && !StringUtils.isEmpty(body)) {
             switch (contentType) {
             case JSON:
                 for (String p : hiddenPaths) {
