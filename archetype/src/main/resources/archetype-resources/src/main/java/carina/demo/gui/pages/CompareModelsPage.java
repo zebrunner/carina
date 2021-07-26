@@ -31,11 +31,20 @@ import ${package}.carina.demo.gui.components.compare.CondidateBlock;
 import ${package}.carina.demo.gui.components.compare.ModelSpecs;
 
 public class CompareModelsPage extends AbstractPage {
+
+    private final String comparePageUrl = "https://www.gsmarena.com/compare.php3";
+
     @FindBy(xpath = "//div[contains(@class, 'candidate-search')]")
     private List<CondidateBlock> condidateBlocks;
 
+    @FindBy(className = "compare-candidates")
+    private ExtendedWebElement compareMenu;
+
     public CompareModelsPage(WebDriver driver) {
         super(driver);
+        setUiLoadedMarker(compareMenu);
+        setPageAbsoluteURL(comparePageUrl);
+        //setPageURL("/compare.php3");
     }
 
     public List<ModelSpecs> compareModels(String... models) {

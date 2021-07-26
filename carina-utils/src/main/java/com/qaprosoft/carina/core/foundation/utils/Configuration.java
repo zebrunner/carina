@@ -16,7 +16,6 @@
 package com.qaprosoft.carina.core.foundation.utils;
 
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,25 +35,7 @@ import com.zebrunner.agent.core.registrar.CurrentTestRun;
  */
 public class Configuration {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static IEnvArgResolver envArgResolver;
-
-    static {
-        String envArgResolverClass = Configuration.get(Parameter.ENV_ARG_RESOLVER);
-        if (envArgResolverClass.isEmpty()) {
-            // redefine using default class
-            envArgResolverClass = "com.qaprosoft.carina.core.foundation.utils.DefaultEnvArgResolver";
-        }
-
-        try {
-            Class<?> cl = Class.forName(envArgResolverClass);
-            Constructor<?> ct = cl.getConstructor();
-            Configuration.setEnvArgResolver((IEnvArgResolver) ct.newInstance());
-        } catch (Exception e) {
-            throw new RuntimeException(
-                    "Configuration failure: can not initiate EnvArgResolver - '" + envArgResolverClass + "'", e);
-        }
-
-    }
+    private static IEnvArgResolver envArgResolver = new DefaultEnvArgResolver();
 
     /**
      * All available configuration parameter keys along with default values.
@@ -64,18 +45,15 @@ public class Configuration {
 
         ENV("env"),
 
-        ENV_ARG_RESOLVER("env_arg_resolver"),
-
         BROWSER("browser"),
-
-        BROWSER_VERSION("browser_version"),
 
         BROWSER_LANGUAGE("browser_language"),
 
+        @Deprecated
         SELENIUM_HOST("selenium_host"),
 
-        DRIVER_RECORDER("driver_recorder"),
-        
+        SELENIUM_URL("selenium_url"),
+
         DRIVER_EVENT_LISTENERS("driver_event_listeners"),
 
         MAX_DRIVER_COUNT("max_driver_count"),
@@ -89,6 +67,8 @@ public class Configuration {
         CHROME_EXPERIMENTAL_OPTS("chrome_experimental_opts"),
         
         CHROME_MOBILE_EMULATION_OPTS("chrome_mobile_emulation_opts"),
+        
+        CHROME_CLOSURE("chrome_closure"),
         
         FIREFOX_ARGS("firefox_args"),
         
@@ -173,8 +153,6 @@ public class Configuration {
         ELEMENT_LOADING_STRATEGY("element_loading_strategy"),
         
         PAGE_OPENING_STRATEGY("page_opening_strategy"),
-
-        APP_PRESIGN_URL("app_presign_url"),
         
         // Amazon
         S3_BUCKET_NAME("s3_bucket_name"),
@@ -183,23 +161,25 @@ public class Configuration {
 
         SECRET_KEY("secret_key"),
 
-        S3_USE_PRESIGN_URL("s3_use_presign_url"),
-        
-        S3_LOCAL_STORAGE("s3_local_storage"),
+        // Azure
+        AZURE_ACCOUNT_NAME("azure_account_name"),
+
+        AZURE_CONTAINER_NAME("azure_container_name"),
+
+        AZURE_BLOB_URL("azure_blob_url"),
+
+        AZURE_ACCESS_KEY_TOKEN("azure_access_key_token"),
+
+        AZURE_LOCAL_STORAGE("azure_local_storage"),
 
         // AppCenter token
         APPCENTER_TOKEN("appcenter_token"),
 
-        APPCENTER_LOCAL_STORAGE("appcenter_local_storage"),
-
         // For localization parser
-        ADD_NEW_LOCALIZATION("add_new_localization"),
 
-        ADD_NEW_LOCALIZATION_ENCODING("add_new_localization_encoding"),
+        LOCALIZATION_ENCODING("localization_encoding"),
 
-        ADD_NEW_LOCALIZATION_PATH("add_new_localization_path"),
-
-        ADD_NEW_LOCALIZATION_PROPERTY_NAME("add_new_localization_property_name"),
+        LOCALIZATION_TESTING("localization_testing"),
 
         // TLS
         TLS_KEYSECURE_LOCATION("tls_keysecure_location"),
@@ -217,23 +197,6 @@ public class Configuration {
         DEFAULT_DEVICE_TIME_FORMAT("default_device_time_format"),
 
         DEFAULT_DEVICE_LANGUAGE("default_device_language"),
-
-        // For screen recording
-        ANDROID_SCREEN_RECORDING_SIZE("android_screen_record_size"),
-
-        ANDROID_SCREEN_RECORDING_BITRATE("android_screen_record_bitrate"),
-
-        ANDROID_ENABLE_BUG_REPORT("android_enable_bug_report"),
-
-        IOS_SCREEN_RECORDING_QUALITY("ios_screen_record_quality"),
-
-        IOS_SCREEN_RECORDING_CODEC("ios_screen_record_codec"),
-
-        IOS_SCREEN_RECORDING_FPS("ios_screen_record_fps"),
-
-        SCREEN_RECORD_DURATION("screen_record_duration"),
-
-        VIDEO_SCALE("video_scale"),
 
         // Ignore SSL
         IGNORE_SSL("ignore_ssl"),
@@ -294,8 +257,8 @@ public class Configuration {
             }
         }
 
-        // write into the log extra information about selenium_host together with capabilities
-        asString.append(String.format("%s=%s%n", "selenium_host", R.CONFIG.get("selenium_host")));
+        // write into the log extra information about selenium_url together with capabilities
+        asString.append(String.format("%s=%s%n", "selenium_url", getSeleniumUrl()));
         asString.append("\n------------- Driver capabilities -----------\n");
         // read all properties from config.properties and use "capabilities.*"
         final String prefix = SpecialKeywords.CAPABILITIES + ".";
@@ -325,10 +288,6 @@ public class Configuration {
 
     public static IEnvArgResolver getEnvArgResolver() {
         return envArgResolver;
-    }
-
-    public static void setEnvArgResolver(IEnvArgResolver envArgResolver) {
-        Configuration.envArgResolver = envArgResolver;
     }
 
     public static boolean isNull(Parameter param) {
@@ -370,39 +329,55 @@ public class Configuration {
     public static String getPlatform(DesiredCapabilities caps) {
         // any platform by default
         String platform = "*";
-
-        // redefine platform if mobile.platformName is available
-        if (!R.CONFIG.get(SpecialKeywords.PLATFORM).isEmpty()) {
-            platform = R.CONFIG.get(SpecialKeywords.PLATFORM);
-        }
         
-        // redefine platform if mobile.platformName is available
+        
+        // redefine platform if os caps is available
+        if (!R.CONFIG.get(SpecialKeywords.BROWSERSTACK_PLATFORM_NAME).isEmpty()) {
+            platform = R.CONFIG.get(SpecialKeywords.BROWSERSTACK_PLATFORM_NAME);
+        }
+
+        // redefine platform if platformName caps is available
         if (!R.CONFIG.get(SpecialKeywords.PLATFORM_NAME).isEmpty()) {
             platform = R.CONFIG.get(SpecialKeywords.PLATFORM_NAME);
         }
-        
-        if (caps != null && caps.getCapability("platform") != null) {
-            platform = caps.getCapability("platform").toString();
-        }
 
+        if (caps != null && caps.getCapability("os") != null) {
+            platform = caps.getCapability("os").toString();
+        }   
+        
         if (caps != null && caps.getCapability("platformName") != null) {
             platform = caps.getCapability("platformName").toString();
         }        
         
-        //TODO: try to get actual platform name
         return platform;
     }
     
     public static String getPlatformVersion() {
+        return getPlatformVersion(new DesiredCapabilities());
+    }
+    
+    public static String getPlatformVersion(DesiredCapabilities caps) {
         // default "os_version=value" should be used to determine current platform
         String platformVersion = "";
 
-        // redefine platform if mobile.platformVersion is available
+        // redefine platform if os_version caps is available
+        if (!R.CONFIG.get(SpecialKeywords.BROWSERSTACK_PLATFORM_VERSION).isEmpty()) {
+            platformVersion = R.CONFIG.get(SpecialKeywords.BROWSERSTACK_PLATFORM_VERSION);
+        }
+        
+        // redefine platform if platformVersion caps is available
         if (!R.CONFIG.get(SpecialKeywords.PLATFORM_VERSION).isEmpty()) {
             platformVersion = R.CONFIG.get(SpecialKeywords.PLATFORM_VERSION);
         }
         
-        //TODO: try to get actual platform version
+        if (caps != null && caps.getCapability("os_version") != null) {
+            platformVersion = caps.getCapability("os_version").toString();
+        }           
+        
+        if (caps.getCapability("platformVersion") != null) {
+            platformVersion = caps.getCapability("platformVersion").toString();
+        }        
+        
         return platformVersion;
     }
 
@@ -422,19 +397,10 @@ public class Configuration {
     
     public static String getBrowserVersion() {
         String browserVersion = "";
-        if (!Configuration.get(Parameter.BROWSER_VERSION).isEmpty()) {
-            // default "browser_version=value" should be used to determine current browser
-            browserVersion = Configuration.get(Parameter.BROWSER_VERSION);
-        }
 
         // redefine browserVersion if capabilities.browserVersion is available
         if (!R.CONFIG.get("capabilities.browserVersion").isEmpty()  && !"null".equalsIgnoreCase(R.CONFIG.get("capabilities.browserVersion"))) {
             browserVersion = R.CONFIG.get("capabilities.browserVersion");
-        }
-        
-        // read from actual_browser_version if specified
-        if (R.CONFIG.containsKey(SpecialKeywords.ACTUAL_BROWSER_VERSION)) {
-            browserVersion = R.CONFIG.get(SpecialKeywords.ACTUAL_BROWSER_VERSION);
         }
         
         return browserVersion;
@@ -461,10 +427,6 @@ public class Configuration {
         }
 
         String platform = "";
-        if (capabilities.getCapability("platform") != null) {
-            platform = capabilities.getCapability("platform").toString();
-        }
-
         if (capabilities.getCapability("platformName") != null) {
             platform = capabilities.getCapability("platformName").toString();
         }
@@ -507,6 +469,8 @@ public class Configuration {
     
     /**
      * Register APP_VERSION number in CONFIG space and as Zebrunner Reporting build number if not empty.
+     *
+     * @param build String
      */
     public static void setBuild(String build) {
         R.CONFIG.put(Parameter.APP_VERSION.getKey(), build);
@@ -515,4 +479,26 @@ public class Configuration {
             CurrentTestRun.setBuild(build);
         }
     }
+
+    public static String getSeleniumUrl() {
+        String value = Configuration.get(Parameter.SELENIUM_URL);
+        if (value.isEmpty()) {
+            String deprecatedValue = Configuration.get(Parameter.SELENIUM_HOST);
+            if (!deprecatedValue.isEmpty()) {
+                LOGGER.warn(Parameter.SELENIUM_HOST.getKey() + " configuration parameter is deprecated. " +
+                        "Please, start using " + Parameter.SELENIUM_URL + " instead!");
+                value = deprecatedValue;
+            }
+        }
+        return value;
+    }
+
+    public static int getThreadCount() {
+        return Configuration.getInt(Parameter.THREAD_COUNT);
+    }
+
+    public static int getDataProviderThreadCount() {
+        return Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT);
+    }
+
 }

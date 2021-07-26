@@ -1,4 +1,4 @@
-Carina framework provides a useful and elegant way of Mobile (Android and iOS) Test Automation. The best practices have a lot in common with web automation, so it's highly recommended to look through [Web automation article](http://qaprosoft.github.io/carina/automation/web/).
+Carina framework provides a useful and elegant way of Mobile (Android and iOS) Test Automation. The best practices have a lot in common with web automation, so it's highly recommended to look through [Web automation article](http://zebrunner.github.io/carina/automation/web/).
 
 ### Mobile special requirements:
 To run mobile tests, [Appium](http://appium.io/) is used instead of Selenium. There are 2 versions of Appium: desktop and console ones, and both are good for Carina. <b>Appium must be running every time before the test run.</b>
@@ -97,7 +97,7 @@ Actual list of Appium capabilities can be found [here](https://appium.io/docs/en
 
 ### Example for Android of _config.properties:
 ```
-selenium_host=http://localhost:4723/wd/hub
+selenium_url=http://localhost:4723/wd/hub
 #============ Android Local Mobile ===================#
 capabilities.platformName=ANDROID
 capabilities.deviceName=Nexus_6
@@ -109,7 +109,7 @@ capabilities.autoGrantPermissions=true
 
 ### Example for iOS of _config.properties:
 ```
-selenium_host=http://localhost:4723/wd/hub
+selenium_url=http://localhost:4723/wd/hub
 #======== Local Run for iOS Mobile ===============#
 capabilities.platformName=iOS
 capabilities.deviceName=iPhone X
@@ -118,7 +118,7 @@ capabilities.app=https://qaprosoft.s3-us-west-2.amazonaws.com/carinademoexample.
 ```
 
 ### Implementation of Page Objects:
-The main idea is the same as in [web-testing](http://qaprosoft.github.io/carina/automation/web/#implementation-of-page-objects). 
+The main idea is the same as in [web-testing](http://zebrunner.github.io/carina/automation/web/#implementation-of-page-objects). 
 
 ### How to find locators for Android application
 To obtain the locators of elements from an Android app different programs are used such as Appium itself or convenient Android SDK tool: `uiautomatorviewer`.
@@ -162,7 +162,7 @@ protected ExtendedWebElement developerText;
 Carina framework uses TestNG for test organization. In general, test represents a manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:
 
 ```
-public class SampleTest extends AbstractTest {
+public class SampleTest implements IAbstractTest {
 
     String name = "My name";
     String carName = "Mercedes";
@@ -186,7 +186,7 @@ public class SampleTest extends AbstractTest {
 ```
 
 <b>Important:</b>
-* Test class should extend com.qaprosoft.carina.core.foundation.AbstractTest
+* Test class should implement com.qaprosoft.carina.core.foundation.IAbstractTest
 * Test method should start with org.testng.annotations.Test annotation
 * Use getDriver() method to get driver instance in test
 * Locate tests in src/test/java source folder
@@ -319,4 +319,34 @@ The list of actions with image elements and related driver settings is available
 Basically, all you need is to create an image template of the element in .png format and place it to your project. We suggest using ```src/main/resources/``` folder to store images. 
 Be sure your image size is less than the real screen size. Real iOS screen sizes are listed [here](https://developer.apple.com/library/archive/documentation/DeviceInformation/Reference/iOSDeviceCompatibility/Displays/Displays.html) in 'UIKit Size (Points)' column. You can also find the ultimate guide to iPhone resolutions [here](https://www.paintcodeapp.com/news/ultimate-guide-to-iphone-resolutions).
 
+### How to change context of application
 
+In carina-demo there is an example of a [tool](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/MobileContextUtils.java),
+that can change context of application. Just add needed context as a field in [View](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/MobileContextUtils.java#L51) enum.
+```
+// for example
+NATIVE("NATIVE_APP"),
+WEB1("WEBVIEW_chromeapp"),
+WEB2("WEBVIEW_opera");
+```
+
+Then change context in your test/page class where needed.
+```
+public void testWebView() {
+    WelcomePageBase welcomePage = initPage(getDriver(), WelcomePageBase.class);
+    LoginPageBase loginPage = welcomePage.clickNextBtn();
+    loginPage.login();
+    WebViewPageBase webViewPageBase = initPage(getDriver(), WebViewPageBase.class);
+    
+    MobileContextUtils contextHelper = new MobileContextUtils();
+    contextHelper.switchMobileContext(View.WEB);
+    
+    ContactUsPageBase contactUsPage = webViewPageBase.goToContactUsPage();
+    contactUsPage.typeName("John Doe");
+    contactUsPage.typeEmail("some@email.com");
+    contactUsPage.typeQuestion("This is a message");
+    contactUsPage.submit();
+    Assert.assertTrue(contactUsPage.isErrorMessagePresent() || contactUsPage.isRecaptchaPresent(),
+        "Error message or captcha was not displayed");
+}
+```

@@ -52,12 +52,10 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebEleme
 
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileBy;
-import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.nativekey.AndroidKey;
 import io.appium.java_client.android.nativekey.KeyEvent;
 import io.appium.java_client.android.nativekey.KeyEventFlag;
-import io.appium.java_client.touch.offset.PointOption;
 
 public interface IAndroidUtils extends IMobileUtils {
 
@@ -70,15 +68,15 @@ public interface IAndroidUtils extends IMobileUtils {
     AdbExecutor executor = new AdbExecutor();
     String[] baseInitCmd = executor.getDefaultCmd();
     static final String LANGUAGE_CHANGE_APP_PATH = "app/ADB_Change_Language.apk";
-    
+
     static final String SHELL_INIT_CONSOLE = "mobile: shell";
     static final String SHELL_INIT_DEEPLINK_CONSOLE = "mobile:deepLink";
     static final String SHELL_INIT_GET_PERMISSION_CONSOLE = "mobile:getPermissions";
     static final String SHELL_INIT_CHANGE_PERMISSION_CONSOLE = "mobile:changePermissions";
-    
+
     static final String SHELL_GPS_STATUS_CMD = "settings get secure location_providers_allowed";
-    static final String SHELL_CLOSE_STATUS_BAR_CMD = "service call statusbar 2";
-    static final String SHELL_OPEN_STATUS_BAR_CMD = "service call statusbar 1";
+    static final String SHELL_CLOSE_STATUS_BAR_CMD = "cmd statusbar collapse";
+    static final String SHELL_OPEN_STATUS_BAR_CMD = "cmd statusbar expand-notifications";
     static final String SHELL_INPUT_TXT_CMD = "input text ";
     static final String SHELL_OPEN_URL_CMD = "am start -a android.intent.action.VIEW";
     static final String SHELL_CLEAR_CACHE_CMD = "pm clear";
@@ -116,31 +114,13 @@ public interface IAndroidUtils extends IMobileUtils {
         pressBottomRightKey();
     }
 
-    // TODO Update this method using findByImage strategy
-    /**
-     * Pressing bottom right button on the keyboard by coordinates: "search", "ok",
-     * "next", etc. - various keys appear at this position. Tested at Nexus 6P
-     * Android 8.0.0 standard keyboard. Coefficients of coordinates for other
-     * devices and custom keyboards could be different.
-     */
-    @SuppressWarnings("rawtypes")
-    default public void pressBottomRightKey() {
-        WebDriver driver = castDriver();
-        Dimension size = helper.performIgnoreException(() -> driver.manage().window().getSize());
-        int height = size.getHeight();
-        int width = size.getWidth();
-
-        PointOption<?> option = PointOption.point((int) (width * 0.915), (int) (height * 0.945));
-        new TouchAction((AndroidDriver<?>) castDriver()).tap(option).perform();
-    }
-
     // Change Device Language section
 
     /**
      * change Android Device Language
      * <p>
      * Url: <a href=
-     * "http://play.google.com/store/apps/details?id=net.sanapeli.adbchangelanguage&hl=ru&rdid=net.sanapeli.adbchangelanguage">
+     * "http://play.google.com/store/apps/details?id=net.sanapeli.adbchangelanguage">
      * ADBChangeLanguage apk </a> Change locale (language) of your device via ADB
      * (on Android OS version 6.0, 5.0, 4.4, 4.3, 4.2 and older). No need to root
      * your device! With ADB (Android Debug Bridge) on your computer, you can fast
@@ -170,7 +150,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * change Android Device Language
      * <p>
      * Url: <a href=
-     * "http://play.google.com/store/apps/details?id=net.sanapeli.adbchangelanguage&hl=ru&rdid=net.sanapeli.adbchangelanguage">
+     * "http://play.google.com/store/apps/details?id=net.sanapeli.adbchangelanguage">
      * ADBChangeLanguage apk </a> Change locale (language) of your device via ADB
      * (on Android OS version 6.0, 5.0, 4.4, 4.3, 4.2 and older). No need to root
      * your device! With ADB (Android Debug Bridge) on your computer, you can fast
@@ -196,8 +176,6 @@ public interface IAndroidUtils extends IMobileUtils {
     default public boolean setDeviceLanguage(String language, int waitTime) {
         boolean status = false;
 
-        String currentAndroidVersion = IDriverPool.getDefaultDevice().getOsVersion();
-
         UTILS_LOGGER.info("Do not concat language for Android. Keep: " + language);
         language = language.replace("_", "-");
         UTILS_LOGGER.info("Refactor language to : " + language);
@@ -218,7 +196,10 @@ public interface IAndroidUtils extends IMobileUtils {
         UTILS_LOGGER.info("Try set localization change permission with following cmd:" + setLocalizationChangePermissionCmd);
         String expandOutput = executeAdbCommand(setLocalizationChangePermissionCmd);
 
-        if (expandOutput.contains("Unknown package: net.sanapeli.adbchangelanguage")) {
+        String pathToInstalledAppCmd = "shell pm path net.sanapeli.adbchangelanguage";
+        String pathToInstalledApp = executeAdbCommand(pathToInstalledAppCmd);
+
+        if (expandOutput.contains("Unknown package: net.sanapeli.adbchangelanguage") || pathToInstalledApp.isEmpty()) {
             UTILS_LOGGER.info("Looks like 'ADB Change Language apk' is not installed. Install it and try again.");
             installApk(LANGUAGE_CHANGE_APP_PATH, true);
             expandOutput = executeAdbCommand(setLocalizationChangePermissionCmd);
@@ -246,7 +227,7 @@ public interface IAndroidUtils extends IMobileUtils {
                 UTILS_LOGGER.info("Adb return empty response without errors.");
                 status = true;
             } else {
-                currentAndroidVersion = IDriverPool.getDefaultDevice().getOsVersion();
+                String currentAndroidVersion = IDriverPool.getDefaultDevice().getOsVersion();
                 UTILS_LOGGER.info("currentAndroidVersion=" + currentAndroidVersion);
                 if (currentAndroidVersion.contains("7.")) {
                     UTILS_LOGGER.info("Adb return language command do not work on some Android 7+ devices."
@@ -319,12 +300,6 @@ public interface IAndroidUtils extends IMobileUtils {
         }
 
         executeAdbCommand("install " + filePath);
-    }
-
-    default public boolean isChecked(final ExtendedWebElement element) {
-        // TODO: SZ migrate to FluentWaits
-        return element.isElementPresent(5)
-                && (element.getElement().isSelected() || element.getAttribute("checked").equals("true"));
     }
 
     public enum SelectorType {
@@ -729,8 +704,8 @@ public interface IAndroidUtils extends IMobileUtils {
      *
      *            NOTE: "adb -s {UDID} shell" - should be omitted.
      *            Example: "adb -s {UDID} shell list packages" - list packages
-     *            
-     * NOTE: shell arguments with space symbols are unsupported!
+     * 
+     *            NOTE: shell arguments with space symbols are unsupported!
      * 
      * @return String - response (might be empty)
      */
@@ -739,7 +714,7 @@ public interface IAndroidUtils extends IMobileUtils {
         List<String> literals = Arrays.asList(command.split(" "));
         return executeShell(literals);
     }
-    
+
     /**
      * 
      * @param commands list of string commands
@@ -750,7 +725,7 @@ public interface IAndroidUtils extends IMobileUtils {
      *
      *            NOTE: "adb -s {UDID} shell" - should be omitted.
      *            Example: "adb -s {UDID} shell list packages" - list packages
-     *            
+     * 
      * @return String - response (might be empty)
      */
     default public String executeShell(List<String> commands) {
@@ -774,16 +749,6 @@ public interface IAndroidUtils extends IMobileUtils {
     default public void displayRecentApps() {
         executeShell(SHELL_RECENT_APPS_CMD);
     }
-    
-    /**
-     * The application that has its package name set to current driver's
-     * capabilities will be closed to background IN CASE IT IS CURRENTLY IN
-     * FOREGROUND. Will be in recent app's list;
-     */
-    default public void closeApp() {
-        UTILS_LOGGER.info("Application will be closed to background");
-        ((AndroidDriver<?>) castDriver()).closeApp();
-    }
 
     /**
      * Tapping at native 'Home' button will be emulated. All applications will be
@@ -792,7 +757,7 @@ public interface IAndroidUtils extends IMobileUtils {
     default public void pressHome() {
         executeShell(SHELL_PRESS_HOME_CMD);
     }
-    
+
     /**
      * Is used to get GPS service status.
      * 
@@ -816,20 +781,20 @@ public interface IAndroidUtils extends IMobileUtils {
     default public void enableGPS() {
         executeShell(SHELL_ENABLE_GPS_CMD);
     }
-    
+
     /**
      * Works if ONLY DEVICE (GPS sensor) is user for obtaining location
      */
     default public void disableGPS() {
         executeShell(SHELL_DISABLE_GPS_CMD);
     }
-    
+
     /**
      * This command will save screenshot to specified folder on device's OS using
      * provided path.
      * 
      * @param filepath
-     *            - path to save screenshot to device's OS.
+     *            - path to save screenshot to device's OS (/storage/emulated/0/Download/scr.png).
      */
     default public void takeScreenShot(String filepath) {
         UTILS_LOGGER.info("Screenshot will be saved to: " + filepath);
@@ -863,7 +828,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * @param packageName String
      * @return appVersion String
      */
-    default public String getAppVersionName(String packageName){
+    default public String getAppVersionName(String packageName) {
         String command = "dumpsys package ".concat(packageName);
         String output = this.executeShell(command);
         String versionName = StringUtils.substringBetween(output, "versionName=", "\n");
@@ -872,23 +837,12 @@ public interface IAndroidUtils extends IMobileUtils {
     }
 
     /**
-     * Method to reset test application.
-     * 
-     * App's settings will be reset. User will be logged out. Application will be
-     * closed to background.
-     */
-    default public void clearAppCache() {
-        UTILS_LOGGER.info("Initiation application reset...");
-        ((AndroidDriver<?>) castDriver()).resetApp();
-    }
-
-    /**
      * To open Android device native settings
      */
     default public void openDeviceSettings() {
         executeShell(SHELL_OPEN_DEVICE_SETTINGS_CMD);
     }
-    
+
     /**
      * Method to reset test specific application by package name
      * 
@@ -907,57 +861,6 @@ public interface IAndroidUtils extends IMobileUtils {
             UTILS_LOGGER.warn(String.format("App data was not cleared for %s app", packageName));
         }
     }
-    
-    /**
-     * If the application you're interested about is installed - returns "true".
-     * Otherwise, returns "false".
-     * 
-     * @param packageName String
-     * @return boolean
-     */
-    default public boolean isApplicationInstalled(String packageName) {
-        boolean installed = ((AndroidDriver<?>) castDriver()).isAppInstalled(packageName);
-        UTILS_LOGGER.info(String.format("Application by package name (%s) installed: ", packageName) + installed);
-        return installed;
-    }
-
-    /**
-     * Method to launch Android application by its package name.
-     * 
-     * Application should be installed to device.
-     * 
-     * Application might not be running in background, but will be launched anyway.
-     * 
-     * @param packageName
-     *            - app's package name
-     */
-    default public void startApp(String packageName) {
-        UTILS_LOGGER.info("Starting " + packageName);
-        ((AndroidDriver<?>) castDriver()).activateApp(packageName);
-    }
-
-    /**
-     * Will install application if path to apk-file on working machine is set.
-     * 
-     * @param apkPath String
-     */
-    default public void installApp(String apkPath) {
-        UTILS_LOGGER.info("Will install application with apk-file from " + apkPath);
-        ((AndroidDriver<?>) castDriver()).installApp(apkPath);
-    }
-
-    /**
-     * To remove installed application by provided package name
-     * 
-     * @param packageName String
-     * 
-     * @return true if succeed
-     */
-    default public boolean removeApp(String packageName) {
-        boolean removed = ((AndroidDriver<?>) castDriver()).removeApp(packageName);
-        UTILS_LOGGER.info(String.format("Application (%s) is successfuly removed: ", packageName) + removed);
-        return removed;
-    }
 
     /**
      * With this method user is able to trigger a deeplink (link to specific place
@@ -972,12 +875,12 @@ public interface IAndroidUtils extends IMobileUtils {
      *            - URL to trigger
      */
     default public void openURL(String link) {
-        //TODO: make openURL call from this mobile interface in DriverHelper
+        // TODO: #1380 make openURL call from this mobile interface in DriverHelper
         UTILS_LOGGER.info("Following link will be triggered via ADB: " + link);
         String command = String.format(SHELL_OPEN_URL_CMD.concat(" %s"), link);
         executeShell(command);
     }
-    
+
     /**
      * With this method user is able to trigger a deeplink (link to specific place
      * within the application)
@@ -1045,7 +948,7 @@ public interface IAndroidUtils extends IMobileUtils {
             executeShell(command);
         }
     }
-    
+
     default public boolean isWifiEnabled() {
         boolean enabled = ((AndroidDriver<?>) castDriver()).getConnection().isWiFiEnabled();
         UTILS_LOGGER.info("Wi-Fi enabled: " + enabled);
@@ -1072,13 +975,15 @@ public interface IAndroidUtils extends IMobileUtils {
 
     /**
      * Method enters an App's menu within device System Settings
+     * 
      * @param appName - Name of the app as it appears in the device's Apps list (Language specific)
      */
-    default void openAppMenuFromDeviceSettings(String appName){
+    default void openAppMenuFromDeviceSettings(String appName) {
         AndroidService androidService = AndroidService.getInstance();
         androidService.executeAdbCommand("shell am start -a android.settings.APPLICATION_SETTINGS");
 
-        ExtendedWebElement appItem = new ExtendedWebElement(By.xpath(String.format("//*[contains(@text, '%s')]", appName)), "notifications", getDriver());
+        ExtendedWebElement appItem = new ExtendedWebElement(By.xpath(String.format("//*[contains(@text, '%s')]", appName)), "notifications",
+                getDriver());
         swipe(appItem);
 
         appItem.click();
@@ -1086,18 +991,21 @@ public interface IAndroidUtils extends IMobileUtils {
 
     /**
      * Toggles a specified app's ability to recieve Push Notifications on the system level
+     * 
      * @param appName - The app name as it appears within device System Settings
      * @param setValue - The value you wish to set the toggle to
      */
-    default void toggleAppNotificationsFromDeviceSettings(String appName, boolean setValue){
+    default void toggleAppNotificationsFromDeviceSettings(String appName, boolean setValue) {
         openAppMenuFromDeviceSettings(appName);
 
         WebDriver driver = getDriver();
-        ExtendedWebElement element = new ExtendedWebElement(By.xpath("//*[contains(@text, 'Notifications') or contains(@text, 'notifications')]"), "notifications", driver);
+        ExtendedWebElement element = new ExtendedWebElement(By.xpath("//*[contains(@text, 'Notifications') or contains(@text, 'notifications')]"),
+                "notifications", driver);
         element.click();
 
-        element = new ExtendedWebElement(By.xpath("//*[@resource-id='com.android.settings:id/switch_text']/following-sibling::android.widget.Switch"), "toggle", driver);
-        if(Boolean.valueOf(element.getAttribute("checked")) != setValue){
+        element = new ExtendedWebElement(By.xpath("//*[@resource-id='com.android.settings:id/switch_text']/following-sibling::android.widget.Switch"),
+                "toggle", driver);
+        if (Boolean.valueOf(element.getAttribute("checked")) != setValue) {
             element.click();
         }
     }
@@ -1105,25 +1013,25 @@ public interface IAndroidUtils extends IMobileUtils {
     /**
      * @return - Returns if the device in use has a running LTE connection
      */
-    default boolean isCarrierConnectionAvailable(){
+    default boolean isCarrierConnectionAvailable() {
         AndroidService androidService = AndroidService.getInstance();
-        boolean status = ((AndroidDriver)this.castDriver()).getConnection().isDataEnabled();
+        boolean status = ((AndroidDriver) this.castDriver()).getConnection().isDataEnabled();
         boolean linkProperties = false;
 
         String linkProp = androidService.executeAdbCommand("shell dumpsys telephony.registry | grep mPreciseDataConnectionState");
         UTILS_LOGGER.info("PROP:  " + linkProp);
-        if(!linkProp.isEmpty()) {
+        if (!linkProp.isEmpty()) {
             linkProperties = !StringUtils.substringBetween(linkProp, "APN: ", " ").equals("null");
         }
         UTILS_LOGGER.info("STATUS ENABLED: " + status);
         UTILS_LOGGER.info("CARRIER AVAILABLE: " + linkProperties);
-        return ((AndroidDriver)this.castDriver()).getConnection().isDataEnabled() && linkProperties;
+        return ((AndroidDriver) this.castDriver()).getConnection().isDataEnabled() && linkProperties;
     }
 
     /**
      * @return - Returns the value of the device model in use as a String
      */
-    default String getDeviceModel(){
+    default String getDeviceModel() {
         AndroidService androidService = AndroidService.getInstance();
         return StringUtils.substringAfter(androidService.executeAdbCommand("shell getprop | grep 'ro.product.model'"), "ro.product.model: ");
     }
@@ -1131,8 +1039,7 @@ public interface IAndroidUtils extends IMobileUtils {
     default public void openStatusBar() {
         executeShell(SHELL_OPEN_STATUS_BAR_CMD);
     }
-    
-    
+
     default public void closeStatusBar() {
         executeShell(SHELL_CLOSE_STATUS_BAR_CMD);
     }

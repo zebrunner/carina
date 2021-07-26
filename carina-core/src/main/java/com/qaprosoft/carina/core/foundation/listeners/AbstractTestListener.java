@@ -17,7 +17,6 @@ package com.qaprosoft.carina.core.foundation.listeners;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -52,16 +51,13 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     private void startItem(ITestResult result, Messager messager) {
         String test = TestNameResolverRegistry.get().resolve(result);
-        String deviceName = getDeviceName();
-        messager.info(deviceName, test, DateUtils.now());
+        messager.info(test, DateUtils.now());
     }
 
     private void passItem(ITestResult result, Messager messager) {
         String test = TestNameResolverRegistry.get().resolve(result);
 
-        String deviceName = getDeviceName();
-
-        messager.info(deviceName, test, DateUtils.now());
+        messager.info(test, DateUtils.now());
 
         EmailReportItemCollector
                 .push(createTestResult(result, TestResultType.PASS, null, result.getMethod().getDescription()));
@@ -73,11 +69,10 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         String test = TestNameResolverRegistry.get().resolve(result);
 
         String errorMessage = getFailureReason(result);
-        String deviceName = getDeviceName();
 
         // TODO: remove hard-coded text
         if (!errorMessage.contains("All tests were skipped! Analyze logs to determine possible configuration issues.")) {
-            messager.error(deviceName, test, DateUtils.now(), errorMessage);
+            messager.error(test, DateUtils.now(), errorMessage);
             if (!R.EMAIL.getBoolean("fail_full_stacktrace_in_report") && result.getThrowable() != null
                     && result.getThrowable().getMessage() != null
                     && !StringUtils.isEmpty(result.getThrowable().getMessage())) {
@@ -91,17 +86,6 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
         result.getTestContext().removeAttribute(SpecialKeywords.TEST_FAILURE_MESSAGE);
         return errorMessage;
-    }
-
-    private String getDeviceName() {
-        String deviceName = IDriverPool.getDefaultDevice().getName();
-        String deviceUdid = IDriverPool.getDefaultDevice().getUdid();
-
-        if (!deviceName.isEmpty() && !deviceUdid.isEmpty()) {
-            deviceName = deviceName + " - " + deviceUdid;
-        }
-
-        return deviceName;
     }
 
     private void afterTest(ITestResult result) {
@@ -248,11 +232,9 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         
         String linkToLog = ReportContext.getTestLogLink();
         String linkToScreenshots = ReportContext.getTestScreenshotsLink();
-        List<String> linksToVideo = ReportContext.getTestVideoLinks(getSessionsForCurrentTest());
 
         String test = StringEscapeUtils.escapeHtml4(TestNameResolverRegistry.get().resolve(result));
-        TestResultItem testResultItem = new TestResultItem(group, test, description, resultType, linkToScreenshots, linkToLog, linksToVideo,
-                failReason);
+        TestResultItem testResultItem = new TestResultItem(group, test, description, resultType, linkToScreenshots, linkToLog, failReason);
         return testResultItem;
     }
 

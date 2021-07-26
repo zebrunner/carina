@@ -19,12 +19,13 @@ import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Optional;
 
-import com.google.common.base.Function;
-import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.*;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.NoSuchSessionException;
+import org.openqa.selenium.Point;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -33,10 +34,9 @@ import org.openqa.selenium.support.ui.Wait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.google.common.base.Function;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.ChromeCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.EdgeCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.FirefoxCapabilities;
@@ -54,7 +54,7 @@ public class DesktopFactory extends AbstractFactory {
     public WebDriver create(String name, DesiredCapabilities capabilities, String seleniumHost) {
         RemoteWebDriver driver = null;
         if (seleniumHost == null) {
-            seleniumHost = Configuration.get(Configuration.Parameter.SELENIUM_HOST);
+            seleniumHost = Configuration.getSeleniumUrl();
         }
 
         if (isCapabilitiesEmpty(capabilities)) {
@@ -65,6 +65,8 @@ public class DesktopFactory extends AbstractFactory {
             LOGGER.info("Static DesiredCapabilities will be merged to basic driver capabilities");
             capabilities.merge(staticCapabilities);
         }
+        
+        LOGGER.debug("capabilities: " + capabilities);
 
         try {
             driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);
@@ -73,7 +75,6 @@ public class DesktopFactory extends AbstractFactory {
         }
         resizeBrowserWindow(driver, capabilities);
 
-        R.CONFIG.put(SpecialKeywords.ACTUAL_BROWSER_VERSION, getBrowserVersion(driver));
         return driver;
     }
 
@@ -83,7 +84,7 @@ public class DesktopFactory extends AbstractFactory {
 
         if (BrowserType.FIREFOX.equalsIgnoreCase(browser)) {
             return new FirefoxCapabilities().getCapability(name);
-        } else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || browser.equalsIgnoreCase("ie")) {
+        } else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || "ie".equalsIgnoreCase(browser)) {
             return new IECapabilities().getCapability(name);
         } else if (BrowserType.SAFARI.equalsIgnoreCase(browser)) {
             return new SafariCapabilities().getCapability(name);
@@ -91,7 +92,7 @@ public class DesktopFactory extends AbstractFactory {
             return new ChromeCapabilities().getCapability(name);
         } else if (BrowserType.OPERA_BLINK.equalsIgnoreCase(browser) || BrowserType.OPERA.equalsIgnoreCase(browser)) {
             return new OperaCapabilities().getCapability(name);
-        } else if (BrowserType.EDGE.toLowerCase().contains(browser.toLowerCase())) {
+        } else if (BrowserType.EDGE.equalsIgnoreCase(browser) || "edge".equalsIgnoreCase(browser)) {
             return new EdgeCapabilities().getCapability(name);
         } else {
             throw new RuntimeException("Unsupported browser: " + browser);
@@ -103,56 +104,6 @@ public class DesktopFactory extends AbstractFactory {
             staticCapabilities = new DesiredCapabilities();
         }
         staticCapabilities.setCapability(name, value);
-    }
-
-    @SuppressWarnings("deprecation")
-    private String getBrowserVersion(WebDriver driver) {
-        String browser_version = Configuration.get(Parameter.BROWSER_VERSION);
-        try {
-            Capabilities cap = ((RemoteWebDriver) driver).getCapabilities();
-            browser_version = cap.getVersion().toString();
-            if (browser_version != null) {
-                if (browser_version.contains(".")) {
-                    browser_version = StringUtils.join(StringUtils.split(browser_version, "."), ".", 0, 2);
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.error("Unable to get actual browser version!", e);
-        }
-        
-        // hotfix to https://github.com/qaprosoft/carina/issues/882
-        String browser = Configuration.get(Parameter.BROWSER);
-        if (BrowserType.OPERA.equalsIgnoreCase(browser) || BrowserType.OPERA_BLINK.equalsIgnoreCase(browser)) {
-            browser_version = getOperaVersion(driver);
-        }
-        return browser_version;
-    }
-    
-    //TODO: reformat later using UserAgent for all browser version identification
-    private String getOperaVersion(WebDriver driver) {
-        String browser_version = Configuration.get(Parameter.BROWSER_VERSION);
-        try { 
-            String userAgent = (String) ((RemoteWebDriver) driver).executeScript("return navigator.userAgent", "");
-            LOGGER.debug("User Agent: " + userAgent);
-            Optional<String> version = getPartialBrowserVersion("OPR", userAgent);
-            if (version.isPresent()) {
-                browser_version = version.get();
-            }
-        } catch (Exception e){
-            // do nothing
-            LOGGER.debug("Unable to get browser_version using userAgent call!", e);
-        }
-        return browser_version;
-    }
-    
-    private Optional<String> getPartialBrowserVersion(String browserName, String userAgentResponse) {
-        return Arrays.stream(userAgentResponse.split(" "))
-                .filter(str -> isRequiredBrowser(browserName,str))
-                .findFirst().map(str -> str.split("/")[1].split("\\.")[0]);
-    }
-    
-    private Boolean isRequiredBrowser(String browser, String auCapabilitie) {
-        return auCapabilitie.split("/")[0].equalsIgnoreCase(browser);
     }
 
     /**

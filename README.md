@@ -1,6 +1,8 @@
-![Alt text](./docs/img/carina.png "Carina Logo")
+![Alt text](https://github.com/zebrunner/carina/raw/master/docs/img/carina.png "Carina Logo")
 
 Carina is a Java-based test automation framework that unites all testing layers: Mobile applications (web, native, hybrid), WEB applications, REST services, Databases.
+
+<B>[TRY DEMO PROJECT NOW](https://github.com/zebrunner/carina-demo)</B>
 
 * Carina framework is built on top of most popular open-source solutions like Selenium, Appium, TestNG allowing to reduce dependence on specific technology stack.
 
@@ -12,19 +14,20 @@ Carina is a Java-based test automation framework that unites all testing layers:
 
 * API testing is based on Freemarker template engine. It enables great flexibility in generating REST requests and responses are dynamically changed by incoming arguments. 
 
-![Alt text](./docs/img/carina_space.png "Carina Overview")
+![Alt text](https://github.com/zebrunner/carina/raw/master/docs/img/carina_overview.png "Carina Overview")
 
 ## Sponsor
-[Zebrunner](https://zebrunner.com) The first cloud-based Selenium hub with by-minute pricing. No limitations by threads number!<br>
-[<b>Try it out for free.</b>](https://zebrunner.com)
+<p align="center">
+  <a href="https://zebrunner.com/"><img alt="Zebrunner" src="https://github.com/zebrunner/carina/raw/master/docs/img/zebrunner_intro.png"></a>
+</p>
 
 ## Documentation and free support
-* [User Manual](http://qaprosoft.github.io/carina)
-* [Demo Project](https://github.com/qaprosoft/carina-demo)
+* [User Guide](http://zebrunner.github.io/carina)
+* [Demo Project](https://github.com/zebrunner/carina-demo)
 * [Telegram Channel](https://t.me/qps_carina)
 
 ## Code formatter
-We propose to use our configured [**Java code formatter for Eclipse**](https://github.com/qaprosoft/carina/blob/master/carina_formatter.xml). To use same formatter in IntelliJ IDEA you should install and configure [**Eclipse Code Formatter**](https://plugins.jetbrains.com/plugin/6546-eclipse-code-formatter).
+We offer to use our configured [**Java code formatter for Eclipse**](https://github.com/zebrunner/carina/blob/master/carina_formatter.xml). To use the same formatter in IntelliJ IDEA you should install and configure [**Eclipse Code Formatter**](https://plugins.jetbrains.com/plugin/6546-eclipse-code-formatter).
 
 ## License
 Code - [Apache Software License v2.0](http://www.apache.org/licenses/LICENSE-2.0)

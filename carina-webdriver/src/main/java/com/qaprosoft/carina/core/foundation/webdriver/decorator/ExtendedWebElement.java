@@ -63,12 +63,15 @@ import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
+import com.qaprosoft.carina.core.foundation.exception.DriverPoolException;
 import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.IWebElement;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
+import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
@@ -78,14 +81,12 @@ import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 
-public class ExtendedWebElement {
+public class ExtendedWebElement implements IWebElement {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
     private static final long RETRY_TIME = Configuration.getLong(Parameter.RETRY_INTERVAL);
-
-    
     
     // we should keep both properties: driver and searchContext obligatory
     // driver is used for actions, javascripts execution etc
@@ -103,8 +104,10 @@ public class ExtendedWebElement {
     private By by;
     
     private boolean caseInsensitive;
-    
+
     private ElementLoadingStrategy loadingStrategy = ElementLoadingStrategy.valueOf(Configuration.get(Parameter.ELEMENT_LOADING_STRATEGY));
+
+    private boolean isLocalized = false;
 
     public ExtendedWebElement(WebElement element, String name, By by) {
         this(element, name);
@@ -115,22 +118,16 @@ public class ExtendedWebElement {
     	this.by = by;
     	this.name = name;
     	this.element = null;
-    	
     }
     
     public ExtendedWebElement(By by, String name, WebDriver driver) {
     	this.by = by;
     	this.name = name;
     	this.driver = driver;
-    	
     }
     
     public ExtendedWebElement(WebElement element, String name) {
-    	this(element);
     	this.name = name;
-    }
-    
-    private ExtendedWebElement(WebElement element) {
         this.element = element;
         
         //read searchContext from not null elements only
@@ -166,6 +163,11 @@ public class ExtendedWebElement {
 				locatorField.setAccessible(true);
 
 				ExtendedElementLocator locator = (ExtendedElementLocator) locatorField.get(innerProxy);
+				this.isLocalized = locator.isLocalized();
+
+				if (isLocalized){
+    			    this.name = locator.getClassName() + "." + name;
+                }
 
 				searchContextField = locator.getClass().getDeclaredField("searchContext");
 				searchContextField.setAccessible(true);
@@ -190,6 +192,7 @@ public class ExtendedWebElement {
 					locatorField.setAccessible(true);
 
 					locator = (ExtendedElementLocator) locatorField.get(innerProxy);
+					this.isLocalized = locator.isLocalized();
 
 					searchContextField = locator.getClass().getDeclaredField("searchContext");
 					searchContextField.setAccessible(true);
@@ -228,7 +231,13 @@ public class ExtendedWebElement {
 				}
 				//this.driver = (WebDriver) tempSearchContext;
 				// that's the only place to use DriverPool to get driver.
-				this.driver = IDriverPool.getDriver(sessionId);
+                try {
+                    //try to search securely in driver pool by sessionId
+                    this.driver = IDriverPool.getDriver(sessionId);
+                } catch (DriverPoolException ex) {
+                    // seems like driver started outside of IDriverPool so try to register it as well
+                    this.driver = (WebDriver) tempSearchContext;
+                }
 			} else {
 				LOGGER.error("Undefined error for searchContext: " + tempSearchContext.toString());
 			}
@@ -308,36 +317,48 @@ public class ExtendedWebElement {
      * @return true if condition happen.
      */
 	private boolean waitUntil(ExpectedCondition<?> condition, long timeout) {
-		boolean result;
+        if (timeout <= 0) {
+            LOGGER.error("Fluent wait with 0 and less timeout might hangs! Updating to 1 sec.");
+            timeout = 1;
+        }
+        boolean result;
 		originalException = null;
 		
 		final WebDriver drv = getDriver();
 		
-		Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME).ignoring(WebDriverException.class)
-				.ignoring(NoSuchSessionException.class)
-				.ignoring(TimeoutException.class); //trying to avoid exception in driver as DriverListener capture it
-		
+		Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME);
+
+		// [VD] Notes:
 		// StaleElementReferenceException is handled by selenium ExpectedConditions in many methods
+		// do not ignore TimeoutException or NoSuchSessionException otherwise you can wait for minutes instead of timeout!
+		
+		LOGGER.debug("waitUntil: starting... timeout: " + timeout);		
 		try {
 			wait.until(condition);
 			result = true;
 		} catch (NoSuchElementException e) {
 			// don't write exception even in debug mode
-			LOGGER.debug("waitUntil: NoSuchElementException: " + condition.toString());
+		    // [VD] don't operate with condition.toString() etc as it might generate org.openqa.selenium.json.JsonException xpected to read a START_MAP but instead have: END. Last 0 characters read
+			LOGGER.debug("waitUntil: NoSuchElementException: " + e.getMessage());
 			result = false;
 			originalException = e;
+        } catch (NoSuchSessionException e) { 
+            LOGGER.debug("waitUntil: NoSuchSessionException: " + e.getMessage());
+            result = false;
+            originalException = e.getCause();			
 		} catch (TimeoutException e) { 
-			LOGGER.debug("waitUntil: TimeoutException: " + condition.toString());
+			LOGGER.debug("waitUntil: TimeoutException: " + e.getMessage());
 			result = false;
 			originalException = e.getCause();
 		} catch (WebDriverException e) {
-            LOGGER.debug("waitUntil: WebDriverException: " + condition.toString());
+            LOGGER.debug("waitUntil: WebDriverException: " + e.getMessage());
             result = false;
             originalException = e.getCause();
 		}
 		catch (Exception e) {
-			LOGGER.error("waitUntil: undefined exception: " + condition.toString(), e);
+			LOGGER.error("waitUntil: undefined exception: " + e.getMessage(), e);
 			result = false;
+			//TODO: e or e.getCause()?
 			originalException = e;
 		}
 		return result;
@@ -840,7 +861,7 @@ public class ExtendedWebElement {
         // has a height and width greater than 0.
     	
         waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
-		boolean tmpResult = waitUntil(waitCondition, 0);
+		boolean tmpResult = waitUntil(waitCondition, 1);
 
 		if (tmpResult) {
 			return true;
@@ -948,7 +969,7 @@ public class ExtendedWebElement {
 		ExpectedCondition<Boolean> textCondition;
 		if (element != null) {
 			ExpectedCondition<Boolean>  tmpCondition = ExpectedConditions.and(ExpectedConditions.visibilityOf(element));
-			boolean tmpResult = waitUntil(tmpCondition, 0);
+			boolean tmpResult = waitUntil(tmpCondition, 1);
 			
 			if (!tmpResult && originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
 				LOGGER.debug("StaleElementReferenceException detected in isElementWithTextPresent!");
@@ -1186,6 +1207,7 @@ public class ExtendedWebElement {
         return new ExtendedWebElement(by, name, getDriver());
     }
 
+
     /**
      * Pause for specified timeout.
      * 
@@ -1325,10 +1347,15 @@ public class ExtendedWebElement {
 
 	/**
 	 * doAction on element.
-	 *
+     *
+	 * @param actionName
+     *            ACTION_NAME
 	 * @param timeout
+     *            long
 	 * @param waitCondition
 	 *            to check element conditions before action
+     * @return
+     *            Object
 	 */
 	private Object doAction(ACTION_NAME actionName, long timeout, ExpectedCondition<?> waitCondition) {
 		// [VD] do not remove null args otherwise all actions without arguments will be broken!
@@ -1346,17 +1373,23 @@ public class ExtendedWebElement {
 		
 		if (waitCondition != null) {
 			//do verification only if waitCondition is fine
+			//TODO: [VD] find another way to test waitCondition as TimeoutException in DEBUG logs are displayed!
+//			boolean tmpResult = waitUntil(waitCondition, 0);
+//			if (!tmpResult && originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
+//				LOGGER.debug("StaleElementReferenceException detected in doAction!");
+//				refindElement();
+//			}
 			
-			boolean tmpResult = waitUntil(waitCondition, 0);
-			if (!tmpResult && originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
-				LOGGER.debug("StaleElementReferenceException detected in doAction!");
-				refindElement();
-			}
-			
-			if (!tmpResult && !waitUntil(waitCondition, timeout)) {
+//		    if (!tmpResult && !waitUntil(waitCondition, timeout)) {
+			if (!waitUntil(waitCondition, timeout)) {
 				LOGGER.error(Messager.ELEMENT_CONDITION_NOT_VERIFIED.getMessage(actionName.getKey(), getNameWithLocator()));
 			}
 		}
+		
+        if (isLocalized) {
+            isLocalized = false; // single verification is enough for this particular element
+            L10N.verify(this);
+        }
 
 		Object output = null;
 		// captureElements();

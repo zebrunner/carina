@@ -69,9 +69,13 @@ public class SpecialKeywords {
     public static final String METHOD_THREAD_POOL_SIZE = "{method_thread_pool_size}";
 
     public static final String TEST_NAME_ARGS_MAP = "testNameArgsMap";
-    
-    public static final String TESTRAIL_SUITE_ID = "TestRailSuiteId";
-    public static final String TESTRAIL_PROJECT_ID = "TestRailProjectId";
+
+    @Deprecated
+    public static final String TESTRAIL_SUITE_ID_OLD = "TestRailSuiteId";
+    @Deprecated
+    public static final String TESTRAIL_PROJECT_ID_OLD = "TestRailProjectId";
+    public static final String TESTRAIL_SUITE_ID = "com.zebrunner.app/tcm.testrail.suite-id";
+    public static final String TESTRAIL_PROJECT_ID = "com.zebrunner.app/tcm.testrail.project-id";
     public static final String TESTRAIL_TESTCASE_UUID = "com.zebrunner.app/tcm.testrail.testcase-id";
 
     public static final String BEFORE_TEST_METHOD = "executeBeforeTestMethod";
@@ -104,8 +108,6 @@ public class SpecialKeywords {
     public static final String SKIPPED = "SKIPPED";
 
     public static final String ZAFIRA_PROJECT = "zafira_project";
-    public static final String ACTUAL_BROWSER_VERSION = "actual_browser_version";
-    
 
     public static final String COMMENT = "comment";
     
@@ -129,21 +131,18 @@ public class SpecialKeywords {
 
     // ------------- CAPABILITIES PROPERTIES --------------------------
     public static final String CAPABILITIES = "capabilities";
-    public static final String ENABLE_VIDEO = "capabilities.enableVideo";
-    public static final String ENABLE_LOG = "capabilities.enableLog";
-    public static final String PLATFORM = "capabilities.platform";
     public static final String PLATFORM_NAME = "capabilities.platformName";
     public static final String PLATFORM_VERSION = "capabilities.platformVersion";
+    public static final String BROWSERSTACK_PLATFORM_NAME = "capabilities.os";
+    public static final String BROWSERSTACK_PLATFORM_VERSION = "capabilities.os_version";
 
     public static final String ADB_EXEC_TIMEOUT = "capabilities.adbExecTimeout";
     public static final String MOBILE_DEVICE_UDID = "capabilities.udid";
     public static final String MOBILE_DEVICE_NAME = "capabilities.deviceName";
-    public static final String MOBILE_DEVICE_BROWSERSTACK_NAME = "capabilities.device";
     public static final String MOBILE_DEVICE_TYPE = "capabilities.deviceType";
     //TODO: switch into the PLATFORM_NAME later
     public static final String MOBILE_DEVICE_PLATFORM = "capabilities.platformName";
     public static final String MOBILE_DEVICE_PLATFORM_VERSION = "capabilities.platformVersion";
-    public static final String MOBILE_DEVICE_BROWSERSTACK_PLATFORM_VERSION = "capabilities.os_version";
     public static final String MOBILE_DEVICE_REMOTE_URL = "capabilities.remoteURL";
     public static final String MOBILE_APP_ACITIVTY = "capabilities.appActivity";
     public static final String MOBILE_APP_PACKAGE = "capabilities.appPackage";
@@ -159,13 +158,17 @@ public class SpecialKeywords {
     
     // ------------- qTEST PROPERTIES -------------------------------
     public static final String QTEST_TESTCASE_UUID = "com.zebrunner.app/tcm.qtest.testcase-id";
-    public static final String QTEST_PROJECT_ID = "qTestProjectId";
+    @Deprecated
+    public static final String QTEST_PROJECT_ID_OLD = "qTestProjectId";
+    public static final String QTEST_PROJECT_ID = "com.zebrunner.app/tcm.qtest.project-id";
 
 
     // ------------- TEST EXECUTION FILTERS CONSTANTS ---------------
     public static final String RULE_FILTER_VALUE_SPLITTER = "=>";
     public static final String RULE_FILTER_SPLITTER = ";;";
     public static final String RULE_FILTER_AND_CONDITION = "&&";
+    public static final String RULE_FILTER_OR_CONDITION = "||";
+    public static final String RULE_FILTER_EXCLUDE_CONDITION = "!!";
 
 
     // ------------- Mobile screenshots cutting strategies configuration  ---------------
@@ -189,6 +192,4 @@ public class SpecialKeywords {
     public static final String CUCUMBER_REPORT_SUBFOLDER = "cucumber-html-reports";
     public static final String CUCUMBER_REPORT_FILE_NAME = "overview-features.html";
     
-    
-    public final static String DEFAULT_VIDEO_FILENAME = "%s.mp4";
 }

@@ -27,7 +27,7 @@ For integration with DB, we recommend to use [MyBatis](http://www.mybatis.org/my
 ```
 
 ## Mappers
-The next step is MyBatis mappers implementation, read [the official documentation](http://www.mybatis.org/mybatis-3/sqlmap-xml.html) to understand all the details. Let's place all the mappers into **src/main/resources/mappers**. Here is a [UserMapper.xml](https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/mappers/UserMapper.xml) sample:
+The next step is MyBatis mappers implementation, read [the official documentation](http://www.mybatis.org/mybatis-3/sqlmap-xml.html) to understand all the details. Let's place all the mappers into **src/main/resources/mappers**. Here is a [UserMapper.xml](https://github.com/zebrunner/carina-demo/blob/master/src/main/resources/mappers/UserMapper.xml) sample:
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
@@ -147,7 +147,7 @@ The next step is MyBatis mappers implementation, read [the official documentatio
 </mapper>
 ```
 
-Now we have to implement a DB domain object [User class](https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/models/User.java) which reflects the DB table structure:
+Now we have to implement a DB domain object [User class](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/models/User.java) which reflects the DB table structure:
 ```
 package com.qaprosoft.carina.demo.db.models;
 
@@ -238,7 +238,7 @@ public class User {
 }
 ```
 
-Also, we have to describe the mapper interface, [UserMapper interface](https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/mappers/UserMapper.java):
+Also, we have to describe the mapper interface, [UserMapper interface](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/mappers/UserMapper.java):
 
 ```
 package com.qaprosoft.carina.demo.db.mappers;
@@ -307,7 +307,7 @@ All the mappers and reference to _database.properties should be specified in **s
 ```
 
 ## Connection factory
-Connection factory is responsible for MyBatis context initialization and creation of mapper instances, take a look at the sample implementation of [ConnectionFactory](https://github.com/qaprosoft/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/ConnectionFactory.java):
+Connection factory is responsible for MyBatis context initialization and creation of mapper instances, take a look at the sample implementation of [ConnectionFactory](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/ConnectionFactory.java):
 ```
 package com.qaprosoft.carina.demo.utils;
 
@@ -349,16 +349,17 @@ public class ConnectionFactory {
 ```
 
 ## Usage sample
-Finally, [DBSampleTest](https://github.com/qaprosoft/carina-demo/blob/master/src/test/java/com/qaprosoft/carina/demo/DBSampleTest.java) illustrates the usage of MyBatis in tests:
+Finally, [DBSampleTest](https://github.com/zebrunner/carina-demo/blob/master/src/test/java/com/qaprosoft/carina/demo/DBSampleTest.java) illustrates the usage of MyBatis in tests:
 ```
 package com.qaprosoft.carina.demo;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
 
+import com.qaprosoft.carina.core.foundation.IAbstractTest;
+import com.zebrunner.agent.core.annotation.TestLabel;
 import org.apache.ibatis.session.SqlSession;
 import org.testng.annotations.Test;
-import com.qaprosoft.carina.core.foundation.AbstractTest;
 import com.qaprosoft.carina.demo.db.mappers.UserMapper;
 import com.qaprosoft.carina.demo.db.mappers.UserPreferenceMapper;
 import com.qaprosoft.carina.demo.db.models.User;
@@ -371,11 +372,12 @@ import com.qaprosoft.carina.demo.db.models.UserPreference;
  * 
  * @author qpsdemo
  */
-public class DBSampleTest extends AbstractTest {
+public class DBSampleTest implements IAbstractTest {
 
 	...
 
 	@Test
+	@TestLabel(name = "feature", value = "database")
 	public void createUser() {
 		try (SqlSession session = ConnectionFactory.getSqlSessionFactory().openSession(true)) {
 			UserMapper userMapper = session.getMapper(UserMapper.class);
@@ -385,6 +387,7 @@ public class DBSampleTest extends AbstractTest {
 	}
 
 	@Test(dependsOnMethods = "createUser")
+	@TestLabel(name = "feature", value = "database")
 	public void createUserPreference() {
 		try (SqlSession session = ConnectionFactory.getSqlSessionFactory().openSession(true)) {
 			UserMapper userMapper = session.getMapper(UserMapper.class);
@@ -395,6 +398,7 @@ public class DBSampleTest extends AbstractTest {
 		}
 	}
 
-	...
+    ...	
+
 }
 ```

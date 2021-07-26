@@ -8,20 +8,18 @@ import com.qaprosoft.carina.core.foundation.report.email.EmailValidator;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.util.ArrayList;
-
 public class EmailTest {
 
     private static final String EMAIL = "test123@gmail.com";
 
     private static final TestResultItem TEST_RESULT_ITEM1 = new TestResultItem("carina-reporting", "Test api 1", "", TestResultType.PASS,
-            "", "", new ArrayList<>(), "");
+            "", "", "");
     private static final TestResultItem TEST_RESULT_ITEM1_1 = new TestResultItem("carina-reporting", "Test api 1", "", TestResultType.PASS,
-            "", "", new ArrayList<>(), "");
+            "", "", "");
     private static final TestResultItem TEST_RESULT_ITEM2 = new TestResultItem("carina-reporting", "Test api 2", "", TestResultType.PASS,
-            "", "", new ArrayList<>(), "");
+            "", "", "");
     private static final TestResultItem TEST_RESULT_ITEM3 = new TestResultItem("carina-reporting", "Test api 3", "", TestResultType.PASS,
-            "", "", new ArrayList<>(), "");
+            "", "", "");
 
     private static final String CREATED_ITEM1 = "item 1";
     private static final String CREATED_ITEM2 = "item 2";

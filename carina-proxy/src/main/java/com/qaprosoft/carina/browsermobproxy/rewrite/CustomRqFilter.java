@@ -64,8 +64,8 @@ public class CustomRqFilter implements RequestFilter {
     
     /**
      * Apply headers to request
-     * @param req
-     * @param headers
+     * @param req HttpRequest
+     * @param headers List&lt;HeaderItem&gt;
      * @return updated request
      */
     private HttpRequest applyHeaders(HttpRequest req, List<HeaderItem> headers) {

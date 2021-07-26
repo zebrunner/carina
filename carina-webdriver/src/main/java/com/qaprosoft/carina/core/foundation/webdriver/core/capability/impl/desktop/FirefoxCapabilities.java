@@ -15,20 +15,15 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
 
-import java.lang.invoke.MethodHandles;
-
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
 public class FirefoxCapabilities extends AbstractCapabilities {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
      * Generate DesiredCapabilities for Firefox with default Carina FirefoxProfile.
@@ -48,7 +43,6 @@ public class FirefoxCapabilities extends AbstractCapabilities {
 
         FirefoxOptions options = new FirefoxOptions().setProfile(profile);
         capabilities.setCapability(FirefoxOptions.FIREFOX_OPTIONS, options);
-        LOGGER.debug("Firefox caps: " + capabilities);
         return capabilities;
     }
 
@@ -69,7 +63,6 @@ public class FirefoxCapabilities extends AbstractCapabilities {
         FirefoxOptions options = new FirefoxOptions().setProfile(profile);
         capabilities.setCapability(FirefoxOptions.FIREFOX_OPTIONS, options);
         
-        LOGGER.debug("Firefox caps: " + capabilities);
         return capabilities;
     }
 

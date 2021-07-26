@@ -27,11 +27,15 @@ public @interface XlsDataSourceParameters {
 
     /**
      * Is mutually exclusive with spreadsheetId
+     *
+     * @return String
      */
     String path() default "";
 
     /**
      * Is mutually exclusive with path
+     *
+     * @return String
      */
     String spreadsheetId() default "";
 
@@ -48,8 +52,6 @@ public @interface XlsDataSourceParameters {
     String staticArgs() default "";
 
     String groupColumn() default "";
-
-    String jiraColumn() default "";
 
     String testRailColumn() default "";
 

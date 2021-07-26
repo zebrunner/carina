@@ -50,6 +50,8 @@ class Marshaller {
 
     /**
      * Get instance for Marshaller
+     *
+     * @return Marshaller
      */
     static Marshaller getInstance() {
         if (null == instance) {

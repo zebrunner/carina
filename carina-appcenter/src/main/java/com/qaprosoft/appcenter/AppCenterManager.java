@@ -47,7 +47,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.qaprosoft.appcenter.http.resttemplate.RestTemplateBuilder;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.R;
 
 /**
  * Created by boyle on 8/16/17.
@@ -55,7 +54,7 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 public class AppCenterManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     
-    protected RestTemplate restTemplate;
+    protected RestTemplate restTemplate = RestTemplateBuilder.newInstance().withDisabledSslChecking().withSpecificJsonMessageConverter().build();
 
     private String ownerName;
     private String versionLong;
@@ -76,9 +75,18 @@ public class AppCenterManager {
         return instance;
     }
 
-    private void disableRestTemplateSsl() {
-        restTemplate = RestTemplateBuilder.newInstance().withDisabledSslChecking().withSpecificJsonMessageConverter().build();
-    }
+    /**
+    *
+    * @param appName takes in the AppCenter Name to look for.
+    * @param platformName takes in the platform we wish to download for.
+    * @param buildType takes in the particular build to download (i.e. Prod.AdHoc, QA.Debug, Prod-Release, QA-Internal etc...)
+    * @param version takes in either "latest" to take the first build that matches the criteria or allows to consume a version to download that
+    *            build.
+    * @return download url for build artifact.
+    */
+   public String getDownloadUrl(String appName, String platformName, String buildType, String version) {
+       return scanAppForBuild(getAppId(appName, platformName), buildType, version);
+   }    
 
     /**
      *
@@ -91,10 +99,9 @@ public class AppCenterManager {
      * @return file to the downloaded build artifact
      */
     public File getBuild(String folder, String appName, String platformName, String buildType, String version) {
-        disableRestTemplateSsl();
+        String buildToDownload = getDownloadUrl(appName, platformName, buildType, version);
 
-        String buildToDownload = scanAppForBuild(getAppId(appName, platformName), buildType, version);
-
+        //TODO: wrap below code into the public download method
         String fileName = folder + "/" + createFileName(appName, buildType, platformName);
         File fileToLocate = null;
 
@@ -163,10 +170,9 @@ public class AppCenterManager {
      *
      * @param appName takes in the AppCenter Name to look for.
      * @param platformName takes in the platform we wish to download for.
-     * @return
+     * @return Map&lt;String, String&gt;
      */
     private Map<String, String> getAppId(String appName, String platformName) {
-
         Map<String, String> appMap = new HashMap<>();
 
         RequestEntity<String> retrieveApps = buildRequestEntity(
@@ -203,10 +209,9 @@ public class AppCenterManager {
      * @param buildType takes in the particular build to download (i.e. Prod.AdHoc, QA.Debug, Prod-Release, QA-Internal etc...)
      * @param version takes in either "latest" to take the first build that matches the criteria or allows to consume a version to download that
      *            build.
-     * @return
+     * @return String
      */
     private String scanAppForBuild(Map<String, String> apps, String buildType, String version) {
-
         for (String currentApp : apps.keySet()) {
             LOGGER.info("Scanning App " + currentApp);
             MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
@@ -244,7 +249,6 @@ public class AppCenterManager {
                                 String.format(
                                         "Fetching Build ID (%s) Version: %s (%s)", latestBuildNumber, versionShort, versionLong));
                         String buildUrl = appBuild.get("download_url").asText();
-                        R.CONFIG.put(Parameter.APP_PRESIGN_URL.getKey(), buildUrl); //register app presign url to register in test run later
                         LOGGER.info("Download URL For Build: " + buildUrl);
 
                         return buildUrl;

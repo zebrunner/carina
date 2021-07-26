@@ -27,6 +27,7 @@ public class PropertiesProcessorMain {
         processors = new ArrayList<PropertiesProcessor>();
         processors.add(new GenerateProcessor());
         processors.add(new CryptoProcessor());
+		processors.add(new NotStringValuesProcessor());
     }
 
     public static Properties processProperties(Properties in) {

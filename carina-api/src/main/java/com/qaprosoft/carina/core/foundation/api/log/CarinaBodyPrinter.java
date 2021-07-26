@@ -50,6 +50,15 @@ public class CarinaBodyPrinter {
     /**
      * Prints the response to the print stream
      *
+     * @param responseBody ResponseBody&lt;?&gt;
+     *
+     * @param stream PrintStream
+     *
+     * @param shouldPrettyPrint boolean
+     *
+     * @param hiddenPaths Set&lt;String&gt;
+     *
+     * @param contentType ContentTypeEnum
      * @return A string of representing the response
      */
     public static String printResponseBody(ResponseBody<?> responseBody, PrintStream stream, boolean shouldPrettyPrint, Set<String> hiddenPaths,
@@ -74,6 +83,16 @@ public class CarinaBodyPrinter {
 
     /**
      * Prints the request to the print stream
+     *
+     * @param requestSpec FilterableRequestSpecification
+     *
+     * @param stream PrintStream
+     *
+     * @param shouldPrettyPrint boolean
+     *
+     * @param hiddenPaths Set&lt;String&gt;
+     *
+     * @param contentType ContentTypeEnum
      */
     public static void printRequestBody(FilterableRequestSpecification requestSpec, PrintStream stream, boolean shouldPrettyPrint,
             Set<String> hiddenPaths, ContentTypeEnum contentType) {

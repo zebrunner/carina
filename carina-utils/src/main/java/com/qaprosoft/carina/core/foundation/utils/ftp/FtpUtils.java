@@ -18,7 +18,7 @@ public class FtpUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 	private static final int DEFAULT_PORT = 21;
 	
-	//TODO: https://github.com/qaprosoft/carina/issues/954
+	//TODO: https://github.com/zebrunner/carina/issues/954
 	// migrate FtpUtils methods to use com.qaprosoft.carina.core.foundation.utils.async.AsyncOperation
 	private static int uploading = 0;
 

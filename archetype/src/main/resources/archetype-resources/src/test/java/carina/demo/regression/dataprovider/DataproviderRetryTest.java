@@ -24,7 +24,7 @@ import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.AbstractTest;
+import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
 
 /**
@@ -33,13 +33,13 @@ import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
  *
  * @author qpsdemo
  */
-public class DataproviderRetryTest extends AbstractTest {
+public class DataproviderRetryTest implements IAbstractTest {
     @Test(dataProvider = "DP1")
     @MethodOwner(owner = "qpsdemo")
     public void testDataproviderRetry(String testRailColumn, int a, int b, int c) {
         boolean isPassed = (new Random().nextInt(2) == 1) ? true : false;
         Assert.assertTrue(isPassed);
-        
+
         setCases(testRailColumn.split(","));
         int actual = a * b;
         int expected = c;

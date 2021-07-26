@@ -25,8 +25,8 @@ public class ContactUsPage extends ContactUsPageBase {
     @FindBy(xpath = "//button[@type='submit' and text()='Send']")
     private ExtendedWebElement submitButton;
 
-    @FindBy(xpath = "//div[contains(@class,'t-form__successbox')]")
-    private ExtendedWebElement successLabel;
+    @FindBy(xpath = "//div[contains(@class,'t-form__errorbox-text')]")
+    private ExtendedWebElement errorLabel;
 
     @FindBy(id = "g-recaptcha-response")
     private ExtendedWebElement recaptcha;
@@ -56,8 +56,8 @@ public class ContactUsPage extends ContactUsPageBase {
     }
 
     @Override
-    public boolean isSuccessMessagePresent() {
-        return successLabel.isElementPresent();
+    public boolean isErrorMessagePresent() {
+        return errorLabel.isElementPresent();
     }
 
     @Override

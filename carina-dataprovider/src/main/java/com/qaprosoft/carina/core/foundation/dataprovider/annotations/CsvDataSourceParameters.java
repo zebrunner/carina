@@ -43,8 +43,6 @@ public @interface CsvDataSourceParameters {
 
     String groupColumn() default "";
 
-    String jiraColumn() default "";
-
     String testRailColumn() default "";
 
     String qTestColumn() default "";

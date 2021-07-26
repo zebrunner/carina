@@ -17,6 +17,7 @@ package com.qaprosoft.carina.core.foundation;
 
 import java.lang.annotation.Annotation;
 
+import com.qaprosoft.carina.core.foundation.listeners.FilterTestsListener;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.SkipException;
@@ -42,13 +43,12 @@ import com.zebrunner.agent.testng.listener.TestRunListener;
  * IAbstractTest - base test for UI and API tests.
  */
 
-// https://github.com/qaprosoft/carina/issues/951
+// https://github.com/zebrunner/carina/issues/951
 // reused com.nordstrom.tools.testng-foundation to register ordered listeners
 
 // on start order is TestRunListener and CarinaListener
 // on finish reverse order, i.e. CarinaListener, TestRunListener
-@LinkedListeners({ CarinaListener.class, TestRunListener.class, DataProviderInterceptor.class })
-@Listeners({DataProviderInterceptor.class})
+@LinkedListeners({ CarinaListener.class, TestRunListener.class, FilterTestsListener.class })
 public interface IAbstractTest extends ICustomTypePageFactory, ITestCases {
 
     long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);

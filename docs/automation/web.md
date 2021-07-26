@@ -1,6 +1,8 @@
 [![Carina - Web automation](https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png)](https://youtu.be/Wgyffk7hJQw)
 
-Carina framework follows Selenium best practices for web test automation. If you are familiar with Selenium WebDriver and have already implemented a few tests with the Page Object Pattern, the following guide will be much easier for understanding. We have chosen [GSM Arena](https://www.gsmarena.com/) public web site for demonstration purposes, the whole test source code is located in [carina-demo](https://github.com/qaprosoft/carina-demo) Github repo.
+Note: Starting from 7.0.4 consider that instead of `extends AbstractTest` we have to `implements IAbstractTest` interface
+
+Carina framework follows Selenium best practices for web test automation. If you are familiar with Selenium WebDriver and have already implemented a few tests with the Page Object Pattern, the following guide will be much easier for understanding. We have chosen [GSM Arena](https://www.gsmarena.com/) public web site for demonstration purposes, the whole test source code is located in [carina-demo](https://github.com/zebrunner/carina-demo) Github repo.
 
 
 ### Implementation of Page Objects
@@ -141,8 +143,8 @@ public class HomePage extends AbstractPage {
 ### Implementation of tests
 Carina framework uses TestNG for test organization. In general, test represents a manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:
 ```
-public class WebSampleTest extends AbstractTest {
-    @Test(description = "JIRA#AUTO-0009")
+public class WebSampleTest implements IAbstractTest {
+    @Test()
     @MethodOwner(owner = "qpsdemo")
     public void testCompareModels() {
         // Open GSM Arena home page and verify page is opened
@@ -167,7 +169,7 @@ It is good practice to implement all elements search logic of Page Object/UI Obj
 
 **Important:**
 
-* Test class should extend **com.qaprosoft.carina.core.foundation.AbstractTest**
+* Test class should implement **com.qaprosoft.carina.core.foundation.IAbstractTest**
 * Test method should start with **org.testng.annotations.Test** annotation
 * Use **getDriver()** method to get driver instance in the test
 * Locate tests in src/test/java source folder
@@ -176,8 +178,7 @@ It is good practice to implement all elements search logic of Page Object/UI Obj
 There are a few critical properties in a _config.properties file which are required for web test execution:
 
 * url=http://www.gsmarena.com
-* browser=chrome
-* browser_version=*
+* capabilities.browserName=chrome
 
 The implemented test cases should be placed in a TestNG xml file according to the test group the test belongs to. You can find more details about TestNG configuration in the [official documentation](http://testng.org/doc/documentation-main.html).
 ```xml
@@ -211,7 +212,7 @@ page.assertPageOpened();  // equals Assert.assertTrue(page.isPageOpened(),"PageN
 
 Page opening strategy configuration can be set in several places:
 
-1) in [_config.properties](http://qaprosoft.github.io/carina/configuration/). This determines whole project page open strategy.
+1) in [_config.properties](http://zebrunner.github.io/carina/configuration/). This determines whole project page open strategy.
 
 2) In page.class. This overrides global page opening strategy for a specific page.
 

@@ -45,7 +45,7 @@ public enum Filter {
         this.filter = filter;
     }
 
-    public Filter getRuleByName(String ruleName) {
+    public static Filter getRuleByName(String ruleName) {
         try {
             Filter rule = Filter.valueOf(ruleName.toUpperCase());
             return rule;

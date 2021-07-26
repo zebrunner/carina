@@ -45,18 +45,13 @@ All the project configuration properties are located in a **_config.properties**
 		<td>Boolean</td>
 	</tr>
 	<tr>
-		<td>browser_version</td>
-		<td>Browser version or an empty string if unknown for Selenium Grid</td>
-		<td>"87", "72"</td>
-	</tr>
-		<tr>
 		<td>browser_language</td>
 		<td>Browser language or nothing to use the English version by default.</td>
 		<td>"es", "fr"</td>
 	</tr>
 	<tr>
-		<td>selenium_host</td>
-		<td>Selenium/Appium server host</td>
+		<td>selenium_url</td>
+		<td>Selenium/Appium server url</td>
 		<td>http://localhost:4444/wd/hub</td>
 	</tr>
 	<tr>
@@ -210,7 +205,7 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 		<tr>
 		<td>thread_count</td>
-		<td>Default number of threads to use when running tests in parallel. Set thread_count=custom to disable any updates on carina side.</td>
+		<td>Default number of threads to use when running tests in parallel. Set thread-count=custom to disable any updates on carina side.</td>
 		<td>Integer</td>
 	</tr>
 		<tr>
@@ -264,39 +259,18 @@ All the project configuration properties are located in a **_config.properties**
 		<td>gkhcvdgvceUYF67897hbjsbdc</td>
 	</tr>
 		<tr>
-		<td>s3_local_storage</td>
-		<td>Local directory for downloading build artifacts</td>
-		<td>./s3</td>
-	</tr>
-		<tr>
 		<td>appcenter_token</td>
 		<td>Token for authentication in Hockey App</td>
 		<td>gkhcvdgvceUYF67897hbjsbdc</td>
 	</tr>
 		<tr>
-		<td>appcenter_local_storage</td>
-		<td>Directory for AppCenter artifacts</td>
-		<td>./appcenter</td>
-	</tr>
-		<tr>
-		<td>add_new_localization</td>
-		<td>Should be set to 'true' if you want to create new localization files for the required Locale. Otherwise, there will be just the localization checking</td>
-		<td>Boolean</td>
-	</tr>
-		<tr>
-		<td>add_new_localization_encoding</td>
 		<td>Encoding for a new localization</td>
 		<td>UTF-8</td>
 	</tr>
 		<tr>
-		<td>add_new_localization_path</td>
-		<td>Path where created localization properties should be saved. If null, they will be added to an artifactory folder in the report</td>
-		<td>./src/main/resources/L10N</td>
-	</tr>
-		<tr>
-		<td>add_new_localization_property_name</td>
-		<td>Basic template for property name.</td>
-		<td>new_locale_file_</td>
+		<td>localization_testing</td>
+		<td>Enables auto verification for elements that are marked with @Localized</td>
+		<td>true, false</td>
 	</tr>
 		<tr>
 		<td>tls_keysecure_location</td>
@@ -316,7 +290,7 @@ All the project configuration properties are located in a **_config.properties**
 	<tr>
 		<td>test_run_rules</td>
 		<td>Executing rules logic: test_run_rules={RULE_NAME_ENUM}=>{RULE_VALUE1}&&{RULE_VALUE2};;...</td>
-		<td>test_run_rules=PRIORITY=>P1&amp;&amp;P2;;OWNER=>owner;;TAGS=>tag1=temp&amp;&amp;feature=reg</td>
+		<td>test_run_rules=PRIORITY=>P1&amp;&amp;P2&&P4;;OWNER=>owner;;TAGS=>tag1=temp||!!feature=reg</td>
 	</tr>
 	<tr>
 		<td>element_loading_strategy</td>
@@ -330,11 +304,12 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 </table>
 Most of the properties may be read in the following way:
+
 ```
 Configuration.get(Parameter.URL) // returns string value
 Configuration.getBoolean(Parameter.AUTO_SCREENSHOT) // returns boolean value
 Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) //return int value
-Configuration.getDouble(Parameter.BROWSER_VERSION) // returns double value
+Configuration.getDouble(Parameter.MAX_DRIVER_COUNT) // returns double value
 ```
 
 ### Environment specific configuration
@@ -351,8 +326,78 @@ Configuration.getEnvArg("url")
 ```
 As a result, you switch between the environments just changing the env argument in the _config.properties file.
 
+### Tests execution filter configuration
+The test_run_rules parameter is responsible for filtering tests.
+There are 3 filter types:
+1) PRIORITY - enum field (from P0 to P6)
+2) OWNER - the test owner
+3) TAGS - custom label
+
+Example of how to attach labels in code:
+```
+@Test
+@TestPriority(Priority.P3)
+@MethodOwner(owner = "Josh")
+@MethodOwner(owner = "Jake")
+@TestTag(name = "feature", value = "web")
+@TestTag(name = "type", value = "regression")
+public void t4(){
+	...
+	some code
+	...
+}
+```
+
+test_run_rules parameter parse logic:
+
+1) A simple filter:
+```
+test_run_rules=OWNER=>Josh
+#Where OWNER is tag, and "=>" split's tag and rule part.
+#Because of the "Josh" rule, test will be executed if it has Josh as owner
+```
+2) With negative logic:
+```
+test_run_rules=OWNER=>!!Josh
+#Test will be executed if it hasn't got Josh as owner
+```
+3) With boolean logic:
+```
+#Use || or && to create more difficult rules
+#where || == OR; && == AND.
+
+test_run_rules=OWNER=>Josh||Jake
+#Test will be executed if it has at least Josh or Jake as owner.
+
+test_run_rules=OWNER=>Josh&&Jake
+#Test will be executed if it has at least Jish and Jake as owner
+
+test_run_rules=OWNER=>Josh&&Jake||Peter
+#Expression will be processed in sequential priority, like
+#test_run_rules=OWNER=>((Josh&&Jake)||Peter)
+#So test will be executed if it has at least (Josh and Jake) or (Peter) as owner
+```
+4) To add more tags to the rule use ";;", example:
+```
+#;; works as && (AND) but for tags
+
+test_run_rules=PRIORITY=>!!P1;;OWNER=>Josh&&!!Jake;;TAGS=>feature=web&&!!type=smoke||feature=android
+
+#Test will be executed if it has
+#1) no @TestPriority(Priority.P1)
+#AND
+#2) @MethodOwner(owner = "Josh") without @MethodOwner(owner = "Jake")
+#AND
+#3) (@TestTag(name = "feature", value = "web") without @TestTag(name = "type", value = "smoke"))
+	 	or @TestTag(name = "feature", value = "android")	 	
+
+#In other words, will be executed tests with Priority that differs from P1, with Josh as owner if there no Jake 
+#and if they are for not smoke web or if they are for android.
+```
+
 ### [Zebrunner Reporting](https://zebrunner.com/documentation/agents/testng) configuration
-[**agent.properties**](https://github.com/qaprosoft/carina-demo/blob/master/src/main/resources/agent.properties) file is used for Zebrunner Reporting integration, here you should specify some values for a proper integration:<table>
+[**agent.properties**](https://github.com/zebrunner/carina-demo/blob/master/src/main/resources/agent.properties) file is used for Zebrunner Reporting integration, here you should specify some values for a proper integration:
+<table>	
 	<tr>
 		<th>Attribute</th>
 		<th>Meaning</th>

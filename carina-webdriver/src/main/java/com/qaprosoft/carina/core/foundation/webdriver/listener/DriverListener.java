@@ -156,7 +156,12 @@ public class DriverListener implements WebDriverEventListener {
         // most suspicious are capture screenshots, generating dumps etc
         if (thr == null
                 || thr.getMessage() == null
-                || thr.getMessage().contains("Method has not yet been implemented")
+                || thr.getMessage().contains("Method has not yet been implemented")                        
+                || thr.getMessage().contains("Expected to read a START_MAP but instead have: END. Last 0 characters read")
+                || thr.getMessage().contains("Unable to determine type from: <. Last 1 characters read")
+                || thr.getMessage().contains("script timeout")
+                || thr.getMessage().contains("javascript error: Cannot read property 'outerHTML' of null")
+                || thr.getMessage().contains("javascript error: Cannot read property 'scrollHeight' of null")
                 || thr.getMessage().contains("Method is not implemented")
                 || thr.getMessage().contains("An element could not be located on the page using the given search parameters")
                 || thr.getMessage().contains("no such element: Unable to locate element")
@@ -340,6 +345,8 @@ public class DriverListener implements WebDriverEventListener {
 
     /**
      * Cast Carina driver to WebDriver removing all extra listeners (try to avoid direct operations via WebDriver as it doesn't support logging etc)
+     *
+     * @param drv WebDriver
      *
      * @return WebDriver
      */

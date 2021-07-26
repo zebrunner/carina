@@ -57,8 +57,6 @@ public enum R {
 
     private static final String OVERRIDE_SIGN = "_";
 
-    private static final String ENG_ARG_RESOLVER_PATH = "com.qaprosoft.carina.core.foundation.utils.DefaultEnvArgResolver";
-
     private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
 
     private String resourceFile;
@@ -103,7 +101,6 @@ public enum R {
 
                 // init R.CONFIG with default values for required fields
                 if (resource.resourceFile.equals("config.properties")) {
-                    properties.put(Parameter.ENV_ARG_RESOLVER.getKey(),ENG_ARG_RESOLVER_PATH);
                     if (!CONFIG.isInit(Parameter.PROJECT_REPORT_DIRECTORY,properties)) {
                         properties.put(Parameter.PROJECT_REPORT_DIRECTORY.getKey(), "./reports");
                     }
@@ -122,8 +119,18 @@ public enum R {
                         String key = entry.getKey();
                         if (key.toLowerCase().startsWith(prefix)) {
                             String value = entry.getValue();
-                            if (!StringUtils.isEmpty(value)) {
+                            if (!StringUtils.isEmpty(value) && !value.equalsIgnoreCase(SpecialKeywords.NULL)) {
                                 properties.put(key, value);
+                            }
+                        }
+                    }
+                    // delete all empty or null capabilites.* items from properties
+                    for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+                        String key = (String) entry.getKey();
+                        if (key.toLowerCase().startsWith(prefix)) {
+                            String value = (String) entry.getValue();
+                            if (StringUtils.isEmpty(value) || value.equalsIgnoreCase(SpecialKeywords.NULL)) {
+                                properties.remove(key, value);
                             }
                         }
                     }

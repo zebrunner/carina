@@ -25,33 +25,38 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.AbstractTest;
+import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
 import com.qaprosoft.carina.core.foundation.report.testrail.TestRailCases;
 import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
 import com.qaprosoft.carina.core.foundation.utils.tag.Priority;
 import com.qaprosoft.carina.core.foundation.utils.tag.TestPriority;
-import com.qaprosoft.carina.core.foundation.utils.tag.TestTag;
 
 /**
  * This sample shows how to use data-providers.
  *
  * @author qpsdemo
  */
-public class DataprovidersSampleTest extends AbstractTest {
+public class DataprovidersSampleTest implements IAbstractTest {
     /**
      * Parametrization using external XLS/XLSX: every row in spreadsheet provides tests arguments set for 1 test.
      * <p>
-     * 1. Specify data-provider type: 
+     * 1. Specify data-provider type:
      * - @Test(dataProvider = "XLSDataProvider") allows parallel execution
-     * - @Test(dataProvider = "SingleDataProvider") allows single-thread execution 
-     * 2. In @XlsDataSourceParameters should contain: 
+     * - @Test(dataProvider = "SingleDataProvider") allows single-thread execution
+     * 2. In @XlsDataSourceParameters should contain:
      * - path - xls/xlsx file path located in src/test/resources
-     * - sheet - xls spreadsheet name 
-     * - dsUid - data-source unique identifier, use TUID or set of parameters 
+     * - sheet - xls spreadsheet name
+     * - dsUid - data-source unique identifier, use TUID or set of parameters
      * - dsArgs - column names from spreadsheet
+     *
+     * @param a String
+     *
+     * @param b String
+     *
+     * @param c String
      */
-    @Test(dataProvider = "DataProvider", description = "JIRA${symbol_pound}DEMO-0005")
+    @Test(dataProvider = "DataProvider")
     @MethodOwner(owner = "qpsdemo")
     @TestRailCases(testCasesId = "1")
     @XlsDataSourceParameters(path = "xls/demo.xlsx", sheet = "Calculator", dsUid = "TUID", dsArgs = "a,b,c", testRailColumn = "a")
@@ -60,20 +65,23 @@ public class DataprovidersSampleTest extends AbstractTest {
         int expected = Integer.valueOf(c);
         Assert.assertEquals(actual, expected, "Invalid sum result!");
     }
-    
+
     /**
-     * Parametrization using external XLS/XLSX: every row in spreadsheet provides tests arguments as Map<String, String> for 1 test.
-     * For datasets with huge number of columns just remove dsArgs parameter to return whole row as single map object  
+     *
+     * Parametrization using external XLS/XLSX: every row in spreadsheet provides tests arguments as Map&lt;String, String&gt; for 1 test.
+     * For datasets with huge number of columns just remove dsArgs parameter to return whole row as single map object
      * <p>
-     * 1. Specify data-provider type: 
+     * 1. Specify data-provider type:
      * - @Test(dataProvider = "XLSDataProvider") allows parallel execution
-     * - @Test(dataProvider = "SingleDataProvider") allows single-thread execution 
-     * 2. In @XlsDataSourceParameters should contain: 
+     * - @Test(dataProvider = "SingleDataProvider") allows single-thread execution
+     * 2. In @XlsDataSourceParameters should contain:
      * - path - xls/xlsx file path located in src/test/resources
-     * - sheet - xls spreadsheet name 
-     * - dsUid - data-source unique identifier, use TUID or set of parameters 
+     * - sheet - xls spreadsheet name
+     * - dsUid - data-source unique identifier, use TUID or set of parameters
+     *
+     * @param args HashMap&lt;String, String&gt;
      */
-    @Test(dataProvider = "DataProvider", description = "JIRA${symbol_pound}DEMO-0005")
+    @Test(dataProvider = "DataProvider")
     @MethodOwner(owner = "qpsdemo")
     @TestRailCases(testCasesId = "1")
     @XlsDataSourceParameters(path = "xls/demo.xlsx", sheet = "Calculator", dsUid = "TUID", testRailColumn = "a")
@@ -88,12 +96,21 @@ public class DataprovidersSampleTest extends AbstractTest {
      * <p>
      * 1. Create data-provider method that returns Object[][] and set DataProvider annotation. 2. Specify data-provider
      * name in @Test annotation.
+     *
+     * @param TUID String
+     *
+     * @param testRailColumn String
+     *
+     * @param a int
+     *
+     * @param b int
+     *
+     * @param c int
      */
-    @Test(dataProvider = "DP1", description = "JIRA${symbol_pound}DEMO-0006")
+    @Test(dataProvider = "DP1")
     @MethodOwner(owner = "qpsdemo")
     @TestPriority(Priority.P3)
     @TestRailCases(testCasesId = "44")
-    @TestTag(name = "area multi", value = "data provider multiply")
     public void testMuliplyOperation(String TUID, String testRailColumn, int a, int b, int c) {
         setCases(testRailColumn.split(","));
         int actual = a * b;
@@ -114,8 +131,13 @@ public class DataprovidersSampleTest extends AbstractTest {
      * <p>
      * 1. List all parameter names in appropriate annotation. 2. Pass all parameters from TestNG xml file (check
      * test_suites/dataproviders.xml).
+     * @param a int
+     *
+     * @param b int
+     *
+     * @param c int
      */
-    @Test(description = "JIRA${symbol_pound}DEMO-0007")
+    @Test()
     @MethodOwner(owner = "qpsdemo")
     @Parameters({"a", "b", "c"})
     @TestRailCases(testCasesId = "55")

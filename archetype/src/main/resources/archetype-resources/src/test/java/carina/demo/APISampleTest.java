@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 import com.qaprosoft.apitools.validation.JsonCompareKeywords;
-import com.qaprosoft.carina.core.foundation.AbstractTest;
+import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
 import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
 import com.qaprosoft.carina.core.foundation.utils.tag.Priority;
@@ -40,11 +40,11 @@ import ${package}.carina.demo.api.PostUserMethod;
  *
  * @author qpsdemo
  */
-public class APISampleTest extends AbstractTest {
+public class APISampleTest implements IAbstractTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    
 
-    @Test(description = "JIRA${symbol_pound}DEMO-0001")
+
+    @Test()
     @MethodOwner(owner = "qpsdemo")
     public void testCreateUser() throws Exception {
         LOGGER.info("test");
@@ -55,7 +55,7 @@ public class APISampleTest extends AbstractTest {
         api.validateResponse();
     }
 
-    @Test(description = "JIRA${symbol_pound}DEMO-0002")
+    @Test()
     @MethodOwner(owner = "qpsdemo")
     public void testCreateUserMissingSomeFields() throws Exception {
         PostUserMethod api = new PostUserMethod();
@@ -66,7 +66,7 @@ public class APISampleTest extends AbstractTest {
         api.validateResponse();
     }
 
-    @Test(description = "JIRA${symbol_pound}DEMO-0003")
+    @Test()
     @MethodOwner(owner = "qpsdemo")
     public void testGetUsers() {
         GetUserMethods getUsersMethods = new GetUserMethods();
@@ -76,7 +76,7 @@ public class APISampleTest extends AbstractTest {
         getUsersMethods.validateResponseAgainstSchema("api/users/_get/rs.schema");
     }
 
-    @Test(description = "JIRA${symbol_pound}DEMO-0004")
+    @Test()
     @MethodOwner(owner = "qpsdemo")
     @TestPriority(Priority.P1)
     public void testDeleteUsers() {

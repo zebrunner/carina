@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.DisableCacheLookup;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Localized;
 
 /**
  * The default element locator, which will lazily locate an element or an
@@ -45,10 +46,13 @@ public class ExtendedElementLocator implements ElementLocator {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final SearchContext searchContext;
-    private boolean shouldCache;
-    private boolean caseInsensitive;
     private By by;
     private WebElement cachedElement;
+    private String className;
+    
+    private boolean shouldCache = true;
+    private boolean caseInsensitive = false;
+    private boolean localized = false;
 
     /**
      * Creates a new element locator.
@@ -59,11 +63,11 @@ public class ExtendedElementLocator implements ElementLocator {
      */
     public ExtendedElementLocator(SearchContext searchContext, Field field) {
         this.searchContext = searchContext;
+        String[] classPath = field.getDeclaringClass().toString().split("\\.");
+        this.className = classPath[classPath.length-1];
 
         if (field.isAnnotationPresent(FindBy.class) || field.isAnnotationPresent(ExtendedFindBy.class)) {
             LocalizedAnnotations annotations = new LocalizedAnnotations(field);
-            this.shouldCache = true;
-            this.caseInsensitive = false;
             this.by = annotations.buildBy();
             if (field.isAnnotationPresent(DisableCacheLookup.class)) {
                 this.shouldCache = false;
@@ -71,8 +75,10 @@ public class ExtendedElementLocator implements ElementLocator {
             if (field.isAnnotationPresent(CaseInsensitiveXPath.class)) {
                 this.caseInsensitive = true;
             }
+            if (field.isAnnotationPresent(Localized.class)) {
+                this.localized = true;
+            }
         }
-
     }
 
     /**
@@ -111,7 +117,7 @@ public class ExtendedElementLocator implements ElementLocator {
         if (element == null) {
             throw exception != null ? exception : new NoSuchElementException("Unable to find element by Selenium/AI");
         }
-
+        
         // 1. enable cache for successfully discovered element to minimize selenium calls
         if (shouldCache) {
             cachedElement = element;
@@ -186,6 +192,14 @@ public class ExtendedElementLocator implements ElementLocator {
 
     public void setShouldCache(boolean shouldCache) {
         this.shouldCache = shouldCache;
+    }
+    
+    public boolean isLocalized() {
+        return localized;
+    }
+
+    public String getClassName(){
+        return className;
     }
 
 }

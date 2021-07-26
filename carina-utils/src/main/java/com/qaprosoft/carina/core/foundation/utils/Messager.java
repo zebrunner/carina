@@ -32,23 +32,23 @@ import com.qaprosoft.carina.core.foundation.utils.messager.IMessager;
 // TODO: move to messager package
 public enum Messager implements IMessager {
 	
-    TEST_STARTED("%s TEST [%s] STARTED at [%s]"),
+    TEST_STARTED("TEST [%s] STARTED at [%s]"),
 
-    TEST_PASSED("%s TEST [%s] PASSED at [%s]"),
+    TEST_PASSED("TEST [%s] PASSED at [%s]"),
 
-    TEST_SKIPPED("%s TEST [%s] SKIPPED at [%s] - %s"),
+    TEST_SKIPPED("TEST [%s] SKIPPED at [%s] - %s"),
 
-    TEST_FAILED("%s TEST [%s] FAILED at [%s] - %s"),
+    TEST_FAILED("TEST [%s] FAILED at [%s] - %s"),
 
-    RETRY_FAILED("%s TEST [%s] RETRY %s of %s FAILED - %s"),
+    RETRY_FAILED("TEST [%s] RETRY %s of %s FAILED - %s"),
 
-    CONFIG_STARTED("%s CONFIG [%s] START at [%s]"),
+    CONFIG_STARTED("CONFIG [%s] START at [%s]"),
 
-    CONFIG_PASSED("%s CONFIG [%s] PASS at [%s]"),
+    CONFIG_PASSED("CONFIG [%s] PASS at [%s]"),
 
-    CONFIG_SKIPPED("%s CONFIG [%s] SKIP at [%s] - %s"),
+    CONFIG_SKIPPED("CONFIG [%s] SKIP at [%s] - %s"),
 
-    CONFIG_FAILED("%s CONFIG [%s] FAIL at [%s] - %s"),
+    CONFIG_FAILED("CONFIG [%s] FAIL at [%s] - %s"),
 
     TEST_RESULT("RESULT #%s: TEST [%s] %s [%s]"),
 
@@ -56,11 +56,17 @@ public enum Messager implements IMessager {
     
     FAIL_GET_PAGE_SOURCE("FAIL: getting page source"),
     
+    ADD_COOKIE("INFO: adding cookie '%s'"),
+    
+    FAIL_ADD_COOKIE("FAIL: adding cookie '%s'"),
+    
     OPENING_URL("INFO: opening url '%s'"),
     
-    OPEN_URL("INFO: url '%s' is opened."),
+    OPENED_URL("INFO: url '%s' is opened."),
     
-    NOT_OPEN_URL("FAIL: url '%s' is not opened!"),
+    NOT_OPENED_URL("FAIL: url '%s' is not opened!"),
+    
+    FAIL_GET_TITLE("FAIL: page title can't be detected!"),
 
     VALIDATION_FAIL("FAIL: '%s' !"),
 
@@ -72,7 +78,9 @@ public enum Messager implements IMessager {
 
     BACK("INFO: navigate to previous page performed."),
 
-    REFRESH("INFO: refresh performed."),
+    REFRESH("INFO: refresh page."),
+
+    FAIL_REFRESH("FAIL: refresh page."),
 
     EXPECTED_URL("PASS: url '%s' is correct."),
 
@@ -138,11 +146,9 @@ public enum Messager implements IMessager {
 
     UI_OBJECT_NOT_PRESENT("FAIL: UI object '%s' does not present!"),
 
-    TITLE_CORERECT("PASS: page '%s' has correct title '%s'."),
+    TITLE_CORRECT("PASS: page has correct title '%s'."),
 
-    TITLE_NOT_CORERECT("FAIL: unexpected title for page '%s', expected '%s' but actual '%s'!"),
-
-    TITLE_DOES_NOT_MATCH_TO_PATTERN("FAIL: unexpected title for page '%s', expected pattern is '%s' but actual '%s'!"),
+    TITLE_NOT_CORRECT("FAIL: incorrect title, expected '%s' but actual '%s'!"),
 
     STEPS_TO_REPRODUCE("Steps to reproduce test failure: \r\n%s"),
 

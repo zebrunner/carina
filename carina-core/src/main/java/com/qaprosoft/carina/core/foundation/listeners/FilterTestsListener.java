@@ -1,9 +1,7 @@
 package com.qaprosoft.carina.core.foundation.listeners;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +41,7 @@ public class FilterTestsListener implements ISuiteListener {
                 if (!isPerform) {
                     break;
                 }
-                isPerform = rule.getTestFilter().isPerform(testMethod, rule.getRuleValues());
+                isPerform = rule.getTestFilter().isPerform(testMethod, rule.getRuleExpression());
             }
             // condition when test should be disabled
             if (!isPerform) {
@@ -60,7 +58,7 @@ public class FilterTestsListener implements ISuiteListener {
     /**
      * Method to disable test
      * 
-     * @param testMethod
+     * @param testMethod ITestNGMethod
      */
     private void disableTest(ITestNGMethod testMethod) {
         LOGGER.info(String.format("Disable test: [%s]", testMethod.getMethodName()));
@@ -68,34 +66,42 @@ public class FilterTestsListener implements ISuiteListener {
     }
 
     /**
-     * 
      * Method that is responsible for rules and filters parsing
-     * 
+     *
      * @param ruleStr String
      * @return list of rules
      */
     private List<Rule> parseRules(String ruleStr) {
         List<Rule> rules = new ArrayList<>();
         String[] ruleStructure;
-        String[] ruleValues;
-        IFilter filter;
-        Rule rule;
         if (!ruleStr.isEmpty()) {
             LOGGER.info("Rules for suite limitation have been defined.");
-            if(ruleStr.contains("&amp;&amp;")) {
-                ruleStr = ruleStr.replaceAll("&amp;&amp;",SpecialKeywords.RULE_FILTER_AND_CONDITION);
+            if (ruleStr.contains("&amp;&amp;")) {
+                ruleStr = ruleStr.replaceAll("&amp;&amp;", SpecialKeywords.RULE_FILTER_AND_CONDITION);
             }
 
+            //parsing each rule
             for (String ruleItem : ruleStr.split(SpecialKeywords.RULE_FILTER_SPLITTER)) {
+                //ruleStructure[0] contains type of the rule, ruleStructure[1] contains the rule description
                 ruleStructure = ruleItem.split(SpecialKeywords.RULE_FILTER_VALUE_SPLITTER);
-                ruleValues = ruleStructure[1].split(SpecialKeywords.RULE_FILTER_AND_CONDITION);
-                filter = Filter.PRIORITY.getRuleByName(ruleStructure[0]).getFilter();
-                rule = new Rule(ruleStructure[0], filter, Arrays.asList(ruleValues));
-                LOGGER.info("Following rule will be added: ".concat(rule.toString()));
-                rules.add(rule);
+                if (ruleStructure.length == 2) {
+                    List<String> priority = prioritize(ruleStructure[1]);
+                    IFilter filter = Filter.getRuleByName(ruleStructure[0]).getFilter();
+                    rules.add(new Rule(ruleStructure[0], filter, priority));
+                }
             }
         }
         return rules;
     }
 
+    /**
+     * Method that is responsible for parsing rule String into prioritized sequence.
+     *
+     * @param ruleStr String
+     * @return prioritized sequence
+     */
+    private List<String> prioritize(String ruleStr) {
+        List<String> values = new ArrayList<>(Arrays.asList(ruleStr.split("(?=&&)|(?=\\|\\|)")));
+        return values;
+    }
 }

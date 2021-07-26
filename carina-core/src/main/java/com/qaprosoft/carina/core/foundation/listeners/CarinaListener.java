@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Category;
 import org.apache.log4j.Level;
@@ -40,16 +41,16 @@ import org.apache.log4j.PropertyConfigurator;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.testng.Assert;
+import org.testng.IClassListener;
 import org.testng.ISuite;
 import org.testng.ISuiteListener;
+import org.testng.ITestClass;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.SkipException;
 import org.testng.TestListenerAdapter;
 import org.testng.TestNG;
-import org.testng.ITestClass;
-import org.testng.IClassListener;
 import org.testng.xml.XmlClass;
 import org.testng.xml.XmlInclude;
 import org.testng.xml.XmlSuite;
@@ -60,8 +61,10 @@ import org.w3c.dom.Node;
 
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.azure.storage.blob.models.BlobProperties;
 import com.qaprosoft.amazon.AmazonS3Manager;
 import com.qaprosoft.appcenter.AppCenterManager;
+import com.qaprosoft.azure.AzureManager;
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
@@ -75,6 +78,7 @@ import com.qaprosoft.carina.core.foundation.skip.ExpectedSkipManager;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.DateUtils;
+import com.qaprosoft.carina.core.foundation.utils.FileManager;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.ZebrunnerNameResolver;
@@ -82,7 +86,6 @@ import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.ftp.FtpUtils;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
-import com.qaprosoft.carina.core.foundation.utils.resources.L10Nparser;
 import com.qaprosoft.carina.core.foundation.utils.tag.PriorityManager;
 import com.qaprosoft.carina.core.foundation.utils.tag.TagManager;
 import com.qaprosoft.carina.core.foundation.webdriver.CarinaDriver;
@@ -102,8 +105,8 @@ import com.zebrunner.agent.core.registrar.maintainer.ChainedMaintainerResolver;
 import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
 
 /*
- * CarinaListener - base carin-core TestNG Listener.
- * 
+ * CarinaListener - base carina-core TestNG Listener.
+ *
  * @author Vadim Delendik
  */
 public class CarinaListener extends AbstractTestListener implements ISuiteListener, IQTestManager, ITestRailManager, IClassListener {
@@ -113,67 +116,56 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     protected static final String SUITE_TITLE = "%s%s%s - %s (%s%s)";
     protected static final String XML_SUITE_NAME = " (%s)";
-    
+
     protected static boolean automaticDriversCleanup = true;
-    
-    static {
+
+    public CarinaListener(){
+        // Add shutdown hook
+        Runtime.getRuntime().addShutdownHook(new ShutdownHook());
+
+        // Zebrunner core java agent is user for capturing events of RemoteDriverSession instances.
+        // Internally, the agent uses java instrumentation agent for its purposes.
+        // The instrumentation agent implicitly triggers initialization of the R class because it uses logger.
+        // Carina has the ThreadLogAppender class which is closely related to logging and internally uses the R class.
+        // Technically, this happen when the maven-surefire-plugin has not set inherited program arguments (passed to mvn process).
+        // That is why it is necessary to reinit R class here when TestNG loads the CarinaListener class.
+        R.reinit();
+
+        // Set log4j properties
+        URL log4jUrl = ClassLoader.getSystemResource("carina-log4j.properties");
+        LOGGER.debug("carina-log4j.properties: " + log4jUrl);
+        PropertyConfigurator.configure(log4jUrl);
+
+        LOGGER.info(Configuration.asString());
+        // Configuration.validateConfiguration();
+
         try {
-            // Add shutdown hook
-            Runtime.getRuntime().addShutdownHook(new ShutdownHook());
-
-            // Zebrunner core java agent is user for capturing events of RemoteDriverSession instances.
-            // Internally, the agent uses java instrumentation agent for its purposes.
-            // The instrumentation agent implicitly triggers initialization of the R class because it uses logger.
-            // Carina has the ThreadLogAppender class which is closely related to logging and internally uses the R class.
-            // Technically, this happen when the maven-surefire-plugin has not set inherited program arguments (passed to mvn process).
-            // That is why it is necessary to reinit R class here when TestNG loads the CarinaListener class.
-            R.reinit();
-
-            // Set log4j properties
-            URL log4jUrl = ClassLoader.getSystemResource("carina-log4j.properties");
-            LOGGER.debug("carina-log4j.properties: " + log4jUrl);
-            PropertyConfigurator.configure(log4jUrl);
-
-            LOGGER.info(Configuration.asString());
-            // Configuration.validateConfiguration();
-
-            try {
-                L10N.init();
-            } catch (Exception e) {
-                LOGGER.error("L10N bundle is not initialized successfully!", e);
-            }
-
-            try {
-                L10Nparser.init();
-            } catch (Exception e) {
-                LOGGER.error("L10N parser bundle is not initialized successfully!", e);
-            }
-
-            // declare global capabilities in configuration if custom_capabilities is declared 
-            String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
-            if (!customCapabilities.isEmpty()) {
-                // redefine core CONFIG properties using global custom capabilities file
-                new CapabilitiesLoader().loadCapabilities(customCapabilities);
-            }
-
-            IScreenshotRule autoScreenshotsRule = (IScreenshotRule) new AutoScreenshotRule();
-            Screenshot.addScreenshotRule(autoScreenshotsRule);
-            
-            updateAppPath();
-            
-            TestNameResolverRegistry.set(new ZebrunnerNameResolver());
-            CompositeLabelResolver.addResolver(new TagManager());
-            CompositeLabelResolver.addResolver(new PriorityManager());
-
+            L10N.load();
         } catch (Exception e) {
-            LOGGER.error("Undefined failure during static carina listener init!", e);
+            LOGGER.error("L10N bundle is not initialized successfully!", e);
         }
+
+        // declare global capabilities in configuration if custom_capabilities is declared
+        String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
+        if (!customCapabilities.isEmpty()) {
+            // redefine core CONFIG properties using global custom capabilities file
+            new CapabilitiesLoader().loadCapabilities(customCapabilities);
+        }
+
+        IScreenshotRule autoScreenshotsRule = (IScreenshotRule) new AutoScreenshotRule();
+        Screenshot.addScreenshotRule(autoScreenshotsRule);
+
+        updateAppPath();
+
+        TestNameResolverRegistry.set(new ZebrunnerNameResolver());
+        CompositeLabelResolver.addResolver(new TagManager());
+        CompositeLabelResolver.addResolver(new PriorityManager());
     }
 
     @Override
     public void onStart(ISuite suite) {
         LOGGER.debug("CarinaListener->onStart(ISuite suite)");
-        
+
         // first means that ownership/maintainer resolver from carina has higher priority
         ChainedMaintainerResolver.addFirst(new Ownership(suite.getParameter("suiteOwner")));
 
@@ -202,17 +194,15 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
         setThreadCount(suite);
         onHealthCheck(suite);
-        
-        //register app link artifact if available...
-        String appUrl = Configuration.get(Parameter.APP_PRESIGN_URL);
-        if (!appUrl.isEmpty()) {
-            LOGGER.debug("app url: " + appUrl);
-            Artifact.attachReferenceToTestRun("app", appUrl);
+
+        String mobileApp = Configuration.getMobileApp();
+        if (!mobileApp.isEmpty()) {
+            // [VD] do not move into the static block as Zebrunner reporting need registered test run!
+            Artifact.attachReferenceToTestRun("app", mobileApp);
         }
-        
         // register app_version/build as artifact if available...
         Configuration.setBuild(Configuration.get(Parameter.APP_VERSION));
-        
+
         LOGGER.info("CARINA_CORE_VERSION: " + getCarinaVersion());
     }
 
@@ -261,13 +251,10 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             TestPhase.setActivePhase(Phase.AFTER_SUITE);
         }
     }
-    
+
     @Override
     public void onConfigurationFailure(ITestResult result) {
         LOGGER.debug("CarinaListener->onConfigurationFailure");
-        String errorMessage = getFailureReason(result);
-        takeScreenshot(result, "CONFIGURATION FAILED - " + errorMessage);
-
         super.onConfigurationFailure(result);
     }
 
@@ -304,8 +291,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     @Override
     public void onTestSkipped(ITestResult result) {
         LOGGER.debug("CarinaListener->onTestSkipped");
-        String errorMessage = getFailureReason(result);
-        takeScreenshot(result, "TEST FAILED - " + errorMessage);
         onTestFinish(result);
         super.onTestSkipped(result);
     }
@@ -338,7 +323,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             R.EMAIL.clearTestProperties();
             R.REPORT.clearTestProperties();
             R.ZAFIRA.clearTestProperties();
-            
+
             LOGGER.debug("Test result is : " + result.getStatus());
             // result status == 2 means failure, status == 3 means skip. We need to quit driver anyway for failure and skip
             if ((automaticDriversCleanup && !hasDependencies(result)) || result.getStatus() == 2 || result.getStatus() == 3) {
@@ -347,7 +332,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 }
             }
 
-            attachLabels(result);
+            attachTestLabels(result);
         } catch (Exception e) {
             LOGGER.error("Exception in CarinaListener->onTestFinish!", e);
         }
@@ -375,6 +360,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     @Override
     public void onFinish(ISuite suite) {
         LOGGER.debug("CarinaListener->onFinish(ISuite suite)");
+        attachTestRunLabels(suite);
         try {
             // TODO: quitAllDivers forcibly
             ReportContext.removeTempDir(); // clean temp artifacts directory
@@ -402,8 +388,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
             ReportContext.getTempDir().delete();
 
-            // // Update JIRA
-            // Jira.updateAfterSuite(context,
             // EmailReportItemCollector.getTestResults());
 
             LOGGER.debug("Generating email report...");
@@ -444,7 +428,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             }
         }
     }
-    
+
     /**
      * Disable automatic drivers cleanup after each TestMethod and switch to controlled by tests itself.
      * But anyway all drivers will be closed forcibly as only suite is finished or aborted 
@@ -559,21 +543,26 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         return getS3Artifact(Configuration.get(Parameter.S3_BUCKET_NAME), key);
     }
 
+    protected void putAzureArtifact(String remotePath, String localPath) {
+        AzureManager.getInstance().put(Configuration.get(Parameter.AZURE_CONTAINER_NAME), remotePath, localPath);
+    }
+
+    protected void getAzureArtifact(String bucket, String remotePath, File localPath) {
+        AzureManager.getInstance().download(bucket, remotePath, localPath);
+    }
+
     private static void updateAppPath() {
-        try {
-            if (!Configuration.get(Parameter.ACCESS_KEY_ID).isEmpty()) {
-                updateS3AppPath();
-            }
-        } catch (Exception e) {
-            LOGGER.error("AWS S3 manager exception detected!", e);
+        if (!Configuration.get(Parameter.AZURE_ACCESS_KEY_TOKEN).isEmpty()) {
+            updateAzureAppPath();
         }
 
-        try {
-            if (!Configuration.get(Parameter.APPCENTER_TOKEN).isEmpty()) {
-                updateAppCenterAppPath();
-            }
-        } catch (Exception e) {
-            LOGGER.error("AppCenter manager exception detected!", e);
+        if (!Configuration.get(Parameter.APPCENTER_TOKEN).isEmpty()) {
+            updateAppCenterAppPath();
+        }
+
+        // AWS S3 is preferable and has higher priority
+        if (!Configuration.get(Parameter.ACCESS_KEY_ID).isEmpty()) {
+            updateS3AppPath();
         }
     }
 
@@ -595,23 +584,13 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             String buildType = matcher.group(3);
             String version = matcher.group(4);
 
-            String appCenterAppLocalStorage = Configuration.get(Parameter.APPCENTER_LOCAL_STORAGE);
-            // download file from AppCenter to local storage
-
-            File file = AppCenterManager.getInstance().getBuild(appCenterAppLocalStorage, appName, platformName, buildType,
+            //TODO: test if generated appcenter download url is valid
+            String presignedAppUrl = AppCenterManager.getInstance().getDownloadUrl(appName, platformName, buildType,
                     version);
 
-            Configuration.setMobileApp(file.getAbsolutePath());
+            Configuration.setMobileApp(presignedAppUrl);
 
-            LOGGER.info("Updated mobile app: " + Configuration.getMobileApp());
-
-            // try to redefine app_version if it's value is latest or empty
-            String appVersion = Configuration.get(Parameter.APP_VERSION);
-            if (appVersion.equals("latest") || appVersion.isEmpty()) {
-                Configuration.setBuild(file.getName());
-            }
         }
-
     }
 
     /**
@@ -644,46 +623,72 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                     key = lastBuild.getKey();
                 }
 
+            } else {
+                key = AmazonS3Manager.getInstance().get(bucketName, key).getKey();
             }
-            
+            LOGGER.info("next s3 app key will be used: " + key);
+
             // generate presign url explicitly to register link as run artifact
             long hours = 72L*1000*60*60; // generate presigned url for nearest 3 days
             String presignedAppUrl = AmazonS3Manager.getInstance().generatePreSignUrl(bucketName, key, hours).toString();
-            R.CONFIG.put(Parameter.APP_PRESIGN_URL.getKey(), presignedAppUrl);
+            Configuration.setMobileApp(presignedAppUrl);
+        }
+    }
 
-            if (Configuration.getBoolean(Parameter.S3_USE_PRESIGN_URL)) {
-                // update app path using presign url only if S3_USE_PRESIGN_URL=true
-                Configuration.setMobileApp(presignedAppUrl);
-            } else {
-                // download artifact into the local storage
-                S3Object objBuild = AmazonS3Manager.getInstance().get(bucketName, key);
-    
-                String s3LocalStorage = Configuration.get(Parameter.S3_LOCAL_STORAGE);
-    
-                // download file from AWS to local storage
-    
-                String fileName = s3LocalStorage + "/" + StringUtils.substringAfterLast(objBuild.getKey(), "/");
-                File file = new File(fileName);
-    
-                // verify maybe requested artifact with the same size was already
-                // download
-                if (file.exists() && file.length() == objBuild.getObjectMetadata().getContentLength()) {
-                    LOGGER.info("build artifact with the same size already downloaded: " + file.getAbsolutePath());
+    /**
+     * Method to update MOBILE_APP path in case if apk is located in Azure storage.
+     */
+    private static void updateAzureAppPath() {
+        Pattern AZURE_CONTAINER_PATTERN = Pattern.compile("\\/\\/([a-z0-9]{3,24})\\.blob.core.windows.net\\/(?:(\\$root|(?:[a-z0-9](?!.*--)[a-z0-9-]{1,61}[a-z0-9]))\\/)?(.{1,1024})");
+
+        String mobileAppPath = Configuration.getMobileApp();
+        Matcher matcher = AZURE_CONTAINER_PATTERN.matcher(mobileAppPath);
+
+        LOGGER.info("Analyzing if mobile app is located on Azure...");
+
+        if (matcher.find()) {
+            LOGGER.info("app artifact is located on Azure...");
+            String accountName = matcher.group(1);
+            String containerName = matcher.group(2) == null ? "$root" : matcher.group(2);
+            String remoteFilePath = matcher.group(3);
+
+            LOGGER.info(
+                    "Account: " + accountName + "\n" +
+                    "Container: " + containerName + "\n" +
+                    "RemotePath: " + remoteFilePath + "\n"
+            );
+
+            R.CONFIG.put(Parameter.AZURE_ACCOUNT_NAME.getKey(), accountName);
+
+            BlobProperties blobProperties = AzureManager.getInstance().get(containerName, remoteFilePath);
+            String azureLocalStorage = Configuration.get(Parameter.AZURE_LOCAL_STORAGE);
+            String localFilePath = azureLocalStorage + "/" + StringUtils.substringAfterLast(remoteFilePath, "/");
+
+            File file = new File(localFilePath);
+
+            try {
+                // verify requested artifact by checking the checksum
+                if (file.exists() && FileManager.getFileChecksum(FileManager.Checksum.MD5, file).equals(Base64.encodeBase64String(blobProperties.getContentMd5()))) {
+                    LOGGER.info("build artifact with the same checksum already downloaded: " + file.getAbsolutePath());
                 } else {
-                    LOGGER.info(String.format("Following data was extracted: bucket: %s, key: %s, local file: %s",
-                            bucketName, key, file.getAbsolutePath()));
-                    AmazonS3Manager.getInstance().download(bucketName, key, new File(fileName));
+                    LOGGER.info(
+                            String.format("Following data was extracted: container: %s, remotePath: %s, local file: %s",
+                            containerName, remoteFilePath, file.getAbsolutePath())
+                    );
+                    AzureManager.getInstance().download(containerName, remoteFilePath, file);
                 }
-    
-                Configuration.setMobileApp(file.getAbsolutePath());
 
-                // try to redefine app_version if it's value is latest or empty
-                String appVersion = Configuration.get(Parameter.APP_VERSION);
-                if (appVersion.equals("latest") || appVersion.isEmpty()) {
-                    Configuration.setBuild(file.getName());
-                }
+            } catch (Exception exception) {
+                LOGGER.error("Azure app path update exception detected!", exception);
             }
 
+            Configuration.setMobileApp(file.getAbsolutePath());
+
+            // try to redefine app_version if it's value is latest or empty
+            String appVersion = Configuration.get(Parameter.APP_VERSION);
+            if (appVersion.equals("latest") || appVersion.isEmpty()) {
+                Configuration.setBuild(file.getName());
+            }
         }
     }
 
@@ -780,38 +785,14 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         }
         return includes;
     }
-    
-    private String takeScreenshot(ITestResult result, String msg) {
-        String screenId = "";
 
-        ConcurrentHashMap<String, CarinaDriver> drivers = getDrivers();
-
-        try {
-            for (Map.Entry<String, CarinaDriver> entry : drivers.entrySet()) {
-                String driverName = entry.getKey();
-                WebDriver drv = entry.getValue().getDriver();
-    
-                if (drv instanceof EventFiringWebDriver) {
-                    drv = ((EventFiringWebDriver) drv).getWrappedDriver();
-                }
-                
-                if (Screenshot.isEnabled()) {
-                    screenId = Screenshot.capture(drv, driverName + ": " + msg, true); // in case of failure
-                }
-            }
-        } catch (Throwable thr) {
-            LOGGER.error("Failure detected on screenshot generation after failure: ", thr);
-        }
-        return screenId;
-    }
-    
     /*
      * Parse TestNG <suite ...> tag and return any attribute
      * @param ISuite suite
      * @param IString attribute
      * @return String attribute value or empty string
-     * 
-    */    
+     *
+    */
     private String getAttributeValue(ISuite suite, String attribute) {
         String res = "";
         File file = new File(suite.getXmlSuite().getFileName());
@@ -859,53 +840,54 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     }
     private void setThreadCount(ISuite suite) {
         //Reuse default thread-count value from suite TestNG file if it is not overridden in _config.properties
-        
+
         /*
          * WARNING! We coudn't override default thread-count="5" and data-provider-thread-count="10"!
          * suite.getXmlSuite().toXml() add those default values anyway even if the absent in suite xml file declaraton.
-         * To make possible to parse correctly we had to reuse external parser and private getAttributeValue  
+         * To make possible to parse correctly we had to reuse external parser and private getAttributeValue
         */
-        if (SpecialKeywords.CUSTOM.equalsIgnoreCase(Configuration.get(Parameter.THREAD_COUNT))) {
+        
+        if (SpecialKeywords.CUSTOM.equalsIgnoreCase(R.CONFIG.get(Parameter.THREAD_COUNT.getKey()))) {
             LOGGER.info("Custom thread count manipulation is enabled. Carina will skip any updates with thread count...");
             return;
         }
-        
-        if (Configuration.getInt(Parameter.THREAD_COUNT) >= 1) {
+
+        if (Configuration.getThreadCount()>= 1) {
             // use thread-count from config.properties
-            suite.getXmlSuite().setThreadCount(Configuration.getInt(Parameter.THREAD_COUNT));
-            LOGGER.debug("Updated thread_count=" + suite.getXmlSuite().getThreadCount());
+            suite.getXmlSuite().setThreadCount(Configuration.getThreadCount());
+            LOGGER.debug("Updated thread-count=" + suite.getXmlSuite().getThreadCount());
         } else {
             String suiteThreadCount = getAttributeValue(suite, "thread-count");
             LOGGER.debug("thread-count from suite: " + suiteThreadCount);
             if (suiteThreadCount.isEmpty()) {
-                LOGGER.info("Set thread_count=1");
+                LOGGER.info("Set thread-count=1");
                 R.CONFIG.put(Parameter.THREAD_COUNT.getKey(), "1");
                 suite.getXmlSuite().setThreadCount(1);
             } else {
                 // reuse value from suite xml file
-                LOGGER.debug("Synching thread_count with values from suite xml file...");
+                LOGGER.debug("Synching thread-count with values from suite xml file...");
                 R.CONFIG.put(Parameter.THREAD_COUNT.getKey(), suiteThreadCount);
-                LOGGER.info("Use thread_count='" + suite.getXmlSuite().getThreadCount() + "' from suite file.");                
+                LOGGER.info("Use thread-count='" + suite.getXmlSuite().getThreadCount() + "' from suite file.");
             }
         }
-        
-        if (Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT) >= 1) {
+
+        if (Configuration.getDataProviderThreadCount() >= 1) {
             // use thread-count from config.properties
-            suite.getXmlSuite().setDataProviderThreadCount(Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT));
-            LOGGER.debug("Updated data_provider_thread_count=" + suite.getXmlSuite().getDataProviderThreadCount());            
+            suite.getXmlSuite().setDataProviderThreadCount(Configuration.getDataProviderThreadCount());
+            LOGGER.debug("Updated data-provider-thread-count=" + suite.getXmlSuite().getDataProviderThreadCount());
         } else {
-            String suiteDataProviderThreadCount = getAttributeValue(suite, "data-provider-thread-count");        
+            String suiteDataProviderThreadCount = getAttributeValue(suite, "data-provider-thread-count");
             LOGGER.debug("data-provider-thread-count from suite: " + suiteDataProviderThreadCount);
-            
+
             if (suiteDataProviderThreadCount.isEmpty()) {
-                LOGGER.info("Set data_provider_thread_count=1");
+                LOGGER.info("Set data-provider-thread-count=1");
                 R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(), "1");
-                suite.getXmlSuite().setDataProviderThreadCount(1);                
+                suite.getXmlSuite().setDataProviderThreadCount(1);
             } else {
                 // reuse value from suite xml file
-                LOGGER.debug("Synching data_provider_thread_count with values from suite xml file...");
+                LOGGER.debug("Synching data-provider-thread-count with values from suite xml file...");
                 R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(), suiteDataProviderThreadCount);
-                LOGGER.info("Use data_provider_thread_count='" + suite.getXmlSuite().getDataProviderThreadCount() + "' from suite file.");                
+                LOGGER.info("Use data-provider-thread-count='" + suite.getXmlSuite().getDataProviderThreadCount() + "' from suite file.");
             }
         }
     }
@@ -931,8 +913,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
         return carinaVersion;
     }
-    
-    private void attachLabels(ITestResult result) {
+
+    private void attachTestLabels(ITestResult result) {
         // register testrail cases...
         Set<String> trCases = getTestRailCasesUuid(result);
         if (trCases.size() > 0) {
@@ -945,7 +927,46 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             Label.attachToTest(SpecialKeywords.QTEST_TESTCASE_UUID, Arrays.copyOf(qtestCases.toArray(), qtestCases.size(), String[].class));
         }
     }
+
+    private void attachTestRunLabels(ISuite suite) {
+        String trProject = getTestRailProjectId(suite);
+        String trSuite = getTestRailSuiteId(suite);
+
+        if (!trSuite.isEmpty() && !trProject.isEmpty()) {
+            Label.attachToTestRun(SpecialKeywords.TESTRAIL_PROJECT_ID, trProject);
+            Label.attachToTestRun(SpecialKeywords.TESTRAIL_SUITE_ID, trSuite);
+        }
+
+        String qtestProject = getQTestProjectId(suite);
+        if (!qtestProject.isEmpty()){
+            Label.attachToTestRun(SpecialKeywords.QTEST_PROJECT_ID, qtestProject);
+        }
+    }
     
+    private String takeScreenshot(ITestResult result, String msg) {
+        String screenId = "";
+
+        ConcurrentHashMap<String, CarinaDriver> drivers = getDrivers();
+
+        try {
+            for (Map.Entry<String, CarinaDriver> entry : drivers.entrySet()) {
+                String driverName = entry.getKey();
+                WebDriver drv = entry.getValue().getDriver();
+
+                if (drv instanceof EventFiringWebDriver) {
+                    drv = ((EventFiringWebDriver) drv).getWrappedDriver();
+                }
+
+                if (Screenshot.isEnabled()) {
+                    screenId = Screenshot.capture(drv, driverName + ": " + msg, true); // in case of failure
+                }
+            }
+        } catch (Throwable thr) {
+            LOGGER.error("Failure detected on screenshot generation after failure: ", thr);
+        }
+        return screenId;
+    }    
+
     public static class ShutdownHook extends Thread {
 
         private static final Logger LOGGER = Logger.getLogger(ShutdownHook.class);
@@ -960,7 +981,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 ProxyPool.stopProxy();
                 try {
                     LOGGER.debug("Driver closing..." + name);
-                    carinaDriver.getDriver().close();                    
+                    carinaDriver.getDriver().close();
                     LOGGER.debug("Driver exiting..." + name);
                     carinaDriver.getDriver().quit();
                     LOGGER.debug("Driver exited..." + name);

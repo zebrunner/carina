@@ -2,6 +2,7 @@ site_name: Carina
 pages:
     - Overview: index.md
     - Getting started: getting_started.md
+    - Integration with Zebrunner: zebrIntegration.md
     - Project structure: project_structure.md
     - Configuration: configuration.md
     - Execution: execution.md
@@ -22,5 +23,5 @@ pages:
     - Contribution: contribution.md
 theme:
   name: 'material'
-repo_url: https://github.com/qaprosoft/carina
+repo_url: https://github.com/zebrunner/carina
 repo_name: Github
