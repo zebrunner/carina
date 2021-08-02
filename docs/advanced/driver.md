@@ -130,7 +130,7 @@ public class TestSample implements IAbstractTest {
   }
 }
 ```
-Not like this:
+Unwanted approach:
 ```
 public class TestSample implements IAbstractTest {
   HomePage homePage = new HomePage(driver);

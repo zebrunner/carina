@@ -338,7 +338,7 @@ public class WebSampleTest implements IAbstractTest {
     }
 }
 ```
-If there is no way to do so, make sure you use @Test(dependsOnMethods=XXX) tag:
+Use dependsOnMethods only if it really required by test login:
 ```
 public class WebSampleSingleDriver implements IAbstractTest {
     HomePage homePage = null;
@@ -421,7 +421,7 @@ public void someTest() {
    WikipediaLocalePage wikipediaLocalePage = wikipediaHomePage.goToWikipediaLocalePage(getDriver());
 }
 ```
-Not like this:
+Unwanted approach:
 ```
 //In page class:
 @FindBy(id = "js-lang-list-button")
