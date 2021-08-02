@@ -63,7 +63,8 @@ public interface ITestRailManager extends ITestCases {
                     TestRailCases methodAnnotation = testMethod.getAnnotation(TestRailCases.class);
                     String platform = methodAnnotation.platform();
                     String locale = methodAnnotation.locale();
-                    if (isValidPlatform(platform) && isValidLocale(locale)) {
+                    String expectedSuiteId = methodAnnotation.suiteId();
+                    if (isValidPlatform(platform) && isValidLocale(locale) && isValidSuite(suiteID, expectedSuiteId)) {
                         String[] testCaseList = methodAnnotation.testCasesId().split(",");
                         for (String tcase : testCaseList) {
                             tcase = tcase.trim();
@@ -83,7 +84,8 @@ public interface ITestRailManager extends ITestCases {
 
                         String platform = tcLocal.platform();
                         String locale = tcLocal.locale();
-                        if (isValidPlatform(platform) && isValidLocale(locale)) {
+                        String expectedSuiteId = tcLocal.suiteId();
+                        if (isValidPlatform(platform) && isValidLocale(locale) && isValidSuite(suiteID, expectedSuiteId)) {
                             String[] testCaseList = tcLocal.testCasesId().split(",");
                             for (String tcase : testCaseList) {
                                 tcase = tcase.trim();
@@ -165,6 +167,10 @@ public interface ITestRailManager extends ITestCases {
         } else {
             return -1;
         }
+    }
+    
+    private boolean isValidSuite(int actualSuiteId, String expectedSuiteId) {
+        return expectedSuiteId.isEmpty() || expectedSuiteId.equalsIgnoreCase(String.valueOf(actualSuiteId));
     }
 
 }

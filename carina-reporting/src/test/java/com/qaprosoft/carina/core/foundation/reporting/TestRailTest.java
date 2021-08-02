@@ -175,5 +175,20 @@ public class TestRailTest implements ITestRailManager {
         
         R.CONFIG.put(Parameter.LOCALE.getKey(), "en");
     }
+    
+    @Test
+    @TestRailCases(testCasesId = FIRST_TEST_ID, suiteId = "1") //1 is default suiteId value during unit testing!
+    @TestRailCases(testCasesId = SECOND_TEST_ID, suiteId = "2")
+    public void testTestRailBySuite() {
+        ITestResult result = Reporter.getCurrentTestResult();
+
+        Set<String> testRailUdids = getTestRailCasesUuid(result);
+
+        testRailUdids = getTestRailCasesUuid(result);
+
+        Assert.assertTrue(testRailUdids.contains(FIRST_TEST_ID), "TestRail should contain id=" + FIRST_TEST_ID);
+
+        Assert.assertEquals(testRailUdids.size(), 1);
+    }
 
 }
