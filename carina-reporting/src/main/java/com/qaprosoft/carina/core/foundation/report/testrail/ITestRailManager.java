@@ -172,7 +172,7 @@ public interface ITestRailManager extends ITestCases {
     private boolean isValidSuite(int actualSuiteId, String expectedSuiteId) {
         boolean isValid = expectedSuiteId.isEmpty() || expectedSuiteId.equalsIgnoreCase(String.valueOf(actualSuiteId));
         if (!isValid){
-            TESTRAIL_LOGGER.info("Invalid suite passed: " + actualSuiteId + ", expected: " + expectedSuiteId);
+            TESTRAIL_LOGGER.error("Invalid suite passed: " + actualSuiteId + ", expected: " + expectedSuiteId);
         }
         return isValid;
     }

@@ -46,7 +46,7 @@ public interface ITestCases {
     default boolean isValidPlatform(String platform) {
         boolean isValid = platform.equalsIgnoreCase(Configuration.getPlatform()) || platform.isEmpty();
         if (!isValid){
-            TEST_CASES_LOGGER.info("Invalid platform passed: " + platform + ", expected: " + Configuration.getPlatform());
+            TEST_CASES_LOGGER.error("Invalid platform passed: " + platform + ", expected: " + Configuration.getPlatform());
         }
         return isValid;
     }
@@ -54,7 +54,7 @@ public interface ITestCases {
     default boolean isValidLocale(String locale) {
         boolean isValid = locale.equalsIgnoreCase(Configuration.get(Parameter.LOCALE)) || locale.isEmpty();
         if (!isValid){
-            TEST_CASES_LOGGER.info("Invalid locale passed: " + locale + ", expected: " + Configuration.get(Parameter.LOCALE));
+            TEST_CASES_LOGGER.error("Invalid locale passed: " + locale + ", expected: " + Configuration.get(Parameter.LOCALE));
         }
         return isValid;
     }
