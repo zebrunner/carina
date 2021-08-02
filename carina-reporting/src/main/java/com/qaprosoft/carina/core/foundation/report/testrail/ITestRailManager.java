@@ -20,6 +20,7 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ISuite;
@@ -168,9 +169,13 @@ public interface ITestRailManager extends ITestCases {
             return -1;
         }
     }
-    
+
     private boolean isValidSuite(int actualSuiteId, String expectedSuiteId) {
-        return expectedSuiteId.isEmpty() || expectedSuiteId.equalsIgnoreCase(String.valueOf(actualSuiteId));
+        boolean isValid = expectedSuiteId.isEmpty() || expectedSuiteId.equalsIgnoreCase(String.valueOf(actualSuiteId));
+        if (!isValid){
+            TESTRAIL_LOGGER.info("Invalid suite passed: " + actualSuiteId + ", expected: " + expectedSuiteId);
+        }
+        return isValid;
     }
 
 }

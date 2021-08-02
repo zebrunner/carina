@@ -15,13 +15,18 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.report.testrail;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public interface ITestCases {
+    static final Logger TEST_CASES_LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     ThreadLocal<List<String>> casesIds = ThreadLocal.withInitial(ArrayList::new);
 
     default List<String> getCases() {
@@ -39,10 +44,18 @@ public interface ITestCases {
     }
 
     default boolean isValidPlatform(String platform) {
-        return platform.equalsIgnoreCase(Configuration.getPlatform()) || platform.isEmpty();
+        boolean isValid = platform.equalsIgnoreCase(Configuration.getPlatform()) || platform.isEmpty();
+        if (!isValid){
+            TEST_CASES_LOGGER.info("Invalid platform passed: " + platform + ", expected: " + Configuration.getPlatform());
+        }
+        return isValid;
     }
     
     default boolean isValidLocale(String locale) {
-        return locale.equalsIgnoreCase(Configuration.get(Parameter.LOCALE)) || locale.isEmpty();
+        boolean isValid = locale.equalsIgnoreCase(Configuration.get(Parameter.LOCALE)) || locale.isEmpty();
+        if (!isValid){
+            TEST_CASES_LOGGER.info("Invalid locale passed: " + locale + ", expected: " + Configuration.get(Parameter.LOCALE));
+        }
+        return isValid;
     }
 }
