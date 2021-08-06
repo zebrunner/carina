@@ -338,7 +338,7 @@ public class WebSampleTest implements IAbstractTest {
     }
 }
 ```
-Use dependsOnMethods only if it really required by test login:
+Use dependsOnMethods only if it is really required by test login:
 ```
 public class WebSampleSingleDriver implements IAbstractTest {
     HomePage homePage = null;
