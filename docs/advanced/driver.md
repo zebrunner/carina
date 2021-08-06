@@ -112,5 +112,42 @@ To quit driver forcibly if needed use **quitDriver()** or **quitDriver(name)**
 To disable driver quit strategy completely and cotrol drivers init/quit on your own provide `forcibly_disable_driver_quit=true` or execute from any place of your test code `CarinaListener.disableDriversCleanup();`
 
 ##Restart
-* **restartDriver()** quit current driver and start new one with the same capabilities
-* **restartDriver(boolean isSameDevice)** quit current driver and start new one on the same device using `uuid` capability. It is fully compatible with [MCloud](https://github.com/zebrunner/mcloud) farm.
+* **restartDriver()** quit the current driver and start a new one with the same capabilities
+* **restartDriver(boolean isSameDevice)** quit the current driver and start a new one on the same device using `uuid` capability. It is fully compatible with [MCloud](https://github.com/zebrunner/mcloud) farm.
+###Tricks
+####Init pages and drivers in places where they are used
+The correct way:
+```
+public class TestSample implements IAbstractTest {
+  @Test(){
+  public void someTest(){
+     //Page declared and initialized right before using it
+     HomePage homePage = new HomePage(getDriver());
+     homePage.open();
+     FooterMenu footerMenu = homePage.getFooterMenu();
+     CompareModelsPage comparePage = footerMenu.openComparePage();
+     List<ModelSpecs> specs = comparePage.compareModels("Samsung Galaxy J3", "Samsung Galaxy J5", "Samsung Galaxy J7 Pro");
+  }
+}
+```
+An unwanted approach:
+```
+public class TestSample implements IAbstractTest {
+  HomePage homePage = new HomePage(driver);
+  WebDriver driver;
+  FooterMenu footerMenu;
+  
+  @BeforeSuite
+  public void driverInit(){
+      driver = getDriver();
+  }
+  
+  @Test(){
+  public void someTest(){
+     homePage.open();
+     footerMenu = homePage.getFooterMenu();
+     CompareModelsPage comparePage = footerMenu.openComparePage();
+     List<ModelSpecs> specs = comparePage.compareModels("Samsung Galaxy J3", "Samsung Galaxy J5", "Samsung Galaxy J7 Pro");
+  }
+}
+```
