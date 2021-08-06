@@ -431,12 +431,12 @@ test_run_rules=PRIORITY=>!!P1;;OWNER=>Josh&&!!Jake;;TAGS=>feature=web&&!!type=sm
 Will work both:
 1) putting parameters in _config.properties :
    selenium_url=http://localhost:4444/wd/hub
-2) passing them it right in test:
+2) passing them right in the test:
 public void testCompareModels() {
    R.CONFIG.put("selenium_host", "http://localhost:4444/wd/hub");
    HomePage homePage = new HomePage(getDriver());
    homePage.open();
    ...
 }
-But recommended to use 1) variant for initialization of all parameters
+Nevertheless, it is recommended to use the 1st variant for initialization of all the parameters.
 ```

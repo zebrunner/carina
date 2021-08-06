@@ -309,13 +309,13 @@ component.assertUIObjectPresent();      // equals to Assert.assertTrue(component
 component.assertUIObjectNotPresent();   // equals to Assert.assertTrue(!component.isUIObjectPresent(),"UI object componentName presents!");
 ```
 >Dynamic elements loading. 
-**waitForJSToLoad()** method was introduced in AbstractPage class. It uses JS under the hood and helps to wait till all dynamic web elements on the page are getting loaded.
+**waitForJSToLoad()** method was introduced in AbstractPage class. It uses JS under the hood and helps to wait till all the dynamic web elements on the page are loaded.
 
 ###Tricks
 ####Independent tests is the best way for the automation!
-Correct example:
+A correct example:
 ```
-//Right way to write tests:
+//The right way to write tests:
 public class WebSampleTest implements IAbstractTest {
     @Test()
     public void testCompareModels() {
@@ -385,9 +385,9 @@ public class WebSampleSingleDriver implements IAbstractTest {
 }
 ```
 #### Operate with web elements in page classes only!
-Correct way:
+The correct way:
 ```
-//In page class:
+//In the page class:
 @FindBy(id = "js-lang-list-button")
 private ExtendedWebElement langListBtn;
     
@@ -414,16 +414,16 @@ public void openLangList() {
 }
 
 
-//In test class:
+//In the test class:
 public void someTest() {
    WikipediaHomePage wikipediaHomePage = new WikipediaHomePage(getDriver());
    wikipediaHomePage.open();
    WikipediaLocalePage wikipediaLocalePage = wikipediaHomePage.goToWikipediaLocalePage(getDriver());
 }
 ```
-Unwanted approach:
+An unwanted approach:
 ```
-//In page class:
+//In the page class:
 @FindBy(id = "js-lang-list-button")
 public ExtendedWebElement langListBtn;
     
@@ -435,7 +435,7 @@ public List<ExtendedWebElement> getLangList(){
 }
 
 
-//In test class:
+//In the test class:
 public void someTest() {
    WikipediaHomePage wikipediaHomePage = new WikipediaHomePage(getDriver());
    wikipediaHomePage.open();

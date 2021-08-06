@@ -112,11 +112,11 @@ To quit driver forcibly if needed use **quitDriver()** or **quitDriver(name)**
 To disable driver quit strategy completely and cotrol drivers init/quit on your own provide `forcibly_disable_driver_quit=true` or execute from any place of your test code `CarinaListener.disableDriversCleanup();`
 
 ##Restart
-* **restartDriver()** quit current driver and start new one with the same capabilities
-* **restartDriver(boolean isSameDevice)** quit current driver and start new one on the same device using `uuid` capability. It is fully compatible with [MCloud](https://github.com/zebrunner/mcloud) farm.
+* **restartDriver()** quit the current driver and start a new one with the same capabilities
+* **restartDriver(boolean isSameDevice)** quit the current driver and start a new one on the same device using `uuid` capability. It is fully compatible with [MCloud](https://github.com/zebrunner/mcloud) farm.
 ###Tricks
-####Init pages and drivers in places where they are used, 
-Correct way:
+####Init pages and drivers in places where they are used
+The correct way:
 ```
 public class TestSample implements IAbstractTest {
   @Test(){
@@ -130,7 +130,7 @@ public class TestSample implements IAbstractTest {
   }
 }
 ```
-Unwanted approach:
+An unwanted approach:
 ```
 public class TestSample implements IAbstractTest {
   HomePage homePage = new HomePage(driver);
