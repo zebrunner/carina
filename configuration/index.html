@@ -282,6 +282,26 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#tricks" class="md-nav__link">
+    Tricks
+  </a>
+  
+    <nav class="md-nav" aria-label="Tricks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pass-params-through-_configproperties-not-in-code" class="md-nav__link">
+    Pass params through _config.properties, not in code.
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -565,6 +585,26 @@
   <a href="#zebrunner-reporting-configuration" class="md-nav__link">
     Zebrunner Reporting configuration
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tricks" class="md-nav__link">
+    Tricks
+  </a>
+  
+    <nav class="md-nav" aria-label="Tricks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pass-params-through-_configproperties-not-in-code" class="md-nav__link">
+    Pass params through _config.properties, not in code.
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1006,6 +1046,20 @@ test_run_rules=PRIORITY=&gt;!!P1;;OWNER=&gt;Josh&amp;&amp;!!Jake;;TAGS=&gt;featu
         <td>empty or any existing name</td>
     </tr>
 </table></p>
+<h3 id="tricks">Tricks</h3>
+<h4 id="pass-params-through-_configproperties-not-in-code">Pass params through _config.properties, not in code.</h4>
+<pre><code>Will work both:
+1) putting parameters in _config.properties :
+   selenium_url=http://localhost:4444/wd/hub
+2) passing them right in the test:
+public void testCompareModels() {
+   R.CONFIG.put(&quot;selenium_host&quot;, &quot;http://localhost:4444/wd/hub&quot;);
+   HomePage homePage = new HomePage(getDriver());
+   homePage.open();
+   ...
+}
+Nevertheless, it is recommended to use the 1st variant for initialization of all the parameters.
+</code></pre>
                 
               
               
