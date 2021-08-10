@@ -57,8 +57,10 @@ import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.windows.WindowsDriver;
 import ru.yandex.qatools.ashot.AShot;
+import ru.yandex.qatools.ashot.comparison.DiffMarkupPolicy;
 import ru.yandex.qatools.ashot.comparison.ImageDiff;
 import ru.yandex.qatools.ashot.comparison.ImageDiffer;
+import ru.yandex.qatools.ashot.comparison.PointsMarkupPolicy;
 import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
 import ru.yandex.qatools.ashot.shooting.ShootingStrategy;
 
@@ -647,21 +649,27 @@ public class Screenshot {
 		return !isContains;
 	}
 
+    public static boolean isScreenshotDiff(BufferedImage bufferedImageExpected, BufferedImage bufferedImageActual, String comment, boolean artifact) {
+        return isScreenshotDiff(bufferedImageExpected, bufferedImageActual, comment, artifact, new PointsMarkupPolicy());
+    }
+
     /**
      * Compares two different screenshots
      *
      * @param bufferedImageExpected - old image
      * @param bufferedImageActual   - new image
-     * @param comment  - String
-     * @param artifact  - boolean
+     * @param comment               - String
+     * @param artifact              - boolean
+     * @param markupPolicy          - DiffMarkupPolicy
      * @return boolean
      */
-    public static boolean isScreenshotDiff(BufferedImage bufferedImageExpected, BufferedImage bufferedImageActual, String comment, boolean artifact) {
+    public static boolean isScreenshotDiff(BufferedImage bufferedImageExpected, BufferedImage bufferedImageActual, String comment, boolean artifact, DiffMarkupPolicy markupPolicy) {
         String screenName;
         BufferedImage screen;
         try {
-            ImageDiffer imageDiff = new ImageDiffer();
-            ImageDiff diff = imageDiff.makeDiff(bufferedImageExpected, bufferedImageActual);
+            ImageDiffer imageDiffer = new ImageDiffer();
+            imageDiffer.withDiffMarkupPolicy(markupPolicy);
+            ImageDiff diff = imageDiffer.makeDiff(bufferedImageExpected, bufferedImageActual);
             if (diff.hasDiff()) {
                 screen = diff.getMarkedImage();
                 // Define test screenshot root
