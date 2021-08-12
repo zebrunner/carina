@@ -242,6 +242,10 @@ public class ReportContext {
      * @return artifact File
      */
     public static File downloadArtifact(WebDriver driver, String name, long timeout) {
+        return downloadArtifact(driver, name, timeout, true);
+    }
+
+    public static File downloadArtifact(WebDriver driver, String name, long timeout, boolean artifact) {
         File file = getArtifact(name);
         if (file == null) {
             // attempt to verify and download file from selenoid
@@ -265,7 +269,9 @@ public class ReportContext {
             try {
                 FileUtils.copyURLToFile(new URL(url), file);
                 LOGGER.debug("Successfully downloaded artifact: " + name);
-                Artifact.attachToTest(name, file); // publish as test artifact to Zebrunner Reporting
+                if (artifact) {
+                    Artifact.attachToTest(name, file); // publish as test artifact to Zebrunner Reporting
+                }
             } catch (IOException e) {
                 LOGGER.error("Artifact: " + url + " wasn't downloaded to " + path, e);
             }
