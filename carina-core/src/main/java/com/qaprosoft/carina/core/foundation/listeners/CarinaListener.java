@@ -100,6 +100,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule
 import com.zebrunner.agent.core.registrar.Artifact;
 import com.zebrunner.agent.core.registrar.CurrentTest;
 import com.zebrunner.agent.core.registrar.Label;
+import com.zebrunner.agent.core.registrar.TestRail;
 import com.zebrunner.agent.core.registrar.label.CompositeLabelResolver;
 import com.zebrunner.agent.core.registrar.maintainer.ChainedMaintainerResolver;
 import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
@@ -917,8 +918,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     private void attachTestLabels(ITestResult result) {
         // register testrail cases...
         Set<String> trCases = getTestRailCasesUuid(result);
-        if (trCases.size() > 0) {
-            Label.attachToTest(SpecialKeywords.TESTRAIL_TESTCASE_UUID, Arrays.copyOf(trCases.toArray(), trCases.size(), String[].class));
+        for (String trCase : trCases) {
+            TestRail.setCaseId(trCase);
         }
 
         // register qtest cases...
@@ -929,12 +930,10 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     }
 
     private void attachTestRunLabels(ISuite suite) {
-        String trProject = getTestRailProjectId(suite);
         String trSuite = getTestRailSuiteId(suite);
 
-        if (!trSuite.isEmpty() && !trProject.isEmpty()) {
-            Label.attachToTestRun(SpecialKeywords.TESTRAIL_PROJECT_ID, trProject);
-            Label.attachToTestRun(SpecialKeywords.TESTRAIL_SUITE_ID, trSuite);
+        if (!trSuite.isEmpty()) {
+            TestRail.setSuiteId(trSuite);
         }
 
         String qtestProject = getQTestProjectId(suite);
