@@ -2178,23 +2178,23 @@ public class ExtendedWebElement implements IWebElement {
         // generate the most popular waitCondition to check if element visible or present
         ExpectedCondition<?> waitCondition = null;
         switch (loadingStrategy) {
-        case BY_PRESENCE: {
+            case BY_PRESENCE: {
                 if (element != null) {
                     waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy), ExpectedConditions.visibilityOf(element));
                 } else {
                     waitCondition = ExpectedConditions.presenceOfElementLocated(myBy);
                 }
-            break;
-        }
-        case BY_VISIBILITY: {
+                break;
+            }
+            case BY_VISIBILITY: {
                 if (element != null) {
                     waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(myBy), ExpectedConditions.visibilityOf(element));
                 } else {
                     waitCondition = ExpectedConditions.visibilityOfElementLocated(myBy);
                 }
-            break;
-        }
-        case BY_PRESENCE_OR_VISIBILITY:
+                break;
+            }
+            case BY_PRESENCE_OR_VISIBILITY:
                 if (element != null) {
                     waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
                             ExpectedConditions.visibilityOfElementLocated(myBy),
@@ -2203,7 +2203,7 @@ public class ExtendedWebElement implements IWebElement {
                     waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
                             ExpectedConditions.visibilityOfElementLocated(myBy));
                 }
-            break;
+                break;
         }
         return waitCondition;
     }
