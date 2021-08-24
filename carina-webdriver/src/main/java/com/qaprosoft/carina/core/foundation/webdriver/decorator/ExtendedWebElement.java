@@ -305,9 +305,27 @@ public class ExtendedWebElement implements IWebElement {
 	 * @return element existence status.
 	 */
 	public boolean isPresent(By by, long timeout) {
-		return waitUntil(getDefaultCondition(by), timeout);
+		return isPresent(by, timeout, false);
 	}
-	
+
+    /**
+     * Check that element with By present within specified timeout.
+     *
+     * @param by
+     *            - By.
+     * @param timeout
+     *            - timeout.
+     * @param bySearchContext
+     *            - check by the given searchContext
+     * @return element existence status.
+     */
+    public boolean isPresent(By by, long timeout, boolean bySearchContext) {
+        if (bySearchContext) {
+            return waitUntil(getDefaultSearchContextCondition(by), timeout);
+        } else {
+            return waitUntil(getDefaultCondition(by), timeout);
+        }
+    }
 	
     /**
      * Wait until any condition happens.
@@ -459,7 +477,21 @@ public class ExtendedWebElement implements IWebElement {
      * @return String text
      */
     public String getText() {
-    	return (String) doAction(ACTION_NAME.GET_TEXT, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+    	return getText(false);
+    }
+
+    /**
+     * Get element text.
+     * @param bySearchContext
+     *            - check by the given searchContext
+     * @return String text
+     */
+    public String getText(boolean bySearchContext) {
+        if (bySearchContext) {
+            return (String) doAction(ACTION_NAME.GET_TEXT, EXPLICIT_TIMEOUT, getDefaultSearchContextCondition(getBy()));
+        } else {
+            return (String) doAction(ACTION_NAME.GET_TEXT, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        }
     }
 
     /**
@@ -468,7 +500,21 @@ public class ExtendedWebElement implements IWebElement {
      * @return Point location
      */
     public Point getLocation() {
-    	return (Point) doAction(ACTION_NAME.GET_LOCATION, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+    	return getLocation(false);
+    }
+
+    /**
+     * Get element location.
+     * @param bySearchContext
+     *            - check by the given searchContext
+     * @return Point location
+     */
+    public Point getLocation(boolean bySearchContext) {
+        if (bySearchContext) {
+            return (Point) doAction(ACTION_NAME.GET_LOCATION, EXPLICIT_TIMEOUT, getDefaultSearchContextCondition(getBy()));
+        } else {
+            return (Point) doAction(ACTION_NAME.GET_LOCATION, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        }
     }
 
     /**
@@ -477,7 +523,21 @@ public class ExtendedWebElement implements IWebElement {
      * @return Dimension size
      */
     public Dimension getSize() {
-    	return (Dimension) doAction(ACTION_NAME.GET_SIZE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+    	return getSize(false);
+    }
+
+    /**
+     * Get element size.
+     * @param bySearchContext
+     *            - check by the given searchContext
+     * @return Dimension size
+     */
+    public Dimension getSize(boolean bySearchContext) {
+        if (bySearchContext) {
+            return (Dimension) doAction(ACTION_NAME.GET_SIZE, EXPLICIT_TIMEOUT, getDefaultSearchContextCondition(getBy()));
+        } else {
+            return (Dimension) doAction(ACTION_NAME.GET_SIZE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        }
     }
 
     /**
@@ -487,7 +547,22 @@ public class ExtendedWebElement implements IWebElement {
      * @return String attribute value
      */
     public String getAttribute(String name) {
-    	return (String) doAction(ACTION_NAME.GET_ATTRIBUTE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), name);
+        return getAttribute(name, false);
+    }
+
+    /**
+     * Get element attribute.
+     *
+     * @param name of attribute
+     * @param bySearchContext - check by the given searchContext
+     * @return String attribute value
+     */
+    public String getAttribute(String name, boolean bySearchContext) {
+        if (bySearchContext) {
+            return (String) doAction(ACTION_NAME.GET_ATTRIBUTE, EXPLICIT_TIMEOUT, getDefaultSearchContextCondition(getBy()), name);
+        } else {
+            return (String) doAction(ACTION_NAME.GET_ATTRIBUTE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), name);
+        }
     }
 
     /**
@@ -503,7 +578,21 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout to wait
      */
     public void click(long timeout) {
-        click(timeout, getDefaultCondition(getBy()));
+        click(timeout, false);
+    }
+
+    /**
+     * Click on element.
+     *
+     * @param timeout to wait
+     * @param bySearchContext - check by the given searchContext
+     */
+    public void click(long timeout, boolean bySearchContext) {
+        if (bySearchContext) {
+            click(timeout, getDefaultSearchContextCondition(getBy()));
+        } else {
+            click(timeout, getDefaultCondition(getBy()));
+        }
     }
     
 	/**
@@ -540,7 +629,21 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout to wait
      */
     public void doubleClick(long timeout) {
-    	doubleClick(timeout, getDefaultCondition(getBy()));
+    	doubleClick(timeout, false);
+    }
+
+    /**
+     * Double Click on element.
+     *
+     * @param timeout to wait
+     * @param bySearchContext - to check by the given searchContext
+     */
+    public void doubleClick(long timeout, boolean bySearchContext) {
+        if (bySearchContext) {
+            doubleClick(timeout, getDefaultSearchContextCondition(getBy()));
+        } else {
+            doubleClick(timeout, getDefaultCondition(getBy()));
+        }
     }
     /**
      * Double Click on element.
@@ -567,7 +670,21 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout to wait
      */
     public void rightClick(long timeout) {
-    	rightClick(timeout, getDefaultCondition(getBy()));
+    	rightClick(timeout, false);
+    }
+
+    /**
+     * Mouse RightClick on element.
+     *
+     * @param timeout to wait
+     * @param bySearchContext - to check by the given searchContext
+     */
+    public void rightClick(long timeout, boolean bySearchContext) {
+        if (bySearchContext) {
+            rightClick(timeout, getDefaultSearchContextCondition(getBy()));
+        } else {
+            rightClick(timeout, getDefaultCondition(getBy()));
+        }
     }
     
     /**
@@ -614,7 +731,18 @@ public class ExtendedWebElement implements IWebElement {
      * @return boolean return true if clicked
      */
     public boolean clickIfPresent(long timeout) {
-        boolean present = isElementPresent(timeout);
+       return clickIfPresent(timeout, false);
+    }
+
+    /**
+     * Click onto element if present.
+     *
+     * @param timeout - timeout
+     * @param bySearchContext - to check by the given searchContext
+     * @return boolean return true if clicked
+     */
+    public boolean clickIfPresent(long timeout, boolean bySearchContext) {
+        boolean present = isElementPresent(timeout, bySearchContext);
         if (present) {
             click();
         }
@@ -639,7 +767,22 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout to wait
      */
     public void sendKeys(Keys keys, long timeout) {
-    	sendKeys(keys, timeout, getDefaultCondition(getBy()));
+    	sendKeys(keys, timeout, false);
+    }
+
+    /**
+     * Send Keys to element.
+     *
+     * @param keys Keys
+     * @param timeout to wait
+     * @param bySearchContext - to check by the given searchContext
+     */
+    public void sendKeys(Keys keys, long timeout, boolean bySearchContext) {
+        if (bySearchContext) {
+            sendKeys(keys, timeout, getDefaultSearchContextCondition(getBy()));
+        } else {
+            sendKeys(keys, timeout, getDefaultCondition(getBy()));
+        }
     }
     
 	/**
@@ -671,7 +814,22 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout to wait
      */
     public void type(String text, long timeout) {
-    	type(text, timeout, getDefaultCondition(getBy()));
+    	type(text, timeout, false);
+    }
+
+    /**
+     * Type text to element.
+     *
+     * @param text String
+     * @param timeout to wait
+     * @param bySearchContext - to check by the given searchContext
+     */
+    public void type(String text, long timeout, boolean bySearchContext) {
+        if (bySearchContext) {
+            type(text, timeout, getDefaultSearchContextCondition(getBy()));
+        } else {
+            type(text, timeout, getDefaultCondition(getBy()));
+        }
     }
     
 	/**
@@ -713,12 +871,25 @@ public class ExtendedWebElement implements IWebElement {
         }
     }
      
-    /* Inputs file path to specified element.
+    /** Inputs file path to specified element.
      *
      * @param filePath path
      */
     public void attachFile(String filePath) {
-    	doAction(ACTION_NAME.ATTACH_FILE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), filePath);
+    	attachFile(filePath, false);
+    }
+
+    /** Inputs file path to specified element.
+     *
+     * @param filePath path
+     * @param bySearchContext - to check by the given searchContext
+     */
+    public void attachFile(String filePath, boolean bySearchContext) {
+        if (bySearchContext) {
+            doAction(ACTION_NAME.ATTACH_FILE, EXPLICIT_TIMEOUT, getDefaultSearchContextCondition(getBy()), filePath);
+        } else {
+            doAction(ACTION_NAME.ATTACH_FILE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), filePath);
+        }
     }
 
     /**
@@ -727,7 +898,22 @@ public class ExtendedWebElement implements IWebElement {
      * for checkbox Element
      */
     public void check() {
-    	doAction(ACTION_NAME.CHECK, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+    	check(false);
+    }
+
+    /**
+     * Check checkbox
+     * <p>
+     * for checkbox Element
+     *
+     * @param bySearchContext - to check by the given searchContext
+     */
+    public void check(boolean bySearchContext) {
+        if (bySearchContext) {
+            doAction(ACTION_NAME.CHECK, EXPLICIT_TIMEOUT, getDefaultSearchContextCondition(getBy()));
+        } else {
+            doAction(ACTION_NAME.CHECK, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        }
     }
 
     /**
@@ -736,7 +922,22 @@ public class ExtendedWebElement implements IWebElement {
      * for checkbox Element
      */
     public void uncheck() {
-    	doAction(ACTION_NAME.UNCHECK, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        uncheck(false);
+    }
+
+    /**
+     * Uncheck checkbox
+     * <p>
+     * for checkbox Element
+     *
+     * @param bySearchContext - to check by the given searchContext
+     */
+    public void uncheck(boolean bySearchContext) {
+        if (bySearchContext) {
+            doAction(ACTION_NAME.UNCHECK, EXPLICIT_TIMEOUT, getDefaultSearchContextCondition(getBy()));
+        } else {
+            doAction(ACTION_NAME.UNCHECK, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        }
     }
 
     /**
@@ -745,7 +946,21 @@ public class ExtendedWebElement implements IWebElement {
      * @return - current state
      */
     public boolean isChecked() {
-    	return (boolean) doAction(ACTION_NAME.IS_CHECKED, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        return isChecked(false);
+    }
+
+    /**
+     * Get checkbox state.
+     *
+     * @param bySearchContext - to check by the given searchContext
+     * @return - current state
+     */
+    public boolean isChecked(boolean bySearchContext) {
+        if (bySearchContext) {
+            return (boolean) doAction(ACTION_NAME.IS_CHECKED, EXPLICIT_TIMEOUT, getDefaultSearchContextCondition(getBy()));
+        } else {
+            return (boolean) doAction(ACTION_NAME.IS_CHECKED, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        }
     }
 
     /**
@@ -754,7 +969,21 @@ public class ExtendedWebElement implements IWebElement {
      * @return selected value
      */
     public String getSelectedValue() {
-    	return (String) doAction(ACTION_NAME.GET_SELECTED_VALUE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+    	return getSelectedValue(false);
+    }
+
+    /**
+     * Get selected elements from one-value select.
+     *
+     * @param bySearchContext - to check by the given searchContext
+     * @return selected value
+     */
+    public String getSelectedValue(boolean bySearchContext) {
+        if (bySearchContext) {
+            return (String) doAction(ACTION_NAME.GET_SELECTED_VALUE, EXPLICIT_TIMEOUT, getDefaultSearchContextCondition(getBy()));
+        } else {
+            return (String) doAction(ACTION_NAME.GET_SELECTED_VALUE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        }
     }
 
     /**
@@ -764,7 +993,22 @@ public class ExtendedWebElement implements IWebElement {
      */
     @SuppressWarnings("unchecked")
 	public List<String> getSelectedValues() {
-    	return (List<String>) doAction(ACTION_NAME.GET_SELECTED_VALUES, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+    	return getSelectedValues(false);
+    }
+
+    /**
+     * Get selected elements from multi-value select.
+     *
+     * @param bySearchContext - to check by the given searchContext
+     * @return selected values
+     */
+    @SuppressWarnings("unchecked")
+    public List<String> getSelectedValues(boolean bySearchContext) {
+        if (bySearchContext) {
+            return (List<String>) doAction(ACTION_NAME.GET_SELECTED_VALUES, EXPLICIT_TIMEOUT, getDefaultSearchContextCondition(getBy()));
+        } else {
+            return (List<String>) doAction(ACTION_NAME.GET_SELECTED_VALUES, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        }
     }
 
     /**
@@ -774,7 +1018,22 @@ public class ExtendedWebElement implements IWebElement {
      * @return true if item selected, otherwise false.
      */
     public boolean select(final String selectText) {
-    	return (boolean) doAction(ACTION_NAME.SELECT, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), selectText);
+    	return select(selectText, false);
+    }
+
+    /**
+     * Selects text in specified select element.
+     *
+     * @param selectText select text
+     * @param bySearchContext - to check by the given searchContext
+     * @return true if item selected, otherwise false.
+     */
+    public boolean select(final String selectText, boolean bySearchContext) {
+        if (bySearchContext) {
+            return (boolean) doAction(ACTION_NAME.SELECT, EXPLICIT_TIMEOUT, getDefaultSearchContextCondition(getBy()), selectText);
+        } else {
+            return (boolean) doAction(ACTION_NAME.SELECT, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), selectText);
+        }
     }
 
     /**
@@ -784,7 +1043,22 @@ public class ExtendedWebElement implements IWebElement {
      * @return boolean.
      */
     public boolean select(final String[] values) {
-    	return (boolean) doAction(ACTION_NAME.SELECT_VALUES, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), values);
+    	return select(values, false);
+    }
+
+    /**
+     * Select multiple text values in specified select element.
+     *
+     * @param values final String[]
+     * @param bySearchContext - to check by the given searchContext
+     * @return boolean.
+     */
+    public boolean select(final String[] values, boolean bySearchContext) {
+        if (bySearchContext) {
+            return (boolean) doAction(ACTION_NAME.SELECT_VALUES, EXPLICIT_TIMEOUT, getDefaultSearchContextCondition(getBy()), values);
+        } else {
+            return (boolean) doAction(ACTION_NAME.SELECT_VALUES, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), values);
+        }
     }
 
     /**
@@ -800,7 +1074,28 @@ public class ExtendedWebElement implements IWebElement {
      *         } };
      */
     public boolean selectByMatcher(final BaseMatcher<String> matcher) {
-    	return (boolean) doAction(ACTION_NAME.SELECT_BY_MATCHER, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), matcher);
+    	return selectByMatcher(matcher, false);
+    }
+
+    /**
+     * Selects value according to text value matcher.
+     *
+     * @param matcher {@link} BaseMatcher
+     * @param bySearchContext - to check by the given searchContext
+     * @return true if item selected, otherwise false.
+     *         <p>
+     *         Usage example: BaseMatcher&lt;String&gt; match=new
+     *         BaseMatcher&lt;String&gt;() { {@literal @}Override public boolean
+     *         matches(Object actual) { return actual.toString().contains(RequiredText);
+     *         } {@literal @}Override public void describeTo(Description description) {
+     *         } };
+     */
+    public boolean selectByMatcher(final BaseMatcher<String> matcher, boolean bySearchContext) {
+        if (bySearchContext) {
+            return (boolean) doAction(ACTION_NAME.SELECT_BY_MATCHER, EXPLICIT_TIMEOUT, getDefaultSearchContextCondition(getBy()), matcher);
+        } else {
+            return (boolean) doAction(ACTION_NAME.SELECT_BY_MATCHER, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), matcher);
+        }
     }
 
     /**
@@ -810,7 +1105,22 @@ public class ExtendedWebElement implements IWebElement {
      * @return true if item selected, otherwise false.
      */
     public boolean selectByPartialText(final String partialSelectText) {
-    	return (boolean) doAction(ACTION_NAME.SELECT_BY_PARTIAL_TEXT, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), partialSelectText);
+    	return selectByPartialText(partialSelectText, false);
+    }
+
+    /**
+     * Selects first value according to partial text value.
+     *
+     * @param partialSelectText select by partial text
+     * @param bySearchContext - to check by the given searchContext
+     * @return true if item selected, otherwise false.
+     */
+    public boolean selectByPartialText(final String partialSelectText, boolean bySearchContext) {
+        if (bySearchContext) {
+            return (boolean) doAction(ACTION_NAME.SELECT_BY_PARTIAL_TEXT, EXPLICIT_TIMEOUT, getDefaultSearchContextCondition(getBy()), partialSelectText);
+        } else {
+            return (boolean) doAction(ACTION_NAME.SELECT_BY_PARTIAL_TEXT, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), partialSelectText);
+        }
     }
 
     /**
@@ -820,7 +1130,22 @@ public class ExtendedWebElement implements IWebElement {
      * @return true if item selected, otherwise false.
      */
     public boolean select(final int index) {
-    	return (boolean) doAction(ACTION_NAME.SELECT_BY_INDEX, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), index);
+        return select(index, false);
+    }
+
+    /**
+     * Selects item by index in specified select element.
+     *
+     * @param index to select by
+     * @param bySearchContext - to check by the given searchContext
+     * @return true if item selected, otherwise false.
+     */
+    public boolean select(final int index, boolean bySearchContext) {
+        if (bySearchContext) {
+            return (boolean) doAction(ACTION_NAME.SELECT_BY_INDEX, EXPLICIT_TIMEOUT, getDefaultSearchContextCondition(getBy()), index);
+        } else {
+            return (boolean) doAction(ACTION_NAME.SELECT_BY_INDEX, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), index);
+        }
     }
 
     // --------------------------------------------------------------------------
@@ -842,6 +1167,17 @@ public class ExtendedWebElement implements IWebElement {
      * @return element existence status.
      */
     public boolean isElementPresent(long timeout) {
+        return isElementPresent(timeout, false);
+    }
+
+    /**
+     * Check that element present and visible within specified timeout.
+     *
+     * @param timeout - timeout.
+     * @param bySearchContext - check by the given searchContext
+     * @return element existence status.
+     */
+    public boolean isElementPresent(long timeout, boolean bySearchContext) {
 		// perform at once super-fast single selenium call and only if nothing found move to waitAction
 		if (!isMobile() && element != null) {
 			try {
@@ -860,10 +1196,10 @@ public class ExtendedWebElement implements IWebElement {
         // visibilityOfElementLocated: Checks to see if the element is present and also visible. To check visibility, it makes sure that the element
         // has a height and width greater than 0.
 
-        if (Configuration.getPlatform().equalsIgnoreCase("iOS")){
-            waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
-        } else {
+        if (bySearchContext) {
             waitCondition = ExpectedConditions.visibilityOf(element);
+        } else {
+            waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
         }
 		boolean tmpResult = waitUntil(waitCondition, 1);
 
@@ -896,6 +1232,17 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     /**
+     * Check that element not present and not visible within specified timeout.
+     *
+     * @param timeout - timeout.
+     * @param bySearchContext - check by the given searchContext
+     * @return element existence status.
+     */
+    public boolean isElementNotPresent(long timeout, boolean bySearchContext) {
+        return !isElementPresent(timeout, bySearchContext);
+    }
+
+    /**
      * Checks that element clickable.
      *
      * @return element clickability status.
@@ -911,17 +1258,28 @@ public class ExtendedWebElement implements IWebElement {
      * @return element clickability status.
      */
     public boolean isClickable(long timeout) {
+        return isClickable(timeout, false);
+    }
+
+    /**
+     * Check that element clickable within specified timeout.
+     *
+     * @param timeout - timeout.
+     * @param bySearchContext - check by the given searchContext
+     * @return element clickability status.
+     */
+    public boolean isClickable(long timeout, boolean bySearchContext) {
     	ExpectedCondition<?> waitCondition;
 
-        if (Configuration.getPlatform().equalsIgnoreCase("iOS")) {
+        if (bySearchContext) {
+            waitCondition = ExpectedConditions.elementToBeClickable(element);
+        } else {
             if (element != null) {
                 waitCondition = ExpectedConditions.or(ExpectedConditions.elementToBeClickable(getBy()),
                         ExpectedConditions.elementToBeClickable(element));
             } else {
                 waitCondition = ExpectedConditions.elementToBeClickable(getBy());
             }
-        } else {
-            waitCondition = ExpectedConditions.elementToBeClickable(element);
         }
     	return waitUntil(waitCondition, timeout);
     }
@@ -941,18 +1299,29 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout - timeout.
      * @return element visibility status.
      */
-	public boolean isVisible(long timeout) {
+    public boolean isVisible(long timeout) {
+        return isVisible(timeout, false);
+    }
+
+    /**
+     * Check that element visible within specified timeout.
+     *
+     * @param timeout - timeout.
+     * @param bySearchContext - check by the given searchContext
+     * @return element visibility status.
+     */
+	public boolean isVisible(long timeout, boolean bySearchContext) {
 		ExpectedCondition<?> waitCondition;
 
-        if (Configuration.getPlatform().equalsIgnoreCase("iOS")) {
+        if (bySearchContext) {
+            waitCondition = ExpectedConditions.visibilityOf(element);
+        } else {
             if (element != null) {
                 waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(getBy()),
                         ExpectedConditions.visibilityOf(element));
             } else {
                 waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
             }
-        } else {
-            waitCondition = ExpectedConditions.visibilityOf(element);
         }
 		
 		return waitUntil(waitCondition, timeout);
@@ -1119,6 +1488,10 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     public boolean waitUntilElementDisappear(final long timeout) {
+        return waitUntilElementDisappear(timeout, false);
+    }
+
+    public boolean waitUntilElementDisappear(final long timeout, boolean bySearchContext) {
     	try {
         	//TODO: investigate maybe searchContext better to use here!
     		//do direct selenium/appium search without any extra validations
@@ -1138,12 +1511,12 @@ public class ExtendedWebElement implements IWebElement {
     		return true;
     	}
 
-        if (Configuration.getPlatform().equalsIgnoreCase("iOS")) {
-            return waitUntil(ExpectedConditions.or(ExpectedConditions.invisibilityOfElementLocated(getBy()),
-                    ExpectedConditions.stalenessOf(element),
+        if (bySearchContext) {
+            return waitUntil(ExpectedConditions.or(ExpectedConditions.stalenessOf(element),
                     ExpectedConditions.invisibilityOf(element)), timeout);
         } else {
-            return waitUntil(ExpectedConditions.or(ExpectedConditions.stalenessOf(element),
+            return waitUntil(ExpectedConditions.or(ExpectedConditions.invisibilityOfElementLocated(getBy()),
+                    ExpectedConditions.stalenessOf(element),
                     ExpectedConditions.invisibilityOf(element)), timeout);
         }
     }
@@ -1806,39 +2179,22 @@ public class ExtendedWebElement implements IWebElement {
         ExpectedCondition<?> waitCondition = null;
         switch (loadingStrategy) {
         case BY_PRESENCE: {
-            if (Configuration.getPlatform().equalsIgnoreCase("iOS")) {
                 if (element != null) {
                     waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy), ExpectedConditions.visibilityOf(element));
                 } else {
                     waitCondition = ExpectedConditions.presenceOfElementLocated(myBy);
                 }
-            } else {
-                if (element != null) {
-                    waitCondition = ExpectedConditions.visibilityOf(element);
-                } else {
-                    waitCondition = ExpectedConditions.presenceOfElementLocated(myBy);
-                }
-            }
             break;
         }
         case BY_VISIBILITY: {
-            if (Configuration.getPlatform().equalsIgnoreCase("iOS")) {
                 if (element != null) {
                     waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(myBy), ExpectedConditions.visibilityOf(element));
                 } else {
                     waitCondition = ExpectedConditions.visibilityOfElementLocated(myBy);
                 }
-            } else {
-                if (element != null) {
-                    ExpectedConditions.visibilityOf(element);
-                } else {
-                    waitCondition = ExpectedConditions.visibilityOfElementLocated(myBy);
-                }
-            }
             break;
         }
         case BY_PRESENCE_OR_VISIBILITY:
-            if (Configuration.getPlatform().equalsIgnoreCase("iOS")) {
                 if (element != null) {
                     waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
                             ExpectedConditions.visibilityOfElementLocated(myBy),
@@ -1847,15 +2203,38 @@ public class ExtendedWebElement implements IWebElement {
                     waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
                             ExpectedConditions.visibilityOfElementLocated(myBy));
                 }
-            } else {
+            break;
+        }
+        return waitCondition;
+    }
+
+    private ExpectedCondition<?> getDefaultSearchContextCondition(By myBy) {
+        ExpectedCondition<?> waitCondition = null;
+        switch (loadingStrategy) {
+            case BY_PRESENCE: {
+                if (element != null) {
+                    waitCondition = ExpectedConditions.visibilityOf(element);
+                } else {
+                    waitCondition = ExpectedConditions.presenceOfElementLocated(myBy);
+                }
+                break;
+            }
+            case BY_VISIBILITY: {
+                if (element != null) {
+                    waitCondition = ExpectedConditions.visibilityOf(element);
+                } else {
+                    waitCondition = ExpectedConditions.visibilityOfElementLocated(myBy);
+                }
+                break;
+            }
+            case BY_PRESENCE_OR_VISIBILITY:
                 if (element != null) {
                     waitCondition = ExpectedConditions.visibilityOf(element);
                 } else {
                     waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
                             ExpectedConditions.visibilityOfElementLocated(myBy));
                 }
-            }
-            break;
+                break;
         }
         return waitCondition;
     }
