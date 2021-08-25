@@ -203,6 +203,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         }
         // register app_version/build as artifact if available...
         Configuration.setBuild(Configuration.get(Parameter.APP_VERSION));
+        
+        attachTestRunLabels(suite);
 
         LOGGER.info("CARINA_CORE_VERSION: " + getCarinaVersion());
     }
@@ -361,7 +363,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     @Override
     public void onFinish(ISuite suite) {
         LOGGER.debug("CarinaListener->onFinish(ISuite suite)");
-        attachTestRunLabels(suite);
         try {
             // TODO: quitAllDivers forcibly
             ReportContext.removeTempDir(); // clean temp artifacts directory
