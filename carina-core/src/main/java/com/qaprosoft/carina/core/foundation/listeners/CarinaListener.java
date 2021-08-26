@@ -936,6 +936,27 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         if (!trSuite.isEmpty()) {
             TestRail.setSuiteId(trSuite);
         }
+        
+        // read command line argument to improve test rail integration capabilities.
+        if (!R.CONFIG.getBoolean("testrail_enabled")) {
+            TestRail.disableSync();
+        }
+        
+        if (!R.CONFIG.getBoolean("include_all")) {
+            TestRail.includeAllTestCasesInNewRun();
+        }
+        
+        if (!R.CONFIG.get("milestone").isEmpty()) {
+            TestRail.setMilestone(R.CONFIG.get("milestone"));
+        }
+        
+        if (!R.CONFIG.get("run_name").isEmpty()) {
+            TestRail.setRunName(R.CONFIG.get("run_name"));
+        }
+        
+        if (!R.CONFIG.get("assignee").isEmpty()) {
+            TestRail.setAssignee(R.CONFIG.get("assignee"));
+        }
 
         String qtestProject = getQTestProjectId(suite);
         if (!qtestProject.isEmpty()){
