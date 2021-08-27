@@ -65,7 +65,7 @@
         <!-- Zebrunner integrations -->
         <zebrunner-testng-pluggable.version>RELEASE</zebrunner-testng-pluggable.version>
         <!-- Others -->
-        <azure-storage-blob.version>12.4.0</azure-storage-blob.version>
+        <azure-storage-blob.version>12.7.0</azure-storage-blob.version>
         <aws-java-sdk.version>1.11.923</aws-java-sdk.version>
         <rest-assured.version>4.3.0</rest-assured.version>
         <imgscalr-lib.version>4.2</imgscalr-lib.version>
