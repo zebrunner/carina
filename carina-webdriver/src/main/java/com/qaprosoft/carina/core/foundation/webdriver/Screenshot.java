@@ -649,8 +649,8 @@ public class Screenshot {
 		return !isContains;
 	}
 
-    public static boolean isScreenshotDiff(BufferedImage bufferedImageExpected, BufferedImage bufferedImageActual, String comment, boolean artifact) {
-        return isScreenshotDiff(bufferedImageExpected, bufferedImageActual, comment, artifact, new PointsMarkupPolicy());
+    public static boolean isDiffers(BufferedImage bufferedImageExpected, BufferedImage bufferedImageActual, String comment, boolean artifact) {
+        return isDiffers(bufferedImageExpected, bufferedImageActual, comment, artifact, new PointsMarkupPolicy());
     }
 
     /**
@@ -663,7 +663,7 @@ public class Screenshot {
      * @param markupPolicy          - DiffMarkupPolicy
      * @return boolean
      */
-    public static boolean isScreenshotDiff(BufferedImage bufferedImageExpected, BufferedImage bufferedImageActual, String comment, boolean artifact, DiffMarkupPolicy markupPolicy) {
+    public static boolean isDiffers(BufferedImage bufferedImageExpected, BufferedImage bufferedImageActual, String comment, boolean artifact, DiffMarkupPolicy markupPolicy) {
         String screenName;
         BufferedImage screen;
         try {
