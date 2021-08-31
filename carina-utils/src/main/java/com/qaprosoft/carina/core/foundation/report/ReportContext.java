@@ -424,7 +424,7 @@ public class ReportContext {
         File testDir = testDirectory.get();
         if (testDir == null) {
             String uniqueDirName = UUID.randomUUID().toString();
-            if (!dirName.isEmpty()) {
+            if (StringUtils.isNoneBlank(dirName)) {
                 uniqueDirName = dirName;
             }
             String directory = String.format("%s/%s", getBaseDir(), uniqueDirName);
@@ -486,11 +486,9 @@ public class ReportContext {
             File newTestDir = new File(String.format("%s/%s", getBaseDir(), test.replaceAll("[^a-zA-Z0-9.-]", "_")));
 
             if (!newTestDir.exists()) {
-                // close ThreadLogAppender resources before renaming
-                closeThreadLogAppender();
                 testDir.renameTo(newTestDir);
                 testDirectory.set(newTestDir);
-                LOGGER.debug("Test directory is set to : " + newTestDir);
+                System.out.println("Test directory is set to : " + newTestDir);
             }
         } else {
             LOGGER.error("Unexpected case with absence of test.log for '" + test + "'");
@@ -531,7 +529,7 @@ public class ReportContext {
 
             int maxHistory = Configuration.getInt(Parameter.MAX_SCREENSHOOT_HISTORY);
 
-            if (maxHistory > 0 && screenshotFolders.size() + 1 > maxHistory && maxHistory != 0) {
+            if (maxHistory > 0 && screenshotFolders.size() + 1 > maxHistory) {
                 Comparator<File> comp = new Comparator<File>() {
                     @Override
                     public int compare(File file1, File file2) {
@@ -546,7 +544,7 @@ public class ReportContext {
                     try {
                         FileUtils.deleteDirectory(screenshotFolders.get(i));
                     } catch (IOException e) {
-                        LOGGER.error(e.getMessage(), e);
+                        System.out.println((e + "\n" + e.getMessage()));
                     }
                 }
             }
@@ -752,7 +750,7 @@ public class ReportContext {
             try {
                 InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream(GALLERY_ZIP);
                 if (is == null) {
-                    LOGGER.warn("Unable to find in classpath: " + GALLERY_ZIP);
+                    System.out.println("Unable to find in classpath: " + GALLERY_ZIP);
                     return;
                 }
                 ZipManager.copyInputStream(is, new BufferedOutputStream(new FileOutputStream(reportsRootDir.getAbsolutePath() + "/"
@@ -761,7 +759,7 @@ public class ReportContext {
                 File zip = new File(reportsRootDir.getAbsolutePath() + "/" + GALLERY_ZIP);
                 zip.delete();
             } catch (Exception e) {
-                LOGGER.error("Unable to copyGalleryLib!", e);
+                System.out.println("Unable to copyGalleryLib! " +  e);
             }
         }
     }

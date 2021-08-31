@@ -200,7 +200,7 @@ public enum R {
     public String get(String key) {
         String value = getTestProperties().getProperty(key);
         if (value != null) {
-            LOGGER.warn("Overridden '" + key + "=" + value + "' property will be used for current test!");
+            System.out.println("Overridden '" + key + "=" + value + "' property will be used for current test!");
             return value;
         }
         
