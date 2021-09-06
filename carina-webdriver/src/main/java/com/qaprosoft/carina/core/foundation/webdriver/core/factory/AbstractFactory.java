@@ -27,6 +27,8 @@ import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 
 import com.qaprosoft.carina.core.foundation.utils.R;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base implementation of WebDriver factory.
@@ -34,7 +36,7 @@ import com.qaprosoft.carina.core.foundation.utils.R;
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
 public abstract class AbstractFactory {
-
+    protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
     /**
      * Creates new instance of {@link WebDriver} according to specified {@link DesiredCapabilities}.
      * 
@@ -75,6 +77,7 @@ public abstract class AbstractFactory {
     protected void setIdleTimeout(DesiredCapabilities capabilities) {
         //return if ESG is not used
         if (!Configuration.getSeleniumUrl().contains("engine")) {
+            LOGGER.debug("ESG is not used");
             return;
         }
 
@@ -83,6 +86,7 @@ public abstract class AbstractFactory {
                 && StringUtils.isNoneBlank(Configuration.get(Configuration.Parameter.IDLE_TIMEOUT))
                 && !SpecialKeywords.NULL.equalsIgnoreCase(Configuration.get(Configuration.Parameter.IDLE_TIMEOUT))) {
             capabilities.setCapability("idleTimeout", Configuration.getInt(Configuration.Parameter.IDLE_TIMEOUT));
+            LOGGER.debug("idleTimeout added to driver caps as " + Configuration.getInt(Configuration.Parameter.IDLE_TIMEOUT) + " sec");
         }
     }
 
