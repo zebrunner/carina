@@ -153,6 +153,8 @@ public class Configuration {
         ELEMENT_LOADING_STRATEGY("element_loading_strategy"),
         
         PAGE_OPENING_STRATEGY("page_opening_strategy"),
+
+        IDLE_TIMEOUT("idle_timeout"),
         
         // Amazon
         S3_BUCKET_NAME("s3_bucket_name"),
@@ -202,9 +204,7 @@ public class Configuration {
         IGNORE_SSL("ignore_ssl"),
 
         // Test Execution Filter rules
-        TEST_RUN_RULES("test_run_rules"),
-
-        IDLE_TIMEOUT("idle_timeout");
+        TEST_RUN_RULES("test_run_rules");
 
         private final String key;
 

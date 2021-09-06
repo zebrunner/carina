@@ -132,8 +132,6 @@ public enum R {
                             if (StringUtils.isBlank(value) || value.equalsIgnoreCase(SpecialKeywords.NULL)) {
                                 properties.remove(key, value);
                             }
-                        } else if (isInteger(value)) {
-                            properties.put(key, Integer.parseInt(value));
                         }
                     }
                 }
@@ -147,20 +145,6 @@ public enum R {
     private boolean isInit(Parameter parameter, Properties properties){
         String value = (String) properties.get(parameter.getKey());
         return !(value == null || value.length() == 0 || value.equals("NULL"));
-    }
-
-    private static boolean isInteger(String value){
-        if (StringUtils.isBlank(value)){
-            return false;
-        }
-
-        try {
-            Integer.parseInt(value);
-        } catch (NumberFormatException ex){
-            return false;
-        }
-
-        return true;
     }
 
     R(String resourceKey) {
