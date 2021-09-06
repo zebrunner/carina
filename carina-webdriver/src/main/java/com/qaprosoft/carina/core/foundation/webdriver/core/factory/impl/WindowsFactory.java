@@ -58,6 +58,8 @@ public class WindowsFactory extends AbstractFactory {
         if (isCapabilitiesEmpty(capabilities)) {
             capabilities = getCapabilities(name);
         }
+
+        setIdleTimeout(capabilities);
         
         URL url;
         try {
