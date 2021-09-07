@@ -261,6 +261,11 @@ public class Configuration {
         StringBuilder asString = new StringBuilder();
         asString.append("\n============= Test configuration =============\n");
         for (Parameter param : Parameter.values()) {
+            //#1451 hide WARN! Value not resolved by key: azure_container_name
+            if (Parameter.AZURE_BLOB_URL.equals(param) && "https://${azure_account_name}.blob.core.windows.net".equalsIgnoreCase(Configuration.get(param))) {
+                // do nothing
+                continue;
+            }
             if (!Parameter.CRYPTO_KEY_PATH.equals(param) && !Configuration.get(param).isEmpty()) {
                 asString.append(String.format("%s=%s%n", param.getKey(), Configuration.get(param)));
             }
