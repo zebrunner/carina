@@ -47,6 +47,7 @@ import io.appium.java_client.ios.IOSElement;
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
 public class MobileFactory extends AbstractFactory {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public WebDriver create(String name, DesiredCapabilities capabilities, String seleniumHost) {

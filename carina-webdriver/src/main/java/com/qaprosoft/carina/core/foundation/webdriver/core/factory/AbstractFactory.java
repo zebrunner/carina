@@ -30,13 +30,15 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.invoke.MethodHandles;
+
 /**
  * Base implementation of WebDriver factory.
  * 
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
 public abstract class AbstractFactory {
-    protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     /**
      * Creates new instance of {@link WebDriver} according to specified {@link DesiredCapabilities}.
      * 
@@ -75,12 +77,6 @@ public abstract class AbstractFactory {
     }
 
     protected void setIdleTimeout(DesiredCapabilities capabilities) {
-        //return if ESG is not used
-        if (!Configuration.getSeleniumUrl().contains("engine")) {
-            LOGGER.debug("ESG is not used");
-            return;
-        }
-
         //if no idleTimeout parameter was passed in caps, trying to get it from configuration.
         if (StringUtils.isNoneBlank((String) capabilities.getCapability(Configuration.Parameter.IDLE_TIMEOUT.getKey()))
                 && StringUtils.isNoneBlank(Configuration.get(Configuration.Parameter.IDLE_TIMEOUT))

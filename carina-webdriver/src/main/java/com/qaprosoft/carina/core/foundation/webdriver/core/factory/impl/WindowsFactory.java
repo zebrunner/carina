@@ -39,6 +39,7 @@ import io.appium.java_client.windows.WindowsElement;
  * @author Sergei Zagriychuk (sergeizagriychuk@gmail.com)
  */
 public class WindowsFactory extends AbstractFactory {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public WebDriver create(String name, DesiredCapabilities capabilities, String seleniumHost) {

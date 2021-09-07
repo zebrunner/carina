@@ -46,6 +46,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.deskt
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 
 public class DesktopFactory extends AbstractFactory {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private static DesiredCapabilities staticCapabilities;
 
     @Override
