@@ -202,18 +202,7 @@ public class Configuration {
         IGNORE_SSL("ignore_ssl"),
 
         // Test Execution Filter rules
-        TEST_RUN_RULES("test_run_rules"),
-        
-        // Test Rail
-        TESTRAIL_ENABLED("testrail_enabled"),
-        
-        INCLUDE_ALL("include_all"),
-        
-        MILESTONE("milestone"),
-        
-        RUN_NAME("run_name"),
-        
-        ASSIGNEE("assignee");
+        TEST_RUN_RULES("test_run_rules");
 
         private final String key;
 

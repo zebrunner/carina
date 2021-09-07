@@ -936,34 +936,30 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             TestRail.setSuiteId(trSuite);
         }
         
-        // read command line argument to improve test rail integration capabilities.
-        LOGGER.info("tr enabled as boolean: " + Configuration.getBoolean(Parameter.TESTRAIL_ENABLED));
-        LOGGER.info("tr enabled as string: " + Configuration.get(Parameter.TESTRAIL_ENABLED));
-        LOGGER.info("tr enabled as string from R.CONFIG: " + R.CONFIG.get(Parameter.TESTRAIL_ENABLED.getKey()));
-        
-        if (!Configuration.getBoolean(Parameter.TESTRAIL_ENABLED)) {
+        // read temporary command line argument to improve test rail integration capabilities.
+        if (!R.CONFIG.getBoolean("testrail_enabled")) {
             LOGGER.info("disable TestRail integration!");
             TestRail.disableSync();
         }
         
-        if (Configuration.getBoolean(Parameter.INCLUDE_ALL)) {
+        if (R.CONFIG.getBoolean("include_all")) {
             LOGGER.info("enable include_all for TestRail integration!");
             TestRail.includeAllTestCasesInNewRun();
         }
         
-        String milestone = Configuration.get(Parameter.MILESTONE);
+        String milestone = R.CONFIG.get("milestone");
         if (!milestone.isEmpty()) {
             LOGGER.info("Set TestRail milestone name: " + milestone);
             TestRail.setMilestone(milestone);
         }
         
-        String runName = Configuration.get(Parameter.RUN_NAME);
+        String runName = R.CONFIG.get("run_name");
         if (!runName.isEmpty()) {
             LOGGER.info("Set TestRail run name: " + runName);
             TestRail.setRunName(runName);
         }
         
-        String assignee = Configuration.get(Parameter.ASSIGNEE);
+        String assignee = R.CONFIG.get("assignee");
         if (!assignee.isEmpty()) {
             LOGGER.info("Set TestRail assignee: " + assignee);
             TestRail.setAssignee(assignee);
