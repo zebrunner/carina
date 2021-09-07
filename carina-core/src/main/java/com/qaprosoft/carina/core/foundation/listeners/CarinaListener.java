@@ -82,8 +82,6 @@ import com.qaprosoft.carina.core.foundation.utils.FileManager;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.ZebrunnerNameResolver;
-import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
-import com.qaprosoft.carina.core.foundation.utils.ftp.FtpUtils;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.tag.PriorityManager;
@@ -422,12 +420,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
         } catch (Exception e) {
             LOGGER.error("Exception in CarinaListener->onFinish(ISuite suite)", e);
-        } finally {
-            int counter = 0;
-            while (FtpUtils.isUploading() && ++counter < 30) {
-                LOGGER.info("waiting to finish FTP uploading... " + counter + " sec.");
-                CommonUtils.pause(1);
-            }
         }
     }
 
