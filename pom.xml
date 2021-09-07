@@ -112,9 +112,9 @@
             </snapshots>
         </repository>
         <repository>
-            <id>zebrunner_snapshots</id>
-            <name>zebrunner Snapshots</name>
-            <url>https://nexus.zebrunner.dev/repository/ce-snapshots/</url>
+            <id>qaprosoft_snapshots</id>
+            <name>Qaprosoft Snapshots</name>
+            <url>https://ci.qaprosoft.com/nexus/content/repositories/snapshots/</url>
             <releases>
                 <enabled>false</enabled>
             </releases>
@@ -123,9 +123,9 @@
             </snapshots>
         </repository>
         <repository>
-            <id>qaprosoft_snapshots</id>
-            <name>Qaprosoft Snapshots</name>
-            <url>https://ci.qaprosoft.com/nexus/content/repositories/snapshots/</url>
+            <id>zebrunner_snapshots</id>
+            <name>zebrunner Snapshots</name>
+            <url>https://nexus.zebrunner.dev/repository/ce-snapshots/</url>
             <releases>
                 <enabled>false</enabled>
             </releases>
