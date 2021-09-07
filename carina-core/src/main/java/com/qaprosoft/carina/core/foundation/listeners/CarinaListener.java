@@ -932,18 +932,21 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     private void attachTestRunLabels(ISuite suite) {
         String trSuite = getTestRailSuiteId(suite);
-
         if (!trSuite.isEmpty()) {
             TestRail.setSuiteId(trSuite);
         }
         
         // read command line argument to improve test rail integration capabilities.
+        LOGGER.info("tr enabled as boolean: " + Configuration.getBoolean(Parameter.TESTRAIL_ENABLED));
+        LOGGER.info("tr enabled as string: " + Configuration.get(Parameter.TESTRAIL_ENABLED));
+        LOGGER.info("tr enabled as string from R.CONFIG: " + R.CONFIG.get(Parameter.TESTRAIL_ENABLED.getKey()));
+        
         if (!Configuration.getBoolean(Parameter.TESTRAIL_ENABLED)) {
             LOGGER.info("disable TestRail integration!");
             TestRail.disableSync();
         }
         
-        if (!Configuration.getBoolean(Parameter.INCLUDE_ALL)) {
+        if (Configuration.getBoolean(Parameter.INCLUDE_ALL)) {
             LOGGER.info("enable include_all for TestRail integration!");
             TestRail.includeAllTestCasesInNewRun();
         }
