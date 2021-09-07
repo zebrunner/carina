@@ -15,8 +15,11 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -24,6 +27,10 @@ import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 
 import com.qaprosoft.carina.core.foundation.utils.R;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.invoke.MethodHandles;
 
 /**
  * Base implementation of WebDriver factory.
@@ -31,7 +38,7 @@ import com.qaprosoft.carina.core.foundation.utils.R;
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
 public abstract class AbstractFactory {
-    
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     /**
      * Creates new instance of {@link WebDriver} according to specified {@link DesiredCapabilities}.
      * 
@@ -67,6 +74,16 @@ public abstract class AbstractFactory {
      */
     protected boolean isCapabilitiesEmpty(Capabilities capabilities) {
         return capabilities == null || MapUtils.isEmpty(capabilities.asMap());
+    }
+
+    protected void setIdleTimeout(DesiredCapabilities capabilities) {
+        //if no idleTimeout parameter was passed in caps, trying to get it from configuration.
+        if (StringUtils.isNoneBlank((String) capabilities.getCapability(Configuration.Parameter.IDLE_TIMEOUT.getKey()))
+                && StringUtils.isNoneBlank(Configuration.get(Configuration.Parameter.IDLE_TIMEOUT))
+                && !SpecialKeywords.NULL.equalsIgnoreCase(Configuration.get(Configuration.Parameter.IDLE_TIMEOUT))) {
+            capabilities.setCapability("idleTimeout", Configuration.getInt(Configuration.Parameter.IDLE_TIMEOUT));
+            LOGGER.debug("idleTimeout added to driver caps as " + Configuration.getInt(Configuration.Parameter.IDLE_TIMEOUT) + " sec");
+        }
     }
 
     protected boolean isEnabled(String capability) {

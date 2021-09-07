@@ -153,6 +153,8 @@ public class Configuration {
         ELEMENT_LOADING_STRATEGY("element_loading_strategy"),
         
         PAGE_OPENING_STRATEGY("page_opening_strategy"),
+
+        IDLE_TIMEOUT("idle_timeout"),
         
         // Amazon
         S3_BUCKET_NAME("s3_bucket_name"),

@@ -127,9 +127,9 @@ public enum R {
                     // delete all empty or null capabilites.* items from properties
                     for (Map.Entry<Object, Object> entry : properties.entrySet()) {
                         String key = (String) entry.getKey();
+                        String value = (String) entry.getValue();
                         if (key.toLowerCase().startsWith(prefix)) {
-                            String value = (String) entry.getValue();
-                            if (StringUtils.isEmpty(value) || value.equalsIgnoreCase(SpecialKeywords.NULL)) {
+                            if (StringUtils.isBlank(value) || value.equalsIgnoreCase(SpecialKeywords.NULL)) {
                                 properties.remove(key, value);
                             }
                         }
