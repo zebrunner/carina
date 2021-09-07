@@ -12,6 +12,7 @@ import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
+import com.qaprosoft.carina.core.foundation.utils.R;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -204,7 +205,9 @@ public class L10N {
      */       
     public static void setLocale(String loc) {
         LOGGER.warn("Default locale: " + locale + " was overriden by " + loc);
+        R.CONFIG.put("locale", loc);
         locale = getLocale(loc);
+        load();
     }    
     
     /**
