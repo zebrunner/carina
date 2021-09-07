@@ -938,26 +938,25 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         }
         
         // read command line argument to improve test rail integration capabilities.
-//        if (!"true".equalsIgnoreCase(System.getProperty("testrail_enabled"))) {
-//            TestRail.disableSync();
-//        }
-//        
-//        if (!"true".equalsIgnoreCase(System.getProperty("include_all"))) {
-//            TestRail.includeAllTestCasesInNewRun();
-//        }
-//        
-//        
-//        if (System.getProperty("milestone") != null && !System.getProperty("milestone").isEmpty()) {
-//            TestRail.setMilestone(System.getProperty("milestone"));
-//        }
-//        
-//        if (System.getProperty("run_name") != null && !System.getProperty("run_name").isEmpty()) {
-//            TestRail.setRunName(System.getProperty("run_name"));
-//        }
-//        
-//        if (System.getProperty("assignee") != null && !System.getProperty("assignee").isEmpty()) {
-//            TestRail.setAssignee(System.getProperty("assignee"));
-//        }
+        if (!R.CONFIG.getBoolean("testrail_enabled")) {
+           TestRail.disableSync();
+        }
+        
+        if (!R.CONFIG.getBoolean("include_all")) {
+            TestRail.includeAllTestCasesInNewRun();
+        }
+        
+        if (!R.CONFIG.get("milestone").isEmpty()) {
+            TestRail.setMilestone(R.CONFIG.get("milestone"));
+        }
+        
+        if (!R.CONFIG.get("run_name").isEmpty()) {
+            TestRail.setRunName(R.CONFIG.get("run_name"));
+        }
+        
+        if (!R.CONFIG.get("assignee").isEmpty()) {
+            TestRail.setAssignee(R.CONFIG.get("assignee"));
+        }
 
         String qtestProject = getQTestProjectId(suite);
         if (!qtestProject.isEmpty()){
