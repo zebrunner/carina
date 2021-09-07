@@ -82,7 +82,7 @@ public abstract class AbstractFactory {
         }
 
         //if no idleTimeout parameter was passed in caps, trying to get it from configuration.
-        if (StringUtils.isBlank((String) capabilities.getCapability(Configuration.Parameter.IDLE_TIMEOUT.getKey()))
+        if (StringUtils.isNoneBlank((String) capabilities.getCapability(Configuration.Parameter.IDLE_TIMEOUT.getKey()))
                 && StringUtils.isNoneBlank(Configuration.get(Configuration.Parameter.IDLE_TIMEOUT))
                 && !SpecialKeywords.NULL.equalsIgnoreCase(Configuration.get(Configuration.Parameter.IDLE_TIMEOUT))) {
             capabilities.setCapability("idleTimeout", Configuration.getInt(Configuration.Parameter.IDLE_TIMEOUT));
