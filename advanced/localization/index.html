@@ -663,15 +663,6 @@ String expectedWelcomeText = L10N.getText(&quot;welcomeText&quot;);
 Assert.assertEquals(welcomeText, expectedWelcomeText.trim(), &quot;Wikipedia welcome text was not the expected.&quot;);
 </code></pre>
 
-<p>To change locale during test run (in runtime) use <code>L10N.setLocale(locale);</code> in your test:</p>
-<pre><code>//using old locale
-wikipediaLocalePage.hoverWelcomeText();
-
-L10N.setLocale(&quot;es_ES&quot;);
-//using new es_ES locale
-wikipediaLocalePage.clickDiscussionBtn();
-</code></pre>
-
 <h2 id="resources-generation">Resources generation</h2>
 <p>To generate resources with Carina, you need to enable <code>localization_testing</code> parameter.For elements that are need localization, you need to mark them with <code>@Localized</code> and operate with them.
 In test call <code>L10N.flush()</code> to create new locale file in your project directory.
