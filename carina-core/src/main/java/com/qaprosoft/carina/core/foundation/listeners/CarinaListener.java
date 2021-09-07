@@ -938,29 +938,29 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         }
         
         // read command line argument to improve test rail integration capabilities.
-        if (!R.CONFIG.getBoolean("testrail_enabled")) {
+        if (!Configuration.getBoolean(Parameter.TESTRAIL_ENABLED)) {
             LOGGER.info("disable TestRail integration!");
             TestRail.disableSync();
         }
         
-        if (!R.CONFIG.getBoolean("include_all")) {
+        if (!Configuration.getBoolean(Parameter.INCLUDE_ALL)) {
             LOGGER.info("enable include_all for TestRail integration!");
             TestRail.includeAllTestCasesInNewRun();
         }
         
-        String milestone = R.CONFIG.get("milestone");
+        String milestone = Configuration.get(Parameter.MILESTONE);
         if (!milestone.isEmpty()) {
             LOGGER.info("Set TestRail milestone name: " + milestone);
             TestRail.setMilestone(milestone);
         }
         
-        String runName = R.CONFIG.get("run_name");
+        String runName = Configuration.get(Parameter.RUN_NAME);
         if (!runName.isEmpty()) {
             LOGGER.info("Set TestRail run name: " + runName);
             TestRail.setRunName(runName);
         }
         
-        String assignee = R.CONFIG.get("assignee");
+        String assignee = Configuration.get(Parameter.ASSIGNEE);
         if (!assignee.isEmpty()) {
             LOGGER.info("Set TestRail assignee: " + assignee);
             TestRail.setAssignee(assignee);
