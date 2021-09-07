@@ -935,7 +935,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             TestRail.disableSync();
         }
         
-        if (!Configuration.getBoolean(Parameter.INCLUDE_ALL)) {
+        if (Configuration.getBoolean(Parameter.INCLUDE_ALL)) {
             LOGGER.info("enable include_all for TestRail integration!");
             TestRail.includeAllTestCasesInNewRun();
         }
