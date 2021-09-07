@@ -116,8 +116,6 @@ public class Configuration {
 
         MAX_SCREENSHOOT_HISTORY("max_screen_history"),
 
-        RESULT_SORTING("result_sorting"),
-
         BIG_SCREEN_WIDTH("big_screen_width"),
 
         BIG_SCREEN_HEIGHT("big_screen_height"),
