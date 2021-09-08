@@ -264,7 +264,7 @@ public class Configuration {
         asString.append("\n============= Test configuration =============\n");
         for (Parameter param : Parameter.values()) {
             //#1451 hide WARN! Value not resolved by key: azure_container_name
-            if (Parameter.AZURE_BLOB_URL.equals(param) && "https://${azure_account_name}.blob.core.windows.net".equalsIgnoreCase(Configuration.get(param))) {
+            if (Parameter.AZURE_BLOB_URL.equals(param) && Configuration.get(param).toLowerCase().contains(SpecialKeywords.NULL.toLowerCase())) {
                 // do nothing
                 continue;
             }
