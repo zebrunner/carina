@@ -75,7 +75,9 @@ public class SpecialKeywords {
     @Deprecated
     public static final String TESTRAIL_PROJECT_ID_OLD = "TestRailProjectId";
     public static final String TESTRAIL_SUITE_ID = "com.zebrunner.app/tcm.testrail.suite-id";
+    @Deprecated
     public static final String TESTRAIL_PROJECT_ID = "com.zebrunner.app/tcm.testrail.project-id";
+    @Deprecated
     public static final String TESTRAIL_TESTCASE_UUID = "com.zebrunner.app/tcm.testrail.testcase-id";
 
     public static final String BEFORE_TEST_METHOD = "executeBeforeTestMethod";

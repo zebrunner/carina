@@ -100,17 +100,17 @@
         <module>carina-azure</module>
     </modules>
     <repositories>
-        <!--repository>
-            <id>zebrunner_snapshots</id>
-            <name>zebrunner Snapshots</name>
-            <url>https://nexus.zebrunner.dev/repository/ce-snapshots/</url>
+        <repository>
+            <id>qaprosoft_3rdparty</id>
+            <name>Qaprosoft Thirdparty</name>
+            <url>https://ci.qaprosoft.com/nexus/content/repositories/thirdparty/</url>
             <releases>
-                <enabled>false</enabled>
+                <enabled>true</enabled>
             </releases>
             <snapshots>
-                <enabled>true</enabled>
+                <enabled>false</enabled>
             </snapshots>
-        </repository-->
+        </repository>
         <repository>
             <id>qaprosoft_snapshots</id>
             <name>Qaprosoft Snapshots</name>
@@ -123,9 +123,15 @@
             </snapshots>
         </repository>
         <repository>
-            <id>qaprosoft_3rdparty</id>
-            <name>Qaprosoft Thirdparty</name>
-            <url>https://ci.qaprosoft.com/nexus/content/repositories/thirdparty/</url>
+            <id>zebrunner_snapshots</id>
+            <name>zebrunner Snapshots</name>
+            <url>https://nexus.zebrunner.dev/repository/ce-snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </repository>
     </repositories>
     <profiles>

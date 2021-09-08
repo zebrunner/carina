@@ -82,8 +82,6 @@ import com.qaprosoft.carina.core.foundation.utils.FileManager;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.ZebrunnerNameResolver;
-import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
-import com.qaprosoft.carina.core.foundation.utils.ftp.FtpUtils;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.tag.PriorityManager;
@@ -100,6 +98,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule
 import com.zebrunner.agent.core.registrar.Artifact;
 import com.zebrunner.agent.core.registrar.CurrentTest;
 import com.zebrunner.agent.core.registrar.Label;
+import com.zebrunner.agent.core.registrar.TestRail;
 import com.zebrunner.agent.core.registrar.label.CompositeLabelResolver;
 import com.zebrunner.agent.core.registrar.maintainer.ChainedMaintainerResolver;
 import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
@@ -202,6 +201,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         }
         // register app_version/build as artifact if available...
         Configuration.setBuild(Configuration.get(Parameter.APP_VERSION));
+        
+        attachTestRunLabels(suite);
 
         LOGGER.info("CARINA_CORE_VERSION: " + getCarinaVersion());
     }
@@ -360,7 +361,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     @Override
     public void onFinish(ISuite suite) {
         LOGGER.debug("CarinaListener->onFinish(ISuite suite)");
-        attachTestRunLabels(suite);
         try {
             // TODO: quitAllDivers forcibly
             ReportContext.removeTempDir(); // clean temp artifacts directory
@@ -420,12 +420,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
         } catch (Exception e) {
             LOGGER.error("Exception in CarinaListener->onFinish(ISuite suite)", e);
-        } finally {
-            int counter = 0;
-            while (FtpUtils.isUploading() && ++counter < 30) {
-                LOGGER.info("waiting to finish FTP uploading... " + counter + " sec.");
-                CommonUtils.pause(1);
-            }
         }
     }
 
@@ -917,8 +911,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     private void attachTestLabels(ITestResult result) {
         // register testrail cases...
         Set<String> trCases = getTestRailCasesUuid(result);
-        if (trCases.size() > 0) {
-            Label.attachToTest(SpecialKeywords.TESTRAIL_TESTCASE_UUID, Arrays.copyOf(trCases.toArray(), trCases.size(), String[].class));
+        for (String trCase : trCases) {
+            TestRail.setCaseId(trCase);
         }
 
         // register qtest cases...
@@ -929,12 +923,39 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     }
 
     private void attachTestRunLabels(ISuite suite) {
-        String trProject = getTestRailProjectId(suite);
         String trSuite = getTestRailSuiteId(suite);
 
-        if (!trSuite.isEmpty() && !trProject.isEmpty()) {
-            Label.attachToTestRun(SpecialKeywords.TESTRAIL_PROJECT_ID, trProject);
-            Label.attachToTestRun(SpecialKeywords.TESTRAIL_SUITE_ID, trSuite);
+        if (!trSuite.isEmpty()) {
+            TestRail.setSuiteId(trSuite);
+        }
+        
+        // read command line argument to improve test rail integration capabilities.
+        if (!Configuration.getBoolean(Parameter.TESTRAIL_ENABLED)) {
+            LOGGER.info("disable TestRail integration!");
+            TestRail.disableSync();
+        }
+        
+        if (Configuration.getBoolean(Parameter.INCLUDE_ALL)) {
+            LOGGER.info("enable include_all for TestRail integration!");
+            TestRail.includeAllTestCasesInNewRun();
+        }
+        
+        String milestone = Configuration.get(Parameter.MILESTONE);
+        if (!milestone.isEmpty()) {
+            LOGGER.info("Set TestRail milestone name: " + milestone);
+            TestRail.setMilestone(milestone);
+        }
+        
+        String runName = Configuration.get(Parameter.RUN_NAME);
+        if (!runName.isEmpty()) {
+            LOGGER.info("Set TestRail run name: " + runName);
+            TestRail.setRunName(runName);
+        }
+        
+        String assignee = Configuration.get(Parameter.ASSIGNEE);
+        if (!assignee.isEmpty()) {
+            LOGGER.info("Set TestRail assignee: " + assignee);
+            TestRail.setAssignee(assignee);
         }
 
         String qtestProject = getQTestProjectId(suite);

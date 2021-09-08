@@ -30,8 +30,6 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 
 /**
@@ -121,11 +119,7 @@ public class EmailReportGenerator {
 
     private String getTestResultsList(List<TestResultItem> testResultItems) {
         if (testResultItems.size() > 0) {
-            if (Configuration.getBoolean(Parameter.RESULT_SORTING)) {
-
-                // TODO: identify way to synch config failure with testNG method
-                Collections.sort(testResultItems, new EmailReportItemComparator());
-            }
+            Collections.sort(testResultItems, new EmailReportItemComparator());
 
             String packageName = "";
             testResults = new StringBuilder();
