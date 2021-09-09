@@ -22,7 +22,8 @@
 	</properties>
 
 	<repositories>
-		<repository>
+		<!-- Uncomment only for testing any SNAPSHOT version of carina or zebrunner agent! -->
+		<!--repository>
 			<id>qaprosoft_snapshots</id>
 			<name>Qaprosoft Snapshots</name>
 			<url>https://ci.qaprosoft.com/nexus/content/repositories/snapshots/</url>
@@ -32,8 +33,8 @@
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
-		</repository>
-		<repository>
+		</repository-->
+		<!--repository>
 			<id>zebrunner_snapshots</id>
 			<name>zebrunner Snapshots</name>
 			<url>https://nexus.zebrunner.dev/repository/ce-snapshots/</url>
@@ -43,7 +44,7 @@
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
-		</repository>
+		</repository-->
 	</repositories>
 
 	<dependencies>
