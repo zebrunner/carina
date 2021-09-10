@@ -82,8 +82,6 @@ public class MobileFactory extends AbstractFactory {
 
         LOGGER.debug("capabilities: " + capabilities);
 
-        setIdleTimeout(capabilities);
-        
         try {
             EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
             

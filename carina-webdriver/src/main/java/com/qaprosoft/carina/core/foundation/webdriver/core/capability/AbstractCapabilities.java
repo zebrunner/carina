@@ -71,9 +71,15 @@ public abstract class AbstractCapabilities {
         Map<String, String> capabilitiesMap = new HashMap(R.CONFIG.getProperties());
         for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
             if (entry.getKey().toLowerCase().startsWith(prefix)) {
-                String value = R.CONFIG.get(entry.getKey());
+                String value = R.CONFIG.get(entry.getKey());                
                 if (!value.isEmpty()) {
                     String cap = entry.getKey().replaceAll(prefix, "");
+                    //TODO: #1463 find a way to analyze capability value and set it as integer for all numbers
+                    if ("idleTimeout".equalsIgnoreCase(cap)) {
+                        capabilities.setCapability(cap, Integer.parseInt(value));
+                        continue;
+                    }
+                    
                     if ("false".equalsIgnoreCase(value)) {
                         capabilities.setCapability(cap, false);
                     } else if ("true".equalsIgnoreCase(value)) {

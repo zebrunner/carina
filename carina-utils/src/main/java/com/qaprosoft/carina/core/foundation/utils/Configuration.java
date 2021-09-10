@@ -152,8 +152,6 @@ public class Configuration {
         
         PAGE_OPENING_STRATEGY("page_opening_strategy"),
 
-        IDLE_TIMEOUT("idle_timeout"),
-        
         // Amazon
         S3_BUCKET_NAME("s3_bucket_name"),
 
