@@ -609,6 +609,7 @@ public class Screenshot {
 				|| message.contains("A session is either terminated or not started")
                 || message.contains("invalid session id")
                 || message.contains("Session does not exist")
+                || message.contains("not found in active sessions")
 				|| message.contains("Session timed out or not found")
 				|| message.contains("Unable to determine type from: <. Last 1 characters read")
 				|| message.contains("not available and is not among the last 1000 terminated sessions")				
