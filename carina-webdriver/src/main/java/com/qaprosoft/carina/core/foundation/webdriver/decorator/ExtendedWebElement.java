@@ -305,7 +305,7 @@ public class ExtendedWebElement implements IWebElement {
 	 * @return element existence status.
 	 */
 	public boolean isPresent(By by, long timeout) {
-		return isPresent(by, timeout, false);
+		return isPresent(by, timeout, true);
 	}
 
     /**
@@ -477,7 +477,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return String text
      */
     public String getText() {
-    	return getText(false);
+    	return getText(true);
     }
 
     /**
@@ -500,7 +500,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return Point location
      */
     public Point getLocation() {
-    	return getLocation(false);
+    	return getLocation(true);
     }
 
     /**
@@ -523,7 +523,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return Dimension size
      */
     public Dimension getSize() {
-    	return getSize(false);
+    	return getSize(true);
     }
 
     /**
@@ -547,7 +547,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return String attribute value
      */
     public String getAttribute(String name) {
-        return getAttribute(name, false);
+        return getAttribute(name, true);
     }
 
     /**
@@ -578,7 +578,7 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout to wait
      */
     public void click(long timeout) {
-        click(timeout, false);
+        click(timeout, true);
     }
 
     /**
@@ -629,7 +629,7 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout to wait
      */
     public void doubleClick(long timeout) {
-    	doubleClick(timeout, false);
+    	doubleClick(timeout, true);
     }
 
     /**
@@ -670,7 +670,7 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout to wait
      */
     public void rightClick(long timeout) {
-    	rightClick(timeout, false);
+    	rightClick(timeout, true);
     }
 
     /**
@@ -731,7 +731,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return boolean return true if clicked
      */
     public boolean clickIfPresent(long timeout) {
-       return clickIfPresent(timeout, false);
+       return clickIfPresent(timeout, true);
     }
 
     /**
@@ -767,7 +767,7 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout to wait
      */
     public void sendKeys(Keys keys, long timeout) {
-    	sendKeys(keys, timeout, false);
+    	sendKeys(keys, timeout, true);
     }
 
     /**
@@ -814,7 +814,7 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout to wait
      */
     public void type(String text, long timeout) {
-    	type(text, timeout, false);
+    	type(text, timeout, true);
     }
 
     /**
@@ -876,7 +876,7 @@ public class ExtendedWebElement implements IWebElement {
      * @param filePath path
      */
     public void attachFile(String filePath) {
-    	attachFile(filePath, false);
+    	attachFile(filePath, true);
     }
 
     /** Inputs file path to specified element.
@@ -898,7 +898,7 @@ public class ExtendedWebElement implements IWebElement {
      * for checkbox Element
      */
     public void check() {
-    	check(false);
+    	check(true);
     }
 
     /**
@@ -922,7 +922,7 @@ public class ExtendedWebElement implements IWebElement {
      * for checkbox Element
      */
     public void uncheck() {
-        uncheck(false);
+        uncheck(true);
     }
 
     /**
@@ -946,7 +946,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return - current state
      */
     public boolean isChecked() {
-        return isChecked(false);
+        return isChecked(true);
     }
 
     /**
@@ -969,7 +969,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return selected value
      */
     public String getSelectedValue() {
-    	return getSelectedValue(false);
+    	return getSelectedValue(true);
     }
 
     /**
@@ -993,7 +993,7 @@ public class ExtendedWebElement implements IWebElement {
      */
     @SuppressWarnings("unchecked")
 	public List<String> getSelectedValues() {
-    	return getSelectedValues(false);
+    	return getSelectedValues(true);
     }
 
     /**
@@ -1018,7 +1018,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return true if item selected, otherwise false.
      */
     public boolean select(final String selectText) {
-    	return select(selectText, false);
+    	return select(selectText, true);
     }
 
     /**
@@ -1043,7 +1043,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return boolean.
      */
     public boolean select(final String[] values) {
-    	return select(values, false);
+    	return select(values, true);
     }
 
     /**
@@ -1074,7 +1074,7 @@ public class ExtendedWebElement implements IWebElement {
      *         } };
      */
     public boolean selectByMatcher(final BaseMatcher<String> matcher) {
-    	return selectByMatcher(matcher, false);
+    	return selectByMatcher(matcher, true);
     }
 
     /**
@@ -1105,7 +1105,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return true if item selected, otherwise false.
      */
     public boolean selectByPartialText(final String partialSelectText) {
-    	return selectByPartialText(partialSelectText, false);
+    	return selectByPartialText(partialSelectText, true);
     }
 
     /**
@@ -1130,7 +1130,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return true if item selected, otherwise false.
      */
     public boolean select(final int index) {
-        return select(index, false);
+        return select(index, true);
     }
 
     /**
@@ -1167,7 +1167,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return element existence status.
      */
     public boolean isElementPresent(long timeout) {
-        return isElementPresent(timeout, false);
+        return isElementPresent(timeout, true);
     }
 
     /**
@@ -1258,7 +1258,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return element clickability status.
      */
     public boolean isClickable(long timeout) {
-        return isClickable(timeout, false);
+        return isClickable(timeout, true);
     }
 
     /**
@@ -1300,7 +1300,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return element visibility status.
      */
     public boolean isVisible(long timeout) {
-        return isVisible(timeout, false);
+        return isVisible(timeout, true);
     }
 
     /**
@@ -1488,7 +1488,7 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     public boolean waitUntilElementDisappear(final long timeout) {
-        return waitUntilElementDisappear(timeout, false);
+        return waitUntilElementDisappear(timeout, true);
     }
 
     public boolean waitUntilElementDisappear(final long timeout, boolean bySearchContext) {
