@@ -133,6 +133,33 @@ public interface IDriverPool {
         return drv;
 
     }
+    
+    /**
+     * Get driver by sessionId.
+     * 
+     * @param sessionId
+     *            - session id to be used for searching a desired driver
+     * 
+     * @return default WebDriver
+     */
+    public static WebDriver getDriver(SessionId sessionId) {
+        for (CarinaDriver carinaDriver : driversPool) {
+            WebDriver drv = carinaDriver.getDriver();
+            if (drv instanceof EventFiringWebDriver) {
+                EventFiringWebDriver eventFirDriver = (EventFiringWebDriver) drv;
+                drv = eventFirDriver.getWrappedDriver();
+            }
+
+            SessionId drvSessionId = ((RemoteWebDriver) drv).getSessionId();
+
+            if (drvSessionId != null) {
+                if (sessionId.equals(drvSessionId)) {
+                    return drv;
+                }
+            }
+        }
+        throw new DriverPoolException("Unable to find driver using sessionId!");
+    }
 
     /**
      * Get Carina driver by sessionId.

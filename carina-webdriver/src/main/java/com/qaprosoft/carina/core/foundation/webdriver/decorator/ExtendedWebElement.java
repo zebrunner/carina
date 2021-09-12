@@ -233,7 +233,7 @@ public class ExtendedWebElement implements IWebElement {
 				// that's the only place to use DriverPool to get driver.
                 try {
                     //try to search securely in driver pool by sessionId
-                    this.driver = IDriverPool.getCarinaDriver(sessionId).getDriver();
+                    this.driver = IDriverPool.getDriver(sessionId);
                 } catch (DriverPoolException ex) {
                     // seems like driver started outside of IDriverPool so try to register it as well
                     this.driver = (WebDriver) tempSearchContext;
