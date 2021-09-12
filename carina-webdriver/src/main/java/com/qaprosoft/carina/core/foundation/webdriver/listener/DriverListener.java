@@ -24,6 +24,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 import org.slf4j.Logger;
@@ -31,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.FileManager;
+import com.qaprosoft.carina.core.foundation.webdriver.CarinaDriver;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 import com.zebrunner.agent.core.registrar.Artifact;
@@ -152,26 +154,15 @@ public class DriverListener implements WebDriverEventListener {
 
     @Override
     public void onException(Throwable thr, WebDriver driver) {
-        // [VD] make below code as much safety as possible otherwise potential recursive failure could occur with driver related issue.
-        // most suspicious are capture screenshots, generating dumps etc
-        if (thr == null
-                || thr.getMessage() == null
-                || thr.getMessage().contains("Method has not yet been implemented")                        
-                || thr.getMessage().contains("Expected to read a START_MAP but instead have: END. Last 0 characters read")
-                || thr.getMessage().contains("Unable to determine type from: <. Last 1 characters read")
-                || thr.getMessage().contains("script timeout")
-                || thr.getMessage().contains("javascript error: Cannot read property 'outerHTML' of null")
-                || thr.getMessage().contains("javascript error: Cannot read property 'scrollHeight' of null")
-                || thr.getMessage().contains("Method is not implemented")
-                || thr.getMessage().contains("An element could not be located on the page using the given search parameters")
-                || thr.getMessage().contains("no such element: Unable to locate element")
-                // carina has a lot of extra verifications to solve all stale reference issue and finally perform an action so ignore such exception in listener!
-                || thr.getMessage().contains("StaleElementReferenceException")
-                || thr.getMessage().contains("stale_element_reference.html")) {
+        if (thr == null || thr.getMessage() == null) {
             // do nothing
             return;
         }
-
+        
+        CarinaDriver carinaDriver = IDriverPool.getCarinaDriver(((RemoteWebDriver) driver).getSessionId());
+        
+        String message = thr.getMessage();
+        
         // handle use-case when application crashed on iOS but tests continue to execute something because doesn't raise valid exception
         // Example:
 
@@ -183,8 +174,51 @@ public class DriverListener implements WebDriverEventListener {
         // stacktrace information)
 
         // TODO: investigate if we run @AfterMethod etc system events after this crash
-        if (thr.getMessage().contains("is not running, possibly crashed")) {
+        if (message.contains("is not running, possibly crashed")) {
             throw new RuntimeException(thr);
+        }
+        
+        if (message.contains("Session ID is null. Using WebDriver after calling quit")
+                || message.contains("A session is either terminated or not started")
+                || message.contains("invalid session id")
+                || message.contains("Session does not exist")
+                || message.contains("not found in active sessions")
+                || message.contains("Session timed out or not found")
+                || message.contains("Unable to determine type from: <. Last 1 characters read")
+                || message.contains("not available and is not among the last 1000 terminated sessions")
+                || message.contains("cannot forward the request")
+                || message.contains("connect ECONNREFUSED")
+                || message.contains("was terminated due to") // FORWARDING_TO_NODE_FAILED, CLIENT_STOPPED_SESSION, PROXY_REREGISTRATION, TIMEOUT, BROWSER_TIMEOUT etc
+                || message.contains("no such window: window was already closed")
+                || message.contains("Error communicating with the remote browser. It may have died")
+                || message.contains("chrome not reachable")
+                || message.contains("cannot forward the request Connect to")
+                || message.contains("Could not proxy command to remote server. Original error:") // Error: socket hang up, Error: read ECONNRESET etc
+                || message.contains("Could not proxy command to the remote server. Original error:") // Different messages on some Appium versions
+                || message.contains("Driver connection refused")) {
+            // mark driver as not alive anymore!
+            LOGGER.error("Mark current driver as died!");
+
+            carinaDriver.setAlive(false);
+            return;
+        }
+        
+        // [VD] make below code as much safety as possible otherwise potential recursive failure could occur with driver related issue.
+        // most suspicious are capture screenshots, generating dumps etc
+        if (message.contains("Method has not yet been implemented")                        
+                || message.contains("Expected to read a START_MAP but instead have: END. Last 0 characters read")
+                || message.contains("Unable to determine type from: <. Last 1 characters read")
+                || message.contains("script timeout")
+                || message.contains("javascript error: Cannot read property 'outerHTML' of null")
+                || message.contains("javascript error: Cannot read property 'scrollHeight' of null")
+                || message.contains("Method is not implemented")
+                || message.contains("An element could not be located on the page using the given search parameters")
+                || message.contains("no such element: Unable to locate element")
+                // carina has a lot of extra verifications to solve all stale reference issue and finally perform an action so ignore such exception in listener!
+                || message.contains("StaleElementReferenceException")
+                || message.contains("stale_element_reference.html")) {
+            // do nothing
+            return;
         }
 
         // hopefully castDriver below resolve root cause of the recursive onException calls but keep below to ensure
@@ -192,12 +226,12 @@ public class DriverListener implements WebDriverEventListener {
                 && (Arrays.toString(thr.getStackTrace())
                         .contains("com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener.onException")
                         || Arrays.toString(thr.getStackTrace()).contains("Unable to capture screenshot due to the WebDriverException"))) {
-            LOGGER.error("Do not generate screenshot for invalid driver!");
+            LOGGER.warn("Do not generate recursive screenshots!");
             // prevent recursive crash for onException
             return;
         }
 
-        LOGGER.debug("DriverListener->onException starting..." + thr.getMessage());
+        LOGGER.debug("DriverListener->onException starting..." + message);
         driver = castDriver(driver);
 
         try {
@@ -207,8 +241,8 @@ public class DriverListener implements WebDriverEventListener {
             // 3. 99% those root exception means that we should prohibit screenshot generation for such use-case
             // 4. if 3rd one is true just update Screenshot.isCaptured() adding part of the exception to the list
             // handle cases which should't be captured
-            if (Screenshot.isCaptured(thr.getMessage())) {
-                captureScreenshot(thr.getMessage(), driver, null, true);
+            if (carinaDriver.isAlive() && Screenshot.isCaptured(message)) {
+                captureScreenshot(message, driver, null, true);
             }
         } catch (Exception e) {
             if (!e.getMessage().isEmpty()
@@ -218,7 +252,7 @@ public class DriverListener implements WebDriverEventListener {
                 LOGGER.error("Unrecognized exception detected in DriverListener->onException! " + e.getMessage(), e);
             }
         } catch (Throwable e) {
-            LOGGER.error("Take a look to the logs above for current thread and add exception into the exclusion for Screenshot.isCaptured(). "
+            LOGGER.error("Take a look to the logs above for current thread and exclude particular exception for Screenshot.isCaptured(). "
                     + e.getMessage(), e);
         }
 

@@ -11,14 +11,17 @@ public class CarinaDriver {
 	private Device device;
 	private Phase phase;
 	private long threadId;
+	private boolean isAlive;
 	
-    public CarinaDriver(String name, WebDriver driver, Device device, Phase phase, long threadId) {
+	public CarinaDriver(String name, WebDriver driver, Device device, Phase phase, long threadId) {
 		super();
 		this.name = name;
 		this.driver = driver;
 		this.device = device;
 		this.phase = phase;
 		this.threadId = threadId;
+		
+		this.isAlive = true;
 	}
 
 	public WebDriver getDriver() {
@@ -43,5 +46,13 @@ public class CarinaDriver {
 
     protected void setThreadId(long threadId) {
         this.threadId = threadId;
+    }
+    
+    public boolean isAlive() {
+        return isAlive;
+    }
+
+    public void setAlive(boolean isAlive) {
+        this.isAlive = isAlive;
     }
 }
