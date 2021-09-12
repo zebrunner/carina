@@ -187,7 +187,7 @@ public class DriverListener implements WebDriverEventListener {
             throw new RuntimeException(thr);
         }
 
-        // hopefully castDriver below resolve root cause of the recursive onException calls but keep below if to ensure
+        // hopefully castDriver below resolve root cause of the recursive onException calls but keep below to ensure
         if (thr.getStackTrace() != null
                 && (Arrays.toString(thr.getStackTrace())
                         .contains("com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener.onException")

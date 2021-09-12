@@ -135,7 +135,7 @@ public interface IDriverPool {
     }
 
     /**
-     * Get driver by WebElement.
+     * Get driver by sessionId.
      * 
      * @param sessionId
      *            - session id to be used for searching a desired driver
