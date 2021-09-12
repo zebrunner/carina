@@ -101,17 +101,6 @@
     </modules>
     <repositories>
         <repository>
-            <id>qaprosoft_3rdparty</id>
-            <name>Qaprosoft Thirdparty</name>
-            <url>https://ci.qaprosoft.com/nexus/content/repositories/thirdparty/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
             <id>qaprosoft_snapshots</id>
             <name>Qaprosoft Snapshots</name>
             <url>https://ci.qaprosoft.com/nexus/content/repositories/snapshots/</url>
