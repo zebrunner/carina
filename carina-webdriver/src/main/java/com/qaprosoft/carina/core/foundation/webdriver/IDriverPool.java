@@ -318,7 +318,11 @@ public interface IDriverPool {
                 POOL_LOGGER.error("InterruptedException: Unable to quit driver!", e);
                 Thread.currentThread().interrupt();
             } catch (ExecutionException e) {
-                POOL_LOGGER.error("ExecutionException: Unable to quit driver!", e);
+                if (e.getMessage() != null && e.getMessage().contains("not found in active sessions")) {
+                    POOL_LOGGER.error("Unable to quit driver: " + e.getMessage());
+                } else {
+                    POOL_LOGGER.error("ExecutionException: Unable to quit driver!", e);
+                }
             } catch (java.util.concurrent.TimeoutException e) {
                 POOL_LOGGER.error("Unable to quit driver for " + timeout + "sec!", e);
             }
