@@ -196,13 +196,13 @@ public class DriverListener implements WebDriverEventListener {
                 || message.contains("Could not proxy command to remote server. Original error:") // Error: socket hang up, Error: read ECONNRESET etc
                 || message.contains("Could not proxy command to the remote server. Original error:") // Different messages on some Appium versions
                 || message.contains("Driver connection refused")) {
-            // mark driver as not alive anymore!
-            LOGGER.error("Mark current driver as died!");
 
             //TODO: need debug to detect valid handler for
             // java.lang.ClassCastException: class com.sun.proxy.$Proxy19 cannot be cast to class org.openqa.selenium.remote.RemoteWebDriver (com.sun.proxy.$Proxy19 and org.openqa.selenium.remote.RemoteWebDriver are in unnamed module of loader 'app')
             if (driver instanceof WebDriver) {
                 CarinaDriver carinaDriver = IDriverPool.getCarinaDriver(((RemoteWebDriver) driver).getSessionId());
+                // mark driver as not alive anymore!
+                LOGGER.error("Mark current driver as died!");
                 carinaDriver.setAlive(false);
             }
             
