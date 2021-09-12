@@ -160,7 +160,6 @@ public class DriverListener implements WebDriverEventListener {
         }
         
         driver = castDriver(driver);
-        CarinaDriver carinaDriver = IDriverPool.getCarinaDriver(((RemoteWebDriver) driver).getSessionId());
         
         String message = thr.getMessage();
         
@@ -200,7 +199,13 @@ public class DriverListener implements WebDriverEventListener {
             // mark driver as not alive anymore!
             LOGGER.error("Mark current driver as died!");
 
-            carinaDriver.setAlive(false);
+            //TODO: need debug to detect valid handler for
+            // java.lang.ClassCastException: class com.sun.proxy.$Proxy19 cannot be cast to class org.openqa.selenium.remote.RemoteWebDriver (com.sun.proxy.$Proxy19 and org.openqa.selenium.remote.RemoteWebDriver are in unnamed module of loader 'app')
+            if (driver instanceof WebDriver) {
+                CarinaDriver carinaDriver = IDriverPool.getCarinaDriver(((RemoteWebDriver) driver).getSessionId());
+                carinaDriver.setAlive(false);
+            }
+            
             return;
         }
         
@@ -241,7 +246,7 @@ public class DriverListener implements WebDriverEventListener {
             // 3. 99% those root exception means that we should prohibit screenshot generation for such use-case
             // 4. if 3rd one is true just update Screenshot.isCaptured() adding part of the exception to the list
             // handle cases which should't be captured
-            if (carinaDriver.isAlive() && Screenshot.isCaptured(message)) {
+            if (Screenshot.isCaptured(message)) {
                 captureScreenshot(message, driver, null, true);
             }
         } catch (Exception e) {
