@@ -530,11 +530,14 @@ public class Screenshot {
             LOGGER.error(message);
             Thread.currentThread().interrupt();
         } catch (ExecutionException e) {
-            String message = "ExecutionException error on capture full screenshot: " + e.getMessage();
-            LOGGER.error(message);
+            if (e.getMessage() != null && e.getMessage().contains("Driver connection refused")) {
+                LOGGER.error("Unable to capture full screenshot due to the driver connection refused!");
+            } else {
+                LOGGER.error("ExecutionException error detected on capture full screenshot!", e);
+            }
         } catch (Exception e) {
-            String message = "Undefined error on capture full screenshot detected: " + e.getMessage();
-            LOGGER.error(message);
+            // for undefined failure keep full stacktrace to handle later correctly!
+            LOGGER.error("Undefined error on capture full screenshot detected!", e);
         } finally {
             LOGGER.debug("finished full size screenshot call.");            
         }
