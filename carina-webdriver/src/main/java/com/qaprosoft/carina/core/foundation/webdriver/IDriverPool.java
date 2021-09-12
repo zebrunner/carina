@@ -319,7 +319,7 @@ public interface IDriverPool {
                 Thread.currentThread().interrupt();
             } catch (ExecutionException e) {
                 if (e.getMessage() != null && e.getMessage().contains("not found in active sessions")) {
-                    POOL_LOGGER.error("Unable to quit driver: " + e.getMessage());
+                    POOL_LOGGER.error("Unable to quit driver for already disconnected session!");
                 } else {
                     POOL_LOGGER.error("ExecutionException: Unable to quit driver!", e);
                 }
