@@ -216,7 +216,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     @Override
     public void onTestSkipped(ITestResult result) {
         LOGGER.debug("AbstractTestListener->onTestSkipped");
-        
+        failItem(result, Messager.TEST_SKIPPED);
         super.onTestSkipped(result);
     }
 
