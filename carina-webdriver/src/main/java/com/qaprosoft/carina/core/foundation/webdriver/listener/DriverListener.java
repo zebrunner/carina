@@ -159,6 +159,7 @@ public class DriverListener implements WebDriverEventListener {
             return;
         }
         
+        driver = castDriver(driver);
         CarinaDriver carinaDriver = IDriverPool.getCarinaDriver(((RemoteWebDriver) driver).getSessionId());
         
         String message = thr.getMessage();
@@ -221,7 +222,7 @@ public class DriverListener implements WebDriverEventListener {
             return;
         }
 
-        // hopefully castDriver below resolve root cause of the recursive onException calls but keep below to ensure
+        // hopefully castDriver above resolved root cause of the recursive onException calls but keep below code to ensure
         if (thr.getStackTrace() != null
                 && (Arrays.toString(thr.getStackTrace())
                         .contains("com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener.onException")
@@ -232,7 +233,6 @@ public class DriverListener implements WebDriverEventListener {
         }
 
         LOGGER.debug("DriverListener->onException starting..." + message);
-        driver = castDriver(driver);
 
         try {
             // 1. if you see mess with afterTest carina actions and Timer startup failure you should follow steps #2+ to determine root cause.
