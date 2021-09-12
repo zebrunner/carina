@@ -616,7 +616,7 @@ public class Screenshot {
 				|| message.contains("cannot forward the request")
                 || message.contains("connect ECONNREFUSED")
 				|| message.contains("was terminated due to") // FORWARDING_TO_NODE_FAILED, CLIENT_STOPPED_SESSION, PROXY_REREGISTRATION, TIMEOUT, BROWSER_TIMEOUT etc
-				|| message.contains("InvalidElementStateException") || message.contains("stale element reference")
+				|| message.contains("InvalidElementStateException")
 				|| message.contains("no such element: Unable to locate element")
 				|| message.contains("https://www.seleniumhq.org/exceptions/no_such_element.html") // use-case for Safari driver
 				|| message.contains("no such window: window was already closed")
