@@ -492,6 +492,8 @@ public class ReportContext {
             File newTestDir = new File(String.format("%s/%s", getBaseDir(), test.replaceAll("[^a-zA-Z0-9.-]", "_")));
 
             if (!newTestDir.exists()) {
+                // close ThreadLogAppender resources before renaming
+                closeThreadLogAppender();
                 testDir.renameTo(newTestDir);
                 testDirectory.set(newTestDir);
                 System.out.println("Test directory is set to : " + newTestDir);
