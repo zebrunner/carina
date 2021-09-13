@@ -73,17 +73,17 @@ public class FileManager {
             try {
                 fw.write(content);
             } catch (Exception e) {
-                LOGGER.debug("Error during FileWriter append. " + e.getMessage(), e.getCause());
+                LOGGER.debug("Error during FileWriter append.", e.getCause());
             } finally {
                 try {
                     fw.close();
                 } catch (Exception e) {
-                    LOGGER.debug("Error during FileWriter close. " + e.getMessage(), e.getCause());
+                    LOGGER.debug("Error during FileWriter close.", e.getCause());
                 }
             }
 
         } catch (IOException e) {
-            LOGGER.debug(e.getMessage(), e.getCause());
+            LOGGER.debug("Error during creating new file with path " + filePath, e);
         }
     }
     

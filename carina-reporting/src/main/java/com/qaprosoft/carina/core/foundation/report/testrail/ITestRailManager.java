@@ -100,7 +100,7 @@ public interface ITestRailManager extends ITestCases {
                 }
             }
         } catch (ClassNotFoundException e) {
-            TESTRAIL_LOGGER.error(e.getMessage(), e);
+            TESTRAIL_LOGGER.error("Can't find test class!", e);
         }
 
         // append cases id values from ITestCases map (custom TestNG provider)

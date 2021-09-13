@@ -143,7 +143,7 @@ public class XLSParser extends AbstractXLSParser {
                 }
             }
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error("Error while parsing spreadsheet!", e);
         }
         return dataTable;
     }

@@ -140,7 +140,7 @@ public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
                 try {
                     driverService.start();
                 } catch (IOException e) {
-                    throw new WebDriverException(e.getMessage(), e);
+                    throw new WebDriverException(e);
                 }
             });
         }

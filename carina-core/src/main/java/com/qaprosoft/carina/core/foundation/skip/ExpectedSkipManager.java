@@ -62,7 +62,7 @@ public class ExpectedSkipManager {
                 }
             } catch (InstantiationException | IllegalAccessException e) {
                 LOGGER.error("Error during skip rules initialization: ".concat(rule.getName()));
-                LOGGER.error("Error msg: ".concat(e.getMessage()), e);
+                LOGGER.error("Error msg: ", e);
             }
         }
         return false;
