@@ -126,7 +126,7 @@ public class MobileFactory extends AbstractFactory {
             // the most common problem might be due to the adb connection problem
             
             // make sure to initiate driver quit
-            LOGGER.error("Unable to register device: " + e.getMessage(), e);
+            LOGGER.error("Unable to register device!", e);
             //TODO: try to handle use-case if quit in this place can hangs for minutes!
             LOGGER.error("starting driver quit...");
             driver.quit();

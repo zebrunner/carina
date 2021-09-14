@@ -356,7 +356,7 @@ public class ExtendedWebElement implements IWebElement {
             originalException = e.getCause();
 		}
 		catch (Exception e) {
-			LOGGER.error("waitUntil: undefined exception: " + e.getMessage(), e);
+			LOGGER.error("waitUntil: undefined exception.", e);
 			result = false;
 			//TODO: e or e.getCause()?
 			originalException = e;
@@ -1096,7 +1096,7 @@ public class ExtendedWebElement implements IWebElement {
                 name = element.getText();
             } catch (Exception e) {
                 /* do nothing */
-                LOGGER.debug(e.getMessage(), e.getCause());
+                LOGGER.debug("Error while getting text from element.", e);
             }
 
             // we can't initiate ExtendedWebElement using by as it belongs to the list of elements
@@ -1406,7 +1406,7 @@ public class ExtendedWebElement implements IWebElement {
 			output = overrideAction(actionName, inputArgs);
 		} catch (WebDriverException e) {
 			// TODO: move to error for snapshot build to detect different negative use-cse and move to debug for released versions!
-			LOGGER.debug("doAction catched WebDriverException: '" + e.getMessage() + "'", e);
+			LOGGER.debug("doAction catched WebDriverException!", e);
 			// try to find again using driver
 			try {
 				element = refindElement();
@@ -1417,7 +1417,7 @@ public class ExtendedWebElement implements IWebElement {
 			}
 			output = overrideAction(actionName, inputArgs);
 		} catch (Throwable e) {
-		    LOGGER.error(e.getMessage(), e);
+		    LOGGER.error(e.getMessage());
 			// print stack trace temporary to be able to handle any problem without extra debugging 
 			e.printStackTrace();
 			throw e;

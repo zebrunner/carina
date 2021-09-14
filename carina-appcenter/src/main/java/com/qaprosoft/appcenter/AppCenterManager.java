@@ -118,7 +118,7 @@ public class AppCenterManager {
                 }
             }
         } catch (Exception ex) {
-            LOGGER.error(String.format("Error Attempting to Look for Existing File: %s", ex.getMessage()), ex);
+            LOGGER.error("Error Attempting to Look for Existing File!", ex);
         }
 
         if (fileToLocate == null) {
@@ -133,7 +133,7 @@ public class AppCenterManager {
                 }
                 LOGGER.debug(String.format("AppCenter Build (%s) was retrieved", fileName));
             } catch (Exception ex) {
-                LOGGER.error(String.format("Error Thrown When Attempting to Transfer AppCenter Build (%s)", ex.getMessage()), ex);
+                LOGGER.error("Error Thrown When Attempting to Transfer AppCenter Build!", ex);
             }
         } else {
             LOGGER.info("Preparing to use local version of AppCenter Build...");
@@ -161,7 +161,7 @@ public class AppCenterManager {
             return false;
         } catch (ClosedByInterruptException ie1) {
             LOGGER.info("Retrying....");
-            LOGGER.error("Getting Error: " + ie1.getMessage(), ie1);
+            LOGGER.error("Getting Error!", ie1);
             return true;
         }
     }

@@ -698,7 +698,7 @@ public interface IMobileUtils extends IDriverPool {
                 UTILS_LOGGER.info(String.format("Current OS is %s. But we can set default TimeZone and Language only for Android.", os));
             }
         } catch (Exception e) {
-            UTILS_LOGGER.error(e.getMessage(), e);
+            UTILS_LOGGER.error("Error while setting to device default timezone and language!", e);
         }
     }
 

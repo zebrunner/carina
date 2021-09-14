@@ -48,7 +48,7 @@ public class CryptoTool {
         try {
             this.cipher = Cipher.getInstance(algorithm);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error("Exception on getting cipher instance", e);
         }
     }
 
@@ -66,12 +66,12 @@ public class CryptoTool {
         try {
             this.key = SecretKeyManager.loadKey(new File(cryptoKeyPath), cryptoKeyType);
         } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error("Can't load secret key!", e);
         }
         try {
             this.cipher = Cipher.getInstance(algorithm);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error("Exception on getting cipher instance", e);
         }
     }
 

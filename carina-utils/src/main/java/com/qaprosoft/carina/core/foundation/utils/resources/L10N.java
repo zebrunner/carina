@@ -107,7 +107,7 @@ public class L10N {
                         LOGGER.debug(String
                                 .format("Resource '%s' added.", resource));
                     } catch (MissingResourceException e) {
-                        LOGGER.debug(e.getMessage(), e);
+                        LOGGER.debug("No resource bundle for the " + resource + " can be found", e);
                     }
                 } else {
                     LOGGER.debug(String
@@ -211,13 +211,9 @@ public class L10N {
      * Flush missed localization resources to property file.
      */
     public static void flush() {
-        try {
-            if (missedResources.size() == 0) {
-                LOGGER.info("There are no new localization properties.");
-                return;
-            }
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+        if (missedResources.size() == 0) {
+            LOGGER.info("There are no new localization properties.");
+            return;
         }
 
         LOGGER.info("New localization for '" + locale + "'");

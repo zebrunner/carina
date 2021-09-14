@@ -40,12 +40,12 @@ public class JenkinsClient {
                     response.append(inputLine);
                 }
             } catch (Exception e) {
-                LOGGER.debug("Error during FileWriter append. " + e.getMessage(), e.getCause());
+                LOGGER.debug("Error during FileWriter append.", e;
             } finally {
                 try {
                     in.close();
                 } catch (Exception e) {
-                    LOGGER.debug("Error during FileWriter close. " + e.getMessage(), e.getCause());
+                    LOGGER.debug("Error during FileWriter close.", e);
                 }
 
             }

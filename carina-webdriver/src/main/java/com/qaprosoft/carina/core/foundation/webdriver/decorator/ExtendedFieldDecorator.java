@@ -76,7 +76,7 @@ public class ExtendedFieldDecorator implements FieldDecorator {
         try {
             locator = factory.createLocator(field);
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error("Error while creating locator!", e);
             return null;
         }
         if (locator == null) {
@@ -147,15 +147,10 @@ public class ExtendedFieldDecorator implements FieldDecorator {
             uiObject = (T) clazz.getConstructor(WebDriver.class, SearchContext.class).newInstance(
                     webDriver, proxy);
         } catch (NoSuchMethodException e) {
-            LOGGER.error("Implement appropriate AbstractUIObject constructor for auto-initialization: "
-                    + e.getMessage());
             throw new RuntimeException(
-                    "Implement appropriate AbstractUIObject constructor for auto-initialization: "
-                            + e.getMessage(),
-                    e);
+                    "Implement appropriate AbstractUIObject constructor for auto-initialization!", e);
         } catch (Exception e) {
-            LOGGER.error("Error creating UIObject: " + e.getMessage());
-            throw new RuntimeException("Error creating UIObject: " + e.getMessage(), e);
+            throw new RuntimeException("Error creating UIObject!", e);
         }
         uiObject.setName(field.getName());
         uiObject.setRootElement(proxy);

@@ -75,14 +75,14 @@ public class ZipManager {
                 }
             }
         } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error("Error during unzip!", e);
         } finally {
             try {
                 if (zipFile != null) {
                     zipFile.close();
                 }
             } catch (IOException e) {
-                LOGGER.error(e.getMessage(), e);
+                LOGGER.error("Error during closing zipFile!", e);
             }
         }
     }

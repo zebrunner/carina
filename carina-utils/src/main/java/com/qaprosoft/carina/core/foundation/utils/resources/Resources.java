@@ -50,7 +50,7 @@ public class Resources {
                 try {
                     collectURL(f, s, file.toURI().toURL());
                 } catch (MalformedURLException e) {
-                    LOGGER.debug(e.getMessage(), e);
+                    LOGGER.debug("Error while collecting urls!", e);
                 }
             }
         }
@@ -81,12 +81,12 @@ public class Resources {
                 try {
                     iterateEntry(new File(url.toURI()), filter, collectedURLs);
                 } catch (URISyntaxException e) {
-                    LOGGER.debug(e.getMessage(), e);
+                    LOGGER.debug("Error during creating URI from url!", e);
                 }
             }
             return collectedURLs;
         } catch (IOException e) {
-            LOGGER.debug(e.getMessage(), e);
+            LOGGER.debug("Error on creating URLClassLoader!", e);
         }
         return collectedURLs;
     }
@@ -100,7 +100,7 @@ public class Resources {
             iterateEntry(new File(src.getLocation().toURI()), filter,
                     collectedURLs);
         } catch (URISyntaxException e) {
-            LOGGER.debug(e.getMessage(), e);
+            LOGGER.debug("Error during creating URI from url!", e);
         }
         return collectedURLs;
     }

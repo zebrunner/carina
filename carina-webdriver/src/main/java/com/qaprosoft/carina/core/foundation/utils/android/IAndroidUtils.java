@@ -688,7 +688,7 @@ public interface IAndroidUtils extends IMobileUtils {
 
             UTILS_LOGGER.info("Returning Output: " + result);
         } catch (Exception e) {
-            UTILS_LOGGER.error(e.getMessage(), e);
+            UTILS_LOGGER.error("Error while executing adb command: " + command, e);
         }
 
         return result;
