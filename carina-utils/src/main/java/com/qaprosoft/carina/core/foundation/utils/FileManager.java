@@ -73,12 +73,12 @@ public class FileManager {
             try {
                 fw.write(content);
             } catch (Exception e) {
-                LOGGER.debug("Error during FileWriter append.", e.getCause());
+                LOGGER.debug("Error during FileWriter append.", e);
             } finally {
                 try {
                     fw.close();
                 } catch (Exception e) {
-                    LOGGER.debug("Error during FileWriter close.", e.getCause());
+                    LOGGER.debug("Error during FileWriter close.", e);
                 }
             }
 

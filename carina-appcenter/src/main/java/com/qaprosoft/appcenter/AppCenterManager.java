@@ -133,7 +133,7 @@ public class AppCenterManager {
                 }
                 LOGGER.debug(String.format("AppCenter Build (%s) was retrieved", fileName));
             } catch (Exception ex) {
-                LOGGER.error("Error Thrown When Attempting to Transfer AppCenter Build (%s)", ex);
+                LOGGER.error("Error Thrown When Attempting to Transfer AppCenter Build!", ex);
             }
         } else {
             LOGGER.info("Preparing to use local version of AppCenter Build...");
