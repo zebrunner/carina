@@ -63,7 +63,7 @@
         <selenium.version>3.141.59</selenium.version>
         <appium.version>7.5.1</appium.version>
         <!-- Zebrunner integrations -->
-        <zebrunner-testng-pluggable.version>RELEASE</zebrunner-testng-pluggable.version>
+        <zebrunner-testng-pluggable.version>1.6.2.234-SNAPSHOT</zebrunner-testng-pluggable.version>
         <!-- Others -->
         <azure-storage-blob.version>12.7.0</azure-storage-blob.version>
         <aws-java-sdk.version>1.11.923</aws-java-sdk.version>
@@ -111,7 +111,7 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository-->
-        <!--repository>
+        <repository>
             <id>zebrunner_snapshots</id>
             <name>zebrunner Snapshots</name>
             <url>https://nexus.zebrunner.dev/repository/ce-snapshots/</url>
@@ -121,7 +121,7 @@
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
-        </repository-->
+        </repository>
     </repositories>
     <profiles>
         <profile>
