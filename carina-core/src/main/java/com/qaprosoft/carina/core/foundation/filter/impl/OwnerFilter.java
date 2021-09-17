@@ -40,8 +40,11 @@ public class OwnerFilter implements IFilter {
                     LOGGER.info(String.format("Test: [%s]. Owners: %s. Expected owner: [%s]", testMethod.getMethodName(), owners.toString(),
                             rules.toString()));
                     return ruleCheck(rules, owners);
-              }
+                }
             }
+
+            //if test was not described by OwnerFilter annotation
+            return ruleCheckWithoutAnnotation(rules);
         }
         return false;
     }

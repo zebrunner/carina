@@ -63,4 +63,38 @@ public interface IFilter {
     default boolean ruleCheck(List<String> ruleExpression, String actualValue) {
         return ruleCheck(ruleExpression, Arrays.asList(actualValue));
     }
+
+    default boolean ruleCheckWithoutAnnotation(List<String> ruleExpression) {
+        String expression = ruleExpression.get(0);
+        boolean match;
+
+        if (expression.contains(SpecialKeywords.RULE_FILTER_EXCLUDE_CONDITION)) {
+            match = true;
+        } else {
+            match = false;
+        }
+
+        for (int i = 1; i < ruleExpression.size(); i++) {
+            expression = ruleExpression.get(i);
+            if (expression.contains(SpecialKeywords.RULE_FILTER_OR_CONDITION)) {
+                //if previous expression is true, we don't need to check this because of (true || false) == true
+                if (match) {
+                    continue;
+                }
+                if (expression.contains(SpecialKeywords.RULE_FILTER_EXCLUDE_CONDITION)) {
+                    match = true;
+                }
+            } else if (expression.contains(SpecialKeywords.RULE_FILTER_AND_CONDITION)) {
+                //if previous expression is false, we don't need to check this because of (false && true) = false
+                if (!match) {
+                    continue;
+                }
+                if (!expression.contains(SpecialKeywords.RULE_FILTER_EXCLUDE_CONDITION)) {
+                    match = false;
+                }
+            }
+        }
+
+        return match;
+    }
 }
