@@ -925,40 +925,40 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     }
 
     private void attachTestRunLabels(ISuite suite) {
-        String trSuite = getTestRailSuiteId(suite);
-
-        if (!trSuite.isEmpty()) {
-            TestRail.setSuiteId(trSuite);
-        }
-        
-        // read command line argument to improve test rail integration capabilities.
-        if (!Configuration.getBoolean(Parameter.TESTRAIL_ENABLED)) {
-            LOGGER.info("disable TestRail integration!");
-            TestRail.disableSync();
-        }
-        
-        if (Configuration.getBoolean(Parameter.INCLUDE_ALL)) {
-            LOGGER.info("enable include_all for TestRail integration!");
-            TestRail.includeAllTestCasesInNewRun();
-        }
-        
-        String milestone = Configuration.get(Parameter.MILESTONE);
-        if (!milestone.isEmpty()) {
-            LOGGER.info("Set TestRail milestone name: " + milestone);
-            TestRail.setMilestone(milestone);
-        }
-        
-        String runName = Configuration.get(Parameter.RUN_NAME);
-        if (!runName.isEmpty()) {
-            LOGGER.info("Set TestRail run name: " + runName);
-            TestRail.setRunName(runName);
-        }
-        
-        String assignee = Configuration.get(Parameter.ASSIGNEE);
-        if (!assignee.isEmpty()) {
-            LOGGER.info("Set TestRail assignee: " + assignee);
-            TestRail.setAssignee(assignee);
-        }
+//        String trSuite = getTestRailSuiteId(suite);
+//
+//        if (!trSuite.isEmpty()) {
+//            TestRail.setSuiteId(trSuite);
+//        }
+//        
+//        // read command line argument to improve test rail integration capabilities.
+//        if (!Configuration.getBoolean(Parameter.TESTRAIL_ENABLED)) {
+//            LOGGER.info("disable TestRail integration!");
+//            TestRail.disableSync();
+//        }
+//        
+//        if (Configuration.getBoolean(Parameter.INCLUDE_ALL)) {
+//            LOGGER.info("enable include_all for TestRail integration!");
+//            TestRail.includeAllTestCasesInNewRun();
+//        }
+//        
+//        String milestone = Configuration.get(Parameter.MILESTONE);
+//        if (!milestone.isEmpty()) {
+//            LOGGER.info("Set TestRail milestone name: " + milestone);
+//            TestRail.setMilestone(milestone);
+//        }
+//        
+//        String runName = Configuration.get(Parameter.RUN_NAME);
+//        if (!runName.isEmpty()) {
+//            LOGGER.info("Set TestRail run name: " + runName);
+//            TestRail.setRunName(runName);
+//        }
+//        
+//        String assignee = Configuration.get(Parameter.ASSIGNEE);
+//        if (!assignee.isEmpty()) {
+//            LOGGER.info("Set TestRail assignee: " + assignee);
+//            TestRail.setAssignee(assignee);
+//        }
 
         String qtestProject = getQTestProjectId(suite);
         if (!qtestProject.isEmpty()){
