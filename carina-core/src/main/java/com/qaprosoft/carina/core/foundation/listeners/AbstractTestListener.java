@@ -89,10 +89,6 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     }
 
     private void afterTest(ITestResult result) {
-        // do not publish log/demo anymore
-        //Artifacts.add("Logs", ReportContext.getTestLogLink(test));
-        //Artifacts.add("Demo", ReportContext.getTestScreenshotsLink(test));
-        
         ReportContext.generateTestReport();
         ReportContext.emptyTestDirData();
     }
@@ -216,7 +212,8 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     @Override
     public void onTestSkipped(ITestResult result) {
         LOGGER.debug("AbstractTestListener->onTestSkipped");
-        
+        failItem(result, Messager.TEST_SKIPPED);
+        //there is no need to afterTest as it is retry failure and we wanna to proceed with the same test.log etc
         super.onTestSkipped(result);
     }
 

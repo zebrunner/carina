@@ -61,8 +61,6 @@ public class DesktopFactory extends AbstractFactory {
             capabilities = getCapabilities(name);
         }
 
-        setIdleTimeout(capabilities);
-
         if (staticCapabilities != null) {
             LOGGER.info("Static DesiredCapabilities will be merged to basic driver capabilities");
             capabilities.merge(staticCapabilities);

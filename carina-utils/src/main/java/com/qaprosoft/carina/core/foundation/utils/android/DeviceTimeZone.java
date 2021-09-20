@@ -280,7 +280,7 @@ public class DeviceTimeZone {
         try {
             return DateTimeZone.forID(tz).toTimeZone().observesDaylightTime();
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error("Error during observing daylight time for: " + tz, e);
             return false;
         }
     }
@@ -289,7 +289,7 @@ public class DeviceTimeZone {
         try {
             return getTimezoneOffset(DateTimeZone.forID(tz).toTimeZone());
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error("Error while getting timezone for: " + tz, e);
             return "";
         }
     }

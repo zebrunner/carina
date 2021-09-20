@@ -307,25 +307,7 @@ public class ExtendedWebElement implements IWebElement {
 	public boolean isPresent(By by, long timeout) {
 		return isPresent(by, timeout, true);
 	}
-
-    /**
-     * Check that element with By present within specified timeout.
-     *
-     * @param by
-     *            - By.
-     * @param timeout
-     *            - timeout.
-     * @param bySearchContext
-     *            - check by the given searchContext
-     * @return element existence status.
-     */
-    public boolean isPresent(By by, long timeout, boolean bySearchContext) {
-        if (bySearchContext) {
-            return waitUntil(getDefaultSearchContextCondition(by), timeout);
-        } else {
-            return waitUntil(getDefaultCondition(by), timeout);
-        }
-    }
+	
 	
     /**
      * Wait until any condition happens.
@@ -374,7 +356,7 @@ public class ExtendedWebElement implements IWebElement {
             originalException = e.getCause();
 		}
 		catch (Exception e) {
-			LOGGER.error("waitUntil: undefined exception: " + e.getMessage(), e);
+			LOGGER.error("waitUntil: undefined exception.", e);
 			result = false;
 			//TODO: e or e.getCause()?
 			originalException = e;
@@ -871,7 +853,7 @@ public class ExtendedWebElement implements IWebElement {
         }
     }
      
-    /** Inputs file path to specified element.
+    /* Inputs file path to specified element.
      *
      * @param filePath path
      */
@@ -1195,12 +1177,8 @@ public class ExtendedWebElement implements IWebElement {
         // visibilityOf: Does not check for presence of the element as the error explains it.
         // visibilityOfElementLocated: Checks to see if the element is present and also visible. To check visibility, it makes sure that the element
         // has a height and width greater than 0.
-
-        if (bySearchContext) {
-            waitCondition = ExpectedConditions.visibilityOf(element);
-        } else {
-            waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
-        }
+    	
+        waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
 		boolean tmpResult = waitUntil(waitCondition, 1);
 
 		if (tmpResult) {
@@ -1232,17 +1210,6 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     /**
-     * Check that element not present and not visible within specified timeout.
-     *
-     * @param timeout - timeout.
-     * @param bySearchContext - check by the given searchContext
-     * @return element existence status.
-     */
-    public boolean isElementNotPresent(long timeout, boolean bySearchContext) {
-        return !isElementPresent(timeout, bySearchContext);
-    }
-
-    /**
      * Checks that element clickable.
      *
      * @return element clickability status.
@@ -1270,17 +1237,13 @@ public class ExtendedWebElement implements IWebElement {
      */
     public boolean isClickable(long timeout, boolean bySearchContext) {
     	ExpectedCondition<?> waitCondition;
-
-        if (bySearchContext) {
-            waitCondition = ExpectedConditions.elementToBeClickable(element);
-        } else {
-            if (element != null) {
-                waitCondition = ExpectedConditions.or(ExpectedConditions.elementToBeClickable(getBy()),
-                        ExpectedConditions.elementToBeClickable(element));
-            } else {
-                waitCondition = ExpectedConditions.elementToBeClickable(getBy());
-            }
-        }
+    	
+		if (element != null) {
+			waitCondition = ExpectedConditions.elementToBeClickable(element);
+		} else {
+			waitCondition = ExpectedConditions.elementToBeClickable(getBy());
+		}
+		
     	return waitUntil(waitCondition, timeout);
     }
 
@@ -1313,16 +1276,12 @@ public class ExtendedWebElement implements IWebElement {
 	public boolean isVisible(long timeout, boolean bySearchContext) {
 		ExpectedCondition<?> waitCondition;
 
-        if (bySearchContext) {
-            waitCondition = ExpectedConditions.visibilityOf(element);
-        } else {
-            if (element != null) {
-                waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(getBy()),
-                        ExpectedConditions.visibilityOf(element));
-            } else {
-                waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
-            }
-        }
+		if (element != null) {
+			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(getBy()),
+			        ExpectedConditions.visibilityOf(element));
+		} else {
+			waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
+		}
 		
 		return waitUntil(waitCondition, timeout);
 	}
@@ -1477,7 +1436,7 @@ public class ExtendedWebElement implements IWebElement {
                 name = element.getText();
             } catch (Exception e) {
                 /* do nothing */
-                LOGGER.debug(e.getMessage(), e.getCause());
+                LOGGER.debug("Error while getting text from element.", e);
             }
 
             // we can't initiate ExtendedWebElement using by as it belongs to the list of elements
@@ -1511,14 +1470,9 @@ public class ExtendedWebElement implements IWebElement {
     		return true;
     	}
 
-        if (bySearchContext) {
-            return waitUntil(ExpectedConditions.or(ExpectedConditions.stalenessOf(element),
-                    ExpectedConditions.invisibilityOf(element)), timeout);
-        } else {
-            return waitUntil(ExpectedConditions.or(ExpectedConditions.invisibilityOfElementLocated(getBy()),
-                    ExpectedConditions.stalenessOf(element),
-                    ExpectedConditions.invisibilityOf(element)), timeout);
-        }
+        return waitUntil(ExpectedConditions.or(ExpectedConditions.invisibilityOfElementLocated(getBy()),
+                ExpectedConditions.stalenessOf(element),
+                ExpectedConditions.invisibilityOf(element)), timeout);
     }
 
     public ExtendedWebElement format(Object... objects) {
@@ -1796,7 +1750,7 @@ public class ExtendedWebElement implements IWebElement {
 			output = overrideAction(actionName, inputArgs);
 		} catch (WebDriverException e) {
 			// TODO: move to error for snapshot build to detect different negative use-cse and move to debug for released versions!
-			LOGGER.debug("doAction catched WebDriverException: '" + e.getMessage() + "'", e);
+			LOGGER.debug("doAction catched WebDriverException!", e);
 			// try to find again using driver
 			try {
 				element = refindElement();
@@ -1807,7 +1761,7 @@ public class ExtendedWebElement implements IWebElement {
 			}
 			output = overrideAction(actionName, inputArgs);
 		} catch (Throwable e) {
-		    LOGGER.error(e.getMessage(), e);
+		    LOGGER.error(e.getMessage());
 			// print stack trace temporary to be able to handle any problem without extra debugging 
 			e.printStackTrace();
 			throw e;
@@ -2178,63 +2132,32 @@ public class ExtendedWebElement implements IWebElement {
         // generate the most popular waitCondition to check if element visible or present
         ExpectedCondition<?> waitCondition = null;
         switch (loadingStrategy) {
-            case BY_PRESENCE: {
-                if (element != null) {
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy), ExpectedConditions.visibilityOf(element));
-                } else {
-                    waitCondition = ExpectedConditions.presenceOfElementLocated(myBy);
-                }
-                break;
+        case BY_PRESENCE: {
+            if (element != null) {
+                waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy), ExpectedConditions.visibilityOf(element));
+            } else {
+                waitCondition = ExpectedConditions.presenceOfElementLocated(myBy);
             }
-            case BY_VISIBILITY: {
-                if (element != null) {
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(myBy), ExpectedConditions.visibilityOf(element));
-                } else {
-                    waitCondition = ExpectedConditions.visibilityOfElementLocated(myBy);
-                }
-                break;
-            }
-            case BY_PRESENCE_OR_VISIBILITY:
-                if (element != null) {
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
-                            ExpectedConditions.visibilityOfElementLocated(myBy),
-                            ExpectedConditions.visibilityOf(element));
-                } else {
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
-                            ExpectedConditions.visibilityOfElementLocated(myBy));
-                }
-                break;
+            break;
         }
-        return waitCondition;
-    }
-
-    private ExpectedCondition<?> getDefaultSearchContextCondition(By myBy) {
-        ExpectedCondition<?> waitCondition = null;
-        switch (loadingStrategy) {
-            case BY_PRESENCE: {
-                if (element != null) {
-                    waitCondition = ExpectedConditions.visibilityOf(element);
-                } else {
-                    waitCondition = ExpectedConditions.presenceOfElementLocated(myBy);
-                }
-                break;
+        case BY_VISIBILITY: {
+            if (element != null) {
+                waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(myBy), ExpectedConditions.visibilityOf(element));
+            } else {
+                waitCondition = ExpectedConditions.visibilityOfElementLocated(myBy);
             }
-            case BY_VISIBILITY: {
-                if (element != null) {
-                    waitCondition = ExpectedConditions.visibilityOf(element);
-                } else {
-                    waitCondition = ExpectedConditions.visibilityOfElementLocated(myBy);
-                }
-                break;
+            break;
+        }
+        case BY_PRESENCE_OR_VISIBILITY:
+            if (element != null) {
+                waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
+                        ExpectedConditions.visibilityOfElementLocated(myBy),
+                        ExpectedConditions.visibilityOf(element));
+            } else {
+                waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
+                        ExpectedConditions.visibilityOfElementLocated(myBy));
             }
-            case BY_PRESENCE_OR_VISIBILITY:
-                if (element != null) {
-                    waitCondition = ExpectedConditions.visibilityOf(element);
-                } else {
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
-                            ExpectedConditions.visibilityOfElementLocated(myBy));
-                }
-                break;
+            break;
         }
         return waitCondition;
     }

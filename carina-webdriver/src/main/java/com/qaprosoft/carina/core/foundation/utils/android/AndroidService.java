@@ -199,7 +199,7 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
             LOGGER.info("Found activity name for application in focus : " + activityName);
             return packageName + "/" + activityName;
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error("Error during getting apk details", e);
             return "";
         }
     }
@@ -419,7 +419,7 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
             CommonUtils.pause(2); // wait while notifications are playing animation to
             // appear to avoid missed taps
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error("Error during searching notification: " + expectedTitle, e);
             LOGGER.info("Using adb to expand Status bar. ");
             expandStatusBar();
 
@@ -1154,7 +1154,7 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
             LOGGER.info("Output date: " + result);
 
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error("Error while parsing output date!", e);
         }
         return result;
     }
@@ -1171,7 +1171,7 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
             SimpleDateFormat outputDateFormat = new SimpleDateFormat("yyyyMMdd.HHmmss");
             res = outputDateFormat.format(inputDate);
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error("Error while converting date into String!", e);
         }
         LOGGER.info("Output date in expected format: " + res);
         return res;

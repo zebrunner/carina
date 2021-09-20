@@ -688,7 +688,7 @@ public interface IAndroidUtils extends IMobileUtils {
 
             UTILS_LOGGER.info("Returning Output: " + result);
         } catch (Exception e) {
-            UTILS_LOGGER.error(e.getMessage(), e);
+            UTILS_LOGGER.error("Error while executing adb command: " + command, e);
         }
 
         return result;
@@ -874,9 +874,8 @@ public interface IAndroidUtils extends IMobileUtils {
      * @param link
      *            - URL to trigger
      */
-    @Deprecated
     default public void openURL(String link) {
-        UTILS_LOGGER.warn("This method is deprecated, start using openURL from DriverHelper instead!");
+        // TODO: #1380 make openURL call from this mobile interface in DriverHelper
         UTILS_LOGGER.info("Following link will be triggered via ADB: " + link);
         String command = String.format(SHELL_OPEN_URL_CMD.concat(" %s"), link);
         executeShell(command);

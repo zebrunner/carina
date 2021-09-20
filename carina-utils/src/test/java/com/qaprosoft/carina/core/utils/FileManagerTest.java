@@ -63,7 +63,7 @@ public class FileManagerTest {
             List<String> lines = Files.readAllLines(filePath);
             content = String.join("\n", lines);
         } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error("Error while reading from file!", e);
         }
         return content;
     }

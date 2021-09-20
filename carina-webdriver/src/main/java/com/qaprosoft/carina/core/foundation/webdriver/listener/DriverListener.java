@@ -187,7 +187,7 @@ public class DriverListener implements WebDriverEventListener {
             throw new RuntimeException(thr);
         }
 
-        // hopefully castDriver below resolve root cause of the recursive onException calls but keep below if to ensure
+        // hopefully castDriver below resolve root cause of the recursive onException calls but keep below to ensure
         if (thr.getStackTrace() != null
                 && (Arrays.toString(thr.getStackTrace())
                         .contains("com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener.onException")
@@ -213,13 +213,12 @@ public class DriverListener implements WebDriverEventListener {
         } catch (Exception e) {
             if (!e.getMessage().isEmpty()
                     && (e.getMessage().contains("Method has not yet been implemented") || (e.getMessage().contains("Method is not implemented")))) {
-                LOGGER.debug("Unrecognized exception detected in DriverListener->onException! " + e.getMessage(), e);
+                LOGGER.debug("Unrecognized exception detected in DriverListener->onException!", e);
             } else {
-                LOGGER.error("Unrecognized exception detected in DriverListener->onException! " + e.getMessage(), e);
+                LOGGER.error("Unrecognized exception detected in DriverListener->onException!", e);
             }
         } catch (Throwable e) {
-            LOGGER.error("Take a look to the logs above for current thread and add exception into the exclusion for Screenshot.isCaptured(). "
-                    + e.getMessage(), e);
+            LOGGER.error("Take a look to the logs above for current thread and add exception into the exclusion for Screenshot.isCaptured().", e);
         }
 
         LOGGER.debug("DriverListener->onException finished.");
@@ -295,7 +294,7 @@ public class DriverListener implements WebDriverEventListener {
                 Screenshot.captureByRule(driver, comment);
             }
         } catch (Exception e) {
-            LOGGER.debug("Unrecognized failure detected in DriverListener->captureScreenshot: " + e.getMessage(), e);
+            LOGGER.debug("Unrecognized failure detected in DriverListener->captureScreenshot!", e);
         } finally {
             resetMessages();
         }

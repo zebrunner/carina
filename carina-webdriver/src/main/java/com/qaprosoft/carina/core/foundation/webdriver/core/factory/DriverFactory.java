@@ -100,7 +100,7 @@ public class DriverFactory {
             }
             
         } catch (Exception e) {
-            LOGGER.error("Unable to register webdriver event listeners: " + e.getMessage(), e);
+            LOGGER.error("Unable to register webdriver event listeners!", e);
         }
         return listeners.toArray(new WebDriverEventListener[listeners.size()]);
     }

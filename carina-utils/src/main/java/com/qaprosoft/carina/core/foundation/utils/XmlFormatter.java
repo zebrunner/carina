@@ -50,7 +50,7 @@ public class XmlFormatter {
 
             return writer.writeToString(document);
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error("Error during adjusting xml!", e);
         }
         return xml; // Return the same string if error take place
     }

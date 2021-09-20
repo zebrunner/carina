@@ -27,7 +27,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -136,7 +135,7 @@ public interface IDriverPool {
     }
 
     /**
-     * Get driver by WebElement.
+     * Get driver by sessionId.
      * 
      * @param sessionId
      *            - session id to be used for searching a desired driver
@@ -316,20 +315,24 @@ public interface IDriverPool {
             try {
                 future.get(timeout, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
-                POOL_LOGGER.error("InterruptedException: Unable to quit driver: " + e.getMessage(), e);
+                POOL_LOGGER.error("InterruptedException: Unable to quit driver!", e);
                 Thread.currentThread().interrupt();
             } catch (ExecutionException e) {
-                POOL_LOGGER.error("ExecutionException: Unable to quit driver: " + e.getMessage(), e);
+                if (e.getMessage() != null && e.getMessage().contains("not found in active sessions")) {
+                    POOL_LOGGER.error("Unable to quit driver for already disconnected session!");
+                } else {
+                    POOL_LOGGER.error("ExecutionException: Unable to quit driver!", e);
+                }
             } catch (java.util.concurrent.TimeoutException e) {
                 POOL_LOGGER.error("Unable to quit driver for " + timeout + "sec!", e);
             }
         } catch (WebDriverException e) {
-            POOL_LOGGER.debug("Error message detected during driver quit: " + e.getMessage(), e);
+            POOL_LOGGER.debug("Error message detected during driver quit!", e);
             // do nothing
         } catch (Exception e) {
-            POOL_LOGGER.error("Error discovered during driver quit: " + e.getMessage(), e);
+            POOL_LOGGER.error("Error discovered during driver quit!", e);
         } finally {
-            POOL_LOGGER.debug("finished driver quit: " + carinaDriver.getName());            
+            POOL_LOGGER.debug("finished driver quit: " + carinaDriver.getName());
             if (!keepProxyDuring) {
                 ProxyPool.stopProxy();
             }

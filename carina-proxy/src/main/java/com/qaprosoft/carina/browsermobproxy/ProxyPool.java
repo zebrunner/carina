@@ -364,8 +364,7 @@ public final class ProxyPool {
             LOGGER.debug("proxy process after kill and 2 sec pause: " + StringUtils.join(output, ""));
             
         } catch (Exception e) {
-            LOGGER.error("Unable to kill process by lsof utility: " + e.getMessage());
-            LOGGER.debug(e.getMessage(), e);
+            LOGGER.error("Unable to kill process by lsof utility!", e);
         }
     }
 }

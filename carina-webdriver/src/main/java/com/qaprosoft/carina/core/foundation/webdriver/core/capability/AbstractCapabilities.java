@@ -71,10 +71,13 @@ public abstract class AbstractCapabilities {
         Map<String, String> capabilitiesMap = new HashMap(R.CONFIG.getProperties());
         for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
             if (entry.getKey().toLowerCase().startsWith(prefix)) {
-                String value = R.CONFIG.get(entry.getKey());
+                String value = R.CONFIG.get(entry.getKey());                
                 if (!value.isEmpty()) {
                     String cap = entry.getKey().replaceAll(prefix, "");
-                    if ("false".equalsIgnoreCase(value)) {
+                    if (isNumber(value)) {
+                        LOGGER.debug("Adding " + entry + " to capabilities as integer");
+                        capabilities.setCapability(cap, Integer.parseInt(value));
+                    } else if ("false".equalsIgnoreCase(value)) {
                         capabilities.setCapability(cap, false);
                     } else if ("true".equalsIgnoreCase(value)) {
                         capabilities.setCapability(cap, true);
@@ -297,6 +300,20 @@ public abstract class AbstractCapabilities {
         }
 
         return caps;
+    }
+
+    private boolean isNumber(String value){
+        if (value == null || value.isEmpty()){
+            return false;
+        }
+
+        try {
+            Integer.parseInt(value);
+        } catch (NumberFormatException ex){
+            return false;
+        }
+
+        return true;
     }
 
     /**

@@ -262,14 +262,14 @@ public class Screenshot {
             if (isCaptured(e.getMessage())) {
                 // display exception as we suspect to make screenshot for this use-case
                 LOGGER.warn("Unable to capture screenshot due to the WebDriverException!");
-                LOGGER.debug(e.getMessage(), e);
+                LOGGER.debug("Error stacktrace: ", e);
             } else {
                 // Do not display exception by default as we don't suspect to make screenshot for this use-case
                 LOGGER.debug("Unable to capture screenshot due to the WebDriverException!", e);
             }
         } catch (Exception e) {
             LOGGER.warn("Unable to capture screenshot due to the Exception!");
-            LOGGER.debug(e.getMessage(), e);
+            LOGGER.debug("Error stacktrace: ", e);
         } finally {
             LOGGER.debug("Screenshot->captureFullSize finished.");
         }
@@ -409,16 +409,16 @@ public class Screenshot {
                 ReportContext.addScreenshotComment(screenName, comment);
             } catch (NoSuchWindowException e) {
                 LOGGER.warn("Unable to capture screenshot due to NoSuchWindowException!");
-                LOGGER.debug(e.getMessage(), e);
+                LOGGER.debug("Error stacktrace: ", e);
             } catch (IOException e) {
                 LOGGER.warn("Unable to capture screenshot due to the I/O issues!");
-                LOGGER.debug(e.getMessage(), e);
+                LOGGER.debug("Error stacktrace: ", e);
             } catch (WebDriverException e) {
                 LOGGER.warn("Unable to capture screenshot due to the WebDriverException!");
-                LOGGER.debug(e.getMessage(), e);                
+                LOGGER.debug("Error stacktrace: ", e);
             } catch (Exception e) {
                 LOGGER.warn("Unable to capture screenshot due to the Exception!");
-                LOGGER.debug(e.getMessage(), e);
+                LOGGER.debug("Error stacktrace: ", e);
             } finally {
                 LOGGER.debug("Screenshot->capture finished.");
             }
@@ -530,11 +530,14 @@ public class Screenshot {
             LOGGER.error(message);
             Thread.currentThread().interrupt();
         } catch (ExecutionException e) {
-            String message = "ExecutionException error on capture full screenshot: " + e.getMessage();
-            LOGGER.error(message);
+            if (e.getMessage() != null && e.getMessage().contains("Driver connection refused")) {
+                LOGGER.error("Unable to capture full screenshot due to the driver connection refused!");
+            } else {
+                LOGGER.error("ExecutionException error detected on capture full screenshot!", e);
+            }
         } catch (Exception e) {
-            String message = "Undefined error on capture full screenshot detected: " + e.getMessage();
-            LOGGER.error(message);
+            // for undefined failure keep full stacktrace to handle later correctly!
+            LOGGER.error("Undefined error on capture full screenshot detected!", e);
         } finally {
             LOGGER.debug("finished full size screenshot call.");            
         }
@@ -609,13 +612,14 @@ public class Screenshot {
 				|| message.contains("A session is either terminated or not started")
                 || message.contains("invalid session id")
                 || message.contains("Session does not exist")
+                || message.contains("not found in active sessions")
 				|| message.contains("Session timed out or not found")
 				|| message.contains("Unable to determine type from: <. Last 1 characters read")
 				|| message.contains("not available and is not among the last 1000 terminated sessions")				
 				|| message.contains("cannot forward the request")
                 || message.contains("connect ECONNREFUSED")
 				|| message.contains("was terminated due to") // FORWARDING_TO_NODE_FAILED, CLIENT_STOPPED_SESSION, PROXY_REREGISTRATION, TIMEOUT, BROWSER_TIMEOUT etc
-				|| message.contains("InvalidElementStateException") || message.contains("stale element reference")
+				|| message.contains("InvalidElementStateException")
 				|| message.contains("no such element: Unable to locate element")
 				|| message.contains("https://www.seleniumhq.org/exceptions/no_such_element.html") // use-case for Safari driver
 				|| message.contains("no such window: window was already closed")
@@ -636,7 +640,8 @@ public class Screenshot {
 				|| message.contains("Unable to find element with")
 				|| message.contains("Unable to locate element")
 				|| message.contains("Illegal base64 character 2e")
-        || message.contains("javascript error: Cannot read property 'outerHTML' of null")
+				|| message.contains("javascript error: Cannot read property 'outerHTML' of null")
+				|| message.contains("Driver connection refused")
 				// carina based errors which means that driver is not ready for screenshoting
 				|| message.contains("Unable to open url during");
 
@@ -701,16 +706,16 @@ public class Screenshot {
             }
         } catch (IOException e) {
             LOGGER.warn("Unable to compare screenshots due to the I/O issues!");
-            LOGGER.debug(e.getMessage(), e);
+            LOGGER.debug("Error stacktrace: ", e);
         } catch (WebDriverException e) {
             LOGGER.warn("Unable to compare screenshots due to the WebDriverException!");
-            LOGGER.debug(e.getMessage(), e);
+            LOGGER.debug("Error stacktrace: ", e);
         } catch (NullPointerException e) {
             LOGGER.warn("Unable to compare screenshots due to the NullPointerException!");
-            LOGGER.debug(e.getMessage(), e);
+            LOGGER.debug("Error stacktrace: ", e);
         } catch (Exception e) {
             LOGGER.warn("Unable to compare screenshots!");
-            LOGGER.debug(e.getMessage(), e);
+            LOGGER.debug("Error stacktrace: ", e);
         } finally {
             // do nothing
         }

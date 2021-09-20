@@ -1,6 +1,6 @@
 ![Alt text](https://github.com/zebrunner/carina/raw/master/docs/img/carina.png "Carina Logo")
 
-Carina is a Java-based test automation framework that unites all testing layers: Mobile applications (web, native, hybrid), WEB applications, REST services, Databases.
+Carina is a Java-based test automation framework that unites all testing layers: Mobile applications (web, native, hybrid), WEB applications, Windows applications, REST services, Databases.
 
 <B>[TRY DEMO PROJECT NOW](https://github.com/zebrunner/carina-demo)</B>
 

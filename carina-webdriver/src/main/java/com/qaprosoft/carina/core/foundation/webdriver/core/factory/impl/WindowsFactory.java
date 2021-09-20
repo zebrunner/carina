@@ -59,8 +59,6 @@ public class WindowsFactory extends AbstractFactory {
             capabilities = getCapabilities(name);
         }
 
-        setIdleTimeout(capabilities);
-        
         URL url;
         try {
             url = new URL(seleniumHost);
