@@ -202,6 +202,7 @@ public class DriverHelper {
         }
 
         String output = (String) ((AppiumDriver<?>) drv).executeScript(SHELL_INIT_CONSOLE, preparedCommand);
+        drv.get(url);
         if (!StringUtils.isEmpty(output)) {
             LOGGER.debug("ADB command output: " + output);
         }
