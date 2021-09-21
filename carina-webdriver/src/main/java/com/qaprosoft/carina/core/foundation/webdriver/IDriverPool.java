@@ -135,14 +135,14 @@ public interface IDriverPool {
     }
 
     /**
-     * Get driver by sessionId.
+     * Get Carina driver by sessionId.
      * 
      * @param sessionId
      *            - session id to be used for searching a desired driver
      * 
-     * @return default WebDriver
+     * @return default CarinaDriver
      */
-    public static WebDriver getDriver(SessionId sessionId) {
+    public static CarinaDriver getCarinaDriver(SessionId sessionId) {
         for (CarinaDriver carinaDriver : driversPool) {
             WebDriver drv = carinaDriver.getDriver();
             if (drv instanceof EventFiringWebDriver) {
@@ -154,11 +154,11 @@ public interface IDriverPool {
 
             if (drvSessionId != null) {
                 if (sessionId.equals(drvSessionId)) {
-                    return drv;
+                    return carinaDriver;
                 }
             }
         }
-        throw new DriverPoolException("Unable to find driver using sessionId artifacts. Returning default one!");
+        throw new DriverPoolException("Unable to find driver using sessionId!");
     }
 
     /**
@@ -238,7 +238,14 @@ public interface IDriverPool {
             throw new RuntimeException("Unable to find driver '" + name + "'!");
         }
         
-        quitDriver(carinaDrv, false);
+        if (carinaDrv.isAlive()) {
+            //do actual quit only if driver still alive
+            quitDriver(carinaDrv, false);
+        } else {
+            POOL_LOGGER.error("Unable to do quit over died driver: " + carinaDrv.getName() + " for thread: " + carinaDrv.getThreadId());            
+        }
+            
+        
         driversPool.remove(carinaDrv);
 
         POOL_LOGGER.debug("after quitDriver: " + driversPool);
