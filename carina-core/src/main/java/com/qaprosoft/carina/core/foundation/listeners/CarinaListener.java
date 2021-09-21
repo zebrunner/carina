@@ -117,6 +117,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     protected static final String XML_SUITE_NAME = " (%s)";
 
     protected static boolean automaticDriversCleanup = true;
+    
+    protected boolean isRunLabelsRegistered = false;
 
     public CarinaListener(){
         // Add shutdown hook
@@ -202,7 +204,18 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         // register app_version/build as artifact if available...
         Configuration.setBuild(Configuration.get(Parameter.APP_VERSION));
         
-        attachTestRunLabels(suite);
+        /*
+         * To support multi-suite declaration as below we have to init test run labels at once only!
+         * <suite-files>
+         *  <suite-file path="suite1.xml"/>
+         *  <suite-file path="suite2.xml"/>
+         * </suite-files>
+         */
+        
+        if (this.isRunLabelsRegistered) {
+            attachTestRunLabels(suite);
+            this.isRunLabelsRegistered = true;
+        }
 
         LOGGER.info("CARINA_CORE_VERSION: " + getCarinaVersion());
     }
