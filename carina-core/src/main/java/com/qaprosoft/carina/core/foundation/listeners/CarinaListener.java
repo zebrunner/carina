@@ -117,6 +117,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     protected static final String XML_SUITE_NAME = " (%s)";
 
     protected static boolean automaticDriversCleanup = true;
+    
+    protected boolean isRunLabelsRegistered = false;
 
     public CarinaListener(){
         // Add shutdown hook
@@ -202,7 +204,18 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         // register app_version/build as artifact if available...
         Configuration.setBuild(Configuration.get(Parameter.APP_VERSION));
         
-        attachTestRunLabels(suite);
+        /*
+         * To support multi-suite declaration as below we have to init test run labels at once only!
+         * <suite-files>
+         *  <suite-file path="suite1.xml"/>
+         *  <suite-file path="suite2.xml"/>
+         * </suite-files>
+         */
+        
+        if (this.isRunLabelsRegistered) {
+            attachTestRunLabels(suite);
+            this.isRunLabelsRegistered = true;
+        }
 
         LOGGER.info("CARINA_CORE_VERSION: " + getCarinaVersion());
     }
@@ -925,40 +938,40 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     }
 
     private void attachTestRunLabels(ISuite suite) {
-//        String trSuite = getTestRailSuiteId(suite);
-//
-//        if (!trSuite.isEmpty()) {
-//            TestRail.setSuiteId(trSuite);
-//        }
-//        
-//        // read command line argument to improve test rail integration capabilities.
-//        if (!Configuration.getBoolean(Parameter.TESTRAIL_ENABLED)) {
-//            LOGGER.info("disable TestRail integration!");
-//            TestRail.disableSync();
-//        }
-//        
-//        if (Configuration.getBoolean(Parameter.INCLUDE_ALL)) {
-//            LOGGER.info("enable include_all for TestRail integration!");
-//            TestRail.includeAllTestCasesInNewRun();
-//        }
-//        
-//        String milestone = Configuration.get(Parameter.MILESTONE);
-//        if (!milestone.isEmpty()) {
-//            LOGGER.info("Set TestRail milestone name: " + milestone);
-//            TestRail.setMilestone(milestone);
-//        }
-//        
-//        String runName = Configuration.get(Parameter.RUN_NAME);
-//        if (!runName.isEmpty()) {
-//            LOGGER.info("Set TestRail run name: " + runName);
-//            TestRail.setRunName(runName);
-//        }
-//        
-//        String assignee = Configuration.get(Parameter.ASSIGNEE);
-//        if (!assignee.isEmpty()) {
-//            LOGGER.info("Set TestRail assignee: " + assignee);
-//            TestRail.setAssignee(assignee);
-//        }
+        String trSuite = getTestRailSuiteId(suite);
+
+        if (!trSuite.isEmpty()) {
+            TestRail.setSuiteId(trSuite);
+        }
+        
+        // read command line argument to improve test rail integration capabilities.
+        if (!Configuration.getBoolean(Parameter.TESTRAIL_ENABLED)) {
+            LOGGER.info("disable TestRail integration!");
+            TestRail.disableSync();
+        }
+        
+        if (Configuration.getBoolean(Parameter.INCLUDE_ALL)) {
+            LOGGER.info("enable include_all for TestRail integration!");
+            TestRail.includeAllTestCasesInNewRun();
+        }
+        
+        String milestone = Configuration.get(Parameter.MILESTONE);
+        if (!milestone.isEmpty()) {
+            LOGGER.info("Set TestRail milestone name: " + milestone);
+            TestRail.setMilestone(milestone);
+        }
+        
+        String runName = Configuration.get(Parameter.RUN_NAME);
+        if (!runName.isEmpty()) {
+            LOGGER.info("Set TestRail run name: " + runName);
+            TestRail.setRunName(runName);
+        }
+        
+        String assignee = Configuration.get(Parameter.ASSIGNEE);
+        if (!assignee.isEmpty()) {
+            LOGGER.info("Set TestRail assignee: " + assignee);
+            TestRail.setAssignee(assignee);
+        }
 
         String qtestProject = getQTestProjectId(suite);
         if (!qtestProject.isEmpty()){
