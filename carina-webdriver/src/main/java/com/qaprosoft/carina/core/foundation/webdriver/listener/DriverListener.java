@@ -398,7 +398,7 @@ public class DriverListener implements WebDriverEventListener {
             InvocationHandler h = Proxy.getInvocationHandler((Proxy) drv);
             Field[] fields = h.getClass().getDeclaredFields();
             fields[0].setAccessible(true);
-            EventFiringWebDriver eventFiringWebDriver = null;
+            EventFiringWebDriver eventFiringWebDriver;
             try {
                 eventFiringWebDriver = ((EventFiringWebDriver) fields[0].get(h));
                 drv = eventFiringWebDriver.getWrappedDriver();
