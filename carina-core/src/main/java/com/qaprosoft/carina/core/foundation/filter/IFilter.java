@@ -64,7 +64,7 @@ public interface IFilter {
         return ruleCheck(ruleExpression, Arrays.asList(actualValue));
     }
 
-    default boolean ruleCheckWithoutAnnotation(List<String> ruleExpression) {
+    default boolean ruleCheck(List<String> ruleExpression) {
         String expression = ruleExpression.get(0);
         boolean match;
 

@@ -3,7 +3,6 @@ package com.qaprosoft.carina.core.foundation.filter.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestNGMethod;
@@ -20,7 +19,7 @@ public class PriorityFilter implements IFilter {
     public boolean isPerform(ITestNGMethod testMethod, List<String> rules) {
         TestPriority priority = testMethod.getConstructorOrMethod().getMethod().getAnnotation(TestPriority.class);
         if (priority == null) {
-            return ruleCheckWithoutAnnotation(rules);
+            return ruleCheck(rules);
         } else {
             Priority testPriority = priority.value();
             String actualTestPriority = testPriority.toString();

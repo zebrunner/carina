@@ -52,7 +52,7 @@ public class TagFilter implements IFilter {
             }
 
             //if test was not described by TagFilters
-            return ruleCheckWithoutAnnotation(rules);
+            return ruleCheck(rules);
         }
         return false;
     }

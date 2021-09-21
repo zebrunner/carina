@@ -44,7 +44,7 @@ public class OwnerFilter implements IFilter {
             }
 
             //if test was not described by OwnerFilter annotation
-            return ruleCheckWithoutAnnotation(rules);
+            return ruleCheck(rules);
         }
         return false;
     }
