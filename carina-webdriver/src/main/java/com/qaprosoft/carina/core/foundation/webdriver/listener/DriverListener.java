@@ -17,6 +17,9 @@ package com.qaprosoft.carina.core.foundation.webdriver.listener;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
 import java.util.Arrays;
 
 import org.apache.commons.lang3.StringUtils;
@@ -40,7 +43,7 @@ import com.zebrunner.agent.core.registrar.Artifact;
 /**
  * ScreenshotEventListener - captures screenshot after essential webdriver event.
  * IMPORTANT! Please avoid any driver calls with extra listeners (recursive exception generation)
- * 
+ *
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
 public class DriverListener implements WebDriverEventListener {
@@ -158,11 +161,15 @@ public class DriverListener implements WebDriverEventListener {
             // do nothing
             return;
         }
-        
-        CarinaDriver carinaDriver = IDriverPool.getCarinaDriver(((RemoteWebDriver) driver).getSessionId());
-        
+        CarinaDriver carinaDriver = null;
+        try {
+            driver = castDriver(driver);
+            carinaDriver = IDriverPool.getCarinaDriver(((RemoteWebDriver) driver).getSessionId());
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
         String message = thr.getMessage();
-        
+
         // handle use-case when application crashed on iOS but tests continue to execute something because doesn't raise valid exception
         // Example:
 
@@ -177,7 +184,7 @@ public class DriverListener implements WebDriverEventListener {
         if (message.contains("is not running, possibly crashed")) {
             throw new RuntimeException(thr);
         }
-        
+
         if (message.contains("Session ID is null. Using WebDriver after calling quit")
                 || message.contains("A session is either terminated or not started")
                 || message.contains("invalid session id")
@@ -202,10 +209,10 @@ public class DriverListener implements WebDriverEventListener {
             carinaDriver.setAlive(false);
             return;
         }
-        
+
         // [VD] make below code as much safety as possible otherwise potential recursive failure could occur with driver related issue.
         // most suspicious are capture screenshots, generating dumps etc
-        if (message.contains("Method has not yet been implemented")                        
+        if (message.contains("Method has not yet been implemented")
                 || message.contains("Expected to read a START_MAP but instead have: END. Last 0 characters read")
                 || message.contains("Unable to determine type from: <. Last 1 characters read")
                 || message.contains("script timeout")
@@ -261,7 +268,7 @@ public class DriverListener implements WebDriverEventListener {
 
     /**
      * Converts char sequence to string.
-     * 
+     *
      * @param csa - char sequence array
      * @return string representation
      */
@@ -387,6 +394,17 @@ public class DriverListener implements WebDriverEventListener {
     private WebDriver castDriver(WebDriver drv) {
         if (drv instanceof EventFiringWebDriver) {
             drv = ((EventFiringWebDriver) drv).getWrappedDriver();
+        } else if (drv instanceof Proxy){
+            InvocationHandler h = Proxy.getInvocationHandler((Proxy) drv);
+            Field[] fields = h.getClass().getDeclaredFields();
+            fields[0].setAccessible(true);
+            EventFiringWebDriver eventFiringWebDriver = null;
+            try {
+                eventFiringWebDriver = ((EventFiringWebDriver) fields[0].get(h));
+                drv = eventFiringWebDriver.getWrappedDriver();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
         }
         return drv;
     }
