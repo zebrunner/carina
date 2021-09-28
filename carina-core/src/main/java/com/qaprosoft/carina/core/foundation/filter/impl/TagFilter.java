@@ -50,6 +50,9 @@ public class TagFilter implements IFilter {
                     return ruleCheck(rules, tags);
                 }
             }
+
+            //if test was not described by TagFilters
+            return ruleCheck(rules);
         }
         return false;
     }

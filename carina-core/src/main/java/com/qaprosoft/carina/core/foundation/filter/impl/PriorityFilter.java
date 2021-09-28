@@ -18,14 +18,14 @@ public class PriorityFilter implements IFilter {
     @Override
     public boolean isPerform(ITestNGMethod testMethod, List<String> rules) {
         TestPriority priority = testMethod.getConstructorOrMethod().getMethod().getAnnotation(TestPriority.class);
-        if (priority != null) {
+        if (priority == null) {
+            return ruleCheck(rules);
+        } else {
             Priority testPriority = priority.value();
             String actualTestPriority = testPriority.toString();
             LOGGER.info(String.format("Test: [%s]. Priority: [%s]. Expected priority: [%s]", testMethod.getMethodName(), actualTestPriority,
                     rules.toString()));
             return ruleCheck(rules, actualTestPriority);
         }
-        return false;
     }
-
 }
