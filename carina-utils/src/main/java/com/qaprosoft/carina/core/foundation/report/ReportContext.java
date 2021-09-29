@@ -110,7 +110,7 @@ public class ReportContext {
      * 
      * @return root screenshot folder for test launch.
      */
-    public static synchronized File getBaseDir() {
+    public static File getBaseDir() {
         try {
             if (baseDirectory == null) {
                 removeOldReports();
