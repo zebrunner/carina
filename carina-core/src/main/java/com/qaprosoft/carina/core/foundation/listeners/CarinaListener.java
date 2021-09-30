@@ -159,6 +159,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         TestNameResolverRegistry.set(new ZebrunnerNameResolver());
         CompositeLabelResolver.addResolver(new TagManager());
         CompositeLabelResolver.addResolver(new PriorityManager());
+        ReportContext.getBaseDir(); // create directory for logging as soon as possible
     }
 
     @Override
@@ -210,7 +211,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 	@Override
     public void onStart(ITestContext context) {
         LOGGER.debug("CarinaListener->OnTestStart(ITestContext context): " + context.getName());
-        ReportContext.getBaseDir(); // create directory for logging as soon as possible
         super.onStart(context);
     }
 
