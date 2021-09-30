@@ -123,8 +123,6 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         String uuid = StringGenerator.generateNumeric(8);
         ParameterGenerator.setUUID(uuid);
 
-        ReportContext.getBaseDir(); // create directory for logging as soon as possible
-
         super.onStart(context);
     }
 
