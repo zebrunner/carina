@@ -114,8 +114,8 @@ To disable driver quit strategy completely and cotrol drivers init/quit on your 
 ##Restart
 * **restartDriver()** quit the current driver and start a new one with the same capabilities
 * **restartDriver(boolean isSameDevice)** quit the current driver and start a new one on the same device using `uuid` capability. It is fully compatible with [MCloud](https://github.com/zebrunner/mcloud) farm.
-###Tricks
-####Init pages and drivers in places where they are used
+##Tricks
+###Init pages and drivers in places where they are used
 The correct way:
 ```
 public class TestSample implements IAbstractTest {
