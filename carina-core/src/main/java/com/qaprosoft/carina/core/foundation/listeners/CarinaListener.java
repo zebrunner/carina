@@ -946,7 +946,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         
         // read command line argument to improve test rail integration capabilities.
         if (!Configuration.getBoolean(Parameter.TESTRAIL_ENABLED)) {
-            LOGGER.info("disable TestRail integration!");
+            LOGGER.debug("disable TestRail integration!");
             TestRail.disableSync();
         }
         
