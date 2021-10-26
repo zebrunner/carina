@@ -567,11 +567,11 @@ public class Screenshot {
             LOGGER.debug("starting screenshot capturing...");
             screenShot = (BufferedImage) future.get(timeout, TimeUnit.SECONDS);
         } catch (java.util.concurrent.TimeoutException e) {
-            String message = "Unable to capture screenshot during " + timeout + "sec!";
-            LOGGER.error(message);
+            String message = "Unable to capture screenshot during " + timeout + " sec!";
+            LOGGER.warn(message);
         } catch (InterruptedException e) {
-            String message = "Unable to capture screenshot during " + timeout + "sec!";
-            LOGGER.error(message);
+            String message = "Unable to capture screenshot during " + timeout + " sec!";
+            LOGGER.warn(message);
             Thread.currentThread().interrupt();
         } catch (ExecutionException e) {
             String message = "ExecutionException error on capture screenshot: " + e.getMessage();
