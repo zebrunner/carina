@@ -4,7 +4,6 @@ import com.azure.storage.blob.models.BlobProperties;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.FileManager;
 import org.apache.commons.codec.binary.Base64;
-import org.junit.rules.ExpectedException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

@@ -117,6 +117,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     protected static final String XML_SUITE_NAME = " (%s)";
 
     protected static boolean automaticDriversCleanup = true;
+    
+    protected boolean isRunLabelsRegistered = false;
 
     public CarinaListener(){
         // Add shutdown hook
@@ -159,6 +161,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         TestNameResolverRegistry.set(new ZebrunnerNameResolver());
         CompositeLabelResolver.addResolver(new TagManager());
         CompositeLabelResolver.addResolver(new PriorityManager());
+        ReportContext.getBaseDir(); // create directory for logging as soon as possible
     }
 
     @Override
@@ -202,7 +205,18 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         // register app_version/build as artifact if available...
         Configuration.setBuild(Configuration.get(Parameter.APP_VERSION));
         
-        attachTestRunLabels(suite);
+        /*
+         * To support multi-suite declaration as below we have to init test run labels at once only!
+         * <suite-files>
+         *  <suite-file path="suite1.xml"/>
+         *  <suite-file path="suite2.xml"/>
+         * </suite-files>
+         */
+        
+        if (this.isRunLabelsRegistered) {
+            attachTestRunLabels(suite);
+            this.isRunLabelsRegistered = true;
+        }
 
         LOGGER.info("CARINA_CORE_VERSION: " + getCarinaVersion());
     }
@@ -210,7 +224,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 	@Override
     public void onStart(ITestContext context) {
         LOGGER.debug("CarinaListener->OnTestStart(ITestContext context): " + context.getName());
-        ReportContext.getBaseDir(); // create directory for logging as soon as possible
         super.onStart(context);
     }
 
@@ -933,7 +946,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         
         // read command line argument to improve test rail integration capabilities.
         if (!Configuration.getBoolean(Parameter.TESTRAIL_ENABLED)) {
-            LOGGER.info("disable TestRail integration!");
+            LOGGER.debug("disable TestRail integration!");
             TestRail.disableSync();
         }
         

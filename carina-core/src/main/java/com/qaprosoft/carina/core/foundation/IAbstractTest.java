@@ -17,7 +17,6 @@ package com.qaprosoft.carina.core.foundation;
 
 import java.lang.annotation.Annotation;
 
-import com.qaprosoft.carina.core.foundation.listeners.FilterTestsListener;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.SkipException;
@@ -25,18 +24,17 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
-import org.testng.annotations.Listeners;
 
 import com.nordstrom.automation.testng.LinkedListeners;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactory;
 import com.qaprosoft.carina.core.foundation.listeners.CarinaListener;
+import com.qaprosoft.carina.core.foundation.listeners.FilterTestsListener;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestCases;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.factory.ICustomTypePageFactory;
 import com.zebrunner.agent.core.registrar.CurrentTest;
-import com.zebrunner.agent.testng.listener.DataProviderInterceptor;
 import com.zebrunner.agent.testng.listener.TestRunListener;
 
 /*
@@ -46,8 +44,8 @@ import com.zebrunner.agent.testng.listener.TestRunListener;
 // https://github.com/zebrunner/carina/issues/951
 // reused com.nordstrom.tools.testng-foundation to register ordered listeners
 
-// on start order is TestRunListener and CarinaListener
-// on finish reverse order, i.e. CarinaListener, TestRunListener
+// on start order is FilterTestsListener, TestRunListener and CarinaListener
+// on finish reverse order, i.e. CarinaListener, TestRunListener and FilterTestsListener
 @LinkedListeners({ CarinaListener.class, TestRunListener.class, FilterTestsListener.class })
 public interface IAbstractTest extends ICustomTypePageFactory, ITestCases {
 

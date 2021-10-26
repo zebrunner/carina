@@ -74,7 +74,7 @@ public abstract class AbstractCapabilities {
                 String value = R.CONFIG.get(entry.getKey());                
                 if (!value.isEmpty()) {
                     String cap = entry.getKey().replaceAll(prefix, "");
-                    if (isNumber(value)) {
+                    if ("idleTimeout".equalsIgnoreCase(cap) && isNumber(value)) {
                         LOGGER.debug("Adding " + entry + " to capabilities as integer");
                         capabilities.setCapability(cap, Integer.parseInt(value));
                     } else if ("false".equalsIgnoreCase(value)) {
