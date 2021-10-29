@@ -50,7 +50,6 @@ public class TestRailTest implements ITestRailManager {
     
     @BeforeSuite()
     public void initData(ITestContext context) {
-        context.getSuite().setAttribute(SpecialKeywords.TESTRAIL_PROJECT_ID, PROJECT_ID);
         context.getSuite().setAttribute(SpecialKeywords.TESTRAIL_SUITE_ID, SUITE_ID);
     }
 

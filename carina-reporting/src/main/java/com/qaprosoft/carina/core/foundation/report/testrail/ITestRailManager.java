@@ -133,10 +133,6 @@ public interface ITestRailManager extends ITestCases {
     private int getTestRailSuiteIdFromSuite(ISuite suite) {
         if (suite.getParameter(SpecialKeywords.TESTRAIL_SUITE_ID) != null) {
             return Integer.parseInt(suite.getParameter(SpecialKeywords.TESTRAIL_SUITE_ID).trim());
-        } else if (suite.getParameter(SpecialKeywords.TESTRAIL_SUITE_ID_OLD) != null) {
-            TESTRAIL_LOGGER.warn(SpecialKeywords.TESTRAIL_SUITE_ID_OLD + " special key parameter is deprecated. " +
-                    "Please, start using " + SpecialKeywords.TESTRAIL_SUITE_ID + " instead!");
-            return Integer.parseInt(suite.getParameter(SpecialKeywords.TESTRAIL_SUITE_ID_OLD).trim());
         } else if (suite.getAttribute(SpecialKeywords.TESTRAIL_SUITE_ID) != null) {
             //use-case to support unit tests
             return Integer.parseInt(suite.getAttribute(SpecialKeywords.TESTRAIL_SUITE_ID).toString().trim());
