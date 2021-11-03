@@ -92,7 +92,7 @@ public class ReportContext {
 
     private static long rootID;
 
-    private static final ThreadLocal<File> testDirectory = new ThreadLocal<File>();
+    private static final ThreadLocal<File> testDirectory = new InheritableThreadLocal<>();
     private static final ThreadLocal<Boolean> isCustomTestDirName = new ThreadLocal<Boolean>();
 
     private static final ExecutorService executor = Executors.newCachedThreadPool();
