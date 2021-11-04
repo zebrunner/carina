@@ -93,7 +93,7 @@ public class ReportContext {
     private static long rootID;
 
     private static final ThreadLocal<File> testDirectory = new InheritableThreadLocal<>();
-    private static final ThreadLocal<Boolean> isCustomTestDirName = new ThreadLocal<Boolean>();
+    private static final ThreadLocal<Boolean> isCustomTestDirName = new InheritableThreadLocal<Boolean>();
 
     private static final ExecutorService executor = Executors.newCachedThreadPool();
 
@@ -471,6 +471,13 @@ public class ReportContext {
         testDirectory.remove();
         isCustomTestDirName.set(Boolean.FALSE);
         closeThreadLogAppender();
+    }
+
+    public static void createNewTestDir() {
+        testDirectory.set(null);
+        //LOGGER.debug("Test directory address = " + testDirectory.get());
+        isCustomTestDirName.set(Boolean.FALSE);
+        testDirectory.set(getTestDir());
     }
 
     private static void closeThreadLogAppender() {
