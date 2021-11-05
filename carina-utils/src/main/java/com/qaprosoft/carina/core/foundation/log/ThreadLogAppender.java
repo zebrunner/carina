@@ -52,7 +52,7 @@ public class ThreadLogAppender extends AppenderSkeleton {
 
             BufferedWriter fw = testLogBuffer.get();
 
-            // for appending to file in test specific folder
+            // check does writer log to the correct test directory, if not - reinit it
             if(currentTestDirectory.get() != ReportContext.getTestDir()){
                 fw = null;
             }

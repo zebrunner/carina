@@ -475,7 +475,6 @@ public class ReportContext {
 
     public static void createNewTestDir() {
         testDirectory.set(null);
-        //LOGGER.debug("Test directory address = " + testDirectory.get());
         isCustomTestDirName.set(Boolean.FALSE);
         testDirectory.set(getTestDir());
     }
