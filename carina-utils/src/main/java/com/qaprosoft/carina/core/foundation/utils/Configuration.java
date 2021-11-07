@@ -211,7 +211,12 @@ public class Configuration {
         
         RUN_NAME("run_name"),
         
-        ASSIGNEE("assignee");
+        ASSIGNEE("assignee"),
+        
+        // GIT
+        GIT_BRANCH("git_branch"),
+        // sha1
+        GIT_COMMIT("git_commit");
 
         private final String key;
 
@@ -388,7 +393,7 @@ public class Configuration {
             platformVersion = caps.getCapability("os_version").toString();
         }           
         
-        if (caps.getCapability("platformVersion") != null) {
+        if (caps != null && caps.getCapability("platformVersion") != null) {
             platformVersion = caps.getCapability("platformVersion").toString();
         }        
         
