@@ -211,7 +211,12 @@ public class Configuration {
         
         RUN_NAME("run_name"),
         
-        ASSIGNEE("assignee");
+        ASSIGNEE("assignee"),
+        
+        // GIT
+        GIT_BRANCH("git_branch"),
+        // sha1
+        GIT_COMMIT("git_commit");
 
         private final String key;
 
