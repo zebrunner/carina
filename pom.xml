@@ -42,6 +42,7 @@
         <maven-surefire-plugin.version>3.0.0-M4</maven-surefire-plugin.version>
         <maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
+        <jacoco-maven-plugin>0.8.7</jacoco-maven-plugin>
         <!-- Testings -->
         <testng.version>7.4.0</testng.version>
         <testng-foundation.version>2.0.1</testng-foundation.version>
@@ -156,7 +157,25 @@
                             </execution>
                         </executions>
                     </plugin>
-
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<version>${jacoco-maven-plugin}</version>
+						<executions>
+							<execution>
+								<id>prepare-agent</id>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>report</id>
+								<goals>
+									<goal>report</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
                 </plugins>
                 <pluginManagement>
                     <plugins>
