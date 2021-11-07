@@ -74,6 +74,8 @@ public class Screenshot {
 
     private static List<IScreenshotRule> rules = Collections.synchronizedList(new ArrayList<IScreenshotRule>());
     
+    private static final String ERROR_STACKTRACE = "Error stacktrace: ";
+    
     protected static boolean defaultCapturer = true;
 
     private Screenshot() {
@@ -262,14 +264,14 @@ public class Screenshot {
             if (isCaptured(e.getMessage())) {
                 // display exception as we suspect to make screenshot for this use-case
                 LOGGER.warn("Unable to capture screenshot due to the WebDriverException!");
-                LOGGER.debug("Error stacktrace: ", e);
+                LOGGER.debug(ERROR_STACKTRACE, e);
             } else {
                 // Do not display exception by default as we don't suspect to make screenshot for this use-case
                 LOGGER.debug("Unable to capture screenshot due to the WebDriverException!", e);
             }
         } catch (Exception e) {
             LOGGER.warn("Unable to capture screenshot due to the Exception!");
-            LOGGER.debug("Error stacktrace: ", e);
+            LOGGER.debug(ERROR_STACKTRACE, e);
         } finally {
             LOGGER.debug("Screenshot->captureFullSize finished.");
         }
@@ -409,16 +411,16 @@ public class Screenshot {
                 ReportContext.addScreenshotComment(screenName, comment);
             } catch (NoSuchWindowException e) {
                 LOGGER.warn("Unable to capture screenshot due to NoSuchWindowException!");
-                LOGGER.debug("Error stacktrace: ", e);
+                LOGGER.debug(ERROR_STACKTRACE, e);
             } catch (IOException e) {
                 LOGGER.warn("Unable to capture screenshot due to the I/O issues!");
-                LOGGER.debug("Error stacktrace: ", e);
+                LOGGER.debug(ERROR_STACKTRACE, e);
             } catch (WebDriverException e) {
                 LOGGER.warn("Unable to capture screenshot due to the WebDriverException!");
-                LOGGER.debug("Error stacktrace: ", e);
+                LOGGER.debug(ERROR_STACKTRACE, e);
             } catch (Exception e) {
                 LOGGER.warn("Unable to capture screenshot due to the Exception!");
-                LOGGER.debug("Error stacktrace: ", e);
+                LOGGER.debug(ERROR_STACKTRACE, e);
             } finally {
                 LOGGER.debug("Screenshot->capture finished.");
             }
@@ -706,16 +708,16 @@ public class Screenshot {
             }
         } catch (IOException e) {
             LOGGER.warn("Unable to compare screenshots due to the I/O issues!");
-            LOGGER.debug("Error stacktrace: ", e);
+            LOGGER.debug(ERROR_STACKTRACE, e);
         } catch (WebDriverException e) {
             LOGGER.warn("Unable to compare screenshots due to the WebDriverException!");
-            LOGGER.debug("Error stacktrace: ", e);
+            LOGGER.debug(ERROR_STACKTRACE, e);
         } catch (NullPointerException e) {
             LOGGER.warn("Unable to compare screenshots due to the NullPointerException!");
-            LOGGER.debug("Error stacktrace: ", e);
+            LOGGER.debug(ERROR_STACKTRACE, e);
         } catch (Exception e) {
             LOGGER.warn("Unable to compare screenshots!");
-            LOGGER.debug("Error stacktrace: ", e);
+            LOGGER.debug(ERROR_STACKTRACE, e);
         } finally {
             // do nothing
         }
