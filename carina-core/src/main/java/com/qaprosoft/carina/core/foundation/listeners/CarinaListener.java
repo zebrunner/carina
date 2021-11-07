@@ -307,7 +307,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     public void onTestFailure(ITestResult result) {
         LOGGER.debug("CarinaListener->onTestFailure");
         String errorMessage = getFailureReason(result);
-        takeScreenshot(result, "TEST FAILED - " + errorMessage);
+        takeScreenshot("TEST FAILED - " + errorMessage);
         onTestFinish(result);
         super.onTestFailure(result);
     }
@@ -316,7 +316,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     public void onTestSkipped(ITestResult result) {
         LOGGER.debug("CarinaListener->onTestSkipped");
         String errorMessage = getFailureReason(result);
-        takeScreenshot(result, "TEST SKIPPED - " + errorMessage, false);
+        takeScreenshot("TEST SKIPPED - " + errorMessage, false);
         onTestFinish(result);
         super.onTestSkipped(result);
     }
@@ -989,11 +989,11 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         }
     }
     
-    private String takeScreenshot(ITestResult result, String msg) {
-        return takeScreenshot(result, msg, true);
+    private String takeScreenshot(String msg) {
+        return takeScreenshot(msg, true);
     }
     
-    private String takeScreenshot(ITestResult result, String msg, boolean isFullSize) {
+    private String takeScreenshot(String msg, boolean isFullSize) {
         String screenId = "";
 
         ConcurrentHashMap<String, CarinaDriver> drivers = getDrivers();
