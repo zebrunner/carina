@@ -18,9 +18,6 @@ package com.qaprosoft.carina.core.foundation.exception;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.R;
-
 public class ExceptionsTest {
 
     @Test
