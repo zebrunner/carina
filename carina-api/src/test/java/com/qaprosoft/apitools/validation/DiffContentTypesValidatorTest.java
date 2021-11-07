@@ -1,17 +1,22 @@
 package com.qaprosoft.apitools.validation;
 
-import com.qaprosoft.apitools.validation.mock.method.MockServer;
-import com.qaprosoft.apitools.validation.mock.method.NoContentTypeMethod;
-import com.qaprosoft.apitools.validation.mock.method.XmlContentTypeMethod;
-import org.testng.Assert;
-import org.testng.annotations.*;
+import static org.apache.commons.lang3.StringUtils.normalizeSpace;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.lang3.StringUtils.normalizeSpace;
+import org.testng.Assert;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.Test;
+
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.qaprosoft.apitools.validation.mock.method.MockServer;
+import com.qaprosoft.apitools.validation.mock.method.NoContentTypeMethod;
+import com.qaprosoft.apitools.validation.mock.method.XmlContentTypeMethod;
+import com.qaprosoft.carina.core.foundation.utils.R;
 
 public class DiffContentTypesValidatorTest {
 
@@ -21,13 +26,17 @@ public class DiffContentTypesValidatorTest {
     public void up() {
         server = new MockServer();
         server.start();
+        //override api_url using dynamic port
+        R.CONFIG.put("DEMO.api_url", server.getBaseUrl());
+        //configure client to use dynamic port 
+        WireMock.configureFor(server.getPort());
     }
 
     @Test
     public void testValidationNoContentTypeMethodSuccess() throws IOException {
         String actualJsonData = Files.lines(Path.of("src/test/resources/validation/array/duplicate/array_act.json"))
                 .collect(Collectors.joining("\n"));
-        MockServer server = new MockServer();
+        //MockServer server = new MockServer();
         server.createResponse("/mock1", actualJsonData);
         NoContentTypeMethod noContentTypeMethod = new NoContentTypeMethod();
         noContentTypeMethod.callAPI();
