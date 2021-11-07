@@ -90,6 +90,11 @@ All the project configuration properties are located in a **_config.properties**
 		<td>STAG, PROD, DEMO</td>
 	</tr>
 	<tr>
+		<td>ignore_ssl</td>
+		<td>API requests/responses to ignore SSL errors. Default: false</td>
+		<td>Boolean</td>
+	</tr>
+	<tr>
 		<td>driver_event_listeners</td>
 		<td>Comma-separated list of extra driver listeners listeners. Listeners provide extra custom actions for WebDriver and have to be the instances of WebDriverEventListener</td>
 		<td>com.some_company.core.EventListener</td>
@@ -225,7 +230,7 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 		<tr>
 		<td>log_all_json</td>
-		<td>API response will be logged in JSON format</td>
+		<td>API response will be logged in JSON format. Default: true</td>
 		<td>Boolean</td>
 	</tr>
 		<tr>
