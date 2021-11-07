@@ -681,7 +681,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
             BlobProperties blobProperties = AzureManager.getInstance().get(containerName, remoteFilePath);
             String azureLocalStorage = Configuration.get(Parameter.AZURE_LOCAL_STORAGE);
-            String localFilePath = azureLocalStorage + "/" + StringUtils.substringAfterLast(remoteFilePath, "/");
+            String localFilePath = azureLocalStorage + File.separator + StringUtils.substringAfterLast(remoteFilePath, "/");
 
             File file = new File(localFilePath);
 
