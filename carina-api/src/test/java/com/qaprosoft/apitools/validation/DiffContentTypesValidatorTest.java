@@ -26,6 +26,7 @@ public class DiffContentTypesValidatorTest {
     public void up() {
         server = new MockServer();
         server.start();
+        
         //override api_url using dynamic port
         R.CONFIG.put("DEMO.api_url", server.getBaseUrl());
         //configure client to use dynamic port 
@@ -36,7 +37,6 @@ public class DiffContentTypesValidatorTest {
     public void testValidationNoContentTypeMethodSuccess() throws IOException {
         String actualJsonData = Files.lines(Path.of("src/test/resources/validation/array/duplicate/array_act.json"))
                 .collect(Collectors.joining("\n"));
-        //MockServer server = new MockServer();
         server.createResponse("/mock1", actualJsonData);
         NoContentTypeMethod noContentTypeMethod = new NoContentTypeMethod();
         noContentTypeMethod.callAPI();
