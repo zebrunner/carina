@@ -1,20 +1,21 @@
 package com.qaprosoft.apitools.validation.mock.method;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.client.WireMock;
-import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 
 public class MockServer {
 
     private WireMockServer wireMockServer;
 
     public MockServer() {
-        WireMock.configureFor(Integer.parseInt(Configuration.getEnvArg("mockServer.port")));
-        wireMockServer = new WireMockServer(options().port(Integer.parseInt(Configuration.getEnvArg("mockServer.port"))));
+        WireMockConfiguration config = options().dynamicPort();
+        wireMockServer = new WireMockServer(config.portNumber());
     }
 
     public void start() {
@@ -42,4 +43,13 @@ public class MockServer {
                         .withHeader("Content-Type", "text/plain")
                         .withBody(response)));
     }
+    
+    public String getBaseUrl() {
+        return wireMockServer.baseUrl();
+    }
+    
+    public int getPort() {
+        return wireMockServer.port();
+    }
+
 }

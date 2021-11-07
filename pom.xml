@@ -5,7 +5,7 @@
     <artifactId>carina</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <url>http://www.qaprosoft.com/</url>
+    <url>https://www.carina-core.io/</url>
     <name>Carina Core - Multi Module</name>
     <description>Test automation framework for Web, Mobile, API testing.</description>
     <licenses>
@@ -18,15 +18,15 @@
     <developers>
         <developer>
             <name>Alex Khursevich</name>
-            <email>alex@qaprosoft.com</email>
-            <organization>Qaprosoft</organization>
-            <organizationUrl>http://qaprosoft.com</organizationUrl>
+            <email>alex@zebrunner.com</email>
+            <organization>Zebrunner</organization>
+            <organizationUrl>https://zebrunner.com</organizationUrl>
         </developer>
         <developer>
-            <name>Vadim Delendin</name>
-            <email>vdelendik@qaprosoft.com</email>
-            <organization>Qaprosoft</organization>
-            <organizationUrl>http://qaprosoft.com</organizationUrl>
+            <name>Vadim Delendik</name>
+            <email>vdelendik@zebrunner.com</email>
+            <organization>Zebrunner</organization>
+            <organizationUrl>https://zebrunner.com</organizationUrl>
         </developer>
     </developers>
     <scm>
@@ -42,6 +42,7 @@
         <maven-surefire-plugin.version>3.0.0-M4</maven-surefire-plugin.version>
         <maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
+        <jacoco-maven-plugin>0.8.7</jacoco-maven-plugin>
         <!-- Testings -->
         <testng.version>7.4.0</testng.version>
         <testng-foundation.version>2.0.1</testng-foundation.version>
@@ -57,13 +58,13 @@
         <commons-io.version>2.7</commons-io.version>
         <commons-codec.version>1.9</commons-codec.version>
         <commons-collections.version>3.2.2</commons-collections.version>
-        <httpclient.version>4.5.9</httpclient.version>
+        <httpclient.version>4.5.13</httpclient.version>
         <jna.version>3.0.9</jna.version>
         <!-- Selenium -->
         <selenium.version>3.141.59</selenium.version>
         <appium.version>7.5.1</appium.version>
         <!-- Zebrunner integrations -->
-        <zebrunner-testng-pluggable.version>RELEASE</zebrunner-testng-pluggable.version>
+        <zebrunner-testng-pluggable.version>1.6.3</zebrunner-testng-pluggable.version>
         <!-- Others -->
         <azure-storage-blob.version>12.7.0</azure-storage-blob.version>
         <aws-java-sdk.version>1.11.923</aws-java-sdk.version>
@@ -156,7 +157,25 @@
                             </execution>
                         </executions>
                     </plugin>
-
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<version>${jacoco-maven-plugin}</version>
+						<executions>
+							<execution>
+								<id>prepare-agent</id>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>report</id>
+								<goals>
+									<goal>report</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
                 </plugins>
                 <pluginManagement>
                     <plugins>

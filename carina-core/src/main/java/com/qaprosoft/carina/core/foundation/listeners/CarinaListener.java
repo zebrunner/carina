@@ -205,6 +205,16 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         // register app_version/build as artifact if available...
         Configuration.setBuild(Configuration.get(Parameter.APP_VERSION));
         
+        String branch = Configuration.get(Parameter.GIT_BRANCH);
+        if (!branch.isEmpty()) {
+            Label.attachToTestRun("branch", branch);
+        }
+        
+        String sha1 = Configuration.get(Parameter.GIT_COMMIT);
+        if (!sha1.isEmpty()) {
+            Label.attachToTestRun("sha1", sha1);
+        }
+        
         /*
          * To support multi-suite declaration as below we have to init test run labels at once only!
          * <suite-files>
@@ -297,7 +307,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     public void onTestFailure(ITestResult result) {
         LOGGER.debug("CarinaListener->onTestFailure");
         String errorMessage = getFailureReason(result);
-        takeScreenshot(result, "TEST FAILED - " + errorMessage);
+        takeScreenshot("TEST FAILED - " + errorMessage);
         onTestFinish(result);
         super.onTestFailure(result);
     }
@@ -306,7 +316,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     public void onTestSkipped(ITestResult result) {
         LOGGER.debug("CarinaListener->onTestSkipped");
         String errorMessage = getFailureReason(result);
-        takeScreenshot(result, "TEST SKIPPED - " + errorMessage, false);
+        takeScreenshot("TEST SKIPPED - " + errorMessage, false);
         onTestFinish(result);
         super.onTestSkipped(result);
     }
@@ -671,7 +681,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
             BlobProperties blobProperties = AzureManager.getInstance().get(containerName, remoteFilePath);
             String azureLocalStorage = Configuration.get(Parameter.AZURE_LOCAL_STORAGE);
-            String localFilePath = azureLocalStorage + "/" + StringUtils.substringAfterLast(remoteFilePath, "/");
+            String localFilePath = azureLocalStorage + File.separator + StringUtils.substringAfterLast(remoteFilePath, "/");
 
             File file = new File(localFilePath);
 
@@ -979,11 +989,11 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         }
     }
     
-    private String takeScreenshot(ITestResult result, String msg) {
-        return takeScreenshot(result, msg, true);
+    private String takeScreenshot(String msg) {
+        return takeScreenshot(msg, true);
     }
     
-    private String takeScreenshot(ITestResult result, String msg, boolean isFullSize) {
+    private String takeScreenshot(String msg, boolean isFullSize) {
         String screenId = "";
 
         ConcurrentHashMap<String, CarinaDriver> drivers = getDrivers();
