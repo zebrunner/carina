@@ -153,7 +153,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             new CapabilitiesLoader().loadCapabilities(customCapabilities);
         }
 
-        IScreenshotRule autoScreenshotsRule = (IScreenshotRule) new AutoScreenshotRule();
+        IScreenshotRule autoScreenshotsRule = (IScreenshotRule) new AutoScreenshotRule("qwe");
         Screenshot.addScreenshotRule(autoScreenshotsRule);
 
         updateAppPath();
