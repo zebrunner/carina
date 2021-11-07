@@ -123,6 +123,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     public CarinaListener(){
         // Add shutdown hook
         Runtime.getRuntime().addShutdownHook(new ShutdownHook());
+        i++;
 
         // Zebrunner core java agent is user for capturing events of RemoteDriverSession instances.
         // Internally, the agent uses java instrumentation agent for its purposes.
