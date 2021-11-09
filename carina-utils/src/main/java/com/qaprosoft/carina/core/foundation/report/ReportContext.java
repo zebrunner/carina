@@ -429,20 +429,10 @@ public class ReportContext {
     public static File getTestDir(String dirName) {
         File testDir = testDirectory.get();
         if (testDir == null) {
-            String uniqueDirName = UUID.randomUUID().toString();
-            if (StringUtils.isNoneBlank(dirName)) {
-                uniqueDirName = dirName;
-            }
-            String directory = String.format("%s/%s", getBaseDir(), uniqueDirName);
-
-            testDir = new File(directory);
-
-            if (!testDir.mkdirs()) {
-                throw new RuntimeException("Test Folder(s) not created: " + testDir.getAbsolutePath());
-            }
+            testDir = createNewTestDir(dirName);
         }
 
-        testDirectory.set(testDir);
+        //testDirectory.set(testDir);
         return testDir;
     }
 
@@ -473,10 +463,21 @@ public class ReportContext {
         closeThreadLogAppender();
     }
 
-    public static void createNewTestDir() {
-        testDirectory.set(null);
-        isCustomTestDirName.set(Boolean.FALSE);
-        testDirectory.set(getTestDir());
+    public static synchronized File createNewTestDir(String dirName) {
+        File testDir;
+        String uniqueDirName = UUID.randomUUID().toString();
+        if (StringUtils.isNoneBlank(dirName)) {
+            uniqueDirName = dirName;
+        }
+        String directory = String.format("%s/%s", getBaseDir(), uniqueDirName);
+
+        testDir = new File(directory);
+
+        if (!testDir.mkdirs()) {
+            throw new RuntimeException("Test Folder(s) not created: " + testDir.getAbsolutePath());
+        }
+        testDirectory.set(testDir);
+        return testDir;
     }
 
     private static void closeThreadLogAppender() {
