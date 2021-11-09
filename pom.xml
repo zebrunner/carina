@@ -112,7 +112,7 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository-->
-        <!--repository>
+        <repository>
             <id>zebrunner_snapshots</id>
             <name>zebrunner Snapshots</name>
             <url>https://nexus.zebrunner.dev/repository/ce-snapshots/</url>
@@ -122,7 +122,7 @@
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
-        </repository-->
+        </repository>
     </repositories>
     <profiles>
         <profile>
