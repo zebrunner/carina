@@ -197,9 +197,6 @@ public abstract class AbstractCapabilities {
             needsPrefs = true;
         }
 
-        if (needsPrefs) {
-        	options.setExperimentalOption("prefs", chromePrefs);
-        }
         
         // [VD] no need to set proxy via options anymore!
         // moreover if below code is uncommented then we have double proxy start and mess in host:port values
@@ -221,20 +218,30 @@ public abstract class AbstractCapabilities {
         }
     
         // add all custom chrome experimental options, w3c=false
-        for (String option: Configuration.get(Parameter.CHROME_EXPERIMENTAL_OPTS).split(",")) {
-            if (option.isEmpty()) {
-                continue;
-            }
+        String experimentalOptions = Configuration.get(Parameter.CHROME_EXPERIMENTAL_OPTS);
+        if(!experimentalOptions.isEmpty()) {
+            needsPrefs = true;
+            for (String option: experimentalOptions.split(",")) {
+                if (option.isEmpty()) {
+                    continue;
+                }
 
-            //TODO: think about equal sign inside name or value later
-            option = option.trim();
-            String name = option.split("=")[0].trim();
-            String value = option.split("=")[1].trim();
-            if ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value)) {
-                options.setExperimentalOption(name, Boolean.valueOf(value));
-            } else {
-                options.setExperimentalOption(name, value);
+                //TODO: think about equal sign inside name or value later
+                option = option.trim();
+                String name = option.split("=")[0].trim();
+                String value = option.split("=")[1].trim();
+                if ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value)) {
+                    chromePrefs.put(name, Boolean.valueOf(value));
+                } else if (isNumber(value)) {
+                    chromePrefs.put(name, Long.valueOf(value));
+                } else {
+                    chromePrefs.put(name, value);
+                }
             }
+        }
+
+        if (needsPrefs) {
+            options.setExperimentalOption("prefs", chromePrefs);
         }
         
         // add all custom chrome mobileEmulation options, deviceName=Nexus 5
