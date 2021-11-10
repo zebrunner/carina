@@ -1,7 +1,6 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-
 package ${package}.carina.demo;
 
 import com.qaprosoft.carina.core.foundation.IAbstractTest;

@@ -2,7 +2,6 @@
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
 
-
 package ${package}.carina.demo;
 
 import org.testng.annotations.Test;
