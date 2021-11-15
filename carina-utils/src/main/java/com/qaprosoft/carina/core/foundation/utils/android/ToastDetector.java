@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.utils.android;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -71,7 +72,7 @@ public class ToastDetector implements Runnable {
         LOGGER.info("Wait for toast...");
         isPresent = false;
         FluentWait<WebDriver> fluentWait = new FluentWait<>(webDriver);
-        fluentWait.withTimeout(waitTimeout, TimeUnit.SECONDS).pollingEvery(300, TimeUnit.MILLISECONDS).until(input -> {
+        fluentWait.withTimeout(Duration.ofSeconds(waitTimeout)).pollingEvery(Duration.ofMillis(300)).until(input -> {
             List<?> webElemenList = webDriver.findElements(By.xpath(String.format(TOAST_PATTERN, toastToWait)));
             if (webElemenList.size() == 1) {
                 LOGGER.info("Toast with text present: " + toastToWait);
