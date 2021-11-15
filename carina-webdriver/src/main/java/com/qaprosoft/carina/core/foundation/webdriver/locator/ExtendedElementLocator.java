@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
@@ -115,7 +116,7 @@ public class ExtendedElementLocator implements ElementLocator {
         
         // If no luck throw general NoSuchElementException
         if (element == null) {
-            throw exception != null ? exception : new NoSuchElementException("Unable to find element by Selenium/AI");
+            throw exception != null ? exception : new NoSuchElementException("Unable to find element");
         }
         
         // 1. enable cache for successfully discovered element to minimize selenium calls
@@ -135,6 +136,10 @@ public class ExtendedElementLocator implements ElementLocator {
             elements = searchContext.findElements(by);
         } catch (NoSuchElementException e) {
             LOGGER.debug("Unable to find elements: " + e.getMessage());
+        } catch (WebDriverException e) {
+            // mostly to handle org.openqa.selenium.WebDriverException: Driver connection refused
+            // TODO: test if we need explicit if to avoid double call for every WebDriverException
+            elements = searchContext.findElements(by);
         }
 
         //TODO: incorporate find by AI???
