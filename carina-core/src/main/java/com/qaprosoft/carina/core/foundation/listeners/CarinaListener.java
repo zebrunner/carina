@@ -814,6 +814,12 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     */
     private String getAttributeValue(ISuite suite, String attribute) {
         String res = "";
+        
+        if (suite.getXmlSuite() == null || suite.getXmlSuite().getFileName() == null) {
+            // #1514 Unable to execute the test classes from maven command line
+            return res;
+        }
+        
         File file = new File(suite.getXmlSuite().getFileName());
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 
