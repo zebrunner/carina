@@ -584,7 +584,10 @@ public class ReportContext {
 
     private static void createNewFileIfNotExists(File file) throws IOException {
         if (!file.exists()) {
-            file.createNewFile();
+            boolean isCreated = file.createNewFile();
+            if (!isCreated) {
+                throw new RuntimeException("File not created: " + file.getAbsolutePath());
+            }
         }
     }
 
