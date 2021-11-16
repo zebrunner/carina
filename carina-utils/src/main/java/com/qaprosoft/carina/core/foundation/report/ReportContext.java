@@ -562,46 +562,32 @@ public class ReportContext {
     public static void generateHtmlReport(String content) {
         String emailableReport = SpecialKeywords.HTML_REPORT;
 
-        try {
-            File reportFile = new File(String.format("%s/%s/%s", System.getProperty("user.dir"),
-                    Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY), emailableReport));
+        File reportFile = new File(String.format("%s/%s/%s", System.getProperty("user.dir"),
+                Configuration.get(Parameter.PROJECT_REPORT_DIRECTORY), emailableReport));
+        File reportFileToBaseDir = new File(String.format("%s/%s", getBaseDir(), emailableReport));
 
-            // if file doesn't exists, then create it
-            if (!reportFile.exists()) {
-                reportFile.createNewFile();
-            }
+        try (FileWriter reportFileWriter = new FileWriter(reportFile.getAbsoluteFile());
+             BufferedWriter reportBufferedWriter = new BufferedWriter(reportFileWriter);
+             FileWriter baseDirFileWriter = new FileWriter(reportFileToBaseDir.getAbsolutePath());
+             BufferedWriter baseDirBufferedWriter = new BufferedWriter(baseDirFileWriter)) {
 
-            FileWriter fw = new FileWriter(reportFile.getAbsoluteFile());
-            try {
-                BufferedWriter bw = new BufferedWriter(fw);
-                try {
-                    bw.write(content);
-                } finally {
-                    bw.close();
-                }
-            } finally {
-                fw.close();
-            }
+            createNewFileIfNotExists(reportFile);
+            reportBufferedWriter.write(content);
 
-            File reportFileToBase = new File(String.format("%s/%s", getBaseDir(), emailableReport));
-            FileWriter fwToBaseDir = new FileWriter(reportFileToBase.getAbsolutePath());
-
-            if (!reportFileToBase.exists()) {
-                reportFileToBase.createNewFile();
-            }
-            try {
-                BufferedWriter bw = new BufferedWriter(fwToBaseDir);
-                try {
-                    bw.write(content);
-                } finally {
-                    bw.close();
-                }
-            } finally {
-                fw.close();
-            }
+            createNewFileIfNotExists(reportFileToBaseDir);
+            baseDirBufferedWriter.write(content);
 
         } catch (IOException e) {
             LOGGER.error("generateHtmlReport failure", e);
+        }
+    }
+
+    private static void createNewFileIfNotExists(File file) throws IOException {
+        if (!file.exists()) {
+            boolean isCreated = file.createNewFile();
+            if (!isCreated) {
+                throw new RuntimeException("File not created: " + file.getAbsolutePath());
+            }
         }
     }
 
