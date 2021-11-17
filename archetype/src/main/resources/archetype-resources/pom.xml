@@ -13,11 +13,11 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<carina-core_version>RELEASE</carina-core_version>
-		<carina-cucumber_version>RELEASE</carina-cucumber_version>
+		<carina-core_version>7.2.13</carina-core_version>
+		<carina-cucumber_version>7.2.13</carina-cucumber_version>
 		<java.version>11</java.version>
 		<spring-boot.version>2.2.2.RELEASE</spring-boot.version>
-		<zebrunner-agent.version>RELEASE</zebrunner-agent.version>
+		<zebrunner-agent.version>1.6.5</zebrunner-agent.version>
 		<suite>helloWorld</suite>
 	</properties>
 
