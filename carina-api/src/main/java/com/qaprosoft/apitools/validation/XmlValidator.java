@@ -22,6 +22,7 @@ import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.stream.StreamSource;
@@ -48,9 +49,8 @@ public class XmlValidator {
      * @param mode XmlCompareMode, determines how to compare 2 XMLs. See type description for more details.
      */
     public static void validateXml(String actualXmlData, String expectedXmlPath, XmlCompareMode mode) {
-        try {
-            String expectedXmlData = Files.lines(Path.of(expectedXmlPath))
-                    .collect(Collectors.joining("\n"));
+        try (Stream<String> stream = Files.lines(Path.of(expectedXmlPath))) {
+            String expectedXmlData = stream.collect(Collectors.joining("\n"));
             if (mode == XmlCompareMode.NON_STRICT) {
                 XmlComparator.nonStrictOrderCompare(actualXmlData, expectedXmlData);
             } else {
