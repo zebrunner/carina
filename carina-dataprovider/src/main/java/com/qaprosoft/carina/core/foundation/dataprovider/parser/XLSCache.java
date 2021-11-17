@@ -27,18 +27,13 @@ public class XLSCache {
     private static Map<String, Workbook> xlsCache = new HashMap<String, Workbook>();
 
     public static synchronized Workbook getWorkbook(String xlsPath) {
-        if (!xlsCache.keySet().contains(xlsPath)) {
+        if (!xlsCache.containsKey(xlsPath)) {
             Workbook wb;
-            try {
-                InputStream is = ClassLoader.getSystemResourceAsStream(xlsPath);
-                try {
+            try (InputStream is = ClassLoader.getSystemResourceAsStream(xlsPath)){
+                if (is != null) {
                     wb = WorkbookFactory.create(is);
-                } finally {
-                    // [VD] code cleanup based on Sonar 
-                    is.close();
-                    // if (is != null) {
-                    //    is.close();
-                    // }
+                } else {
+                    throw new RuntimeException("Can't read xls: " + xlsPath);
                 }
             } catch (Exception e) {
                 throw new RuntimeException("Can't read xls: " + xlsPath);
