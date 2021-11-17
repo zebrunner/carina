@@ -236,9 +236,8 @@ public class L10N {
         
 
         String missedResorceFile = "missed_" + locale + ".properties";
-        try {
-            missedResources.store(new OutputStreamWriter(
-                    new FileOutputStream(missedResorceFile), getEncoding()), null);            
+        try (FileOutputStream outputStream = new FileOutputStream(missedResorceFile)) {
+            missedResources.store(new OutputStreamWriter(outputStream, getEncoding()), null);
         } catch (Exception e) {
             LOGGER.error("Unable to store missed resources: " + missedResorceFile + "!", e);
         }
