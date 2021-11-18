@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2020-2022 Zebrunner Inc (https://www.zebrunner.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,9 @@ import org.apache.log4j.Category;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.testng.Assert;
 import org.testng.IClassListener;
@@ -97,10 +99,12 @@ import com.qaprosoft.carina.core.foundation.webdriver.screenshot.AutoScreenshotR
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
 import com.zebrunner.agent.core.registrar.Artifact;
 import com.zebrunner.agent.core.registrar.CurrentTest;
+import com.zebrunner.agent.core.registrar.CurrentTestRun;
 import com.zebrunner.agent.core.registrar.Label;
 import com.zebrunner.agent.core.registrar.TestRail;
 import com.zebrunner.agent.core.registrar.label.CompositeLabelResolver;
 import com.zebrunner.agent.core.registrar.maintainer.ChainedMaintainerResolver;
+import com.zebrunner.agent.core.webdriver.RemoteWebDriverFactory;
 import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
 
 /*
@@ -153,6 +157,13 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             new CapabilitiesLoader().loadCapabilities(customCapabilities);
         }
 
+        // declare global capabilities from Zebrunner Launcher if any
+        Capabilities zebrunnerCapabilities = RemoteWebDriverFactory.getCapabilities();
+        if (!zebrunnerCapabilities.asMap().isEmpty()) {
+            // redefine core CONFIG properties using caps from Zebrunner launchers
+            new CapabilitiesLoader().loadCapabilities(zebrunnerCapabilities);
+        }
+
         IScreenshotRule autoScreenshotsRule = (IScreenshotRule) new AutoScreenshotRule();
         Screenshot.addScreenshotRule(autoScreenshotsRule);
 
@@ -196,6 +207,10 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
         setThreadCount(suite);
         onHealthCheck(suite);
+        
+        if (Configuration.getPlatform().equalsIgnoreCase(SpecialKeywords.API)) {
+            CurrentTestRun.setPlatform(SpecialKeywords.API);
+        }
 
         String mobileApp = Configuration.getMobileApp();
         if (!mobileApp.isEmpty()) {
@@ -814,6 +829,12 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     */
     private String getAttributeValue(ISuite suite, String attribute) {
         String res = "";
+        
+        if (suite.getXmlSuite() == null || suite.getXmlSuite().getFileName() == null) {
+            // #1514 Unable to execute the test classes from maven command line
+            return res;
+        }
+        
         File file = new File(suite.getXmlSuite().getFileName());
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 

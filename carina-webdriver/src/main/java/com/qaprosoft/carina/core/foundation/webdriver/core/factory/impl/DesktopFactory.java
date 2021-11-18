@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2020-2022 Zebrunner Inc (https://www.zebrunner.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,7 +81,7 @@ public class DesktopFactory extends AbstractFactory {
     @SuppressWarnings("deprecation")
     public DesiredCapabilities getCapabilities(String name) {
         String browser = Configuration.getBrowser();
-
+        
         if (BrowserType.FIREFOX.equalsIgnoreCase(browser)) {
             return new FirefoxCapabilities().getCapability(name);
         } else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || "ie".equalsIgnoreCase(browser)) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2020-2022 Zebrunner Inc (https://www.zebrunner.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory;
 
 import java.lang.invoke.MethodHandles;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,10 +30,12 @@ import org.slf4j.LoggerFactory;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.DesktopFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.MobileFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.WindowsFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
+import com.zebrunner.agent.core.webdriver.RemoteWebDriverFactory;
 
 /**
  * DriverFactory produces driver instance with desired capabilities according to
@@ -47,6 +50,12 @@ public class DriverFactory {
 	public static WebDriver create(String testName, DesiredCapabilities capabilities, String seleniumHost) {
 		LOGGER.debug("DriverFactory start...");
 		AbstractFactory factory;
+
+        URL seleniumUrl = RemoteWebDriverFactory.getSeleniumHubUrl();
+        if (seleniumUrl != null) {
+            // override existing selenium_url in config
+            R.CONFIG.put(Parameter.SELENIUM_URL.getKey(), seleniumUrl.toString());
+        }
 
 		String driverType = Configuration.getDriverType(capabilities);
 		switch (driverType) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-2020 QaProSoft (http://www.qaprosoft.com).
+ * Copyright 2020-2022 Zebrunner Inc (https://www.zebrunner.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,8 +71,29 @@ public class CapabilitiesLoader {
             // add each property directly into CONFIG
             R.CONFIG.put(key, value, currentTestOnly);
         }
-
     }
+    
+    /**
+     * Put DesiredCapabilities from Zebrunner Agent.
+     *  
+     * @param caps 
+     *            Capabilities from Zebrunner Agent launcher
+     *            
+     * @return desiredCapabilities
+     *          DesiredCapabilities
+     */
+    public DesiredCapabilities loadCapabilities(Capabilities caps) {
+        for (Map.Entry<String, Object> cap : caps.asMap().entrySet()) {
+            String key = cap.getKey();
+            // so far only primitive String, integer and boolean are supported from Zebrunner Launcher
+            String value = cap.getValue().toString(); 
+            LOGGER.info("Set custom property: " + key + "; value: " + value);
+            // add each property directly into CONFIG
+            R.CONFIG.put(SpecialKeywords.CAPABILITIES + "." + key, value);
+        }
+        
+        return (DesiredCapabilities) caps;
+    }    
     
     /**
      * Generate DesiredCapabilities from external file.
@@ -81,7 +103,7 @@ public class CapabilitiesLoader {
      *            String path to the properties file with custom capabilities
      *            
      * @return desiredCapabilities
-     * 			DesiredCapabilities y
+     * 			DesiredCapabilities
      */
     public DesiredCapabilities getCapabilities(String fileName) {
         DesiredCapabilities capabilities = new DesiredCapabilities();
