@@ -21,7 +21,6 @@ import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -36,7 +35,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobil
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
-import com.zebrunner.agent.core.webdriver.RemoteWebDriverFactory;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidElement;
@@ -140,11 +138,6 @@ public class MobileFactory extends AbstractFactory {
     }
 
     private DesiredCapabilities getCapabilities(String name) {
-        Capabilities zebrunnerCapabilities = RemoteWebDriverFactory.getCapabilities();
-        if (!zebrunnerCapabilities.asMap().isEmpty()) {
-            return (DesiredCapabilities) zebrunnerCapabilities;
-        }
-        
         return new MobileCapabilities().getCapability(name);
     }
 

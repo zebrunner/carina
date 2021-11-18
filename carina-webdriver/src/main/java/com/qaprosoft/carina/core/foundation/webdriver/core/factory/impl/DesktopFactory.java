@@ -20,7 +20,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
 
-import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.Point;
@@ -45,7 +44,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.deskt
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.OperaCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.SafariCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
-import com.zebrunner.agent.core.webdriver.RemoteWebDriverFactory;
 
 public class DesktopFactory extends AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -84,11 +82,6 @@ public class DesktopFactory extends AbstractFactory {
     public DesiredCapabilities getCapabilities(String name) {
         String browser = Configuration.getBrowser();
         
-        Capabilities zebrunnerCapabilities = RemoteWebDriverFactory.getCapabilities();
-        if (!zebrunnerCapabilities.asMap().isEmpty()) {
-            return (DesiredCapabilities) zebrunnerCapabilities;
-        }
-
         if (BrowserType.FIREFOX.equalsIgnoreCase(browser)) {
             return new FirefoxCapabilities().getCapability(name);
         } else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || "ie".equalsIgnoreCase(browser)) {

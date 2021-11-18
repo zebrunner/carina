@@ -73,11 +73,6 @@ public class WindowsFactory extends AbstractFactory {
     }
 
     private DesiredCapabilities getCapabilities(String name) {
-        Capabilities zebrunnerCapabilities = RemoteWebDriverFactory.getCapabilities();
-        if (!zebrunnerCapabilities.asMap().isEmpty()) {
-            return (DesiredCapabilities) zebrunnerCapabilities;
-        }
-        
         return new WindowsCapabilities().getCapability(name);
     }
 
