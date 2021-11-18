@@ -160,6 +160,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         // declare global capabilities from Zebrunner Launcher if any
         Capabilities zebrunnerCapabilities = RemoteWebDriverFactory.getCapabilities();
         if (!zebrunnerCapabilities.asMap().isEmpty()) {
+            LOGGER.info("Loading capabilities from Zebrunner launcher");
             // redefine core CONFIG properties using global custom capabilities file
             new CapabilitiesLoader().loadCapabilities(zebrunnerCapabilities);
         }
