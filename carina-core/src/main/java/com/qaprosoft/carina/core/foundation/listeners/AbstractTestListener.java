@@ -129,7 +129,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     @Override
     public void onTestStart(ITestResult result) {
         // create new folder for test report
-        ReportContext.createNewTestDir(StringUtils.EMPTY);
+        ReportContext.createTestDir();
         LOGGER.debug("AbstractTestListener->onTestStart");
         LOGGER.debug("Test Directory: {}", ReportContext.getTestDir().getName());
         IRetryAnalyzer curRetryAnalyzer = getRetryAnalyzer(result);

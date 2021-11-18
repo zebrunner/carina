@@ -429,10 +429,8 @@ public class ReportContext {
     public static File getTestDir(String dirName) {
         File testDir = testDirectory.get();
         if (testDir == null) {
-            testDir = createNewTestDir(dirName);
+            testDir = createTestDir(dirName);
         }
-
-        //testDirectory.set(testDir);
         return testDir;
     }
 
@@ -463,7 +461,11 @@ public class ReportContext {
         closeThreadLogAppender();
     }
 
-    public static synchronized File createNewTestDir(String dirName) {
+    public static synchronized File createTestDir() {
+        return createTestDir(StringUtils.EMPTY);
+    }
+
+    public static synchronized File createTestDir(String dirName) {
         File testDir;
         String uniqueDirName = UUID.randomUUID().toString();
         if (StringUtils.isNoneBlank(dirName)) {
