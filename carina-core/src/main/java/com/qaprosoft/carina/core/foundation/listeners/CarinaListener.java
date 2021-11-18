@@ -38,7 +38,9 @@ import org.apache.log4j.Category;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.testng.Assert;
 import org.testng.IClassListener;
@@ -102,6 +104,7 @@ import com.zebrunner.agent.core.registrar.Label;
 import com.zebrunner.agent.core.registrar.TestRail;
 import com.zebrunner.agent.core.registrar.label.CompositeLabelResolver;
 import com.zebrunner.agent.core.registrar.maintainer.ChainedMaintainerResolver;
+import com.zebrunner.agent.core.webdriver.RemoteWebDriverFactory;
 import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
 
 /*
@@ -152,6 +155,13 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         if (!customCapabilities.isEmpty()) {
             // redefine core CONFIG properties using global custom capabilities file
             new CapabilitiesLoader().loadCapabilities(customCapabilities);
+        }
+
+        // declare global capabilities from Zebrunner Launcher if any
+        Capabilities zebrunnerCapabilities = RemoteWebDriverFactory.getCapabilities();
+        if (!zebrunnerCapabilities.asMap().isEmpty()) {
+            // redefine core CONFIG properties using caps from Zebrunner launchers
+            new CapabilitiesLoader().loadCapabilities(zebrunnerCapabilities);
         }
 
         IScreenshotRule autoScreenshotsRule = (IScreenshotRule) new AutoScreenshotRule();
