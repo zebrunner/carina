@@ -89,7 +89,7 @@ public class CapabilitiesLoader {
             String value = cap.getValue().toString(); 
             LOGGER.info("Set custom property: " + key + "; value: " + value);
             // add each property directly into CONFIG
-            R.CONFIG.put(key, value);
+            R.CONFIG.put(SpecialKeywords.CAPABILITIES + "." + key, value);
         }
         
         return (DesiredCapabilities) caps;
