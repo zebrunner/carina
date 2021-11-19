@@ -101,7 +101,7 @@
         <module>carina-azure</module>
     </modules>
     <repositories>
-        <!--repository>
+        <repository>
             <id>qaprosoft_snapshots</id>
             <name>Qaprosoft Snapshots</name>
             <url>https://ci.qaprosoft.com/nexus/content/repositories/snapshots/</url>
@@ -122,7 +122,7 @@
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
-        </repository-->
+        </repository>
     </repositories>
     <profiles>
         <profile>
