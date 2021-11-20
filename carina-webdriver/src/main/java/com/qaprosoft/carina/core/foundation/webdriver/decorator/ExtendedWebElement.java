@@ -391,7 +391,9 @@ public class ExtendedWebElement implements IWebElement {
                 LOGGER.debug("refindElement: searchContext is null for " + getNameWithLocator());
                 element = getDriver().findElement(by);
             }
-        } catch (StaleElementReferenceException | InvalidElementStateException | JsonException e) {
+        } catch (WebDriverException e) {
+            //already including 'StaleElementReferenceException | InvalidElementStateException | JsonException'
+            CommonUtils.pause(0.3);
             LOGGER.debug("catched exception: ", e);
             // use available driver to research again...
             // TODO: handle case with rootBy to be able to refind also lists etc
@@ -402,10 +404,6 @@ public class ExtendedWebElement implements IWebElement {
                 LOGGER.debug("refindElement: searchContext is null for " + getNameWithLocator());
                 element = getDriver().findElement(by);
             }
-        } catch (WebDriverException e) {
-            LOGGER.debug("refindElement catched WebDriverException: '" + e.getMessage() + "'", e);
-            // that's should fix use case when we switch between tabs and corrupt searchContext (mostly for Appium for mobile)
-            element = getDriver().findElement(by);
         }
         return element;
     }
