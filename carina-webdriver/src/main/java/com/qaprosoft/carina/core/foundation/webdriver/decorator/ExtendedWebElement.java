@@ -404,37 +404,8 @@ public class ExtendedWebElement implements IWebElement {
             }
         } catch (WebDriverException e) {
             LOGGER.debug("refindElement catched WebDriverException: '" + e.getMessage() + "'", e);
-            
-            //below try/catch mostly to handle org.openqa.selenium.WebDriverException: Driver connection refused
-            NoSuchElementException exception = null;
-            try {
-                element = getDriver().findElement(by);
-            } catch (NoSuchElementException ex) {
-                exception = ex;
-                
-                //TODO: on iOS findElement return nothing but findElements return valid single item
-                // maybe migrate to the latest appium java driver
-                List<WebElement> elements = null;
-                
-                elements = getDriver().findElements(by);
-                if (!elements.isEmpty()) {
-                    exception = null;
-                    element = elements.get(0);
-                } else {
-                    // If no luck throw general NoSuchElementException
-                    throw exception != null ? exception : new NoSuchElementException("Unable to find element using by: " + by.toString());
-                }
-                
-                // hide below debug message as it is to often displayed in logs due to the fluent waits etc
-                //LOGGER.debug("Unable to find element: " + e.getMessage());
-            }
-            
-            if (isMobile()) {
-                // that's should fix use case when we switch between tabs and corrupt searchContext (mostly for Appium for mobile)
-                element = getDriver().findElement(by);
-            } else {
-                throw e;
-            }
+            // that's should fix use case when we switch between tabs and corrupt searchContext (mostly for Appium for mobile)
+            element = getDriver().findElement(by);
         }
         return element;
     }
