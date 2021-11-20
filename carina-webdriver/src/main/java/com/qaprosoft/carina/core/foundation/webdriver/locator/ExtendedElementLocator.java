@@ -72,7 +72,7 @@ public class ExtendedElementLocator implements ElementLocator {
         if (field.isAnnotationPresent(FindBy.class) || field.isAnnotationPresent(ExtendedFindBy.class)) {
             LocalizedAnnotations annotations = new LocalizedAnnotations(field);
             this.by = annotations.buildBy();
-            if (field.isAnnotationPresent(DisableCacheLookup.class) || !Configuration.getBoolean(Parameter.CACHE_LOOKUP)) {
+            if (field.isAnnotationPresent(DisableCacheLookup.class) || Configuration.getBoolean(Parameter.DISABLE_CACHE_LOOKUP)) {
                 this.shouldCache = false;
             }
             if (field.isAnnotationPresent(CaseInsensitiveXPath.class)) {

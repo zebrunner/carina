@@ -152,7 +152,7 @@ public class Configuration {
         
         PAGE_OPENING_STRATEGY("page_opening_strategy"),
         
-        CACHE_LOOKUP("cache_lookup"),
+        DISABLE_CACHE_LOOKUP("disable_cache_lookup"),
 
         // Amazon
         S3_BUCKET_NAME("s3_bucket_name"),
