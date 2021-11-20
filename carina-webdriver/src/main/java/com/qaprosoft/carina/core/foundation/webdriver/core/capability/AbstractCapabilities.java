@@ -88,7 +88,7 @@ public abstract class AbstractCapabilities {
             }
         }
         capabilities.setCapability("carinaTestRunId", SpecialKeywords.TEST_RUN_ID);
-        capabilities.setCapability("zebrunnerTestSessionId ", java.util.UUID.randomUUID().toString());
+        capabilities.setCapability("fallbackSessionId", java.util.UUID.randomUUID().toString());
         
         //TODO: [VD] reorganize in the same way Firefox profiles args/options if any and review other browsers
         // support customization for Chrome args and options
