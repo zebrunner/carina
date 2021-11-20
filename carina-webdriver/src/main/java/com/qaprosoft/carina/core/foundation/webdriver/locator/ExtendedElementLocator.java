@@ -117,8 +117,8 @@ public class ExtendedElementLocator implements ElementLocator {
                 //LOGGER.debug("Unable to find element: " + e.getMessage());
             } catch (WebDriverException e) {
                 if (e.getMessage() != null && e.getMessage().contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED)) {
-                    CommonUtils.pause(0.1);
-                    element = searchContext.findElement(by);    
+                    CommonUtils.pause(0.3);
+                    element = searchContext.findElement(by);
                 } else {
                     throw e;
                 }
@@ -151,7 +151,7 @@ public class ExtendedElementLocator implements ElementLocator {
             // mostly to handle org.openqa.selenium.WebDriverException: Driver connection refused
             // TODO: test if we need explicit if to avoid double call for every WebDriverException
             if (e.getMessage() != null && e.getMessage().contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED)) {
-                CommonUtils.pause(0.1);
+                CommonUtils.pause(0.3);
                 elements = searchContext.findElements(by);  
             } else {
                 throw e;

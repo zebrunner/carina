@@ -1406,7 +1406,7 @@ public class ExtendedWebElement implements IWebElement {
 			output = overrideAction(actionName, inputArgs);
 		} catch (WebDriverException e) {
             if (e.getMessage() != null && e.getMessage().contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED)) {
-                CommonUtils.pause(0.1);
+                CommonUtils.pause(0.3);
                 output = overrideAction(actionName, inputArgs);
             } else {
                 // TODO: move to error for snapshot build to detect different negative use-case and move to debug for released versions!
