@@ -1399,23 +1399,28 @@ public class ExtendedWebElement implements IWebElement {
 			element = getCachedElement();
 			output = overrideAction(actionName, inputArgs);
 		} catch (StaleElementReferenceException | InvalidElementStateException | ClassCastException e) {
-			//sometime Appiuminstead printing valid StaleElementException generate java.lang.ClassCastException: com.google.common.collect.Maps$TransformedEntriesMap cannot be cast to java.lang.String
+			//sometime Appium instead printing valid StaleElementException generate java.lang.ClassCastException: com.google.common.collect.Maps$TransformedEntriesMap cannot be cast to java.lang.String
 			LOGGER.debug("catched StaleElementReferenceException: ", e);
 			// try to find again using driver
 			element = refindElement();
 			output = overrideAction(actionName, inputArgs);
 		} catch (WebDriverException e) {
-			// TODO: move to error for snapshot build to detect different negative use-cse and move to debug for released versions!
-			LOGGER.debug("doAction catched WebDriverException!", e);
-			// try to find again using driver
-			try {
-				element = refindElement();
-			} catch (NoSuchElementException | JsonException ex) {
-				//no sense to repeat action if refind element didn't help
-				// JsonException is captured to handle "Unable to determine type from: <. Last 1 characters read" use-case
-				throw new NoSuchElementException("Unable to detect element: " + getNameWithLocator(), ex);
-			}
-			output = overrideAction(actionName, inputArgs);
+            if (e.getMessage() != null && e.getMessage().contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED)) {
+                CommonUtils.pause(0.1);
+                output = overrideAction(actionName, inputArgs);
+            } else {
+                // TODO: move to error for snapshot build to detect different negative use-case and move to debug for released versions!
+                LOGGER.debug("doAction catched WebDriverException!", e);
+                // try to find again using driver
+                try {
+                    element = refindElement();
+                } catch (NoSuchElementException | JsonException ex) { //TODO: try to exclude JsonException as we don't use ggr under huge load anymore
+                    // no sense to repeat action if refind element didn't help
+                    // JsonException is captured to handle "Unable to determine type from: <. Last 1 characters read" use-case
+                    throw new NoSuchElementException("Unable to detect element: " + getNameWithLocator(), ex);
+                }
+                output = overrideAction(actionName, inputArgs);
+            }
 		} catch (Throwable e) {
 		    LOGGER.error(e.getMessage());
 			// print stack trace temporary to be able to handle any problem without extra debugging 

@@ -32,6 +32,7 @@ import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
@@ -58,8 +59,6 @@ public class ExtendedElementLocator implements ElementLocator {
     private boolean caseInsensitive = false;
     private boolean localized = false;
     
-    private final static String DRIVER_CONNECTION_REFUSED = "Driver connection refused";
-
     /**
      * Creates a new element locator.
      * 
@@ -117,7 +116,7 @@ public class ExtendedElementLocator implements ElementLocator {
                 // hide below debug message as it is to often displayed in logs due to the fluent waits etc
                 //LOGGER.debug("Unable to find element: " + e.getMessage());
             } catch (WebDriverException e) {
-                if (e.getMessage() != null && e.getMessage().contains(DRIVER_CONNECTION_REFUSED)) {
+                if (e.getMessage() != null && e.getMessage().contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED)) {
                     CommonUtils.pause(0.1);
                     element = searchContext.findElement(by);    
                 } else {
@@ -151,7 +150,7 @@ public class ExtendedElementLocator implements ElementLocator {
         } catch (WebDriverException e) {
             // mostly to handle org.openqa.selenium.WebDriverException: Driver connection refused
             // TODO: test if we need explicit if to avoid double call for every WebDriverException
-            if (e.getMessage() != null && e.getMessage().contains(DRIVER_CONNECTION_REFUSED)) {
+            if (e.getMessage() != null && e.getMessage().contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED)) {
                 CommonUtils.pause(0.1);
                 elements = searchContext.findElements(by);  
             } else {
