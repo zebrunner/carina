@@ -88,10 +88,11 @@ public abstract class AbstractCapabilities {
                     if ("enableVNC".equalsIgnoreCase(cap) ||
                             "enableVideo".equalsIgnoreCase(cap) ||
                             "enableLog".equalsIgnoreCase(cap) ||
-                            "enableMetadata".equalsIgnoreCase(cap) ||
-                            "provider".equalsIgnoreCase(cap)) {
+                            "enableMetadata".equalsIgnoreCase(cap)) {
                         LOGGER.debug("Adding " + cap + " to capabilities as zebrunner options");
-                        zbrCaps.put(cap, value);                        
+                        zbrCaps.put(cap, Boolean.parseBoolean(value));
+                    } else if ("provider".equalsIgnoreCase(cap)) {
+                        zbrCaps.put(cap, value);
                     } else if ("idleTimeout".equalsIgnoreCase(cap) && isNumber(value)) {
                         LOGGER.debug("Adding idleTimeout to capabilities as integer");
                         capabilities.setCapability(cap, Integer.parseInt(value));
