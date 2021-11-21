@@ -74,7 +74,6 @@ public abstract class AbstractCapabilities {
          * enableVideo, fallbackSessionId, provider]
          */
         Map<String, Object> zbrCaps = new HashMap<>();
-        zbrCaps.put("carinaTestRunId", SpecialKeywords.TEST_RUN_ID);
         zbrCaps.put("fallbackSessionId", this.fallbackSessionId);
 
         
@@ -91,10 +90,10 @@ public abstract class AbstractCapabilities {
                             "enableLog".equalsIgnoreCase(cap) ||
                             "enableMetadata".equalsIgnoreCase(cap) ||
                             "provider".equalsIgnoreCase(cap)) {
-                        LOGGER.debug("Adding " + entry + " to capabilities as zebrunner options");
+                        LOGGER.debug("Adding " + cap + " to capabilities as zebrunner options");
                         zbrCaps.put(cap, value);                        
                     } else if ("idleTimeout".equalsIgnoreCase(cap) && isNumber(value)) {
-                        LOGGER.debug("Adding " + entry + " to capabilities as integer");
+                        LOGGER.debug("Adding idleTimeout to capabilities as integer");
                         capabilities.setCapability(cap, Integer.parseInt(value));
                     } else if ("false".equalsIgnoreCase(value)) {
                         capabilities.setCapability(cap, false);
@@ -107,7 +106,13 @@ public abstract class AbstractCapabilities {
             }
         }
 
-        capabilities.setCapability("zebrunner:options", zbrCaps);
+        String provider = !R.CONFIG.get("capabilities.provider").isEmpty() ? R.CONFIG.get("capabilities.provider") : "zebrunner";
+        if ("selenium".equalsIgnoreCase(provider)) {
+            // selenium is default provider name in Zebrunner CE
+            provider = "selenoid";
+        }
+        String optionName = provider + ":options";
+        capabilities.setCapability(optionName, zbrCaps);
         
         //TODO: [VD] reorganize in the same way Firefox profiles args/options if any and review other browsers
         // support customization for Chrome args and options
