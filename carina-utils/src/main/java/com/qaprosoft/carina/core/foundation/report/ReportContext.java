@@ -462,16 +462,12 @@ public class ReportContext {
     }
 
     public static synchronized File createTestDir() {
-        return createTestDir(StringUtils.EMPTY);
+        return createTestDir(UUID.randomUUID().toString());
     }
 
     public static synchronized File createTestDir(String dirName) {
         File testDir;
-        String uniqueDirName = UUID.randomUUID().toString();
-        if (StringUtils.isNoneBlank(dirName)) {
-            uniqueDirName = dirName;
-        }
-        String directory = String.format("%s/%s", getBaseDir(), uniqueDirName);
+        String directory = String.format("%s/%s", getBaseDir(), dirName);
 
         testDir = new File(directory);
 
