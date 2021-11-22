@@ -92,8 +92,8 @@ public class ReportContext {
 
     private static long rootID;
 
-    private static final ThreadLocal<File> testDirectory = new ThreadLocal<File>();
-    private static final ThreadLocal<Boolean> isCustomTestDirName = new ThreadLocal<Boolean>();
+    private static final ThreadLocal<File> testDirectory = new InheritableThreadLocal<>();
+    private static final ThreadLocal<Boolean> isCustomTestDirName = new InheritableThreadLocal<Boolean>();
 
     private static final ExecutorService executor = Executors.newCachedThreadPool();
 
@@ -429,20 +429,8 @@ public class ReportContext {
     public static File getTestDir(String dirName) {
         File testDir = testDirectory.get();
         if (testDir == null) {
-            String uniqueDirName = UUID.randomUUID().toString();
-            if (StringUtils.isNoneBlank(dirName)) {
-                uniqueDirName = dirName;
-            }
-            String directory = String.format("%s/%s", getBaseDir(), uniqueDirName);
-
-            testDir = new File(directory);
-
-            if (!testDir.mkdirs()) {
-                throw new RuntimeException("Test Folder(s) not created: " + testDir.getAbsolutePath());
-            }
+            testDir = createTestDir(dirName);
         }
-
-        testDirectory.set(testDir);
         return testDir;
     }
 
@@ -471,6 +459,27 @@ public class ReportContext {
         testDirectory.remove();
         isCustomTestDirName.set(Boolean.FALSE);
         closeThreadLogAppender();
+    }
+
+    public static synchronized File createTestDir() {
+        return createTestDir(StringUtils.EMPTY);
+    }
+
+    public static synchronized File createTestDir(String dirName) {
+        File testDir;
+        String uniqueDirName = UUID.randomUUID().toString();
+        if (StringUtils.isNoneBlank(dirName)) {
+            uniqueDirName = dirName;
+        }
+        String directory = String.format("%s/%s", getBaseDir(), uniqueDirName);
+
+        testDir = new File(directory);
+
+        if (!testDir.mkdirs()) {
+            throw new RuntimeException("Test Folder(s) not created: " + testDir.getAbsolutePath());
+        }
+        testDirectory.set(testDir);
+        return testDir;
     }
 
     private static void closeThreadLogAppender() {

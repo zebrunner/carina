@@ -35,6 +35,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 public class ThreadLogAppender extends AppenderSkeleton {
     // single buffer for each thread test.log file
     private final ThreadLocal<BufferedWriter> testLogBuffer = new ThreadLocal<BufferedWriter>();
+    private ThreadLocal<File> currentTestDirectory = new ThreadLocal<>();
     private final String MAX_LOG_FILE_SIZE = "1024";
     private long bytesWritten;
     @Override
@@ -50,9 +51,16 @@ public class ThreadLogAppender extends AppenderSkeleton {
         try {
 
             BufferedWriter fw = testLogBuffer.get();
+
+            // check does writer log to the correct test directory, if not - reinit it
+            if(currentTestDirectory.get() != ReportContext.getTestDir()){
+                fw = null;
+            }
+
             if (fw == null) {
                 // 1st request to log something for this thread/test
                 File testLogFile = new File(ReportContext.getTestDir() + "/test.log");
+                currentTestDirectory.set(ReportContext.getTestDir());
                 if (!testLogFile.exists()){
                     testLogFile.createNewFile();
                     bytesWritten = 0;
