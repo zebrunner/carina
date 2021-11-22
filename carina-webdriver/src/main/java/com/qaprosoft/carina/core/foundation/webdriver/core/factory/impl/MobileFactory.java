@@ -34,7 +34,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidElement;
@@ -83,13 +82,11 @@ public class MobileFactory extends AbstractFactory {
         LOGGER.debug("capabilities: " + capabilities);
 
         try {
-            EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
-            
             if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
-                driver = new AndroidDriver<AndroidElement>(ce, capabilities);
+                driver = new AndroidDriver<AndroidElement>(new URL(seleniumHost), capabilities);
             } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.IOS)
                     || mobilePlatformName.equalsIgnoreCase(SpecialKeywords.TVOS)) {
-                driver = new IOSDriver<IOSElement>(ce, capabilities);
+                driver = new IOSDriver<IOSElement>(new URL(seleniumHost), capabilities);
             } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.CUSTOM)) {
                 // that's a case for custom mobile capabilities like browserstack or saucelabs
                 driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);

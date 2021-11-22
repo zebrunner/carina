@@ -21,7 +21,6 @@ package com.qaprosoft.carina.core.foundation.commons;
  * @author Alex Khursevich
  */
 public class SpecialKeywords {
-    public static final String TEST_RUN_ID = java.util.UUID.randomUUID().toString();
     public static final String IGNORE = "$ignore";
     public static final String GENERATE = "\\{generate:\\d*\\}";
     public static final String GENERATE_UUID = "\\{generate_uuid\\}";
@@ -121,6 +120,9 @@ public class SpecialKeywords {
 
     public static final String TEST_PRIORITY_TAG = "priority";
     public static final String TEST_FEATURE_TAG = "feature";
+    
+    
+    public final static String DRIVER_CONNECTION_REFUSED = "Driver connection refused";
     
     // ------------- CARINA CRYPTO DEFAULT PROPERTIES -----------------
     public static final String CRYPTO_ALGORITHM = "AES/ECB/PKCS5Padding";

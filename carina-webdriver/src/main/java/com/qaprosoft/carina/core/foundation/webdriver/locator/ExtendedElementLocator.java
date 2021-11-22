@@ -32,6 +32,10 @@ import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.DisableCacheLookup;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Localized;
@@ -54,7 +58,7 @@ public class ExtendedElementLocator implements ElementLocator {
     private boolean shouldCache = true;
     private boolean caseInsensitive = false;
     private boolean localized = false;
-
+    
     /**
      * Creates a new element locator.
      * 
@@ -70,7 +74,7 @@ public class ExtendedElementLocator implements ElementLocator {
         if (field.isAnnotationPresent(FindBy.class) || field.isAnnotationPresent(ExtendedFindBy.class)) {
             LocalizedAnnotations annotations = new LocalizedAnnotations(field);
             this.by = annotations.buildBy();
-            if (field.isAnnotationPresent(DisableCacheLookup.class)) {
+            if (field.isAnnotationPresent(DisableCacheLookup.class) || Configuration.getBoolean(Parameter.DISABLE_CACHE_LOOKUP)) {
                 this.shouldCache = false;
             }
             if (field.isAnnotationPresent(CaseInsensitiveXPath.class)) {
@@ -111,6 +115,13 @@ public class ExtendedElementLocator implements ElementLocator {
                 }
                 // hide below debug message as it is to often displayed in logs due to the fluent waits etc
                 //LOGGER.debug("Unable to find element: " + e.getMessage());
+            } catch (WebDriverException e) {
+                if (e.getMessage() != null && e.getMessage().contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED)) {
+                    CommonUtils.pause(0.3);
+                    element = searchContext.findElement(by);
+                } else {
+                    throw e;
+                }
             }
         }
         
@@ -139,14 +150,17 @@ public class ExtendedElementLocator implements ElementLocator {
         } catch (WebDriverException e) {
             // mostly to handle org.openqa.selenium.WebDriverException: Driver connection refused
             // TODO: test if we need explicit if to avoid double call for every WebDriverException
-            elements = searchContext.findElements(by);
+            if (e.getMessage() != null && e.getMessage().contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED)) {
+                CommonUtils.pause(0.3);
+                elements = searchContext.findElements(by);  
+            } else {
+                throw e;
+            }
         }
 
-        //TODO: incorporate find by AI???
-        
         // If no luck throw general NoSuchElementException
         if (elements == null) {
-            throw new NoSuchElementException("Unable to find elements by Selenium");
+            throw new NoSuchElementException("Unable to find elements");
         }
 
         // we can't enable cache for lists by default as we can't handle/catch list.get(index).action(). And for all dynamic lists
