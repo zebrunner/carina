@@ -238,7 +238,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
          * </suite-files>
          */
         
-        if (this.isRunLabelsRegistered) {
+        if (!this.isRunLabelsRegistered) {
             attachTestRunLabels(suite);
             this.isRunLabelsRegistered = true;
         }
