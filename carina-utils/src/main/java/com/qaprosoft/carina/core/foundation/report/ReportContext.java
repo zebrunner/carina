@@ -470,10 +470,13 @@ public class ReportContext {
         String directory = String.format("%s/%s", getBaseDir(), dirName);
 
         testDir = new File(directory);
-
-        if (!testDir.mkdirs()) {
-            throw new RuntimeException("Test Folder(s) not created: " + testDir.getAbsolutePath());
+        if (!testDir.exists()) {
+            testDir.mkdirs();
+            if (!testDir.exists()) {
+                throw new RuntimeException("Test Folder(s) not created: " + testDir.getAbsolutePath());
+            }
         }
+        
         testDirectory.set(testDir);
         return testDir;
     }
