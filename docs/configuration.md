@@ -439,7 +439,7 @@ Will work both:
    selenium_url=http://localhost:4444/wd/hub
 2) passing them right in the test:
 public void testCompareModels() {
-   R.CONFIG.put("selenium_host", "http://localhost:4444/wd/hub");
+   R.CONFIG.put("selenium_url", "http://localhost:4444/wd/hub");
    HomePage homePage = new HomePage(getDriver());
    homePage.open();
    ...
