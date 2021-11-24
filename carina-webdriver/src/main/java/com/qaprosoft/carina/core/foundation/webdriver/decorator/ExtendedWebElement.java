@@ -124,6 +124,13 @@ public class ExtendedWebElement implements IWebElement {
     	this.driver = driver;
     }
     
+    public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext) {
+        this.by = by;
+        this.name = name;
+        this.driver = driver;
+        this.searchContext = searchContext;
+    }
+    
     public ExtendedWebElement(WebElement element, String name) {
     	this.name = name;
         this.element = element;
@@ -257,12 +264,6 @@ public class ExtendedWebElement implements IWebElement {
 			    LOGGER.warn("this.searchContext is null!", thr);
 			}
     	}
-    }
-
-    public ExtendedWebElement(By by, String name, SearchContext searchContext) {
-        this.by = by;
-        this.name = name;
-        this.searchContext = searchContext;
     }
 
     public WebElement getElement() {
@@ -1168,7 +1169,7 @@ public class ExtendedWebElement implements IWebElement {
             by = MobileBy.AndroidUIAutomator(String.format(StringUtils.remove(locator, "By.AndroidUIAutomator: "), objects));
             LOGGER.debug("Formatted locator is : " + by.toString());
         }
-        return new ExtendedWebElement(by, name, this.searchContext);
+        return new ExtendedWebElement(by, name, this.driver, this.searchContext);
     }
 
 
