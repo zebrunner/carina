@@ -307,11 +307,6 @@ All the project configuration properties are located in a **_config.properties**
 		<td>Determines how carina detects whether expected page is opened: by expected url pattern, by marker element loading state or by both these conditions</td>
 		<td>BY_ELEMENT, BY_URL, BY_URL_AND_ELEMENT</td>
 	</tr>
-	<tr>
-		<td>disable_cache_lookup</td>
-		<td>Be able to disable globally elements caching techniques. It might be useful for application written in Google Web Toolkit</td>
-		<td>true, false</td>
-	</tr>
 
 </table>
 Most of the properties may be read in the following way:

@@ -32,10 +32,7 @@ import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.DisableCacheLookup;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Localized;
 
 /**
@@ -50,10 +47,8 @@ public class ExtendedElementLocator implements ElementLocator {
 
     private final SearchContext searchContext;
     private By by;
-    private WebElement cachedElement;
     private String className;
     
-    private boolean shouldCache = true;
     private boolean caseInsensitive = false;
     private boolean localized = false;
     
@@ -72,9 +67,6 @@ public class ExtendedElementLocator implements ElementLocator {
         if (field.isAnnotationPresent(FindBy.class) || field.isAnnotationPresent(ExtendedFindBy.class)) {
             LocalizedAnnotations annotations = new LocalizedAnnotations(field);
             this.by = annotations.buildBy();
-            if (field.isAnnotationPresent(DisableCacheLookup.class) || Configuration.getBoolean(Parameter.DISABLE_CACHE_LOOKUP)) {
-                this.shouldCache = false;
-            }
             if (field.isAnnotationPresent(CaseInsensitiveXPath.class)) {
                 this.caseInsensitive = true;
             }
@@ -88,10 +80,6 @@ public class ExtendedElementLocator implements ElementLocator {
      * Find the element.
      */
     public WebElement findElement() {
-        if (cachedElement != null && shouldCache) {
-            return cachedElement;
-        }
-
         WebElement element = null;
         List<WebElement> elements = null;
         NoSuchElementException exception = null;
@@ -123,10 +111,6 @@ public class ExtendedElementLocator implements ElementLocator {
             throw exception != null ? exception : new NoSuchElementException("Unable to find element");
         }
         
-        // 1. enable cache for successfully discovered element to minimize selenium calls
-        if (shouldCache) {
-            cachedElement = element;
-        }
         return element;
     }
 
@@ -195,10 +179,6 @@ public class ExtendedElementLocator implements ElementLocator {
         return By.xpath(sb.toString());
     }
 
-    public void setShouldCache(boolean shouldCache) {
-        this.shouldCache = shouldCache;
-    }
-    
     public boolean isLocalized() {
         return localized;
     }
