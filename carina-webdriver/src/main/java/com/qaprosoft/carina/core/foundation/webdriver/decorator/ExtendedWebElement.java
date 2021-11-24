@@ -363,8 +363,13 @@ public class ExtendedWebElement implements IWebElement {
             // TODO: use-case when format method is used. Need investigate howto init context in this case as well
             element = searchContext.findElement(by);
         } else {
-            //TODO: temporary changes log level from debug to error. better to return back before release!
-            LOGGER.error("refindElement: searchContext is null for " + getNameWithLocator());
+            try {
+                throw new RuntimeException("this.searchContext is null!");
+            } catch (Throwable thr) {
+                LOGGER.warn("this.searchContext is null!", thr);
+            }
+            //TODO: temporary commented while try/catch above is available
+            //LOGGER.debug("findElement: searchContext is null for " + getNameWithLocator());
             element = getDriver().findElement(by);
         }
         return element;
