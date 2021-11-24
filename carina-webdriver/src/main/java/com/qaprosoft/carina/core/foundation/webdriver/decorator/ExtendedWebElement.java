@@ -259,6 +259,12 @@ public class ExtendedWebElement implements IWebElement {
     	}
     }
 
+    public ExtendedWebElement(By by, String name, SearchContext searchContext) {
+        this.by = by;
+        this.name = name;
+        this.searchContext = searchContext;
+    }
+
     public WebElement getElement() {
         if (this.element == null) {
             this.element = findElement();
@@ -1162,7 +1168,7 @@ public class ExtendedWebElement implements IWebElement {
             by = MobileBy.AndroidUIAutomator(String.format(StringUtils.remove(locator, "By.AndroidUIAutomator: "), objects));
             LOGGER.debug("Formatted locator is : " + by.toString());
         }
-        return new ExtendedWebElement(by, name, getDriver());
+        return new ExtendedWebElement(by, name, this.searchContext);
     }
 
 
