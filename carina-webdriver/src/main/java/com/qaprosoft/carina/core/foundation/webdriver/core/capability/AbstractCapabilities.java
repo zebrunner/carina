@@ -91,6 +91,9 @@ public abstract class AbstractCapabilities {
                             "enableMetadata".equalsIgnoreCase(cap)) {
                         LOGGER.debug("Adding " + cap + " to capabilities as zebrunner options");
                         zbrCaps.put(cap, Boolean.parseBoolean(value));
+                        
+                        //TODO: remove later as temporary restored to see video recording(s)
+                        capabilities.setCapability(cap, Boolean.parseBoolean(value));
                     } else if ("provider".equalsIgnoreCase(cap)) {
                         zbrCaps.put(cap, value);
                     } else if ("idleTimeout".equalsIgnoreCase(cap) && isNumber(value)) {
