@@ -16,11 +16,14 @@
 package com.qaprosoft.carina.core.foundation.webdriver.listener;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.net.URL;
 
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
@@ -29,6 +32,7 @@ import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
  * EventFiringSeleniumCommandExecutor triggers event listener before/after execution of the command.
  */
 public class CarinaCommandExecutor extends HttpCommandExecutor {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     
     public CarinaCommandExecutor(URL addressOfRemoteServer) {
         super(addressOfRemoteServer);
@@ -48,6 +52,7 @@ public class CarinaCommandExecutor extends HttpCommandExecutor {
                 String msg = e.getMessage();
                 if (msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED)
                         || msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED2)) {
+                    LOGGER.warn("Enabled command executor retries: " + msg);
                     CommonUtils.pause(pause);
                 } else {
                     throw e;
