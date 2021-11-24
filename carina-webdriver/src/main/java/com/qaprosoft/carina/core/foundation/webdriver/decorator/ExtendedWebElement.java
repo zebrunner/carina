@@ -31,7 +31,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
@@ -46,7 +45,6 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Locatable;
-import org.openqa.selenium.json.JsonException;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
@@ -1416,28 +1414,11 @@ public class ExtendedWebElement implements IWebElement {
 		Object output = executeAction(actionName, new ActionSteps() {
 			@Override
 			public void doClick() {
-				try {
-					DriverListener.setMessages(Messager.ELEMENT_CLICKED.getMessage(getName()),
-							Messager.ELEMENT_NOT_CLICKED.getMessage(getNameWithLocator()));
+                DriverListener.setMessages(Messager.ELEMENT_CLICKED.getMessage(getName()),
+                        Messager.ELEMENT_NOT_CLICKED.getMessage(getNameWithLocator()));
 
-                    try {
-                        element.click();
-                    } catch (ElementNotInteractableException e) { //TODO: investigate if more exceptions should be catched
-                        // not visible so we can't interact using selenium or actions
-                        LOGGER.warn("Trying to do click by JavascriptExecutor because element '" + getNameWithLocator()
-                                + "' is not visible...");
-                        JavascriptExecutor executor = (JavascriptExecutor) getDriver();
-                        executor.executeScript("arguments[0].click();", element);
-                    }
-				} catch (WebDriverException e) {
-					if (e != null && (e.getMessage().contains("Other element would receive the click:"))) {
-						LOGGER.warn("Trying to do click by Actions due to the: " + e.getMessage());
-						Actions actions = new Actions(getDriver());
-						actions.moveToElement(element).click().perform();
-					} else {
-						throw e;
-					}
-				}
+                element.click();
+
 			}
 			
 			@Override
