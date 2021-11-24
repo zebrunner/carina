@@ -26,6 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 
 /**
@@ -41,10 +43,10 @@ public class CarinaCommandExecutor extends HttpCommandExecutor {
     @Override
     public Response execute(Command command) throws IOException {
         Response response = null;
-        int i = 10; //max attempts to repeit
         boolean isContinue = true;
-        Number pause = 0.3;
-        while (--i > 0 && isContinue) {
+        int retry = 10; //max attempts to repeit
+        Number pause = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / retry;
+        while (--retry > 0 && isContinue) {
             try {
                 response = super.execute(command);
                 isContinue = false;
