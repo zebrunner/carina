@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
 
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.Response;
@@ -50,7 +51,7 @@ public class CarinaCommandExecutor extends HttpCommandExecutor {
             try {
                 response = super.execute(command);
                 isContinue = false;
-            } catch (Exception e) {
+            } catch (WebDriverException e) {
                 String msg = e.getMessage();
                 if (msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED)
                         || msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED2)) {
