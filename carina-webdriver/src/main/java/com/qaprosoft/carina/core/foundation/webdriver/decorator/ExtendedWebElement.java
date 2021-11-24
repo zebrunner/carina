@@ -361,6 +361,7 @@ public class ExtendedWebElement implements IWebElement {
         // Ideal solution should init searchContext everytime so we can remove getDriver usage from this method and class overall!
         if (searchContext != null) {
             // TODO: use-case when format method is used. Need investigate howto init context in this case as well
+            // https://github.com/zebrunner/carina/issues/1536 searchContext is null for ExtendedWebElement which use format method
             element = searchContext.findElement(by);
         } else {
             try {
