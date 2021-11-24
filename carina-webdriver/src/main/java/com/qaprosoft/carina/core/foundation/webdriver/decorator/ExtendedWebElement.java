@@ -1390,7 +1390,6 @@ public class ExtendedWebElement implements IWebElement {
         }
 
 		Object output = null;
-		// captureElements();
 
 		//handle invalid element state: Element is not currently interactable and may not be manipulated
 		try {
@@ -1402,27 +1401,8 @@ public class ExtendedWebElement implements IWebElement {
 			// try to find again using driver
 			element = refindElement();
 			output = overrideAction(actionName, inputArgs);
-		} catch (WebDriverException e) {
-            if (e.getMessage() != null && e.getMessage().contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED)) {
-                CommonUtils.pause(0.3);
-                output = overrideAction(actionName, inputArgs);
-            } else {
-                // TODO: move to error for snapshot build to detect different negative use-case and move to debug for released versions!
-                LOGGER.debug("doAction catched WebDriverException!", e);
-                // try to find again using driver
-                try {
-                    element = refindElement();
-                } catch (NoSuchElementException | JsonException ex) { //TODO: try to exclude JsonException as we don't use ggr under huge load anymore
-                    // no sense to repeat action if refind element didn't help
-                    // JsonException is captured to handle "Unable to determine type from: <. Last 1 characters read" use-case
-                    throw new NoSuchElementException("Unable to detect element: " + getNameWithLocator(), ex);
-                }
-                output = overrideAction(actionName, inputArgs);
-            }
 		} catch (Throwable e) {
 		    LOGGER.error(e.getMessage());
-			// print stack trace temporary to be able to handle any problem without extra debugging 
-			e.printStackTrace();
 			throw e;
 		} finally {
 		    // do nothing

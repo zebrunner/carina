@@ -121,9 +121,6 @@ public class SpecialKeywords {
     public static final String TEST_PRIORITY_TAG = "priority";
     public static final String TEST_FEATURE_TAG = "feature";
     
-    
-    public final static String DRIVER_CONNECTION_REFUSED = "Driver connection refused";
-    
     // ------------- CARINA CRYPTO DEFAULT PROPERTIES -----------------
     public static final String CRYPTO_ALGORITHM = "AES/ECB/PKCS5Padding";
     public static final String CRYPTO_KEY_TYPE = "AES";

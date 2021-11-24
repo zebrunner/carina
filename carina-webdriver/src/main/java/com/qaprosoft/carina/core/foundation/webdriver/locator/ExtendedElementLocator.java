@@ -32,10 +32,8 @@ import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.DisableCacheLookup;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Localized;
@@ -116,12 +114,7 @@ public class ExtendedElementLocator implements ElementLocator {
                 // hide below debug message as it is to often displayed in logs due to the fluent waits etc
                 //LOGGER.debug("Unable to find element: " + e.getMessage());
             } catch (WebDriverException e) {
-                if (e.getMessage() != null && e.getMessage().contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED)) {
-                    CommonUtils.pause(0.3);
-                    element = searchContext.findElement(by);
-                } else {
-                    throw e;
-                }
+                throw e;
             }
         }
         
@@ -148,14 +141,7 @@ public class ExtendedElementLocator implements ElementLocator {
         } catch (NoSuchElementException e) {
             LOGGER.debug("Unable to find elements: " + e.getMessage());
         } catch (WebDriverException e) {
-            // mostly to handle org.openqa.selenium.WebDriverException: Driver connection refused
-            // TODO: test if we need explicit if to avoid double call for every WebDriverException
-            if (e.getMessage() != null && e.getMessage().contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED)) {
-                CommonUtils.pause(0.3);
-                elements = searchContext.findElements(by);  
-            } else {
-                throw e;
-            }
+            throw e;
         }
 
         // If no luck throw general NoSuchElementException
