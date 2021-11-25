@@ -101,8 +101,6 @@ public class ExtendedElementLocator implements ElementLocator {
                 }
                 // hide below debug message as it is to often displayed in logs due to the fluent waits etc
                 //LOGGER.debug("Unable to find element: " + e.getMessage());
-            } catch (WebDriverException e) {
-                throw e;
             }
         }
         
@@ -124,8 +122,6 @@ public class ExtendedElementLocator implements ElementLocator {
             elements = searchContext.findElements(by);
         } catch (NoSuchElementException e) {
             LOGGER.debug("Unable to find elements: " + e.getMessage());
-        } catch (WebDriverException e) {
-            throw e;
         }
 
         // If no luck throw general NoSuchElementException
