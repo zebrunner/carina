@@ -406,6 +406,8 @@ public class Screenshot {
                 ImageIO.write(screen, "PNG", screenshot);
 
                 com.zebrunner.agent.core.registrar.Screenshot.upload(Files.readAllBytes(screenshot.toPath()), Instant.now().toEpochMilli());
+                
+                LOGGER.info(comment);
 
                 // add screenshot comment to collector
                 ReportContext.addScreenshotComment(screenName, comment);
