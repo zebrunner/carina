@@ -47,11 +47,12 @@ public class CarinaCommandExecutor extends HttpCommandExecutor {
         boolean isContinue = true;
         int retry = 10; //max attempts to repeit
         Number pause = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / retry;
-        while (--retry > 0 && isContinue) {
+        while (retry > 0 && isContinue) {
             try {
                 response = super.execute(command);
                 isContinue = false;
             } catch (WebDriverException e) {
+                e.printStackTrace();
                 String msg = e.getMessage();
                 if (msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED)
                         || msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED2)) {
@@ -60,6 +61,18 @@ public class CarinaCommandExecutor extends HttpCommandExecutor {
                 } else {
                     throw e;
                 }
+            } catch (Throwable e) {
+                e.printStackTrace();
+                String msg = e.getMessage();
+                if (msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED)
+                        || msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED2)) {
+                    LOGGER.warn("Enabled command executor retries: " + msg);
+                    CommonUtils.pause(pause);
+                } else {
+                    throw e;
+                }
+            } finally {
+                retry--;
             }
         }
 
