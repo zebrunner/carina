@@ -320,7 +320,7 @@ public class ExtendedWebElement implements IWebElement {
             timeout = 1;
         }
         boolean result;
-		originalException = null;
+		this.originalException = null;
 		
 		final WebDriver drv = getDriver();
 		
@@ -349,7 +349,7 @@ public class ExtendedWebElement implements IWebElement {
 			result = false;
 			originalException = e.getCause();
 		} catch (WebDriverException e) {
-            LOGGER.debug("waitUntil: WebDriverException: " + e.getMessage());
+            LOGGER.debug("waitUntil: WebDriverException: ", e);
             result = false;
             originalException = e.getCause();
 		}
@@ -1355,11 +1355,6 @@ public class ExtendedWebElement implements IWebElement {
 			// try to find again using driver
 			element = findElement();
 			output = overrideAction(actionName, inputArgs);
-		} catch (Throwable e) {
-		    LOGGER.error(e.getMessage());
-			throw e;
-		} finally {
-		    // do nothing
 		}
 
 		return output;

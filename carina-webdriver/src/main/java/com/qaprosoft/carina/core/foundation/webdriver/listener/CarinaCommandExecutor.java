@@ -52,17 +52,10 @@ public class CarinaCommandExecutor extends HttpCommandExecutor {
                 response = super.execute(command);
                 isContinue = false;
             } catch (WebDriverException e) {
+                //TODO: remove after debugging the issue
                 e.printStackTrace();
-                String msg = e.getMessage();
-                if (msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED)
-                        || msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED2)) {
-                    LOGGER.warn("Enabled command executor retries: " + msg);
-                    CommonUtils.pause(pause);
-                } else {
-                    throw e;
-                }
-            } catch (Throwable e) {
-                e.printStackTrace();
+                LOGGER.error("Temp CarinaCommandExecutor catched: ", e);
+                
                 String msg = e.getMessage();
                 if (msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED)
                         || msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED2)) {
