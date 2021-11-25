@@ -1034,7 +1034,7 @@ public class ExtendedWebElement implements IWebElement {
      */
     public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
         if (isPresent(by, timeout)) {
-            return new ExtendedWebElement(getElement().findElement(by), name, by);
+            return new ExtendedWebElement(by, name, this.driver, this.searchContext);
         } else {
         	throw new NoSuchElementException("Unable to find dynamic element using By: " + by.toString());
         }
@@ -1065,7 +1065,7 @@ public class ExtendedWebElement implements IWebElement {
             }
 
             // we can't initiate ExtendedWebElement using by as it belongs to the list of elements
-            extendedWebElements.add(new ExtendedWebElement(element, name, generateByForList(by, i)));
+            extendedWebElements.add(new ExtendedWebElement(generateByForList(by, i), name, this.driver, this.searchContext));
             i++;
         }
         return extendedWebElements;
