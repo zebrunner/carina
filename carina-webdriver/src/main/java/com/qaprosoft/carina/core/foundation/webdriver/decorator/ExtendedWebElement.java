@@ -314,53 +314,34 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout - timeout.
      * @return true if condition happen.
      */
-	private boolean waitUntil(ExpectedCondition<?> condition, long timeout) {
+    private boolean waitUntil(ExpectedCondition<?> condition, long timeout) {
         if (timeout <= 0) {
             LOGGER.error("Fluent wait with 0 and less timeout might hangs! Updating to 1 sec.");
             timeout = 1;
         }
-        boolean result;
-		this.originalException = null;
-		
-		final WebDriver drv = getDriver();
-		
-		Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME);
+        boolean result = false;
 
-		// [VD] Notes:
-		// StaleElementReferenceException is handled by selenium ExpectedConditions in many methods
-		// do not ignore TimeoutException or NoSuchSessionException otherwise you can wait for minutes instead of timeout!
-		
-		LOGGER.debug("waitUntil: starting... timeout: " + timeout);		
-		try {
-			wait.until(condition);
-			result = true;
-		} catch (NoSuchElementException e) {
-			// don't write exception even in debug mode
-		    // [VD] don't operate with condition.toString() etc as it might generate org.openqa.selenium.json.JsonException xpected to read a START_MAP but instead have: END. Last 0 characters read
-			LOGGER.debug("waitUntil: NoSuchElementException: " + e.getMessage());
-			result = false;
-			originalException = e;
-        } catch (NoSuchSessionException e) { 
-            LOGGER.debug("waitUntil: NoSuchSessionException: " + e.getMessage());
-            result = false;
-            originalException = e.getCause();			
-		} catch (TimeoutException e) { 
-			LOGGER.debug("waitUntil: TimeoutException: " + e.getMessage());
-			result = false;
-			originalException = e.getCause();
-		} catch (WebDriverException e) {
-            LOGGER.debug("waitUntil: WebDriverException: ", e);
-            result = false;
-            originalException = e.getCause();
-		}
-		catch (Exception e) {
-			LOGGER.error("waitUntil: undefined exception.", e);
-			result = false;
-			//TODO: e or e.getCause()?
-			originalException = e;
-		}
-		return result;
-	}
+        Wait<WebDriver> wait = new WebDriverWait(getDriver(), timeout, RETRY_TIME)
+                .ignoring(WebDriverException.class)
+                .ignoring(NoSuchSessionException.class)
+                .ignoring(NoSuchElementException.class);
+
+        // [VD] Notes:
+        // StaleElementReferenceException is handled by selenium ExpectedConditions in many methods
+        // do not ignore TimeoutException or NoSuchSessionException otherwise you can wait for minutes instead of timeout!
+
+        // [VD] note about NoSuchSessionException is pretty strange. Let's ignore here and return false only in case of
+        // TimeoutException putting details into the debug log message. All the rest shouldn't be ignored
+
+        LOGGER.debug("waitUntil: starting... timeout: " + timeout);
+        try {
+            wait.until(condition);
+            result = true;
+        } catch (TimeoutException e) {
+            LOGGER.debug("waitUntil: TimeoutException", e);
+        }
+        return result;
+    }
 
     private WebElement findElement() {
         // do not return without element initialization!
