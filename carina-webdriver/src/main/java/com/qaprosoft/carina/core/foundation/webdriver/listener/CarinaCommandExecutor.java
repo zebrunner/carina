@@ -49,7 +49,7 @@ public class CarinaCommandExecutor extends HttpCommandExecutor {
         while (retry > 0) {
             response = super.execute(command);
             if (response.getValue() instanceof WebDriverException) {
-                LOGGER.error("Temp CarinaCommandExecutor catched: " + response.getValue().toString());
+                LOGGER.debug("CarinaCommandExecutor catched: " + response.getValue().toString());
                 String msg = response.getValue().toString();
                 if (msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED)
                         || msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED2)) {
