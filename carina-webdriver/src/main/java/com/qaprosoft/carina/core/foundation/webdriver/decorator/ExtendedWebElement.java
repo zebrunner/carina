@@ -1327,7 +1327,7 @@ public class ExtendedWebElement implements IWebElement {
 		Object output = null;
 
 		try {
-			element = getElement();
+			this.element = getElement();
 			output = overrideAction(actionName, inputArgs);
 		} catch (StaleElementReferenceException | InvalidElementStateException | ClassCastException e) {
 		    //TODO: test removal of the exceptions catch in this place!
