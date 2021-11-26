@@ -407,7 +407,8 @@ public class Screenshot {
 
                 com.zebrunner.agent.core.registrar.Screenshot.upload(Files.readAllBytes(screenshot.toPath()), Instant.now().toEpochMilli());
                 
-                LOGGER.info(comment);
+                // [VD] do not print log message as it double lines in reporting 
+                // LOGGER.info(comment);
 
                 // add screenshot comment to collector
                 ReportContext.addScreenshotComment(screenName, comment);
