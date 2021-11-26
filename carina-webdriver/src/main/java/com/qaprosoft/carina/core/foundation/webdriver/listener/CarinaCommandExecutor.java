@@ -44,29 +44,23 @@ public class CarinaCommandExecutor extends HttpCommandExecutor {
     @Override
     public Response execute(Command command) throws IOException {
         Response response = null;
-        boolean isContinue = true;
         int retry = 10; //max attempts to repeit
         Number pause = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / retry;
-        while (retry > 0 && isContinue) {
-            try {
-                response = super.execute(command);
-                isContinue = false;
-            } catch (WebDriverException e) {
-                //TODO: remove after debugging the issue
-                e.printStackTrace();
-                LOGGER.error("Temp CarinaCommandExecutor catched: ", e);
-                
-                String msg = e.getMessage();
+        while (retry > 0) {
+            response = super.execute(command);
+            if (response.getValue() instanceof WebDriverException) {
+                LOGGER.error("Temp CarinaCommandExecutor catched: " + response.getValue().toString());
+                String msg = response.getValue().toString();
                 if (msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED)
                         || msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED2)) {
                     LOGGER.warn("Enabled command executor retries: " + msg);
                     CommonUtils.pause(pause);
-                } else {
-                    throw e;
                 }
-            } finally {
-                retry--;
+            } else {
+                // do nothing as response already contains all the information we need
+                break;
             }
+            retry--;
         }
 
         return response;
