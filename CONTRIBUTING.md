@@ -14,15 +14,19 @@ Exact build number can be found among check details:
 
 Update your project [pom.xml](https://github.com/zebrunner/carina-demo/blob/ea08927c722d5138a003cdb1f04b03363d89aeb7/pom.xml#L16), make sure to have [snapshot](https://github.com/zebrunner/carina-demo/blob/d23dd865567e8bafbdd3c925fa89374ae712b6bd/pom.xml#L26) repository enabled and test your changes. Add test results/comments into the Pull Request if possible.
 
-After review and merge we generate consolidated release candidate build increasing build number, for example after `7.2.13` release all merges will be built into the `7.2.14-SNAPSHOT`. We strongly recommend to do extra testing using this build to find possible regressions as fast as possible.
+After review and merge we generate consolidated release candidate build increasing build number, for example after `7.2.14` release all merges vome into the `7.2.15-SNAPSHOT`. We strongly recommend to do one more testing round using this build number.
 
-You will probably also want to have a look at this more in-depth [**Carina's Overview**](https://zebrunner.github.io/carina/) of the project,
+Release candidate build number also can be found on latest SHA1 commit details:
+![Alt text](https://github.com/zebrunner/carina/raw/master/docs/img/snapshot-build.png "Release Candidate")
+
+
+You will probably also want to have a look at this more in-depth [**Carina Overview**](https://zebrunner.github.io/carina/) of the project,
 how it is architected, how to use it etc.
 
 ### Help out on our community
 
 We can always use help on our forums at
-[Carina Support](https://t.me/qps_carina)! Hop on over and see if there
+[**Carina Support**](https://t.me/qps_carina)! Hop on over and see if there
 are any questions that you can answer.
 
 ### Submit bug reports or feature requests
