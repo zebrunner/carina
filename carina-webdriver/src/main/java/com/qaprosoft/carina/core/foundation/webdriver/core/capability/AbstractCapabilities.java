@@ -73,8 +73,8 @@ public abstract class AbstractCapabilities {
          * Caused by: java.lang.IllegalArgumentException: Illegal key values seen in w3c capabilities: [carinaTestRunId, enableLog, enableVNC,
          * enableVideo, fallbackSessionId, provider]
          */
-        Map<String, Object> zbrCaps = new HashMap<>();
-        zbrCaps.put("fallbackSessionId", this.fallbackSessionId);
+        Map<String, Object> providerCaps = new HashMap<>();
+        providerCaps.put("fallbackSessionId", this.fallbackSessionId);
 
         
         final String prefix = SpecialKeywords.CAPABILITIES + ".";
@@ -89,10 +89,17 @@ public abstract class AbstractCapabilities {
                             "enableVideo".equalsIgnoreCase(cap) ||
                             "enableLog".equalsIgnoreCase(cap) ||
                             "enableMetadata".equalsIgnoreCase(cap)) {
-                        LOGGER.debug("Adding " + cap + " to capabilities as zebrunner options");
-                        zbrCaps.put(cap, Boolean.parseBoolean(value));
+                        
+                        //TODO: restore regular non-w3c capability TEMPORARY to have access to the video in current MCloud version
+                        capabilities.setCapability(cap, Boolean.parseBoolean(value));
+                        
+                        LOGGER.debug("Adding " + cap + " to capabilities as provider options");
+                        providerCaps.put(cap, Boolean.parseBoolean(value));
                     } else if ("provider".equalsIgnoreCase(cap)) {
-                        zbrCaps.put(cap, value);
+                        //TODO: restore regular non-w3c capability TEMPORARY to have access to the video in current ESG version
+                        capabilities.setCapability(cap, value);
+                        
+                        providerCaps.put(cap, value);
                     } else if ("idleTimeout".equalsIgnoreCase(cap) && isNumber(value)) {
                         LOGGER.debug("Adding idleTimeout to capabilities as integer");
                         capabilities.setCapability(cap, Integer.parseInt(value));
@@ -113,7 +120,7 @@ public abstract class AbstractCapabilities {
             provider = "selenoid";
         }
         String optionName = provider + ":options";
-        capabilities.setCapability(optionName, zbrCaps);
+        capabilities.setCapability(optionName, providerCaps);
         
         //TODO: [VD] reorganize in the same way Firefox profiles args/options if any and review other browsers
         // support customization for Chrome args and options

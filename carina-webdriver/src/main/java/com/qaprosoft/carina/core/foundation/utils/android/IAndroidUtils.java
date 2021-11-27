@@ -894,7 +894,7 @@ public interface IAndroidUtils extends IMobileUtils {
             ((AppiumDriver<?>) castDriver()).executeScript(SHELL_INIT_DEEPLINK_CONSOLE, preparedCommand);
         } catch (WebDriverException wde) {
             // TODO: need to pay attention
-            UTILS_LOGGER.warn("org.openqa.selenium.WebDriverException is caught and ignored.");
+            UTILS_LOGGER.warn("org.openqa.selenium.WebDriverException is caught and ignored.", wde);
         }
     }
 

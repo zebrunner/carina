@@ -109,8 +109,6 @@ public class SpecialKeywords {
     public static final String FAILED = "FAILED";
     public static final String SKIPPED = "SKIPPED";
 
-    public static final String ZAFIRA_PROJECT = "zafira_project";
-
     public static final String COMMENT = "comment";
     
     public static final String ANDROID_START_NODE = "<android[\\w\\.]* ";
@@ -121,8 +119,10 @@ public class SpecialKeywords {
     public static final String TEST_PRIORITY_TAG = "priority";
     public static final String TEST_FEATURE_TAG = "feature";
     
-    
     public final static String DRIVER_CONNECTION_REFUSED = "Driver connection refused";
+    public final static String DRIVER_CONNECTION_REFUSED2 = "Expected to read a START_MAP but instead have: END. Last 0 characters read";
+    public final static String DRIVER_NO_SUCH_WINDOW = "no such window: window was already closed";
+
     
     // ------------- CARINA CRYPTO DEFAULT PROPERTIES -----------------
     public static final String CRYPTO_ALGORITHM = "AES/ECB/PKCS5Padding";
