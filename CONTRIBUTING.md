@@ -1,24 +1,30 @@
-# Contributing to carina
+# Contributing to Carina
 
-## Git configuration 
-1). **Fork repository** `https://github.com/zebrunner/carina` to your own user.
+There are a lot of different ways to contribute to Carina. See below for everything you can do and the processes to follow for each contribution method.
+Your contribution is governed by our [Code of Conduct](CODE_OF_CONDUCT.md).
 
-2). **Clone your fork to your local machine**:
+### Make changes to the Carina code or docs
 
- `git clone git@github.com:your_fork_url/carina.git`
+Please use unified code formattor [Java code formatter for Eclipse](carina_formatter.xml), in IntelliJ IDEA install and configure [Eclipse Code Formatter](https://plugins.jetbrains.com/plugin/6546-eclipse-code-formatter).
 
-3). `git remote add origin <your_fork_url>` (can be already added)
+Fork the project, make a change, and send a pull request. For every Pull Request automatic snapshot build is generated and [Sonar](https://ci.zebrunner.com/sonarqube/dashboard?id=com.qaprosoft%3Acarina) quality checks performed.
+Exact build number can be found among check details:
+![Alt text](https://github.com/zebrunner/carina/raw/master/docs/img/pr-checker.png "Pull Request Checker")
 
-4). `git fetch origin`
 
-5). `git remote add upstream git@github.com:qaprosoft/carina.git`
+Update your project [pom.xml](https://github.com/zebrunner/carina-demo/blob/ea08927c722d5138a003cdb1f04b03363d89aeb7/pom.xml#L16), make sure to have [snapshot](https://github.com/zebrunner/carina-demo/blob/d23dd865567e8bafbdd3c925fa89374ae712b6bd/pom.xml#L26) repository enabled and test your changes. Add test results/comments into the Pull Request if possible.
 
-6). `git fetch upstream`
+After review and merge we generate consolidated release candidate build increasing build number, for example after `7.2.13` release all merges will be built into the `7.2.14-SNAPSHOT`. We strongly recommend to do extra testing using this build to find possible regressions as fast as possible.
 
-7). `git checkout -b work_local_branch upstream/master`
+You will probably also want to have a look at this more in-depth [**Carina's Overview**](https://zebrunner.github.io/carina/) of the project,
+how it is architected, how to use it etc.
 
-And then after adding files (`git add` ...) use `git commit` (add description) and then`push`:
+### Help out on our community
 
-    git push origin work_local_branch:work_remote_branch
-    
-And on [https://github.com/zebrunner/carina](https://github.com/zebrunner/carina) you will see possibility to "Compare & Pull Request"
+We can always use help on our forums at
+[Carina Support](https://t.me/qps_carina)! Hop on over and see if there
+are any questions that you can answer.
+
+### Submit bug reports or feature requests
+
+Just use the GitHub issue tracker to submit your bug reports and feature requests. Please follow the [issue](.github/ISSUE_TEMPLATE/bug-report.md) or [feature](.github/ISSUE_TEMPLATE/feature_request.md) templates.
