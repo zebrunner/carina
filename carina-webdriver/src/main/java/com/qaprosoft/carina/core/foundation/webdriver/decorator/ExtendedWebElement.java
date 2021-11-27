@@ -344,21 +344,11 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     private WebElement findElement() {
-        // do not return without element initialization!
-        // TODO: "if" operator was added as part of a hotfix only.
-        // Ideal solution should init searchContext everytime so we can remove getDriver usage from this method and class overall!
+        // as we still provide several ways to init ExtendedWebElement without searchContext we have to use "if" operator and getDriver()
+        // to use only searchContext we must remove all findExtendedWebElement(s) methods in DriverHelper which is not so simple
         if (searchContext != null) {
-            // TODO: use-case when format method is used. Need investigate howto init context in this case as well
-            // https://github.com/zebrunner/carina/issues/1536 searchContext is null for ExtendedWebElement which use format method
             element = searchContext.findElement(by);
         } else {
-            try {
-                throw new RuntimeException("this.searchContext is null!");
-            } catch (Throwable thr) {
-                LOGGER.warn("this.searchContext is null!", thr);
-            }
-            //TODO: temporary commented while try/catch above is available
-            //LOGGER.debug("findElement: searchContext is null for " + getNameWithLocator());
             element = getDriver().findElement(by);
         }
         return element;
