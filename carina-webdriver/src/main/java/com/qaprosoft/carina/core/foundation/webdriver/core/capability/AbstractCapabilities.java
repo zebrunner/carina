@@ -89,11 +89,16 @@ public abstract class AbstractCapabilities {
                             "enableVideo".equalsIgnoreCase(cap) ||
                             "enableLog".equalsIgnoreCase(cap) ||
                             "enableMetadata".equalsIgnoreCase(cap)) {
+                        
+                        //TODO: restore regular non-w3c capability TEMPORARY to have access to the video in current MCloud version
+                        capabilities.setCapability(cap, Boolean.parseBoolean(value));
+                        
                         LOGGER.debug("Adding " + cap + " to capabilities as provider options");
                         providerCaps.put(cap, Boolean.parseBoolean(value));
                     } else if ("provider".equalsIgnoreCase(cap)) {
-                        //TODO: restore regular non-w3c `provider` capability temporary to have access to the video in current ESG version
+                        //TODO: restore regular non-w3c capability TEMPORARY to have access to the video in current ESG version
                         capabilities.setCapability(cap, value);
+                        
                         providerCaps.put(cap, value);
                     } else if ("idleTimeout".equalsIgnoreCase(cap) && isNumber(value)) {
                         LOGGER.debug("Adding idleTimeout to capabilities as integer");
