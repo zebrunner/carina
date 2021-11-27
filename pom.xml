@@ -102,17 +102,6 @@
     </modules>
     <repositories>
         <!--repository>
-            <id>qaprosoft_snapshots</id>
-            <name>Qaprosoft Snapshots</name>
-            <url>https://ci.qaprosoft.com/nexus/content/repositories/snapshots/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
             <id>zebrunner_snapshots</id>
             <name>zebrunner Snapshots</name>
             <url>https://nexus.zebrunner.dev/repository/ce-snapshots/</url>
@@ -669,9 +658,9 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
         </repository>
         <snapshotRepository>
-            <id>deploymentRepo</id>
-            <name>Qaprosoft Snapshots</name>
-            <url>https://ci.qaprosoft.com/nexus/content/repositories/snapshots/</url>
+            <id>ZBR_Nexus</id>
+            <name>Zebrunner Snapshots</name>
+            <url>https://nexus.zebrunner.dev/repository/ce-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 </project>
