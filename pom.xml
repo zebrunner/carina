@@ -658,7 +658,7 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
         </repository>
         <snapshotRepository>
-            <id>deploymentRepo</id>
+            <id>ZBR_Nexus</id>
             <name>Zebrunner Snapshots</name>
             <url>https://nexus.zebrunner.dev/repository/ce-snapshots/</url>
         </snapshotRepository>
