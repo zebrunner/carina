@@ -21,8 +21,9 @@ import java.net.URL;
 import java.time.Duration;
 
 import org.openqa.selenium.remote.http.HttpClient;
-import org.openqa.selenium.remote.http.HttpClient.Builder;
-import org.openqa.selenium.remote.internal.OkHttpClient;
+import org.openqa.selenium.remote.http.HttpClient.Factory;
+//import org.openqa.selenium.remote.internal.OkHttpClient;
+import org.openqa.selenium.remote.http.netty.NettyClient;
 
 import com.google.common.base.Strings;
 import com.qaprosoft.carina.core.foundation.utils.R;
