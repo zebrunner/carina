@@ -406,6 +406,9 @@ public class Screenshot {
                 ImageIO.write(screen, "PNG", screenshot);
 
                 com.zebrunner.agent.core.registrar.Screenshot.upload(Files.readAllBytes(screenshot.toPath()), Instant.now().toEpochMilli());
+                
+                // [VD] do not print log message as it double lines in reporting 
+                // LOGGER.info(comment);
 
                 // add screenshot comment to collector
                 ReportContext.addScreenshotComment(screenName, comment);
@@ -532,10 +535,16 @@ public class Screenshot {
             LOGGER.error(message);
             Thread.currentThread().interrupt();
         } catch (ExecutionException e) {
-            if (e.getMessage() != null && e.getMessage().contains("Driver connection refused")) {
-                LOGGER.error("Unable to capture full screenshot due to the driver connection refused!");
-            } else {
-                LOGGER.error("ExecutionException error detected on capture full screenshot!", e);
+            if (e.getMessage() != null) {
+                String msg = e.getMessage();
+                if (msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED)
+                        || msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED2)) {
+                    LOGGER.error("Unable to capture full screenshot due to the driver connection refused!");
+                } else if (msg.contains(SpecialKeywords.DRIVER_NO_SUCH_WINDOW)) {
+                    LOGGER.error("Unable to capture full screenshot due to the " + SpecialKeywords.DRIVER_NO_SUCH_WINDOW);
+                } else {
+                    LOGGER.error("ExecutionException error detected on capture full screenshot!", e);
+                }
             }
         } catch (Exception e) {
             // for undefined failure keep full stacktrace to handle later correctly!
@@ -576,8 +585,17 @@ public class Screenshot {
             LOGGER.warn(message);
             Thread.currentThread().interrupt();
         } catch (ExecutionException e) {
-            String message = "ExecutionException error on capture screenshot: " + e.getMessage();
-            LOGGER.error(message);
+            if (e.getMessage() != null) {
+                String msg = e.getMessage();
+                if (msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED)
+                        || msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED2)) {
+                    LOGGER.error("ExecutionException error on capture screenshot due to the driver connection refused");
+                } else if (msg.contains(SpecialKeywords.DRIVER_NO_SUCH_WINDOW)) {
+                    LOGGER.error("ExecutionException error on capture screenshot due to the " + SpecialKeywords.DRIVER_NO_SUCH_WINDOW);
+                } else {
+                    LOGGER.error("ExecutionException error detected on capture full screenshot!", e);
+                }
+            }
         } catch (Exception e) {
             String message = "Undefined error on capture screenshot detected: " + e.getMessage();
             LOGGER.error(message);

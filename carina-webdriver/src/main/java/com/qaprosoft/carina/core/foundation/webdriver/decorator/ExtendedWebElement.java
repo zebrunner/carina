@@ -31,7 +31,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
@@ -46,7 +45,6 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Locatable;
-import org.openqa.selenium.json.JsonException;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
@@ -124,6 +122,13 @@ public class ExtendedWebElement implements IWebElement {
     	this.by = by;
     	this.name = name;
     	this.driver = driver;
+    }
+    
+    public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext) {
+        this.by = by;
+        this.name = name;
+        this.driver = driver;
+        this.searchContext = searchContext;
     }
     
     public ExtendedWebElement(WebElement element, String name) {
@@ -262,20 +267,13 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     public WebElement getElement() {
-    	element = refindElement();
-    	return element;
+        if (this.element == null) {
+            this.element = findElement();
+        }
+        
+        return this.element;
     }
     
-    private WebElement getCachedElement() {
-        if (element == null) {
-            LOGGER.debug("TODO: investigate why cached element might be null!");
-            
-            //TODO: why 1 sec?
-            element = findElement(1);
-        }
-        return element;
-    }
-
     /**
      * Check that element present or visible.
      *
@@ -316,94 +314,42 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout - timeout.
      * @return true if condition happen.
      */
-	private boolean waitUntil(ExpectedCondition<?> condition, long timeout) {
+    private boolean waitUntil(ExpectedCondition<?> condition, long timeout) {
         if (timeout <= 0) {
             LOGGER.error("Fluent wait with 0 and less timeout might hangs! Updating to 1 sec.");
             timeout = 1;
         }
-        boolean result;
-		originalException = null;
-		
-		final WebDriver drv = getDriver();
-		
-		Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME);
+        boolean result = false;
 
-		// [VD] Notes:
-		// StaleElementReferenceException is handled by selenium ExpectedConditions in many methods
-		// do not ignore TimeoutException or NoSuchSessionException otherwise you can wait for minutes instead of timeout!
-		
-		LOGGER.debug("waitUntil: starting... timeout: " + timeout);		
-		try {
-			wait.until(condition);
-			result = true;
-		} catch (NoSuchElementException e) {
-			// don't write exception even in debug mode
-		    // [VD] don't operate with condition.toString() etc as it might generate org.openqa.selenium.json.JsonException xpected to read a START_MAP but instead have: END. Last 0 characters read
-			LOGGER.debug("waitUntil: NoSuchElementException: " + e.getMessage());
-			result = false;
-			originalException = e;
-        } catch (NoSuchSessionException e) { 
-            LOGGER.debug("waitUntil: NoSuchSessionException: " + e.getMessage());
-            result = false;
-            originalException = e.getCause();			
-		} catch (TimeoutException e) { 
-			LOGGER.debug("waitUntil: TimeoutException: " + e.getMessage());
-			result = false;
-			originalException = e.getCause();
-		} catch (WebDriverException e) {
-            LOGGER.debug("waitUntil: WebDriverException: " + e.getMessage());
-            result = false;
-            originalException = e.getCause();
-		}
-		catch (Exception e) {
-			LOGGER.error("waitUntil: undefined exception.", e);
-			result = false;
-			//TODO: e or e.getCause()?
-			originalException = e;
-		}
-		return result;
-	}
+        Wait<WebDriver> wait = new WebDriverWait(getDriver(), timeout, RETRY_TIME)
+                .ignoring(WebDriverException.class)
+                .ignoring(NoSuchSessionException.class)
+                .ignoring(NoSuchElementException.class);
 
-    private WebElement findElement(long timeout) {
-        if (element != null) {
-            return element;
-        }
-        
-        if (isPresent(timeout)) {
-        	//TODO: investigate maybe searchContext better to use here!
-        	element = getDriver().findElement(by);
-        } else {
-        	throw new NoSuchElementException("Unable to detect element using By: " + by.toString());
-        }
+        // [VD] Notes:
+        // StaleElementReferenceException is handled by selenium ExpectedConditions in many methods
+        // do not ignore TimeoutException or NoSuchSessionException otherwise you can wait for minutes instead of timeout!
 
-        return element;
-    }
-    
-    private WebElement refindElement() {
-        // do not return without element initialization!
-        // TODO: if is added as part of a hotfix. Ideal solution should init searchContext everytime so we can remove getDriver usage from this class
-        // at all!
+        // [VD] note about NoSuchSessionException is pretty strange. Let's ignore here and return false only in case of
+        // TimeoutException putting details into the debug log message. All the rest shouldn't be ignored
+
+        LOGGER.debug("waitUntil: starting... timeout: " + timeout);
         try {
-            if (searchContext != null) {
-                // TODO: use-case when format method is used. Need investigate howto init context in this case as well
-                element = searchContext.findElement(by);
-            } else {
-                LOGGER.debug("refindElement: searchContext is null for " + getNameWithLocator());
-                element = getDriver().findElement(by);
-            }
-        } catch (WebDriverException e) {
-            //already including 'StaleElementReferenceException | InvalidElementStateException | JsonException'
-            CommonUtils.pause(0.3);
-            LOGGER.debug("catched exception: ", e);
-            // use available driver to research again...
-            // TODO: handle case with rootBy to be able to refind also lists etc
-            if (searchContext != null) {
-                // TODO: use-case when format method is used. Need investigate howto init context in this case as well
-                element = searchContext.findElement(by);
-            } else {
-                LOGGER.debug("refindElement: searchContext is null for " + getNameWithLocator());
-                element = getDriver().findElement(by);
-            }
+            wait.until(condition);
+            result = true;
+        } catch (TimeoutException e) {
+            LOGGER.debug("waitUntil: TimeoutException", e);
+        }
+        return result;
+    }
+
+    private WebElement findElement() {
+        // as we still provide several ways to init ExtendedWebElement without searchContext we have to use "if" operator and getDriver()
+        // to use only searchContext we must remove all findExtendedWebElement(s) methods in DriverHelper which is not so simple
+        if (searchContext != null) {
+            element = searchContext.findElement(by);
+        } else {
+            element = getDriver().findElement(by);
         }
         return element;
     }
@@ -695,7 +641,7 @@ public class ExtendedWebElement implements IWebElement {
             return;
         }
         try {
-            Locatable locatableElement = (Locatable) findElement(EXPLICIT_TIMEOUT);
+            Locatable locatableElement = (Locatable) findElement();
             // [VD] onScreen should be updated onto onPage as only 2nd one
             // returns real coordinates without scrolling... read below material
             // for details
@@ -868,7 +814,7 @@ public class ExtendedWebElement implements IWebElement {
 		if (originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
 			LOGGER.debug("StaleElementReferenceException detected in isElementPresent!");
 			try {
-				element = refindElement();
+				element = findElement();
                 waitCondition = ExpectedConditions.visibilityOf(element);
 			} catch (NoSuchElementException e) {
 				// search element based on By if exception was thrown
@@ -972,7 +918,7 @@ public class ExtendedWebElement implements IWebElement {
 			if (!tmpResult && originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
 				LOGGER.debug("StaleElementReferenceException detected in isElementWithTextPresent!");
 				try {
-					refindElement();
+					findElement();
 					textCondition = ExpectedConditions.textToBePresentInElement(element, decryptedText);
 				} catch (NoSuchElementException e) {
 					// search element based on By if exception was thrown
@@ -1059,11 +1005,7 @@ public class ExtendedWebElement implements IWebElement {
      */
     public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
         if (isPresent(by, timeout)) {
-			try {
-				return new ExtendedWebElement(getCachedElement().findElement(by), name, by);
-			} catch (StaleElementReferenceException e) {
-				return new ExtendedWebElement(getElement().findElement(by), name, by);
-			}
+            return new ExtendedWebElement(by, name, this.driver, this.searchContext);
         } else {
         	throw new NoSuchElementException("Unable to find dynamic element using By: " + by.toString());
         }
@@ -1078,11 +1020,7 @@ public class ExtendedWebElement implements IWebElement {
         List<WebElement> webElements = new ArrayList<WebElement>();
         
         if (isPresent(by, timeout)) {
-			try {
-				webElements = getCachedElement().findElements(by);
-			} catch (StaleElementReferenceException e) {
-				webElements = getElement().findElements(by);
-			}
+            webElements = getElement().findElements(by);
         } else {
         	throw new NoSuchElementException("Unable to find dynamic elements using By: " + by.toString());
         }
@@ -1098,7 +1036,7 @@ public class ExtendedWebElement implements IWebElement {
             }
 
             // we can't initiate ExtendedWebElement using by as it belongs to the list of elements
-            extendedWebElements.add(new ExtendedWebElement(element, name, generateByForList(by, i)));
+            extendedWebElements.add(new ExtendedWebElement(generateByForList(by, i), name, this.driver, this.searchContext));
             i++;
         }
         return extendedWebElements;
@@ -1202,7 +1140,7 @@ public class ExtendedWebElement implements IWebElement {
             by = MobileBy.AndroidUIAutomator(String.format(StringUtils.remove(locator, "By.AndroidUIAutomator: "), objects));
             LOGGER.debug("Formatted locator is : " + by.toString());
         }
-        return new ExtendedWebElement(by, name, getDriver());
+        return new ExtendedWebElement(by, name, this.driver, this.searchContext);
     }
 
 
@@ -1364,21 +1302,8 @@ public class ExtendedWebElement implements IWebElement {
 	private Object doAction(ACTION_NAME actionName, long timeout, ExpectedCondition<?> waitCondition,
 			Object...inputArgs) {
 		
-		// do explicit single call to selenium/appium to detect new element before fluentWaits
-		// it should resolve stale element exceptions much more effective 
-		// (more stable and faster for already present but cached incorrectly elements)
-		//detectElement();
-		
 		if (waitCondition != null) {
 			//do verification only if waitCondition is fine
-			//TODO: [VD] find another way to test waitCondition as TimeoutException in DEBUG logs are displayed!
-//			boolean tmpResult = waitUntil(waitCondition, 0);
-//			if (!tmpResult && originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
-//				LOGGER.debug("StaleElementReferenceException detected in doAction!");
-//				refindElement();
-//			}
-			
-//		    if (!tmpResult && !waitUntil(waitCondition, timeout)) {
 			if (!waitUntil(waitCondition, timeout)) {
 				LOGGER.error(Messager.ELEMENT_CONDITION_NOT_VERIFIED.getMessage(actionName.getKey(), getNameWithLocator()));
 			}
@@ -1390,42 +1315,17 @@ public class ExtendedWebElement implements IWebElement {
         }
 
 		Object output = null;
-		// captureElements();
 
-		//handle invalid element state: Element is not currently interactable and may not be manipulated
 		try {
-			element = getCachedElement();
+			this.element = getElement();
 			output = overrideAction(actionName, inputArgs);
 		} catch (StaleElementReferenceException | InvalidElementStateException | ClassCastException e) {
+		    //TODO: test removal of the exceptions catch in this place!
 			//sometime Appium instead printing valid StaleElementException generate java.lang.ClassCastException: com.google.common.collect.Maps$TransformedEntriesMap cannot be cast to java.lang.String
 			LOGGER.debug("catched StaleElementReferenceException: ", e);
 			// try to find again using driver
-			element = refindElement();
+			element = findElement();
 			output = overrideAction(actionName, inputArgs);
-		} catch (WebDriverException e) {
-            if (e.getMessage() != null && e.getMessage().contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED)) {
-                CommonUtils.pause(0.3);
-                output = overrideAction(actionName, inputArgs);
-            } else {
-                // TODO: move to error for snapshot build to detect different negative use-case and move to debug for released versions!
-                LOGGER.debug("doAction catched WebDriverException!", e);
-                // try to find again using driver
-                try {
-                    element = refindElement();
-                } catch (NoSuchElementException | JsonException ex) { //TODO: try to exclude JsonException as we don't use ggr under huge load anymore
-                    // no sense to repeat action if refind element didn't help
-                    // JsonException is captured to handle "Unable to determine type from: <. Last 1 characters read" use-case
-                    throw new NoSuchElementException("Unable to detect element: " + getNameWithLocator(), ex);
-                }
-                output = overrideAction(actionName, inputArgs);
-            }
-		} catch (Throwable e) {
-		    LOGGER.error(e.getMessage());
-			// print stack trace temporary to be able to handle any problem without extra debugging 
-			e.printStackTrace();
-			throw e;
-		} finally {
-		    // do nothing
 		}
 
 		return output;
@@ -1436,28 +1336,11 @@ public class ExtendedWebElement implements IWebElement {
 		Object output = executeAction(actionName, new ActionSteps() {
 			@Override
 			public void doClick() {
-				try {
-					DriverListener.setMessages(Messager.ELEMENT_CLICKED.getMessage(getName()),
-							Messager.ELEMENT_NOT_CLICKED.getMessage(getNameWithLocator()));
+                DriverListener.setMessages(Messager.ELEMENT_CLICKED.getMessage(getName()),
+                        Messager.ELEMENT_NOT_CLICKED.getMessage(getNameWithLocator()));
 
-                    try {
-                        element.click();
-                    } catch (ElementNotInteractableException e) { //TODO: investigate if more exceptions should be catched
-                        // not visible so we can't interact using selenium or actions
-                        LOGGER.warn("Trying to do click by JavascriptExecutor because element '" + getNameWithLocator()
-                                + "' is not visible...");
-                        JavascriptExecutor executor = (JavascriptExecutor) getDriver();
-                        executor.executeScript("arguments[0].click();", element);
-                    }
-				} catch (WebDriverException e) {
-					if (e != null && (e.getMessage().contains("Other element would receive the click:"))) {
-						LOGGER.warn("Trying to do click by Actions due to the: " + e.getMessage());
-						Actions actions = new Actions(getDriver());
-						actions.moveToElement(element).click().perform();
-					} else {
-						throw e;
-					}
-				}
+                element.click();
+
 			}
 			
 			@Override
@@ -1624,7 +1507,7 @@ public class ExtendedWebElement implements IWebElement {
 						Messager.SELECT_BY_TEXT_NOT_PERFORMED.getMessage(textLog, getNameWithLocator()));
 
 				
-				final Select s = new Select(getCachedElement());
+				final Select s = new Select(getElement());
 				// [VD] do not use selectByValue as modern controls could have only visible value without value
 				s.selectByVisibleText(decryptedSelectText);
 				return true;
@@ -1648,7 +1531,7 @@ public class ExtendedWebElement implements IWebElement {
 						Messager.SELECT_BY_MATCHER_TEXT_NOT_PERFORMED.getMessage(matcher.toString(), getNameWithLocator()));
 
 				
-				final Select s = new Select(getCachedElement());
+				final Select s = new Select(getElement());
 				String fullTextValue = null;
 				for (WebElement option : s.getOptions()) {
 					if (matcher.matches(option.getText())) {
@@ -1667,7 +1550,7 @@ public class ExtendedWebElement implements IWebElement {
 						Messager.SELECT_BY_TEXT_PERFORMED.getMessage(partialSelectText, getName()),
 						Messager.SELECT_BY_TEXT_NOT_PERFORMED.getMessage(partialSelectText, getNameWithLocator()));
 				
-				final Select s = new Select(getCachedElement());
+				final Select s = new Select(getElement());
 				String fullTextValue = null;
 				for (WebElement option : s.getOptions()) {
 					if (option.getText().contains(partialSelectText)) {
@@ -1686,20 +1569,20 @@ public class ExtendedWebElement implements IWebElement {
 						Messager.SELECT_BY_INDEX_NOT_PERFORMED.getMessage(String.valueOf(index), getNameWithLocator()));
 				
 				
-				final Select s = new Select(getCachedElement());
+				final Select s = new Select(getElement());
 				s.selectByIndex(index);
 				return true;
 			}
 
 			@Override
 			public String doGetSelectedValue() {
-				final Select s = new Select(getCachedElement());
+				final Select s = new Select(getElement());
 				return s.getAllSelectedOptions().get(0).getText();
 			}
 
 			@Override
 			public List<String> doGetSelectedValues() {
-		        final Select s = new Select(getCachedElement());
+		        final Select s = new Select(getElement());
 		        List<String> values = new ArrayList<String>();
 		        for (WebElement we : s.getAllSelectedOptions()) {
 		            values.add(we.getText());

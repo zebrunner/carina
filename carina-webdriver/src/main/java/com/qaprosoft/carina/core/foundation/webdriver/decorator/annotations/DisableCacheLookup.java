@@ -22,5 +22,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.FIELD, ElementType.TYPE })
+@Deprecated
 public @interface DisableCacheLookup {
 }
