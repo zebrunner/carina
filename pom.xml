@@ -62,7 +62,7 @@
         <jna.version>3.0.9</jna.version>
         <!-- Selenium -->
 		<selenium.version>4.1.0</selenium.version>
-        <appium.version>8.0.0-beta</appium.version>
+        <appium.version>7.5.1</appium.version>
         <!-- Zebrunner integrations -->
         <zebrunner-testng-pluggable.version>1.6.6</zebrunner-testng-pluggable.version>
         <!-- Others -->
