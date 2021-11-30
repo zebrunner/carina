@@ -127,10 +127,6 @@ public interface IQTestManager extends ITestCases {
     private int getQTestProjectIdFromSuite(ISuite suite) {
         if (suite.getParameter(SpecialKeywords.QTEST_PROJECT_ID) != null) {
             return Integer.parseInt(suite.getParameter(SpecialKeywords.QTEST_PROJECT_ID).trim());
-        } else if (suite.getParameter(SpecialKeywords.QTEST_PROJECT_ID_OLD) != null) {
-            QTEST_LOGGER.warn(SpecialKeywords.QTEST_PROJECT_ID_OLD + " special key parameter is deprecated. " +
-                    "Please, start using " + SpecialKeywords.QTEST_PROJECT_ID + " instead!");
-            return Integer.parseInt(suite.getParameter(SpecialKeywords.QTEST_PROJECT_ID_OLD).trim());
         } else if (suite.getAttribute(SpecialKeywords.QTEST_PROJECT_ID) != null) {
             //use-case to support unit tests
             return Integer.parseInt(suite.getAttribute(SpecialKeywords.QTEST_PROJECT_ID).toString().trim());
