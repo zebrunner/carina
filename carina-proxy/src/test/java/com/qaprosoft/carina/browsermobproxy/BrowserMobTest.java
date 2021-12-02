@@ -45,7 +45,7 @@ public class BrowserMobTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static String header = "my_header";
     private static String headerValue = "my_value";
-    private static String testUrl = "https://ci.qaprosoft.com";
+    private static String testUrl = "https://ci.zebrunner.dev";
     private static String filterKey = "</html>";
     private static String requestMethod = "GET";
 
