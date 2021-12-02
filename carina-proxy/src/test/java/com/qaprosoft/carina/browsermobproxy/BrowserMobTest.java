@@ -45,7 +45,7 @@ public class BrowserMobTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static String header = "my_header";
     private static String headerValue = "my_value";
-    private static String testUrl = "https://ci.zebrunner.dev";
+    private static String testUrl = "https://ci.qaprosoft.com";
     private static String filterKey = "</html>";
     private static String requestMethod = "GET";
 
@@ -165,6 +165,7 @@ public class BrowserMobTest {
             con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod(requestMethod);
             httpResponseStatus = con.getResponseCode();
+            LOGGER.info("httpResponseStatus" + httpResponseStatus);
             Assert.assertTrue(httpResponseStatus < 399, "Response code is not as expected!");
         } catch (IOException e) {
             e.printStackTrace();
