@@ -28,8 +28,12 @@
 		<itext.version>5.5.13.2</itext.version>
 		<reflections.version>0.9.10</reflections.version>
 		<mockito-all.version>1.10.19</mockito-all.version>
+		<!-- for add zebrunner agent-->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<zebrunner-agent.version>RELEASE</zebrunner-agent.version>
 
 	</properties>
+
 
 	<dependencies>
 		<dependency>
@@ -70,11 +74,19 @@
 		</dependency>
 
 		<dependency>
-			<!--  5-7 compilation failures w/o it. just agent-core dep doesn't work. -->
+			<!--we need it to reuse benefits of zebrunner testng agent for webdriver
+				sesssion(s) declaration -->
+			<groupId>net.bytebuddy</groupId>
+			<artifactId>byte-buddy</artifactId>
+			<version>1.10.18</version>
+		</dependency>
+
+		<!--<dependency>
+			&lt;!&ndash;  5-7 compilation failures w/o it. just agent-core dep doesn't work. &ndash;&gt;
 			<groupId>com.zebrunner</groupId>
 			<artifactId>agent-testng-pluggable</artifactId>
-		</dependency>
-		
+		</dependency>-->
+
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
@@ -174,10 +186,10 @@
 		</dependency>
 
 		<!-- Test utilities -->
-		<dependency>
+		<!--<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
-		</dependency>
+		</dependency>-->
 
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
@@ -219,6 +231,33 @@
 					<release>${java.version}</release>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>3.1.2</version>
+				<executions>
+					<execution>
+						<id>copy</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<artifactItems>
+						<artifactItem>
+							<groupId>com.zebrunner</groupId>
+							<artifactId>agent-core</artifactId>
+							<version>${zebrunner-agent.version}</version>
+							<outputDirectory>${project.build.directory}/agent</outputDirectory>
+							<destFileName>zebrunner-agent.jar</destFileName>
+						</artifactItem>
+					</artifactItems>
+				</configuration>
+			</plugin>
+
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>

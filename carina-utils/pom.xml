@@ -30,6 +30,7 @@
 
 	<dependencies>
 		<!-- Carina sub-modules dependencies -->
+
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-crypto</artifactId>
@@ -39,6 +40,8 @@
                 <groupId>com.zebrunner</groupId>
                 <artifactId>agent-testng-pluggable</artifactId>
             </dependency>
+
+
 
 		<dependency>
 			<groupId>log4j</groupId>

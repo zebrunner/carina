@@ -23,8 +23,11 @@ import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import org.apache.log4j.Logger;
 
 public class MessageBuilder {
+
+    private static final Logger LOGGER = Logger.getLogger(MessageBuilder.class);
 
     private static Configuration freemarkerConfiguration;
 
