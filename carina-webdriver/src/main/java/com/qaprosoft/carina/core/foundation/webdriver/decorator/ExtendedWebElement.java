@@ -458,11 +458,7 @@ public class ExtendedWebElement implements IWebElement {
 	 *            to check element conditions before action
 	 */
     public void click(long timeout, ExpectedCondition<?> waitCondition) {
-    	if (isMobile()) {
-    		doAction(ACTION_NAME.TAP, timeout, waitCondition);
-    	} else {
-    		doAction(ACTION_NAME.CLICK, timeout, waitCondition);
-    	}
+        doAction(ACTION_NAME.CLICK, timeout, waitCondition);
     }
     
 	private boolean isMobile() {
@@ -1162,8 +1158,6 @@ public class ExtendedWebElement implements IWebElement {
 	public interface ActionSteps {
 		void doClick();
 		
-		void doTap();
-
 		void doDoubleClick();
 
 		void doRightClick();
@@ -1210,9 +1204,6 @@ public class ExtendedWebElement implements IWebElement {
 		switch (actionName) {
 		case CLICK:
 			actionSteps.doClick();
-			break;
-		case TAP:
-			actionSteps.doTap();
 			break;
 		case DOUBLE_CLICK:
 			actionSteps.doDoubleClick();
@@ -1343,15 +1334,6 @@ public class ExtendedWebElement implements IWebElement {
 
 			}
 			
-			@Override
-			// click for mobile devices
-			public void doTap() {
-				DriverListener.setMessages(Messager.ELEMENT_CLICKED.getMessage(getName()),
-						Messager.ELEMENT_NOT_CLICKED.getMessage(getNameWithLocator()));
-
-				element.click();
-			}
-
 			@Override
 			public void doDoubleClick() {
 				DriverListener.setMessages(Messager.ELEMENT_DOUBLE_CLICKED.getMessage(getName()),

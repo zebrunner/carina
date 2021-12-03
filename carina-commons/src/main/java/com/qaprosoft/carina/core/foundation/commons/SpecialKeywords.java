@@ -155,8 +155,6 @@ public class SpecialKeywords {
     
     // ------------- qTEST PROPERTIES -------------------------------
     public static final String QTEST_TESTCASE_UUID = "com.zebrunner.app/tcm.qtest.testcase-id";
-    @Deprecated
-    public static final String QTEST_PROJECT_ID_OLD = "qTestProjectId";
     public static final String QTEST_PROJECT_ID = "com.zebrunner.app/tcm.qtest.project-id";
 
 
