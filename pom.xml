@@ -647,7 +647,12 @@
                 <version>${mokito-core.version}</version>
                 <scope>test</scope>
             </dependency>
-
+<dependency>
+  <groupId>com.zebrunner</groupId>
+  <artifactId>agent-testng</artifactId>
+  <version>RELEASE</version>
+  <scope>test</scope>
+</dependency>
         </dependencies>
     </dependencyManagement>
 

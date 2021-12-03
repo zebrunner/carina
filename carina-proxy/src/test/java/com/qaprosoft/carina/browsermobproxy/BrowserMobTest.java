@@ -165,6 +165,7 @@ public class BrowserMobTest {
             con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod(requestMethod);
             httpResponseStatus = con.getResponseCode();
+            LOGGER.info("httpResponseStatus" + httpResponseStatus);
             Assert.assertTrue(httpResponseStatus < 399, "Response code is not as expected!");
         } catch (IOException e) {
             e.printStackTrace();

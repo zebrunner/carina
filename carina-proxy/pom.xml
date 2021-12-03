@@ -53,8 +53,8 @@
 
 		<!-- Test utilities -->
 		<dependency>
-			<groupId>org.testng</groupId>
-			<artifactId>testng</artifactId>
+			<groupId>com.zebrunner</groupId>
+			<artifactId>agent-testng</artifactId>
 		</dependency>
 	</dependencies>
 
