@@ -34,10 +34,10 @@ import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 /**
  * EventFiringSeleniumCommandExecutor triggers event listener before/after execution of the command.
  */
-public class CarinaCommandExecutor extends HttpCommandExecutor {
+public class EventFiringSeleniumCommandExecutor extends HttpCommandExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     
-    public CarinaCommandExecutor(URL addressOfRemoteServer) {
+    public EventFiringSeleniumCommandExecutor(URL addressOfRemoteServer) {
         super(addressOfRemoteServer);
     }
 
