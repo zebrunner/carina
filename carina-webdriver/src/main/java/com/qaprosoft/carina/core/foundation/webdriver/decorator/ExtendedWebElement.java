@@ -96,7 +96,7 @@ public class ExtendedWebElement implements IWebElement {
 
     private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
 
-    private WebElement element;
+    private WebElement element = null;
     private Throwable originalException;
     private String name;
     private By by;
@@ -115,7 +115,6 @@ public class ExtendedWebElement implements IWebElement {
     public ExtendedWebElement(By by, String name) {
     	this.by = by;
     	this.name = name;
-    	this.element = null;
     }
     
     public ExtendedWebElement(By by, String name, WebDriver driver) {
@@ -783,7 +782,7 @@ public class ExtendedWebElement implements IWebElement {
      */
     public boolean isElementPresent(long timeout) {
 		// perform at once super-fast single selenium call and only if nothing found move to waitAction
-		if (!isMobile() && element != null) {
+		if (element != null) {
 			try {
 				if (element.isDisplayed()) {
 					return true;
