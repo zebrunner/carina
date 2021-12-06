@@ -70,13 +70,14 @@ import com.qaprosoft.carina.core.foundation.webdriver.httpclient.HttpClientFacto
 
 import io.appium.java_client.MobileCommand;
 import io.appium.java_client.internal.Config;
+import io.appium.java_client.remote.AppiumCommandExecutor;
 import io.appium.java_client.remote.AppiumW3CHttpCommandCodec;
 import io.appium.java_client.remote.NewAppiumSessionPayload;
 
 /**
  * EventFiringAppiumCommandExecutor overrides execute command.
  * Please track {@link AppiumCommandExecutor} for latest changes.
-   */
+ */
 
 @SuppressWarnings({ "unchecked" })
 public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
