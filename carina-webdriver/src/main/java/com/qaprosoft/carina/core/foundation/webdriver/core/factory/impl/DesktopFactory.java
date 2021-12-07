@@ -45,7 +45,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.deskt
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.OperaCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.SafariCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.CarinaCommandExecutor;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
 
 public class DesktopFactory extends AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -71,7 +71,7 @@ public class DesktopFactory extends AbstractFactory {
         LOGGER.debug("capabilities: " + capabilities);
 
         try {
-            CarinaCommandExecutor ce = new CarinaCommandExecutor(new URL(seleniumHost));
+            EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(new URL(seleniumHost));
             driver = new RemoteWebDriver(ce, capabilities);
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed selenium URL!", e);

@@ -535,7 +535,7 @@ public class DriverHelper {
     
     /**
      * Get a string representing the current URL that the browser is looking at.
-     * @param timeout
+     * @param timeout long
      * @return validation result.
      */
     public String getCurrentUrl(long timeout) {
@@ -592,7 +592,7 @@ public class DriverHelper {
      * 
      * @param expectedURL
      *            Expected Url
-     * @param timeout
+     * @param timeout long
      * @return validation result.
      */
     public boolean isUrlAsExpected(String expectedURL, long timeout) {
