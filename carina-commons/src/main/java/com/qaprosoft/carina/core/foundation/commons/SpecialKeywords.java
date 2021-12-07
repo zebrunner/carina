@@ -21,7 +21,6 @@ package com.qaprosoft.carina.core.foundation.commons;
  * @author Alex Khursevich
  */
 public class SpecialKeywords {
-    public static final String TEST_RUN_ID = java.util.UUID.randomUUID().toString();
     public static final String IGNORE = "$ignore";
     public static final String GENERATE = "\\{generate:\\d*\\}";
     public static final String GENERATE_UUID = "\\{generate_uuid\\}";
@@ -70,15 +69,7 @@ public class SpecialKeywords {
 
     public static final String TEST_NAME_ARGS_MAP = "testNameArgsMap";
 
-    @Deprecated
-    public static final String TESTRAIL_SUITE_ID_OLD = "TestRailSuiteId";
-    @Deprecated
-    public static final String TESTRAIL_PROJECT_ID_OLD = "TestRailProjectId";
     public static final String TESTRAIL_SUITE_ID = "com.zebrunner.app/tcm.testrail.suite-id";
-    @Deprecated
-    public static final String TESTRAIL_PROJECT_ID = "com.zebrunner.app/tcm.testrail.project-id";
-    @Deprecated
-    public static final String TESTRAIL_TESTCASE_UUID = "com.zebrunner.app/tcm.testrail.testcase-id";
 
     public static final String BEFORE_TEST_METHOD = "executeBeforeTestMethod";
 
@@ -110,8 +101,6 @@ public class SpecialKeywords {
     public static final String FAILED = "FAILED";
     public static final String SKIPPED = "SKIPPED";
 
-    public static final String ZAFIRA_PROJECT = "zafira_project";
-
     public static final String COMMENT = "comment";
     
     public static final String ANDROID_START_NODE = "<android[\\w\\.]* ";
@@ -121,6 +110,11 @@ public class SpecialKeywords {
 
     public static final String TEST_PRIORITY_TAG = "priority";
     public static final String TEST_FEATURE_TAG = "feature";
+    
+    public final static String DRIVER_CONNECTION_REFUSED = "Driver connection refused";
+    public final static String DRIVER_CONNECTION_REFUSED2 = "Expected to read a START_MAP but instead have: END. Last 0 characters read";
+    public final static String DRIVER_NO_SUCH_WINDOW = "no such window: window was already closed";
+
     
     // ------------- CARINA CRYPTO DEFAULT PROPERTIES -----------------
     public static final String CRYPTO_ALGORITHM = "AES/ECB/PKCS5Padding";
@@ -161,8 +155,6 @@ public class SpecialKeywords {
     
     // ------------- qTEST PROPERTIES -------------------------------
     public static final String QTEST_TESTCASE_UUID = "com.zebrunner.app/tcm.qtest.testcase-id";
-    @Deprecated
-    public static final String QTEST_PROJECT_ID_OLD = "qTestProjectId";
     public static final String QTEST_PROJECT_ID = "com.zebrunner.app/tcm.qtest.project-id";
 
 

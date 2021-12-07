@@ -34,7 +34,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.CarinaCommandExecutor;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidElement;
@@ -83,7 +83,7 @@ public class MobileFactory extends AbstractFactory {
         LOGGER.debug("capabilities: " + capabilities);
 
         try {
-            EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
+            CarinaCommandExecutor ce = new CarinaCommandExecutor(new URL(seleniumHost));
             
             if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
                 driver = new AndroidDriver<AndroidElement>(ce, capabilities);

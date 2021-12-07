@@ -307,6 +307,7 @@ All the project configuration properties are located in a **_config.properties**
 		<td>Determines how carina detects whether expected page is opened: by expected url pattern, by marker element loading state or by both these conditions</td>
 		<td>BY_ELEMENT, BY_URL, BY_URL_AND_ELEMENT</td>
 	</tr>
+
 </table>
 Most of the properties may be read in the following way:
 
@@ -438,7 +439,7 @@ Will work both:
    selenium_url=http://localhost:4444/wd/hub
 2) passing them right in the test:
 public void testCompareModels() {
-   R.CONFIG.put("selenium_host", "http://localhost:4444/wd/hub");
+   R.CONFIG.put("selenium_url", "http://localhost:4444/wd/hub");
    HomePage homePage = new HomePage(getDriver());
    homePage.open();
    ...

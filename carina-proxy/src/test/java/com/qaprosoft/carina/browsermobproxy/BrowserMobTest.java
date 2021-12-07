@@ -28,10 +28,7 @@ import javax.net.ssl.SSLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -58,8 +55,8 @@ public class BrowserMobTest {
         R.CONFIG.put("browsermob_disabled_mitm", "false");
     }
 
-    @AfterMethod(alwaysRun = true)
-    public void afterMethod() {
+    @AfterClass(alwaysRun = true)
+    public void afterClass() {
         ProxyPool.stopAllProxies();
     }
 
@@ -165,6 +162,7 @@ public class BrowserMobTest {
             con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod(requestMethod);
             httpResponseStatus = con.getResponseCode();
+            LOGGER.info("httpResponseStatus" + httpResponseStatus);
             Assert.assertTrue(httpResponseStatus < 399, "Response code is not as expected!");
         } catch (IOException e) {
             e.printStackTrace();

@@ -44,6 +44,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.deskt
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.OperaCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.SafariCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.CarinaCommandExecutor;
 
 public class DesktopFactory extends AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -69,7 +70,8 @@ public class DesktopFactory extends AbstractFactory {
         LOGGER.debug("capabilities: " + capabilities);
 
         try {
-            driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);
+            CarinaCommandExecutor ce = new CarinaCommandExecutor(new URL(seleniumHost));
+            driver = new RemoteWebDriver(ce, capabilities);
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed selenium URL!", e);
         }
@@ -81,7 +83,7 @@ public class DesktopFactory extends AbstractFactory {
     @SuppressWarnings("deprecation")
     public DesiredCapabilities getCapabilities(String name) {
         String browser = Configuration.getBrowser();
-
+        
         if (BrowserType.FIREFOX.equalsIgnoreCase(browser)) {
             return new FirefoxCapabilities().getCapability(name);
         } else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || "ie".equalsIgnoreCase(browser)) {

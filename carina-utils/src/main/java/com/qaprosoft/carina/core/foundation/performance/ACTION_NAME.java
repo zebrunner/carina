@@ -15,11 +15,9 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.performance;
 
-import com.qaprosoft.carina.core.foundation.performance.Timer.IPerformanceOperation;
 
-public enum ACTION_NAME implements IPerformanceOperation {
+public enum ACTION_NAME {
     CLICK("click"),
-    TAP("tap"),
     DOUBLE_CLICK("double_click"),
     RIGHT_CLICK("right_click"),
     HOVER("hover"),
@@ -52,7 +50,6 @@ public enum ACTION_NAME implements IPerformanceOperation {
         this.key = key;
     }
 
-    @Override
     public String getKey() {
         return this.key;
     }

@@ -49,9 +49,6 @@ public class Configuration {
 
         BROWSER_LANGUAGE("browser_language"),
 
-        @Deprecated
-        SELENIUM_HOST("selenium_host"),
-
         SELENIUM_URL("selenium_url"),
 
         DRIVER_EVENT_LISTENERS("driver_event_listeners"),
@@ -151,7 +148,7 @@ public class Configuration {
         ELEMENT_LOADING_STRATEGY("element_loading_strategy"),
         
         PAGE_OPENING_STRATEGY("page_opening_strategy"),
-
+        
         // Amazon
         S3_BUCKET_NAME("s3_bucket_name"),
 
@@ -500,16 +497,7 @@ public class Configuration {
     }
 
     public static String getSeleniumUrl() {
-        String value = Configuration.get(Parameter.SELENIUM_URL);
-        if (value.isEmpty()) {
-            String deprecatedValue = Configuration.get(Parameter.SELENIUM_HOST);
-            if (!deprecatedValue.isEmpty()) {
-                LOGGER.warn(Parameter.SELENIUM_HOST.getKey() + " configuration parameter is deprecated. " +
-                        "Please, start using " + Parameter.SELENIUM_URL + " instead!");
-                value = deprecatedValue;
-            }
-        }
-        return value;
+        return Configuration.get(Parameter.SELENIUM_URL);
     }
 
     public static int getThreadCount() {

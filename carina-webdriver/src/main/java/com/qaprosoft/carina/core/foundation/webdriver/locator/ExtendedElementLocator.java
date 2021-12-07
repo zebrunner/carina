@@ -25,7 +25,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
@@ -33,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.DisableCacheLookup;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Localized;
 
 /**
@@ -48,13 +46,11 @@ public class ExtendedElementLocator implements ElementLocator {
 
     private final SearchContext searchContext;
     private By by;
-    private WebElement cachedElement;
     private String className;
     
-    private boolean shouldCache = true;
     private boolean caseInsensitive = false;
     private boolean localized = false;
-
+    
     /**
      * Creates a new element locator.
      * 
@@ -70,9 +66,6 @@ public class ExtendedElementLocator implements ElementLocator {
         if (field.isAnnotationPresent(FindBy.class) || field.isAnnotationPresent(ExtendedFindBy.class)) {
             LocalizedAnnotations annotations = new LocalizedAnnotations(field);
             this.by = annotations.buildBy();
-            if (field.isAnnotationPresent(DisableCacheLookup.class)) {
-                this.shouldCache = false;
-            }
             if (field.isAnnotationPresent(CaseInsensitiveXPath.class)) {
                 this.caseInsensitive = true;
             }
@@ -86,10 +79,6 @@ public class ExtendedElementLocator implements ElementLocator {
      * Find the element.
      */
     public WebElement findElement() {
-        if (cachedElement != null && shouldCache) {
-            return cachedElement;
-        }
-
         WebElement element = null;
         List<WebElement> elements = null;
         NoSuchElementException exception = null;
@@ -119,10 +108,6 @@ public class ExtendedElementLocator implements ElementLocator {
             throw exception != null ? exception : new NoSuchElementException("Unable to find element");
         }
         
-        // 1. enable cache for successfully discovered element to minimize selenium calls
-        if (shouldCache) {
-            cachedElement = element;
-        }
         return element;
     }
 
@@ -136,17 +121,11 @@ public class ExtendedElementLocator implements ElementLocator {
             elements = searchContext.findElements(by);
         } catch (NoSuchElementException e) {
             LOGGER.debug("Unable to find elements: " + e.getMessage());
-        } catch (WebDriverException e) {
-            // mostly to handle org.openqa.selenium.WebDriverException: Driver connection refused
-            // TODO: test if we need explicit if to avoid double call for every WebDriverException
-            elements = searchContext.findElements(by);
         }
 
-        //TODO: incorporate find by AI???
-        
         // If no luck throw general NoSuchElementException
         if (elements == null) {
-            throw new NoSuchElementException("Unable to find elements by Selenium");
+            throw new NoSuchElementException("Unable to find elements");
         }
 
         // we can't enable cache for lists by default as we can't handle/catch list.get(index).action(). And for all dynamic lists
@@ -195,10 +174,6 @@ public class ExtendedElementLocator implements ElementLocator {
         return By.xpath(sb.toString());
     }
 
-    public void setShouldCache(boolean shouldCache) {
-        this.shouldCache = shouldCache;
-    }
-    
     public boolean isLocalized() {
         return localized;
     }

@@ -33,7 +33,10 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
-
+<dependency>
+	<groupId>log4j</groupId>
+	<artifactId>log4j</artifactId>
+</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
@@ -53,8 +56,8 @@
 
 		<!-- Test utilities -->
 		<dependency>
-			<groupId>org.testng</groupId>
-			<artifactId>testng</artifactId>
+			<groupId>com.zebrunner</groupId>
+			<artifactId>agent-testng</artifactId>
 		</dependency>
 	</dependencies>
 
