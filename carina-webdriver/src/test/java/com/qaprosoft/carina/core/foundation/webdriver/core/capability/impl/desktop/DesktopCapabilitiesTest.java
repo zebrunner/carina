@@ -22,7 +22,7 @@ import java.util.Map;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.ie.InternetExplorerDriver;
-import org.openqa.selenium.remote.Browser;
+//import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -45,7 +45,7 @@ public class DesktopCapabilitiesTest {
         ChromeCapabilities chromeCapabilities = new ChromeCapabilities();
         DesiredCapabilities capabilities = chromeCapabilities.getCapability(testName);
 
-        Assert.assertEquals(capabilities.getBrowserName(), Browser.CHROME, "Returned browser name is not valid!");
+        Assert.assertEquals(capabilities.getBrowserName(), BrowserType.CHROME, "Returned browser name is not valid!");
 
         Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
 
@@ -123,7 +123,7 @@ public class DesktopCapabilitiesTest {
         Assert.assertFalse((Boolean) capabilities.getCapability(CapabilityType.TAKES_SCREENSHOT), "Returned capability value is not valid!");
     }
 
-    @Test(groups = {"DesktopCapabilitiesTestClass"}, enabled = false)
+/*    @Test(groups = {"DesktopCapabilitiesTestClass"}, enabled = false)
     public static void getSafariCapabilityTest() {
         String testName = "safari - getSafariCapabilityTest";
 
@@ -134,7 +134,7 @@ public class DesktopCapabilitiesTest {
 
         Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
     }
-
+*/
     @Test(groups = {"DesktopCapabilitiesTestClass"}, enabled = false)
     public static void getEdgeCapabilityTest() {
         String testName = "edge - getEdgeCapabilityTest";

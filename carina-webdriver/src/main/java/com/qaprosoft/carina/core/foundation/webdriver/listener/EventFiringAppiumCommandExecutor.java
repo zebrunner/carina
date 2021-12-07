@@ -66,7 +66,7 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
-import com.qaprosoft.carina.core.foundation.webdriver.httpclient.HttpClientFactoryCustom;
+//import com.qaprosoft.carina.core.foundation.webdriver.httpclient.HttpClientFactoryCustom;
 
 import io.appium.java_client.MobileCommand;
 import io.appium.java_client.internal.Config;
@@ -120,8 +120,10 @@ public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
     }
 
     public EventFiringAppiumCommandExecutor(URL addressOfRemoteServer) {
-        this(MobileCommand.commandRepository, addressOfRemoteServer, new HttpClientFactoryCustom());
+    	this(MobileCommand.commandRepository, addressOfRemoteServer, HttpClient.Factory.createDefault());
+        //this(MobileCommand.commandRepository, addressOfRemoteServer, new HttpClientFactoryCustom());
     }
+    
     
     protected <B> B getPrivateFieldValue(String fieldName, Class<B> fieldType) {
         Class<?> superclass = getClass().getSuperclass();
