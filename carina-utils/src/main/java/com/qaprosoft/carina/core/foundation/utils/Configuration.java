@@ -346,16 +346,18 @@ public class Configuration {
         // any platform by default
         String platform = "*";
         
-        
+        LOGGER.debug("platform1: " + platform);
         // redefine platform if os caps is available
         if (!R.CONFIG.get(SpecialKeywords.BROWSERSTACK_PLATFORM_NAME).isEmpty()) {
             platform = R.CONFIG.get(SpecialKeywords.BROWSERSTACK_PLATFORM_NAME);
         }
+        LOGGER.debug("platform2: " + platform);
 
         // redefine platform if platformName caps is available
         if (!R.CONFIG.get(SpecialKeywords.PLATFORM_NAME).isEmpty()) {
             platform = R.CONFIG.get(SpecialKeywords.PLATFORM_NAME);
         }
+        LOGGER.debug("platform3: " + platform);
 
         // Do not read from os capabilities as most of the hub providers return LINUX instead of ANDROID
 //        if (caps != null && caps.getCapability("os") != null) {
@@ -364,7 +366,8 @@ public class Configuration {
         
         if (caps != null && caps.getCapability("platformName") != null) {
             platform = caps.getCapability("platformName").toString();
-        }        
+        }
+        LOGGER.debug("platform4: " + platform);
         
         return platform;
     }
