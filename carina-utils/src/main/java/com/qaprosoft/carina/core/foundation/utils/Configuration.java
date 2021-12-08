@@ -357,9 +357,10 @@ public class Configuration {
             platform = R.CONFIG.get(SpecialKeywords.PLATFORM_NAME);
         }
 
-        if (caps != null && caps.getCapability("os") != null) {
-            platform = caps.getCapability("os").toString();
-        }   
+        // Do not read from os capabilities as most of the hub providers return LINUX instead of ANDROID
+//        if (caps != null && caps.getCapability("os") != null) {
+//            platform = caps.getCapability("os").toString();
+//        }   
         
         if (caps != null && caps.getCapability("platformName") != null) {
             platform = caps.getCapability("platformName").toString();
