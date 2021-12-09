@@ -41,8 +41,6 @@
                 <artifactId>agent-testng-pluggable</artifactId>
             </dependency>
 
-
-
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>

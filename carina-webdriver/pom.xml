@@ -70,11 +70,6 @@
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
 
-<dependency>
-	<groupId>log4j</groupId>
-	<artifactId>log4j</artifactId>
-</dependency>
-
 		<dependency>
 			<!--  5-7 compilation failures w/o it. just agent-core dep doesn't work. -->
 			<groupId>com.zebrunner</groupId>
