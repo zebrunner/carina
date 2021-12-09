@@ -37,13 +37,13 @@ public class CryptoToolTest {
     private CryptoTool cryptoTool;
     private final static String cryptoFileName = "crypto.key";
 
-    @Test(priority = 1)
+    @Test()
     public void testGenerateKey() throws NoSuchAlgorithmException {
         key = SecretKeyManager.generateKey(SpecialKeywords.CRYPTO_KEY_TYPE, SpecialKeywords.CRYPTO_KEY_SIZE);
         Assert.assertEquals(SpecialKeywords.CRYPTO_KEY_TYPE, key.getAlgorithm());
     }
 
-    @Test(priority = 2)
+    @Test(dependsOnMethods= {"testGenerateKey"})
     public void testSaveKey() throws NoSuchAlgorithmException, IOException {
         File keyFile = new File(cryptoFileName);
         SecretKeyManager.saveKey(key, keyFile);
@@ -51,14 +51,14 @@ public class CryptoToolTest {
         Assert.assertTrue(keyFile.exists());
     }
 
-    @Test(priority = 3)
+    @Test(dependsOnMethods= {"testSaveKey"})
     public void testLoadKey() throws NoSuchAlgorithmException, IOException {
         File keyFile = new File(cryptoFileName);
         key = SecretKeyManager.loadKey(keyFile, SpecialKeywords.CRYPTO_KEY_TYPE);
         Assert.assertEquals(SpecialKeywords.CRYPTO_KEY_TYPE, key.getAlgorithm());
     }
 
-    @Test(priority = 4)
+    @Test(dependsOnMethods= {"testLoadKey"})
     public void testInitializationFromKeyFile() {
         cryptoTool = new CryptoTool(cryptoFileName);
         Assert.assertNotNull(cryptoTool.getAlgorithm());
@@ -66,7 +66,7 @@ public class CryptoToolTest {
         Assert.assertEquals(SpecialKeywords.CRYPTO_ALGORITHM, cryptoTool.getAlgorithm());
     }
 
-    @Test(priority = 5)
+    @Test(dependsOnMethods= {"testInitializationFromKeyFile"})
     public void testEncrypt() {
         String input = "EncryptMe";
         String encrypted = cryptoTool.encrypt(input);
@@ -74,7 +74,7 @@ public class CryptoToolTest {
         Assert.assertFalse(encrypted.equals(input));
     }
 
-    @Test(priority = 6)
+    @Test(dependsOnMethods= {"testEncrypt"})
     public void testDecrypt() {
         String input = "EncryptMe";
         String encrypted = cryptoTool.encrypt(input);
@@ -83,7 +83,7 @@ public class CryptoToolTest {
         Assert.assertEquals(input, decrypted);
     }
 
-    @Test(priority = 7)
+    @Test(dependsOnMethods= {"testDecrypt"})
     public void testInitializationFromKey() {
         cryptoTool = new CryptoTool(SpecialKeywords.CRYPTO_ALGORITHM, SpecialKeywords.CRYPTO_KEY_TYPE, key);
         Assert.assertNotNull(cryptoTool.getAlgorithm());
@@ -91,7 +91,7 @@ public class CryptoToolTest {
         Assert.assertEquals(SpecialKeywords.CRYPTO_ALGORITHM, cryptoTool.getAlgorithm());
     }
 
-    @Test(priority = 8)
+    @Test(dependsOnMethods= {"testInitializationFromKey"})
     public void testEncrypt2() {
         String input = "EncryptMe";
         String encrypted = cryptoTool.encrypt(input);
@@ -99,7 +99,7 @@ public class CryptoToolTest {
         Assert.assertFalse(encrypted.equals(input));
     }
 
-    @Test(priority = 8)
+    @Test(dependsOnMethods= {"testEncrypt2"})
     public void testDecrypt2() {
         String input = "EncryptMe";
         String encrypted = cryptoTool.encrypt(input);
@@ -108,7 +108,7 @@ public class CryptoToolTest {
         Assert.assertEquals(input, decrypted);
     }
 
-    @Test(priority = 8)
+    @Test(dependsOnMethods= {"testDecrypt2"})
     public void testEncryptByPattern() {
         String input = "{crypt: EncryptMe}";
         String encrypted = cryptoTool.encryptByPattern(input, CRYPTO_PATTERN);
@@ -116,7 +116,7 @@ public class CryptoToolTest {
         Assert.assertFalse(encrypted.equals(input));
     }
 
-    @Test(priority = 8)
+    @Test(dependsOnMethods= {"testEncryptByPattern"})
     public void testDecryptByPattern() {
         String input = "{crypt:EncryptMe}";
         String resultInput = "EncryptMe";
@@ -128,7 +128,7 @@ public class CryptoToolTest {
         Assert.assertEquals(resultInput, decrypted);
     }
 
-    @Test(priority = 8)
+    @Test(dependsOnMethods= {"testDecryptByPattern"})
     public void testEncryptByPatternAndWrap() {
         String input = "{custom_crypt: EncryptMe}";
         String customWrapper = "{custom_crypt:%s}";
@@ -139,7 +139,7 @@ public class CryptoToolTest {
         Assert.assertFalse(encrypted.equals(input));
     }
 
-    @Test(priority = 8)
+    @Test(dependsOnMethods= {"testEncryptByPatternAndWrap"})
     public void testDecryptByPatternAndWrap() {
         String input = "{custom_crypt: EncryptMe}";
         String customWrapper = "{custom_crypt:%s}";

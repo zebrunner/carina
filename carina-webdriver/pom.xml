@@ -31,6 +31,7 @@
 
 	</properties>
 
+
 	<dependencies>
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
@@ -74,7 +75,7 @@
 			<groupId>com.zebrunner</groupId>
 			<artifactId>agent-testng-pluggable</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
@@ -173,12 +174,6 @@
 			</exclusions>
 		</dependency>
 
-		<!-- Test utilities -->
-		<dependency>
-			<groupId>org.testng</groupId>
-			<artifactId>testng</artifactId>
-		</dependency>
-
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-core</artifactId>
@@ -206,6 +201,17 @@
 			<artifactId>mockito-all</artifactId>
 			<version>${mockito-all.version}</version>
 			<scope>test</scope>
+		</dependency>
+
+		<!-- Test utilities -->
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.zebrunner</groupId>
+			<artifactId>agent-testng</artifactId>
 		</dependency>
 
 	</dependencies>
