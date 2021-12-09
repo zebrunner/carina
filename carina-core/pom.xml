@@ -63,6 +63,8 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
+
 		
 		<dependency>
 			<groupId>log4j</groupId>
@@ -96,9 +98,14 @@
 
 		<!-- Test utilities -->
 		<dependency>
-			<groupId>org.testng</groupId>
+		<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.zebrunner</groupId>
+			<artifactId>agent-testng</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>com.nordstrom.tools</groupId>
 			<artifactId>testng-foundation</artifactId>
