@@ -43,6 +43,7 @@
         <maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <jacoco-maven-plugin>0.8.7</jacoco-maven-plugin>
+        <zebrunner-agent.version>1.6.6</zebrunner-agent.version>
         <!-- Testings -->
         <testng.version>7.4.0</testng.version>
         <testng-foundation.version>2.0.1</testng-foundation.version>
@@ -403,6 +404,7 @@
                 <version>${zebrunner-testng-pluggable.version}</version>
             </dependency>
 
+
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
@@ -648,6 +650,12 @@
                 <scope>test</scope>
             </dependency>
 
+            <dependency>
+              <groupId>com.zebrunner</groupId>
+              <artifactId>agent-testng</artifactId>
+              <version>${zebrunner-agent.version}</version>
+              <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
