@@ -359,7 +359,7 @@ public class Configuration {
         }
         LOGGER.debug("platform3: " + platform);
 
-        // Do not read from os capabilities as most of the hub providers return LINUX instead of ANDROID
+        // do not read "os" from caps as Saucelabs return LINUX instead of ANDROID
 //        if (caps != null && caps.getCapability("os") != null) {
 //            platform = caps.getCapability("os").toString();
 //        }   
