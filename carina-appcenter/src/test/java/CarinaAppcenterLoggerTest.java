@@ -8,7 +8,7 @@ public class CarinaAppcenterLoggerTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Test
-    public void x(){
+    public void testReportingAppender(){
         LOGGER.info("logger test");
     }
 }
