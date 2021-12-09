@@ -43,11 +43,7 @@ public class DisabledSslClientHttpRequestFactory extends SimpleClientHttpRequest
             }
             TrustManager[] trustManagerArray = { new NullX509TrustManager() };
             try {
-                if(sslContext != null){
-                    sslContext.init(null, trustManagerArray, null);
-                } else {
-                    throw new RuntimeException("Unable to prepare ssl connection");
-                }
+                sslContext.init(null, trustManagerArray, null);
             } catch (KeyManagementException e) {
                 e.printStackTrace();
             }
