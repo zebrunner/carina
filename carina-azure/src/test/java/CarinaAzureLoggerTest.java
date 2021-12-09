@@ -8,7 +8,7 @@ public class CarinaAzureLoggerTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Test
-    public void checkTestWithUseLog(){
+    public void testReportingAppender(){
         LOGGER.info("logger test");
     }
 }

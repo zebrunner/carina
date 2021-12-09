@@ -155,6 +155,11 @@
 
 		<!-- Test utilities -->
 		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>com.zebrunner</groupId>
 			<artifactId>agent-testng</artifactId>
 		</dependency>
