@@ -9,6 +9,6 @@ public class CarinaCryptoLoggerTest {
 
     @Test
     public void checkTestWithUseLog(){
-        LOGGER.info("to implement later");
+        LOGGER.info("logger test");
     }
 }

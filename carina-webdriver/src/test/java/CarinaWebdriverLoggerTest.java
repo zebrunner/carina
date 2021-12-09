@@ -9,6 +9,6 @@ public class CarinaWebdriverLoggerTest {
 
     @Test
     public void checkTestWithUseLog(){
-        LOGGER.info("to implement later");
+        LOGGER.info("logger test");
     }
 }
