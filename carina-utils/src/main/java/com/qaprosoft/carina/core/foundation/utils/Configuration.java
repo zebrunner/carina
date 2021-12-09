@@ -359,14 +359,14 @@ public class Configuration {
         }
         LOGGER.debug("platform3: " + platform);
 
-        // do not read "os" from caps as Saucelabs return LINUX instead of ANDROID
+        // do not read "os" or "platformName" from caps as Saucelabs return LINUX instead of ANDROID
 //        if (caps != null && caps.getCapability("os") != null) {
 //            platform = caps.getCapability("os").toString();
 //        }   
         
-        if (caps != null && caps.getCapability("platformName") != null) {
-            platform = caps.getCapability("platformName").toString();
-        }
+//        if (caps != null && caps.getCapability("platformName") != null) {
+//            platform = caps.getCapability("platformName").toString();
+//        }
         LOGGER.debug("platform4: " + platform);
         
         return platform;
