@@ -30,6 +30,7 @@
 
 	<dependencies>
 		<!-- Carina sub-modules dependencies -->
+
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-crypto</artifactId>
@@ -96,12 +97,6 @@
 			<artifactId>json-path</artifactId>
 		</dependency>
 
-		<!-- Test utilities -->
-		<dependency>
-			<groupId>org.testng</groupId>
-			<artifactId>testng</artifactId>
-		</dependency>
-
 		<!-- Carina-utils only dependencies -->
 		<dependency>
 			<groupId>org.apache.pdfbox</groupId>
@@ -163,6 +158,17 @@
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
 			<scope>test</scope>
+		</dependency>
+
+		<!-- Test utilities -->
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.zebrunner</groupId>
+			<artifactId>agent-testng</artifactId>
 		</dependency>
 
 	</dependencies>
