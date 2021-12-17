@@ -23,6 +23,7 @@ import org.openqa.selenium.Proxy;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 //import org.openqa.selenium.remote.Browser;
+import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -45,7 +46,7 @@ public class DesktopCapabilitiesTest {
         ChromeCapabilities chromeCapabilities = new ChromeCapabilities();
         DesiredCapabilities capabilities = chromeCapabilities.getCapability(testName);
 
-        Assert.assertEquals(capabilities.getBrowserName(), BrowserType.CHROME, "Returned browser name is not valid!");
+        Assert.assertEquals(capabilities.getBrowserName(), Browser.CHROME.browserName(), "Returned browser name is not valid!");
 
         Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
 
@@ -58,14 +59,14 @@ public class DesktopCapabilitiesTest {
         Assert.assertTrue((Boolean) capabilities.getCapability(CapabilityType.ACCEPT_INSECURE_CERTS), "Returned capability value is not valid!");
     }
 
-    @Test(groups = {"DesktopCapabilitiesTestClass"})
+    @Test(groups = {"DesktopCapabilitiesTestClass"}, enabled = false)
     public static void getFirefoxCapabilityWithDefaultFirefoxProfileTest() {
         String testName = "firefox - getFirefoxDefaultCapabilityTest";
 
         FirefoxCapabilities firefoxCapabilities = new FirefoxCapabilities();
         DesiredCapabilities capabilities = firefoxCapabilities.getCapability(testName);
 
-        Assert.assertEquals(capabilities.getBrowserName(), BrowserType.FIREFOX, "Returned browser name is not valid!");
+        Assert.assertEquals(capabilities.getBrowserName(), Browser.FIREFOX.browserName(), "Returned browser name is not valid!");
 
         Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
 
@@ -80,7 +81,7 @@ public class DesktopCapabilitiesTest {
         Assert.assertEquals(actualMediaGmpManagerUpdateEnabled, MEDIA_GMP_MANAGER_UPDATE_ENABLED, "Returned firefox profile preference is not valid!");
     }
 
-    @Test(groups = {"DesktopCapabilitiesTestClass"})
+    @Test(groups = {"DesktopCapabilitiesTestClass"}, enabled = false)
     public static void getFirefoxCapabilityWithCustomFirefoxProfileTest() {
         String testName = "firefox - getFirefoxCustomCapabilityTest";
 
@@ -92,7 +93,7 @@ public class DesktopCapabilitiesTest {
 
         DesiredCapabilities capabilities = firefoxCapabilities.getCapability(testName, profile);
 
-        Assert.assertEquals(capabilities.getBrowserName(), BrowserType.FIREFOX, "Returned browser name is not valid!");
+        Assert.assertEquals(capabilities.getBrowserName(), Browser.FIREFOX.browserName(), "Returned browser name is not valid!");
 
         Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
 
@@ -142,7 +143,7 @@ public class DesktopCapabilitiesTest {
         EdgeCapabilities edgeCapabilities = new EdgeCapabilities();
         DesiredCapabilities capabilities = edgeCapabilities.getCapability(testName);
 
-        Assert.assertEquals(capabilities.getBrowserName(), BrowserType.EDGE, "Returned browser name is not valid!");
+        Assert.assertEquals(capabilities.getBrowserName(), Browser.EDGE.browserName(), "Returned browser name is not valid!");
 
         Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
 
@@ -158,7 +159,7 @@ public class DesktopCapabilitiesTest {
         IECapabilities ieCapabilities = new IECapabilities();
         DesiredCapabilities capabilities = ieCapabilities.getCapability(testName);
 
-        Assert.assertEquals(capabilities.getBrowserName(), BrowserType.IE, "Returned browser name is not valid!");
+        Assert.assertEquals(capabilities.getBrowserName(), Browser.IE.browserName(), "Returned browser name is not valid!");
 
         Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
 
