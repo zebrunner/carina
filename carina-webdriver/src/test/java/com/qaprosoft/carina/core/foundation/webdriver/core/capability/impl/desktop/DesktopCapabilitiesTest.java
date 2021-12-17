@@ -23,6 +23,7 @@ import org.openqa.selenium.Proxy;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 //import org.openqa.selenium.remote.Browser;
+import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -38,14 +39,14 @@ public class DesktopCapabilitiesTest {
     private static final boolean MEDIA_EME_ENABLED = true;
     private static final boolean MEDIA_GMP_MANAGER_UPDATE_ENABLED = true;
 
-    @Test(groups = {"DesktopCapabilitiesTestClass"}, enabled = false)
+    @Test(groups = {"DesktopCapabilitiesTestClass"})
     public static void getChromeCapabilityTest() {
         String testName = "chrome - getChromeCapabilityTest";
 
         ChromeCapabilities chromeCapabilities = new ChromeCapabilities();
         DesiredCapabilities capabilities = chromeCapabilities.getCapability(testName);
 
-        Assert.assertEquals(capabilities.getBrowserName(), BrowserType.CHROME, "Returned browser name is not valid!");
+        Assert.assertEquals(capabilities.getBrowserName(), Browser.CHROME.browserName(), "Returned browser name is not valid!");
 
         Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
 
@@ -65,7 +66,7 @@ public class DesktopCapabilitiesTest {
         FirefoxCapabilities firefoxCapabilities = new FirefoxCapabilities();
         DesiredCapabilities capabilities = firefoxCapabilities.getCapability(testName);
 
-        Assert.assertEquals(capabilities.getBrowserName(), BrowserType.FIREFOX, "Returned browser name is not valid!");
+        Assert.assertEquals(capabilities.getBrowserName(), Browser.FIREFOX.browserName(), "Returned browser name is not valid!");
 
         Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
 
@@ -92,7 +93,7 @@ public class DesktopCapabilitiesTest {
 
         DesiredCapabilities capabilities = firefoxCapabilities.getCapability(testName, profile);
 
-        Assert.assertEquals(capabilities.getBrowserName(), BrowserType.FIREFOX, "Returned browser name is not valid!");
+        Assert.assertEquals(capabilities.getBrowserName(), Browser.FIREFOX.browserName(), "Returned browser name is not valid!");
 
         Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
 
@@ -107,7 +108,7 @@ public class DesktopCapabilitiesTest {
         Assert.assertEquals(actualMediaGmpManagerUpdateEnabled, !MEDIA_GMP_MANAGER_UPDATE_ENABLED, "Returned firefox profile preference is not valid!");
     }
 
-    @Test(groups = {"DesktopCapabilitiesTestClass"}, enabled = false)
+    @Test(groups = {"DesktopCapabilitiesTestClass"})
     public static void getOperaCapabilityTest() {
         String testName = "opera - getOperaCapabilityTest";
 
@@ -123,7 +124,7 @@ public class DesktopCapabilitiesTest {
         Assert.assertFalse((Boolean) capabilities.getCapability(CapabilityType.TAKES_SCREENSHOT), "Returned capability value is not valid!");
     }
 
-/*    @Test(groups = {"DesktopCapabilitiesTestClass"}, enabled = false)
+   @Test(groups = {"DesktopCapabilitiesTestClass"}, enabled = false)
     public static void getSafariCapabilityTest() {
         String testName = "safari - getSafariCapabilityTest";
 
@@ -134,15 +135,15 @@ public class DesktopCapabilitiesTest {
 
         Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
     }
-*/
-    @Test(groups = {"DesktopCapabilitiesTestClass"}, enabled = false)
+
+    @Test(groups = {"DesktopCapabilitiesTestClass"})
     public static void getEdgeCapabilityTest() {
         String testName = "edge - getEdgeCapabilityTest";
 
         EdgeCapabilities edgeCapabilities = new EdgeCapabilities();
         DesiredCapabilities capabilities = edgeCapabilities.getCapability(testName);
 
-        Assert.assertEquals(capabilities.getBrowserName(), BrowserType.EDGE, "Returned browser name is not valid!");
+        Assert.assertEquals(capabilities.getBrowserName(), Browser.EDGE.browserName(), "Returned browser name is not valid!");
 
         Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
 
@@ -151,14 +152,14 @@ public class DesktopCapabilitiesTest {
         Assert.assertFalse((Boolean) capabilities.getCapability(CapabilityType.TAKES_SCREENSHOT), "Returned capability value is not valid!");
     }
 
-    @Test(groups = {"DesktopCapabilitiesTestClass"}, enabled = false)
+    @Test(groups = {"DesktopCapabilitiesTestClass"})
     public static void getIECapabilityTest() {
         String testName = "ie - getIECapabilityTest";
 
         IECapabilities ieCapabilities = new IECapabilities();
         DesiredCapabilities capabilities = ieCapabilities.getCapability(testName);
 
-        Assert.assertEquals(capabilities.getBrowserName(), BrowserType.IE, "Returned browser name is not valid!");
+        Assert.assertEquals(capabilities.getBrowserName(), Browser.IE.browserName(), "Returned browser name is not valid!");
 
         Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
 
@@ -170,7 +171,7 @@ public class DesktopCapabilitiesTest {
         Assert.assertFalse((Boolean) capabilities.getCapability(CapabilityType.TAKES_SCREENSHOT), "Returned capability value is not valid!");
     }
 
-    @Test(groups = {"DesktopCapabilitiesTestClass"}, enabled = false)
+    @Test(groups = {"DesktopCapabilitiesTestClass"})
     public static void getChromeCapabilityHeadlessTest() {
         R.CONFIG.put(Configuration.Parameter.HEADLESS.getKey(), "true");
 
@@ -182,7 +183,7 @@ public class DesktopCapabilitiesTest {
         Assert.assertFalse((Boolean) capabilities.getCapability("enableVideo"), "Returned capability value is not valid!");
     }
 
-    @Test(groups = {"DesktopCapabilitiesTestClass"}, enabled = false)
+    @Test(groups = {"DesktopCapabilitiesTestClass"})
     public static void getChromeCapabilityProxyTest() {
         String proxyHost = "host.example.com";
         String proxyPort = "80";
@@ -209,7 +210,7 @@ public class DesktopCapabilitiesTest {
         Assert.assertEquals(((Proxy) capabilities.getCapability(CapabilityType.PROXY)).getNoProxy(), noProxy, "No proxy is not valid!");
     }
 
-    @Test(groups = {"DesktopCapabilitiesTestClass"}, enabled = false)
+    @Test(groups = {"DesktopCapabilitiesTestClass"})
     public static void getChromeCapabilityBrowserLanguageTest() {
         String browserLanguage = "en_US";
         R.CONFIG.put(Configuration.Parameter.BROWSER_LANGUAGE.getKey(), browserLanguage, true);
@@ -223,7 +224,7 @@ public class DesktopCapabilitiesTest {
         Assert.assertTrue(chromeOptionsArgs.contains("--lang=" + browserLanguage), "Browser language wasn't set!");
     }
 
-    @Test(groups = {"DesktopCapabilitiesTestClass"}, enabled = false)
+    @Test(groups = {"DesktopCapabilitiesTestClass"})
     public static void getChromeCapabilityAutoDownloadTest() {
         R.CONFIG.put(Configuration.Parameter.AUTO_DOWNLOAD.getKey(), "true", true);
 
