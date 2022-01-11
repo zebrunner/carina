@@ -68,15 +68,6 @@ public abstract class AbstractCapabilities {
 
     protected DesiredCapabilities initCapabilities(DesiredCapabilities capabilities) {
         // read all properties which starts from "capabilities.*" prefix and add them into desired capabilities.
-        /*
-         * make sure to provide non w3c correctly to avoid on mobile grid such errors:
-         * Caused by: java.lang.IllegalArgumentException: Illegal key values seen in w3c capabilities: [carinaTestRunId, enableLog, enableVNC,
-         * enableVideo, fallbackSessionId, provider]
-         */
-        Map<String, Object> providerCaps = new HashMap<>();
-        providerCaps.put("fallbackSessionId", this.fallbackSessionId);
-
-        
         final String prefix = SpecialKeywords.CAPABILITIES + ".";
         @SuppressWarnings({ "unchecked", "rawtypes" })
         Map<String, String> capabilitiesMap = new HashMap(R.CONFIG.getProperties());
@@ -85,15 +76,7 @@ public abstract class AbstractCapabilities {
                 String value = R.CONFIG.get(entry.getKey());                
                 if (!value.isEmpty()) {
                     String cap = entry.getKey().replaceAll(prefix, "");
-                    if ("enableVNC".equalsIgnoreCase(cap) ||
-                            "enableVideo".equalsIgnoreCase(cap) ||
-                            "enableLog".equalsIgnoreCase(cap) ||
-                            "enableMetadata".equalsIgnoreCase(cap)) {
-                        LOGGER.debug("Adding " + cap + " to capabilities as provider options");
-                        providerCaps.put(cap, Boolean.parseBoolean(value));
-                    } else if ("provider".equalsIgnoreCase(cap)) {
-                        providerCaps.put(cap, value);
-                    } else if ("idleTimeout".equalsIgnoreCase(cap) && isNumber(value)) {
+                    if ("idleTimeout".equalsIgnoreCase(cap) && isNumber(value)) {
                         LOGGER.debug("Adding idleTimeout to capabilities as integer");
                         capabilities.setCapability(cap, Integer.parseInt(value));
                     } else if ("false".equalsIgnoreCase(value)) {
@@ -107,14 +90,6 @@ public abstract class AbstractCapabilities {
             }
         }
 
-        String provider = !R.CONFIG.get("capabilities.provider").isEmpty() ? R.CONFIG.get("capabilities.provider") : "zebrunner";
-        if ("selenium".equalsIgnoreCase(provider)) {
-            // selenium is default provider name in Zebrunner CE
-            provider = "selenoid";
-        }
-        String optionName = provider + ":options";
-        capabilities.setCapability(optionName, providerCaps);
-        
         //TODO: [VD] reorganize in the same way Firefox profiles args/options if any and review other browsers
         // support customization for Chrome args and options
 
