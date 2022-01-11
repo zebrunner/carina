@@ -232,11 +232,11 @@ public abstract class AbstractCapabilities {
                 String name = option.split("=")[0].trim();
                 String value = option.split("=")[1].trim();
                 if ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value)) {
-                    chromePrefs.put(name, Boolean.valueOf(value));
+                    options.setExperimentalOption(name, Boolean.valueOf(value));
                 } else if (isNumber(value)) {
-                    chromePrefs.put(name, Long.valueOf(value));
+                    options.setExperimentalOption(name, Long.valueOf(value));
                 } else {
-                    chromePrefs.put(name, value);
+                    options.setExperimentalOption(name, value);
                 }
             }
         }
