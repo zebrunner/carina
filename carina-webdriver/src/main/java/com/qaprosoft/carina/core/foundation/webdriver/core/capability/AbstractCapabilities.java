@@ -40,6 +40,7 @@ import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.proxy.SystemProxy;
 
 public abstract class AbstractCapabilities {
@@ -48,12 +49,13 @@ public abstract class AbstractCapabilities {
 
     public abstract DesiredCapabilities getCapability(String testName);
     
-    private String fallbackSessionId = java.util.UUID.randomUUID().toString();
-
     protected DesiredCapabilities initBaseCapabilities(DesiredCapabilities capabilities, String browser, String testName) {
 
         capabilities.setBrowserName(browser);
-        capabilities.setCapability("name", testName);
+        if (!IDriverPool.DEFAULT.equalsIgnoreCase(testName)) {
+            // #1573: remove "default" driver name capability registration
+            capabilities.setCapability("name", testName);
+        }
 
         Proxy proxy = setupProxy();
         if (proxy != null) {
@@ -232,11 +234,11 @@ public abstract class AbstractCapabilities {
                 String name = option.split("=")[0].trim();
                 String value = option.split("=")[1].trim();
                 if ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value)) {
-                    options.setExperimentalOption(name, Boolean.valueOf(value));
+                    chromePrefs.put(name, Boolean.valueOf(value));
                 } else if (isNumber(value)) {
-                    options.setExperimentalOption(name, Long.valueOf(value));
+                    chromePrefs.put(name, Long.valueOf(value));
                 } else {
-                    options.setExperimentalOption(name, value);
+                    chromePrefs.put(name, value);
                 }
             }
         }
