@@ -6,7 +6,7 @@
 
 Before the start, make sure you have [Zebrunner Community Edition](https://github.com/zebrunner/zebrunner)
 installed together with the [Reporting service](https://github.com/zebrunner/reporting). If you haven’t yet used Zebrunner CE, 
-follow the [User Guide](https://zebrunner.github.io/zebrunner/) with the steps on installation and configuration. 
+follow the [User Guide](https://zebrunner.github.io/community-edition/) with the steps on installation and configuration. 
 Let’s begin the integration!
 
 ![Zebrunner dashboards](./img/zebrDashboards.jpg)

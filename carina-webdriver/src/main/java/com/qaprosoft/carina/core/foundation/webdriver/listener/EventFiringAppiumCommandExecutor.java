@@ -282,7 +282,7 @@ public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
             if (NEW_SESSION.equals(command.getName())) {
                 response = createSession(command);
             } else {
-                int retry = 10; //max attempts to repeit
+                int retry = 10; //max attempts to repeat
                 Number pause = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / retry;
                 while (retry > 0) {
                     response = super.execute(command);
