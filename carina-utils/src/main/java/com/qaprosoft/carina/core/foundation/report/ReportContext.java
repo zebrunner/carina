@@ -49,16 +49,16 @@ import javax.imageio.ImageIO;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.FileManager;
@@ -71,7 +71,7 @@ import com.zebrunner.agent.core.registrar.Artifact;
  */
 
 public class ReportContext {
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public static final String ARTIFACTS_FOLDER = "artifacts";
 
@@ -309,7 +309,7 @@ public class ReportContext {
         try {
             return new WebDriverWait(driver, timeout).until((k) -> checkArtifactUsingHttp(url, username, password));
         } catch (Exception e) {
-            LOGGER.debug(e);
+            LOGGER.debug(e.getMessage(), e);
             return false;
         }
     }
@@ -483,10 +483,10 @@ public class ReportContext {
 
     private static void closeThreadLogAppender() {
         try {
-            ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
-            if (tla != null) {
-                tla.close();
-            }
+//            ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
+//            if (tla != null) {
+//                tla.close();
+//            }
 
         } catch (NoSuchMethodError e) {
             LOGGER.error("Exception while closing thread log appender.");
