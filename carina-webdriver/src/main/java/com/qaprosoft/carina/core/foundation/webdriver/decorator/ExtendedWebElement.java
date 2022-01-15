@@ -459,6 +459,33 @@ public class ExtendedWebElement implements IWebElement {
     }
     
     /**
+     * Click on element by javascript.
+     */
+    public void clickByJs() {
+        clickByJs(EXPLICIT_TIMEOUT);
+    }
+
+    /**
+     * Click on element by javascript.
+     *
+     * @param timeout to wait
+     */
+    public void clickByJs(long timeout) {
+        clickByJs(timeout, getDefaultCondition(getBy()));
+    }
+    
+    /**
+     * Click on element by javascript.
+     *
+     * @param timeout to wait
+     * @param waitCondition
+     *            to check element conditions before action
+     */
+    public void clickByJs(long timeout, ExpectedCondition<?> waitCondition) {
+        doAction(ACTION_NAME.CLICK_BY_JS, timeout, waitCondition);
+    }
+    
+    /**
      * Double Click on element.
      */
     public void doubleClick() {
@@ -1149,6 +1176,8 @@ public class ExtendedWebElement implements IWebElement {
 	public interface ActionSteps {
 		void doClick();
 		
+		void doClickByJs();
+		
 		void doDoubleClick();
 
 		void doRightClick();
@@ -1322,8 +1351,18 @@ public class ExtendedWebElement implements IWebElement {
                         Messager.ELEMENT_NOT_CLICKED.getMessage(getNameWithLocator()));
 
                 element.click();
-
 			}
+			
+            @Override
+            public void doClickByJs() {
+                DriverListener.setMessages(Messager.ELEMENT_CLICKED.getMessage(getName()),
+                        Messager.ELEMENT_NOT_CLICKED.getMessage(getNameWithLocator()));
+
+                // not visible so we can't interact using selenium or actions
+                LOGGER.info("Do click by JavascriptExecutor for element '" + getNameWithLocator());
+                JavascriptExecutor executor = (JavascriptExecutor) getDriver();
+                executor.executeScript("arguments[0].click();", element);
+            }
 			
 			@Override
 			public void doDoubleClick() {

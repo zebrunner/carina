@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.performance;
 
 public enum ACTION_NAME {
     CLICK("click"),
+    CLICK_BY_JS("click_by_js"),
     DOUBLE_CLICK("double_click"),
     RIGHT_CLICK("right_click"),
     HOVER("hover"),
