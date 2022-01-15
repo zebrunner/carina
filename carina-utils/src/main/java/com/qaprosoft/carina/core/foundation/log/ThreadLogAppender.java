@@ -26,8 +26,6 @@ import org.apache.log4j.MDC;
 import org.apache.log4j.spi.LoggingEvent;
 
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 
 /*
  * This appender log groups test outputs by test method/test thread so they don't mess up each other even they runs in parallel.
