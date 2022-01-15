@@ -1,4 +1,4 @@
-#How to integrate Carina based projects with Zebrunner
+#Zebrunner Reporting Integration
 
 [![Zebrunner + Carina logo](../img/carinaPlusZebrunner.png)](https://zebrunner.com/)
 
