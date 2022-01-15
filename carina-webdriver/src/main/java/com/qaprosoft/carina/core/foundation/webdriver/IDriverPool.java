@@ -526,6 +526,7 @@ public interface IDriverPool {
      * @return Device device
      * 
      */
+    @Deprecated
     public static Device getDefaultDevice() {
         long threadId = Thread.currentThread().getId();
         Device device = currentDevice.get();
