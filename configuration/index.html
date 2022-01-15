@@ -936,8 +936,8 @@ R.TESTDATA.get(&quot;user.email&quot;)
         <td>page_opening_strategy</td>
         <td>Determines how carina detects whether expected page is opened: by expected url pattern, by marker element loading state or by both these conditions</td>
         <td>BY_ELEMENT, BY_URL, BY_URL_AND_ELEMENT</td>
-    </tr>
-</table>
+    </tr></p>
+<p></table>
 Most of the properties may be read in the following way:</p>
 <pre><code>Configuration.get(Parameter.URL) // returns string value
 Configuration.getBoolean(Parameter.AUTO_SCREENSHOT) // returns boolean value
@@ -1058,7 +1058,7 @@ test_run_rules=PRIORITY=&gt;!!P1;;OWNER=&gt;Josh&amp;&amp;!!Jake;;TAGS=&gt;featu
    selenium_url=http://localhost:4444/wd/hub
 2) passing them right in the test:
 public void testCompareModels() {
-   R.CONFIG.put(&quot;selenium_host&quot;, &quot;http://localhost:4444/wd/hub&quot;);
+   R.CONFIG.put(&quot;selenium_url&quot;, &quot;http://localhost:4444/wd/hub&quot;);
    HomePage homePage = new HomePage(getDriver());
    homePage.open();
    ...
