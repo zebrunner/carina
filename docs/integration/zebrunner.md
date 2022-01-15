@@ -37,10 +37,10 @@ Possible parameters in agent.properties:
 - `reporting.run.build` - optional value. The build number that is associated with the test run. It can depict either the test build number or the application build number;
 - `reporting.run.environment` - optional value. The environment in which the tests will run.
 
-
+Example of the agent.yaml:
 ![agent configuration](../img/agentConfiguration.png)
 
-More details and examples of Environment variables, Program arguments, Properties file can be found in the 
+More details and examples of Environment variables, Program arguments etc can be found in the 
 [Documentation](https://zebrunner.com/documentation/agents/testng) in the section ‘Tracking of test results’. 
 
 ###The integration with Zebrunner is in place!
