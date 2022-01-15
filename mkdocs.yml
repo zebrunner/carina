@@ -19,6 +19,8 @@ pages:
       - Program flow: advanced/program_flow.md
       - Proxy: advanced/proxy.md
       - Security: advanced/security.md
+    - Integration:
+      - Zebrunner: integration/zebrunner.md
     - Cucumber: cucumber.md
     - Contribution: contribution.md
 theme:
