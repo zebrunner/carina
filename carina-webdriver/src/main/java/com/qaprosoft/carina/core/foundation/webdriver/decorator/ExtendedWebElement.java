@@ -76,8 +76,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLoc
 import com.sun.jersey.core.util.Base64;
 
 import io.appium.java_client.MobileBy;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.ios.IOSDriver;
 
 public class ExtendedWebElement implements IWebElement {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -460,12 +458,6 @@ public class ExtendedWebElement implements IWebElement {
         doAction(ACTION_NAME.CLICK, timeout, waitCondition);
     }
     
-	private boolean isMobile() {
-		// TODO: investigating potential class cast exception
-		WebDriver driver = getDriver();
-		return (driver instanceof IOSDriver) || (driver instanceof AndroidDriver);
-	}
-
     /**
      * Double Click on element.
      */
