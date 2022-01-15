@@ -47,6 +47,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#contributing-to-carina" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -452,10 +457,59 @@
     
     <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
     
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Contribution
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9h14V7H3v2m0 4h14v-2H3v2m0 4h14v-2H3v2m16 0h2v-2h-2v2m0-10v2h2V7h-2m0 6h2v-2h-2v2z"/></svg>
+        </span>
+      </label>
     
     <a href="./" title="Contribution" class="md-nav__link md-nav__link--active">
       Contribution
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#make-changes-to-the-carina-code-or-docs" class="md-nav__link">
+    Make changes to the Carina code or docs
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#help-out-on-our-community" class="md-nav__link">
+    Help out on our community
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#submit-bug-reports-or-feature-requests" class="md-nav__link">
+    Submit bug reports or feature requests
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
     
   </li>
 
@@ -466,6 +520,52 @@
                 </div>
               </div>
             
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#make-changes-to-the-carina-code-or-docs" class="md-nav__link">
+    Make changes to the Carina code or docs
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#help-out-on-our-community" class="md-nav__link">
+    Help out on our community
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#submit-bug-reports-or-feature-requests" class="md-nav__link">
+    Submit bug reports or feature requests
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
             
           
           <div class="md-content">
@@ -480,21 +580,26 @@
                   
                 
                 
-                  <h1>Contribution</h1>
-                
-                <p>Configure ssh connection based on git documentation <a href="https://help.github.com/articles/connecting-to-github-with-ssh">https://help.github.com/articles/connecting-to-github-with-ssh</a>.</p>
-<p>1) <strong>Fork repository</strong> <code>https://github.com/zebrunner/carina</code> to your own user.</p>
-<p>2) <strong>Clone your fork to your local machine</strong>:</p>
-<p><code>git clone git@github.com:your_fork_url/carina.git</code></p>
-<p>3) <code>git remote add origin &lt;your_fork_url&gt;</code> (can be already added)</p>
-<p>4) <code>git fetch origin</code></p>
-<p>5) <code>git remote add upstream git@github.com:qaprosoft/carina.git</code></p>
-<p>6) <code>git fetch upstream</code></p>
-<p>7) <code>git checkout -b work_local_branch upstream/master</code></p>
-<p>And then, after adding the files (<code>git add</code> ...), use <code>git commit</code> (add description) and then<code>push</code>:</p>
-<pre><code>git push origin work_local_branch:work_remote_branch
-</code></pre>
-<p>And on <a href="https://github.com/zebrunner/carina">https://github.com/zebrunner/carina</a> you will see the possibility to "Compare &amp; Pull Request"</p>
+                <h1 id="contributing-to-carina">Contributing to Carina</h1>
+<p>There are multiple ways to contribute to Carina. See below for everything you can do and the processes to follow for each contribution method.
+Your contribution is governed by our <a href="CODE_OF_CONDUCT.md">Code of Conduct</a>.</p>
+<h3 id="make-changes-to-the-carina-code-or-docs">Make changes to the Carina code or docs</h3>
+<p>Please use the unified code formatter <a href="carina_formatter.xml">Java code formatter for Eclipse</a>; in IntelliJ IDEA, install and configure <a href="https://plugins.jetbrains.com/plugin/6546-eclipse-code-formatter">Eclipse Code Formatter</a>.</p>
+<p>Fork the project, make a change, and send a pull request. For every Pull Request, an automatic snapshot build is generated and <a href="https://ci.zebrunner.com/sonarqube/dashboard?id=com.qaprosoft%3Acarina">Sonar</a> quality checks are performed.
+The exact build number can be found among the check details:
+<img alt="Alt text" src="https://github.com/zebrunner/carina/raw/master/docs/img/pr-checker.png" title="Pull Request Checker" /></p>
+<p>Update your project <a href="https://github.com/zebrunner/carina-demo/blob/ea08927c722d5138a003cdb1f04b03363d89aeb7/pom.xml#L16">pom.xml</a>, make sure to have a <a href="https://github.com/zebrunner/carina-demo/blob/d23dd865567e8bafbdd3c925fa89374ae712b6bd/pom.xml#L26">snapshot</a> repository enabled and test your changes. Add test results/comments into the Pull Request if possible.</p>
+<p>After reviewing and merging, we generate a consolidated release candidate build increasing the build number, for example, after release <code>7.2.14</code> all the merges come into <code>7.2.15-SNAPSHOT</code>. We strongly recommend that you do one more testing round using this build number.</p>
+<p>The release candidate build number can also be found in the latest SHA1 commit details:
+<img alt="Alt text" src="https://github.com/zebrunner/carina/raw/master/docs/img/snapshot-build.png" title="Release Candidate" /></p>
+<p>You will probably want to have a look at this more in-depth <a href="https://zebrunner.github.io/carina/"><strong>Carina Overview</strong></a> of the project,
+providing details on how it is architected, how to use it, etc.</p>
+<h3 id="help-out-on-our-community">Help out on our community</h3>
+<p>We can always use help on our forums at
+<a href="https://t.me/qps_carina"><strong>Carina Support</strong></a>! Hop on over and see if there
+are any questions that you can answer.</p>
+<h3 id="submit-bug-reports-or-feature-requests">Submit bug reports or feature requests</h3>
+<p>Just use the GitHub issue tracker to submit your bug reports and feature requests. Please follow the <a href=".github/ISSUE_TEMPLATE/bug-report.md">issue</a> or <a href=".github/ISSUE_TEMPLATE/feature_request.md">feature</a> templates.</p>
                 
               
               
