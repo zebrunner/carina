@@ -15,17 +15,20 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.log;
 
-import com.qaprosoft.carina.core.foundation.api.log.LoggingOutputStream;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.io.*;
+import com.qaprosoft.carina.core.foundation.api.log.LoggingOutputStream;
 
 public class LoggingOutputStreamTest {
 
-    private static final Logger LOGGER = Logger.getLogger(LoggingOutputStreamTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Test
     public void testLoggingOutputStream() {

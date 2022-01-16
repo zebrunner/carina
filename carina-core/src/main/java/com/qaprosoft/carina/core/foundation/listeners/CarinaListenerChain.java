@@ -15,20 +15,22 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.listeners;
 
-import com.google.common.collect.Lists;
-import com.nordstrom.automation.testng.ListenerChain;
-import org.apache.log4j.Logger;
-import org.testng.IConfigurationListener;
-import org.testng.ITestNGMethod;
-import org.testng.ITestResult;
-
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testng.IConfigurationListener;
+import org.testng.ITestNGMethod;
+import org.testng.ITestResult;
+
+import com.google.common.collect.Lists;
+import com.nordstrom.automation.testng.ListenerChain;
+
 public class CarinaListenerChain extends ListenerChain {
 
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     // The IConfigurationListener interface has two methods with the same meaning:
     // 1. void beforeConfiguration(ITestResult tr)

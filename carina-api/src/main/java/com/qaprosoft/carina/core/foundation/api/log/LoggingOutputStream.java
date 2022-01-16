@@ -18,8 +18,8 @@ package com.qaprosoft.carina.core.foundation.api.log;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.event.Level;
 
 public class LoggingOutputStream extends OutputStream {
 
@@ -119,7 +119,26 @@ public class LoggingOutputStream extends OutputStream {
         final byte[] bytes = new byte[count];
         System.arraycopy(buf, 0, bytes, 0, count);
         String str = new String(bytes);
-        log.log(level, str);
+        switch (level) {
+        case ERROR:
+            log.error(str);
+            break;
+        case WARN:
+            log.warn(str);
+            break;
+        case INFO:
+            log.info(str);
+            break;
+        case DEBUG:
+            log.debug(str);
+            break;
+        case TRACE:
+            log.warn(str);
+            break;
+        default:
+            log.info(str);
+            break;
+        }
         count = 0;
     }
 
