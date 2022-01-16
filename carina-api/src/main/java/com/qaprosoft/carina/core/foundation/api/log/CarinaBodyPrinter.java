@@ -19,6 +19,7 @@ package com.qaprosoft.carina.core.foundation.api.log;
 import java.io.PrintStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -34,7 +35,8 @@ import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -53,7 +55,7 @@ import io.restassured.specification.FilterableRequestSpecification;
 
 public class CarinaBodyPrinter {
 
-    private final static Logger LOGGER = Logger.getLogger(CarinaBodyPrinter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final String HIDDEN_PATTERN = "****************";
 
