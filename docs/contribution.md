@@ -1,23 +1,31 @@
-Configure ssh connection based on git documentation [https://help.github.com/articles/connecting-to-github-with-ssh](https://help.github.com/articles/connecting-to-github-with-ssh).
+# Contributing to Carina
 
-1) **Fork repository** `https://github.com/zebrunner/carina` to your own user.
+There are multiple ways to contribute to Carina. See below for everything you can do and the processes to follow for each contribution method.
+Your contribution is governed by our [Code of Conduct](https://github.com/zebrunner/carina/blob/master/CODE_OF_CONDUCT.md).
 
-2) **Clone your fork to your local machine**:
+### Make changes to the Carina code or docs
 
- `git clone git@github.com:your_fork_url/carina.git`
+Please use the unified code formatter [Java code formatter for Eclipse](https://github.com/zebrunner/carina/blob/master/carina_formatter.xml); in IntelliJ IDEA, install and configure [Eclipse Code Formatter](https://plugins.jetbrains.com/plugin/6546-eclipse-code-formatter).
 
-3) `git remote add origin <your_fork_url>` (can be already added)
+Fork the project, make a change, and send a pull request. For every Pull Request, an automatic snapshot build is generated and [Sonar](https://ci.zebrunner.com/sonarqube/dashboard?id=com.qaprosoft%3Acarina) quality checks are performed.
+The exact build number can be found among the check details:
+![Alt text](https://github.com/zebrunner/carina/raw/master/docs/img/pr-checker.png "Pull Request Checker")
 
-4) `git fetch origin`
 
-5) `git remote add upstream git@github.com:qaprosoft/carina.git`
+Update your project [pom.xml](https://github.com/zebrunner/carina-demo/blob/ea08927c722d5138a003cdb1f04b03363d89aeb7/pom.xml#L16), make sure to have a [snapshot](https://github.com/zebrunner/carina-demo/blob/d23dd865567e8bafbdd3c925fa89374ae712b6bd/pom.xml#L26) repository enabled and test your changes. Add test results/comments into the Pull Request if possible.
 
-6) `git fetch upstream`
+After reviewing and merging, we generate a consolidated release candidate build increasing the build number, for example, after release `7.2.14` all the merges come into `7.2.15-SNAPSHOT`. We strongly recommend that you do one more testing round using this build number.
 
-7) `git checkout -b work_local_branch upstream/master`
+The release candidate build number can also be found in the latest SHA1 commit details:
+![Alt text](https://github.com/zebrunner/carina/raw/master/docs/img/snapshot-build.png "Release Candidate")
 
-And then, after adding the files (`git add` ...), use `git commit` (add description) and then`push`:
 
-    git push origin work_local_branch:work_remote_branch
-    
-And on [https://github.com/zebrunner/carina](https://github.com/zebrunner/carina) you will see the possibility to "Compare & Pull Request"
+### Help out on our community
+
+We can always use help on our forums at
+[**Carina Support**](https://t.me/qps_carina)! Hop on over and see if there
+are any questions that you can answer.
+
+### Submit bug reports or feature requests
+
+Just use the GitHub issue tracker to submit your bug reports and feature requests. Please follow the [issue](https://github.com/zebrunner/carina/blob/master/.github/ISSUE_TEMPLATE/bug-report.md) or [feature](https://github.com/zebrunner/carina/blob/master/.github/ISSUE_TEMPLATE/feature_request.md) templates.

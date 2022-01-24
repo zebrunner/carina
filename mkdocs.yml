@@ -2,7 +2,6 @@ site_name: Carina
 pages:
     - Overview: index.md
     - Getting started: getting_started.md
-    - Integration with Zebrunner: zebrIntegration.md
     - Project structure: project_structure.md
     - Configuration: configuration.md
     - Execution: execution.md
@@ -19,6 +18,8 @@ pages:
       - Program flow: advanced/program_flow.md
       - Proxy: advanced/proxy.md
       - Security: advanced/security.md
+    - Integration:
+      - Zebrunner: integration/zebrunner.md
     - Cucumber: cucumber.md
     - Contribution: contribution.md
 theme:

@@ -210,11 +210,9 @@ public class Configuration {
         
         ASSIGNEE("assignee"),
         
-        // GIT
-        GIT_BRANCH("git_branch"),
         // sha1
-        GIT_COMMIT("git_commit");
-
+        GIT_HASH("git_hash");
+        
         private final String key;
 
         Parameter(String key) {

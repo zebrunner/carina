@@ -221,12 +221,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         // register app_version/build as artifact if available...
         Configuration.setBuild(Configuration.get(Parameter.APP_VERSION));
         
-        String branch = Configuration.get(Parameter.GIT_BRANCH);
-        if (!branch.isEmpty()) {
-            Label.attachToTestRun("branch", branch);
-        }
-        
-        String sha1 = Configuration.get(Parameter.GIT_COMMIT);
+        String sha1 = Configuration.get(Parameter.GIT_HASH);
         if (!sha1.isEmpty()) {
             Label.attachToTestRun("sha1", sha1);
         }
