@@ -21,10 +21,10 @@ import java.util.Properties;
 
 public class PropertiesProcessorMain {
 
-    private static List<PropertiesProcessor> processors;
+    private static final List<PropertiesProcessor> processors;
 
     static {
-        processors = new ArrayList<PropertiesProcessor>();
+        processors = new ArrayList<>();
         processors.add(new GenerateProcessor());
         processors.add(new CryptoProcessor());
 		processors.add(new NotStringValuesProcessor());
