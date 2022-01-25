@@ -486,6 +486,33 @@ public class ExtendedWebElement implements IWebElement {
     }
     
     /**
+     * Click on element by Actions.
+     */
+    public void clickByActions() {
+        clickByActions(EXPLICIT_TIMEOUT);
+    }
+
+    /**
+     * Click on element by Actions.
+     *
+     * @param timeout to wait
+     */
+    public void clickByActions(long timeout) {
+        clickByActions(timeout, getDefaultCondition(getBy()));
+    }
+    
+    /**
+     * Click on element by Actions.
+     *
+     * @param timeout to wait
+     * @param waitCondition
+     *            to check element conditions before action
+     */
+    public void clickByActions(long timeout, ExpectedCondition<?> waitCondition) {
+        doAction(ACTION_NAME.CLICK_BY_ACTIONS, timeout, waitCondition);
+    }
+    
+    /**
      * Double Click on element.
      */
     public void doubleClick() {
@@ -1178,6 +1205,8 @@ public class ExtendedWebElement implements IWebElement {
 		
 		void doClickByJs();
 		
+		void doClickByActions();
+		
 		void doDoubleClick();
 
 		void doRightClick();
@@ -1358,11 +1387,20 @@ public class ExtendedWebElement implements IWebElement {
                 DriverListener.setMessages(Messager.ELEMENT_CLICKED.getMessage(getName()),
                         Messager.ELEMENT_NOT_CLICKED.getMessage(getNameWithLocator()));
 
-                // not visible so we can't interact using selenium or actions
-                LOGGER.info("Do click by JavascriptExecutor for element '" + getNameWithLocator());
+                LOGGER.info("Do click by JavascriptExecutor for element: " + getNameWithLocator());
                 JavascriptExecutor executor = (JavascriptExecutor) getDriver();
                 executor.executeScript("arguments[0].click();", element);
             }
+            
+            @Override
+            public void doClickByActions() {
+                DriverListener.setMessages(Messager.ELEMENT_CLICKED.getMessage(getName()),
+                        Messager.ELEMENT_NOT_CLICKED.getMessage(getNameWithLocator()));
+
+                LOGGER.info("Do click by Actions for element: " + getNameWithLocator());
+                Actions actions = new Actions(getDriver());
+                actions.moveToElement(element).click().perform();
+            }     
 			
 			@Override
 			public void doDoubleClick() {

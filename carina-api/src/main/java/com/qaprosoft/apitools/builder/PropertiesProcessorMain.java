@@ -16,27 +16,33 @@
 package com.qaprosoft.apitools.builder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.Predicate;
 
 public class PropertiesProcessorMain {
 
-    private static List<PropertiesProcessor> processors;
+    private static final List<PropertiesProcessor> processors;
 
     static {
-        processors = new ArrayList<PropertiesProcessor>();
+        processors = new ArrayList<>();
         processors.add(new GenerateProcessor());
         processors.add(new CryptoProcessor());
 		processors.add(new NotStringValuesProcessor());
     }
 
-    public static Properties processProperties(Properties in) {
+    public static Properties processProperties(Properties in, List<Class<? extends PropertiesProcessor>> ignoredPropertiesProcessorClasses) {
         Properties out = new Properties();
         out.putAll(in);
-        for (PropertiesProcessor processor : processors) {
-            out.putAll(processor.process(in));
-        }
+        processors.stream()
+                .filter(isProcessorToExecute(ignoredPropertiesProcessorClasses))
+                .forEach(processor -> out.putAll(processor.process(in)));
         return out;
     }
 
+    private static Predicate<PropertiesProcessor> isProcessorToExecute(List<Class<? extends PropertiesProcessor>> ignoredPropertiesProcessorClasses) {
+        return pr -> ignoredPropertiesProcessorClasses == null || ignoredPropertiesProcessorClasses.stream()
+                .noneMatch(pc -> pr.getClass().isAssignableFrom(pc));
+    }
 }

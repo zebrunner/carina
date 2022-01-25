@@ -66,5 +66,5 @@ More details and examples of Environment variables, Program arguments etc can be
 Join us in our support [Telegram channel](https://t.me/zebrunner)
 for more updates in Carina and Zebrunner!
 
-Want to get the advanced test execution and reporting for your testing? Sign up for a FREE 30-day trial in
+Want to get the advanced test execution and reporting for your testing? Sign up for a FREE 14-day trial in
 [Zebrunner PRO](https://zebrunner.com/).

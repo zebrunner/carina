@@ -21,7 +21,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<freemarker.version>2.3.14</freemarker.version>
+		<freemarker.version>2.3.31</freemarker.version>
 		<jsonassert.version>1.5.0</jsonassert.version>
 		<org.everit.json.schema.version>1.5.1</org.everit.json.schema.version>
 	</properties>

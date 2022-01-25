@@ -16,8 +16,10 @@
 package com.qaprosoft.apitools.message;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 
+import com.qaprosoft.apitools.builder.PropertiesProcessor;
 import org.apache.commons.configuration2.CompositeConfiguration;
 
 import com.qaprosoft.apitools.builder.MessageBuilder;
@@ -33,6 +35,8 @@ public class TemplateMessage extends Message {
     private Properties[] propertiesArr;
 
     private Properties propertiesStorage;
+
+    private List<Class<? extends PropertiesProcessor>> ignoredPropertiesProcessorClasses;
 
     private String propertiesPath;
 
@@ -97,9 +101,13 @@ public class TemplateMessage extends Message {
         propertiesStorage.remove(key);
     }
 
+    public void setIgnoredPropertiesProcessorClasses(List<Class<? extends PropertiesProcessor>> ignoredPropertiesProcessorClasses) {
+        this.ignoredPropertiesProcessorClasses = ignoredPropertiesProcessorClasses;
+    }
+
     @Override
     public String getMessageText() {
-        propertiesStorage = PropertiesProcessorMain.processProperties(propertiesStorage);
+        propertiesStorage = PropertiesProcessorMain.processProperties(propertiesStorage, ignoredPropertiesProcessorClasses);
         return MessageBuilder.buildStringMessage(templatePath, propertiesStorage);
     }
 }

@@ -18,6 +18,7 @@ package com.qaprosoft.apitools.builder;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+@Deprecated
 public class NotStringValuesProcessor implements PropertiesProcessor {
 
 	@Override
