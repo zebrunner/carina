@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.apitools.validation;
 
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,10 +29,16 @@ import org.skyscreamer.jsonassert.comparator.DefaultComparator;
 
 public class JsonKeywordsComparator extends DefaultComparator {
 
-    private String validationFlags[];
+    private final String[] validationFlags;
+    private final JsonComparatorContext context;
 
     public JsonKeywordsComparator(JSONCompareMode mode, String... validationFlags) {
+        this(mode, null, validationFlags);
+    }
+
+    public JsonKeywordsComparator(JSONCompareMode mode, JsonComparatorContext context, String... validationFlags) {
         super(mode);
+        this.context = context;
         this.validationFlags = validationFlags;
     }
 
@@ -39,19 +46,33 @@ public class JsonKeywordsComparator extends DefaultComparator {
     public void compareValues(String prefix, Object expectedValue, Object actualValue, JSONCompareResult result) throws JSONException {
         if (JsonCompareKeywords.SKIP.getKey().equals(expectedValue.toString())) {
             // do nothing
-        } else if (expectedValue != null && expectedValue.toString().startsWith(JsonCompareKeywords.TYPE.getKey())) {
+        } else if (expectedValue.toString().startsWith(JsonCompareKeywords.TYPE.getKey())) {
             String expType = expectedValue.toString().replace(JsonCompareKeywords.TYPE.getKey(), "");
             if (!expType.equals(actualValue.getClass().getSimpleName())) {
                 result.fail(String.format("%s\nValue type '%s' doesn't match to expected type '%s'\n", prefix, actualValue.getClass()
                         .getSimpleName(), expType));
             }
-        } else if (expectedValue != null && expectedValue.toString().startsWith(JsonCompareKeywords.REGEX.getKey())) {
+        } else if (expectedValue.toString().startsWith(JsonCompareKeywords.REGEX.getKey())) {
             if (actualValue instanceof Number || actualValue instanceof String) {
                 String actualStr = actualValue.toString();
                 String regex = expectedValue.toString().replace(JsonCompareKeywords.REGEX.getKey(), "");
                 Matcher m = Pattern.compile(regex).matcher(actualStr);
                 if (!m.find()) {
                     result.fail(String.format("%s\nActual value '%s' doesn't match to expected regex '%s'\n", prefix, actualStr, regex));
+                }
+            } else {
+                super.compareValues(prefix, expectedValue, actualValue, result);
+            }
+        } else if (expectedValue.toString().startsWith(JsonCompareKeywords.PREDICATE.getKey())) {
+            if (context != null) {
+                String expPredicate = expectedValue.toString().replace(JsonCompareKeywords.PREDICATE.getKey(), "");
+                Predicate<Object> predicate = context.getNamedPredicates().get(expPredicate);
+                if (predicate != null) {
+                    if (!predicate.test(actualValue)) {
+                        result.fail(String.format("%s\nActual value '%s' doesn't match to expected predicate '%s'\n", prefix, actualValue, expPredicate));
+                    }
+                } else {
+                    super.compareValues(prefix, expectedValue, actualValue, result);
                 }
             } else {
                 super.compareValues(prefix, expectedValue, actualValue, result);

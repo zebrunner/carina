@@ -15,26 +15,30 @@
  *******************************************************************************/
 package com.qaprosoft.apitools.validation;
 
-public enum JsonCompareKeywords {
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 
-    SKIP("skip"),
-    TYPE("type:"),
-    REGEX("regex:"),
-    ARRAY_CONTAINS("validate_array_contains_only:"),
-    PREDICATE("predicate:");
+public final class JsonComparatorContext {
 
-    private String key;
+    private final Map<String, Predicate<Object>> namedPredicates;
 
-    private JsonCompareKeywords(String key) {
-        this.key = key;
+    public JsonComparatorContext() {
+        this.namedPredicates = new ConcurrentHashMap<>();
     }
 
-    public String getKey() {
-        return key;
+    public <T> JsonComparatorContext withPredicate(String name, Predicate<T> predicate) {
+        if (predicate != null) {
+            this.namedPredicates.put(name, (Predicate<Object>) predicate);
+        }
+        return this;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    Map<String, Predicate<Object>> getNamedPredicates() {
+        return namedPredicates;
     }
 
+    public static JsonComparatorContext context() {
+        return new JsonComparatorContext();
+    }
 }

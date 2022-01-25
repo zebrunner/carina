@@ -193,11 +193,13 @@ In some cases, you may need to generate data in the request to make the request 
 ```
 Another option is to specify the placeholder in the request template and then pass some generated value directly from the test method.
 
-Wildcards are also useful for response validation. In some cases, you may need to skip some values or validate by regex:
+Wildcards are also useful for response validation. In some cases, you may need to skip some values or validate by regex, type and predicate:
 ```
 {
     "id": "skip",                                    // Will skip actual value validation and just verify id key presence
     "signup_date": "regex:\\d{4}-\\d{2}-\\d{2}",     // Will validate date value by specified regex
+    "age": "type:Integer",                           // Will validate age value by specified Java type
+    "created_date": "predicate:isDateValid",         // Will validate created_date value by specified name of Predicate which was kept in JsonComparatorContext
 }
 ```
 

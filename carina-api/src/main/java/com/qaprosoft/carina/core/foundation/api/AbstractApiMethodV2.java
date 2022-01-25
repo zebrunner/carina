@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Properties;
 
 import com.qaprosoft.apitools.builder.PropertiesProcessor;
+import com.qaprosoft.apitools.validation.*;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -31,10 +32,6 @@ import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.apitools.builder.PropertiesProcessorMain;
 import com.qaprosoft.apitools.message.TemplateMessage;
-import com.qaprosoft.apitools.validation.JsonKeywordsComparator;
-import com.qaprosoft.apitools.validation.JsonValidator;
-import com.qaprosoft.apitools.validation.XmlCompareMode;
-import com.qaprosoft.apitools.validation.XmlValidator;
 import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
 import com.qaprosoft.carina.core.foundation.api.annotation.RequestTemplatePath;
 import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePath;
@@ -201,7 +198,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     /**
      * Validates JSON response using custom options
-     * 
+     *
      * @param mode
      *            - determines how to compare 2 JSONs. See type description for more details. Mode is not applied for
      *            arrays comparison
@@ -210,6 +207,35 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
      *            Use JsonCompareKeywords.ARRAY_CONTAINS.getKey() construction for that
      */
     public void validateResponse(JSONCompareMode mode, String... validationFlags) {
+        validateResponse(mode, null, validationFlags);
+    }
+
+    /**
+     * Validates JSON response using custom options
+     *
+     *  @param comparatorContext
+     *            - stores additional validation items provided from outside
+     * @param validationFlags
+     *            - used for JSON arrays validation when we need to check presence of some array items in result array.
+     *            Use JsonCompareKeywords.ARRAY_CONTAINS.getKey() construction for that
+     */
+    public void validateResponse(JsonComparatorContext comparatorContext, String... validationFlags) {
+        validateResponse(JSONCompareMode.NON_EXTENSIBLE, comparatorContext, validationFlags);
+    }
+
+    /**
+     * Validates JSON response using custom options
+     * 
+     * @param mode
+     *            - determines how to compare 2 JSONs. See type description for more details. Mode is not applied for
+     *            arrays comparison
+     * @param comparatorContext
+     *            - stores additional validation items provided from outside
+     * @param validationFlags
+     *            - used for JSON arrays validation when we need to check presence of some array items in result array.
+     *            Use JsonCompareKeywords.ARRAY_CONTAINS.getKey() construction for that
+     */
+    public void validateResponse(JSONCompareMode mode, JsonComparatorContext comparatorContext, String... validationFlags) {
         if (rsPath == null) {
             throw new RuntimeException("Please specify rsPath to make Response body validation");
         }
@@ -225,7 +251,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         tm.setPropertiesStorage(properties);
         String expectedRs = tm.getMessageText();
         try {
-            JSONAssert.assertEquals(expectedRs, actualRsBody, new JsonKeywordsComparator(mode, validationFlags));
+            JSONAssert.assertEquals(expectedRs, actualRsBody, new JsonKeywordsComparator(mode, comparatorContext, validationFlags));
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
