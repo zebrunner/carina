@@ -119,7 +119,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     
     protected boolean isRunLabelsRegistered = false;
 
-    public CarinaListener(){
+    public CarinaListener() {
         // Add shutdown hook
         Runtime.getRuntime().addShutdownHook(new ShutdownHook());
 
@@ -130,12 +130,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         // Technically, this happen when the maven-surefire-plugin has not set inherited program arguments (passed to mvn process).
         // That is why it is necessary to reinit R class here when TestNG loads the CarinaListener class.
         R.reinit();
-
-//        // Set log4j properties
-//        URL log4jUrl = ClassLoader.getSystemResource("carina-log4j.properties");
-//        LOGGER.debug("carina-log4j.properties: " + log4jUrl);
-//        PropertyConfigurator.configure(log4jUrl);
-
+        
         LOGGER.info(Configuration.asString());
         // Configuration.validateConfiguration();
 
