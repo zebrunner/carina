@@ -18,8 +18,11 @@ package com.qaprosoft.carina.core.foundation.api;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
+import com.qaprosoft.apitools.builder.PropertiesProcessor;
 import com.qaprosoft.apitools.validation.*;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -43,6 +46,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     private static final String ACCEPT_ALL_HEADER = "Accept=*/*";
 
     private Properties properties;
+    private List<Class<? extends PropertiesProcessor>> ignoredPropertiesProcessorClasses;
     private String rqPath;
     private String rsPath;
     private String actualRsBody;
@@ -70,10 +74,14 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         super();
         setHeaders(ACCEPT_ALL_HEADER);
         if (properties != null) {
-            this.properties = PropertiesProcessorMain.processProperties(properties);
+            this.properties = PropertiesProcessorMain.processProperties(properties, ignoredPropertiesProcessorClasses);
         }
         this.rqPath = rqPath;
         this.rsPath = rsPath;
+    }
+
+    public AbstractApiMethodV2(String rqPath, String rsPath) {
+        this(rqPath, rsPath, new Properties());
     }
 
     private void initPathsFromAnnotation() {
@@ -85,10 +93,6 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         if (responseTemplatePath != null) {
             this.rsPath = responseTemplatePath.path();
         }
-    }
-
-    public AbstractApiMethodV2(String rqPath, String rsPath) {
-        this(rqPath, rsPath, new Properties());
     }
 
     /**
@@ -113,6 +117,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     public Response callAPI() {
         if (rqPath != null) {
             TemplateMessage tm = new TemplateMessage();
+            tm.setIgnoredPropertiesProcessorClasses(ignoredPropertiesProcessorClasses);
             tm.setTemplatePath(rqPath);
             tm.setPropertiesStorage(properties);
             setBodyContent(tm.getMessageText());
@@ -154,7 +159,14 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         } else {
             throw new RuntimeException("Properties can't be found by path: " + propertiesPath);
         }
-        properties = PropertiesProcessorMain.processProperties(properties);
+        properties = PropertiesProcessorMain.processProperties(properties, ignoredPropertiesProcessorClasses);
+    }
+
+    public void ignorePropertiesProcessor(Class<? extends PropertiesProcessor> ignoredPropertiesProcessorClass) {
+        if (this.ignoredPropertiesProcessorClasses == null) {
+            this.ignoredPropertiesProcessorClasses = new ArrayList<>();
+        }
+        this.ignoredPropertiesProcessorClasses.add(ignoredPropertiesProcessorClass);
     }
 
     /**
@@ -163,7 +175,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
      * @param properties Properties object with predefined properties for declared API method
      */
     public void setProperties(Properties properties) {
-        this.properties = PropertiesProcessorMain.processProperties(properties);
+        this.properties = PropertiesProcessorMain.processProperties(properties, ignoredPropertiesProcessorClasses);
     }
 
     public void addProperty(String key, Object value) {
@@ -234,6 +246,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
             throw new RuntimeException("Actual response body is null. Please make API call before validation response");
         }
         TemplateMessage tm = new TemplateMessage();
+        tm.setIgnoredPropertiesProcessorClasses(ignoredPropertiesProcessorClasses);
         tm.setTemplatePath(rsPath);
         tm.setPropertiesStorage(properties);
         String expectedRs = tm.getMessageText();
@@ -291,6 +304,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         switch (contentTypeEnum) {
         case JSON:
             TemplateMessage tm = new TemplateMessage();
+            tm.setIgnoredPropertiesProcessorClasses(ignoredPropertiesProcessorClasses);
             tm.setTemplatePath(schemaPath);
             String schema = tm.getMessageText();
             JsonValidator.validateJsonAgainstSchema(schema, actualRsBody);
