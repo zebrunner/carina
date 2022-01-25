@@ -46,9 +46,12 @@ import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
+import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
 import org.imgscalr.Scalr;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -309,7 +312,7 @@ public class ReportContext {
         try {
             return new WebDriverWait(driver, timeout).until((k) -> checkArtifactUsingHttp(url, username, password));
         } catch (Exception e) {
-            LOGGER.debug(e.getMessage(), e);
+            LOGGER.debug("", e);
             return false;
         }
     }
@@ -458,7 +461,7 @@ public class ReportContext {
     public static void emptyTestDirData() {
         testDirectory.remove();
         isCustomTestDirName.set(Boolean.FALSE);
-        closeThreadLogAppender();
+        stopThreadLogAppender();
     }
 
     public static synchronized File createTestDir() {
@@ -481,15 +484,16 @@ public class ReportContext {
         return testDir;
     }
 
-    private static void closeThreadLogAppender() {
+    private static void stopThreadLogAppender() {
         try {
-//            ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
-//            if (tla != null) {
-//                tla.close();
-//            }
+            LoggerContext loggerContext = (LoggerContext) LogManager.getContext(true);
+            ThreadLogAppender appender = loggerContext.getConfiguration().getAppender("ThreadLogAppender");;
+            if (appender != null) {
+                appender.stop();
+            }
 
-        } catch (NoSuchMethodError e) {
-            LOGGER.error("Exception while closing thread log appender.");
+        } catch (Exception e) {
+            LOGGER.error("Exception while closing thread log appender.", e);
         }
     }
 
@@ -501,7 +505,7 @@ public class ReportContext {
 
             if (!newTestDir.exists()) {
                 // close ThreadLogAppender resources before renaming
-                closeThreadLogAppender();
+                stopThreadLogAppender();
                 testDir.renameTo(newTestDir);
                 testDirectory.set(newTestDir);
                 System.out.println("Test directory is set to : " + newTestDir);
