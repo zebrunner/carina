@@ -100,7 +100,8 @@ public abstract class AbstractApiMethod extends HttpClient {
         }
         if (typePath.contains(":")) {
             methodType = HttpMethodType.valueOf(typePath.split(":")[0]);
-            methodPath = typePath.split(":")[1];
+            methodPath = typePath.split(methodType + ":")[1];
+
         } else {
             methodType = HttpMethodType.valueOf(typePath);
         }
