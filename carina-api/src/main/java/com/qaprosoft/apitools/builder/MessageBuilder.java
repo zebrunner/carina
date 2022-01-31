@@ -31,14 +31,14 @@ public class MessageBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static Configuration freemarkerConfiguration;
+    private static final Configuration freemarkerConfiguration;
 
     static {
         freemarkerConfiguration = new Configuration();
         freemarkerConfiguration.setTemplateLoader(new ClassTemplateLoader(MessageBuilder.class, "/"));
     }
 
-    public final static synchronized String buildStringMessage(String templatePath, Properties... propertiesArr) {
+    public static synchronized String buildStringMessage(String templatePath, Properties... propertiesArr) {
         Template template;
         try {
             template = freemarkerConfiguration.getTemplate(templatePath);
