@@ -18,9 +18,9 @@ package com.qaprosoft.carina.core.foundation.api;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.function.Predicate;
 
 import com.qaprosoft.apitools.builder.PropertiesProcessor;
 import com.qaprosoft.apitools.validation.*;
@@ -50,6 +50,8 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     private String rqPath;
     private String rsPath;
     private String actualRsBody;
+
+    private volatile Response response;
 
     /**
      * When this constructor is called then paths to request and expected response templates are taken from @RequestTemplatePath
@@ -125,6 +127,44 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         Response rs = super.callAPI();
         actualRsBody = rs.asString();
         return rs;
+    }
+
+    /**
+     * Waits the correct response
+     *
+     * @param period - interval between requests
+     * @param delay - maximum waiting time
+     * @param isValid - passed function to check the correctness of the response
+     * @param unit - information for period and delay time parameters
+     * @return response
+     */
+    public Response callAPI(long period, long delay, Predicate<Optional<Response>> isValid, TimeUnit unit){
+        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+
+        Runnable callAPITask = () -> {
+                Optional<Response> rs = Optional.of(this.callAPI());
+                if (isValid.test(rs)) response = rs.get();
+        };
+        ScheduledFuture<?> callAPIFuture  = executorService.scheduleAtFixedRate(callAPITask, 0, period, unit);
+
+        Runnable responseCheckerTask = () -> {
+            if(response == null) return;
+            callAPIFuture.cancel(false);
+            executorService.shutdown();
+        };
+        ScheduledFuture<?> responseCheckerFuture = executorService.scheduleAtFixedRate(responseCheckerTask, 0, period, unit);
+
+        Runnable rsCheckerCancelerTask = () -> {
+            responseCheckerFuture.cancel(false);
+            executorService.shutdown();
+        };
+        executorService.schedule(rsCheckerCancelerTask, delay, TimeUnit.SECONDS);
+
+        while(true) {
+            if(executorService.isShutdown()) break;
+        }
+        if(response == null) throw new RuntimeException("Can't get a correct response from server or time is gone");
+        return response;
     }
 
     /**
@@ -321,3 +361,5 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         addCookie("pfJSESSIONID", jSessionId);
     }
 }
+
+
