@@ -24,6 +24,7 @@ import java.util.function.Predicate;
 
 import com.qaprosoft.apitools.builder.PropertiesProcessor;
 import com.qaprosoft.apitools.validation.*;
+import com.qaprosoft.carina.core.foundation.api.annotation.*;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -32,17 +33,13 @@ import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.apitools.builder.PropertiesProcessorMain;
 import com.qaprosoft.apitools.message.TemplateMessage;
-import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
-import com.qaprosoft.carina.core.foundation.api.annotation.RequestTemplatePath;
-import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePath;
-import com.qaprosoft.carina.core.foundation.api.annotation.SuccessfulHttpStatus;
 
 import io.restassured.response.Response;
 
 
 public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    
+
     private static final String ACCEPT_ALL_HEADER = "Accept=*/*";
 
     private Properties properties;
@@ -51,7 +48,10 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     private String rsPath;
     private String actualRsBody;
 
-    private volatile Response response;
+    private int rqPeriod;
+    private int rqDelay;
+    private TimeUnit periodDelayUnit;
+    private Response response;
 
     /**
      * When this constructor is called then paths to request and expected response templates are taken from @RequestTemplatePath
@@ -61,12 +61,14 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         super();
         setHeaders(ACCEPT_ALL_HEADER);
         initPathsFromAnnotation();
+        initWaitingAPIPropsFromAnnotation();
         setProperties(new Properties());
     }
 
     public AbstractApiMethodV2(String rqPath, String rsPath, String propertiesPath) {
         super();
         setHeaders(ACCEPT_ALL_HEADER);
+        initWaitingAPIPropsFromAnnotation();
         setProperties(propertiesPath);
         this.rqPath = rqPath;
         this.rsPath = rsPath;
@@ -75,6 +77,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     public AbstractApiMethodV2(String rqPath, String rsPath, Properties properties) {
         super();
         setHeaders(ACCEPT_ALL_HEADER);
+        initWaitingAPIPropsFromAnnotation();
         if (properties != null) {
             this.properties = PropertiesProcessorMain.processProperties(properties, ignoredPropertiesProcessorClasses);
         }
@@ -97,9 +100,18 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         }
     }
 
+    private void initWaitingAPIPropsFromAnnotation() {
+        WaitingRequestProps waitingRequestProps = this.getClass().getAnnotation(WaitingRequestProps.class);
+        if (waitingRequestProps != null) {
+            this.rqDelay = waitingRequestProps.delay();
+            this.rqPeriod = waitingRequestProps.period();
+            this.periodDelayUnit = waitingRequestProps.unit();
+        }
+    }
+
     /**
      * Sets path to freemarker template for request body
-     * 
+     *
      * @param path String
      */
     public void setRequestTemplate(String path) {
@@ -108,7 +120,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     /**
      * Sets path to freemarker template for expected response body
-     * 
+     *
      * @param path String
      */
     public void setResponseTemplate(String path) {
@@ -129,47 +141,61 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         return rs;
     }
 
+
+    public int getRqPeriod() {
+        return rqPeriod;
+    }
+
+    public int getRqDelay() {
+        return rqDelay;
+    }
+
+    public TimeUnit getPeriodDelayUnit() {
+        return periodDelayUnit;
+    }
+
     /**
      * Waits the correct response
      *
-     * @param period - interval between requests
-     * @param delay - maximum waiting time
      * @param isValid - passed function to check the correctness of the response
-     * @param unit - information for period and delay time parameters
-     * @return response
      */
-    public Response callAPI(long period, long delay, Predicate<Optional<Response>> isValid, TimeUnit unit){
-        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+    public Response callAPI(Predicate<Optional<Response>> isValid) {
+        WaitingRequestProps waitingRequestProps = this.getClass().getAnnotation(WaitingRequestProps.class);
+        if (waitingRequestProps == null) {
+            throw new RuntimeException("To use this method please declare @WaitingRequestProps for your AbstractApiMethod class");
+        }
+
+        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
         Runnable callAPITask = () -> {
-                Optional<Response> rs = Optional.of(this.callAPI());
-                if (isValid.test(rs)) response = rs.get();
+            Optional<Response> rs = Optional.of(this.callAPI());
+            if (isValid.test(rs)) response = rs.get();
         };
-        ScheduledFuture<?> callAPIFuture  = executorService.scheduleAtFixedRate(callAPITask, 0, period, unit);
+        ScheduledFuture<?> callAPIFuture = executorService.scheduleAtFixedRate(callAPITask, 0, rqPeriod, periodDelayUnit);
 
         Runnable responseCheckerTask = () -> {
-            if(response == null) return;
+            if (response == null) return;
             callAPIFuture.cancel(false);
             executorService.shutdown();
         };
-        ScheduledFuture<?> responseCheckerFuture = executorService.scheduleAtFixedRate(responseCheckerTask, 0, period, unit);
+        ScheduledFuture<?> responseCheckerFuture = executorService.scheduleAtFixedRate(responseCheckerTask, 0, rqPeriod, periodDelayUnit);
 
         Runnable rsCheckerCancelerTask = () -> {
             responseCheckerFuture.cancel(false);
             executorService.shutdown();
         };
-        executorService.schedule(rsCheckerCancelerTask, delay, TimeUnit.SECONDS);
+        executorService.schedule(rsCheckerCancelerTask, rqDelay, TimeUnit.SECONDS);
 
-        while(true) {
-            if(executorService.isShutdown()) break;
+        while (true) {
+            if (executorService.isShutdown()) break;
         }
-        if(response == null) throw new RuntimeException("Can't get a correct response from server or time is gone");
+        if (response == null) throw new RuntimeException("Can't get a correct response from server or time is gone");
         return response;
     }
 
     /**
      * Calls API expecting http status in response taken from @SuccessfulHttpStatus value
-     * 
+     *
      * @return restassured Response object
      */
     public Response callAPIExpectSuccess() {
@@ -183,7 +209,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     /**
      * Sets path to .properties file which stores properties list for declared API method
-     * 
+     *
      * @param propertiesPath String path to properties file
      */
     public void setProperties(String propertiesPath) {
@@ -211,7 +237,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     /**
      * Sets properties list for declared API method
-     * 
+     *
      * @param properties Properties object with predefined properties for declared API method
      */
     public void setProperties(Properties properties) {
@@ -239,12 +265,10 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     /**
      * Validates JSON response using custom options
      *
-     * @param mode
-     *            - determines how to compare 2 JSONs. See type description for more details. Mode is not applied for
-     *            arrays comparison
-     * @param validationFlags
-     *            - used for JSON arrays validation when we need to check presence of some array items in result array.
-     *            Use JsonCompareKeywords.ARRAY_CONTAINS.getKey() construction for that
+     * @param mode            - determines how to compare 2 JSONs. See type description for more details. Mode is not applied for
+     *                        arrays comparison
+     * @param validationFlags - used for JSON arrays validation when we need to check presence of some array items in result array.
+     *                        Use JsonCompareKeywords.ARRAY_CONTAINS.getKey() construction for that
      */
     public void validateResponse(JSONCompareMode mode, String... validationFlags) {
         validateResponse(mode, null, validationFlags);
@@ -253,11 +277,9 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     /**
      * Validates JSON response using custom options
      *
-     *  @param comparatorContext
-     *            - stores additional validation items provided from outside
-     * @param validationFlags
-     *            - used for JSON arrays validation when we need to check presence of some array items in result array.
-     *            Use JsonCompareKeywords.ARRAY_CONTAINS.getKey() construction for that
+     * @param comparatorContext - stores additional validation items provided from outside
+     * @param validationFlags   - used for JSON arrays validation when we need to check presence of some array items in result array.
+     *                          Use JsonCompareKeywords.ARRAY_CONTAINS.getKey() construction for that
      */
     public void validateResponse(JsonComparatorContext comparatorContext, String... validationFlags) {
         validateResponse(JSONCompareMode.NON_EXTENSIBLE, comparatorContext, validationFlags);
@@ -265,15 +287,12 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     /**
      * Validates JSON response using custom options
-     * 
-     * @param mode
-     *            - determines how to compare 2 JSONs. See type description for more details. Mode is not applied for
-     *            arrays comparison
-     * @param comparatorContext
-     *            - stores additional validation items provided from outside
-     * @param validationFlags
-     *            - used for JSON arrays validation when we need to check presence of some array items in result array.
-     *            Use JsonCompareKeywords.ARRAY_CONTAINS.getKey() construction for that
+     *
+     * @param mode              - determines how to compare 2 JSONs. See type description for more details. Mode is not applied for
+     *                          arrays comparison
+     * @param comparatorContext - stores additional validation items provided from outside
+     * @param validationFlags   - used for JSON arrays validation when we need to check presence of some array items in result array.
+     *                          Use JsonCompareKeywords.ARRAY_CONTAINS.getKey() construction for that
      */
     public void validateResponse(JSONCompareMode mode, JsonComparatorContext comparatorContext, String... validationFlags) {
         if (rsPath == null) {
@@ -299,7 +318,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     /**
      * Validates Xml response using custom options
-     * 
+     *
      * @param mode - determines how to compare 2 XMLs. See {@link XmlCompareMode} for more details.
      */
     public void validateXmlResponse(XmlCompareMode mode) {
@@ -318,14 +337,14 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
      */
     public void validateResponse(String... validationFlags) {
         switch (contentTypeEnum) {
-        case JSON:
-            validateResponse(JSONCompareMode.NON_EXTENSIBLE, validationFlags);
-            break;
-        case XML:
-            validateXmlResponse(XmlCompareMode.STRICT);
-            break;
-        default:
-            throw new RuntimeException("Unsupported argument of content type");
+            case JSON:
+                validateResponse(JSONCompareMode.NON_EXTENSIBLE, validationFlags);
+                break;
+            case XML:
+                validateXmlResponse(XmlCompareMode.STRICT);
+                break;
+            default:
+                throw new RuntimeException("Unsupported argument of content type");
         }
     }
 
@@ -333,7 +352,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
      * Validates actual API response per schema (JSON or XML depending on response body type).
      * Annotation {@link ContentType} on your AbstractApiMethodV2 class is used to determine whether to validate JSON or XML.
      * If ContentType is not specified then JSON schema validation will be applied by default.
-     * 
+     *
      * @param schemaPath Path to schema file in resources
      */
     public void validateResponseAgainstSchema(String schemaPath) {
@@ -342,18 +361,18 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         }
 
         switch (contentTypeEnum) {
-        case JSON:
-            TemplateMessage tm = new TemplateMessage();
-            tm.setIgnoredPropertiesProcessorClasses(ignoredPropertiesProcessorClasses);
-            tm.setTemplatePath(schemaPath);
-            String schema = tm.getMessageText();
-            JsonValidator.validateJsonAgainstSchema(schema, actualRsBody);
-            break;
-        case XML:
-            XmlValidator.validateXmlAgainstSchema(schemaPath, actualRsBody);
-            break;
-        default:
-            throw new RuntimeException("Unsupported argument of content type: " + contentTypeEnum);
+            case JSON:
+                TemplateMessage tm = new TemplateMessage();
+                tm.setIgnoredPropertiesProcessorClasses(ignoredPropertiesProcessorClasses);
+                tm.setTemplatePath(schemaPath);
+                String schema = tm.getMessageText();
+                JsonValidator.validateJsonAgainstSchema(schema, actualRsBody);
+                break;
+            case XML:
+                XmlValidator.validateXmlAgainstSchema(schemaPath, actualRsBody);
+                break;
+            default:
+                throw new RuntimeException("Unsupported argument of content type: " + contentTypeEnum);
         }
     }
 
