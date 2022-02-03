@@ -25,6 +25,8 @@ import java.util.function.Predicate;
 import com.qaprosoft.apitools.builder.PropertiesProcessor;
 import com.qaprosoft.apitools.validation.*;
 import com.qaprosoft.carina.core.foundation.api.annotation.*;
+import com.qaprosoft.carina.core.foundation.api.exception.AnnotationMissingException;
+import com.qaprosoft.carina.core.foundation.api.exception.IncorrectResponseException;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -51,7 +53,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     private int rqPeriod;
     private int rqDelay;
     private TimeUnit periodDelayUnit;
-    private Response response;
+    private Response waitingAPIResponse;
 
     /**
      * When this constructor is called then paths to request and expected response templates are taken from @RequestTemplatePath
@@ -162,19 +164,19 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     public Response callAPI(Predicate<Optional<Response>> isValid) {
         WaitingRequestProps waitingRequestProps = this.getClass().getAnnotation(WaitingRequestProps.class);
         if (waitingRequestProps == null) {
-            throw new RuntimeException("To use this method please declare @WaitingRequestProps for your AbstractApiMethod class");
+            throw new AnnotationMissingException("To use this method please declare @WaitingRequestProps for your AbstractApiMethod class");
         }
 
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
         Runnable callAPITask = () -> {
             Optional<Response> rs = Optional.of(this.callAPI());
-            if (isValid.test(rs)) response = rs.get();
+            if (isValid.test(rs)) waitingAPIResponse = rs.get();
         };
         ScheduledFuture<?> callAPIFuture = executorService.scheduleAtFixedRate(callAPITask, 0, rqPeriod, periodDelayUnit);
 
         Runnable responseCheckerTask = () -> {
-            if (response == null) return;
+            if (waitingAPIResponse == null) return;
             callAPIFuture.cancel(false);
             executorService.shutdown();
         };
@@ -189,8 +191,8 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         while (true) {
             if (executorService.isShutdown()) break;
         }
-        if (response == null) throw new RuntimeException("Can't get a correct response from server or time is gone");
-        return response;
+        if (waitingAPIResponse == null) throw new IncorrectResponseException("Can't get a correct response from the server");
+        return waitingAPIResponse;
     }
 
     /**
