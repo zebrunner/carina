@@ -182,6 +182,31 @@ public class APISampleTest implements IAbstractTest {
 ### Useful features
 The framework contains a list of useful features for building requests and validation of responses. It makes the support of such tests easier and at the same time minimizes the amount of test data.
 
+#### call API with retry
+Sometimes we should do a lot of API calls waiting for particular artifact in response. In this case, you can use `callAPIWithRetry`method.
+This method takes a lambda expression, polling interval and timeout as a parameters. Lambda expression gives you the
+opportunity to take one or more response artifact's and validate them. If you think that response is correct, you
+should return true, otherwise false. Polling interval and timeout allow you to specify the retry interval and timeout respectively.
+
+Example of using:
+```
+  @Test
+    public void testCallAPIWithRetry() throws ExecutionException, InterruptedException {
+        PostUserMethod api = new PostUserMethod();
+        api.expectResponseStatus(HttpResponseStatusType.CREATED_201);
+        api.callAPIWithRetry(
+                (rs) -> {
+                    if (rs.isEmpty())
+                        return false;
+                    String rsBodyAsString = rs.get().getBody().asString();
+                    return rsBodyAsString.contains("\"website\": \"hildegard.org\"");
+                },
+                Duration.ofSeconds(1),
+                Duration.ofSeconds(10));
+        api.validateResponse();
+    }
+```
+
 #### Wildcards
 In some cases, you may need to generate data in the request to make the request data unique. The best way to do this is to use wildcards for data generation:
 ```
