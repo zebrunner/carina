@@ -47,8 +47,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
 public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private static final String ACCEPT_ALL_HEADER = "Accept=*/*";
 
     private Properties properties;
@@ -119,7 +119,8 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         this.rsPath = path;
     }
 
-    @Override public Response callAPI() {
+    @Override
+    public Response callAPI() {
         if (rqPath != null) {
             TemplateMessage tm = new TemplateMessage();
             tm.setIgnoredPropertiesProcessorClasses(ignoredPropertiesProcessorClasses);
@@ -138,7 +139,8 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
      * @param pollingInterval  - retry interval between API calls
      * @param successCondition - lambda expression to check the correctness of the response's artifacts
      */
-    public Response callAPIWithRetry(Predicate<Optional<Response>> successCondition, Duration pollingInterval, Duration timeout) {
+    public Response callAPIWithRetry(Predicate<Optional<Response>> successCondition, Duration pollingInterval, Duration timeout)
+            throws InterruptedException {
         if (pollingInterval == null || timeout == null) {
             throw new InvalidParameterValue("Parameters cannot be null");
         }
@@ -152,11 +154,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
             }
         };
         service.scheduleAtFixedRate(callAPITask, 0, pollingInterval.toNanos(), TimeUnit.NANOSECONDS);
-        try {
             service.awaitTermination(timeout.toNanos(), TimeUnit.NANOSECONDS);
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Error when try to interrupt callAPITask");
-        }
         if (response.get() == null)
             throw new IncorrectResponseException("Can't get a correct response from API");
         return response.get();
@@ -234,10 +232,12 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     /**
      * Validates JSON response using custom options
      *
-     * @param mode            - determines how to compare 2 JSONs. See type description for more details. Mode is not applied for
-     *                        arrays comparison
-     * @param validationFlags - used for JSON arrays validation when we need to check presence of some array items in result array.
-     *                        Use JsonCompareKeywords.ARRAY_CONTAINS.getKey() construction for that
+     * @param mode
+     *            - determines how to compare 2 JSONs. See type description for more details. Mode is not applied for
+     *            arrays comparison
+     * @param validationFlags
+     *            - used for JSON arrays validation when we need to check presence of some array items in result array.
+     *            Use JsonCompareKeywords.ARRAY_CONTAINS.getKey() construction for that
      */
     public void validateResponse(JSONCompareMode mode, String... validationFlags) {
         validateResponse(mode, null, validationFlags);
@@ -246,9 +246,11 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     /**
      * Validates JSON response using custom options
      *
-     * @param comparatorContext - stores additional validation items provided from outside
-     * @param validationFlags   - used for JSON arrays validation when we need to check presence of some array items in result array.
-     *                          Use JsonCompareKeywords.ARRAY_CONTAINS.getKey() construction for that
+     *  @param comparatorContext
+     *            - stores additional validation items provided from outside
+     * @param validationFlags
+     *            - used for JSON arrays validation when we need to check presence of some array items in result array.
+     *            Use JsonCompareKeywords.ARRAY_CONTAINS.getKey() construction for that
      */
     public void validateResponse(JsonComparatorContext comparatorContext, String... validationFlags) {
         validateResponse(JSONCompareMode.NON_EXTENSIBLE, comparatorContext, validationFlags);
@@ -257,11 +259,14 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     /**
      * Validates JSON response using custom options
      *
-     * @param mode              - determines how to compare 2 JSONs. See type description for more details. Mode is not applied for
-     *                          arrays comparison
-     * @param comparatorContext - stores additional validation items provided from outside
-     * @param validationFlags   - used for JSON arrays validation when we need to check presence of some array items in result array.
-     *                          Use JsonCompareKeywords.ARRAY_CONTAINS.getKey() construction for that
+     * @param mode
+     *            - determines how to compare 2 JSONs. See type description for more details. Mode is not applied for
+     *            arrays comparison
+     * @param comparatorContext
+     *            - stores additional validation items provided from outside
+     * @param validationFlags
+     *            - used for JSON arrays validation when we need to check presence of some array items in result array.
+     *            Use JsonCompareKeywords.ARRAY_CONTAINS.getKey() construction for that
      */
     public void validateResponse(JSONCompareMode mode, JsonComparatorContext comparatorContext, String... validationFlags) {
         if (rsPath == null) {
