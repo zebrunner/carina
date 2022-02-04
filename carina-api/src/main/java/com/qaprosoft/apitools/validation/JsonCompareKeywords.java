@@ -21,7 +21,8 @@ public enum JsonCompareKeywords {
     TYPE("type:"),
     REGEX("regex:"),
     ARRAY_CONTAINS("validate_array_contains_only:"),
-    PREDICATE("predicate:");
+    PREDICATE("predicate:"),
+    OGNL("ognl:");
 
     private String key;
 

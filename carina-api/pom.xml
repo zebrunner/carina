@@ -24,6 +24,7 @@
 		<freemarker.version>2.3.31</freemarker.version>
 		<jsonassert.version>1.5.0</jsonassert.version>
 		<org.everit.json.schema.version>1.5.1</org.everit.json.schema.version>
+		<ognl.version>3.3.2</ognl.version>
 	</properties>
 
 	<dependencies>
@@ -105,6 +106,12 @@
 					<artifactId>android-json</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>ognl</groupId>
+			<artifactId>ognl</artifactId>
+			<version>${ognl.version}</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.xmlunit/xmlunit-assertj3 -->
