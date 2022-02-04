@@ -21,10 +21,7 @@ import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
 import com.qaprosoft.carina.core.foundation.api.http.HttpMethodType;
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
 
-import java.util.concurrent.TimeUnit;
-
 @ContentType(type = "application/xml")
-@WaitingRequestProps(period = 2, delay = 10, unit = TimeUnit.MINUTES)
 @Endpoint(methodType = HttpMethodType.POST, url = "http://test.api.com")
 @RequestTemplatePath(path = "/testdata/api/rq.json")
 @ResponseTemplatePath(path = "/testdata/api/rs.json")

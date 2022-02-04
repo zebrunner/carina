@@ -15,16 +15,11 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.api.annotation;
 
+import com.qaprosoft.carina.core.foundation.api.http.ContentTypeEnum;
+import io.restassured.internal.RequestSpecificationImpl;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import com.qaprosoft.carina.core.foundation.api.http.ContentTypeEnum;
-
-import io.restassured.internal.RequestSpecificationImpl;
-
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 public class ApiMethodAnnotationTest {
     private ApiMethodWAnnotation m;
@@ -44,12 +39,4 @@ public class ApiMethodAnnotationTest {
         Assert.assertEquals(((RequestSpecificationImpl) m.getRequest()).getContentType(), ContentTypeEnum.XML
                 .getStringValues()[0], "Content type from annotation not as expected");
     }
-
-    @Test
-    public void testWaitingRequestProps() {
-        Assert.assertEquals(m.getRqPeriod(), 2, "Request period from annotation not as expected");
-        Assert.assertEquals(m.getRqDelay(), 10, "Request delay from annotation not as expected");
-        Assert.assertEquals(m.getPeriodDelayUnit(), TimeUnit.MINUTES, "Period and delay unit not as expected");
-    }
-
 }

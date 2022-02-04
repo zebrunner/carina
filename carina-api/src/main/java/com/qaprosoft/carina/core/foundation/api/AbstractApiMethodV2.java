@@ -15,33 +15,40 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.api;
 
-import java.io.IOException;
-import java.lang.invoke.MethodHandles;
-import java.net.URL;
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.function.Predicate;
-
 import com.qaprosoft.apitools.builder.PropertiesProcessor;
+import com.qaprosoft.apitools.builder.PropertiesProcessorMain;
+import com.qaprosoft.apitools.message.TemplateMessage;
 import com.qaprosoft.apitools.validation.*;
-import com.qaprosoft.carina.core.foundation.api.annotation.*;
-import com.qaprosoft.carina.core.foundation.api.exception.AnnotationMissingException;
+import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
+import com.qaprosoft.carina.core.foundation.api.annotation.RequestTemplatePath;
+import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePath;
+import com.qaprosoft.carina.core.foundation.api.annotation.SuccessfulHttpStatus;
 import com.qaprosoft.carina.core.foundation.api.exception.IncorrectResponseException;
+import com.qaprosoft.carina.core.foundation.api.exception.InvalidParameterValue;
+import io.restassured.response.Response;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.apitools.builder.PropertiesProcessorMain;
-import com.qaprosoft.apitools.message.TemplateMessage;
-
-import io.restassured.response.Response;
-
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.net.URL;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
 
 public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String ACCEPT_ALL_HEADER = "Accept=*/*";
 
     private Properties properties;
@@ -49,11 +56,6 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     private String rqPath;
     private String rsPath;
     private String actualRsBody;
-
-    private int rqPeriod;
-    private int rqDelay;
-    private TimeUnit periodDelayUnit;
-    private Response waitingAPIResponse;
 
     /**
      * When this constructor is called then paths to request and expected response templates are taken from @RequestTemplatePath
@@ -63,14 +65,12 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         super();
         setHeaders(ACCEPT_ALL_HEADER);
         initPathsFromAnnotation();
-        initWaitingAPIPropsFromAnnotation();
         setProperties(new Properties());
     }
 
     public AbstractApiMethodV2(String rqPath, String rsPath, String propertiesPath) {
         super();
         setHeaders(ACCEPT_ALL_HEADER);
-        initWaitingAPIPropsFromAnnotation();
         setProperties(propertiesPath);
         this.rqPath = rqPath;
         this.rsPath = rsPath;
@@ -79,7 +79,6 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     public AbstractApiMethodV2(String rqPath, String rsPath, Properties properties) {
         super();
         setHeaders(ACCEPT_ALL_HEADER);
-        initWaitingAPIPropsFromAnnotation();
         if (properties != null) {
             this.properties = PropertiesProcessorMain.processProperties(properties, ignoredPropertiesProcessorClasses);
         }
@@ -102,15 +101,6 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         }
     }
 
-    private void initWaitingAPIPropsFromAnnotation() {
-        WaitingRequestProps waitingRequestProps = this.getClass().getAnnotation(WaitingRequestProps.class);
-        if (waitingRequestProps != null) {
-            this.rqDelay = waitingRequestProps.delay();
-            this.rqPeriod = waitingRequestProps.period();
-            this.periodDelayUnit = waitingRequestProps.unit();
-        }
-    }
-
     /**
      * Sets path to freemarker template for request body
      *
@@ -129,8 +119,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         this.rsPath = path;
     }
 
-    @Override
-    public Response callAPI() {
+    @Override public Response callAPI() {
         if (rqPath != null) {
             TemplateMessage tm = new TemplateMessage();
             tm.setIgnoredPropertiesProcessorClasses(ignoredPropertiesProcessorClasses);
@@ -143,56 +132,34 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         return rs;
     }
 
-
-    public int getRqPeriod() {
-        return rqPeriod;
-    }
-
-    public int getRqDelay() {
-        return rqDelay;
-    }
-
-    public TimeUnit getPeriodDelayUnit() {
-        return periodDelayUnit;
-    }
-
     /**
-     * Waits the correct response
+     * Allows to do a lot of API calls waiting for particular artifact in response
      *
-     * @param isValid - passed function to check the correctness of the response
+     * @param pollingInterval  - retry interval between API calls
+     * @param successCondition - lambda expression to check the correctness of the response's artifacts
      */
-    public Response callAPI(Predicate<Optional<Response>> isValid) {
-        WaitingRequestProps waitingRequestProps = this.getClass().getAnnotation(WaitingRequestProps.class);
-        if (waitingRequestProps == null) {
-            throw new AnnotationMissingException("To use this method please declare @WaitingRequestProps for your AbstractApiMethod class");
+    public Response callAPIWithRetry(Predicate<Optional<Response>> successCondition, Duration pollingInterval, Duration timeout) {
+        if (pollingInterval == null || timeout == null) {
+            throw new InvalidParameterValue("Parameters cannot be null");
         }
-
-        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-
+        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+        AtomicReference<Response> response = new AtomicReference<>();
         Runnable callAPITask = () -> {
-            Optional<Response> rs = Optional.of(this.callAPI());
-            if (isValid.test(rs)) waitingAPIResponse = rs.get();
+            Optional<Response> optionalResponse = Optional.of(callAPI());
+            if (successCondition.test(optionalResponse)) {
+                response.set(optionalResponse.get());
+                service.shutdown();
+            }
         };
-        ScheduledFuture<?> callAPIFuture = executorService.scheduleAtFixedRate(callAPITask, 0, rqPeriod, periodDelayUnit);
-
-        Runnable responseCheckerTask = () -> {
-            if (waitingAPIResponse == null) return;
-            callAPIFuture.cancel(false);
-            executorService.shutdown();
-        };
-        ScheduledFuture<?> responseCheckerFuture = executorService.scheduleAtFixedRate(responseCheckerTask, 0, rqPeriod, periodDelayUnit);
-
-        Runnable rsCheckerCancelerTask = () -> {
-            responseCheckerFuture.cancel(false);
-            executorService.shutdown();
-        };
-        executorService.schedule(rsCheckerCancelerTask, rqDelay, TimeUnit.SECONDS);
-
-        while (true) {
-            if (executorService.isShutdown()) break;
+        service.scheduleAtFixedRate(callAPITask, 0, pollingInterval.toNanos(), TimeUnit.NANOSECONDS);
+        try {
+            service.awaitTermination(timeout.toNanos(), TimeUnit.NANOSECONDS);
+        } catch (InterruptedException e) {
+            throw new RuntimeException("Error when try to interrupt callAPITask");
         }
-        if (waitingAPIResponse == null) throw new IncorrectResponseException("Can't get a correct response from the server");
-        return waitingAPIResponse;
+        if (response.get() == null)
+            throw new IncorrectResponseException("Can't get a correct response from API");
+        return response.get();
     }
 
     /**
@@ -339,14 +306,14 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
      */
     public void validateResponse(String... validationFlags) {
         switch (contentTypeEnum) {
-            case JSON:
-                validateResponse(JSONCompareMode.NON_EXTENSIBLE, validationFlags);
-                break;
-            case XML:
-                validateXmlResponse(XmlCompareMode.STRICT);
-                break;
-            default:
-                throw new RuntimeException("Unsupported argument of content type");
+        case JSON:
+            validateResponse(JSONCompareMode.NON_EXTENSIBLE, validationFlags);
+            break;
+        case XML:
+            validateXmlResponse(XmlCompareMode.STRICT);
+            break;
+        default:
+            throw new RuntimeException("Unsupported argument of content type");
         }
     }
 
@@ -363,18 +330,18 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         }
 
         switch (contentTypeEnum) {
-            case JSON:
-                TemplateMessage tm = new TemplateMessage();
-                tm.setIgnoredPropertiesProcessorClasses(ignoredPropertiesProcessorClasses);
-                tm.setTemplatePath(schemaPath);
-                String schema = tm.getMessageText();
-                JsonValidator.validateJsonAgainstSchema(schema, actualRsBody);
-                break;
-            case XML:
-                XmlValidator.validateXmlAgainstSchema(schemaPath, actualRsBody);
-                break;
-            default:
-                throw new RuntimeException("Unsupported argument of content type: " + contentTypeEnum);
+        case JSON:
+            TemplateMessage tm = new TemplateMessage();
+            tm.setIgnoredPropertiesProcessorClasses(ignoredPropertiesProcessorClasses);
+            tm.setTemplatePath(schemaPath);
+            String schema = tm.getMessageText();
+            JsonValidator.validateJsonAgainstSchema(schema, actualRsBody);
+            break;
+        case XML:
+            XmlValidator.validateXmlAgainstSchema(schemaPath, actualRsBody);
+            break;
+        default:
+            throw new RuntimeException("Unsupported argument of content type: " + contentTypeEnum);
         }
     }
 
