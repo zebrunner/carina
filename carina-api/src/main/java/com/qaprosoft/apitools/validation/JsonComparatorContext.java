@@ -15,6 +15,8 @@
  *******************************************************************************/
 package com.qaprosoft.apitools.validation;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
@@ -22,9 +24,11 @@ import java.util.function.Predicate;
 public final class JsonComparatorContext {
 
     private final Map<String, Predicate<Object>> namedPredicates;
+    private final List<JsonKeywordComparator> comparators;
 
     public JsonComparatorContext() {
         this.namedPredicates = new ConcurrentHashMap<>();
+        this.comparators = new ArrayList<>();
     }
 
     public <T> JsonComparatorContext withPredicate(String name, Predicate<T> predicate) {
@@ -34,8 +38,19 @@ public final class JsonComparatorContext {
         return this;
     }
 
+    public <T> JsonComparatorContext withComparator(JsonKeywordComparator comparator) {
+        if (comparator != null) {
+            this.comparators.add(comparator);
+        }
+        return this;
+    }
+
     Map<String, Predicate<Object>> getNamedPredicates() {
         return namedPredicates;
+    }
+
+    List<JsonKeywordComparator> getComparators() {
+        return comparators;
     }
 
     public static JsonComparatorContext context() {
