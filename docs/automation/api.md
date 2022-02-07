@@ -1,8 +1,13 @@
-[![Carina - API automation](https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png)](https://youtu.be/oJL5y8Ovta0)
+# api
+
+Importing multiple files is available to Pro Users - [you can try Pro for Free](craftdocs://openSubscription).
+
+![video.png](https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png)
 
 Note: Starting from 7.0.4 consider that instead of `extends AbstractTest` we have to `implements IAbstractTest` interface
 
 ### Introduction
+
 Rest API testing is a vital part of integration testing process, it may be used separately or together with web, mobile or DB testing. The general process may be described by the following steps:
 
 1. Compile an HTTP request with the required meta data
@@ -12,21 +17,26 @@ Rest API testing is a vital part of integration testing process, it may be used 
 5. Build a call to the next (or the same) endpoint using (or not using) the data from the previous response
 
 The schema below demonstrates the sequence:
-![API flow](../img/api/api-flow-new.png)
 
 From this perspective, we decided to use the following instruments:
 
-* Rest-assured - "Testing and validation of REST services in Java are harder than in dynamic languages such as Ruby and Groovy. REST
+- Rest-assured - "Testing and validation of REST services in Java are harder than in dynamic languages such as Ruby and Groovy. REST
+
 Assured brings the simplicity of using these languages into the Java domain."
-* Freemarker - "Apache FreeMarker is a template engine: a Java library to generate text output (HTML web pages, e-mails, configuration
+
+- Freemarker - "Apache FreeMarker is a template engine: a Java library to generate text output (HTML web pages, e-mails, configuration
+
 files, source code, etc.) based on templates and changing data."
-* JsonPath - a library for extracting data from JSON body
-* JsonAssert - a library for comparing the actual JSON body with an expected one
-* Json-schema-validator - a library for validating of JSON body for matching to JSON schema
+
+- JsonPath - a library for extracting data from JSON body
+- JsonAssert - a library for comparing the actual JSON body with an expected one
+- Json-schema-validator - a library for validating of JSON body for matching to JSON schema
 
 ### Example of test implementation
-Let's create an automated test for the next call: POST https://jsonplaceholder.typicode.com/users request with a request body
-```
+
+Let's create an automated test for the next call: POST [https://jsonplaceholder.typicode.com/users](https://jsonplaceholder.typicode.com/users) request with a request body
+
+```other
 [
     {
         "id": 1,
@@ -53,20 +63,22 @@ Let's create an automated test for the next call: POST https://jsonplaceholder.t
     }
 ]
 ```
+
 and the response body the same as the request body
 
 #### Definition of request and response templates
+
 If we are going to send POST request, we need to create a request template with some placeholders that may be replaced by different arguments for different test flows. The best place to store these resources is src/test/resources/api package, try to keep REST hierarchy in a package structure for better maintenance and visibility:
-![API flow](../img/api/resources-structure.png)
+
 Request (rq.json) and response (rs.json) templates have some placeholders that will be populated from the tests later on:
-![API flow](../img/api/rq-example.png)
-![API flow](../img/api/rs-example.png)
+
 While user.properties contains some default value which may be replaced later:
-![API flow](../img/api/props-example.png)
 
 #### REST service call domain object
+
 Now we are ready to create REST service domain object which will be used to interact with web service and perform additional response validations. Our domain object is located in /carina-demo/src/main/java/com/qaprosoft/carina/demo/api, make sure that it extends AbstractApiMethodV2 and triggers the base class constructor for initialization. In general cases, you will specify the path to request and response templates along with default properties files (all of them have been created in the previous step). Also, we replace the URL placeholder to set an appropriate environment.
-```
+
+```other
 package com.qaprosoft.carina.demo.api;
 
 import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
@@ -81,9 +93,12 @@ public class PostUserMethod extends AbstractApiMethodV2 {
 ```
 
 #### HTTP method and path
+
 The last step before the test implementation itself is the association of the domain object class and the required HTTP method and path.
+
 It should be defined in /carina-demo/src/main/resources/_api.properties file, the key should be equal to domain class name, the value has the following pattern {http_method}:{http_path}. The HTTP path may contain placeholders, the HTTP method should be one of the following variants: GET, POST, PUT, UPDATE, DELETE.
-```
+
+```other
 #=====================================================#
 #=================== API methods  ====================#
 #=====================================================#
@@ -95,8 +110,10 @@ PatchPostsMethod=PATCH:${base_url}/posts/1
 ```
 
 #### API test
+
 API test is a general TestNG test, a class should extend APITest, in our case, the test implements IAbstractTest that encapsulates some test data and login method. The test is located in /carina-demo/src/test/java/com/qaprosoft/carina/demo.
-```
+
+```other
 package com.qaprosoft.carina.demo;
 
 import java.lang.invoke.MethodHandles;
@@ -171,6 +188,7 @@ public class APISampleTest implements IAbstractTest {
 ```
 
 #### Test steps once again
+
 1. Create REST call object
 2. Specify the properties for a request/response placeholder
 3. Add headers if required
@@ -180,21 +198,26 @@ public class APISampleTest implements IAbstractTest {
 7. Make further calls using the data from the previous call if needed
 
 ### Useful features
+
 The framework contains a list of useful features for building requests and validation of responses. It makes the support of such tests easier and at the same time minimizes the amount of test data.
 
 #### Wildcards
+
 In some cases, you may need to generate data in the request to make the request data unique. The best way to do this is to use wildcards for data generation:
-```
+
+```other
 {
     "username": "generate_word(10)",          // Will generate random alphanumeric string with 10 characters
     "zip": "generate_number(6)",              // Will generate random number with 6 digits
     "birthday": "generate_date(yyyy-MM-dd;0)" // Will generate current date (first arg is date format, second is delta in days from now)
 }
 ```
+
 Another option is to specify the placeholder in the request template and then pass some generated value directly from the test method.
 
 Wildcards are also useful for response validation. In some cases, you may need to skip some values or validate by regex, type and predicate:
-```
+
+```other
 {
     "id": "skip",                                    // Will skip actual value validation and just verify id key presence
     "signup_date": "regex:\\d{4}-\\d{2}-\\d{2}",     // Will validate date value by specified regex
@@ -204,20 +227,26 @@ Wildcards are also useful for response validation. In some cases, you may need t
 ```
 
 #### Validation against JSON schema
+
 When you need to validate response structure regardless of the actual values, you may use validation by JSON schema. In this case, you need an actual response from the service, let's say we have the following:
-```
+
+```other
 {
     "email": "test@domain.com",
     "firstName": "SOME FIRST NAME",
     "id": 11111
 }
 ```
-Now we need to generate a schema (you may use any generator you like, for example, https://jsonschema.net/).
-IMPORTANT: For now, the schemas of version draft03 and draft04 are supported only. Please, use the appropriate generator (e.g.  https://www.liquid-technologies.com/online-json-to-schema-converter)
+
+Now we need to generate a schema (you may use any generator you like, for example, [https://jsonschema.net/](https://jsonschema.net/)).
+
+IMPORTANT: For now, the schemas of version draft03 and draft04 are supported only. Please, use the appropriate generator (e.g.  [https://www.liquid-technologies.com/online-json-to-schema-converter](https://www.liquid-technologies.com/online-json-to-schema-converter))
+
 In the tool like this you need to provide the original JSON from the response, then choose some schema options (allow the additional properties in objects, mark the current object properties as required, hard-code some expected values, etc.) and then generate the schema. Copy-paste the generated schema into test resources, and you're ready to use it in the test.
-![API flow](../img/api/schema-generator.png)
+
 Make sure that you change all the required flags to true. After that, create a new file in the resources and place it into an appropriate endpoint package:
-```
+
+```other
 {
     "type":"object",
     "$schema": "http://json-schema.org/draft-03/schema",
@@ -242,8 +271,10 @@ Make sure that you change all the required flags to true. After that, create a n
     }
 }
 ```
+
 And finally, we call JSON validation from Java test as the following:
-```
+
+```other
 @Test
 public void testCheckJSONSchema()
 {
@@ -255,9 +286,12 @@ public void testCheckJSONSchema()
 ```
 
 #### Building requests with an array
+
 There are a couple of options for building a request with an array of items provided by the framework:
+
 1. The first one uses hardcoded placeholders for changeable variables.
-```
+
+```other
 {
    "name": "${name}",
    "description": "${description}",
@@ -282,12 +316,16 @@ There are a couple of options for building a request with an array of items prov
    ]
 }
 ```
+
 As you see, this structure is quite flexible. If you need 2 taskTypes items, you need to declare at least task_name_2 or task_description_2 property. If you need 3 items in addition to that, you need to declare a task_name_3 or task_description_3 property. Otherwise, the array will contain only 1 item.
+
 For instance, you need to build JSON which contains a taskTypes array. Then the template with placeholders will be the following:
+
 It's easy to extend such a structure. You just need to add items with similar placeholders increasing their index.
 
 2. Another approach is based on using Freemarker loop. Here is the template example for the same JSON:
-```
+
+```other
 <#if task_name_1?exists>
     <#assign task_names = [task_name_1]>
     <#assign task_descriptions = [task_description_1]>
@@ -318,20 +356,29 @@ It's easy to extend such a structure. You just need to add items with similar pl
    ]
 }
 ```
+
 This approach is useful when the structure of an array item is quite complex. So, it makes sense to specify the item attributes only once, doing it inside #list operation.
+
 This approach also allows to choose the amount of array items dynamically.
+
 But note that you should specify all properties for every item, so this view cannot be used for negative tests when you need to miss some properties.
 
 #### Validation of responses with an array
+
 Sometimes you can face a situation when you need to validate the presence of only one item (or a couple of them) in a JSON array ignoring the rest of the items.
+
 In such case, you can use a validation option ARRAY_CONTAINS.
+
 Here is a code sample:
-```
+
+```other
 JSONAssert.assertEquals(expectedRs, actualRs, new JsonKeywordsComparator(JSONCompareMode.STRICT,
                     JsonCompareKeywords.ARRAY_CONTAINS.getKey() + "content"));
 ```
+
 The expected array:
-```
+
+```other
 {
     "totalElements": "skip",
     "pageNumber": "skip",
@@ -350,8 +397,10 @@ The expected array:
     ]
 }
 ```
+
 And the actual response:
-```
+
+```other
 {
     "totalElements": 1017,
     "pageNumber": 0,
@@ -382,11 +431,16 @@ And the actual response:
 ```
 
 ### Deserialization of JSON
+
 Sometimes you may need to transform your JSON response to POJO. It may be useful if you need to validate your response using the data from a database as the expected data.
+
 For this purpose, it's better to use Jackson libraries that are already included in Carina framework.
-For this, you need to prepare the domain class based on your JSON structure. Some online resources provide such opportunities, like https://timboudreau.com/blog/json/read.
+
+For this, you need to prepare the domain class based on your JSON structure. Some online resources provide such opportunities, like [https://timboudreau.com/blog/json/read](https://timboudreau.com/blog/json/read).
+
 Let's say we need to deserialize an array of Clients from JSON. An example of the required domain object will be:
-```
+
+```other
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 public final class Clients
@@ -418,54 +472,75 @@ public final class Clients
     }
 }
 ```
+
 Pay attention that POJO field names can differ from JSON properties. In this case, @JsonProperty annotation can be used for mapping.
+
 An example of a deserialization code:
-```
+
+```other
 GetClientsMethod getClientsMethod = new GetClientsMethod("11111");
 getClientsMethod.expectResponseStatus(HttpResponseStatusType.OK_200);
 String rs = getClientsMethod.callAPI().asString();
 ObjectMapper mapper = new ObjectMapper();
 Clients clients = mapper.readValue(rs, Clients.class);
 ```
+
 Then you can use POJO object for any kind of validation or for easy retrieving of the required properties.
 
 ### Security
-Carina provides some security features that could be used to hide/protect sensitive data in your API calls.  
+
+Carina provides some security features that could be used to hide/protect sensitive data in your API calls.
 
 #### Encryption of API method properties
-It's possible to use default carina crypto logic for automatic decription of sensitive data.  
-In order to encrypt the data you can use carina's [CryptoConsole](../advanced/security.md)  
-Then you can save your encrypted properties using default pattern: "{crypt:ENCRYPTED_TXT}"  
-During properties parsing process carina-api module will automatically decrypt the text and put decrypted value into request body.  
+
+It's possible to use default carina crypto logic for automatic decription of sensitive data.
+
+In order to encrypt the data you can use carina's CryptoConsole
+
+Then you can save your encrypted properties using default pattern: "{crypt:ENCRYPTED_TXT}"
+
+During properties parsing process carina-api module will automatically decrypt the text and put decrypted value into request body.
 
 #### Hiding of API request headers
+
 In order to hide the value of API request header you need to annotate your API method with @HideRequestHeadersInLogs annotation.
+
 Usage sample:
-```
+
+```other
 @HideRequestHeadersInLogs(headers = "Content-Type")
 public class YourAPIMethod extends AbstractApiMethodV2 {
     public YourAPIMethod() {    
     }
 }
-```  
+```
+
 Then in your test logs for mentioned headers you'll get "[ BLACKLISTED ]" mask
 
 #### Hiding of API call body parts
-If you want not to show some sensitive data in body of your api calls in test logs then you'll need to annotate your API method with @HideRequestBodyPartsInLogs/@HideResponseBodyPartsInLogs annotations.  
-These annotations support both json and xml content type.  
-As the value of annotation you need to pass array of JSON or XML paths you want to hide.  
-Once done in test logs you'll get "\*\*\*\*\*\*\*\*" mask instead of actual values.  
-Example for json:  
-```
+
+If you want not to show some sensitive data in body of your api calls in test logs then you'll need to annotate your API method with @HideRequestBodyPartsInLogs/@HideResponseBodyPartsInLogs annotations.
+
+These annotations support both json and xml content type.
+
+As the value of annotation you need to pass array of JSON or XML paths you want to hide.
+
+Once done in test logs you'll get "********" mask instead of actual values.
+
+Example for json:
+
+```other
 @HideRequestBodyPartsInLogs(paths = { "$.[*].username", "$.[*].id" })
 @HideResponseBodyPartsInLogs(paths = { "$.[*].address.zipcode", "$.[*].address.geo.lat", "$.[*].id" })
 public class YourAPIMethod extends AbstractApiMethodV2 {
     public YourAPIMethod() {
     }
 }
-```  
-Example for xml:
 ```
+
+Example for xml:
+
+```other
 @HideRequestBodyPartsInLogs(paths = { "//root/city/text()" })
 @HideResponseBodyPartsInLogs(paths = { "//root/state/text()" })
 @ContentType(type = "application/xml")
@@ -473,6 +548,122 @@ public class XmlPostMethod extends AbstractApiMethodV2 {
     public XmlPostMethod() {
     }
 }
-```  
-Important: for XML content type it's obligatory to pass @ContentType annotation to your API method indicating actual header value.  
-If @ContentType is not specified then data will be automatically considered as JSON.  
+```
+
+Important: for XML content type it's obligatory to pass @ContentType annotation to your API method indicating actual header value.
+
+If @ContentType is not specified then data will be automatically considered as JSON.
+
+## SOAP documentation
+
+SOAP (Simple Object Access Protocol) is a standards-based web services access protocol. It mostly relies on XML documents.
+
+Let’s create some automated SOAP tests on demonstrative Web Service:
+
+[**https://www.crcind.com/csp/samples/SOAP.Demo.cls**](https://www.crcind.com/csp/samples/SOAP.Demo.cls)**.**
+
+***AddInteger*** method adds two integers and returns the result.
+
+***LookupCity*** method returns the city and state for the given U.S. ZIP Code packaged within a Sample.Address object
+
+First of all, we need to create a request template and response template. It is located in **/carina-demo/src/test/resources/api/soap/addinteger.**
+
+#### rq.xml
+
+```other
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org">
+    <soapenv:Header/>
+    <soapenv:Body>
+        <tem:AddInteger>
+            <tem:Arg1>${firstNumber}</tem:Arg1>
+            <tem:Arg2>${secondNumber}</tem:Arg2>
+        </tem:AddInteger>
+    </soapenv:Body>
+</soapenv:Envelope>
+```
+
+**rs.xml**
+
+```other
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <AddIntegerResponse xmlns="http://tempuri.org">
+            <#if firstNumber?? and secondNumber??>
+                <AddIntegerResult>${firstNumber+secondNumber}</AddIntegerResult>
+            </#if>
+        </AddIntegerResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+```
+
+This templates contain some placeholders that can be later replaced from properties file.
+
+#### soap.properties
+
+```other
+#=============== AddInteger properties ===========#
+firstNumber=4
+secondNumber=6
+result=10
+```
+
+Now we are ready to create SOAP service domain object which will be used to interact with web service and perform additional response validations. This domain object is located in **/carina-demo/src/main/java/com/qaprosoft/carina/demo/soap/**, make sure that it extends AbstractApiMethodV2.
+
+We can specify the endpoint-url, expected HttpStatus, paths to request and response templates and content type using annotations.
+
+**LookupCity.java**
+
+```other
+@Endpoint(url = "${base_url}", methodType = HttpMethodType.POST)
+@SuccessfulHttpStatus(status = HttpResponseStatusType.OK_200)
+@RequestTemplatePath(path = "api/soap/lookupcity/rq.xml")
+@ResponseTemplatePath(path = "src/test/resources/api/soap/lookupcity/rs.xml")
+@ContentType(type = "text/xml")
+public class LookupCityMethod extends AbstractApiMethodV2 {
+
+    public LookupCityMethod() {
+        replaceUrlPlaceholder("base_url",Configuration.getEnvArg("soap_url"));
+    }
+}
+```
+
+Then we can create test class with soap test methods. This class is located in **/carina-demo/src/test/java/com/qaprosoft/carina/demo/**. Test class must implement IAbstractTest. Test methods should start with @Test annotation.
+
+To send SOAP request we have to set some request headers. SOAPAction header indicates the intent of the SOAP HTTP request.
+
+We can validate the response by Response Status. Also we can use response data and compare it to expected results.
+
+**SoapSampleTest.java**
+
+```other
+public class SoapSampleTest implements IAbstractTest {
+
+    @Test
+    public void testAddInteger() {
+        AddIntegerMethod soap = new AddIntegerMethod();
+        soap.setProperties("api/soap/soap.properties");
+        soap.setHeaders(String.format("SOAPAction=%s", "http://tempuri.org/SOAP.Demo.AddInteger"));
+
+        Response response = soap.callAPIExpectSuccess();
+        XmlPath rsBody = XmlPath.given(response.asString());
+        Integer actualResult = rsBody.getInt("AddIntegerResult");
+        Integer expectedResult = Integer.valueOf(soap.getProperties().getProperty("result"));
+        Assert.assertEquals(actualResult, expectedResult);
+    }
+}
+```
+
+> Method ValidateResponse can be used only with JSON files. To validate the whole xml responses we can use ValidateXMLRespone method.
+
+```other
+@Test
+    public void testLookupCity() throws Exception{
+        LookupCityMethod soap = new LookupCityMethod();
+        soap.setProperties("api/soap/soap.properties");
+        soap.setHeaders(String.format("SOAPAction=%s", "http://tempuri.org/SOAP.Demo.LookupCity"));
+
+        soap.callAPIExpectSuccess();
+        soap.validateXmlResponse(XmlCompareMode.STRICT);
+    }
+```
+
