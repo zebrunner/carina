@@ -90,15 +90,16 @@ public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
         this(additionalCommands, null, checkNotNull(addressOfRemoteServer), httpClientFactory);
     }
 
-    public EventFiringAppiumCommandExecutor(Map<String, CommandInfo> additionalCommands,
+    //TODO import latest java-appium client 
+/*    public EventFiringAppiumCommandExecutor(Map<String, CommandInfo> additionalCommands,
             URL addressOfRemoteServer) {
         this(additionalCommands, addressOfRemoteServer, new HttpClientFactoryCustom());
-    }
+    }*/
 
-    public EventFiringAppiumCommandExecutor(Map<String, CommandInfo> additionalCommands,
+/*    public EventFiringAppiumCommandExecutor(Map<String, CommandInfo> additionalCommands,
             DriverService service) {
         this(additionalCommands, service, new HttpClientFactoryCustom());
-    }
+    }*/
 
     public EventFiringAppiumCommandExecutor(URL addressOfRemoteServer) {
     	this(MobileCommand.commandRepository, addressOfRemoteServer, HttpClient.Factory.createDefault());
