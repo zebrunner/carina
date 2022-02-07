@@ -2,28 +2,26 @@
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-<suite name="Carina Demo Tests - Mobile Sample (iOS)" verbose="1" parallel="tests">
+<suite name="Carina Demo Tests - iOS Safari Sample" verbose="1" parallel="tests">
 
 	<parameter name="suiteOwner" value="qpsdemo" />
 	<parameter name="provider" value="mcloud"/>
-	<parameter name="jenkinsJobName" value="Mobile-iOS-Simulator-Demo-Test" />
-	<parameter name="jenkinsJobType" value="ios"/>
-	<parameter name="jenkinsEmail" value="demo@qaprosoft.com" />
+	<parameter name="jenkinsJobName" value="Mobile-iOS-Safari-Test" />
+	<parameter name="jenkinsJobType" value="web"/>
+	<parameter name="capabilities" value="browserName=safari;platformName=iOS;deviceName=ANY" />
 	<parameter name="jenkinsEnvironments" value="DEMO" />
-
-	<parameter name="stringParam::capabilities.app::path to carina demo mobile application" value="https://qaprosoft.s3-us-west-2.amazonaws.com/carinademoexample.zip" />
 
 	<parameter name="jenkinsMobileDefaultPool" value="ANY" />
 
  	<parameter name="jenkinsRegressionPipeline" value="mobile_regression" />
 	<parameter name="jenkinsPipelineEnvironments" value="DEMO" />
-	<parameter name="jenkinsJobExecutionOrder" value="3" />
+	<parameter name="jenkinsJobExecutionOrder" value="5" />
 	<parameter name="jenkinsJobExecutionMode" value="continue" />
 	<parameter name="jenkinsAutoScreenshot" value="true"/>
 
-	<test name="Mobile test">
+	<test name="Safari test">
 		<classes>
-			<class name="${package}.carina.demo.MobileSampleTest" />
+			<class name="com.qaprosoft.carina.demo.IOSSafariTest" />
 		</classes>
 	</test>
 
