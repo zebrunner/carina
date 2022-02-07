@@ -6,7 +6,7 @@
   <artifactId>carina-archetype</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>maven-archetype</packaging>
-  <url>http://www.qaprosoft.com/</url>
+  <url>https://zebrunner.com</url>
   <name>carina-archetype</name>
   <description>Carina Archetype</description>
 
@@ -19,16 +19,10 @@
   </licenses>
   <developers>
     <developer>
-      <name>Alex Khursevich</name>
-      <email>alex@qaprosoft.com</email>
-      <organization>Qaprosoft</organization>
-      <organizationUrl>http://qaprosoft.com</organizationUrl>
-    </developer>
-    <developer>
       <name>Vadim Delendik</name>
-      <email>vadim@qaprosoft.com</email>
-      <organization>Qaprosoft</organization>
-      <organizationUrl>http://qaprosoft.com</organizationUrl>
+      <email>vdelendik@zebrunner.com</email>
+      <organization>Zebrunner Inc</organization>
+      <organizationUrl>https://zebrunner.com</organizationUrl>
     </developer>
   </developers>
   <scm>
