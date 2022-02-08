@@ -475,4 +475,118 @@ public class XmlPostMethod extends AbstractApiMethodV2 {
 }
 ```  
 Important: for XML content type it's obligatory to pass @ContentType annotation to your API method indicating actual header value.  
-If @ContentType is not specified then data will be automatically considered as JSON.  
+If @ContentType is not specified then data will be automatically considered as JSON. 
+
+## SOAP documentation
+
+SOAP (Simple Object Access Protocol) is a standards-based web services access protocol. It mostly relies on XML documents.
+
+Let’s create some automated SOAP tests on demonstrative Web Service:
+
+[**https://www.crcind.com/csp/samples/SOAP.Demo.cls**](https://www.crcind.com/csp/samples/SOAP.Demo.cls)**.**
+
+***AddInteger*** method adds two integers and returns the result.
+
+***LookupCity*** method returns the city and state for the given U.S. ZIP Code packaged within a Sample.Address object
+
+First of all, we need to create a request template and response template. It is located in **/carina-demo/src/test/resources/api/soap/addinteger.**
+
+#### rq.xml
+
+```other
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org">
+    <soapenv:Header/>
+    <soapenv:Body>
+        <tem:AddInteger>
+            <tem:Arg1>${firstNumber}</tem:Arg1>
+            <tem:Arg2>${secondNumber}</tem:Arg2>
+        </tem:AddInteger>
+    </soapenv:Body>
+</soapenv:Envelope>
+```
+
+**rs.xml**
+
+```other
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <AddIntegerResponse xmlns="http://tempuri.org">
+            <#if firstNumber?? and secondNumber??>
+                <AddIntegerResult>${firstNumber+secondNumber}</AddIntegerResult>
+            </#if>
+        </AddIntegerResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+```
+
+This templates contain some placeholders that can be later replaced from properties file.
+
+#### soap.properties
+
+```other
+#=============== AddInteger properties ===========#
+firstNumber=4
+secondNumber=6
+result=10
+```
+
+Now we are ready to create SOAP service domain object which will be used to interact with web service and perform additional response validations. This domain object is located in **/carina-demo/src/main/java/com/qaprosoft/carina/demo/soap/**, make sure that it extends AbstractApiMethodV2.
+
+We can specify the endpoint-url, expected HttpStatus, paths to request and response templates and content type using annotations.
+
+**LookupCity.java**
+
+```other
+@Endpoint(url = "${base_url}", methodType = HttpMethodType.POST)
+@SuccessfulHttpStatus(status = HttpResponseStatusType.OK_200)
+@RequestTemplatePath(path = "api/soap/lookupcity/rq.xml")
+@ResponseTemplatePath(path = "src/test/resources/api/soap/lookupcity/rs.xml")
+@ContentType(type = "text/xml")
+public class LookupCityMethod extends AbstractApiMethodV2 {
+
+    public LookupCityMethod() {
+        replaceUrlPlaceholder("base_url",Configuration.getEnvArg("soap_url"));
+    }
+}
+```
+
+Then we can create test class with soap test methods. This class is located in **/carina-demo/src/test/java/com/qaprosoft/carina/demo/**. Test class must implement IAbstractTest. Test methods should start with @Test annotation.
+
+To send SOAP request we have to set some request headers. SOAPAction header indicates the intent of the SOAP HTTP request.
+
+We can validate the response by Response Status. Also we can use response data and compare it to expected results.
+
+**SoapSampleTest.java**
+
+```other
+public class SoapSampleTest implements IAbstractTest {
+
+    @Test
+    public void testAddInteger() {
+        AddIntegerMethod soap = new AddIntegerMethod();
+        soap.setProperties("api/soap/soap.properties");
+        soap.setHeaders(String.format("SOAPAction=%s", "http://tempuri.org/SOAP.Demo.AddInteger"));
+
+        Response response = soap.callAPIExpectSuccess();
+        XmlPath rsBody = XmlPath.given(response.asString());
+        Integer actualResult = rsBody.getInt("AddIntegerResult");
+        Integer expectedResult = Integer.valueOf(soap.getProperties().getProperty("result"));
+        Assert.assertEquals(actualResult, expectedResult);
+    }
+}
+```
+
+> Method ValidateResponse can be used only with JSON files. To validate the whole xml responses we can use ValidateXMLRespone method.
+
+```other
+@Test
+    public void testLookupCity() throws Exception{
+        LookupCityMethod soap = new LookupCityMethod();
+        soap.setProperties("api/soap/soap.properties");
+        soap.setHeaders(String.format("SOAPAction=%s", "http://tempuri.org/SOAP.Demo.LookupCity"));
+
+        soap.callAPIExpectSuccess();
+        soap.validateXmlResponse(XmlCompareMode.STRICT);
+    }
+```
+ 
