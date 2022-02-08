@@ -64,7 +64,7 @@ Request (rq.json) and response (rs.json) templates have some placeholders that w
 While user.properties contains some default value which may be replaced later:
 ![API flow](../img/api/props-example.png)
 
-#### REST service call domain object
+#### REST service call domain object [DEPRECATED]
 Now we are ready to create REST service domain object which will be used to interact with web service and perform additional response validations. Our domain object is located in /carina-demo/src/main/java/com/qaprosoft/carina/demo/api, make sure that it extends AbstractApiMethodV2 and triggers the base class constructor for initialization. In general cases, you will specify the path to request and response templates along with default properties files (all of them have been created in the previous step). Also, we replace the URL placeholder to set an appropriate environment.
 ```
 package com.qaprosoft.carina.demo.api;
@@ -80,7 +80,7 @@ public class PostUserMethod extends AbstractApiMethodV2 {
 }
 ```
 
-#### HTTP method and path
+#### HTTP method and path [DEPRECATED]
 The last step before the test implementation itself is the association of the domain object class and the required HTTP method and path.
 It should be defined in /carina-demo/src/main/resources/_api.properties file, the key should be equal to domain class name, the value has the following pattern {http_method}:{http_path}. The HTTP path may contain placeholders, the HTTP method should be one of the following variants: GET, POST, PUT, UPDATE, DELETE.
 ```
@@ -93,6 +93,29 @@ DeleteUserMethod=DELETE:${base_url}/users/1
 PutPostsMethod=PUT:${base_url}/posts/1
 PatchPostsMethod=PATCH:${base_url}/posts/1
 ```
+#### REST service call domain object (Annotation based approach)
+
+Approach based on initialisation of super class constructor is deprecated and more convenient way is to use annotations. They can be used over class declarations. For api testing we can use such annotations:
+
+1. @ContentType - is used to define the value of Content-type header in response;
+2. @Endpoint - defines the place that APIs send requests and where the resource lives
+3. @RequestTemplatePath - contains a path from source root to request template file.
+4. @ResponseTemplatePath - contains a path from source root to response template file.
+5. @SuccessfulHttpStatus - specifies the expected HTTP status
+
+In this case we don’t need to define _api.properties file and call the constructor of a super class, but if we have some properties file used in this request we should explicitly set it in test method. Insead of callAPI() and expectResponseStatus() methods we can use callAPIExpectSuccess() that will call API expecting http status in response taken from @SuccessfulHttpStatus value.
+```
+@Endpoint(url = "${base_url}/users/1", methodType = HttpMethodType.DELETE)
+@RequestTemplatePath(path = "api/users/_delete/rq.json")
+@ResponseTemplatePath(path = "api/users/_delete/rs.json")
+@SuccessfulHttpStatus(status = HttpResponseStatusType.OK_200)
+public class DeleteUserMethod extends AbstractApiMethodV2 {
+
+    public DeleteUserMethod() {
+        replaceUrlPlaceholder("base_url", Configuration.getEnvArg("api_url"));
+    }
+}
+```
 
 #### API test
 API test is a general TestNG test, a class should extend APITest, in our case, the test implements IAbstractTest that encapsulates some test data and login method. The test is located in /carina-demo/src/test/java/com/qaprosoft/carina/demo.
@@ -101,14 +124,13 @@ package com.qaprosoft.carina.demo;
 
 import java.lang.invoke.MethodHandles;
 
-import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 import com.qaprosoft.apitools.validation.JsonCompareKeywords;
-import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
+import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
 import com.qaprosoft.carina.core.foundation.utils.tag.Priority;
 import com.qaprosoft.carina.core.foundation.utils.tag.TestPriority;
@@ -122,8 +144,8 @@ import com.qaprosoft.carina.demo.api.PostUserMethod;
  * @author qpsdemo
  */
 public class APISampleTest implements IAbstractTest {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    
 
     @Test()
     @MethodOwner(owner = "qpsdemo")
@@ -140,33 +162,31 @@ public class APISampleTest implements IAbstractTest {
     @MethodOwner(owner = "qpsdemo")
     public void testCreateUserMissingSomeFields() throws Exception {
         PostUserMethod api = new PostUserMethod();
+        api.setProperties("api/users/user.properties");
         api.getProperties().remove("name");
         api.getProperties().remove("username");
-        api.expectResponseStatus(HttpResponseStatusType.CREATED_201);
-        api.callAPI();
+        api.callAPIExpectSuccess();
         api.validateResponse();
     }
 
     @Test()
-    @MethodOwner(owner = "qpsdemo")
-    public void testGetUsers() {
-        GetUserMethods getUsersMethods = new GetUserMethods();
-        getUsersMethods.expectResponseStatus(HttpResponseStatusType.OK_200);
-        getUsersMethods.callAPI();
-        getUsersMethods.validateResponse(JSONCompareMode.STRICT, JsonCompareKeywords.ARRAY_CONTAINS.getKey());
-        getUsersMethods.validateResponseAgainstSchema("api/users/_get/rs.schema");
-    }
+     @MethodOwner(owner = "qpsdemo")
+     public void testGetUsers() {
+         GetUserMethods getUsersMethods = new GetUserMethods();
+         getUsersMethods.callAPIExpectSuccess();
+         getUsersMethods.validateResponse(JSONCompareMode.STRICT, JsonCompareKeywords.ARRAY_CONTAINS.getKey());
+         getUsersMethods.validateResponseAgainstSchema("api/users/_get/rs.schema");
+     }
 
     @Test()
     @MethodOwner(owner = "qpsdemo")
     @TestPriority(Priority.P1)
     public void testDeleteUsers() {
         DeleteUserMethod deleteUserMethod = new DeleteUserMethod();
-        deleteUserMethod.expectResponseStatus(HttpResponseStatusType.OK_200);
-        deleteUserMethod.callAPI();
+        deleteUserMethod.setProperties("api/users/user.properties");
+        deleteUserMethod.callAPIExpectSuccess();
         deleteUserMethod.validateResponse();
     }
-
 }
 ```
 
