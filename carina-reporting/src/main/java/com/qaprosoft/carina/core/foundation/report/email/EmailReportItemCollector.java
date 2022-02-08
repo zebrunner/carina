@@ -37,9 +37,12 @@ public class EmailReportItemCollector {
     private static Map<String, TestResultItem> testResultsMap = Collections.synchronizedMap(new HashMap<String, TestResultItem>());
     private static List<String> createdItems = new ArrayList<String>();
 
+    private static int hashModifier = 0;
+
     public static synchronized void push(TestResultItem emailItem) {
-        emailResultsMap.put(emailItem.hash(), emailItem);
-        testResultsMap.put(emailItem.getTest(), emailItem);
+        hashModifier++;
+        emailResultsMap.put(emailItem.hash() + "-" + hashModifier, emailItem);
+        testResultsMap.put(emailItem.getTest() + "-" + hashModifier, emailItem);
     }
 
     public static synchronized void push(String itemToDelete) {
