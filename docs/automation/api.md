@@ -80,7 +80,7 @@ public class PostUserMethod extends AbstractApiMethodV2 {
 }
 ```
 
-#### HTTP method and path
+#### HTTP method and path [DEPRECATED]
 The last step before the test implementation itself is the association of the domain object class and the required HTTP method and path.
 It should be defined in /carina-demo/src/main/resources/_api.properties file, the key should be equal to domain class name, the value has the following pattern {http_method}:{http_path}. The HTTP path may contain placeholders, the HTTP method should be one of the following variants: GET, POST, PUT, UPDATE, DELETE.
 ```
@@ -104,6 +104,18 @@ Approach based on initialisation of super class constructor is deprecated and mo
 5. @SuccessfulHttpStatus - specifies the expected HTTP status
 
 In this case we don’t need to define _api.properties file and call the constructor of a super class, but if we have some properties file used in this request we should explicitly set it in test method. Insead of callAPI() and expectResponseStatus() methods we can use callAPIExpectSuccess() that will call API expecting http status in response taken from @SuccessfulHttpStatus value.
+```
+@Endpoint(url = "${base_url}/users/1", methodType = HttpMethodType.DELETE)
+@RequestTemplatePath(path = "api/users/_delete/rq.json")
+@ResponseTemplatePath(path = "api/users/_delete/rs.json")
+@SuccessfulHttpStatus(status = HttpResponseStatusType.OK_200)
+public class DeleteUserMethod extends AbstractApiMethodV2 {
+
+    public DeleteUserMethod() {
+        replaceUrlPlaceholder("base_url", Configuration.getEnvArg("api_url"));
+    }
+}
+```
 
 #### API test
 API test is a general TestNG test, a class should extend APITest, in our case, the test implements IAbstractTest that encapsulates some test data and login method. The test is located in /carina-demo/src/test/java/com/qaprosoft/carina/demo.
@@ -141,8 +153,8 @@ public class APISampleTest implements IAbstractTest {
         LOGGER.info("test");
         setCases("4555,54545");
         PostUserMethod api = new PostUserMethod();
-        api.setProperties("api/users/user.properties");
-        api.callAPIExpectSuccess();
+        api.expectResponseStatus(HttpResponseStatusType.CREATED_201);
+        api.callAPI();
         api.validateResponse();
     }
 
@@ -158,13 +170,13 @@ public class APISampleTest implements IAbstractTest {
     }
 
     @Test()
-    @MethodOwner(owner = "qpsdemo")
-    public void testGetUsers() {
-        GetUserMethods getUsersMethods = new GetUserMethods();
-        getUsersMethods.callAPIExpectSuccess();
-        getUsersMethods.validateResponse(JSONCompareMode.STRICT, JsonCompareKeywords.ARRAY_CONTAINS.getKey());
-        getUsersMethods.validateResponseAgainstSchema("api/users/_get/rs.schema");
-    }
+     @MethodOwner(owner = "qpsdemo")
+     public void testGetUsers() {
+         GetUserMethods getUsersMethods = new GetUserMethods();
+         getUsersMethods.callAPIExpectSuccess();
+         getUsersMethods.validateResponse(JSONCompareMode.STRICT, JsonCompareKeywords.ARRAY_CONTAINS.getKey());
+         getUsersMethods.validateResponseAgainstSchema("api/users/_get/rs.schema");
+     }
 
     @Test()
     @MethodOwner(owner = "qpsdemo")
