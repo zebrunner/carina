@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.api;
 
+import com.qaprosoft.apitools.validation.mock.method.DeleteUserMethod;
 import com.qaprosoft.carina.core.foundation.api.ssl.PutDocMethod;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -22,11 +23,18 @@ import org.testng.annotations.Test;
 public class AbstractApiMethodTest {
 
     private final static String BODY_CONTENT = "{\"key\": \"value\"}";
+    private final static String EXPECTED_METHOD_PATH_URL = "https://jsonplaceholder.typicode.com/users/1";
 
     @Test
     public void testGetRequestBodyMethod() {
         PutDocMethod putDocMethod = new PutDocMethod();
         putDocMethod.setBodyContent(BODY_CONTENT);
         Assert.assertEquals(putDocMethod.getRequestBody(), BODY_CONTENT);
+    }
+
+    @Test
+    public void testInitMethod() {
+        DeleteUserMethod api = new DeleteUserMethod();
+        Assert.assertEquals(api.methodPath, EXPECTED_METHOD_PATH_URL);
     }
 }
