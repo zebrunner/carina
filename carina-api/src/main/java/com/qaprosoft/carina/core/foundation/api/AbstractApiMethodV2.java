@@ -26,7 +26,6 @@ import com.qaprosoft.apitools.builder.PropertiesProcessor;
 import com.qaprosoft.apitools.validation.*;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -63,7 +62,6 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         setHeaders(ACCEPT_ALL_HEADER);
         initPathsFromAnnotation();
         setProperties(new Properties());
-        replaceUrlPlaceholders();
     }
 
     public AbstractApiMethodV2(String rqPath, String rsPath, String propertiesPath) {
@@ -93,18 +91,17 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         for (String param : params) {
             if (param != null && param.startsWith("config.env.")) {
                 String newParam = param.split("\\.")[2];
-                methodPath = methodPath.replace("${" + param + "}", Configuration.getEnvArg(newParam));
+                replaceUrlPlaceholder(param, Configuration.getEnvArg(newParam));
             } else if (param != null && param.startsWith("config.")) {
                 String newParam = param.substring(7);
-                methodPath = methodPath.replace("${" + param + "}", R.CONFIG.get(newParam));
+                replaceUrlPlaceholder(param, R.CONFIG.get(newParam));
             } else {
-                methodPath = methodPath.replace("${" + param + "}", "");
+                throw new RuntimeException("Invalid placeholders");
             }
-            methodPath = StringUtils.removeEnd(methodPath, "/");
         }
     }
 
-    public List<String> getParamsFromUrl() {
+    private List<String> getParamsFromUrl() {
         List<String> params = new ArrayList<>();
         StringBuilder path = new StringBuilder(methodPath);
         while (path.indexOf("{") != -1) {
