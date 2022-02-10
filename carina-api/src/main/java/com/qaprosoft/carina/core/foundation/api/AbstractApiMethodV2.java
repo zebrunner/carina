@@ -63,6 +63,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         setHeaders(ACCEPT_ALL_HEADER);
         initPathsFromAnnotation();
         setProperties(new Properties());
+        replaceUrlPlaceholders();
     }
 
     public AbstractApiMethodV2(String rqPath, String rsPath, String propertiesPath) {
