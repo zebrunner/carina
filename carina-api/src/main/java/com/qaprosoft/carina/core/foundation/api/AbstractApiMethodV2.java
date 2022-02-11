@@ -26,6 +26,7 @@ import com.qaprosoft.apitools.builder.PropertiesProcessor;
 import com.qaprosoft.apitools.validation.*;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.R;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -87,29 +88,27 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     }
 
     public void replaceUrlPlaceholders() {
+        final String envParam = "config.env.";
+        final String configParam = "config.";
         List<String> params = getParamsFromUrl();
         for (String param : params) {
-            if (param != null && param.startsWith("config.env.")) {
-                String newParam = param.split("\\.")[2];
+            if (param.startsWith(envParam)) {
+                String newParam = StringUtils.substringAfter(param, envParam);
                 replaceUrlPlaceholder(param, Configuration.getEnvArg(newParam));
-            } else if (param != null && param.startsWith("config.")) {
-                String newParam = param.substring(7);
+            } else if (param.startsWith(configParam)) {
+                String newParam = StringUtils.substringAfter(param, configParam);
                 replaceUrlPlaceholder(param, R.CONFIG.get(newParam));
-            } else {
-                throw new RuntimeException("Invalid placeholders");
             }
         }
     }
 
     private List<String> getParamsFromUrl() {
         List<String> params = new ArrayList<>();
-        StringBuilder path = new StringBuilder(methodPath);
-        while (path.indexOf("{") != -1) {
-            int begin = path.indexOf("{");
-            int end = path.indexOf("}");
-            String param = path.substring(begin + 1, end);
+        String path = methodPath;
+        while (path.contains("{")) {
+            String param = StringUtils.substringBetween(path, "${", "}");
             params.add(param);
-            path.delete(begin - 1, end + 1);
+            path = StringUtils.substringAfter(path, "}");
         }
         return params;
     }
