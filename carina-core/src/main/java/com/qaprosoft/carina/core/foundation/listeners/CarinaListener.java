@@ -428,7 +428,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             ReportContext.generateHtmlReport(emailContent);
 
             printExecutionSummary(EmailReportItemCollector.getTestResults());
-            ReportContext.setCustomTestDirName("run_summary");
 
             TestResultType suiteResult = EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
             switch (suiteResult) {
