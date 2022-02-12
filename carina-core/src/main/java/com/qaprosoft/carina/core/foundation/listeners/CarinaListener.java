@@ -18,10 +18,8 @@ package com.qaprosoft.carina.core.foundation.listeners;
 import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,14 +32,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Category;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.IClassListener;
 import org.testng.ISuite;
@@ -113,7 +108,7 @@ import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
  * @author Vadim Delendik
  */
 public class CarinaListener extends AbstractTestListener implements ISuiteListener, IQTestManager, ITestRailManager, IClassListener {
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
@@ -124,7 +119,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     
     protected boolean isRunLabelsRegistered = false;
 
-    public CarinaListener(){
+    public CarinaListener() {
         // Add shutdown hook
         Runtime.getRuntime().addShutdownHook(new ShutdownHook());
 
@@ -135,12 +130,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         // Technically, this happen when the maven-surefire-plugin has not set inherited program arguments (passed to mvn process).
         // That is why it is necessary to reinit R class here when TestNG loads the CarinaListener class.
         R.reinit();
-
-        // Set log4j properties
-        URL log4jUrl = ClassLoader.getSystemResource("carina-log4j.properties");
-        LOGGER.debug("carina-log4j.properties: " + log4jUrl);
-        PropertyConfigurator.configure(log4jUrl);
-
+        
         LOGGER.info(Configuration.asString());
         // Configuration.validateConfiguration();
 
@@ -186,23 +176,24 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 Arrays.asList(Configuration.get(Parameter.CORE_LOG_PACKAGES).split(",")));
         if (coreLogPackages.size() > 0 && !"INFO".equalsIgnoreCase(Configuration.get(Parameter.CORE_LOG_LEVEL))) {
             // do core log level change only if custom properties are declared
-            try {
-                Logger root = Logger.getRootLogger();
-                Enumeration<?> allLoggers = root.getLoggerRepository().getCurrentCategories();
-                while (allLoggers.hasMoreElements()) {
-                    Category tmpLogger = (Category) allLoggers.nextElement();
-                    // LOGGER.debug("loggerName: " + tmpLogger.getName());
-                    for (String coreLogPackage : coreLogPackages) {
-                        if (tmpLogger.getName().contains(coreLogPackage.trim())) {
-                            LOGGER.info("Updaged logger level for '" + tmpLogger.getName() + "' to "
-                                    + Configuration.get(Parameter.CORE_LOG_LEVEL));
-                            tmpLogger.setLevel(Level.toLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
-                        }
-                    }
-                }
-            } catch (NoSuchMethodError e) {
-                LOGGER.error("Unable to redefine logger level due to the conflicts between log4j and slf4j!");
-            }
+            Assert.fail("Implement log level updater!");
+//            try {
+//                Logger root = Logger.getRootLogger();
+//                Enumeration<?> allLoggers = root.getLoggerRepository().getCurrentCategories();
+//                while (allLoggers.hasMoreElements()) {
+//                    Category tmpLogger = (Category) allLoggers.nextElement();
+//                    // LOGGER.debug("loggerName: " + tmpLogger.getName());
+//                    for (String coreLogPackage : coreLogPackages) {
+//                        if (tmpLogger.getName().contains(coreLogPackage.trim())) {
+//                            LOGGER.info("Updaged logger level for '" + tmpLogger.getName() + "' to "
+//                                    + Configuration.get(Parameter.CORE_LOG_LEVEL));
+//                            tmpLogger.setLevel(Level.toLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
+//                        }
+//                    }
+//                }
+//            } catch (NoSuchMethodError e) {
+//                LOGGER.error("Unable to redefine logger level due to the conflicts between log4j and slf4j!");
+//            }
         }
 
         setThreadCount(suite);
@@ -437,7 +428,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             ReportContext.generateHtmlReport(emailContent);
 
             printExecutionSummary(EmailReportItemCollector.getTestResults());
-            ReportContext.setCustomTestDirName("run_summary");
 
             TestResultType suiteResult = EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
             switch (suiteResult) {
@@ -943,7 +933,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 carinaVersion = matcher.group(1);
             }
         } catch (Exception e) {
-            LOGGER.debug(e);
+            LOGGER.debug(e.getMessage(), e);
         }
 
         return carinaVersion;
@@ -1035,7 +1025,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     public static class ShutdownHook extends Thread {
 
-        private static final Logger LOGGER = Logger.getLogger(ShutdownHook.class);
+        private static final Logger LOGGER = LoggerFactory.getLogger(ShutdownHook.class);
 
         private void quitAllDriversOnHook() {
             // as it is shutdown hook just try to quit all existing drivers one by one

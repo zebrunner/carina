@@ -15,29 +15,78 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.log;
 
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.Core;
+import org.apache.logging.log4j.core.Filter;
+import org.apache.logging.log4j.core.Layout;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.config.Property;
+import org.apache.logging.log4j.core.config.plugins.Plugin;
+import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
+import org.apache.logging.log4j.core.config.plugins.PluginElement;
+import org.apache.logging.log4j.core.config.plugins.PluginFactory;
+import org.apache.logging.log4j.core.layout.PatternLayout;
+import org.apache.logging.log4j.message.Message;
+import org.slf4j.MDC;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.MDC;
-import org.apache.log4j.spi.LoggingEvent;
-
-import com.qaprosoft.carina.core.foundation.report.ReportContext;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /*
  * This appender log groups test outputs by test method/test thread so they don't mess up each other even they runs in parallel.
  */
-public class ThreadLogAppender extends AppenderSkeleton {
+@Plugin(
+        name = "ThreadLogAppender",
+        category = Core.CATEGORY_NAME,
+        elementType = Appender.ELEMENT_TYPE
+)
+public class ThreadLogAppender extends AbstractAppender {
+
+    private static final long MAX_LOG_FILE_SIZE_IN_MEGABYTES = 1024 * 1024 * 1024;
+    private static final DateTimeFormatter LOG_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
+
+    private static final ThreadLocal<File> currentTestDirectory = new ThreadLocal<>();
     // single buffer for each thread test.log file
-    private final ThreadLocal<BufferedWriter> testLogBuffer = new ThreadLocal<BufferedWriter>();
-    private ThreadLocal<File> currentTestDirectory = new ThreadLocal<>();
-    private final String MAX_LOG_FILE_SIZE = "1024";
-    private long bytesWritten;
+    private static final ThreadLocal<BufferedWriter> testLogBuffer = new ThreadLocal<>();
+
+    private static final Map<String, Long> fileNameToWrittenBytes = new ConcurrentHashMap<>();
+
+    private ThreadLogAppender(String name,
+                              Filter filter,
+                              Layout<? extends Serializable> layout,
+                              boolean ignoreExceptions) {
+        super(name, filter, layout, ignoreExceptions, Property.EMPTY_ARRAY);
+    }
+
+    @PluginFactory
+    public static ThreadLogAppender create(@PluginAttribute("name") String name,
+                                           @PluginElement("Layout") Layout<? extends Serializable> layout,
+                                           @PluginElement("Filter") Filter filter) {
+
+        if (name == null) {
+            LOGGER.error("No name provided for ThreadLogAppender");
+            return null;
+        }
+
+        if (layout == null) {
+            layout = PatternLayout.createDefaultLayout();
+        }
+
+        return new ThreadLogAppender(name, filter, layout, true);
+    }
+
     @Override
-    public void append(LoggingEvent event) {
+    public void append(LogEvent event) {
         // TODO: [VD] OBLIGATORY double check and create separate unit test for this case
         /*
          * if (!ReportContext.isBaseDireCreated()) {
@@ -47,66 +96,64 @@ public class ThreadLogAppender extends AppenderSkeleton {
          */
 
         try {
-
-            BufferedWriter fw = testLogBuffer.get();
+            BufferedWriter logFileWriter = testLogBuffer.get();
 
             // check does writer log to the correct test directory, if not - reinit it
-            if(currentTestDirectory.get() != ReportContext.getTestDir()){
-                fw = null;
+            if (currentTestDirectory.get() != ReportContext.getTestDir()) {
+                logFileWriter = null;
             }
 
-            if (fw == null) {
+            String logFilePath = ReportContext.getTestDir() + "/test.log";
+            if (logFileWriter == null) {
                 // 1st request to log something for this thread/test
-                File testLogFile = new File(ReportContext.getTestDir() + "/test.log");
+                File testLogFile = new File(logFilePath);
                 currentTestDirectory.set(ReportContext.getTestDir());
-                if (!testLogFile.exists()){
+
+                if (!testLogFile.exists()) {
                     testLogFile.createNewFile();
-                    bytesWritten = 0;
                 }
 
-                fw = new BufferedWriter(new FileWriter(testLogFile, true));
-                testLogBuffer.set(fw);
+                logFileWriter = new BufferedWriter(new FileWriter(testLogFile, true));
+                testLogBuffer.set(logFileWriter);
 
+                fileNameToWrittenBytes.putIfAbsent(logFilePath, 0L);
             }
 
-            if (event != null) {
-                // append time, thread, class name and device name if any
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); // 2016-05-26 04:39:16
-                String time = dateFormat.format(event.getTimeStamp());
-                // System.out.println("time: " + time);
-
-                long threadId = Thread.currentThread().getId();
-                MDC.put("threadId", "-" + String.valueOf(threadId));
-                // System.out.println("thread: " + threadId);
-                String fileName = event.getLocationInformation().getFileName();
-                // System.out.println("fileName: " + fileName);
-
-                String logLevel = event.getLevel().toString();
-
-                String message = "[%s] [%s] [%s] [%s] %s";
-                String eventMessage = "";
-                if (event != null && event.getMessage() != null) {
-                    eventMessage = event.getMessage().toString();
-                }
-                
-                message = String.format(message, time, fileName, threadId, logLevel, eventMessage);
-                ensureCapacity(message.length());
-                fw.write(message);
-            } else {
-                fw.write("null");
+            String logLine = this.toLogLine(event);
+            long newWrittenBytes = fileNameToWrittenBytes.get(logFilePath) + logLine.length();
+            if (newWrittenBytes > MAX_LOG_FILE_SIZE_IN_MEGABYTES) {
+                throw new IOException("test Log file size exceeded core limit: " + newWrittenBytes + " > " + MAX_LOG_FILE_SIZE_IN_MEGABYTES);
             }
-            fw.write("\n");
-            fw.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
+
+            logFileWriter.write(logLine);
+            logFileWriter.flush();
+
+            fileNameToWrittenBytes.computeIfPresent(logFilePath, ($, bytesWritten) -> bytesWritten + logLine.length());
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
 
+    private String toLogLine(LogEvent event) {
+        String logTime = LocalDateTime.ofEpochSecond(event.getInstant().getEpochSecond(),
+                                                     event.getInstant().getNanoOfSecond(),
+                                                     ZoneOffset.UTC)
+                                      .format(LOG_TIME_FORMATTER);
+
+        long threadId = Thread.currentThread().getId();
+        MDC.put("threadId", "-" + threadId);
+        String logLevel = event.getLevel().toString();
+
+        Message eventMessage = event.getMessage();
+        String logMessage = eventMessage != null
+                ? eventMessage.getFormattedMessage()
+                : "";
+
+        return "[" + logTime + "] " + "[" + threadId + "] " + "[" + logLevel + "] " + logMessage + "\n";
     }
 
     @Override
-    public void close() {
+    public void stop() {
         try {
             BufferedWriter fw = testLogBuffer.get();
             if (fw != null) {
@@ -115,20 +162,9 @@ public class ThreadLogAppender extends AppenderSkeleton {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            super.setStopped();
         }
     }
 
-    @Override
-    public boolean requiresLayout() {
-        return false;
-    }
-
-    private void ensureCapacity(int len) throws IOException {
-        long newBytesWritten = this.bytesWritten + len;
-        long maxMegaBytes = Long.parseLong(MAX_LOG_FILE_SIZE) * 1024 * 1024;
-
-        if (newBytesWritten > maxMegaBytes)
-            throw new IOException("test Log file size exceeded core limit: " + newBytesWritten + " > " + maxMegaBytes);
-        this.bytesWritten = newBytesWritten;
-    }
 }
