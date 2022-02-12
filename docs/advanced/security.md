@@ -1,4 +1,3 @@
-#Security
 Security functionality in Carina framework is required for sensitive data that should be hidden in test configurations and logging. It uses a symmetric key encryption algorithm for security implementation, which means that anyone may encrypt/decrypt the data in the same way, using the same key. In Carina framework, AES encryption is used by default with a 128-bit security key.
 
 ![Security Algorithm](../img/security-alg.png)

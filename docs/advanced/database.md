@@ -1,5 +1,3 @@
-# Database usage
-
 Here is a simple DB schema that will be used for this sample:
 ![db_schema](../img/database-usage-1.png)
 We will implement mapping for Users and UserPreferences tables.

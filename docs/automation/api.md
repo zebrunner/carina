@@ -1,4 +1,3 @@
-### Introduction
 Rest API testing is a vital part of integration testing process, it may be used separately or together with web, mobile or DB testing. The general process may be described by the following steps:
 
 1. Compile an HTTP request with the required meta data

@@ -1,6 +1,4 @@
-# Program flow
-
-Under the hood Carina use TestNG framework, so the first class to initialize is RemoteTestNGStarter.class. Program life cycle logic could be observed at [TestNG.class](https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestNG.java) run() method.
+Under the hood Carina uses TestNG framework, so the first class to initialize is RemoteTestNGStarter.class. Program life cycle logic could be observed at [TestNG.class](https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestNG.java) run() method.
 
 The initializing turn comes to Carina when [CarinaListenerChain.class](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListenerChain.java) object created.
 It extends [ListenerChain.class](http://javadox.com/com.nordstrom.tools/testng-foundation/1.10.0/com/nordstrom/automation/testng/package-summary.html)

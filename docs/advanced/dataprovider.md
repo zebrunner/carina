@@ -1,5 +1,3 @@
-# Dataprovider usage
-
 Modern test automation frameworks should support data-driven testing, when you are able to verify a variety of edge cases providing test data sets into the tests using external data sources. Carina is not an exception, the framework supports multiple ways of test parametrization (see the [samples](https://github.com/zebrunner/carina-demo/blob/master/src/test/java/com/qaprosoft/carina/demo/DataprovidersSampleTest.java)):
 
 * Java data-providers

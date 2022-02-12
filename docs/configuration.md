@@ -1,4 +1,3 @@
-### Configuration files
 There are multiple properties files located in src/main/resources:
 
 *  **api.properties** - API test endpoints reference
