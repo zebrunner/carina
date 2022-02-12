@@ -67,6 +67,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.FileManager;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.ZipManager;
+import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.zebrunner.agent.core.registrar.Artifact;
 
 /*
@@ -504,11 +505,23 @@ public class ReportContext {
             File newTestDir = new File(String.format("%s/%s", getBaseDir(), test.replaceAll("[^a-zA-Z0-9.-]", "_")));
 
             if (!newTestDir.exists()) {
-                // close ThreadLogAppender resources before renaming
-                stopThreadLogAppender();
-                testDir.renameTo(newTestDir);
-                testDirectory.set(newTestDir);
-                System.out.println("Test directory is set to : " + newTestDir);
+                boolean isRenamed = false;
+                int retry = 5;
+                while (!isRenamed && retry > 0) {
+                    // close ThreadLogAppender resources before renaming
+                    stopThreadLogAppender();
+                    isRenamed = testDir.renameTo(newTestDir);
+                    if (!isRenamed) {
+                        CommonUtils.pause(1);
+                        System.err.println("renaming failed to '" + newTestDir + "'");
+                    }
+                    retry--;
+                }
+                    
+                if (isRenamed) {
+                    testDirectory.set(newTestDir);
+                    System.out.println("Test directory renamed to '" + newTestDir + "'");
+                }
             }
         } else {
             LOGGER.error("Unexpected case with absence of test.log for '" + test + "'");
