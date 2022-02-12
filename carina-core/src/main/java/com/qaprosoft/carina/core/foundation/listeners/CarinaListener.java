@@ -84,12 +84,10 @@ import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.tag.PriorityManager;
 import com.qaprosoft.carina.core.foundation.utils.tag.TagManager;
 import com.qaprosoft.carina.core.foundation.webdriver.CarinaDriver;
-import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoader;
-import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.AutoScreenshotRule;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
 import com.zebrunner.agent.core.registrar.Artifact;
@@ -112,7 +110,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
-    protected static final String SUITE_TITLE = "%s%s%s - %s (%s%s)";
+    protected static final String SUITE_TITLE = "%s%s%s - %s (%s)";
     protected static final String XML_SUITE_NAME = " (%s)";
 
     protected static boolean automaticDriversCleanup = true;
@@ -393,7 +391,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             // HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
 
             String browser = getBrowser();
-            String deviceName = getFullDeviceName();
             // String suiteName = getSuiteName(context);
             String title = getTitle(suite.getXmlSuite());
 
@@ -420,7 +417,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
             // Generate emailable html report using regular method
             EmailReportGenerator report = new EmailReportGenerator(title, env, Configuration.get(Parameter.APP_VERSION),
-                    deviceName, browser, DateUtils.now(), EmailReportItemCollector.getTestResults(),
+                    browser, DateUtils.now(), EmailReportItemCollector.getTestResults(),
                     EmailReportItemCollector.getCreatedItems());
 
             String emailContent = report.getEmailBody();
@@ -456,20 +453,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         automaticDriversCleanup = false;
     }
 
-    // TODO: remove this private method
-    private String getFullDeviceName() {
-        String deviceName = "Desktop";
-
-        if (!IDriverPool.getDefaultDevice().isNull()) {
-            // Samsung - Android 4.4.2; iPhone - iOS 7
-            Device device = IDriverPool.getDefaultDevice();
-            String deviceTemplate = "%s - %s %s";
-            deviceName = String.format(deviceTemplate, device.getName(), device.getOs(), device.getOsVersion());
-        }
-
-        return deviceName;
-    }
-
     protected String getBrowser() {
         return Configuration.getBrowser();
     }
@@ -479,8 +462,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         if (!browser.isEmpty()) {
             browser = " " + browser; // insert the space before
         }
-        String device = getFullDeviceName();
-
         String env = !Configuration.isNull(Parameter.ENV) ? Configuration.get(Parameter.ENV)
                 : Configuration.get(Parameter.URL);
 
@@ -495,8 +476,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         String suiteName = getSuiteName(suite);
         String xmlFile = getSuiteFileName(suite);
 
-        title = String.format(SUITE_TITLE, app_version, suiteName, String.format(XML_SUITE_NAME, xmlFile), env, device,
-                browser);
+        title = String.format(SUITE_TITLE, app_version, suiteName, String.format(XML_SUITE_NAME, xmlFile), env, browser);
 
         return title;
     }
