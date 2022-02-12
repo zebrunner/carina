@@ -50,6 +50,7 @@ public class JsonKeywordsComparator extends DefaultComparator {
         this.comparators.add(new SkipKeywordComparator());
         this.comparators.add(new TypeKeywordComparator());
         this.comparators.add(new RegexKeywordComparator());
+        this.comparators.add(new OgnlKeywordsComparator());
 
         ServiceLoader.load(JsonKeywordComparator.class)
                 .forEach(this.comparators::add);
