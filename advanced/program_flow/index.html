@@ -47,11 +47,6 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
-        
-        <a href="#program-flow" class="md-skip">
-          Skip to content
-        </a>
-      
     </div>
     <div data-md-component="announce">
       
@@ -394,8 +389,6 @@
     
     <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
     
-      
-    
     
     <a href="./" title="Program flow" class="md-nav__link md-nav__link--active">
       Program flow
@@ -506,21 +499,6 @@
               </div>
             
             
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-    
-  
-  
-</nav>
-                  </div>
-                </div>
-              </div>
-            
           
           <div class="md-content">
             <article class="md-content__inner md-typeset">
@@ -534,8 +512,9 @@
                   
                 
                 
-                <h1 id="program-flow">Program flow</h1>
-<p>Under the hood Carina use TestNG framework, so the first class to initialize is RemoteTestNGStarter.class. Program life cycle logic could be observed at <a href="https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestNG.java">TestNG.class</a> run() method.</p>
+                  <h1>Program flow</h1>
+                
+                <p>Under the hood Carina uses TestNG framework, so the first class to initialize is RemoteTestNGStarter.class. Program life cycle logic could be observed at <a href="https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestNG.java">TestNG.class</a> run() method.</p>
 <p>The initializing turn comes to Carina when <a href="https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListenerChain.java">CarinaListenerChain.class</a> object created.
 It extends <a href="http://javadox.com/com.nordstrom.tools/testng-foundation/1.10.0/com/nordstrom/automation/testng/package-summary.html">ListenerChain.class</a>
 which will create, sort and attach <a href="https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/AbstractTest.java">AbstractTest.class</a> listeners. This whole sequence is described in <a href="https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestRunner.java">TestRunner.class</a> init() method.</p>
