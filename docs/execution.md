@@ -1,15 +1,7 @@
-### Selenium/Appium
-
-[![Carina - Start Selenium](https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png)](https://youtu.be/YGXsVoEY74M)
-
 Before running any web or mobile test you have to start Selenium/Appium locally or use a remote Selenium Grid. 
-We recommend to use lightweight Zebrunner [Selenoid](https://github.com/zebrunner/selenoid) and [MCloud](https://github.com/zebrunner/mcloud) solutions.
+We recommend to use scalable [Zebrunner Engine](https://zebrunner.com/) grid.
 
 ### Running tests
-
-[![Carina - Running tests](http://img.youtube.com/vi/QGHCezE-d-I/0.jpg)](https://youtu.be/QGHCezE-d-I)
-
-Note: Starting from 7.0.4 consider that instead of `extends AbstractTest` we have to `implements IAbstractTest` interface
 
 There are several options to execute a test: you may run test suite from Eclipse IDE or initiate test execution from the console using Maven Surefire plugin built into Carina framework.
 

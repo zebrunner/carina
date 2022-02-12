@@ -1,7 +1,3 @@
-[![Carina - Project structure](https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png)](https://youtu.be/I1u07JspECE)
-
-Note: Starting from 7.0.4 consider that instead of `extends AbstractTest` we have to `implements IAbstractTest` interface
-
 Carina test project is structured as a standard Maven project:
 ```
 carina-demo
