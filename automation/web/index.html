@@ -704,9 +704,7 @@
                 
                   <h1>Web</h1>
                 
-                <p><a href="https://youtu.be/Wgyffk7hJQw"><img alt="Carina - Web automation" src="https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png" /></a></p>
-<p>Note: Starting from 7.0.4 consider that instead of <code>extends AbstractTest</code> we have to <code>implements IAbstractTest</code> interface</p>
-<p>Carina framework follows Selenium best practices for web test automation. If you are familiar with Selenium WebDriver and have already implemented a few tests with the Page Object Pattern, the following guide will be much easier for understanding. We have chosen <a href="https://www.gsmarena.com/">GSM Arena</a> public web site for demonstration purposes, the whole test source code is located in <a href="https://github.com/zebrunner/carina-demo">carina-demo</a> Github repo.</p>
+                <p>Carina framework follows Selenium best practices for web test automation. If you are familiar with Selenium WebDriver and have already implemented a few tests with the Page Object Pattern, the following guide will be much easier for understanding. We have chosen <a href="https://www.gsmarena.com/">GSM Arena</a> public web site for demonstration purposes, the whole test source code is located in <a href="https://github.com/zebrunner/carina-demo">carina-demo</a> Github repo.</p>
 <h3 id="implementation-of-page-objects">Implementation of Page Objects</h3>
 <p>When you are writing functional tests using Selenium, the major part of your code will consist of interactions with the web interface you are testing through the WebDriver API. After fetching elements, you will verify some state of an element through various assertions and move on to fetching the next element. You may find WebElements directly in your tests:</p>
 <pre><code>List&lt;WebElement&gt; zipCodes = driver.findElements(By.id(&quot;zipCodes&quot;));
