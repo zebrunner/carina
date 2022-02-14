@@ -15,21 +15,24 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.utils;
 
-import com.qaprosoft.carina.core.foundation.utils.FileManager;
-import com.qaprosoft.carina.core.foundation.utils.ZipManager;
-import org.apache.log4j.Logger;
-import org.testng.Assert;
-import org.testng.annotations.Test;
-
 import java.io.File;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
+import com.qaprosoft.carina.core.foundation.utils.FileManager;
+import com.qaprosoft.carina.core.foundation.utils.ZipManager;
+
 public class FileManagerTest {
-    private static final Logger LOGGER = Logger.getLogger(FileManagerTest.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final String ZIP_FOLDER_PATH = "src/test/resources/zip";
     private static final String ZIP_FILE_PATH = ZIP_FOLDER_PATH + "/zipFile.zip";

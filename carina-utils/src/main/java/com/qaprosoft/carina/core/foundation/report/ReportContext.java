@@ -46,24 +46,28 @@ import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
+import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
 import org.imgscalr.Scalr;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.FileManager;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.ZipManager;
+import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.zebrunner.agent.core.registrar.Artifact;
 
 /*
@@ -71,7 +75,7 @@ import com.zebrunner.agent.core.registrar.Artifact;
  */
 
 public class ReportContext {
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public static final String ARTIFACTS_FOLDER = "artifacts";
 
@@ -309,7 +313,7 @@ public class ReportContext {
         try {
             return new WebDriverWait(driver, timeout).until((k) -> checkArtifactUsingHttp(url, username, password));
         } catch (Exception e) {
-            LOGGER.debug(e);
+            LOGGER.debug("", e);
             return false;
         }
     }
@@ -458,7 +462,7 @@ public class ReportContext {
     public static void emptyTestDirData() {
         testDirectory.remove();
         isCustomTestDirName.set(Boolean.FALSE);
-        closeThreadLogAppender();
+        stopThreadLogAppender();
     }
 
     public static synchronized File createTestDir() {
@@ -481,15 +485,16 @@ public class ReportContext {
         return testDir;
     }
 
-    private static void closeThreadLogAppender() {
+    private static void stopThreadLogAppender() {
         try {
-            ThreadLogAppender tla = (ThreadLogAppender) Logger.getRootLogger().getAppender("ThreadLogAppender");
-            if (tla != null) {
-                tla.close();
+            LoggerContext loggerContext = (LoggerContext) LogManager.getContext(true);
+            ThreadLogAppender appender = loggerContext.getConfiguration().getAppender("ThreadLogAppender");;
+            if (appender != null) {
+                appender.stop();
             }
 
-        } catch (NoSuchMethodError e) {
-            LOGGER.error("Exception while closing thread log appender.");
+        } catch (Exception e) {
+            LOGGER.error("Exception while closing thread log appender.", e);
         }
     }
 
@@ -500,11 +505,23 @@ public class ReportContext {
             File newTestDir = new File(String.format("%s/%s", getBaseDir(), test.replaceAll("[^a-zA-Z0-9.-]", "_")));
 
             if (!newTestDir.exists()) {
-                // close ThreadLogAppender resources before renaming
-                closeThreadLogAppender();
-                testDir.renameTo(newTestDir);
-                testDirectory.set(newTestDir);
-                System.out.println("Test directory is set to : " + newTestDir);
+                boolean isRenamed = false;
+                int retry = 5;
+                while (!isRenamed && retry > 0) {
+                    // close ThreadLogAppender resources before renaming
+                    stopThreadLogAppender();
+                    isRenamed = testDir.renameTo(newTestDir);
+                    if (!isRenamed) {
+                        CommonUtils.pause(1);
+                        System.err.println("renaming failed to '" + newTestDir + "'");
+                    }
+                    retry--;
+                }
+                    
+                if (isRenamed) {
+                    testDirectory.set(newTestDir);
+                    System.out.println("Test directory renamed to '" + newTestDir + "'");
+                }
             }
         } else {
             LOGGER.error("Unexpected case with absence of test.log for '" + test + "'");

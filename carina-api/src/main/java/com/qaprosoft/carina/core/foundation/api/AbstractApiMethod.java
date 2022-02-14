@@ -32,11 +32,12 @@ import javax.net.ssl.TrustManager;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.hamcrest.xml.HasXPath;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 
 import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
 import com.qaprosoft.carina.core.foundation.api.annotation.Endpoint;
@@ -67,7 +68,7 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
 public abstract class AbstractApiMethod extends HttpClient {
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private StringBuilder bodyContent = null;
     protected String methodPath = null;
     protected HttpMethodType methodType = null;
@@ -100,7 +101,8 @@ public abstract class AbstractApiMethod extends HttpClient {
         }
         if (typePath.contains(":")) {
             methodType = HttpMethodType.valueOf(typePath.split(":")[0]);
-            methodPath = typePath.split(":")[1];
+            methodPath = StringUtils.substringAfter(typePath, methodType + ":");
+
         } else {
             methodType = HttpMethodType.valueOf(typePath);
         }

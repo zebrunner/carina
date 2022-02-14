@@ -1,8 +1,3 @@
-[![Carina - API automation](https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png)](https://youtu.be/oJL5y8Ovta0)
-
-Note: Starting from 7.0.4 consider that instead of `extends AbstractTest` we have to `implements IAbstractTest` interface
-
-### Introduction
 Rest API testing is a vital part of integration testing process, it may be used separately or together with web, mobile or DB testing. The general process may be described by the following steps:
 
 1. Compile an HTTP request with the required meta data
@@ -64,7 +59,7 @@ Request (rq.json) and response (rs.json) templates have some placeholders that w
 While user.properties contains some default value which may be replaced later:
 ![API flow](../img/api/props-example.png)
 
-#### REST service call domain object
+#### REST service call domain object [DEPRECATED]
 Now we are ready to create REST service domain object which will be used to interact with web service and perform additional response validations. Our domain object is located in /carina-demo/src/main/java/com/qaprosoft/carina/demo/api, make sure that it extends AbstractApiMethodV2 and triggers the base class constructor for initialization. In general cases, you will specify the path to request and response templates along with default properties files (all of them have been created in the previous step). Also, we replace the URL placeholder to set an appropriate environment.
 ```
 package com.qaprosoft.carina.demo.api;
@@ -80,7 +75,7 @@ public class PostUserMethod extends AbstractApiMethodV2 {
 }
 ```
 
-#### HTTP method and path
+#### HTTP method and path [DEPRECATED]
 The last step before the test implementation itself is the association of the domain object class and the required HTTP method and path.
 It should be defined in /carina-demo/src/main/resources/_api.properties file, the key should be equal to domain class name, the value has the following pattern {http_method}:{http_path}. The HTTP path may contain placeholders, the HTTP method should be one of the following variants: GET, POST, PUT, UPDATE, DELETE.
 ```
@@ -93,6 +88,29 @@ DeleteUserMethod=DELETE:${base_url}/users/1
 PutPostsMethod=PUT:${base_url}/posts/1
 PatchPostsMethod=PATCH:${base_url}/posts/1
 ```
+#### REST service call domain object (Annotation based approach)
+
+Approach based on initialisation of super class constructor is deprecated and more convenient way is to use annotations. They can be used over class declarations. For api testing we can use such annotations:
+
+1. @ContentType - is used to define the value of Content-type header in response;
+2. @Endpoint - defines the place that APIs send requests and where the resource lives
+3. @RequestTemplatePath - contains a path from source root to request template file.
+4. @ResponseTemplatePath - contains a path from source root to response template file.
+5. @SuccessfulHttpStatus - specifies the expected HTTP status
+
+In this case we don’t need to define _api.properties file and call the constructor of a super class, but if we have some properties file used in this request we should explicitly set it in test method. Insead of callAPI() and expectResponseStatus() methods we can use callAPIExpectSuccess() that will call API expecting http status in response taken from @SuccessfulHttpStatus value.
+```
+@Endpoint(url = "${base_url}/users/1", methodType = HttpMethodType.DELETE)
+@RequestTemplatePath(path = "api/users/_delete/rq.json")
+@ResponseTemplatePath(path = "api/users/_delete/rs.json")
+@SuccessfulHttpStatus(status = HttpResponseStatusType.OK_200)
+public class DeleteUserMethod extends AbstractApiMethodV2 {
+
+    public DeleteUserMethod() {
+        replaceUrlPlaceholder("base_url", Configuration.getEnvArg("api_url"));
+    }
+}
+```
 
 #### API test
 API test is a general TestNG test, a class should extend APITest, in our case, the test implements IAbstractTest that encapsulates some test data and login method. The test is located in /carina-demo/src/test/java/com/qaprosoft/carina/demo.
@@ -101,14 +119,13 @@ package com.qaprosoft.carina.demo;
 
 import java.lang.invoke.MethodHandles;
 
-import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 import com.qaprosoft.apitools.validation.JsonCompareKeywords;
-import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
+import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
 import com.qaprosoft.carina.core.foundation.utils.tag.Priority;
 import com.qaprosoft.carina.core.foundation.utils.tag.TestPriority;
@@ -122,8 +139,8 @@ import com.qaprosoft.carina.demo.api.PostUserMethod;
  * @author qpsdemo
  */
 public class APISampleTest implements IAbstractTest {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    
 
     @Test()
     @MethodOwner(owner = "qpsdemo")
@@ -140,33 +157,31 @@ public class APISampleTest implements IAbstractTest {
     @MethodOwner(owner = "qpsdemo")
     public void testCreateUserMissingSomeFields() throws Exception {
         PostUserMethod api = new PostUserMethod();
+        api.setProperties("api/users/user.properties");
         api.getProperties().remove("name");
         api.getProperties().remove("username");
-        api.expectResponseStatus(HttpResponseStatusType.CREATED_201);
-        api.callAPI();
+        api.callAPIExpectSuccess();
         api.validateResponse();
     }
 
     @Test()
-    @MethodOwner(owner = "qpsdemo")
-    public void testGetUsers() {
-        GetUserMethods getUsersMethods = new GetUserMethods();
-        getUsersMethods.expectResponseStatus(HttpResponseStatusType.OK_200);
-        getUsersMethods.callAPI();
-        getUsersMethods.validateResponse(JSONCompareMode.STRICT, JsonCompareKeywords.ARRAY_CONTAINS.getKey());
-        getUsersMethods.validateResponseAgainstSchema("api/users/_get/rs.schema");
-    }
+     @MethodOwner(owner = "qpsdemo")
+     public void testGetUsers() {
+         GetUserMethods getUsersMethods = new GetUserMethods();
+         getUsersMethods.callAPIExpectSuccess();
+         getUsersMethods.validateResponse(JSONCompareMode.STRICT, JsonCompareKeywords.ARRAY_CONTAINS.getKey());
+         getUsersMethods.validateResponseAgainstSchema("api/users/_get/rs.schema");
+     }
 
     @Test()
     @MethodOwner(owner = "qpsdemo")
     @TestPriority(Priority.P1)
     public void testDeleteUsers() {
         DeleteUserMethod deleteUserMethod = new DeleteUserMethod();
-        deleteUserMethod.expectResponseStatus(HttpResponseStatusType.OK_200);
-        deleteUserMethod.callAPI();
+        deleteUserMethod.setProperties("api/users/user.properties");
+        deleteUserMethod.callAPIExpectSuccess();
         deleteUserMethod.validateResponse();
     }
-
 }
 ```
 
@@ -475,4 +490,118 @@ public class XmlPostMethod extends AbstractApiMethodV2 {
 }
 ```  
 Important: for XML content type it's obligatory to pass @ContentType annotation to your API method indicating actual header value.  
-If @ContentType is not specified then data will be automatically considered as JSON.  
+If @ContentType is not specified then data will be automatically considered as JSON. 
+
+## SOAP documentation
+
+SOAP (Simple Object Access Protocol) is a standards-based web services access protocol. It mostly relies on XML documents.
+
+Let’s create some automated SOAP tests on demonstrative Web Service:
+
+[**https://www.crcind.com/csp/samples/SOAP.Demo.cls**](https://www.crcind.com/csp/samples/SOAP.Demo.cls)**.**
+
+***AddInteger*** method adds two integers and returns the result.
+
+***LookupCity*** method returns the city and state for the given U.S. ZIP Code packaged within a Sample.Address object
+
+First of all, we need to create a request template and response template. It is located in **/carina-demo/src/test/resources/api/soap/addinteger.**
+
+#### rq.xml
+
+```other
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org">
+    <soapenv:Header/>
+    <soapenv:Body>
+        <tem:AddInteger>
+            <tem:Arg1>${firstNumber}</tem:Arg1>
+            <tem:Arg2>${secondNumber}</tem:Arg2>
+        </tem:AddInteger>
+    </soapenv:Body>
+</soapenv:Envelope>
+```
+
+**rs.xml**
+
+```other
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <AddIntegerResponse xmlns="http://tempuri.org">
+            <#if firstNumber?? and secondNumber??>
+                <AddIntegerResult>${firstNumber+secondNumber}</AddIntegerResult>
+            </#if>
+        </AddIntegerResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+```
+
+This templates contain some placeholders that can be later replaced from properties file.
+
+#### soap.properties
+
+```other
+#=============== AddInteger properties ===========#
+firstNumber=4
+secondNumber=6
+result=10
+```
+
+Now we are ready to create SOAP service domain object which will be used to interact with web service and perform additional response validations. This domain object is located in **/carina-demo/src/main/java/com/qaprosoft/carina/demo/soap/**, make sure that it extends AbstractApiMethodV2.
+
+We can specify the endpoint-url, expected HttpStatus, paths to request and response templates and content type using annotations.
+
+**LookupCity.java**
+
+```other
+@Endpoint(url = "${base_url}", methodType = HttpMethodType.POST)
+@SuccessfulHttpStatus(status = HttpResponseStatusType.OK_200)
+@RequestTemplatePath(path = "api/soap/lookupcity/rq.xml")
+@ResponseTemplatePath(path = "src/test/resources/api/soap/lookupcity/rs.xml")
+@ContentType(type = "text/xml")
+public class LookupCityMethod extends AbstractApiMethodV2 {
+
+    public LookupCityMethod() {
+        replaceUrlPlaceholder("base_url",Configuration.getEnvArg("soap_url"));
+    }
+}
+```
+
+Then we can create test class with soap test methods. This class is located in **/carina-demo/src/test/java/com/qaprosoft/carina/demo/**. Test class must implement IAbstractTest. Test methods should start with @Test annotation.
+
+To send SOAP request we have to set some request headers. SOAPAction header indicates the intent of the SOAP HTTP request.
+
+We can validate the response by Response Status. Also we can use response data and compare it to expected results.
+
+**SoapSampleTest.java**
+
+```other
+public class SoapSampleTest implements IAbstractTest {
+
+    @Test
+    public void testAddInteger() {
+        AddIntegerMethod soap = new AddIntegerMethod();
+        soap.setProperties("api/soap/soap.properties");
+        soap.setHeaders(String.format("SOAPAction=%s", "http://tempuri.org/SOAP.Demo.AddInteger"));
+
+        Response response = soap.callAPIExpectSuccess();
+        XmlPath rsBody = XmlPath.given(response.asString());
+        Integer actualResult = rsBody.getInt("AddIntegerResult");
+        Integer expectedResult = Integer.valueOf(soap.getProperties().getProperty("result"));
+        Assert.assertEquals(actualResult, expectedResult);
+    }
+}
+```
+
+> Method ValidateResponse can be used only with JSON files. To validate the whole xml responses we can use ValidateXMLRespone method.
+
+```other
+@Test
+    public void testLookupCity() throws Exception{
+        LookupCityMethod soap = new LookupCityMethod();
+        soap.setProperties("api/soap/soap.properties");
+        soap.setHeaders(String.format("SOAPAction=%s", "http://tempuri.org/SOAP.Demo.LookupCity"));
+
+        soap.callAPIExpectSuccess();
+        soap.validateXmlResponse(XmlCompareMode.STRICT);
+    }
+```
+ 

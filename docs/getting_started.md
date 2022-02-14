@@ -1,6 +1,3 @@
-
-[![Carina - Getting started](https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png)](https://youtu.be/UtY-KLFnmI8)
-
 * Install and configure JDK 11+
 * Install and configure [Apache Maven 3.6.0+](http://maven.apache.org/)
 * Download the latest version of [Eclipse](http://www.eclipse.org/downloads/) and install [TestNG plugin](http://testng.org/doc/download.html), maven-dependency-plugin connector and optionally lombok

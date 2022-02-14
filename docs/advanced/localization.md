@@ -1,5 +1,3 @@
-# Localization usage
-
 There is an enhanced L10N utility to support localized (L10N)  test automation testing. It can load localized resources on the fly and verify texts if needed.
 > We recommend to use existing localized resources and don't generate them by automation team!
 

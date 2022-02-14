@@ -15,27 +15,23 @@
  *******************************************************************************/
 package com.qaprosoft.apitools.validation;
 
-public enum JsonCompareKeywords {
+import org.skyscreamer.jsonassert.JSONCompareResult;
 
-    SKIP("skip"),
-    TYPE("type:"),
-    REGEX("regex:"),
-    ARRAY_CONTAINS("validate_array_contains_only:"),
-    PREDICATE("predicate:"),
-    OGNL("ognl:");
+public class JsonCompareResultWrapper {
 
-    private String key;
+    private final JsonKeywordsComparator comparatorManager;
+    private final JSONCompareResult result;
 
-    private JsonCompareKeywords(String key) {
-        this.key = key;
+    public JsonCompareResultWrapper(JsonKeywordsComparator comparatorManager, JSONCompareResult result) {
+        this.comparatorManager = comparatorManager;
+        this.result = result;
     }
 
-    public String getKey() {
-        return key;
+    public void compareByDefault(String prefix, Object expectedValue, Object actualValue) {
+        comparatorManager.compareByDefault(prefix, expectedValue, actualValue, result);
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void fail(String message) {
+        result.fail(message);
     }
-
 }

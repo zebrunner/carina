@@ -15,27 +15,10 @@
  *******************************************************************************/
 package com.qaprosoft.apitools.validation;
 
-public enum JsonCompareKeywords {
+public interface JsonKeywordComparator {
 
-    SKIP("skip"),
-    TYPE("type:"),
-    REGEX("regex:"),
-    ARRAY_CONTAINS("validate_array_contains_only:"),
-    PREDICATE("predicate:"),
-    OGNL("ognl:");
+    void compare(String prefix, Object expectedValue, Object actualValue, JsonCompareResultWrapper result);
 
-    private String key;
-
-    private JsonCompareKeywords(String key) {
-        this.key = key;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
+    boolean isMatch(Object expectedValue);
 
 }

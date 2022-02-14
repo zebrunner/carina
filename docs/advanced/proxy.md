@@ -1,4 +1,3 @@
-# Proxy usage
 There is a possibility to send all test traffic via proxy including the embedded light-weight BrowserMob proxy server.
 There are several properties available to manage all kinds of proxy usage:
 ```

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration packages="com.zebrunner.agent.core.logging.log4j2, com.qaprosoft.carina.core.foundation.log">
+   <properties>
+      <property name="carina-pattern">%d{yyyy-MM-dd HH:mm:ss} %c{1} [%t%X{threadId}] [%p] %m%n</property>
+      <property name="zebrunner-pattern">[%d{HH:mm:ss}] %-5p (%F:%L) - %m%n</property>
+   </properties>
+   <appenders>
+      <Console name="Console" target="SYSTEM_OUT" follow="true">
+          <PatternLayout pattern="${carina-pattern}"/>
+      </Console>
+      <ThreadLogAppender name="ThreadLogAppender">
+         <PatternLayout pattern="${carina-pattern}" />
+      </ThreadLogAppender>
+      <ReportingAppender name="ReportingAppender">
+         <PatternLayout pattern="${zebrunner-pattern}" />
+      </ReportingAppender>
+   </appenders>
+   <loggers>
+      <root level="info">
+         <appender-ref ref="Console"/>
+         <appender-ref ref="ThreadLogAppender"/>
+         <appender-ref ref="ReportingAppender"/>
+      </root>
+   </loggers>
+</configuration>
