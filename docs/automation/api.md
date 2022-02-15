@@ -105,7 +105,6 @@ In this case we don’t need to define _api.properties file and call the constru
 @ResponseTemplatePath(path = "api/users/_delete/rs.json")
 @SuccessfulHttpStatus(status = HttpResponseStatusType.OK_200)
 public class DeleteUserMethod extends AbstractApiMethodV2 {
-
     public DeleteUserMethod() {
         replaceUrlPlaceholder("base_url", Configuration.getEnvArg("api_url"));
     }
@@ -208,14 +207,120 @@ In some cases, you may need to generate data in the request to make the request 
 ```
 Another option is to specify the placeholder in the request template and then pass some generated value directly from the test method.
 
-Wildcards are also useful for response validation. In some cases, you may need to skip some values or validate by regex, type and predicate:
+Wildcards are also useful for response validation. In several cases, you may need to skip some values or validate by regex, type, ognl expression or predicate:
 ```
 {
-    "id": "skip",                                    // Will skip actual value validation and just verify id key presence
-    "signup_date": "regex:\\d{4}-\\d{2}-\\d{2}",     // Will validate date value by specified regex
-    "age": "type:Integer",                           // Will validate age value by specified Java type
-    "created_date": "predicate:isDateValid",         // Will validate created_date value by specified name of Predicate which was kept in JsonComparatorContext
+    "id": "skip",                                           // Will skip actual value validation and just verify id key presence
+    "signup_date": "regex:\\d{4}-\\d{2}-\\d{2}",            // Will validate date value by specified regex
+    "age": "type:Integer",                                  // Will validate age value by specified Java type simple name
+    "annual_income": "ognl:#root != null && #root > 10",    // Will validate annual_income value using provided OGNL expression
+    "created_date": "predicate:isDateValid",                // Will validate created_date value by specified name of Predicate which is stored in JsonComparatorContext
 }
+```
+*OGNL*
+
+To learn about Apache Object Graph Navigation Library follow this [article](https://commons.apache.org/proper/commons-ognl/language-guide.html).
+Using this option you have the ability to validate a response value with expression approach. Actual value is represented as `#root`.
+
+*Predicate*
+
+This approach provides the ability to validate a response value programmatically. Just create a `java.util.function.Predicate` and provide it into JsonComparatorContext:
+```
+    JsonComparatorContext comparatorContext = JsonComparatorContext.context()
+                .<String>withPredicate("firstNamePredicate", firstName -> firstName.startsWith("Carina"))
+                .<Integer>withPredicate("agePredicate", age -> age > 18)
+                .<Boolean>withPredicate("enabledPredicate", enabled -> enabled != null && enabled);
+    
+    myApiMethod.validateResponse(comparatorContext);
+```
+In your json file
+```
+{
+    "first_name": "predicate:firstNamePredicate",
+    "age": "predicate:agePredicate",
+    "enabled": "predicate:enabledPredicate"
+}
+```
+
+
+#### Custom wildcards
+You have a possibility to implement custom wildcard for response validation as well. All you need is JsonKeywordComparator interface implementation:
+```
+package com.qaprosoft.carina.demo;
+
+import com.qaprosoft.apitools.validation.JsonCompareResultWrapper;
+import com.qaprosoft.apitools.validation.JsonKeywordComparator;
+
+public class CustomComparator implements JsonKeywordComparator {
+
+    private static final String MY_KEYWORD = "my-wildcard:";
+
+    @Override
+    public void compare(String prefix, Object expectedValue, Object actualValue, JsonCompareResultWrapper result) {
+        String expectedWildcardValue = expectedValue.toString().replace(MY_KEYWORD, "");
+        switch (expectedWildcardValue) {
+            case "isGreaterThanZero":
+                int number = Integer.parseInt(actualValue.toString());
+                if (!isGreaterThanZero(number)) {
+                    String message = String.format("%s\nActual value '%d' less than or equals to zero\n", prefix, number);
+                    result.fail(message);
+                }
+                break;
+            case "hasSemicolon":
+                String str = actualValue.toString();
+                if (!hasSemicolon(str)) {
+                    String message = String.format("%s\nActual value '%s' doesn't contain semicolon a symbol\n", prefix, str);
+                    result.fail(message);
+                }
+                break;
+            default:
+                result.compareByDefault(prefix, expectedValue, actualValue);
+                break;
+        }
+    }
+
+    private boolean isGreaterThanZero(int value) {
+        return value > 0;
+    }
+
+    private boolean hasSemicolon(String value) {
+        return value.contains(";");
+    }
+
+    @Override
+    public boolean isMatch(Object expectedValue) {
+        return expectedValue.toString().startsWith(MY_KEYWORD);
+    }
+}
+```
+In your json file
+```
+{
+    "id": "my-wildcard:isGreaterThanZero",
+    "email": "my-wildcard:hasSemicolon"
+}
+```
+After that you need to register your custom comparator. There are two ways:
+
+*Using JsonComparatorContext*
+
+Using this one you will be able to specify your comparators for each validation.
+```
+JsonComparatorContext comparatorContext = JsonComparatorContext.context()
+        .withComparator(new CustomComparator())
+        .withComparator(new OtherCustomComparator());
+
+myApiMethod.validateResponse(comparatorContext);
+```
+*Using Service Provider*
+
+This option provides the ability to register your comparators, which will be always available for response validation, to the whole project.
+
+Just create a file named `com.qaprosoft.apitools.validation.JsonKeywordComparator`
+in `/resources/META-INF/services` folder and set the path(s) of your implementation(s) into it:
+```
+com.qaprosoft.carina.demo.CustomComparator
+com.qaprosoft.carina.demo.OtherCustomComparator
 ```
 
 #### Validation against JSON schema
