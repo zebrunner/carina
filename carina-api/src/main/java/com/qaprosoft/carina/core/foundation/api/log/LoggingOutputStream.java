@@ -130,4 +130,33 @@ public class LoggingOutputStream extends OutputStream {
         flush();
         hasBeenClosed = true;
     }
+
+    public void setHasBeenClosed(boolean hasBeenClosed) {
+        this.hasBeenClosed = hasBeenClosed;
+    }
+
+    public byte[] getBuf() {
+        return buf;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    public Logger getLog() {
+        return log;
+    }
+
+    public void setLog(Logger log) {
+        this.log = log;
+    }
+
+    public Level getLevel() {
+        return level;
+    }
+
 }

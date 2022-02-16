@@ -24,6 +24,7 @@ import java.util.Properties;
 
 import com.qaprosoft.apitools.builder.PropertiesProcessor;
 import com.qaprosoft.apitools.validation.*;
+import com.qaprosoft.carina.core.foundation.api.log.LoggingOutputStream;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -123,6 +124,19 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
             setBodyContent(tm.getMessageText());
         }
         Response rs = super.callAPI();
+        actualRsBody = rs.asString();
+        return rs;
+    }
+
+    public Response callAPI(LoggingOutputStream outputStream) {
+        if (rqPath != null) {
+            TemplateMessage tm = new TemplateMessage();
+            tm.setIgnoredPropertiesProcessorClasses(ignoredPropertiesProcessorClasses);
+            tm.setTemplatePath(rqPath);
+            tm.setPropertiesStorage(properties);
+            setBodyContent(tm.getMessageText());
+        }
+        Response rs = super.callAPI(outputStream);
         actualRsBody = rs.asString();
         return rs;
     }
