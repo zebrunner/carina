@@ -48,7 +48,6 @@ import org.hamcrest.xml.HasXPath;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.invoke.MethodHandles;
 import java.security.KeyManagementException;
@@ -270,7 +269,7 @@ public abstract class AbstractApiMethod extends HttpClient {
         return rs;
     }
 
-    public Response callAPI(LoggingOutputStream ostream) {
+    Response callAPI(LoggingOutputStream outputStream) {
 
         if (ignoreSSL) {
             ignoreSSLCerts();
@@ -283,7 +282,7 @@ public abstract class AbstractApiMethod extends HttpClient {
 
         PrintStream ps = null;
         if (logRequest || logResponse) {
-            ps = new PrintStream(ostream);
+            ps = new PrintStream(outputStream);
             initLogging(ps);
         }
 

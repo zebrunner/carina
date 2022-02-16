@@ -15,30 +15,28 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.api;
 
-import java.io.IOException;
-import java.lang.invoke.MethodHandles;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
 import com.qaprosoft.apitools.builder.PropertiesProcessor;
+import com.qaprosoft.apitools.builder.PropertiesProcessorMain;
+import com.qaprosoft.apitools.message.TemplateMessage;
 import com.qaprosoft.apitools.validation.*;
+import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
+import com.qaprosoft.carina.core.foundation.api.annotation.RequestTemplatePath;
+import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePath;
+import com.qaprosoft.carina.core.foundation.api.annotation.SuccessfulHttpStatus;
 import com.qaprosoft.carina.core.foundation.api.log.LoggingOutputStream;
+import io.restassured.response.Response;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.apitools.builder.PropertiesProcessorMain;
-import com.qaprosoft.apitools.message.TemplateMessage;
-import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
-import com.qaprosoft.carina.core.foundation.api.annotation.RequestTemplatePath;
-import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePath;
-import com.qaprosoft.carina.core.foundation.api.annotation.SuccessfulHttpStatus;
-
-import io.restassured.response.Response;
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 
 public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
@@ -128,7 +126,8 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         return rs;
     }
 
-    public Response callAPI(LoggingOutputStream outputStream) {
+    @Override
+    Response callAPI(LoggingOutputStream outputStream) {
         if (rqPath != null) {
             TemplateMessage tm = new TemplateMessage();
             tm.setIgnoredPropertiesProcessorClasses(ignoredPropertiesProcessorClasses);
