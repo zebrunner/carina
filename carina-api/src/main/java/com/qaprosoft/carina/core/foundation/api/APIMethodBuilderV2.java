@@ -1,8 +1,10 @@
 package com.qaprosoft.carina.core.foundation.api;
 
+import com.qaprosoft.carina.core.foundation.api.exception.ParametersNotAssignedValues;
 import com.qaprosoft.carina.core.foundation.api.log.ControlLoggingOutputStream;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import io.restassured.response.Response;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -82,6 +84,7 @@ public class APIMethodBuilderV2 {
      * @return the value of the action expression if the until method succeeds, and null otherwise
      */
     public Response execute() {
+        validateParameters();
         AtomicBoolean stopExecution = setupTerminateTask(timeout.toMillis());
         Response result = null;
         ControlLoggingOutputStream loggingOutputStream = new ControlLoggingOutputStream(LOGGER, Level.INFO);
@@ -94,7 +97,7 @@ public class APIMethodBuilderV2 {
             }
             CommonUtils.pause(pollingInterval.getSeconds());
         }
-        loggingOutputStream.logging();
+        loggingOutputStream.log();
         return result;
     }
 
@@ -111,5 +114,19 @@ public class APIMethodBuilderV2 {
             }
         }, timeoutInMillis);
         return stopExecution;
+    }
+
+    private void validateParameters() {
+        if (!ObjectUtils.allNotNull(apiMethod, pollingInterval, timeout, successCondition)) {
+            throw new ParametersNotAssignedValues("One or more parameters of APIMethodBuilderV2 object are not assigned values");
+        }
+
+        if (timeout.toMillis() < pollingInterval.toMillis()) {
+            throw new RuntimeException("Timeout cannot be less than polling interval");
+        }
+
+        if (timeout.isNegative() || pollingInterval.isNegative()) {
+            throw new RuntimeException("Timeout or polling interval can't be negative");
+        }
     }
 }

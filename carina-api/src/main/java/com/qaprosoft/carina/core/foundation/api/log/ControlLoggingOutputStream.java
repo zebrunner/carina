@@ -44,7 +44,7 @@ public class ControlLoggingOutputStream extends LoggingOutputStream {
     /**
      * Realised all buffered data
      */
-    public void logging() {
+    public void log() {
         getLog().log(getLevel(), strBuf);
     }
 
