@@ -182,6 +182,30 @@ public class APISampleTest implements IAbstractTest {
 ### Useful features
 The framework contains a list of useful features for building requests and validation of responses. It makes the support of such tests easier and at the same time minimizes the amount of test data.
 
+#### API Builder
+Sometimes we should do a lot of API calls waiting for particular artifact in response. In this case, you can use `APIMethodBuilderV2`class.
+This class has methods that give us an ability to set a lambda expression, polling interval and timeout. Lambda expression gives us the
+opportunity to take one or more response artifact's and check them. If you think that response is correct, you
+should return true, otherwise false. Polling interval and timeout allows you to specify the retry interval and timeout respectively.
+Also, you should set api method using `apiMethod` method.
+
+Example of using:
+```
+    @Test
+    public void testCreateUserUsingRetry() {
+        PostUserMethod api = new PostUserMethod();
+        api.expectResponseStatus(HttpResponseStatusType.CREATED_201);
+
+        Response response = APIMethodBuilderV2.builder()
+                .pollEvery(1, ChronoUnit.SECONDS)
+                .stopAfter(20, ChronoUnit.SECONDS)
+                .apiMethod(api)
+                .until(rs -> rs.getBody().asString().contains("id"))
+                .execute();
+        api.validateResponse();
+        Assert.assertNotNull(response, "Response cannot be null");
+    }
+```
 #### Wildcards
 In some cases, you may need to generate data in the request to make the request data unique. The best way to do this is to use wildcards for data generation:
 ```
