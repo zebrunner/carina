@@ -13,18 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.apitools.validation.mock.method;
+package com.qaprosoft.mock.apimethod;
 
 import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
-import com.qaprosoft.carina.core.foundation.api.annotation.*;
-import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
 
-@SuccessfulHttpStatus(status = HttpResponseStatusType.OK_200)
-@ResponseTemplatePath(path = "validation/array/duplicate/array_act.json")
-public class NoContentTypeMethod extends AbstractApiMethodV2 {
+@Deprecated
+public class PutDocMethod extends AbstractApiMethodV2 {
 
-    public NoContentTypeMethod() {
-        replaceUrlPlaceholder("base_url", Configuration.getEnvArg("api_url"));
+	private String baseURL = "";
+	
+    public PutDocMethod() {
+        super(null, null);
+        replaceUrlPlaceholder("base_url", baseURL);
+        request.header("Content-Type", "text/plain");
+        request.header("LCDOC_TYPE", "test");
+        request.body("Test Core Client");
     }
+
+	public String getBaseURL() {
+		return baseURL;
+	}
+
+	public void setBaseURL(String baseURL) {
+		this.baseURL = baseURL;
+	}
 }

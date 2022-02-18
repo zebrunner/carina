@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.httpclient;
+package com.qaprosoft.carina.core.foundation.api.http;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
