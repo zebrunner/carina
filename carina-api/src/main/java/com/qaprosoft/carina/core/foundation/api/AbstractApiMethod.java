@@ -21,9 +21,11 @@ import java.io.PrintStream;
 import java.lang.invoke.MethodHandles;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.SSLContext;
@@ -84,6 +86,7 @@ public abstract class AbstractApiMethod extends HttpClient {
         bodyContent = new StringBuilder();
         request = given();
         initContentTypeFromAnnotation();
+        replaceUrlPlaceholders();
     }
 
     @SuppressWarnings({ "rawtypes" })
@@ -102,7 +105,6 @@ public abstract class AbstractApiMethod extends HttpClient {
         if (typePath.contains(":")) {
             methodType = HttpMethodType.valueOf(typePath.split(":")[0]);
             methodPath = StringUtils.substringAfter(typePath, methodType + ":");
-
         } else {
             methodType = HttpMethodType.valueOf(typePath);
         }
@@ -125,6 +127,32 @@ public abstract class AbstractApiMethod extends HttpClient {
             contentTypeEnum = ContentTypeEnum.NA;
         }
         this.request.contentType(contentTypeA.type());
+    }
+
+    private void replaceUrlPlaceholders() {
+        final String envParam = "config.env.";
+        final String configParam = "config.";
+        List<String> params = getParamsFromUrl();
+        for (String param : params) {
+            if (param.startsWith(envParam)) {
+                String newParam = StringUtils.substringAfter(param, envParam);
+                replaceUrlPlaceholder(param, Configuration.getEnvArg(newParam));
+            } else if (param.startsWith(configParam)) {
+                String newParam = StringUtils.substringAfter(param, configParam);
+                replaceUrlPlaceholder(param, R.CONFIG.get(newParam));
+            }
+        }
+    }
+
+    private List<String> getParamsFromUrl() {
+        List<String> params = new ArrayList<>();
+        String path = methodPath;
+        while (path.contains("{")) {
+            String param = StringUtils.substringBetween(path, "${", "}");
+            params.add(param);
+            path = StringUtils.substringAfter(path, "}");
+        }
+        return params;
     }
 
     public void setHeaders(String... headerKeyValues) {

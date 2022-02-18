@@ -22,19 +22,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import com.qaprosoft.apitools.builder.PropertiesProcessor;
-import com.qaprosoft.apitools.validation.*;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.R;
-import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.qaprosoft.apitools.builder.PropertiesProcessor;
 import com.qaprosoft.apitools.builder.PropertiesProcessorMain;
 import com.qaprosoft.apitools.message.TemplateMessage;
+import com.qaprosoft.apitools.validation.JsonComparatorContext;
+import com.qaprosoft.apitools.validation.JsonKeywordsComparator;
+import com.qaprosoft.apitools.validation.JsonValidator;
+import com.qaprosoft.apitools.validation.XmlCompareMode;
+import com.qaprosoft.apitools.validation.XmlValidator;
 import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
 import com.qaprosoft.carina.core.foundation.api.annotation.RequestTemplatePath;
 import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePath;
@@ -85,32 +86,6 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     public AbstractApiMethodV2(String rqPath, String rsPath) {
         this(rqPath, rsPath, new Properties());
-    }
-
-    public void replaceUrlPlaceholders() {
-        final String envParam = "config.env.";
-        final String configParam = "config.";
-        List<String> params = getParamsFromUrl();
-        for (String param : params) {
-            if (param.startsWith(envParam)) {
-                String newParam = StringUtils.substringAfter(param, envParam);
-                replaceUrlPlaceholder(param, Configuration.getEnvArg(newParam));
-            } else if (param.startsWith(configParam)) {
-                String newParam = StringUtils.substringAfter(param, configParam);
-                replaceUrlPlaceholder(param, R.CONFIG.get(newParam));
-            }
-        }
-    }
-
-    private List<String> getParamsFromUrl() {
-        List<String> params = new ArrayList<>();
-        String path = methodPath;
-        while (path.contains("{")) {
-            String param = StringUtils.substringBetween(path, "${", "}");
-            params.add(param);
-            path = StringUtils.substringAfter(path, "}");
-        }
-        return params;
     }
 
     private void initPathsFromAnnotation() {
