@@ -28,10 +28,10 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
-import com.qaprosoft.apitools.validation.mock.method.MockServer;
-import com.qaprosoft.apitools.validation.mock.method.NoContentTypeMethod;
-import com.qaprosoft.apitools.validation.mock.method.XmlContentTypeMethod;
 import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.mock.apimethod.NoContentTypeMethod;
+import com.qaprosoft.mock.apimethod.XmlContentTypeMethod;
+import com.qaprosoft.mock.server.MockServer;
 
 public class DiffContentTypesValidatorTest {
 

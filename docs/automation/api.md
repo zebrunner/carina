@@ -109,7 +109,19 @@ public class DeleteUserMethod extends AbstractApiMethodV2 {
         replaceUrlPlaceholder("base_url", Configuration.getEnvArg("api_url"));
     }
 }
+```   
+Also placeholders in URL can be automatically replaced by carina if they're specified in carina configuration properties (config.properties).
+To make auto-replacement happen just use next syntax in your URL:
+- when param starts with "config.\*" then R.CONFIG.get("\*") will be used as a replacement
+- when param starts with "config.env.\*" then Configuration.getEnvArg("\*") will be used as a replacement    
+So you may use next implementation:   
 ```
+@Endpoint(url = "${config.env.base_url}/users/1", methodType = HttpMethodType.DELETE)
+public class DeleteUserMethod extends AbstractApiMethodV2 {
+}
+```   
+And before sending of request base part of URL will be set by carina depending on used environment automatically.
+
 
 #### API test
 API test is a general TestNG test, a class should extend APITest, in our case, the test implements IAbstractTest that encapsulates some test data and login method. The test is located in /carina-demo/src/test/java/com/qaprosoft/carina/demo.
