@@ -15,7 +15,11 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.api;
 
-import com.qaprosoft.carina.core.foundation.api.annotation.*;
+import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
+import com.qaprosoft.carina.core.foundation.api.annotation.Endpoint;
+import com.qaprosoft.carina.core.foundation.api.annotation.HideRequestBodyPartsInLogs;
+import com.qaprosoft.carina.core.foundation.api.annotation.HideRequestHeadersInLogs;
+import com.qaprosoft.carina.core.foundation.api.annotation.HideResponseBodyPartsInLogs;
 import com.qaprosoft.carina.core.foundation.api.http.ContentTypeEnum;
 import com.qaprosoft.carina.core.foundation.api.http.HttpClient;
 import com.qaprosoft.carina.core.foundation.api.http.HttpMethodType;
@@ -244,29 +248,7 @@ public abstract class AbstractApiMethod extends HttpClient {
     }
 
     public Response callAPI() {
-
-        if (ignoreSSL) {
-            ignoreSSLCerts();
-        }
-
-        if (bodyContent.length() != 0)
-            request.body(bodyContent.toString());
-
-        Response rs = null;
-
-        PrintStream ps = null;
-        if (logRequest || logResponse) {
-            ps = new PrintStream(new LoggingOutputStream(LOGGER, Level.INFO));
-            initLogging(ps);
-        }
-
-        try {
-            rs = HttpClient.send(request, methodPath, methodType);
-        } finally {
-            if (ps != null)
-                ps.close();
-        }
-        return rs;
+        return callAPI(new LoggingOutputStream(LOGGER, Level.INFO));
     }
 
     Response callAPI(LoggingOutputStream outputStream) {

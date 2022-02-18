@@ -18,7 +18,11 @@ package com.qaprosoft.carina.core.foundation.api;
 import com.qaprosoft.apitools.builder.PropertiesProcessor;
 import com.qaprosoft.apitools.builder.PropertiesProcessorMain;
 import com.qaprosoft.apitools.message.TemplateMessage;
-import com.qaprosoft.apitools.validation.*;
+import com.qaprosoft.apitools.validation.JsonComparatorContext;
+import com.qaprosoft.apitools.validation.JsonKeywordsComparator;
+import com.qaprosoft.apitools.validation.JsonValidator;
+import com.qaprosoft.apitools.validation.XmlCompareMode;
+import com.qaprosoft.apitools.validation.XmlValidator;
 import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
 import com.qaprosoft.carina.core.foundation.api.annotation.RequestTemplatePath;
 import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePath;
@@ -37,7 +41,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-
 
 public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -112,8 +115,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         this.rsPath = path;
     }
 
-    @Override
-    public Response callAPI() {
+    private void initBodyContent() {
         if (rqPath != null) {
             TemplateMessage tm = new TemplateMessage();
             tm.setIgnoredPropertiesProcessorClasses(ignoredPropertiesProcessorClasses);
@@ -121,6 +123,11 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
             tm.setPropertiesStorage(properties);
             setBodyContent(tm.getMessageText());
         }
+    }
+
+    @Override
+    public Response callAPI() {
+        initBodyContent();
         Response rs = super.callAPI();
         actualRsBody = rs.asString();
         return rs;
@@ -128,16 +135,16 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
 
     @Override
     Response callAPI(LoggingOutputStream outputStream) {
-        if (rqPath != null) {
-            TemplateMessage tm = new TemplateMessage();
-            tm.setIgnoredPropertiesProcessorClasses(ignoredPropertiesProcessorClasses);
-            tm.setTemplatePath(rqPath);
-            tm.setPropertiesStorage(properties);
-            setBodyContent(tm.getMessageText());
-        }
+        initBodyContent();
         Response rs = super.callAPI(outputStream);
         actualRsBody = rs.asString();
         return rs;
+    }
+
+    public APIMethodPoller callAPIWithRetry() {
+        initBodyContent();
+        return APIMethodPoller.builder(this)
+                .doAfterExecute(response -> actualRsBody = response.asString());
     }
 
     /**
