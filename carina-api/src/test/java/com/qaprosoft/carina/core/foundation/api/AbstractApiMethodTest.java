@@ -19,6 +19,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.mock.apimethod.AutoReplaceUrlPartsMethod;
 import com.qaprosoft.mock.apimethod.NoPlaceholdersInURLMethod;
 import com.qaprosoft.mock.apimethod.PutDocMethod;
@@ -42,8 +43,10 @@ public class AbstractApiMethodTest {
 
     @Test
     public void testAutoReplacementInURL() {
+        final String id = "1";
+        R.CONFIG.put("some_id", id);
         AutoReplaceUrlPartsMethod method = new AutoReplaceUrlPartsMethod();
-        final String expectedMethodPath = Configuration.getEnvArg("base_url") + "/mock/part";
+        final String expectedMethodPath = Configuration.getEnvArg("base_url") + "/mock/part/" + id;
         Assert.assertEquals(method.getMethodPath(), expectedMethodPath);
     }
 }
