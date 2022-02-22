@@ -388,6 +388,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#custom-wildcards" class="md-nav__link">
+    Custom wildcards
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#validation-against-json-schema" class="md-nav__link">
     Validation against JSON schema
   </a>
@@ -779,6 +786,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#custom-wildcards" class="md-nav__link">
+    Custom wildcards
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#validation-against-json-schema" class="md-nav__link">
     Validation against JSON schema
   </a>
@@ -995,13 +1009,23 @@ PatchPostsMethod=PATCH:${base_url}/posts/1
 @ResponseTemplatePath(path = &quot;api/users/_delete/rs.json&quot;)
 @SuccessfulHttpStatus(status = HttpResponseStatusType.OK_200)
 public class DeleteUserMethod extends AbstractApiMethodV2 {
-
     public DeleteUserMethod() {
         replaceUrlPlaceholder(&quot;base_url&quot;, Configuration.getEnvArg(&quot;api_url&quot;));
     }
 }
 </code></pre>
 
+<p>Also placeholders in URL can be automatically replaced by carina if they're specified in carina configuration properties (config.properties).
+To make auto-replacement happen just use next syntax in your URL:
+- when param starts with "config.*" then R.CONFIG.get("*") will be used as a replacement
+- when param starts with "config.env.*" then Configuration.getEnvArg("*") will be used as a replacement  <br />
+So you may use next implementation:   </p>
+<pre><code>@Endpoint(url = &quot;${config.env.base_url}/users/1&quot;, methodType = HttpMethodType.DELETE)
+public class DeleteUserMethod extends AbstractApiMethodV2 {
+}
+</code></pre>
+
+<p>And before sending of request base part of URL will be set by carina depending on used environment automatically.</p>
 <h4 id="api-test">API test</h4>
 <p>API test is a general TestNG test, a class should extend APITest, in our case, the test implements IAbstractTest that encapsulates some test data and login method. The test is located in /carina-demo/src/test/java/com/qaprosoft/carina/demo.</p>
 <pre><code>package com.qaprosoft.carina.demo;
@@ -1096,13 +1120,110 @@ public class APISampleTest implements IAbstractTest {
 </code></pre>
 
 <p>Another option is to specify the placeholder in the request template and then pass some generated value directly from the test method.</p>
-<p>Wildcards are also useful for response validation. In some cases, you may need to skip some values or validate by regex, type and predicate:</p>
+<p>Wildcards are also useful for response validation. In several cases, you may need to skip some values or validate by regex, type, ognl expression or predicate:</p>
 <pre><code>{
-    &quot;id&quot;: &quot;skip&quot;,                                    // Will skip actual value validation and just verify id key presence
-    &quot;signup_date&quot;: &quot;regex:\\d{4}-\\d{2}-\\d{2}&quot;,     // Will validate date value by specified regex
-    &quot;age&quot;: &quot;type:Integer&quot;,                           // Will validate age value by specified Java type
-    &quot;created_date&quot;: &quot;predicate:isDateValid&quot;,         // Will validate created_date value by specified name of Predicate which was kept in JsonComparatorContext
+    &quot;id&quot;: &quot;skip&quot;,                                           // Will skip actual value validation and just verify id key presence
+    &quot;signup_date&quot;: &quot;regex:\\d{4}-\\d{2}-\\d{2}&quot;,            // Will validate date value by specified regex
+    &quot;age&quot;: &quot;type:Integer&quot;,                                  // Will validate age value by specified Java type simple name
+    &quot;annual_income&quot;: &quot;ognl:#root != null &amp;&amp; #root &gt; 10&quot;,    // Will validate annual_income value using provided OGNL expression
+    &quot;created_date&quot;: &quot;predicate:isDateValid&quot;,                // Will validate created_date value by specified name of Predicate which is stored in JsonComparatorContext
 }
+</code></pre>
+
+<p><em>OGNL</em></p>
+<p>To learn about Apache Object Graph Navigation Library follow this <a href="https://commons.apache.org/proper/commons-ognl/language-guide.html">article</a>.
+Using this option you have the ability to validate a response value with expression approach. Actual value is represented as <code>#root</code>.</p>
+<p><em>Predicate</em></p>
+<p>This approach provides the ability to validate a response value programmatically. Just create a <code>java.util.function.Predicate</code> and provide it into JsonComparatorContext:</p>
+<pre><code>    JsonComparatorContext comparatorContext = JsonComparatorContext.context()
+                .&lt;String&gt;withPredicate(&quot;firstNamePredicate&quot;, firstName -&gt; firstName.startsWith(&quot;Carina&quot;))
+                .&lt;Integer&gt;withPredicate(&quot;agePredicate&quot;, age -&gt; age &gt; 18)
+                .&lt;Boolean&gt;withPredicate(&quot;enabledPredicate&quot;, enabled -&gt; enabled != null &amp;&amp; enabled);
+
+    myApiMethod.validateResponse(comparatorContext);
+</code></pre>
+
+<p>In your json file</p>
+<pre><code>{
+    &quot;first_name&quot;: &quot;predicate:firstNamePredicate&quot;,
+    &quot;age&quot;: &quot;predicate:agePredicate&quot;,
+    &quot;enabled&quot;: &quot;predicate:enabledPredicate&quot;
+}
+</code></pre>
+
+<h4 id="custom-wildcards">Custom wildcards</h4>
+<p>You have a possibility to implement custom wildcard for response validation as well. All you need is JsonKeywordComparator interface implementation:</p>
+<pre><code>package com.qaprosoft.carina.demo;
+
+import com.qaprosoft.apitools.validation.JsonCompareResultWrapper;
+import com.qaprosoft.apitools.validation.JsonKeywordComparator;
+
+public class CustomComparator implements JsonKeywordComparator {
+
+    private static final String MY_KEYWORD = &quot;my-wildcard:&quot;;
+
+    @Override
+    public void compare(String prefix, Object expectedValue, Object actualValue, JsonCompareResultWrapper result) {
+        String expectedWildcardValue = expectedValue.toString().replace(MY_KEYWORD, &quot;&quot;);
+        switch (expectedWildcardValue) {
+            case &quot;isGreaterThanZero&quot;:
+                int number = Integer.parseInt(actualValue.toString());
+                if (!isGreaterThanZero(number)) {
+                    String message = String.format(&quot;%s\nActual value '%d' less than or equals to zero\n&quot;, prefix, number);
+                    result.fail(message);
+                }
+                break;
+            case &quot;hasSemicolon&quot;:
+                String str = actualValue.toString();
+                if (!hasSemicolon(str)) {
+                    String message = String.format(&quot;%s\nActual value '%s' doesn't contain semicolon a symbol\n&quot;, prefix, str);
+                    result.fail(message);
+                }
+                break;
+            default:
+                result.compareByDefault(prefix, expectedValue, actualValue);
+                break;
+        }
+    }
+
+    private boolean isGreaterThanZero(int value) {
+        return value &gt; 0;
+    }
+
+    private boolean hasSemicolon(String value) {
+        return value.contains(&quot;;&quot;);
+    }
+
+    @Override
+    public boolean isMatch(Object expectedValue) {
+        return expectedValue.toString().startsWith(MY_KEYWORD);
+    }
+}
+</code></pre>
+
+<p>In your json file</p>
+<pre><code>{
+    &quot;id&quot;: &quot;my-wildcard:isGreaterThanZero&quot;,
+    &quot;email&quot;: &quot;my-wildcard:hasSemicolon&quot;
+}
+</code></pre>
+
+<p>After that you need to register your custom comparator. There are two ways:</p>
+<p><em>Using JsonComparatorContext</em></p>
+<p>Using this one you will be able to specify your comparators for each validation.</p>
+<pre><code>JsonComparatorContext comparatorContext = JsonComparatorContext.context()
+        .withComparator(new CustomComparator())
+        .withComparator(new OtherCustomComparator());
+
+myApiMethod.validateResponse(comparatorContext);
+</code></pre>
+
+<p><em>Using Service Provider</em></p>
+<p>This option provides the ability to register your comparators, which will be always available for response validation, to the whole project.</p>
+<p>Just create a file named <code>com.qaprosoft.apitools.validation.JsonKeywordComparator</code>
+in <code>/resources/META-INF/services</code> folder and set the path(s) of your implementation(s) into it:</p>
+<pre><code>com.qaprosoft.carina.demo.CustomComparator
+com.qaprosoft.carina.demo.OtherCustomComparator
 </code></pre>
 
 <h4 id="validation-against-json-schema">Validation against JSON schema</h4>
