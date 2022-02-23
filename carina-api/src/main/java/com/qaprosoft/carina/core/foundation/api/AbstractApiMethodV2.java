@@ -15,32 +15,30 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.api;
 
-import com.qaprosoft.apitools.builder.PropertiesProcessor;
-import com.qaprosoft.apitools.builder.PropertiesProcessorMain;
-import com.qaprosoft.apitools.message.TemplateMessage;
-import com.qaprosoft.apitools.validation.JsonComparatorContext;
-import com.qaprosoft.apitools.validation.JsonKeywordsComparator;
-import com.qaprosoft.apitools.validation.JsonValidator;
-import com.qaprosoft.apitools.validation.XmlCompareMode;
-import com.qaprosoft.apitools.validation.XmlValidator;
-import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
-import com.qaprosoft.carina.core.foundation.api.annotation.RequestTemplatePath;
-import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePath;
-import com.qaprosoft.carina.core.foundation.api.annotation.SuccessfulHttpStatus;
-import com.qaprosoft.carina.core.foundation.api.log.LoggingOutputStream;
-import io.restassured.response.Response;
-import org.json.JSONException;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONCompareMode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import com.qaprosoft.apitools.builder.PropertiesProcessor;
+import com.qaprosoft.apitools.validation.*;
+import com.qaprosoft.carina.core.foundation.api.log.LoggingOutputStream;
+import org.json.JSONException;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.qaprosoft.apitools.builder.PropertiesProcessorMain;
+import com.qaprosoft.apitools.message.TemplateMessage;
+import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
+import com.qaprosoft.carina.core.foundation.api.annotation.RequestTemplatePath;
+import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePath;
+import com.qaprosoft.carina.core.foundation.api.annotation.SuccessfulHttpStatus;
+
+import io.restassured.response.Response;
 
 public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

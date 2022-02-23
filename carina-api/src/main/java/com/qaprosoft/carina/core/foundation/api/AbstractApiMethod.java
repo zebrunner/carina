@@ -15,6 +15,29 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.api;
 
+import static io.restassured.RestAssured.given;
+
+import java.io.PrintStream;
+import java.lang.invoke.MethodHandles;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
+import org.hamcrest.xml.HasXPath;
+
 import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
 import com.qaprosoft.carina.core.foundation.api.annotation.Endpoint;
 import com.qaprosoft.carina.core.foundation.api.annotation.HideRequestBodyPartsInLogs;
@@ -33,6 +56,7 @@ import com.qaprosoft.carina.core.foundation.api.ssl.SSLContextBuilder;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
+
 import io.restassured.RestAssured;
 import io.restassured.config.RestAssuredConfig;
 import io.restassured.config.SSLConfig;
@@ -41,27 +65,6 @@ import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
-import org.hamcrest.xml.HasXPath;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import java.io.PrintStream;
-import java.lang.invoke.MethodHandles;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-
-import static io.restassured.RestAssured.given;
 
 public abstract class AbstractApiMethod extends HttpClient {
     private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass());

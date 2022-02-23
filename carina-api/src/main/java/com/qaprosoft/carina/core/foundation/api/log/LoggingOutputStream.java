@@ -15,11 +15,11 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.api.log;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-
 import java.io.IOException;
 import java.io.OutputStream;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 public class LoggingOutputStream extends OutputStream {
 
