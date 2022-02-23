@@ -26,14 +26,10 @@ public class ConditionalLoggingOutputStream extends LoggingOutputStream {
         // No operation
     }
 
-    public void conditionalClose(Response response) {
-        if (logCondition == null || logCondition.test(response)) {
-            doClose();
+    public void conditionLogging(Response response) {
+        if (logCondition.test(response)) {
+            super.flush();
         }
-    }
-
-    public void doClose() {
-        super.close();
     }
 
     public void setLogCondition(Predicate<Response> logCondition) {

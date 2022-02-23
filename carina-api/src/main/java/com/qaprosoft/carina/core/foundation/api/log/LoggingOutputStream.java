@@ -134,7 +134,8 @@ public class LoggingOutputStream extends OutputStream {
         hasBeenClosed = true;
     }
 
-    public boolean hasBeenClosed() {
-        return hasBeenClosed;
+    public void setBytesOfStreamInvalid() {
+        this.count = 0;
     }
+
 }

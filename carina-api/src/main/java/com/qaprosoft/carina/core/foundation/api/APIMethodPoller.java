@@ -33,42 +33,81 @@ public class APIMethodPoller {
         return new APIMethodPoller(method);
     }
 
-    // TODO: 18.02.22 doc 
+    /**
+     * Sets the repetition interval for the api calling
+     *
+     * @param period   repetition interval
+     * @param timeUnit time unit
+     * @return APIMethodPoller object
+     */
     public APIMethodPoller pollEvery(long period, TemporalUnit timeUnit) {
         this.actionPoller.pollEvery(period, timeUnit);
         return this;
     }
 
-    // TODO: 18.02.22 doc 
+    /**
+     * Sets the timeout for the api calling
+     *
+     * @param timeout  timeout
+     * @param timeUnit time unit
+     * @return APIMethodPoller object
+     */
     public APIMethodPoller stopAfter(long timeout, TemporalUnit timeUnit) {
         this.actionPoller.stopAfter(timeout, timeUnit);
         return this;
     }
 
-    // TODO: 18.02.22 doc 
+    /**
+     * Sets the logging strategy
+     *
+     * @param logStrategy logging strategy
+     * @return APIMethodPoller object
+     */
     public APIMethodPoller withLogStrategy(LogStrategy logStrategy) {
         this.logStrategy = logStrategy;
         return this;
     }
 
-    // TODO: 18.02.22 doc 
+    /**
+     * Sets an action that will be executed immediately after the api calling
+     *
+     * @param peekAction lambda expression
+     * @return APIMethodPoller object
+     */
     public APIMethodPoller peek(Consumer<Response> peekAction) {
         actionPoller.peek(peekAction);
         return this;
     }
 
-    // TODO: 18.02.22 doc 
+    /**
+     * Sets the condition under which the api calling is considered successfully completed and the response is returned
+     *
+     * @param successCondition lambda expression that that should return true if we consider the api calling completed
+     *                         successfully, and false if not
+     * @return APIMethodPoller object
+     */
     public APIMethodPoller until(Predicate<Response> successCondition) {
         this.actionPoller.until(successCondition);
         return this;
     }
 
+    /**
+     * Sets an action that will be executed after an api calling
+     *
+     * @param afterExecuteAction lambda expression
+     * @return APIMethodPoller object
+     */
     APIMethodPoller doAfterExecute(Consumer<Response> afterExecuteAction) {
         this.afterExecuteAction = afterExecuteAction;
         return this;
     }
 
-    // TODO: 18.02.22 doc 
+    /**
+     * Starts an api calling repetition with a condition. if the condition is met, then the method returns response, otherwise, if
+     * the time was elapsed, the method returns null
+     *
+     * @return response if condition successful, otherwise null
+     */
     public Optional<Response> execute() {
         if (logStrategy == null) {
             logStrategy = LogStrategy.ALL;
@@ -78,13 +117,18 @@ public class APIMethodPoller {
 
         outputStream.setLogCondition(logCondition);
 
-        Optional<Response> maybeResponse = actionPoller.task(() -> method.callAPI(outputStream))
-                .peek(outputStream::conditionalClose)
+        Optional<Response> maybeResponse = actionPoller.task(() -> {
+                    method.request.noFilters();
+                    outputStream.setBytesOfStreamInvalid();
+                    return method.callAPI(outputStream);
+                })
+                .peek(outputStream::conditionLogging)
                 .execute();
 
-        if (!outputStream.hasBeenClosed() || !LogStrategy.NONE.equals(logStrategy)) {
-            outputStream.doClose();
+        if (LogStrategy.LAST_ONLY.equals(logStrategy) && maybeResponse.isEmpty()) {
+            outputStream.flush();
         }
+        outputStream.close();
 
         if (afterExecuteAction != null && maybeResponse.isPresent()) {
             afterExecuteAction.accept(maybeResponse.get());

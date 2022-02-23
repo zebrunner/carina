@@ -32,68 +32,69 @@ public class ActionPoller<T> {
         return new ActionPoller<>();
     }
 
-    /** TODO
-     * Sets the repetition interval for lambda expression that should be passed to the task function
+    /**
+     * Sets the retry time of the task
      *
      * @param period   repetition interval
      * @param timeUnit time unit
-     * @return object of ActionPoller class for setting other parameters for builder or calling execute method for
-     * getting the final result
+     * @return ActionPoller object
      */
     public ActionPoller<T> pollEvery(long period, TemporalUnit timeUnit) {
         this.pollingInterval = Duration.of(period, timeUnit);
         return this;
     }
 
-    /** TODO
-     * Sets a timeout for executing the lambda expression that should be passed to the task function
+    /**
+     * Sets the timeout for the given task
      *
-     * @param timeout  timeout for task
+     * @param timeout  timeout
      * @param timeUnit time unit
-     * @return object of ActionPoller class for setting other parameters for builder or calling execute method for
-     * getting the final result
+     * @return ActionPoller object
      */
     public ActionPoller<T> stopAfter(long timeout, TemporalUnit timeUnit) {
         this.timeout = Duration.of(timeout, timeUnit);
         return this;
     }
 
-    // TODO: 18.02.22 DOC
+    /**
+     * Adds an action that will be executed immediately after the task
+     *
+     * @param peekAction lambda expression
+     * @return ActionPoller object
+     */
     public ActionPoller<T> peek(Consumer<T> peekAction) {
         this.peekActions.add(peekAction);
         return this;
     }
 
-    /** TODO
-     * Accepts a lambda expression that will repeat
+    /**
+     * Sets the task to repeat
      *
-     * @param task lambda expression to re-execute
-     * @return object of ActionPoller class for setting other parameters for builder or calling execute method for
-     * * getting the final result
+     * @param task lambda expression
+     * @return ActionPoller object
      */
     public ActionPoller<T> task(Supplier<T> task) {
         this.task = task;
         return this;
     }
 
-    /** TODO
+    /**
      * Sets the condition under which the task is considered successfully completed and the result is returned
      *
      * @param successCondition lambda expression that that should return true if we consider the task completed
      *                         successfully, and false if not
-     * @return object of ActionPoller class for setting other parameters for builder or calling execute method for
-     * getting the final result
+     * @return ActionPoller object
      */
     public ActionPoller<T> until(Predicate<T> successCondition) {
         this.successCondition = successCondition;
         return this;
     }
 
-    /** TODO
-     * Execute  task in intervals with timeout. If condition, that should be set in until function returns true, this
-     * method returns result of task, otherwise returns null
+    /**
+     * Starts a task repetition with a condition. if the condition is met, then the method returns result, otherwise, if
+     * the time was elapsed, the method returns null
      *
-     * @return result of task method
+     * @return result of the task method if condition successful, otherwise returns null
      */
     public Optional<T> execute() {
         validateParameters();

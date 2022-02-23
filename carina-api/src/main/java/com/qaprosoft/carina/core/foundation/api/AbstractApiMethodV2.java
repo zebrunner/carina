@@ -141,6 +141,12 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         return rs;
     }
 
+    /**
+     * Allows to create an api request with repetition, timeout and condition of successful response, as well as setting
+     * a logging strategy
+     *
+     * @return APIMethodPoller object
+     */
     public APIMethodPoller callAPIWithRetry() {
         initBodyContent();
         return APIMethodPoller.builder(this)
