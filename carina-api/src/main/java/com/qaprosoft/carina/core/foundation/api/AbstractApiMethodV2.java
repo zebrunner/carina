@@ -28,6 +28,7 @@ import com.qaprosoft.apitools.validation.JsonKeywordsComparator;
 import com.qaprosoft.apitools.validation.JsonValidator;
 import com.qaprosoft.apitools.validation.XmlCompareMode;
 import com.qaprosoft.apitools.validation.XmlValidator;
+import com.qaprosoft.carina.core.foundation.api.log.LoggingOutputStream;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -117,8 +118,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         this.rsPath = path;
     }
 
-    @Override
-    public Response callAPI() {
+    private void initBodyContent() {
         if (rqPath != null) {
             TemplateMessage tm = new TemplateMessage();
             tm.setIgnoredPropertiesProcessorClasses(ignoredPropertiesProcessorClasses);
@@ -126,10 +126,36 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
             tm.setPropertiesStorage(properties);
             setBodyContent(tm.getMessageText());
         }
+    }
+
+    @Override
+    public Response callAPI() {
+        initBodyContent();
         Response rs = super.callAPI();
         actualRsBody = rs.asString();
         return rs;
     }
+
+    @Override
+    Response callAPI(LoggingOutputStream outputStream) {
+        initBodyContent();
+        Response rs = super.callAPI(outputStream);
+        actualRsBody = rs.asString();
+        return rs;
+    }
+
+    /**
+     * Allows to create an api request with repetition, timeout and condition of successful response, as well as setting
+     * a logging strategy
+     *
+     * @return APIMethodPoller object
+     */
+    public APIMethodPoller callAPIWithRetry() {
+        initBodyContent();
+        return APIMethodPoller.builder(this)
+                .doAfterExecute(response -> actualRsBody = response.asString());
+    }
+
 
     /**
      * Calls API expecting http status in response taken from @SuccessfulHttpStatus value
