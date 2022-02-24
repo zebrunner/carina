@@ -2,8 +2,9 @@ package com.qaprosoft.carina.core.foundation.api;
 
 import com.qaprosoft.carina.core.foundation.api.log.ConditionalLoggingOutputStream;
 import io.restassured.response.Response;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 
 import java.lang.invoke.MethodHandles;
 import java.time.temporal.TemporalUnit;
@@ -13,7 +14,7 @@ import java.util.function.Predicate;
 
 public class APIMethodPoller {
 
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final ActionPoller<Response> actionPoller;
     private final AbstractApiMethodV2 method;

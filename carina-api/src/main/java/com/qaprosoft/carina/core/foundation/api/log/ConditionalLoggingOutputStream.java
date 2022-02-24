@@ -1,8 +1,8 @@
 package com.qaprosoft.carina.core.foundation.api.log;
 
 import io.restassured.response.Response;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.event.Level;
 
 import java.util.function.Predicate;
 
