@@ -23,8 +23,11 @@ import java.util.List;
 import java.util.Properties;
 
 import com.qaprosoft.apitools.builder.PropertiesProcessor;
-import com.qaprosoft.apitools.validation.*;
-import com.qaprosoft.carina.core.foundation.api.log.LoggingOutputStream;
+import com.qaprosoft.apitools.validation.JsonComparatorContext;
+import com.qaprosoft.apitools.validation.JsonKeywordsComparator;
+import com.qaprosoft.apitools.validation.JsonValidator;
+import com.qaprosoft.apitools.validation.XmlCompareMode;
+import com.qaprosoft.apitools.validation.XmlValidator;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -39,6 +42,7 @@ import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePath;
 import com.qaprosoft.carina.core.foundation.api.annotation.SuccessfulHttpStatus;
 
 import io.restassured.response.Response;
+
 
 public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -113,7 +117,8 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         this.rsPath = path;
     }
 
-    private void initBodyContent() {
+    @Override
+    public Response callAPI() {
         if (rqPath != null) {
             TemplateMessage tm = new TemplateMessage();
             tm.setIgnoredPropertiesProcessorClasses(ignoredPropertiesProcessorClasses);
@@ -121,34 +126,9 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
             tm.setPropertiesStorage(properties);
             setBodyContent(tm.getMessageText());
         }
-    }
-
-    @Override
-    public Response callAPI() {
-        initBodyContent();
         Response rs = super.callAPI();
         actualRsBody = rs.asString();
         return rs;
-    }
-
-    @Override
-    Response callAPI(LoggingOutputStream outputStream) {
-        initBodyContent();
-        Response rs = super.callAPI(outputStream);
-        actualRsBody = rs.asString();
-        return rs;
-    }
-
-    /**
-     * Allows to create an api request with repetition, timeout and condition of successful response, as well as setting
-     * a logging strategy
-     *
-     * @return APIMethodPoller object
-     */
-    public APIMethodPoller callAPIWithRetry() {
-        initBodyContent();
-        return APIMethodPoller.builder(this)
-                .doAfterExecute(response -> actualRsBody = response.asString());
     }
 
     /**

@@ -1,5 +1,3 @@
-#Driver usage
-
 All described methods are implemented inside `IDriverPool` interface and accessible by default from any test class. 
 To access this functionality from another places like your services just implement this interface.
 

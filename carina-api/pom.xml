@@ -24,6 +24,7 @@
 		<freemarker.version>2.3.31</freemarker.version>
 		<jsonassert.version>1.5.0</jsonassert.version>
 		<org.everit.json.schema.version>1.5.1</org.everit.json.schema.version>
+		<ognl.version>3.3.2</ognl.version>
 	</properties>
 
 	<dependencies>
@@ -41,11 +42,6 @@
 					<artifactId>guava</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
 		</dependency>
 
 		<dependency>
@@ -107,6 +103,12 @@
 			</exclusions>
 		</dependency>
 
+		<dependency>
+			<groupId>ognl</groupId>
+			<artifactId>ognl</artifactId>
+			<version>${ognl.version}</version>
+		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/org.xmlunit/xmlunit-assertj3 -->
 		<dependency>
 			<groupId>org.xmlunit</groupId>
@@ -157,11 +159,6 @@
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.zebrunner</groupId>
-			<artifactId>agent-testng</artifactId>
 		</dependency>
 				
 	</dependencies>

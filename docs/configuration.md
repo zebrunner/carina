@@ -1,6 +1,3 @@
-[![Carina - Configuration](https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png)](https://youtu.be/MMviWxCS9x4)
-
-### Configuration files
 There are multiple properties files located in src/main/resources:
 
 *  **api.properties** - API test endpoints reference
@@ -222,11 +219,6 @@ All the project configuration properties are located in a **_config.properties**
 		<td>core_log_level</td>
 		<td>Level for Carina logging</td>
 		<td>ALL, DEBUG, ERROR, WARN, FATAL, INFO, OFF, TRACE</td>
-	</tr>
-		<tr>
-		<td>core_log_packages</td>
-		<td>Comma-separated list of core packages where you want to redefine the log level</td>
-		<td>com.qaprosoft.carina.core, com.zebrunner etc</td>
 	</tr>
 		<tr>
 		<td>log_all_json</td>

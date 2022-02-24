@@ -1,5 +1,3 @@
-# Contributing to Carina
-
 There are multiple ways to contribute to Carina. See below for everything you can do and the processes to follow for each contribution method.
 Your contribution is governed by our [Code of Conduct](https://github.com/zebrunner/carina/blob/master/CODE_OF_CONDUCT.md).
 

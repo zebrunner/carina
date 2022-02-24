@@ -1,8 +1,6 @@
-### BDD approach with Cucumber
-
-Carina allows you to integrate BDD approach into your test project easily.   
-Under the hood it uses popular BDD framework Cucumber extending its basic functionality and integrating cool test reports.   
-To integrate carina-cucumber functionality you just need to add its library into your project.   
+Carina allows you to integrate BDD approach into your test project easily.
+Under the hood it uses popular BDD framework Cucumber extending its basic functionality and integrating cool test reports.
+To integrate carina-cucumber functionality you just need to add its library into your project.
 For instance with maven that can be done by adding next lines into your pom.xml:
 ```xml
 <dependency>

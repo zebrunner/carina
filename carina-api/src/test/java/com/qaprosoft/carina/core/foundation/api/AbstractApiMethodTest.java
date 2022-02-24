@@ -15,18 +15,38 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.api;
 
-import com.qaprosoft.carina.core.foundation.api.ssl.PutDocMethod;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class AbstractApiMethodTest {
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.mock.apimethod.AutoReplaceUrlPartsMethod;
+import com.qaprosoft.mock.apimethod.NoPlaceholdersInURLMethod;
+import com.qaprosoft.mock.apimethod.PutDocMethod;
 
-    private final static String BODY_CONTENT = "{\"key\": \"value\"}";
+public class AbstractApiMethodTest {
 
     @Test
     public void testGetRequestBodyMethod() {
         PutDocMethod putDocMethod = new PutDocMethod();
-        putDocMethod.setBodyContent(BODY_CONTENT);
-        Assert.assertEquals(putDocMethod.getRequestBody(), BODY_CONTENT);
+        final String bodyContent = "{\"key\": \"value\"}";
+        putDocMethod.setBodyContent(bodyContent);
+        Assert.assertEquals(putDocMethod.getRequestBody(), bodyContent);
+    }
+
+    @Test
+    public void testNoPlacehodlersInURL() {
+        NoPlaceholdersInURLMethod api = new NoPlaceholdersInURLMethod();
+        final String expectedMethodPath = "https://jsonplaceholder.typicode.com/users/1";
+        Assert.assertEquals(api.methodPath, expectedMethodPath);
+    }
+
+    @Test
+    public void testAutoReplacementInURL() {
+        final String id = "1";
+        R.CONFIG.put("some_id", id);
+        AutoReplaceUrlPartsMethod method = new AutoReplaceUrlPartsMethod();
+        final String expectedMethodPath = Configuration.getEnvArg("base_url") + "/mock/part/" + id;
+        Assert.assertEquals(method.getMethodPath(), expectedMethodPath);
     }
 }

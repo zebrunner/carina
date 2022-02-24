@@ -43,13 +43,12 @@
         <maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <jacoco-maven-plugin>0.8.7</jacoco-maven-plugin>
-        <zebrunner-agent.version>1.6.6</zebrunner-agent.version>
         <!-- Testings -->
         <testng.version>7.4.0</testng.version>
         <testng-foundation.version>2.0.1</testng-foundation.version>
         <!-- Logging -->
-        <log4j.version>1.2.17</log4j.version>
         <slf4j.version>1.7.30</slf4j.version>
+        <log4j.version>2.17.1</log4j.version>
 
         <!-- Commons -->
         <commons-text.version>1.8</commons-text.version>
@@ -404,24 +403,26 @@
                 <version>${zebrunner-testng-pluggable.version}</version>
             </dependency>
 
-
-            <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
-                <version>${log4j.version}</version>
-            </dependency>
-
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4j.version}</version>
             </dependency>
-
-            <!-- Binding for Log4J -->
+            <!-- Log4j2 -->
             <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4j.version}</version>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-slf4j-impl</artifactId>
+                <version>${log4j.version}</version>
             </dependency>
 
             <dependency>
@@ -648,13 +649,6 @@
                 <artifactId>mockito-core</artifactId>
                 <version>${mokito-core.version}</version>
                 <scope>test</scope>
-            </dependency>
-
-            <dependency>
-              <groupId>com.zebrunner</groupId>
-              <artifactId>agent-testng</artifactId>
-              <version>${zebrunner-agent.version}</version>
-              <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

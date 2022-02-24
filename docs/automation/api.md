@@ -1,8 +1,3 @@
-[![Carina - API automation](https://raw.githubusercontent.com/qaprosoft/carina/master/docs/img/video.png)](https://youtu.be/oJL5y8Ovta0)
-
-Note: Starting from 7.0.4 consider that instead of `extends AbstractTest` we have to `implements IAbstractTest` interface
-
-### Introduction
 Rest API testing is a vital part of integration testing process, it may be used separately or together with web, mobile or DB testing. The general process may be described by the following steps:
 
 1. Compile an HTTP request with the required meta data
@@ -64,7 +59,7 @@ Request (rq.json) and response (rs.json) templates have some placeholders that w
 While user.properties contains some default value which may be replaced later:
 ![API flow](../img/api/props-example.png)
 
-#### REST service call domain object
+#### REST service call domain object [DEPRECATED]
 Now we are ready to create REST service domain object which will be used to interact with web service and perform additional response validations. Our domain object is located in /carina-demo/src/main/java/com/qaprosoft/carina/demo/api, make sure that it extends AbstractApiMethodV2 and triggers the base class constructor for initialization. In general cases, you will specify the path to request and response templates along with default properties files (all of them have been created in the previous step). Also, we replace the URL placeholder to set an appropriate environment.
 ```
 package com.qaprosoft.carina.demo.api;
@@ -80,7 +75,7 @@ public class PostUserMethod extends AbstractApiMethodV2 {
 }
 ```
 
-#### HTTP method and path
+#### HTTP method and path [DEPRECATED]
 The last step before the test implementation itself is the association of the domain object class and the required HTTP method and path.
 It should be defined in /carina-demo/src/main/resources/_api.properties file, the key should be equal to domain class name, the value has the following pattern {http_method}:{http_path}. The HTTP path may contain placeholders, the HTTP method should be one of the following variants: GET, POST, PUT, UPDATE, DELETE.
 ```
@@ -93,6 +88,40 @@ DeleteUserMethod=DELETE:${base_url}/users/1
 PutPostsMethod=PUT:${base_url}/posts/1
 PatchPostsMethod=PATCH:${base_url}/posts/1
 ```
+#### REST service call domain object (Annotation based approach)
+
+Approach based on initialisation of super class constructor is deprecated and more convenient way is to use annotations. They can be used over class declarations. For api testing we can use such annotations:
+
+1. @ContentType - is used to define the value of Content-type header in response;
+2. @Endpoint - defines the place that APIs send requests and where the resource lives
+3. @RequestTemplatePath - contains a path from source root to request template file.
+4. @ResponseTemplatePath - contains a path from source root to response template file.
+5. @SuccessfulHttpStatus - specifies the expected HTTP status
+
+In this case we don’t need to define _api.properties file and call the constructor of a super class, but if we have some properties file used in this request we should explicitly set it in test method. Insead of callAPI() and expectResponseStatus() methods we can use callAPIExpectSuccess() that will call API expecting http status in response taken from @SuccessfulHttpStatus value.
+```
+@Endpoint(url = "${base_url}/users/1", methodType = HttpMethodType.DELETE)
+@RequestTemplatePath(path = "api/users/_delete/rq.json")
+@ResponseTemplatePath(path = "api/users/_delete/rs.json")
+@SuccessfulHttpStatus(status = HttpResponseStatusType.OK_200)
+public class DeleteUserMethod extends AbstractApiMethodV2 {
+    public DeleteUserMethod() {
+        replaceUrlPlaceholder("base_url", Configuration.getEnvArg("api_url"));
+    }
+}
+```   
+Also placeholders in URL can be automatically replaced by carina if they're specified in carina configuration properties (config.properties).
+To make auto-replacement happen just use next syntax in your URL:
+- when param starts with "config.\*" then R.CONFIG.get("\*") will be used as a replacement
+- when param starts with "config.env.\*" then Configuration.getEnvArg("\*") will be used as a replacement    
+So you may use next implementation:   
+```
+@Endpoint(url = "${config.env.base_url}/users/1", methodType = HttpMethodType.DELETE)
+public class DeleteUserMethod extends AbstractApiMethodV2 {
+}
+```   
+And before sending of request base part of URL will be set by carina depending on used environment automatically.
+
 
 #### API test
 API test is a general TestNG test, a class should extend APITest, in our case, the test implements IAbstractTest that encapsulates some test data and login method. The test is located in /carina-demo/src/test/java/com/qaprosoft/carina/demo.
@@ -101,14 +130,13 @@ package com.qaprosoft.carina.demo;
 
 import java.lang.invoke.MethodHandles;
 
-import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 import com.qaprosoft.apitools.validation.JsonCompareKeywords;
-import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
+import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
 import com.qaprosoft.carina.core.foundation.utils.tag.Priority;
 import com.qaprosoft.carina.core.foundation.utils.tag.TestPriority;
@@ -122,8 +150,8 @@ import com.qaprosoft.carina.demo.api.PostUserMethod;
  * @author qpsdemo
  */
 public class APISampleTest implements IAbstractTest {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    
 
     @Test()
     @MethodOwner(owner = "qpsdemo")
@@ -140,33 +168,31 @@ public class APISampleTest implements IAbstractTest {
     @MethodOwner(owner = "qpsdemo")
     public void testCreateUserMissingSomeFields() throws Exception {
         PostUserMethod api = new PostUserMethod();
+        api.setProperties("api/users/user.properties");
         api.getProperties().remove("name");
         api.getProperties().remove("username");
-        api.expectResponseStatus(HttpResponseStatusType.CREATED_201);
-        api.callAPI();
+        api.callAPIExpectSuccess();
         api.validateResponse();
     }
 
     @Test()
-    @MethodOwner(owner = "qpsdemo")
-    public void testGetUsers() {
-        GetUserMethods getUsersMethods = new GetUserMethods();
-        getUsersMethods.expectResponseStatus(HttpResponseStatusType.OK_200);
-        getUsersMethods.callAPI();
-        getUsersMethods.validateResponse(JSONCompareMode.STRICT, JsonCompareKeywords.ARRAY_CONTAINS.getKey());
-        getUsersMethods.validateResponseAgainstSchema("api/users/_get/rs.schema");
-    }
+     @MethodOwner(owner = "qpsdemo")
+     public void testGetUsers() {
+         GetUserMethods getUsersMethods = new GetUserMethods();
+         getUsersMethods.callAPIExpectSuccess();
+         getUsersMethods.validateResponse(JSONCompareMode.STRICT, JsonCompareKeywords.ARRAY_CONTAINS.getKey());
+         getUsersMethods.validateResponseAgainstSchema("api/users/_get/rs.schema");
+     }
 
     @Test()
     @MethodOwner(owner = "qpsdemo")
     @TestPriority(Priority.P1)
     public void testDeleteUsers() {
         DeleteUserMethod deleteUserMethod = new DeleteUserMethod();
-        deleteUserMethod.expectResponseStatus(HttpResponseStatusType.OK_200);
-        deleteUserMethod.callAPI();
+        deleteUserMethod.setProperties("api/users/user.properties");
+        deleteUserMethod.callAPIExpectSuccess();
         deleteUserMethod.validateResponse();
     }
-
 }
 ```
 
@@ -215,14 +241,120 @@ In some cases, you may need to generate data in the request to make the request 
 ```
 Another option is to specify the placeholder in the request template and then pass some generated value directly from the test method.
 
-Wildcards are also useful for response validation. In some cases, you may need to skip some values or validate by regex, type and predicate:
+Wildcards are also useful for response validation. In several cases, you may need to skip some values or validate by regex, type, ognl expression or predicate:
 ```
 {
-    "id": "skip",                                    // Will skip actual value validation and just verify id key presence
-    "signup_date": "regex:\\d{4}-\\d{2}-\\d{2}",     // Will validate date value by specified regex
-    "age": "type:Integer",                           // Will validate age value by specified Java type
-    "created_date": "predicate:isDateValid",         // Will validate created_date value by specified name of Predicate which was kept in JsonComparatorContext
+    "id": "skip",                                           // Will skip actual value validation and just verify id key presence
+    "signup_date": "regex:\\d{4}-\\d{2}-\\d{2}",            // Will validate date value by specified regex
+    "age": "type:Integer",                                  // Will validate age value by specified Java type simple name
+    "annual_income": "ognl:#root != null && #root > 10",    // Will validate annual_income value using provided OGNL expression
+    "created_date": "predicate:isDateValid",                // Will validate created_date value by specified name of Predicate which is stored in JsonComparatorContext
 }
+```
+*OGNL*
+
+To learn about Apache Object Graph Navigation Library follow this [article](https://commons.apache.org/proper/commons-ognl/language-guide.html).
+Using this option you have the ability to validate a response value with expression approach. Actual value is represented as `#root`.
+
+*Predicate*
+
+This approach provides the ability to validate a response value programmatically. Just create a `java.util.function.Predicate` and provide it into JsonComparatorContext:
+```
+    JsonComparatorContext comparatorContext = JsonComparatorContext.context()
+                .<String>withPredicate("firstNamePredicate", firstName -> firstName.startsWith("Carina"))
+                .<Integer>withPredicate("agePredicate", age -> age > 18)
+                .<Boolean>withPredicate("enabledPredicate", enabled -> enabled != null && enabled);
+    
+    myApiMethod.validateResponse(comparatorContext);
+```
+In your json file
+```
+{
+    "first_name": "predicate:firstNamePredicate",
+    "age": "predicate:agePredicate",
+    "enabled": "predicate:enabledPredicate"
+}
+```
+
+
+#### Custom wildcards
+You have a possibility to implement custom wildcard for response validation as well. All you need is JsonKeywordComparator interface implementation:
+```
+package com.qaprosoft.carina.demo;
+
+import com.qaprosoft.apitools.validation.JsonCompareResultWrapper;
+import com.qaprosoft.apitools.validation.JsonKeywordComparator;
+
+public class CustomComparator implements JsonKeywordComparator {
+
+    private static final String MY_KEYWORD = "my-wildcard:";
+
+    @Override
+    public void compare(String prefix, Object expectedValue, Object actualValue, JsonCompareResultWrapper result) {
+        String expectedWildcardValue = expectedValue.toString().replace(MY_KEYWORD, "");
+        switch (expectedWildcardValue) {
+            case "isGreaterThanZero":
+                int number = Integer.parseInt(actualValue.toString());
+                if (!isGreaterThanZero(number)) {
+                    String message = String.format("%s\nActual value '%d' less than or equals to zero\n", prefix, number);
+                    result.fail(message);
+                }
+                break;
+            case "hasSemicolon":
+                String str = actualValue.toString();
+                if (!hasSemicolon(str)) {
+                    String message = String.format("%s\nActual value '%s' doesn't contain semicolon a symbol\n", prefix, str);
+                    result.fail(message);
+                }
+                break;
+            default:
+                result.compareByDefault(prefix, expectedValue, actualValue);
+                break;
+        }
+    }
+
+    private boolean isGreaterThanZero(int value) {
+        return value > 0;
+    }
+
+    private boolean hasSemicolon(String value) {
+        return value.contains(";");
+    }
+
+    @Override
+    public boolean isMatch(Object expectedValue) {
+        return expectedValue.toString().startsWith(MY_KEYWORD);
+    }
+}
+```
+In your json file
+```
+{
+    "id": "my-wildcard:isGreaterThanZero",
+    "email": "my-wildcard:hasSemicolon"
+}
+```
+After that you need to register your custom comparator. There are two ways:
+
+*Using JsonComparatorContext*
+
+Using this one you will be able to specify your comparators for each validation.
+```
+JsonComparatorContext comparatorContext = JsonComparatorContext.context()
+        .withComparator(new CustomComparator())
+        .withComparator(new OtherCustomComparator());
+
+myApiMethod.validateResponse(comparatorContext);
+```
+*Using Service Provider*
+
+This option provides the ability to register your comparators, which will be always available for response validation, to the whole project.
+
+Just create a file named `com.qaprosoft.apitools.validation.JsonKeywordComparator`
+in `/resources/META-INF/services` folder and set the path(s) of your implementation(s) into it:
+```
+com.qaprosoft.carina.demo.CustomComparator
+com.qaprosoft.carina.demo.OtherCustomComparator
 ```
 
 #### Validation against JSON schema
@@ -497,4 +629,118 @@ public class XmlPostMethod extends AbstractApiMethodV2 {
 }
 ```  
 Important: for XML content type it's obligatory to pass @ContentType annotation to your API method indicating actual header value.  
-If @ContentType is not specified then data will be automatically considered as JSON.  
+If @ContentType is not specified then data will be automatically considered as JSON. 
+
+## SOAP documentation
+
+SOAP (Simple Object Access Protocol) is a standards-based web services access protocol. It mostly relies on XML documents.
+
+Let’s create some automated SOAP tests on demonstrative Web Service:
+
+[**https://www.crcind.com/csp/samples/SOAP.Demo.cls**](https://www.crcind.com/csp/samples/SOAP.Demo.cls)**.**
+
+***AddInteger*** method adds two integers and returns the result.
+
+***LookupCity*** method returns the city and state for the given U.S. ZIP Code packaged within a Sample.Address object
+
+First of all, we need to create a request template and response template. It is located in **/carina-demo/src/test/resources/api/soap/addinteger.**
+
+#### rq.xml
+
+```other
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org">
+    <soapenv:Header/>
+    <soapenv:Body>
+        <tem:AddInteger>
+            <tem:Arg1>${firstNumber}</tem:Arg1>
+            <tem:Arg2>${secondNumber}</tem:Arg2>
+        </tem:AddInteger>
+    </soapenv:Body>
+</soapenv:Envelope>
+```
+
+**rs.xml**
+
+```other
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <AddIntegerResponse xmlns="http://tempuri.org">
+            <#if firstNumber?? and secondNumber??>
+                <AddIntegerResult>${firstNumber+secondNumber}</AddIntegerResult>
+            </#if>
+        </AddIntegerResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+```
+
+This templates contain some placeholders that can be later replaced from properties file.
+
+#### soap.properties
+
+```other
+#=============== AddInteger properties ===========#
+firstNumber=4
+secondNumber=6
+result=10
+```
+
+Now we are ready to create SOAP service domain object which will be used to interact with web service and perform additional response validations. This domain object is located in **/carina-demo/src/main/java/com/qaprosoft/carina/demo/soap/**, make sure that it extends AbstractApiMethodV2.
+
+We can specify the endpoint-url, expected HttpStatus, paths to request and response templates and content type using annotations.
+
+**LookupCity.java**
+
+```other
+@Endpoint(url = "${base_url}", methodType = HttpMethodType.POST)
+@SuccessfulHttpStatus(status = HttpResponseStatusType.OK_200)
+@RequestTemplatePath(path = "api/soap/lookupcity/rq.xml")
+@ResponseTemplatePath(path = "src/test/resources/api/soap/lookupcity/rs.xml")
+@ContentType(type = "text/xml")
+public class LookupCityMethod extends AbstractApiMethodV2 {
+
+    public LookupCityMethod() {
+        replaceUrlPlaceholder("base_url",Configuration.getEnvArg("soap_url"));
+    }
+}
+```
+
+Then we can create test class with soap test methods. This class is located in **/carina-demo/src/test/java/com/qaprosoft/carina/demo/**. Test class must implement IAbstractTest. Test methods should start with @Test annotation.
+
+To send SOAP request we have to set some request headers. SOAPAction header indicates the intent of the SOAP HTTP request.
+
+We can validate the response by Response Status. Also we can use response data and compare it to expected results.
+
+**SoapSampleTest.java**
+
+```other
+public class SoapSampleTest implements IAbstractTest {
+
+    @Test
+    public void testAddInteger() {
+        AddIntegerMethod soap = new AddIntegerMethod();
+        soap.setProperties("api/soap/soap.properties");
+        soap.setHeaders(String.format("SOAPAction=%s", "http://tempuri.org/SOAP.Demo.AddInteger"));
+
+        Response response = soap.callAPIExpectSuccess();
+        XmlPath rsBody = XmlPath.given(response.asString());
+        Integer actualResult = rsBody.getInt("AddIntegerResult");
+        Integer expectedResult = Integer.valueOf(soap.getProperties().getProperty("result"));
+        Assert.assertEquals(actualResult, expectedResult);
+    }
+}
+```
+
+> Method ValidateResponse can be used only with JSON files. To validate the whole xml responses we can use ValidateXMLRespone method.
+
+```other
+@Test
+    public void testLookupCity() throws Exception{
+        LookupCityMethod soap = new LookupCityMethod();
+        soap.setProperties("api/soap/soap.properties");
+        soap.setHeaders(String.format("SOAPAction=%s", "http://tempuri.org/SOAP.Demo.LookupCity"));
+
+        soap.callAPIExpectSuccess();
+        soap.validateXmlResponse(XmlCompareMode.STRICT);
+    }
+```
+ 

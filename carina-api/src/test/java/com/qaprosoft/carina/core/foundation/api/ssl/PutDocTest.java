@@ -16,7 +16,9 @@
 package com.qaprosoft.carina.core.foundation.api.ssl;
 
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
+import com.qaprosoft.mock.apimethod.PutDocMethod;
 
+@Deprecated
 public class PutDocTest {
     // @Test
     public void testPath() {

@@ -18,7 +18,8 @@ package com.qaprosoft.carina.core.foundation.utils;
 
 import java.lang.invoke.MethodHandles;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.utils.messager.IMessager;
 
@@ -198,7 +199,7 @@ public enum Messager implements IMessager {
 
     TAP_NOT_EXECUTED("FAIL: Tap on X:'%s' Y:'%s' was not executed.");
     
-    private static final Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private String pattern;
 

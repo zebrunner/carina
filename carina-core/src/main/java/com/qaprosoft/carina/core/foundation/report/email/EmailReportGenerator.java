@@ -54,7 +54,6 @@ public class EmailReportGenerator {
     private static String CREATED_ITEM = R.EMAIL.get("created_item");
     private static final String TITLE_PLACEHOLDER = "${title}";
     private static final String ENV_PLACEHOLDER = "${env}";
-    private static final String DEVICE_PLACEHOLDER = "${device}";
     private static final String BROWSER_PLACEHOLDER = "${browser}";
     private static final String VERSION_PLACEHOLDER = "${version}";
     private static final String FINISH_DATE_PLACEHOLDER = "${finish_date}";
@@ -91,11 +90,10 @@ public class EmailReportGenerator {
     private int failCount = 0;
     private int skipCount = 0;
 
-    public EmailReportGenerator(String title, String url, String version, String device, String browser, String finishDate,
+    public EmailReportGenerator(String title, String url, String version, String browser, String finishDate,
             List<TestResultItem> testResultItems, List<String> createdItems) {
         emailBody = emailBody.replace(TITLE_PLACEHOLDER, title);
         emailBody = emailBody.replace(ENV_PLACEHOLDER, url);
-        emailBody = emailBody.replace(DEVICE_PLACEHOLDER, device);
         emailBody = emailBody.replace(VERSION_PLACEHOLDER, version);
         emailBody = emailBody.replace(BROWSER_PLACEHOLDER, browser);
         emailBody = emailBody.replace(FINISH_DATE_PLACEHOLDER, finishDate);
