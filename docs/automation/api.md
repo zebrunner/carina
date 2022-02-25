@@ -52,11 +52,16 @@ and the response body the same as the request body
 
 #### Definition of request and response templates
 If we are going to send POST request, we need to create a request template with some placeholders that may be replaced by different arguments for different test flows. The best place to store these resources is src/test/resources/api package, try to keep REST hierarchy in a package structure for better maintenance and visibility:
+
 ![API flow](../img/api/resources-structure.png)
+
 Request (rq.json) and response (rs.json) templates have some placeholders that will be populated from the tests later on:
+
 ![API flow](../img/api/rq-example.png)
 ![API flow](../img/api/rs-example.png)
+
 While user.properties contains some default value which may be replaced later:
+
 ![API flow](../img/api/props-example.png)
 
 #### REST service call domain object [DEPRECATED]
@@ -109,7 +114,19 @@ public class DeleteUserMethod extends AbstractApiMethodV2 {
         replaceUrlPlaceholder("base_url", Configuration.getEnvArg("api_url"));
     }
 }
+```   
+Also placeholders in URL can be automatically replaced by carina if they're specified in carina configuration properties (config.properties).
+To make auto-replacement happen just use next syntax in your URL:
+- when param starts with "config.\*" then R.CONFIG.get("\*") will be used as a replacement
+- when param starts with "config.env.\*" then Configuration.getEnvArg("\*") will be used as a replacement    
+So you may use next implementation:   
 ```
+@Endpoint(url = "${config.env.base_url}/users/1", methodType = HttpMethodType.DELETE)
+public class DeleteUserMethod extends AbstractApiMethodV2 {
+}
+```   
+And before sending of request base part of URL will be set by carina depending on used environment automatically.
+
 
 #### API test
 API test is a general TestNG test, a class should extend APITest, in our case, the test implements IAbstractTest that encapsulates some test data and login method. The test is located in /carina-demo/src/test/java/com/qaprosoft/carina/demo.

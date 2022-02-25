@@ -221,11 +221,6 @@ All the project configuration properties are located in a **_config.properties**
 		<td>ALL, DEBUG, ERROR, WARN, FATAL, INFO, OFF, TRACE</td>
 	</tr>
 		<tr>
-		<td>core_log_packages</td>
-		<td>Comma-separated list of core packages where you want to redefine the log level</td>
-		<td>com.qaprosoft.carina.core, com.zebrunner etc</td>
-	</tr>
-		<tr>
 		<td>log_all_json</td>
 		<td>API response will be logged in JSON format. Default: true</td>
 		<td>Boolean</td>

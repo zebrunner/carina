@@ -131,8 +131,6 @@ public class Configuration {
 
         CORE_LOG_LEVEL("core_log_level"),
 
-        CORE_LOG_PACKAGES("core_log_packages"),
-
         LOG_ALL_JSON("log_all_json"),
 
         DATE_FORMAT("date_format"),

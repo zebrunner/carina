@@ -32,6 +32,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
@@ -170,28 +174,12 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         // first means that ownership/maintainer resolver from carina has higher priority
         ChainedMaintainerResolver.addFirst(new Ownership(suite.getParameter("suiteOwner")));
 
-        List<String> coreLogPackages = new ArrayList<String>(
-                Arrays.asList(Configuration.get(Parameter.CORE_LOG_PACKAGES).split(",")));
-        if (coreLogPackages.size() > 0 && !"INFO".equalsIgnoreCase(Configuration.get(Parameter.CORE_LOG_LEVEL))) {
-            // do core log level change only if custom properties are declared
-            Assert.fail("Implement log level updater!");
-//            try {
-//                Logger root = Logger.getRootLogger();
-//                Enumeration<?> allLoggers = root.getLoggerRepository().getCurrentCategories();
-//                while (allLoggers.hasMoreElements()) {
-//                    Category tmpLogger = (Category) allLoggers.nextElement();
-//                    // LOGGER.debug("loggerName: " + tmpLogger.getName());
-//                    for (String coreLogPackage : coreLogPackages) {
-//                        if (tmpLogger.getName().contains(coreLogPackage.trim())) {
-//                            LOGGER.info("Updaged logger level for '" + tmpLogger.getName() + "' to "
-//                                    + Configuration.get(Parameter.CORE_LOG_LEVEL));
-//                            tmpLogger.setLevel(Level.toLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
-//                        }
-//                    }
-//                }
-//            } catch (NoSuchMethodError e) {
-//                LOGGER.error("Unable to redefine logger level due to the conflicts between log4j and slf4j!");
-//            }
+        if (!"INFO".equalsIgnoreCase(Configuration.get(Parameter.CORE_LOG_LEVEL))) {
+            LoggerContext ctx = (LoggerContext) LogManager.getContext(this.getClass().getClassLoader(), false);
+            org.apache.logging.log4j.core.config.Configuration config = ctx.getConfiguration();
+            // make sure to update after moving to "com.zebrunner"
+            LoggerConfig logger = config.getLoggerConfig("com.qaprosoft.carina.core");
+            logger.setLevel(Level.getLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
         }
 
         setThreadCount(suite);

@@ -22,16 +22,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import com.qaprosoft.apitools.builder.PropertiesProcessor;
-import com.qaprosoft.apitools.validation.*;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.qaprosoft.apitools.builder.PropertiesProcessor;
 import com.qaprosoft.apitools.builder.PropertiesProcessorMain;
 import com.qaprosoft.apitools.message.TemplateMessage;
+import com.qaprosoft.apitools.validation.JsonComparatorContext;
+import com.qaprosoft.apitools.validation.JsonKeywordsComparator;
+import com.qaprosoft.apitools.validation.JsonValidator;
+import com.qaprosoft.apitools.validation.XmlCompareMode;
+import com.qaprosoft.apitools.validation.XmlValidator;
 import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
 import com.qaprosoft.carina.core.foundation.api.annotation.RequestTemplatePath;
 import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePath;
