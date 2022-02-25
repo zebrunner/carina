@@ -52,11 +52,16 @@ and the response body the same as the request body
 
 #### Definition of request and response templates
 If we are going to send POST request, we need to create a request template with some placeholders that may be replaced by different arguments for different test flows. The best place to store these resources is src/test/resources/api package, try to keep REST hierarchy in a package structure for better maintenance and visibility:
+
 ![API flow](../img/api/resources-structure.png)
+
 Request (rq.json) and response (rs.json) templates have some placeholders that will be populated from the tests later on:
+
 ![API flow](../img/api/rq-example.png)
 ![API flow](../img/api/rs-example.png)
+
 While user.properties contains some default value which may be replaced later:
+
 ![API flow](../img/api/props-example.png)
 
 #### REST service call domain object [DEPRECATED]
