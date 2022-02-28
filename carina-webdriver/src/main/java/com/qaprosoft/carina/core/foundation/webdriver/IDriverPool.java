@@ -186,7 +186,7 @@ public interface IDriverPool {
 
         if (isSameDevice) {
             keepProxy = true;
-            device = getDefaultDevice();
+            device = getDevice(drv);
             POOL_LOGGER.debug("Added udid: " + device.getUdid() + " to capabilities for restartDriver on the same device.");
             caps.setCapability("udid", device.getUdid());
         }
@@ -490,6 +490,25 @@ public interface IDriverPool {
             return nullDevice;
         }
         
+    }
+    
+    /**
+     * Get device registered to driver. If no driver discovered nullDevice will be returned.
+     * 
+     * @param drv
+     *            WebDriver
+     * @return Device
+     */
+    default public Device getDevice(WebDriver drv) {
+        Device device = nullDevice;
+        
+        for (CarinaDriver carinaDriver : driversPool) {
+            if (carinaDriver.getDriver().equals(drv)) {
+                device = carinaDriver.getDevice(); 
+            }
+        }
+        
+        return device;
     }
 
     /**
