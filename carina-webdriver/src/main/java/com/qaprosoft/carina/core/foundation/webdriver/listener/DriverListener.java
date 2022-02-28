@@ -41,7 +41,7 @@ import com.zebrunner.agent.core.registrar.Artifact;
  * 
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
-public class DriverListener implements WebDriverEventListener {
+public class DriverListener implements WebDriverEventListener, IDriverPool {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final static ThreadLocal<String> currentPositiveMessage = new ThreadLocal<String>();
@@ -286,7 +286,7 @@ public class DriverListener implements WebDriverEventListener {
                     String screenName = Screenshot.capture(driver, comment, true); // in case of failure
                     // do not generate UI dump if no screenshot
                     if (!screenName.isEmpty()) {
-                        generateDump(screenName);
+                        generateDump(driver, screenName);
                     }
                 }
             } else {
@@ -300,9 +300,9 @@ public class DriverListener implements WebDriverEventListener {
         }
     }
 
-    private void generateDump(String screenName) {
+    private void generateDump(WebDriver driver, String screenName) {
         // XML layout extraction
-        File uiDumpFile = IDriverPool.getDefaultDevice().generateUiDump(screenName);
+        File uiDumpFile = getDevice(driver).generateUiDump(screenName);
         if (uiDumpFile != null) {
             // use the same naming but with zip extension. Put into the test artifacts folder
             String dumpArtifact = ReportContext.getArtifactsFolder().getAbsolutePath() + "/" + screenName.replace(".png", ".zip");
