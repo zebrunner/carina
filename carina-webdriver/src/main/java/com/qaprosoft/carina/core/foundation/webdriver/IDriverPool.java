@@ -160,6 +160,25 @@ public interface IDriverPool {
         }
         throw new DriverPoolException("Unable to find driver using sessionId artifacts. Returning default one!");
     }
+    
+    /**
+     * Get driver registered to device. If no device discovered null will be returned.
+     * 
+     * @param device
+     *            Device
+     * @return WebDriver
+     */
+    default public WebDriver getDriver(Device device) {
+        WebDriver drv = null;
+        
+        for (CarinaDriver carinaDriver : driversPool) {
+            if (carinaDriver.getDevice().equals(device)) {
+                drv = carinaDriver.getDriver(); 
+            }
+        }
+        
+        return drv;
+    }
 
     /**
      * Restart default driver

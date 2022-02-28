@@ -665,8 +665,13 @@ public class Device implements IDriverPool {
         // return File -> Zip png and uix or move this logic to zafira
         
         try {
+            WebDriver driver = getDriver(this);
+            if (driver == null) {
+                LOGGER.debug(String.format("There is no active driver for device: %s", getName()));
+                return null;
+            }
+            
             LOGGER.debug("UI dump generation...");
-            WebDriver driver = getDriver();
             String fileName = ReportContext.getTestDir() + String.format("/%s.uix", screenshotName.replace(".png", ""));
             String pageSource = driver.getPageSource();
             pageSource = pageSource.replaceAll(SpecialKeywords.ANDROID_START_NODE, SpecialKeywords.ANDROID_START_UIX_NODE).
