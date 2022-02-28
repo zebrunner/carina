@@ -389,7 +389,7 @@ public interface IDriverPool {
                 if (device.isNull()) {
                     // During driver creation we choose device and assign it to
                     // the test thread
-                    device = getDefaultDevice();
+                    device = getDevice(drv);
                 }
                 
                 // moved proxy start logic here since device will be initialized here only
