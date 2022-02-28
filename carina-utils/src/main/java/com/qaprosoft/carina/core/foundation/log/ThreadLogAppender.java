@@ -15,7 +15,17 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.log;
 
-import com.qaprosoft.carina.core.foundation.report.ReportContext;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Core;
 import org.apache.logging.log4j.core.Filter;
@@ -31,16 +41,7 @@ import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.apache.logging.log4j.message.Message;
 import org.slf4j.MDC;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
 
 /*
  * This appender log groups test outputs by test method/test thread so they don't mess up each other even they runs in parallel.
@@ -57,7 +58,7 @@ public class ThreadLogAppender extends AbstractAppender {
 
     private static final ThreadLocal<File> currentTestDirectory = new ThreadLocal<>();
     // single buffer for each thread test.log file
-    private static final ThreadLocal<BufferedWriter> testLogBuffer = new ThreadLocal<>();
+    private static final ThreadLocal<BufferedWriter> testLogBuffer = new InheritableThreadLocal<>();
 
     private static final Map<String, Long> fileNameToWrittenBytes = new ConcurrentHashMap<>();
 
