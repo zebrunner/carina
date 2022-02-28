@@ -25,11 +25,6 @@ public class DevicePoolTest implements IDriverPool {
     private final static Device nullDevice = IDriverPool.getNullDevice();
     
     @Test()
-    public void getDefaultNullDevice() {
-        Assert.assertEquals(IDriverPool.getDefaultDevice(), nullDevice, "Incorrect nullDevice has been returned");
-    }
-    
-    @Test()
     public void getNullDevice() {
         Assert.assertEquals(getDevice(), nullDevice, "Incorrect nullDevice has been returned");
     }
@@ -46,7 +41,6 @@ public class DevicePoolTest implements IDriverPool {
         IDriverPool.registerDevice(device);
         
         Assert.assertTrue(isDeviceRegistered(), "device is registered incorrectly");
-        Assert.assertEquals(IDriverPool.getDefaultDevice(), device, "Incorrect device has been returned");
     }
 
     @Test()
