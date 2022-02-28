@@ -495,8 +495,8 @@ public interface IDriverPool {
     /**
      * Get device registered to driver. If no driver discovered nullDevice will be returned.
      * 
-     * @param name
-     *            String driver name
+     * @param drv
+     *            WebDriver
      * @return Device
      */
     default public Device getDevice(WebDriver drv) {
