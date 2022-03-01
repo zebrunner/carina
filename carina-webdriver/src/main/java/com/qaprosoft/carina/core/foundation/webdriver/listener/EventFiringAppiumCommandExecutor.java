@@ -46,7 +46,6 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
-import com.qaprosoft.carina.core.foundation.webdriver.httpclient.HttpClientFactoryCustom;
 
 import io.appium.java_client.MobileCommand;
 import io.appium.java_client.remote.AppiumCommandExecutor;
@@ -84,19 +83,9 @@ public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
             URL addressOfRemoteServer, HttpClient.Factory httpClientFactory) {
         this(additionalCommands, null, checkNotNull(addressOfRemoteServer), httpClientFactory);
     }
-
-    public EventFiringAppiumCommandExecutor(Map<String, CommandInfo> additionalCommands,
-            URL addressOfRemoteServer) {
-        this(additionalCommands, addressOfRemoteServer, new HttpClientFactoryCustom());
-    }
-
-    public EventFiringAppiumCommandExecutor(Map<String, CommandInfo> additionalCommands,
-            DriverService service) {
-        this(additionalCommands, service, new HttpClientFactoryCustom());
-    }
-
+    
     public EventFiringAppiumCommandExecutor(URL addressOfRemoteServer) {
-        this(MobileCommand.commandRepository, addressOfRemoteServer, new HttpClientFactoryCustom());
+        this(MobileCommand.commandRepository, addressOfRemoteServer, HttpClient.Factory.createDefault());
     }
 
     private <B> B getPrivateFieldValue(String fieldName, Class<B> fieldType) {
