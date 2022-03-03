@@ -64,9 +64,9 @@ public interface ICustomTypePageFactory extends IDriverPool {
         Set<Class<? extends T>> setClasses = REFLECTIONS.getSubTypesOf(parentClass);
         PAGEFACTORY_LOGGER.debug("Relatives classes count:" + setClasses.size());
         Class<? extends T> versionClass = null, majorVersionClass = null, deviceClass = null, familyClass = null, requiredClass = null;
-        Type screenType = IDriverPool.getDefaultDevice().getDeviceType();
+        Device device = getDevice(driver);
+        Type screenType = device.getDeviceType();
 
-        Device device = IDriverPool.getDefaultDevice();
         // default version in case if it is desktop driver
         String deviceVersion = "1";
         if (!device.getOsVersion().isEmpty()) {

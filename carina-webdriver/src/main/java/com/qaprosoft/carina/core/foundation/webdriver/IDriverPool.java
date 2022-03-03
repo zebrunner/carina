@@ -160,6 +160,25 @@ public interface IDriverPool {
         }
         throw new DriverPoolException("Unable to find driver using sessionId artifacts. Returning default one!");
     }
+    
+    /**
+     * Get driver registered to device. If no device discovered null will be returned.
+     * 
+     * @param device
+     *            Device
+     * @return WebDriver
+     */
+    default public WebDriver getDriver(Device device) {
+        WebDriver drv = null;
+        
+        for (CarinaDriver carinaDriver : driversPool) {
+            if (carinaDriver.getDevice().equals(device)) {
+                drv = carinaDriver.getDriver(); 
+            }
+        }
+        
+        return drv;
+    }
 
     /**
      * Restart default driver
@@ -186,7 +205,7 @@ public interface IDriverPool {
 
         if (isSameDevice) {
             keepProxy = true;
-            device = getDefaultDevice();
+            device = getDevice(drv);
             POOL_LOGGER.debug("Added udid: " + device.getUdid() + " to capabilities for restartDriver on the same device.");
             caps.setCapability("udid", device.getUdid());
         }
@@ -389,7 +408,7 @@ public interface IDriverPool {
                 if (device.isNull()) {
                     // During driver creation we choose device and assign it to
                     // the test thread
-                    device = getDefaultDevice();
+                    device = getDevice(drv);
                 }
                 
                 // moved proxy start logic here since device will be initialized here only
@@ -490,6 +509,25 @@ public interface IDriverPool {
             return nullDevice;
         }
         
+    }
+    
+    /**
+     * Get device registered to driver. If no driver discovered nullDevice will be returned.
+     * 
+     * @param drv
+     *            WebDriver
+     * @return Device
+     */
+    default public Device getDevice(WebDriver drv) {
+        Device device = nullDevice;
+        
+        for (CarinaDriver carinaDriver : driversPool) {
+            if (carinaDriver.getDriver().equals(drv)) {
+                device = carinaDriver.getDevice(); 
+            }
+        }
+        
+        return device;
     }
 
     /**
