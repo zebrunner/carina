@@ -404,17 +404,18 @@ public interface IDriverPool {
                 }
                 
                 drv = DriverFactory.create(name, capabilities, seleniumHost);
-
-                if (device.isNull()) {
-                    // During driver creation we choose device and assign it to
-                    // the test thread
-                    device = getDevice(drv);
+                
+                if (currentDevice.get() != null) {
+                    device = currentDevice.get();
                 }
                 
-                // moved proxy start logic here since device will be initialized here only
+                CarinaDriver carinaDriver = new CarinaDriver(name, drv, device, TestPhase.getActivePhase(), threadId);
+                driversPool.add(carinaDriver);
+                POOL_LOGGER.debug("initDriver finish...");
+                
                 if (Configuration.getBoolean(Parameter.BROWSERMOB_PROXY)) {
                     if (!device.isNull()) {
-                    	int proxyPort;
+                        int proxyPort;
                         try {
                             proxyPort = Integer.parseInt(device.getProxyPort());
                         } catch (NumberFormatException e) {
@@ -427,11 +428,6 @@ public interface IDriverPool {
                     }
                 }
 
-                
-                // new 6.0 approach to manipulate drivers via regular Set
-                CarinaDriver carinaDriver = new CarinaDriver(name, drv, device, TestPhase.getActivePhase(), threadId);
-                driversPool.add(carinaDriver);
-                POOL_LOGGER.debug("initDriver finish...");
             } catch (Exception e) {
                 device.disconnectRemote();
                 //TODO: [VD] think about excluding device from pool for explicit reasons like out of space etc
@@ -521,11 +517,10 @@ public interface IDriverPool {
     default public Device getDevice(WebDriver drv) {
         Device device = nullDevice;
         
-        drv = castDriver(drv);
-        
         for (CarinaDriver carinaDriver : driversPool) {
             if (carinaDriver.getDriver().equals(drv)) {
-                device = carinaDriver.getDevice(); 
+                device = carinaDriver.getDevice();
+                break;
             }
         }
         
