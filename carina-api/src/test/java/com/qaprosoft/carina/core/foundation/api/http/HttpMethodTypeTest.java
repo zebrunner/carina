@@ -18,8 +18,6 @@ package com.qaprosoft.carina.core.foundation.api.http;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.api.http.HttpMethodType;
-
 public class HttpMethodTypeTest {
     @Test
     public void testGetHttpMethod() {

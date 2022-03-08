@@ -16,7 +16,6 @@
 package com.qaprosoft.carina.core.foundation.report;
 
 import java.nio.charset.Charset;
-import java.util.List;
 
 public class TestResultItem {
     private String pack = null;
