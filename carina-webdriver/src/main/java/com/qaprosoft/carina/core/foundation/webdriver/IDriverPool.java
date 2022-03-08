@@ -521,6 +521,8 @@ public interface IDriverPool {
     default public Device getDevice(WebDriver drv) {
         Device device = nullDevice;
         
+        drv = castDriver(drv);
+        
         for (CarinaDriver carinaDriver : driversPool) {
             if (carinaDriver.getDriver().equals(drv)) {
                 device = carinaDriver.getDevice(); 
