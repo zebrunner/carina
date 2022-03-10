@@ -359,8 +359,7 @@ public class ExtendedWebElement implements IWebElement {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } catch (java.util.concurrent.TimeoutException e) {
-            // do nothing
-            LOGGER.info("waitUntil: java.util.concurrent.TimeoutException", e);
+            LOGGER.error("waitUntil: java.util.concurrent.TimeoutException", e);
         } catch (ExecutionException e) {
             LOGGER.error(e.getMessage(), e);
         }
