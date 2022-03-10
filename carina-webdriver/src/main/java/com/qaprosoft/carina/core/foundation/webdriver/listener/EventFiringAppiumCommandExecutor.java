@@ -158,6 +158,9 @@ public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
                             || msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED2)) {
                         LOGGER.warn("Enabled command executor retries: " + msg);
                         CommonUtils.pause(pause);
+                    } else {
+                        // do not retry if not driver connection refused detected!
+                        break;
                     }
                 } else {
                     // do nothing as response already contains all the information we need
