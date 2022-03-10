@@ -344,7 +344,7 @@ public class ExtendedWebElement implements IWebElement {
                     wait.until(condition);
                     res = true;
                 } catch (TimeoutException e) {
-                    LOGGER.debug("waitUntil: TimeoutException", e);
+                    LOGGER.info("waitUntil: org.openqa.selenium.TimeoutException", e);
                 }
                 return res;
             }
@@ -356,6 +356,7 @@ public class ExtendedWebElement implements IWebElement {
             Thread.currentThread().interrupt();
         } catch (java.util.concurrent.TimeoutException e) {
             // do nothing
+            LOGGER.info("waitUntil: java.util.concurrent.TimeoutException", e);
         } catch (ExecutionException e) {
             LOGGER.error(e.getMessage(), e);
         }
