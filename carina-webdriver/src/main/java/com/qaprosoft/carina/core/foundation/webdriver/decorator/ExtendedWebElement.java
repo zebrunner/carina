@@ -344,7 +344,7 @@ public class ExtendedWebElement implements IWebElement {
                     wait.until(condition);
                     res = true;
                 } catch (TimeoutException e) {
-                    LOGGER.info("waitUntil: org.openqa.selenium.TimeoutException", e);
+                    LOGGER.debug("waitUntil: org.openqa.selenium.TimeoutException", e);
                 }
                 return res;
             }
