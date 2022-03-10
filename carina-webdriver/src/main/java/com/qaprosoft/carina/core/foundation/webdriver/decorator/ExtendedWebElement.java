@@ -58,6 +58,7 @@ import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.Sleeper;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
@@ -323,9 +324,11 @@ public class ExtendedWebElement implements IWebElement {
         }
         boolean result = false;
 
-        Wait<WebDriver> wait = new WebDriverWait(getDriver(), timeout, RETRY_TIME)
+//      Wait<WebDriver> wait = new WebDriverWait(getDriver(), timeout, RETRY_TIME)
+        //try to use better tickMillis clock 
+        Wait<WebDriver> wait = new WebDriverWait(getDriver(), java.time.Clock.tickMillis(java.time.ZoneId.systemDefault()), Sleeper.SYSTEM_SLEEPER, timeout, RETRY_TIME)
                 .ignoring(WebDriverException.class)
-                .ignoring(NoSuchSessionException.class)
+                .ignoring(NoSuchSessionException.class) // why do we ignore noSuchSession? Just to minimize errors?
                 .ignoring(NoSuchElementException.class);
 
         // [VD] Notes:
