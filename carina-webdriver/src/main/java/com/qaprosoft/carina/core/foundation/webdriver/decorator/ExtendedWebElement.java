@@ -25,6 +25,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -331,12 +336,30 @@ public class ExtendedWebElement implements IWebElement {
         // TimeoutException putting details into the debug log message. All the rest shouldn't be ignored
 
         LOGGER.debug("waitUntil: starting... timeout: " + timeout);
+        
+        Future<?> future = Executors.newSingleThreadExecutor().submit(new Callable<Boolean>() {
+            public Boolean call() throws Exception {
+                boolean res = false;
+                try {
+                    wait.until(condition);
+                    res = true;
+                } catch (TimeoutException e) {
+                    LOGGER.debug("waitUntil: TimeoutException", e);
+                }
+                return res;
+            }
+        });
+        
         try {
-            wait.until(condition);
-            result = true;
-        } catch (TimeoutException e) {
-            LOGGER.debug("waitUntil: TimeoutException", e);
+            result = (boolean) future.get(timeout, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (java.util.concurrent.TimeoutException e) {
+            // do nothing
+        } catch (ExecutionException e) {
+            LOGGER.error(e.getMessage(), e);
         }
+        
         return result;
     }
 
