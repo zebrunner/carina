@@ -350,8 +350,10 @@ public class ExtendedWebElement implements IWebElement {
             }
         });
         
+        long processTimeout = Math.max(3, timeout);
+        
         try {
-            result = (boolean) future.get(timeout, TimeUnit.SECONDS);
+            result = (boolean) future.get(processTimeout, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } catch (java.util.concurrent.TimeoutException e) {
