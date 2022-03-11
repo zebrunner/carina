@@ -39,10 +39,8 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -331,9 +329,7 @@ public class ExtendedWebElement implements IWebElement {
                 .ignoring(NoSuchElementException.class);
 
         // [VD] Notes:
-        // StaleElementReferenceException is handled by selenium ExpectedConditions in many methods
         // do not ignore TimeoutException or NoSuchSessionException otherwise you can wait for minutes instead of timeout!
-
         // [VD] note about NoSuchSessionException is pretty strange. Let's ignore here and return false only in case of
         // TimeoutException putting details into the debug log message. All the rest shouldn't be ignored
 
@@ -886,24 +882,6 @@ public class ExtendedWebElement implements IWebElement {
         // has a height and width greater than 0.
     	
         waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
-		boolean tmpResult = waitUntil(waitCondition, 1);
-
-		if (tmpResult) {
-			return true;
-		}
-
-		if (originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
-		    //TODO: hide below log message to debug
-			LOGGER.warn("StaleElementReferenceException detected in isElementPresent!");
-			try {
-				element = this.findElement();
-                waitCondition = ExpectedConditions.visibilityOf(element);
-			} catch (NoSuchElementException e) {
-				// search element based on By if exception was thrown
-				waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
-			}
-		}
-
     	return waitUntil(waitCondition, timeout);
     }
 
@@ -994,20 +972,6 @@ public class ExtendedWebElement implements IWebElement {
     	final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
 		ExpectedCondition<Boolean> textCondition;
 		if (element != null) {
-			ExpectedCondition<Boolean>  tmpCondition = ExpectedConditions.and(ExpectedConditions.visibilityOf(element));
-			boolean tmpResult = waitUntil(tmpCondition, 1);
-			
-			if (!tmpResult && originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
-				LOGGER.debug("StaleElementReferenceException detected in isElementWithTextPresent!");
-				try {
-					this.findElement();
-					textCondition = ExpectedConditions.textToBePresentInElement(element, decryptedText);
-				} catch (NoSuchElementException e) {
-					// search element based on By if exception was thrown
-					textCondition = ExpectedConditions.textToBePresentInElementLocated(getBy(), decryptedText);
-				}
-			}
-			
 			textCondition = ExpectedConditions.textToBePresentInElement(element, decryptedText);
 		} else {
 			textCondition = ExpectedConditions.textToBePresentInElementLocated(getBy(), decryptedText);
