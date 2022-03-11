@@ -372,9 +372,22 @@ public class ExtendedWebElement implements IWebElement {
         // as we still provide several ways to init ExtendedWebElement without searchContext we have to use "if" operator and getDriver()
         // to use only searchContext we must remove all findExtendedWebElement(s) methods in DriverHelper which is not so simple
         if (searchContext != null) {
-            element = searchContext.findElement(by);
+            //element = searchContext.findElement(by);
+            List <WebElement> elements = searchContext.findElements(by);
+            if (!elements.isEmpty()) {
+                this.element = elements.get(0);
+            } else {
+                throw new NoSuchElementException("Unable to find element using " + by.toString());
+            }
         } else {
-            element = getDriver().findElement(by);
+            // element = getDriver().findElement(by);
+            LOGGER.warn("Please, inform Carina team about this warn providing logs...");
+            List <WebElement> elements = getDriver().findElements(by);
+            if (!elements.isEmpty()) {
+                this.element = elements.get(0);
+            } else {
+                throw new NoSuchElementException("Unable to find element using " + by.toString());
+            }
         }
         return element;
     }
