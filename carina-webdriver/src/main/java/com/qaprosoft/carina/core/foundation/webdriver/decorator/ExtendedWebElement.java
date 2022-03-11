@@ -98,7 +98,6 @@ public class ExtendedWebElement implements IWebElement {
     private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
 
     private WebElement element = null;
-    private Throwable originalException;
     private String name;
     private By by;
     
@@ -325,13 +324,15 @@ public class ExtendedWebElement implements IWebElement {
         //try to use better tickMillis clock 
         Wait<WebDriver> wait = new WebDriverWait(getDriver(), java.time.Clock.tickMillis(java.time.ZoneId.systemDefault()), Sleeper.SYSTEM_SLEEPER, timeout, RETRY_TIME)
                 .ignoring(WebDriverException.class)
-                .ignoring(NoSuchSessionException.class) // why do we ignore noSuchSession? Just to minimize errors?
                 .ignoring(NoSuchElementException.class);
 
         // [VD] Notes:
         // do not ignore TimeoutException or NoSuchSessionException otherwise you can wait for minutes instead of timeout!
         // [VD] note about NoSuchSessionException is pretty strange. Let's ignore here and return false only in case of
         // TimeoutException putting details into the debug log message. All the rest shouldn't be ignored
+        
+        // 7.3.17-SNAPSHOT. Removed NoSuchSessionException (Mar-11-2022)
+        //.ignoring(NoSuchSessionException.class) // why do we ignore noSuchSession? Just to minimize errors?
 
         LOGGER.debug("waitUntil: starting... timeout: " + timeout);
         
