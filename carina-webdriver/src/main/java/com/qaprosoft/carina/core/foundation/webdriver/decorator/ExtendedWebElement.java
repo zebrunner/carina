@@ -36,7 +36,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
@@ -1396,22 +1395,8 @@ public class ExtendedWebElement implements IWebElement {
             L10N.verify(this);
         }
 
-		Object output = null;
-
-		try {
-			this.element = getElement();
-			output = overrideAction(actionName, inputArgs);
-		} catch (StaleElementReferenceException | InvalidElementStateException | ClassCastException e) {
-		    //TODO: test removal of the exceptions catch in this place!
-			//sometime Appium instead printing valid StaleElementException generate java.lang.ClassCastException: com.google.common.collect.Maps$TransformedEntriesMap cannot be cast to java.lang.String
-		    //TODO: move log message to debug
-			LOGGER.warn("catched StaleElementReferenceException: ", e);
-			// try to find again using driver
-			element = this.findElement();
-			output = overrideAction(actionName, inputArgs);
-		}
-
-		return output;
+        this.element = getElement();
+        return overrideAction(actionName, inputArgs);
 	}
 
 	// single place for all supported UI actions in carina core
