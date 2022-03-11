@@ -271,7 +271,7 @@ public class ExtendedWebElement implements IWebElement {
 
     public WebElement getElement() {
         if (this.element == null) {
-            this.element = findElement();
+            this.element = this.findElement();
         }
         
         return this.element;
@@ -723,7 +723,7 @@ public class ExtendedWebElement implements IWebElement {
             return;
         }
         try {
-            Locatable locatableElement = (Locatable) findElement();
+            Locatable locatableElement = (Locatable) this.findElement();
             // [VD] onScreen should be updated onto onPage as only 2nd one
             // returns real coordinates without scrolling... read below material
             // for details
@@ -894,9 +894,10 @@ public class ExtendedWebElement implements IWebElement {
 		}
 
 		if (originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
-			LOGGER.debug("StaleElementReferenceException detected in isElementPresent!");
+		    //TODO: hide below log message to debug
+			LOGGER.warn("StaleElementReferenceException detected in isElementPresent!");
 			try {
-				element = findElement();
+				element = this.findElement();
                 waitCondition = ExpectedConditions.visibilityOf(element);
 			} catch (NoSuchElementException e) {
 				// search element based on By if exception was thrown
@@ -1000,7 +1001,7 @@ public class ExtendedWebElement implements IWebElement {
 			if (!tmpResult && originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
 				LOGGER.debug("StaleElementReferenceException detected in isElementWithTextPresent!");
 				try {
-					findElement();
+					this.findElement();
 					textCondition = ExpectedConditions.textToBePresentInElement(element, decryptedText);
 				} catch (NoSuchElementException e) {
 					// search element based on By if exception was thrown
@@ -1403,9 +1404,10 @@ public class ExtendedWebElement implements IWebElement {
 		} catch (StaleElementReferenceException | InvalidElementStateException | ClassCastException e) {
 		    //TODO: test removal of the exceptions catch in this place!
 			//sometime Appium instead printing valid StaleElementException generate java.lang.ClassCastException: com.google.common.collect.Maps$TransformedEntriesMap cannot be cast to java.lang.String
-			LOGGER.debug("catched StaleElementReferenceException: ", e);
+		    //TODO: move log message to debug
+			LOGGER.warn("catched StaleElementReferenceException: ", e);
 			// try to find again using driver
-			element = findElement();
+			element = this.findElement();
 			output = overrideAction(actionName, inputArgs);
 		}
 
