@@ -87,25 +87,33 @@ public class ExtendedElementLocator implements ElementLocator {
             if (caseInsensitive && !by.toString().contains("translate(")) {
                 by = toCaseInsensitive(by.toString());
             }
-            try {
-                element = searchContext.findElement(by);
-            } catch (NoSuchElementException e) {
-                exception = e;
-                //TODO: on iOS findElement return nothing but findElements return valid single item
-                // maybe migrate to the latest appium java driver
-                elements = searchContext.findElements(by);
-                if (!elements.isEmpty()) {
-                    exception = null;
-                    element = elements.get(0);
-                }
-                // hide below debug message as it is to often displayed in logs due to the fluent waits etc
-                //LOGGER.debug("Unable to find element: " + e.getMessage());
+            
+            //TODO: test how findElements work for web and android
+            // maybe migrate to the latest appium java driver
+            elements = searchContext.findElements(by);
+            if (!elements.isEmpty()) {
+                element = elements.get(0);
             }
+            
+//            try {
+//                element = searchContext.findElement(by);
+//            } catch (NoSuchElementException e) {
+//                exception = e;
+//                //TODO: on iOS findElement return nothing but findElements return valid single item
+//                // maybe migrate to the latest appium java driver
+//                elements = searchContext.findElements(by);
+//                if (!elements.isEmpty()) {
+//                    exception = null;
+//                    element = elements.get(0);
+//                }
+//                // hide below debug message as it is to often displayed in logs due to the fluent waits etc
+//                //LOGGER.debug("Unable to find element: " + e.getMessage());
+//            }
         }
         
         // If no luck throw general NoSuchElementException
         if (element == null) {
-            throw exception != null ? exception : new NoSuchElementException("Unable to find element");
+            throw exception != null ? exception : new NoSuchElementException("Unable to find element using " + by.toString());
         }
         
         return element;
