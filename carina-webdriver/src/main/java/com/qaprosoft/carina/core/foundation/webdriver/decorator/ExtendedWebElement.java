@@ -1384,8 +1384,9 @@ public class ExtendedWebElement implements IWebElement {
 			Object...inputArgs) {
 		
 		if (waitCondition != null) {
-			//do verification only if waitCondition is fine
+			//do verification only if waitCondition is not null
 			if (!waitUntil(waitCondition, timeout)) {
+				//TODO: think about raising exception otherwise we do extra call and might wait and hangs especially for mobile/appium
 				LOGGER.error(Messager.ELEMENT_CONDITION_NOT_VERIFIED.getMessage(actionName.getKey(), getNameWithLocator()));
 			}
 		}
