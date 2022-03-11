@@ -80,7 +80,7 @@ public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements 
     	try {
     		elements = locator.findElements();
 		} catch (StaleElementReferenceException | InvalidElementStateException e) {
-			LOGGER.debug("catched StaleElementReferenceException: ", e);
+			LOGGER.warn("catched StaleElementReferenceException: ", e);
 			elements = webDriver.findElements(locatorBy);
 		}
 

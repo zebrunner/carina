@@ -69,7 +69,7 @@ public class LocatingListHandler implements InvocationHandler {
     	try {
     		elements = locator.findElements();
 		} catch (StaleElementReferenceException | InvalidElementStateException e) {
-			LOGGER.debug("catched StaleElementReferenceException: ", e);
+			LOGGER.warn("catched StaleElementReferenceException: ", e);
 			elements = driver.findElements(by);
 		}
 
