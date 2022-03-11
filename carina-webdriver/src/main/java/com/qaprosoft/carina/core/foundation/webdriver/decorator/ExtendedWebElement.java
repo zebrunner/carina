@@ -353,13 +353,14 @@ public class ExtendedWebElement implements IWebElement {
             }
         });
         
+     // make future process timeout 10s longer
+        long processTimeout = timeout + 10;
         try {
-            // make future process timeout 10s longer 
-            result = (boolean) future.get(timeout + 10, TimeUnit.SECONDS);
+            result = (boolean) future.get(processTimeout, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } catch (java.util.concurrent.TimeoutException e) {
-            LOGGER.error("waitUntil: java.util.concurrent.TimeoutException", e);
+            LOGGER.error("waitUntil: java.util.concurrent.TimeoutException: " + processTimeout + "s", e);
         } catch (ExecutionException e) {
             LOGGER.error(e.getMessage(), e);
         }
