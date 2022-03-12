@@ -89,10 +89,13 @@ public class ExtendedElementLocator implements ElementLocator {
             }
             
             //TODO: test how findElements work for web and android
-            // maybe migrate to the latest appium java driver
+            // maybe migrate to the latest appium java driver and reuse original findElement!
             elements = searchContext.findElements(by);
-            if (!elements.isEmpty()) {
+            if (elements.size() == 1) {
                 element = elements.get(0);
+            } else if (elements.size() > 1) {
+                element = elements.get(0);
+                LOGGER.error(elements.size() + " elements detected by: " + by.toString());
             }
             
 //            try {
