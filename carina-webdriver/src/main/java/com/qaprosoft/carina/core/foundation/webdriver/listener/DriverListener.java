@@ -60,6 +60,9 @@ public class DriverListener implements WebDriverEventListener, IDriverPool {
     @Override
     public void afterChangeValueOf(WebElement element, WebDriver driver, CharSequence[] value) {
         String comment = String.format("Text '%s' typed", charArrayToString(value));
+        if (value.length == 0) {
+            comment = "empty string typed.";
+        }
         captureScreenshot(comment, driver, element, false);
     }
 
