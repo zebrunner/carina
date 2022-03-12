@@ -373,7 +373,7 @@ public class ExtendedWebElement implements IWebElement {
             if (!elements.isEmpty()) {
                 this.element = elements.get(0);
             } else {
-                throw new NoSuchElementException("Unable to find element using " + by.toString());
+                throw new NoSuchElementException("no such element " + by.toString());
             }
         } else {
             // element = getDriver().findElement(by);
@@ -382,7 +382,7 @@ public class ExtendedWebElement implements IWebElement {
             if (!elements.isEmpty()) {
                 this.element = elements.get(0);
             } else {
-                throw new NoSuchElementException("Unable to find element using " + by.toString());
+                throw new NoSuchElementException("no such element " + by.toString());
             }
         }
         return element;
@@ -1054,7 +1054,7 @@ public class ExtendedWebElement implements IWebElement {
         if (isPresent(by, timeout)) {
             return new ExtendedWebElement(by, name, this.driver, this.searchContext);
         } else {
-        	throw new NoSuchElementException("Unable to find dynamic element using By: " + by.toString());
+        	throw new NoSuchElementException("no such element " + by.toString());
         }
     }
 
@@ -1069,7 +1069,7 @@ public class ExtendedWebElement implements IWebElement {
         if (isPresent(by, timeout)) {
             webElements = getElement().findElements(by);
         } else {
-        	throw new NoSuchElementException("Unable to find dynamic elements using By: " + by.toString());
+        	throw new NoSuchElementException("no such element " + by.toString());
         }
 
         int i = 1;

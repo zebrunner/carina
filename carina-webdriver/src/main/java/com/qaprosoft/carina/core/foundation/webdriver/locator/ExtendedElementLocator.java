@@ -113,7 +113,7 @@ public class ExtendedElementLocator implements ElementLocator {
         
         // If no luck throw general NoSuchElementException
         if (element == null) {
-            throw exception != null ? exception : new NoSuchElementException("Unable to find element using " + by.toString());
+            throw exception != null ? exception : new NoSuchElementException("no such element " + by.toString());
         }
         
         return element;
@@ -133,7 +133,7 @@ public class ExtendedElementLocator implements ElementLocator {
 
         // If no luck throw general NoSuchElementException
         if (elements == null) {
-            throw new NoSuchElementException("Unable to find elements using " + by.toString());
+            throw new NoSuchElementException("no such element " + by.toString());
         }
 
         return elements;

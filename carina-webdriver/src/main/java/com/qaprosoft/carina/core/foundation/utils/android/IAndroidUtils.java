@@ -379,7 +379,7 @@ public interface IAndroidUtils extends IMobileUtils {
                     break;
                 }
             } catch (NoSuchElementException noSuchElement) {
-                UTILS_LOGGER.error(String.format("Element %s:%s was NOT found.", eleSelectorType, scrollToEle),
+                UTILS_LOGGER.error(String.format("no such element %s:%s", eleSelectorType, scrollToEle),
                         noSuchElement);
             }
 
@@ -451,7 +451,7 @@ public interface IAndroidUtils extends IMobileUtils {
                     break;
                 }
             } catch (NoSuchElementException noSuchElement) {
-                UTILS_LOGGER.error(String.format("Element %s:%s was NOT found.", eleSelectorType, scrollToEle),
+                UTILS_LOGGER.error(String.format("no such element %s:%s", eleSelectorType, scrollToEle),
                         noSuchElement);
             }
 
@@ -517,7 +517,7 @@ public interface IAndroidUtils extends IMobileUtils {
                     break;
                 }
             } catch (NoSuchElementException noSuchElement) {
-                UTILS_LOGGER.error(String.format("Element %s:%s was NOT found.", eleSelectorType, scrollToEle),
+                UTILS_LOGGER.error(String.format("no such element %s:%s", eleSelectorType, scrollToEle),
                         noSuchElement);
             }
 
