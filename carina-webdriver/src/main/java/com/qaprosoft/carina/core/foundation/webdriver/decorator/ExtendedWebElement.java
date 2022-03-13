@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -106,6 +107,9 @@ public class ExtendedWebElement implements IWebElement {
     private ElementLoadingStrategy loadingStrategy = ElementLoadingStrategy.valueOf(Configuration.get(Parameter.ELEMENT_LOADING_STRATEGY));
 
     private boolean isLocalized = false;
+    
+    // Converted array of objects to String for dynamic element locators
+    private String formatValues = "";
 
     public ExtendedWebElement(WebElement element, String name, By by) {
         this(element, name);
@@ -265,6 +269,13 @@ public class ExtendedWebElement implements IWebElement {
     	}
     }
 
+    
+    
+    public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext, Object[] formatValues) {
+        this(by, name, driver, searchContext);
+        this.formatValues = Arrays.toString(formatValues);
+    }
+
     public WebElement getElement() {
         if (this.element == null) {
             this.element = this.findElement();
@@ -393,11 +404,15 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     public String getName() {
-        return name != null ? name : String.format(" (%s)", by);
+        return this.name + this.formatValues;
     }
 
     public String getNameWithLocator() {
-        return by != null ? name + String.format(" (%s)", by) : name + " (n/a)";
+        if (this.by != null) {
+            return this.name + this.formatValues + String.format(" (%s)", by);
+        } else {
+            return this.name + this.formatValues + " (n/a)";
+        }
     }
 
     public void setName(String name) {
@@ -1187,7 +1202,7 @@ public class ExtendedWebElement implements IWebElement {
             by = MobileBy.AndroidUIAutomator(String.format(StringUtils.remove(locator, "By.AndroidUIAutomator: "), objects));
             LOGGER.debug("Formatted locator is : " + by.toString());
         }
-        return new ExtendedWebElement(by, name, this.driver, this.searchContext);
+        return new ExtendedWebElement(by, name, this.driver, this.searchContext, objects);
     }
 
 
