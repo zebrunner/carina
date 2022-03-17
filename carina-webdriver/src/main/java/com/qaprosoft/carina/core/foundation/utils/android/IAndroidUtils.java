@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableMap;
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.android.Permissions.Permission;
 import com.qaprosoft.carina.core.foundation.utils.android.Permissions.PermissionAction;
@@ -379,7 +380,7 @@ public interface IAndroidUtils extends IMobileUtils {
                     break;
                 }
             } catch (NoSuchElementException noSuchElement) {
-                UTILS_LOGGER.error(String.format("no such element %s:%s", eleSelectorType, scrollToEle),
+                UTILS_LOGGER.error(String.format("%s %s:%s", SpecialKeywords.NO_SUCH_ELEMENT_ERROR, eleSelectorType, scrollToEle),
                         noSuchElement);
             }
 
@@ -451,7 +452,7 @@ public interface IAndroidUtils extends IMobileUtils {
                     break;
                 }
             } catch (NoSuchElementException noSuchElement) {
-                UTILS_LOGGER.error(String.format("no such element %s:%s", eleSelectorType, scrollToEle),
+                UTILS_LOGGER.error(String.format("%s%s:%s", SpecialKeywords.NO_SUCH_ELEMENT_ERROR, eleSelectorType, scrollToEle),
                         noSuchElement);
             }
 
@@ -517,7 +518,7 @@ public interface IAndroidUtils extends IMobileUtils {
                     break;
                 }
             } catch (NoSuchElementException noSuchElement) {
-                UTILS_LOGGER.error(String.format("no such element %s:%s", eleSelectorType, scrollToEle),
+                UTILS_LOGGER.error(String.format("%s%s:%s", SpecialKeywords.NO_SUCH_ELEMENT_ERROR, eleSelectorType, scrollToEle),
                         noSuchElement);
             }
 
