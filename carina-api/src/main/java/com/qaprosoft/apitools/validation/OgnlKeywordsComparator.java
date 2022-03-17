@@ -13,10 +13,11 @@ final class OgnlKeywordsComparator implements JsonKeywordComparator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final Object root;
+    private final String actualStr;
+    private Object root;
 
     public OgnlKeywordsComparator(String actualStr) {
-        this.root = JsonUtils.fromJson(actualStr, Object.class);
+        this.actualStr = actualStr;
     }
 
     @Override
@@ -40,6 +41,9 @@ final class OgnlKeywordsComparator implements JsonKeywordComparator {
     private Object parseExpression(String expression, Object value) {
         Object result = null;
         try {
+            if (this.root == null) {
+                this.root = JsonUtils.fromJson(actualStr, Object.class);
+            }
             result = Ognl.getValue(expression, Map.of("val", value), root);
         } catch (OgnlException e) {
             LOGGER.error(e.getMessage(), e);
