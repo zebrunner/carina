@@ -384,7 +384,7 @@ public class ExtendedWebElement implements IWebElement {
             if (!elements.isEmpty()) {
                 this.element = elements.get(0);
             } else {
-                throw new NoSuchElementException("no such element " + by.toString());
+                throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
             }
         } else {
             // element = getDriver().findElement(by);
@@ -393,7 +393,7 @@ public class ExtendedWebElement implements IWebElement {
             if (!elements.isEmpty()) {
                 this.element = elements.get(0);
             } else {
-                throw new NoSuchElementException("no such element " + by.toString());
+                throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
             }
         }
         return element;
@@ -1069,7 +1069,7 @@ public class ExtendedWebElement implements IWebElement {
         if (isPresent(by, timeout)) {
             return new ExtendedWebElement(by, name, this.driver, this.searchContext);
         } else {
-        	throw new NoSuchElementException("no such element " + by.toString());
+        	throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
         }
     }
 
@@ -1084,7 +1084,7 @@ public class ExtendedWebElement implements IWebElement {
         if (isPresent(by, timeout)) {
             webElements = getElement().findElements(by);
         } else {
-        	throw new NoSuchElementException("no such element " + by.toString());
+        	throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
         }
 
         int i = 1;

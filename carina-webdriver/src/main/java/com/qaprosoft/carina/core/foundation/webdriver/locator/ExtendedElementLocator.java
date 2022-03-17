@@ -31,6 +31,7 @@ import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Localized;
 
@@ -116,7 +117,7 @@ public class ExtendedElementLocator implements ElementLocator {
         
         // If no luck throw general NoSuchElementException
         if (element == null) {
-            throw exception != null ? exception : new NoSuchElementException("no such element " + by.toString());
+            throw exception != null ? exception : new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
         }
         
         return element;
@@ -136,7 +137,7 @@ public class ExtendedElementLocator implements ElementLocator {
 
         // If no luck throw general NoSuchElementException
         if (elements == null) {
-            throw new NoSuchElementException("no such element " + by.toString());
+            throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
         }
 
         return elements;
