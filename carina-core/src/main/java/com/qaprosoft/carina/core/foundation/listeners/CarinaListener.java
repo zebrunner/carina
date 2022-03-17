@@ -438,6 +438,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
      * But anyway all drivers will be closed forcibly as only suite is finished or aborted 
      */
     public static void disableDriversCleanup() {
+        LOGGER.info("Automatic drivers cleanup will be disabled!");
         automaticDriversCleanup = false;
     }
 
