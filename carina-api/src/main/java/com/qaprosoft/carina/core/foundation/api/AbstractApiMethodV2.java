@@ -255,7 +255,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         tm.setPropertiesStorage(properties);
         String expectedRs = tm.getMessageText();
         try {
-            JSONAssert.assertEquals(expectedRs, actualRsBody, new JsonKeywordsComparator(mode, comparatorContext, validationFlags));
+            JSONAssert.assertEquals(expectedRs, actualRsBody, new JsonKeywordsComparator(actualRsBody, mode, comparatorContext, validationFlags));
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
