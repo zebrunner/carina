@@ -59,8 +59,7 @@ public class DriverListener implements WebDriverEventListener, IDriverPool {
 
     @Override
     public void afterChangeValueOf(WebElement element, WebDriver driver, CharSequence[] value) {
-        String comment = String.format("Text '%s' typed", charArrayToString(value));
-        captureScreenshot(comment, driver, element, false);
+        captureScreenshot(String.format("Text '%s' typed", charArrayToString(value)), driver, element, false);
     }
 
     @Override

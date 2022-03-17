@@ -84,6 +84,7 @@ public interface IMobileUtils extends IDriverPool {
      * @param element ExtendedWebElement
      */
     default public void tap(ExtendedWebElement element) {
+        UTILS_LOGGER.info("tap on " + element.getName());
         Point point = element.getLocation();
         Dimension size = element.getSize();
         tap(point.getX() + size.getWidth() / 2, point.getY() + size.getHeight() / 2);
@@ -106,6 +107,7 @@ public interface IMobileUtils extends IDriverPool {
      *            element
      */
     default public void longTap(ExtendedWebElement elem) {
+        UTILS_LOGGER.info("longTap on" + elem.getName());
         Dimension size = elem.getSize();
 
         int width = size.getWidth();
@@ -127,6 +129,7 @@ public interface IMobileUtils extends IDriverPool {
      * @return boolean
      */
     default public boolean longPress(ExtendedWebElement element) {
+        UTILS_LOGGER.info("longPress on" + element.getName());
         // TODO: SZ migrate to FluentWaits
         try {
             WebDriver driver = castDriver();

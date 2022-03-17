@@ -24,24 +24,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.InvalidElementStateException;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.Wait;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.gui.AbstractUIObject;
 
 public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements InvocationHandler {
@@ -76,14 +65,7 @@ public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements 
 //    	waitUntil(ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(locatorBy),
 //    			ExpectedConditions.visibilityOfElementLocated(locatorBy)));
 
-    	List<WebElement> elements = null;
-    	try {
-    		elements = locator.findElements();
-		} catch (StaleElementReferenceException | InvalidElementStateException e) {
-			LOGGER.debug("catched StaleElementReferenceException: ", e);
-			elements = webDriver.findElements(locatorBy);
-		}
-
+    	List<WebElement> elements = locator.findElements();
         List<T> uIObjects = new ArrayList<T>();
         int index = 0;
         if (elements != null) {
@@ -140,34 +122,4 @@ public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements 
     	return rootBy;
     }
     
-    /**
-     * Wait until any condition happens.
-     *
-     * @param condition - ExpectedCondition.
-     * @return true if condition happen.
-     */
-	@SuppressWarnings("unchecked")
-	private boolean waitUntil(ExpectedCondition<?> condition) {
-		boolean result;
-		
-		long timeout = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
-		long RETRY_TIME = Configuration.getLong(Parameter.RETRY_INTERVAL);
-		
-		@SuppressWarnings("rawtypes")
-		Wait wait = new WebDriverWait(webDriver, timeout, RETRY_TIME).ignoring(WebDriverException.class)
-				.ignoring(NoSuchSessionException.class);
-		try {
-			wait.until(condition);
-			result = true;
-			LOGGER.debug("waitUntil: finished true...");
-		} catch (NoSuchElementException | TimeoutException e) {
-			// don't write exception even in debug mode
-			LOGGER.debug("waitUntil: NoSuchElementException | TimeoutException e..." + condition.toString());
-			result = false;
-		} catch (Exception e) {
-			LOGGER.error("waitUntil: " + condition.toString(), e);
-			result = false;
-		}
-		return result;
-	}
 }

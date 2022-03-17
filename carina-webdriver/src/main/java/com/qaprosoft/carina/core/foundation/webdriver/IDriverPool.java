@@ -434,9 +434,12 @@ public interface IDriverPool {
                 // but initially try to implement it on selenium-hub level
                 String msg = String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s", name, count,
                         maxCount, e.getMessage());
-                POOL_LOGGER.error(msg, e);
+                
                 if (count == maxCount) {
                     throw e;
+                } else {
+                    // do not provide huge stacktrace as more retries exists. Only latest will generate full error + stacktrace
+                    POOL_LOGGER.error(msg);    
                 }
                 CommonUtils.pause(Configuration.getInt(Parameter.INIT_RETRY_INTERVAL));
             }

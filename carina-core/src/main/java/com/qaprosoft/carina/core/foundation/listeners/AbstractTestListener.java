@@ -69,6 +69,11 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         String test = TestNameResolverRegistry.get().resolve(result);
 
         String errorMessage = getFailureReason(result);
+        
+        TestResultType failType = TestResultType.FAIL;
+        if (result.getStatus() == 3) {
+            failType = TestResultType.SKIP;
+        }
 
         // TODO: remove hard-coded text
         if (!errorMessage.contains("All tests were skipped! Analyze logs to determine possible configuration issues.")) {
@@ -76,10 +81,10 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
             if (!R.EMAIL.getBoolean("fail_full_stacktrace_in_report") && result.getThrowable() != null
                     && result.getThrowable().getMessage() != null
                     && !StringUtils.isEmpty(result.getThrowable().getMessage())) {
-                EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL,
+                EmailReportItemCollector.push(createTestResult(result, failType,
                         result.getThrowable().getMessage(), result.getMethod().getDescription()));
             } else {
-                EmailReportItemCollector.push(createTestResult(result, TestResultType.FAIL, errorMessage, result
+                EmailReportItemCollector.push(createTestResult(result, failType, errorMessage, result
                         .getMethod().getDescription()));
             }
         }
