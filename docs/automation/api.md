@@ -230,14 +230,15 @@ Wildcards are also useful for response validation. In several cases, you may nee
     "id": "skip",                                           // Will skip actual value validation and just verify id key presence
     "signup_date": "regex:\\d{4}-\\d{2}-\\d{2}",            // Will validate date value by specified regex
     "age": "type:Integer",                                  // Will validate age value by specified Java type simple name
-    "annual_income": "ognl:#root != null && #root > 10",    // Will validate annual_income value using provided OGNL expression
+    "annual_income": "ognl:#val != null && #val > 10",    // Will validate annual_income value using provided OGNL expression
     "created_date": "predicate:isDateValid",                // Will validate created_date value by specified name of Predicate which is stored in JsonComparatorContext
 }
 ```
 *OGNL*
 
 To learn about Apache Object Graph Navigation Library follow this [article](https://commons.apache.org/proper/commons-ognl/language-guide.html).
-Using this option you have the ability to validate a response value with expression approach. Actual value is represented as `#root`.
+Using this option you have the ability to validate a response value with expression approach. Actual value is represented as `#val`.
+Also you have an access to full json tree using `#root` keyword.
 
 *Predicate*
 

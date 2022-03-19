@@ -40,7 +40,7 @@ public class JsonValidatorTest {
 
         boolean isErrorThrown = false;
         try {
-            JSONAssert.assertEquals(expectedRs, actualRs, new JsonKeywordsComparator(JSONCompareMode.STRICT,
+            JSONAssert.assertEquals(expectedRs, actualRs, new JsonKeywordsComparator(actualRs, JSONCompareMode.STRICT,
                     JsonCompareKeywords.ARRAY_CONTAINS.getKey() + "content"));
         } catch (JSONException e) {
             throw new RuntimeException(e);
@@ -174,7 +174,7 @@ public class JsonValidatorTest {
         String expectedRs = IOUtils.toString(JsonValidatorTest.class.getClassLoader().getResourceAsStream(
                 "validation/array/integer/array_exp.json"), Charset.forName("UTF-8").toString());
 
-        JSONAssert.assertEquals(expectedRs, actualRs, new JsonKeywordsComparator(JSONCompareMode.STRICT,
+        JSONAssert.assertEquals(expectedRs, actualRs, new JsonKeywordsComparator(actualRs, JSONCompareMode.STRICT,
                 JsonCompareKeywords.ARRAY_CONTAINS.getKey() + "clientIds"));
     }
 
@@ -189,7 +189,7 @@ public class JsonValidatorTest {
 
         boolean isErrorThrown = false;
         try {
-            JSONAssert.assertEquals(expectedRs, actualRs, new JsonKeywordsComparator(JSONCompareMode.STRICT,
+            JSONAssert.assertEquals(expectedRs, actualRs, new JsonKeywordsComparator(actualRs, JSONCompareMode.STRICT,
                     JsonCompareKeywords.ARRAY_CONTAINS.getKey() + "clientIds"));
         } catch (AssertionError e) {
             isErrorThrown = true;

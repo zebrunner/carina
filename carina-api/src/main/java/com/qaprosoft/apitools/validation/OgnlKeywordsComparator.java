@@ -1,15 +1,24 @@
 package com.qaprosoft.apitools.validation;
 
+import com.qaprosoft.carina.core.foundation.utils.JsonUtils;
 import ognl.Ognl;
 import ognl.OgnlException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Map;
 
 final class OgnlKeywordsComparator implements JsonKeywordComparator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+    private final String actualStr;
+    private Object root;
+
+    public OgnlKeywordsComparator(String actualStr) {
+        this.actualStr = actualStr;
+    }
 
     @Override
     public void compare(String prefix, Object expectedValue, Object actualValue, JsonCompareResultWrapper result) {
@@ -32,7 +41,10 @@ final class OgnlKeywordsComparator implements JsonKeywordComparator {
     private Object parseExpression(String expression, Object value) {
         Object result = null;
         try {
-            result = Ognl.getValue(expression, value);
+            if (this.root == null) {
+                this.root = JsonUtils.fromJson(actualStr, Object.class);
+            }
+            result = Ognl.getValue(expression, Map.of("val", value), root);
         } catch (OgnlException e) {
             LOGGER.error(e.getMessage(), e);
         }
