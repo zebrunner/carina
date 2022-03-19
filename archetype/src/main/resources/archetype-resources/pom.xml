@@ -13,9 +13,9 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<carina-core_version>7.3.16</carina-core_version>
+		<carina-core_version>7.3.17</carina-core_version>
 		<java.version>11</java.version>
-		<zebrunner-agent.version>1.6.6</zebrunner-agent.version>
+		<zebrunner-agent.version>1.6.7</zebrunner-agent.version>
 		<suite>helloWorld</suite>
 	</properties>
 
