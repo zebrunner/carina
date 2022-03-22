@@ -1269,84 +1269,84 @@ public class ExtendedWebElement implements IWebElement {
 		List<String> doGetSelectedValues();
 	}
 
-	private Object executeAction(ACTION_NAME actionName, ActionSteps actionSteps, Object...inputArgs) {
-		Object result = null;
-		switch (actionName) {
-		case CLICK:
-			actionSteps.doClick();
-			break;
+    private Object executeAction(ACTION_NAME actionName, ActionSteps actionSteps, Object... inputArgs) {
+        Object result = null;
+        switch (actionName) {
+        case CLICK:
+            actionSteps.doClick();
+            break;
         case CLICK_BY_JS:
             actionSteps.doClickByJs();
             break;
         case CLICK_BY_ACTIONS:
             actionSteps.doClickByActions();
-            break;            
-		case DOUBLE_CLICK:
-			actionSteps.doDoubleClick();
-			break;
-		case HOVER:
-			actionSteps.doHover((Integer) inputArgs[0], (Integer) inputArgs[1]);
-			break;
-		case RIGHT_CLICK:
-			actionSteps.doRightClick();
-			break;
-		case GET_TEXT:
-			result = actionSteps.doGetText();
-			break;
-		case GET_LOCATION:
-			result = actionSteps.doGetLocation();
-			break;
-		case GET_SIZE:
-			result = actionSteps.doGetSize();
-			break;
-		case GET_ATTRIBUTE:
-			result = actionSteps.doGetAttribute((String) inputArgs[0]);
-			break;
-		case SEND_KEYS:
-			actionSteps.doSendKeys((Keys) inputArgs[0]);
-			break;
-		case TYPE:
-			actionSteps.doType((String) inputArgs[0]);
-			break;
-		case ATTACH_FILE:
-			actionSteps.doAttachFile((String) inputArgs[0]);
-			break;
-		case CHECK:
-			actionSteps.doCheck();
-			break;
-		case UNCHECK:
-			actionSteps.doUncheck();
-			break;
-		case IS_CHECKED:
-			result = actionSteps.doIsChecked();
-			break;
-		case SELECT:
-			result = actionSteps.doSelect((String) inputArgs[0]);
-			break;
-		case SELECT_VALUES:
-			result = actionSteps.doSelectValues((String[]) inputArgs);
-			break;
-		case SELECT_BY_MATCHER:
-			result = actionSteps.doSelectByMatcher((BaseMatcher<String>) inputArgs[0]);
-			break;
-		case SELECT_BY_PARTIAL_TEXT:
-			result = actionSteps.doSelectByPartialText((String) inputArgs[0]);
-			break;
-		case SELECT_BY_INDEX:
-			result = actionSteps.doSelectByIndex((int) inputArgs[0]);
-			break;
-		case GET_SELECTED_VALUE:
-			result = actionSteps.doGetSelectedValue();
-			break;
-		case GET_SELECTED_VALUES:
-			result = actionSteps.doGetSelectedValues();
-			break;
-		default:
-			Assert.fail("Unsupported UI action name" + actionName.toString());
-			break;
-		}
-		return result;
-	}
+            break;
+        case DOUBLE_CLICK:
+            actionSteps.doDoubleClick();
+            break;
+        case HOVER:
+            actionSteps.doHover((Integer) inputArgs[0], (Integer) inputArgs[1]);
+            break;
+        case RIGHT_CLICK:
+            actionSteps.doRightClick();
+            break;
+        case GET_TEXT:
+            result = actionSteps.doGetText();
+            break;
+        case GET_LOCATION:
+            result = actionSteps.doGetLocation();
+            break;
+        case GET_SIZE:
+            result = actionSteps.doGetSize();
+            break;
+        case GET_ATTRIBUTE:
+            result = actionSteps.doGetAttribute((String) inputArgs[0]);
+            break;
+        case SEND_KEYS:
+            actionSteps.doSendKeys((Keys) inputArgs[0]);
+            break;
+        case TYPE:
+            actionSteps.doType((String) inputArgs[0]);
+            break;
+        case ATTACH_FILE:
+            actionSteps.doAttachFile((String) inputArgs[0]);
+            break;
+        case CHECK:
+            actionSteps.doCheck();
+            break;
+        case UNCHECK:
+            actionSteps.doUncheck();
+            break;
+        case IS_CHECKED:
+            result = actionSteps.doIsChecked();
+            break;
+        case SELECT:
+            result = actionSteps.doSelect((String) inputArgs[0]);
+            break;
+        case SELECT_VALUES:
+            result = actionSteps.doSelectValues((String[]) inputArgs);
+            break;
+        case SELECT_BY_MATCHER:
+            result = actionSteps.doSelectByMatcher((BaseMatcher<String>) inputArgs[0]);
+            break;
+        case SELECT_BY_PARTIAL_TEXT:
+            result = actionSteps.doSelectByPartialText((String) inputArgs[0]);
+            break;
+        case SELECT_BY_INDEX:
+            result = actionSteps.doSelectByIndex((int) inputArgs[0]);
+            break;
+        case GET_SELECTED_VALUE:
+            result = actionSteps.doGetSelectedValue();
+            break;
+        case GET_SELECTED_VALUES:
+            result = actionSteps.doGetSelectedValues();
+            break;
+        default:
+            Assert.fail("Unsupported UI action name" + actionName.toString());
+            break;
+        }
+        return result;
+    }
 
 	/**
 	 * doAction on element.
