@@ -1275,6 +1275,12 @@ public class ExtendedWebElement implements IWebElement {
 		case CLICK:
 			actionSteps.doClick();
 			break;
+        case CLICK_BY_JS:
+            actionSteps.doClickByJs();
+            break;
+        case CLICK_BY_ACTIONS:
+            actionSteps.doClickByActions();
+            break;            
 		case DOUBLE_CLICK:
 			actionSteps.doDoubleClick();
 			break;
