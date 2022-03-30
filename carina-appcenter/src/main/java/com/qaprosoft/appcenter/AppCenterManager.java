@@ -216,6 +216,7 @@ public class AppCenterManager {
             LOGGER.info("Scanning App " + currentApp);
             MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
             queryParams.add("published_only", "true");
+            queryParams.add("scope", "tester");
 
             RequestEntity<String> retrieveList = buildRequestEntity(
                     HOST_URL,
@@ -269,6 +270,7 @@ public class AppCenterManager {
     private String getLatestBuildDate(String app, String appUpdatedAt) {
         MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
         queryParams.add("published_only", "true");
+        queryParams.add("scope", "tester");
 
         RequestEntity<String> retrieveList = buildRequestEntity(
                 HOST_URL,
