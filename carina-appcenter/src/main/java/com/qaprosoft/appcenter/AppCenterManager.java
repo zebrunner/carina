@@ -213,7 +213,7 @@ public class AppCenterManager {
      */
     private String scanAppForBuild(Map<String, String> apps, String buildType, String version) {
         for (String currentApp : apps.keySet()) {
-            LOGGER.info("Scanning App {}", currentApp);
+            LOGGER.info("Scanning App " + currentApp);
             MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
             queryParams.add("published_only", "true");
             queryParams.add("scope", "tester");
@@ -224,7 +224,7 @@ public class AppCenterManager {
                     queryParams,
                     HttpMethod.GET);
             JsonNode buildList = restTemplate.exchange(retrieveList, JsonNode.class).getBody();
-            LOGGER.info("Available Builds JSON: {}", buildList);
+            LOGGER.debug("Available Builds JSON: " + buildList);
 
             if (buildList.size() > 0) {
                 int buildLimiter = 0;
