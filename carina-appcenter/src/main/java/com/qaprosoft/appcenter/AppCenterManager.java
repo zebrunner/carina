@@ -224,7 +224,7 @@ public class AppCenterManager {
                     queryParams,
                     HttpMethod.GET);
             JsonNode buildList = restTemplate.exchange(retrieveList, JsonNode.class).getBody();
-            LOGGER.debug("Available Builds JSON: " + buildList);
+            LOGGER.info("Available Builds JSON: " + buildList);
 
             if (buildList.size() > 0) {
                 int buildLimiter = 0;
