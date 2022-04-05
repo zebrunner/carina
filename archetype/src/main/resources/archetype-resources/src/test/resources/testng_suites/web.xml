@@ -11,7 +11,6 @@
 	<parameter name="jenkinsEmail" value="demo@qaprosoft.com"/>
   
 	<parameter name="jenkinsRegressionPipeline" value="web_regression, full_regression"/>
-	<parameter name="jenkinsPipelineEnvironments" value="DEMO"/>
 
 	<parameter name="jenkinsRegressionMatrix_full_regression" value="browser: chrome; browser: firefox; browser: opera"/>
 	<parameter name="jenkinsJobExecutionOrder" value="1"/>
