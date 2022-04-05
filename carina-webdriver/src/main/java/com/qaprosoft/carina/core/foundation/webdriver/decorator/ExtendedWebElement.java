@@ -387,8 +387,8 @@ public class ExtendedWebElement implements IWebElement {
                 throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
             }
         } else {
-            // element = getDriver().findElement(by);
-            LOGGER.warn("Please, inform Carina team about this warn providing logs...");
+            // No way to remove this else piece as several projects play with this part of finder
+            //LOGGER.warn("Please, inform Carina team about this warn providing logs...");
             List <WebElement> elements = getDriver().findElements(by);
             if (!elements.isEmpty()) {
                 this.element = elements.get(0);
