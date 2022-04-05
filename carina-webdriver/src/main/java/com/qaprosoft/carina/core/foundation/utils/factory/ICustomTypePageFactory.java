@@ -141,7 +141,6 @@ public interface ICustomTypePageFactory extends IDriverPool {
         }
     }
 
-    // TODO: make it private after migration to Java 9
     /**
      * Get constructor from clazz that satisfy specific range of parameters
      * (using Reflection)
@@ -156,7 +155,7 @@ public interface ICustomTypePageFactory extends IDriverPool {
      * 			
      */
     @SuppressWarnings("unchecked")
-    default <T extends AbstractPage> Constructor<? extends T> getConstructorByParams(Class<T> clazz, Object... parameters) {
+    private <T extends AbstractPage> Constructor<? extends T> getConstructorByParams(Class<T> clazz, Object... parameters) {
         PAGEFACTORY_LOGGER.debug("Attempt to find costructor that satisfy to following parameters: " + Arrays.toString(parameters));
         Class<?>[] parametersTypes;
         List<Class<?>> parametersTypesList = new ArrayList<Class<?>>();
@@ -210,7 +209,6 @@ public interface ICustomTypePageFactory extends IDriverPool {
         return (Constructor<? extends T>) requiredCtor;
     }
 
-    // TODO: make it private after migration to Java 9
     /**
      * Method to compare primitives with corresponding wrappers
      * 
@@ -221,7 +219,7 @@ public interface ICustomTypePageFactory extends IDriverPool {
      * @return boolean
      * 			boolean result
      */
-    default boolean comparePrimitives(Object obj1, Object obj2) {
+    private boolean comparePrimitives(Object obj1, Object obj2) {
 
         switch (obj1.toString()) {
         case INT_STR:
