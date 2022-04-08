@@ -281,6 +281,10 @@ public abstract class AbstractApiMethod extends HttpClient {
     }
 
     public Response callAPI() {
+        return callAPI(new LoggingOutputStream(LOGGER, Level.INFO));
+    }
+
+    Response callAPI(LoggingOutputStream outputStream) {
 
         if (ignoreSSL) {
             ignoreSSLCerts();
@@ -293,7 +297,7 @@ public abstract class AbstractApiMethod extends HttpClient {
 
         PrintStream ps = null;
         if (logRequest || logResponse) {
-            ps = new PrintStream(new LoggingOutputStream(LOGGER, Level.INFO));
+            ps = new PrintStream(outputStream);
             initLogging(ps);
         }
 

@@ -213,6 +213,28 @@ public class APISampleTest implements IAbstractTest {
 ### Useful features
 The framework contains a list of useful features for building requests and validation of responses. It makes the support of such tests easier and at the same time minimizes the amount of test data.
 
+#### Repeating API calling with the condition
+Sometimes we should do a lot of API calls waiting for particular artifact in response. In this case, you can use `callAPIWithRetry`method in 
+`AbstractApiMethodV2` class.
+This method provides us an object of `APIMethodPoller` class. Methods of this object give us an ability to set an interval for api calling, 
+timeout, logging strategy, actions that should be executed immediately after the api calling, condition under which the
+response is considered successful, action that will be executed after all api callings.
+
+Example of using:
+```
+    @Test
+    public void testCreateUserWaitingResponseContainsAddress() {
+        PostUserMethod api = new PostUserMethod();
+        api.expectResponseStatus(HttpResponseStatusType.CREATED_201);
+
+        Optional<Response> response = api.callAPIWithRetry()
+                .withLogStrategy(APIMethodPoller.LogStrategy.LAST_ONLY)
+                .until(rs -> rs.getBody().asString().contains("address"))
+                .execute();
+        api.validateResponse();
+        Assert.assertFalse(response.isEmpty(), "Response should exists");
+    }
+```
 #### Wildcards
 In some cases, you may need to generate data in the request to make the request data unique. The best way to do this is to use wildcards for data generation:
 ```
