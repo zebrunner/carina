@@ -381,6 +381,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#repeating-api-calling-with-the-condition" class="md-nav__link">
+    Repeating API calling with the condition
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#wildcards" class="md-nav__link">
     Wildcards
   </a>
@@ -779,6 +786,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#repeating-api-calling-with-the-condition" class="md-nav__link">
+    Repeating API calling with the condition
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#wildcards" class="md-nav__link">
     Wildcards
   </a>
@@ -1110,6 +1124,27 @@ public class APISampleTest implements IAbstractTest {
 </ol>
 <h3 id="useful-features">Useful features</h3>
 <p>The framework contains a list of useful features for building requests and validation of responses. It makes the support of such tests easier and at the same time minimizes the amount of test data.</p>
+<h4 id="repeating-api-calling-with-the-condition">Repeating API calling with the condition</h4>
+<p>Sometimes we should do a lot of API calls waiting for particular artifact in response. In this case, you can use <code>callAPIWithRetry</code>method in 
+<code>AbstractApiMethodV2</code> class.
+This method provides us an object of <code>APIMethodPoller</code> class. Methods of this object give us an ability to set an interval for api calling, 
+timeout, logging strategy, actions that should be executed immediately after the api calling, condition under which the
+response is considered successful, action that will be executed after all api callings.</p>
+<p>Example of using:</p>
+<pre><code>    @Test
+    public void testCreateUserWaitingResponseContainsAddress() {
+        PostUserMethod api = new PostUserMethod();
+        api.expectResponseStatus(HttpResponseStatusType.CREATED_201);
+
+        Optional&lt;Response&gt; response = api.callAPIWithRetry()
+                .withLogStrategy(APIMethodPoller.LogStrategy.LAST_ONLY)
+                .until(rs -&gt; rs.getBody().asString().contains(&quot;address&quot;))
+                .execute();
+        api.validateResponse();
+        Assert.assertFalse(response.isEmpty(), &quot;Response should exists&quot;);
+    }
+</code></pre>
+
 <h4 id="wildcards">Wildcards</h4>
 <p>In some cases, you may need to generate data in the request to make the request data unique. The best way to do this is to use wildcards for data generation:</p>
 <pre><code>{
@@ -1125,14 +1160,15 @@ public class APISampleTest implements IAbstractTest {
     &quot;id&quot;: &quot;skip&quot;,                                           // Will skip actual value validation and just verify id key presence
     &quot;signup_date&quot;: &quot;regex:\\d{4}-\\d{2}-\\d{2}&quot;,            // Will validate date value by specified regex
     &quot;age&quot;: &quot;type:Integer&quot;,                                  // Will validate age value by specified Java type simple name
-    &quot;annual_income&quot;: &quot;ognl:#root != null &amp;&amp; #root &gt; 10&quot;,    // Will validate annual_income value using provided OGNL expression
+    &quot;annual_income&quot;: &quot;ognl:#val != null &amp;&amp; #val &gt; 10&quot;,    // Will validate annual_income value using provided OGNL expression
     &quot;created_date&quot;: &quot;predicate:isDateValid&quot;,                // Will validate created_date value by specified name of Predicate which is stored in JsonComparatorContext
 }
 </code></pre>
 
 <p><em>OGNL</em></p>
 <p>To learn about Apache Object Graph Navigation Library follow this <a href="https://commons.apache.org/proper/commons-ognl/language-guide.html">article</a>.
-Using this option you have the ability to validate a response value with expression approach. Actual value is represented as <code>#root</code>.</p>
+Using this option you have the ability to validate a response value with expression approach. Actual value is represented as <code>#val</code>.
+Also you have an access to full json tree using <code>#root</code> keyword.</p>
 <p><em>Predicate</em></p>
 <p>This approach provides the ability to validate a response value programmatically. Just create a <code>java.util.function.Predicate</code> and provide it into JsonComparatorContext:</p>
 <pre><code>    JsonComparatorContext comparatorContext = JsonComparatorContext.context()
