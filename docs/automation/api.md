@@ -220,7 +220,7 @@ This method provides us an object of `APIMethodPoller` class. Methods of this ob
 timeout, logging strategy, actions that should be executed immediately after the api calling, condition under which the
 response is considered successful, action that will be executed after all api callings.
 
-Example of using:
+[Example](https://github.com/zebrunner/carina-demo/blob/master/src/test/java/com/qaprosoft/carina/demo/APISampleTest.java) of using:
 ```
     @Test
     public void testCreateUserWaitingResponseContainsAddress() {
