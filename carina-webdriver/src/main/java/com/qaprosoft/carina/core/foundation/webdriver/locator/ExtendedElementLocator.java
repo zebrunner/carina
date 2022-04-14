@@ -84,10 +84,10 @@ public class ExtendedElementLocator implements ElementLocator {
         List<WebElement> elements = null;
         // Finding element using Selenium
         if (by != null) {
-            if (caseInsensitive && !by.toString().contains("translate(")) {
+            if (caseInsensitive) {
                 by = toCaseInsensitive(by.toString());
             }
-            
+
             //TODO: test how findElements work for web and android
             // maybe migrate to the latest appium java driver and reuse original findElement!
             elements = searchContext.findElements(by);
@@ -97,15 +97,13 @@ public class ExtendedElementLocator implements ElementLocator {
                 element = elements.get(0);
                 LOGGER.debug(elements.size() + " elements detected by: " + by.toString());
             }
-            
-        }
-        
-        // If no luck throw general NoSuchElementException
-        if (element != null) {
-            return element;
         }
 
-        throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by);
+        // If no luck throw general NoSuchElementException
+        if (element == null) {
+            throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by);
+        }
+        return element;
     }
 
     /**
