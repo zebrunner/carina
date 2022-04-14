@@ -15,12 +15,9 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.locator;
 
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Localized;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -31,9 +28,12 @@ import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Localized;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The default element locator, which will lazily locate an element or an
@@ -127,7 +127,7 @@ public class ExtendedElementLocator implements ElementLocator {
 
         return elements;
     }
-    
+
     /**
      * Transform XPath locator to case insensitive
      * 
@@ -136,36 +136,24 @@ public class ExtendedElementLocator implements ElementLocator {
      */
     public static By toCaseInsensitive(String locator) {
         String xpath = StringUtils.remove(locator, "By.xpath: ");
-        String attributePattern = "((@text|text\\(\\)|@content-desc)\\s*(\\,|\\=)\\s*(\\'|\\\")(.+?)(\\'|\\\")(\\)(\\s*\\bor\\b\\s*)?|\\]|\\)\\]))";
-        //TODO: test when xpath globally are declared inside single quota
-        
-        // @text of text() - group(2)
-        // , or = - group(3)
-        // ' or " - group(4)
-        // value - group(5)
-        // ' or " - group(6)
-        // ] or ) - group(7)
-        
-        // double translate is needed to make xpath and value case insensitive.
-        // For example on UI we have "Inscription", so with a single translate we must convert in page object all those values to lowercase
-        // double translate allow to use as is and convert everywhere
-        
-        // Expected xpath for both side translate
-        // *[translate(@text, '$U', '$l')=translate("Inscription", "inscription".UPPER, "inscription".LOWER)]
-        
-        Matcher matcher = Pattern.compile(attributePattern).matcher(xpath);
-        StringBuffer sb = new StringBuffer();
-        while (matcher.find()) {
-            String value = matcher.group(5);
-            String replacement = "translate(" + matcher.group(2) + ", " + matcher.group(4) + value.toUpperCase() + matcher.group(4) + ", " + matcher.group(4) + value.toLowerCase() + matcher.group(4) + ")" + matcher.group(3)
-                    + "translate(" + matcher.group(4) + value + matcher.group(4)+ ", " + matcher.group(4) + value.toUpperCase() + matcher.group(4) + ", " + matcher.group(4) + value.toLowerCase() + matcher.group(6)
-                    + ")" + matcher.group(7);
-            replacement = replacement.replaceAll("\\$", "\\\\\\$");
-            LOGGER.debug(replacement);
-            matcher.appendReplacement(sb, replacement);
-        }
-        matcher.appendTail(sb);
-        return By.xpath(sb.toString());
+        String attributeValuePattern = "(?<attribute>@text|text\\(\\))\\s*(\\=)\\s*((\\'|\\\")(?<value>.*?)(\\'|\\\"))";
+
+        Matcher finalMatcher = Pattern.compile(attributeValuePattern).matcher(xpath);
+
+        xpath = finalMatcher.replaceAll((matchResult) -> {
+                    String attribute = matchResult.group(1);
+                    String value = matchResult.group(5);
+
+                    return String.format("translate(%s, '%s', '%s') %s '%s'",
+                            attribute,
+                            value.toUpperCase(Locale.ROOT),
+                            value.toLowerCase(Locale.ROOT),
+                            "=",
+                            value.toLowerCase(Locale.ROOT)
+                    );
+                })
+                .replaceAll("\\$", "\\\\\\$");
+        return By.xpath(xpath);
     }
 
     public boolean isLocalized() {
