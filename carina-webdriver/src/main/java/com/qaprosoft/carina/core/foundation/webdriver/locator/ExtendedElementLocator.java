@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -134,26 +133,43 @@ public class ExtendedElementLocator implements ElementLocator {
      */
     public static By toCaseInsensitive(String locator) {
         String xpath = StringUtils.remove(locator, "By.xpath: ");
-        String attributeValuePattern = "(?<attribute>@text|text\\(\\))\\s*(\\=)\\s*((\\'|\\\")(?<value>.*?)(\\'|\\\"))";
+        String attributePattern = "((@text|text\\(\\)|@content-desc)\\s*(\\,|\\=)\\s*((['\"])((?:(?!\\5|\\\\).|\\\\.)*)\\5))";
+        //TODO: test when xpath globally are declared inside single quota
 
-        Matcher finalMatcher = Pattern.compile(attributeValuePattern).matcher(xpath);
+        // @text or text() or @content-desc [group(2)]
+        // , or =  [group(3)]
+        // ' or " - [group(5)]
+        // value - group(6)
+        // ' or " - group(5)
+        // ] or ) - group(7)
 
-        xpath = finalMatcher.replaceAll((matchResult) -> {
-                    String attribute = matchResult.group(1);
-                    String value = matchResult.group(5);
+        // double translate is needed to make xpath and value case insensitive.
+        // For example on UI we have "Inscription", so with a single translate we must convert in page object all those values to lowercase
+        // double translate allow to use as is and convert everywhere
 
-                    return String.format("translate(%s, '%s', '%s') %s '%s'",
-                            attribute,
-                            value.toUpperCase(Locale.ROOT),
-                            value.toLowerCase(Locale.ROOT),
-                            "=",
-                            value.toLowerCase(Locale.ROOT)
-                    );
-                })
-                .replaceAll("\\$", "\\\\\\$");
-        return By.xpath(xpath);
+        // Expected xpath for both side translate
+        // *[translate(@text, '$U', '$l')=translate("Inscription", "inscription".UPPER, "inscription".LOWER)]
+
+        Matcher matcher = Pattern.compile(attributePattern).matcher(xpath);
+        StringBuffer sb = new StringBuffer();
+        while (matcher.find()) {
+            String attribute = matcher.group(2);
+            String value = matcher.group(6);
+            String quote = matcher.group(5);
+            String delimiter = matcher.group(3);
+            String replacement =
+                    "translate(" + attribute + ", " + quote + value.toUpperCase() + quote + ", " + quote
+                            + value.toLowerCase() + quote + ")" + delimiter
+                            + "translate(" + quote + value + quote + ", " + quote + value.toUpperCase()
+                            + quote + ", " + quote + value.toLowerCase() + quote
+                            + ")";
+            replacement = replacement.replaceAll("\\$", "\\\\\\$");
+            LOGGER.debug(replacement);
+            matcher.appendReplacement(sb, replacement);
+        }
+        matcher.appendTail(sb);
+        return By.xpath(sb.toString());
     }
-
     public boolean isLocalized() {
         return localized;
     }
