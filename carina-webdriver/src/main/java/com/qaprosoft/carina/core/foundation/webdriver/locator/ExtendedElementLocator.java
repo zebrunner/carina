@@ -83,7 +83,8 @@ public class ExtendedElementLocator implements ElementLocator {
         List<WebElement> elements = null;
         // Finding element using Selenium
         if (by != null) {
-            if (caseInsensitive) {
+            // convert only locators that are xpath
+            if (caseInsensitive && by.toString().matches("^By.xpath:.*?")) {
                 by = toCaseInsensitive(by.toString());
             }
 
