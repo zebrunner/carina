@@ -26,7 +26,7 @@ public class CaseInsensitiveTest {
     	String xpath = "//android.widget.Button[@text = 'Text text']";
     	By expectedRes = By.xpath("//android.widget.Button[translate(@text, 'TEXT TEXT', 'text text')=translate('Text text', 'TEXT TEXT', 'text text')]");
     	
-    	By result = ExtendedElementLocator.toCaseInsensitive(xpath);
+    	By result = ExtendedElementLocator.xpathToCaseInsensitive(xpath);
         Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
     }
     
@@ -35,7 +35,7 @@ public class CaseInsensitiveTest {
     	String xpath = "//div[text() = 'Text text']";
     	By expectedRes = By.xpath("//div[translate(text(), 'TEXT TEXT', 'text text')=translate('Text text', 'TEXT TEXT', 'text text')]");
     	
-    	By result = ExtendedElementLocator.toCaseInsensitive(xpath);
+    	By result = ExtendedElementLocator.xpathToCaseInsensitive(xpath);
         Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
     }
     
@@ -44,7 +44,7 @@ public class CaseInsensitiveTest {
     	String xpath = "//android.widget.Button[@text = \"Text text\"]";
     	By expectedRes = By.xpath("//android.widget.Button[translate(@text, \"TEXT TEXT\", \"text text\")=translate(\"Text text\", \"TEXT TEXT\", \"text text\")]");
     	
-    	By result = ExtendedElementLocator.toCaseInsensitive(xpath);
+    	By result = ExtendedElementLocator.xpathToCaseInsensitive(xpath);
         Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
     }
     
@@ -53,7 +53,7 @@ public class CaseInsensitiveTest {
     	String xpath = "//div[text() = \"Text text\"]";
     	By expectedRes = By.xpath("//div[translate(text(), \"TEXT TEXT\", \"text text\")=translate(\"Text text\", \"TEXT TEXT\", \"text text\")]");
     	
-    	By result = ExtendedElementLocator.toCaseInsensitive(xpath);
+    	By result = ExtendedElementLocator.xpathToCaseInsensitive(xpath);
         Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
     }
     
@@ -62,7 +62,7 @@ public class CaseInsensitiveTest {
     	String xpath = "//android.widget.Button[contains(@text, 'Text text')]";
     	By expectedRes = By.xpath("//android.widget.Button[contains(translate(@text, 'TEXT TEXT', 'text text'),translate('Text text', 'TEXT TEXT', 'text text'))]");
     	
-    	By result = ExtendedElementLocator.toCaseInsensitive(xpath);
+    	By result = ExtendedElementLocator.xpathToCaseInsensitive(xpath);
         Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
     }
     
@@ -71,7 +71,7 @@ public class CaseInsensitiveTest {
     	String xpath = "//div[contains(text(), 'Text text')]";
     	By expectedRes = By.xpath("//div[contains(translate(text(), 'TEXT TEXT', 'text text'),translate('Text text', 'TEXT TEXT', 'text text'))]");
     	
-    	By result = ExtendedElementLocator.toCaseInsensitive(xpath);
+    	By result = ExtendedElementLocator.xpathToCaseInsensitive(xpath);
         Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
     }
     
@@ -80,7 +80,7 @@ public class CaseInsensitiveTest {
     	String xpath = "//android.widget.Button[contains(@text, \"Text text\")]";
     	By expectedRes = By.xpath("//android.widget.Button[contains(translate(@text, \"TEXT TEXT\", \"text text\"),translate(\"Text text\", \"TEXT TEXT\", \"text text\"))]");
     	
-    	By result = ExtendedElementLocator.toCaseInsensitive(xpath);
+    	By result = ExtendedElementLocator.xpathToCaseInsensitive(xpath);
         Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
     }
     
@@ -89,7 +89,7 @@ public class CaseInsensitiveTest {
     	String xpath = "//div[contains(text(), \"Text text\")]";
     	By expectedRes = By.xpath("//div[contains(translate(text(), \"TEXT TEXT\", \"text text\"),translate(\"Text text\", \"TEXT TEXT\", \"text text\"))]");
     	
-    	By result = ExtendedElementLocator.toCaseInsensitive(xpath);
+    	By result = ExtendedElementLocator.xpathToCaseInsensitive(xpath);
         Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
     }
     
@@ -98,7 +98,7 @@ public class CaseInsensitiveTest {
     	String xpath = "//android.widget.Button[contains(@text, \"Text's text\")]";
     	By expectedRes = By.xpath("//android.widget.Button[contains(translate(@text, \"TEXT'S TEXT\", \"text's text\"),translate(\"Text's text\", \"TEXT'S TEXT\", \"text's text\"))]");
     	
-    	By result = ExtendedElementLocator.toCaseInsensitive(xpath);
+    	By result = ExtendedElementLocator.xpathToCaseInsensitive(xpath);
         Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
     }
     
@@ -107,7 +107,7 @@ public class CaseInsensitiveTest {
     	String xpath = "//div[contains(text(), \"Text's text\")]";
     	By expectedRes = By.xpath("//div[contains(translate(text(), \"TEXT'S TEXT\", \"text's text\"),translate(\"Text's text\", \"TEXT'S TEXT\", \"text's text\"))]");
     	
-    	By result = ExtendedElementLocator.toCaseInsensitive(xpath);
+    	By result = ExtendedElementLocator.xpathToCaseInsensitive(xpath);
         Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
     }
 
@@ -116,7 +116,7 @@ public class CaseInsensitiveTest {
         String xpath = "//android.widget.Button[@text = 'Text text$169,90']";
         By expectedRes = By.xpath("//android.widget.Button[translate(@text, 'TEXT TEXT$169,90', 'text text$169,90')=translate('Text text$169,90', 'TEXT TEXT$169,90', 'text text$169,90')]");
 
-        By result = ExtendedElementLocator.toCaseInsensitive(xpath);
+        By result = ExtendedElementLocator.xpathToCaseInsensitive(xpath);
         Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
     }
 
@@ -125,7 +125,7 @@ public class CaseInsensitiveTest {
         String xpath = "//div[text() = 'Text text$169,90']";
         By expectedRes = By.xpath("//div[translate(text(), 'TEXT TEXT$169,90', 'text text$169,90')=translate('Text text$169,90', 'TEXT TEXT$169,90', 'text text$169,90')]");
 
-        By result = ExtendedElementLocator.toCaseInsensitive(xpath);
+        By result = ExtendedElementLocator.xpathToCaseInsensitive(xpath);
         Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
     }
 
@@ -134,7 +134,7 @@ public class CaseInsensitiveTest {
         String xpath = "//android.widget.Button[@text = \"Text text$169,90\"]";
         By expectedRes = By.xpath("//android.widget.Button[translate(@text, \"TEXT TEXT$169,90\", \"text text$169,90\")=translate(\"Text text$169,90\", \"TEXT TEXT$169,90\", \"text text$169,90\")]");
 
-        By result = ExtendedElementLocator.toCaseInsensitive(xpath);
+        By result = ExtendedElementLocator.xpathToCaseInsensitive(xpath);
         Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
     }
 
@@ -143,7 +143,7 @@ public class CaseInsensitiveTest {
         String xpath = "//div[text() = \"Text text$169,90\"]";
         By expectedRes = By.xpath("//div[translate(text(), \"TEXT TEXT$169,90\", \"text text$169,90\")=translate(\"Text text$169,90\", \"TEXT TEXT$169,90\", \"text text$169,90\")]");
 
-        By result = ExtendedElementLocator.toCaseInsensitive(xpath);
+        By result = ExtendedElementLocator.xpathToCaseInsensitive(xpath);
         Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
     }
     
@@ -152,7 +152,7 @@ public class CaseInsensitiveTest {
     	String xpath = "//android.widget.LinearLayout[./android.widget.TextView[contains(@text, 'Text text')]]//*[contains(@resource-id, 'id/someId')]";
     	By expectedRes = By.xpath("//android.widget.LinearLayout[./android.widget.TextView[contains(translate(@text, 'TEXT TEXT', 'text text'),translate('Text text', 'TEXT TEXT', 'text text'))]]//*[contains(@resource-id, 'id/someId')]");
     	
-    	By result = ExtendedElementLocator.toCaseInsensitive(xpath);
+    	By result = ExtendedElementLocator.xpathToCaseInsensitive(xpath);
         Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
     }
     
@@ -161,7 +161,7 @@ public class CaseInsensitiveTest {
     	String xpath = "//div[@class = 'someClass']/../..//h5[contains(text(), 'Text text')]//span[contains(@class, 'someClass')]";
     	By expectedRes = By.xpath("//div[@class = 'someClass']/../..//h5[contains(translate(text(), 'TEXT TEXT', 'text text'),translate('Text text', 'TEXT TEXT', 'text text'))]//span[contains(@class, 'someClass')]");
     	
-    	By result = ExtendedElementLocator.toCaseInsensitive(xpath);
+    	By result = ExtendedElementLocator.xpathToCaseInsensitive(xpath);
         Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
     }
     
@@ -170,7 +170,7 @@ public class CaseInsensitiveTest {
     	String xpath = "//android.widget.LinearLayout[./android.widget.TextView[contains(@text, \"Text's text\")]]//*[contains(@resource-id, 'id/someId')]";
     	By expectedRes = By.xpath("//android.widget.LinearLayout[./android.widget.TextView[contains(translate(@text, \"TEXT'S TEXT\", \"text's text\"),translate(\"Text's text\", \"TEXT'S TEXT\", \"text's text\"))]]//*[contains(@resource-id, 'id/someId')]");
     	
-    	By result = ExtendedElementLocator.toCaseInsensitive(xpath);
+    	By result = ExtendedElementLocator.xpathToCaseInsensitive(xpath);
         Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
     }
     
@@ -179,7 +179,7 @@ public class CaseInsensitiveTest {
     	String xpath = "//div[@class = 'someClass']/../..//h5[contains(text(), \"Text's text\")]//span[contains(@class, 'someClass')]";
     	By expectedRes = By.xpath("//div[@class = 'someClass']/../..//h5[contains(translate(text(), \"TEXT'S TEXT\", \"text's text\"),translate(\"Text's text\", \"TEXT'S TEXT\", \"text's text\"))]//span[contains(@class, 'someClass')]");
     	
-    	By result = ExtendedElementLocator.toCaseInsensitive(xpath);
+    	By result = ExtendedElementLocator.xpathToCaseInsensitive(xpath);
         Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
     }
     
@@ -191,7 +191,7 @@ public class CaseInsensitiveTest {
     			+ " or contains(translate(@text, 'SOME', 'some'),translate('Some', 'SOME', 'some'))"
     			+ " or contains(translate(@text, '{L10N:ANY}', '{l10n:any}'),translate('{L10N:Any}', '{L10N:ANY}', '{l10n:any}'))]");
     	
-    	By result = ExtendedElementLocator.toCaseInsensitive(xpath);
+    	By result = ExtendedElementLocator.xpathToCaseInsensitive(xpath);
         Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
     }
     
@@ -200,7 +200,7 @@ public class CaseInsensitiveTest {
     	String xpath = "//*[@content-desc=\"{L10N:anySelect}\"]";
     	By expectedRes = By.xpath("//*[translate(@content-desc, \"{L10N:ANYSELECT}\", \"{l10n:anyselect}\")=translate(\"{L10N:anySelect}\", \"{L10N:ANYSELECT}\", \"{l10n:anyselect}\")]");
     	
-    	By result = ExtendedElementLocator.toCaseInsensitive(xpath);
+    	By result = ExtendedElementLocator.xpathToCaseInsensitive(xpath);
         Assert.assertEquals(result, expectedRes, "Incorrect converting to caseinsensitive xpath!");
     }
 

@@ -427,7 +427,7 @@ public class ExtendedWebElement implements IWebElement {
     public By getBy() {
         By value = by;
         if (caseInsensitive) {
-            value = ExtendedElementLocator.toCaseInsensitive(by.toString());
+            value = ExtendedElementLocator.xpathToCaseInsensitive(by.toString());
         }
         return value;
     }
@@ -1148,7 +1148,7 @@ public class ExtendedWebElement implements IWebElement {
                 by = By.xpath(locator);
             } else {
                 // return by using toCaseInsensitive(locator) method. To avoid double By.xpath during formatting
-                by = ExtendedElementLocator.toCaseInsensitive(locator);
+                by = ExtendedElementLocator.xpathToCaseInsensitive(locator);
             }
         }
         
