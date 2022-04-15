@@ -133,15 +133,8 @@ public class ExtendedElementLocator implements ElementLocator {
      */
     public static By toCaseInsensitive(String locator) {
         String xpath = StringUtils.remove(locator, "By.xpath: ");
-        String attributePattern = "((@text|text\\(\\)|@content-desc)\\s*(\\,|\\=)\\s*((['\"])((?:(?!\\5|\\\\).|\\\\.)*)\\5))";
+        String attributePattern = "(?<!(translate\\())((@text|text\\(\\)|@content-desc)\\s*(\\,|\\=)\\s*((['\"])((?:(?!\\6|\\\\).|\\\\.)*)\\6))";
         //TODO: test when xpath globally are declared inside single quota
-
-        // @text or text() or @content-desc [group(2)]
-        // , or =  [group(3)]
-        // ' or " - [group(5)]
-        // value - group(6)
-        // ' or " - group(5)
-        // ] or ) - group(7)
 
         // double translate is needed to make xpath and value case insensitive.
         // For example on UI we have "Inscription", so with a single translate we must convert in page object all those values to lowercase
@@ -151,12 +144,12 @@ public class ExtendedElementLocator implements ElementLocator {
         // *[translate(@text, '$U', '$l')=translate("Inscription", "inscription".UPPER, "inscription".LOWER)]
 
         Matcher matcher = Pattern.compile(attributePattern).matcher(xpath);
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         while (matcher.find()) {
-            String attribute = matcher.group(2);
-            String value = matcher.group(6);
-            String quote = matcher.group(5);
-            String delimiter = matcher.group(3);
+            String attribute = matcher.group(3);            // @text or text()
+            String value = matcher.group(7);                //  'some text' or "some text"
+            String quote = matcher.group(6);                // ' or "
+            String delimiter = matcher.group(4);            // , or =
             String replacement =
                     "translate(" + attribute + ", " + quote + value.toUpperCase() + quote + ", " + quote
                             + value.toLowerCase() + quote + ")" + delimiter
@@ -170,6 +163,7 @@ public class ExtendedElementLocator implements ElementLocator {
         matcher.appendTail(sb);
         return By.xpath(sb.toString());
     }
+
     public boolean isLocalized() {
         return localized;
     }
@@ -179,3 +173,4 @@ public class ExtendedElementLocator implements ElementLocator {
     }
 
 }
+
