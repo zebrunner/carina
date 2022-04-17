@@ -155,7 +155,7 @@ public interface ICustomTypePageFactory extends IDriverPool {
      * 			
      */
     @SuppressWarnings("unchecked")
-    private <T extends AbstractPage> Constructor<? extends T> getConstructorByParams(Class<T> clazz, Object... parameters) {
+    default <T extends AbstractPage> Constructor<? extends T> getConstructorByParams(Class<T> clazz, Object... parameters) {
         PAGEFACTORY_LOGGER.debug("Attempt to find costructor that satisfy to following parameters: " + Arrays.toString(parameters));
         Class<?>[] parametersTypes;
         List<Class<?>> parametersTypesList = new ArrayList<Class<?>>();
@@ -219,7 +219,7 @@ public interface ICustomTypePageFactory extends IDriverPool {
      * @return boolean
      * 			boolean result
      */
-    private boolean comparePrimitives(Object obj1, Object obj2) {
+    default boolean comparePrimitives(Object obj1, Object obj2) {
 
         switch (obj1.toString()) {
         case INT_STR:
