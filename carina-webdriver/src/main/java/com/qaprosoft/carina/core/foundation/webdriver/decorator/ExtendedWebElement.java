@@ -427,22 +427,22 @@ public class ExtendedWebElement implements IWebElement {
 
         if (caseInsensitive) {
             // trying to get part of locator that gives information of it's type
-
             String locator = by.toString();
+
             if (locator.startsWith("By.xpath:")) {
-                return ExtendedElementLocator.xpathToCaseInsensitive(by.toString());
+                value = ExtendedElementLocator.xpathToCaseInsensitive(by.toString());
             }
 
             if (locator.startsWith("By.id:")) {
-                return ExtendedElementLocator.idToXpathCaseInsensitive(by.toString());
+                value = ExtendedElementLocator.idToXpathCaseInsensitive(by.toString());
             }
 
             if (locator.startsWith("By.name:")) {
-                return ExtendedElementLocator.nameToXpathCaseInsensitive(by.toString());
+                value = ExtendedElementLocator.nameToXpathCaseInsensitive(by.toString());
             }
 
-            if (locator.startsWith("linkText:")) {
-                return ExtendedElementLocator.linkTextToXpathCaseInsensitive(by.toString());
+            if (locator.startsWith("By.linkText:")) {
+                value = ExtendedElementLocator.linkTextToXpathCaseInsensitive(by.toString());
             }
         }
         return value;
@@ -1175,13 +1175,13 @@ public class ExtendedWebElement implements IWebElement {
             }
         }
 
-        if (locator.startsWith("linkText:")) {
+        if (locator.startsWith("By.linkText:")) {
             if (caseInsensitive) {
                 // return by using toCaseInsensitive(locator) method. To avoid double By.xpath during formatting
                 by = ExtendedElementLocator.linkTextToXpathCaseInsensitive(locator);
             } else {
                 // generate xpath from locator string
-                by = By.xpath(String.format(StringUtils.remove(locator, "linkText: "), objects));
+                by = By.xpath(String.format(StringUtils.remove(locator, "By.linkText: "), objects));
             }
         }
 
@@ -1203,7 +1203,7 @@ public class ExtendedWebElement implements IWebElement {
         if (locator.startsWith("By.IosClassChain: **")) {
             by = MobileBy.iOSClassChain(String.format(StringUtils.remove(locator, "By.IosClassChain: "), objects));
         }
-        
+
         if (locator.startsWith("By.IosNsPredicate: **")) {
             by = MobileBy.iOSNsPredicateString(String.format(StringUtils.remove(locator, "By.IosNsPredicate: "), objects));
         }
@@ -1211,7 +1211,7 @@ public class ExtendedWebElement implements IWebElement {
         if (locator.startsWith("By.AccessibilityId: ")) {
             by = MobileBy.AccessibilityId(String.format(StringUtils.remove(locator, "By.AccessibilityId: "), objects));
         }
-        
+
         if (locator.startsWith("By.Image: ")) {
             String formattedLocator = String.format(StringUtils.remove(locator, "By.Image: "), objects);
             Path path = Paths.get(formattedLocator);
@@ -1231,6 +1231,7 @@ public class ExtendedWebElement implements IWebElement {
             by = MobileBy.AndroidUIAutomator(String.format(StringUtils.remove(locator, "By.AndroidUIAutomator: "), objects));
             LOGGER.debug("Formatted locator is : " + by.toString());
         }
+
         return new ExtendedWebElement(by, name, this.driver, this.searchContext, objects);
     }
 
