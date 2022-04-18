@@ -77,7 +77,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ExtendedWebElement implements IWebElement {
@@ -428,23 +427,22 @@ public class ExtendedWebElement implements IWebElement {
 
         if (caseInsensitive) {
             // trying to get part of locator that gives information of it's type
-            Pattern locatorStartsWithPattern = Pattern.compile("^By\\.(.*?):");
-            Matcher locatorStartsWithMatcher = locatorStartsWithPattern.matcher(by.toString());
-            switch (locatorStartsWithMatcher.group(1)) {
-            case "xpath":
-                value = ExtendedElementLocator.xpathToCaseInsensitive(by.toString());
-                break;
-            case "id":
-                value = ExtendedElementLocator.idToXpathCaseInsensitive(by.toString());
-                break;
-            case "name":
-                value = ExtendedElementLocator.nameToXpathCaseInsensitive(by.toString());
-                break;
-            case "linkText":
-                value = ExtendedElementLocator.linkTextToXpathCaseInsensitive(by.toString());
-                break;
-            default:
-                throw new NoSuchElementException("There are no handler for locator: " + by.toString());
+
+            String locator = by.toString();
+            if (locator.startsWith("By.xpath:")) {
+                return ExtendedElementLocator.xpathToCaseInsensitive(by.toString());
+            }
+
+            if (locator.startsWith("By.id:")) {
+                return ExtendedElementLocator.idToXpathCaseInsensitive(by.toString());
+            }
+
+            if (locator.startsWith("By.name:")) {
+                return ExtendedElementLocator.nameToXpathCaseInsensitive(by.toString());
+            }
+
+            if (locator.startsWith("linkText:")) {
+                return ExtendedElementLocator.linkTextToXpathCaseInsensitive(by.toString());
             }
         }
         return value;
@@ -1151,48 +1149,39 @@ public class ExtendedWebElement implements IWebElement {
         String locator = by.toString();
         By by = null;
 
-        if (locator.startsWith("By.id: ")) {
-            locator = String.format(StringUtils.remove(locator, "By.id: "), objects);
-
-            if (!caseInsensitive) {
-                by = By.id(locator);
-            } else {
+        if (locator.startsWith("By.id:")) {
+            if (caseInsensitive) {
                 by = ExtendedElementLocator.idToXpathCaseInsensitive(locator);
+            } else {
+                by = By.id(String.format(StringUtils.remove(locator, "By.id: "), objects));
             }
-
         }
 
-        if (locator.startsWith("By.name: ")) {
-            locator = String.format(StringUtils.remove(locator, "By.name: "), objects);
-
-            if (!caseInsensitive) {
-                by = By.id(locator);
-            } else {
+        if (locator.startsWith("By.name:")) {
+            if (caseInsensitive) {
                 by = ExtendedElementLocator.nameToXpathCaseInsensitive(locator);
+            } else {
+                by = By.id(String.format(StringUtils.remove(locator, "By.name: "), objects));
             }
         }
 
-        if (locator.startsWith("By.xpath: ")) {
-            locator = String.format(StringUtils.remove(locator, "By.xpath: "), objects);
-
-            if (!caseInsensitive) {
-                // generate xpath from locator string
-                by = By.xpath(locator);
-            } else {
+        if (locator.startsWith("By.xpath:")) {
+            if (caseInsensitive) {
                 // return by using toCaseInsensitive(locator) method. To avoid double By.xpath during formatting
                 by = ExtendedElementLocator.xpathToCaseInsensitive(locator);
+            } else {
+                // generate xpath from locator string
+                by = By.xpath(String.format(StringUtils.remove(locator, "By.xpath: "), objects));
             }
         }
-        
-        if (locator.startsWith("linkText: ")) {
-            locator = String.format(StringUtils.remove(locator, "linkText: "), objects);
 
-            if (!caseInsensitive) {
-                // generate xpath from locator string
-                by = By.xpath(locator);
-            } else {
+        if (locator.startsWith("linkText:")) {
+            if (caseInsensitive) {
                 // return by using toCaseInsensitive(locator) method. To avoid double By.xpath during formatting
                 by = ExtendedElementLocator.linkTextToXpathCaseInsensitive(locator);
+            } else {
+                // generate xpath from locator string
+                by = By.xpath(String.format(StringUtils.remove(locator, "linkText: "), objects));
             }
         }
 

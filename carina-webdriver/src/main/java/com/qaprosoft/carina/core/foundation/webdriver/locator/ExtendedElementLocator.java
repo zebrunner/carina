@@ -82,26 +82,19 @@ public class ExtendedElementLocator implements ElementLocator {
         WebElement element = null;
         List<WebElement> elements = null;
         // Finding element using Selenium
+
         if (by != null) {
             if (caseInsensitive) {
-                // trying to get part of locator that gives information of it's type
-                Pattern locatorStartsWithPattern = Pattern.compile("^By\\.(.*?):");
-                Matcher locatorStartsWithMatcher = locatorStartsWithPattern.matcher(by.toString());
-                switch (locatorStartsWithMatcher.group(1)) {
-                case "xpath":
-                    by = xpathToCaseInsensitive(by.toString());
-                    break;
-                case "id":
-                    by = idToXpathCaseInsensitive(by.toString());
-                    break;
-                case "name":
-                    by = nameToXpathCaseInsensitive(by.toString());
-                    break;
-                case "linkText":
-                    by = linkTextToXpathCaseInsensitive(by.toString());
-                    break;
-                default:
-                    throw new NoSuchElementException("There are no handler for locator: " + by.toString());
+                String locator = by.toString();
+
+                if (locator.startsWith("By.xpath:")) {
+                    by = xpathToCaseInsensitive(locator);
+                } else if (locator.startsWith("By.id:")) {
+                    by = idToXpathCaseInsensitive(locator);
+                } else if (locator.startsWith("By.name:")) {
+                    by = nameToXpathCaseInsensitive(locator);
+                } else if (locator.startsWith("linkText:")) {
+                    by = linkTextToXpathCaseInsensitive(locator);
                 }
             }
 
@@ -193,8 +186,8 @@ public class ExtendedElementLocator implements ElementLocator {
         StringBuilder sb = new StringBuilder();
         while (matcher.find()) {
             String attribute = "@id";
-            String value = matcher.group(2);                //  'some text' or "some text"
-            String quote = matcher.group(1);                // ' or "
+            String value = matcher.group(0);                //  'some text' or "some text"
+            String quote = "'";                // ' or "
             String delimiter = "=";
             String replacement =
                     "//*[translate(" + attribute + ", " + quote + value.toUpperCase() + quote + ", " + quote
@@ -220,8 +213,8 @@ public class ExtendedElementLocator implements ElementLocator {
         StringBuilder sb = new StringBuilder();
         while (matcher.find()) {
             String attribute = "@name";
-            String value = matcher.group(2);                //  'some text' or "some text"
-            String quote = matcher.group(1);                // ' or "
+            String value = matcher.group(0);                //  'some text' or "some text"
+            String quote = "'";                // ' or "
             String delimiter = "=";
             String replacement =
                     "//*[translate(" + attribute + ", " + quote + value.toUpperCase() + quote + ", " + quote
@@ -240,15 +233,15 @@ public class ExtendedElementLocator implements ElementLocator {
 
     public static By linkTextToXpathCaseInsensitive(String locator) {
         LOGGER.debug("link  locator before converting: " + locator);
-        String xpath = StringUtils.remove(locator, "By.linkText: ");
+        String xpath = StringUtils.remove(locator, "linkText: ");
         String attributePattern = ".*";
 
         Matcher matcher = Pattern.compile(attributePattern).matcher(xpath);
         StringBuilder sb = new StringBuilder();
         while (matcher.find()) {
             String attribute = "text()";
-            String value = matcher.group(2);                //  'some text' or "some text"
-            String quote = matcher.group(1);                // ' or "
+            String value = matcher.group(0);                //  'some text' or "some text"
+            String quote = "'";                // ' or "
             String delimiter = ",";
             String replacement =
                     "//a[contains(translate(" + attribute + ", " + quote + value.toUpperCase() + quote + ", " + quote
