@@ -103,7 +103,6 @@ public class ExtendedElementLocator implements ElementLocator {
                 default:
                     throw new NoSuchElementException("There are no handler for locator: " + by.toString());
                 }
-                caseInsensitive = false;
             }
 
             //TODO: test how findElements work for web and android

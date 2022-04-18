@@ -15,24 +15,22 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.decorator;
 
-import java.io.IOException;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Proxy;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
-
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
+import com.qaprosoft.carina.core.foundation.exception.DriverPoolException;
+import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.IWebElement;
+import com.qaprosoft.carina.core.foundation.utils.Messager;
+import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
+import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
+import com.sun.jersey.core.util.Base64;
+import io.appium.java_client.MobileBy;
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
@@ -63,23 +61,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
-import com.qaprosoft.carina.core.foundation.exception.DriverPoolException;
-import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.IWebElement;
-import com.qaprosoft.carina.core.foundation.utils.Messager;
-import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
-import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
-import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
-import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
-import com.sun.jersey.core.util.Base64;
-
-import io.appium.java_client.MobileBy;
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ExtendedWebElement implements IWebElement {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -426,8 +425,27 @@ public class ExtendedWebElement implements IWebElement {
      */
     public By getBy() {
         By value = by;
+
         if (caseInsensitive) {
-            value = ExtendedElementLocator.xpathToCaseInsensitive(by.toString());
+            // trying to get part of locator that gives information of it's type
+            Pattern locatorStartsWithPattern = Pattern.compile("^By\\.(.*?):");
+            Matcher locatorStartsWithMatcher = locatorStartsWithPattern.matcher(by.toString());
+            switch (locatorStartsWithMatcher.group(1)) {
+            case "xpath":
+                value = ExtendedElementLocator.xpathToCaseInsensitive(by.toString());
+                break;
+            case "id":
+                value = ExtendedElementLocator.idToXpathCaseInsensitive(by.toString());
+                break;
+            case "name":
+                value = ExtendedElementLocator.nameToXpathCaseInsensitive(by.toString());
+                break;
+            case "linkText":
+                value = ExtendedElementLocator.linkTextToXpathCaseInsensitive(by.toString());
+                break;
+            default:
+                throw new NoSuchElementException("There are no handler for locator: " + by.toString());
+            }
         }
         return value;
     }
@@ -1134,15 +1152,29 @@ public class ExtendedWebElement implements IWebElement {
         By by = null;
 
         if (locator.startsWith("By.id: ")) {
-            by = By.id(String.format(StringUtils.remove(locator, "By.id: "), objects));
+            locator = String.format(StringUtils.remove(locator, "By.id: "), objects);
+
+            if (!caseInsensitive) {
+                by = By.id(locator);
+            } else {
+                by = ExtendedElementLocator.idToXpathCaseInsensitive(locator);
+            }
+
         }
 
         if (locator.startsWith("By.name: ")) {
-            by = By.name(String.format(StringUtils.remove(locator, "By.name: "), objects));
+            locator = String.format(StringUtils.remove(locator, "By.name: "), objects);
+
+            if (!caseInsensitive) {
+                by = By.id(locator);
+            } else {
+                by = ExtendedElementLocator.nameToXpathCaseInsensitive(locator);
+            }
         }
 
         if (locator.startsWith("By.xpath: ")) {
             locator = String.format(StringUtils.remove(locator, "By.xpath: "), objects);
+
             if (!caseInsensitive) {
                 // generate xpath from locator string
                 by = By.xpath(locator);
@@ -1153,7 +1185,15 @@ public class ExtendedWebElement implements IWebElement {
         }
         
         if (locator.startsWith("linkText: ")) {
-            by = By.linkText(String.format(StringUtils.remove(locator, "linkText: "), objects));
+            locator = String.format(StringUtils.remove(locator, "linkText: "), objects);
+
+            if (!caseInsensitive) {
+                // generate xpath from locator string
+                by = By.xpath(locator);
+            } else {
+                // return by using toCaseInsensitive(locator) method. To avoid double By.xpath during formatting
+                by = ExtendedElementLocator.linkTextToXpathCaseInsensitive(locator);
+            }
         }
 
         if (locator.startsWith("partialLinkText: ")) {
