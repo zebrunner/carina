@@ -18,7 +18,6 @@ package com.qaprosoft.carina.core.foundation.webdriver.locator;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Localized;
-import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
@@ -31,8 +30,6 @@ import org.slf4j.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * The default element locator, which will lazily locate an element or an
@@ -67,8 +64,10 @@ public class ExtendedElementLocator implements ElementLocator {
             LocalizedAnnotations annotations = new LocalizedAnnotations(field);
             this.by = annotations.buildBy();
             if (field.isAnnotationPresent(CaseInsensitiveXPath.class)) {
-                this.caseInsensitive = true;
+                caseInsensitive = true;
+                by = LocatorConverter.toCaseInsensitive(by);
             }
+
             if (field.isAnnotationPresent(Localized.class)) {
                 this.localized = true;
             }
@@ -79,42 +78,23 @@ public class ExtendedElementLocator implements ElementLocator {
      * Find the element.
      */
     public WebElement findElement() {
-        WebElement element = null;
-        List<WebElement> elements = null;
-        // Finding element using Selenium
-        if (by != null) {
-            if (caseInsensitive) {
-                String locator = by.toString();
 
-                if (locator.startsWith("By.xpath:")) {
-                    by = xpathToCaseInsensitive(locator);
-                }
-
-                if (locator.startsWith("By.id:")) {
-                    by = idToXpathCaseInsensitive(locator);
-                }
-
-                if (locator.startsWith("By.name:")) {
-                    by = nameToXpathCaseInsensitive(locator);
-                }
-
-                if (locator.startsWith("linkText:")) {
-                    by = linkTextToXpathCaseInsensitive(locator);
-                }
-            }
-
-            //TODO: test how findElements work for web and android
-            // maybe migrate to the latest appium java driver and reuse original findElement!
-            elements = searchContext.findElements(by);
-            if (elements.size() == 1) {
-                element = elements.get(0);
-            } else if (elements.size() > 1) {
-                element = elements.get(0);
-                LOGGER.debug(elements.size() + " elements detected by: " + by.toString());
-            }
+        if (by == null) {
+            throw new RuntimeException("By cannot be null");        // todo change to informative exception
         }
 
-        // If no luck throw general NoSuchElementException
+        //TODO: test how findElements work for web and android
+        // maybe migrate to the latest appium java driver and reuse original findElement!
+        List<WebElement> elements = searchContext.findElements(by);
+
+        WebElement element = null;
+        if (elements.size() == 1) {
+            element = elements.get(0);
+        } else if (elements.size() > 1) {
+            element = elements.get(0);
+            LOGGER.debug(elements.size() + " elements detected by: " + by.toString());
+        }
+
         if (element == null) {
             throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by);
         }
@@ -133,7 +113,6 @@ public class ExtendedElementLocator implements ElementLocator {
             LOGGER.debug("Unable to find elements: " + e.getMessage());
         }
 
-        // If no luck throw general NoSuchElementException
         if (elements == null) {
             throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
         }
@@ -141,143 +120,16 @@ public class ExtendedElementLocator implements ElementLocator {
         return elements;
     }
 
-    /**
-     * Transform XPath locator to case insensitive
-     *
-     * @param locator - locator as a String
-     * @return By
-     */
-    public static By xpathToCaseInsensitive(String locator) {
-        LOGGER.debug("xpath before converting: " + locator);
-        String xpath = StringUtils.remove(locator, "By.xpath: ");
-        String attributePattern = "(?<!(translate\\())((@text|text\\(\\)|@content-desc)\\s*(\\,|\\=)\\s*((['\"])((?:(?!\\6|\\\\).|\\\\.)*)\\6))";
-        //TODO: test when xpath globally are declared inside single quota
-
-        // double translate is needed to make xpath and value case insensitive.
-        // For example on UI we have "Inscription", so with a single translate we must convert in page object all those values to lowercase
-        // double translate allow to use as is and convert everywhere
-
-        // Expected xpath for both side translate
-        // *[translate(@text, '$U', '$l')=translate("Inscription", "inscription".UPPER, "inscription".LOWER)]
-
-        Matcher matcher = Pattern.compile(attributePattern).matcher(xpath);
-        StringBuilder sb = new StringBuilder();
-
-        while (matcher.find()) {
-            String attribute = matcher.group(3);            // @text or text()
-            String value = matcher.group(7);                //  'some text' or "some text"
-            String quote = matcher.group(6);                // ' or "
-            String delimiter = matcher.group(4);            // , or =
-
-            String replacement =
-                    "translate(" + attribute + ", " + quote + value.toUpperCase() + quote + ", " + quote
-                            + value.toLowerCase() + quote + ")" + delimiter
-                            + "translate(" + quote + value + quote + ", " + quote + value.toUpperCase()
-                            + quote + ", " + quote + value.toLowerCase() + quote
-                            + ")";
-
-            replacement = replacement.replaceAll("\\$", "\\\\\\$");
-            LOGGER.debug(replacement);
-            matcher.appendReplacement(sb, replacement);
-        }
-        matcher.appendTail(sb);
-        LOGGER.debug("AFTER CONVERTING: " + By.xpath(sb.toString()).toString());
-        return By.xpath(sb.toString());
-    }
-
-    public static By idToXpathCaseInsensitive(String locator) {
-        LOGGER.debug("id  locator before converting: " + locator);
-        String xpath = StringUtils.remove(locator, "By.id: ");
-        String attributePattern = "^.*$";
-
-        Matcher matcher = Pattern.compile(attributePattern).matcher(xpath);
-        StringBuilder sb = new StringBuilder();
-
-        while (matcher.find()) {
-            String attribute = "@id";
-            String value = matcher.group();
-            String quote = "'";
-            String delimiter = "=";
-
-            String replacement =
-                    "//*[translate(" + attribute + ", " + quote + value.toUpperCase() + quote + ", " + quote
-                            + value.toLowerCase() + quote + ")" + delimiter
-                            + "translate(" + quote + value + quote + ", " + quote + value.toUpperCase()
-                            + quote + ", " + quote + value.toLowerCase() + quote
-                            + ")]";
-
-            replacement = replacement.replaceAll("\\$", "\\\\\\$");
-            LOGGER.debug(replacement);
-            matcher.appendReplacement(sb, replacement);
-        }
-        matcher.appendTail(sb);
-        LOGGER.debug("AFTER CONVERTING: " + By.xpath(sb.toString()).toString());
-        return By.xpath(sb.toString());
-    }
-
-    public static By nameToXpathCaseInsensitive(String locator) {
-        LOGGER.debug("name  locator before converting: " + locator);
-        String xpath = StringUtils.remove(locator, "By.name: ");
-        String attributePattern = "^.*$";
-
-        Matcher matcher = Pattern.compile(attributePattern).matcher(xpath);
-        StringBuilder sb = new StringBuilder();
-
-        while (matcher.find()) {
-            String attribute = "@name";
-            String value = matcher.group();
-            String quote = "'";
-            String delimiter = "=";
-
-            String replacement =
-                    "//*[translate(" + attribute + ", " + quote + value.toUpperCase() + quote + ", " + quote
-                            + value.toLowerCase() + quote + ")" + delimiter
-                            + "translate(" + quote + value + quote + ", " + quote + value.toUpperCase()
-                            + quote + ", " + quote + value.toLowerCase() + quote
-                            + ")]";
-
-            replacement = replacement.replaceAll("\\$", "\\\\\\$");
-            LOGGER.debug(replacement);
-            matcher.appendReplacement(sb, replacement);
-        }
-        matcher.appendTail(sb);
-        LOGGER.debug("AFTER CONVERTING: " + By.xpath(sb.toString()).toString());
-        return By.xpath(sb.toString());
-    }
-
-    // FIXME Cannot find element
-    public static By linkTextToXpathCaseInsensitive(String locator) {
-        LOGGER.debug("link  locator before converting: " + locator);
-        String xpath = StringUtils.remove(locator, "By.linkText: ");
-        String attributePattern = "^.*$";
-
-        Matcher matcher = Pattern.compile(attributePattern).matcher(xpath);
-        StringBuilder sb = new StringBuilder();
-
-        while (matcher.find()) {
-            String attribute = "text()";
-            String value = matcher.group();
-            String quote = "'";
-            String delimiter = ",";
-
-            String replacement =
-                    "//a[contains(translate(" + attribute + ", " + quote + value.toUpperCase() + quote + ", " + quote
-                            + value.toLowerCase() + quote + ")" + delimiter
-                            + "translate(" + quote + value + quote + ", " + quote + value.toUpperCase()
-                            + quote + ", " + quote + value.toLowerCase() + quote
-                            + "))]";
-
-            replacement = replacement.replaceAll("\\$", "\\\\\\$");
-            LOGGER.debug(replacement);
-            matcher.appendReplacement(sb, replacement);
-        }
-        matcher.appendTail(sb);
-        LOGGER.debug("AFTER CONVERTING: " + By.xpath(sb.toString()).toString());
-        return By.xpath(sb.toString());
+    public SearchContext getSearchContext() {
+        return searchContext;
     }
 
     public boolean isLocalized() {
         return localized;
+    }
+
+    public boolean isCaseInsensitive() {
+        return caseInsensitive;
     }
 
     public String getClassName() {
@@ -285,4 +137,3 @@ public class ExtendedElementLocator implements ElementLocator {
     }
 
 }
-

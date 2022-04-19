@@ -29,6 +29,7 @@ import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorConverter;
 import com.sun.jersey.core.util.Base64;
 import io.appium.java_client.MobileBy;
 import org.apache.commons.lang3.StringUtils;
@@ -138,15 +139,15 @@ public class ExtendedWebElement implements IWebElement {
         
         //read searchContext from not null elements only
         if (element == null) {
-        	// it seems like we have to specify WebElement or By annotation! Add verification that By is valid in this case!
-        	if (getBy() == null) {
-				try {
-					throw new RuntimeException("review stacktrace to analyze why tempBy is not populated correctly via reflection!");
-				} catch (Throwable thr) {
-				    LOGGER.warn("getBy() is null!", thr);
-				}
-        	}
-        	return;
+            // it seems like we have to specify WebElement or By annotation! Add verification that By is valid in this case!
+            if (by == null) {
+                try {
+                    throw new RuntimeException("review stacktrace to analyze why tempBy is not populated correctly via reflection!");
+                } catch (Throwable thr) {
+                    LOGGER.warn("by is null!", thr);
+                }
+            }
+            return;
         }
 
 		try {
@@ -168,31 +169,32 @@ public class ExtendedWebElement implements IWebElement {
 				locatorField = innerProxy.getClass().getDeclaredField("locator");
 				locatorField.setAccessible(true);
 
-				ExtendedElementLocator locator = (ExtendedElementLocator) locatorField.get(innerProxy);
-				this.isLocalized = locator.isLocalized();
+                ExtendedElementLocator locator = (ExtendedElementLocator) locatorField.get(innerProxy);
+                this.isLocalized = locator.isLocalized();
+                this.caseInsensitive = locator.isCaseInsensitive();
 
-				if (isLocalized){
-    			    this.name = locator.getClassName() + "." + name;
+                if (isLocalized) {
+                    this.name = locator.getClassName() + "." + name;
                 }
 
 				searchContextField = locator.getClass().getDeclaredField("searchContext");
 				searchContextField.setAccessible(true);
 				this.searchContext = tempSearchContext = (SearchContext) searchContextField.get(locator);
 
-                caseInsensitiveContextField = locator.getClass().getDeclaredField("caseInsensitive");
-                caseInsensitiveContextField.setAccessible(true);
-                this.caseInsensitive = (Boolean) caseInsensitiveContextField.get(locator);
+                byContextField = locator.getClass().getDeclaredField("by");
+                byContextField.setAccessible(true);
+                //TODO: identify if it is a child element and
+                //	1. get rootBy
+                //  2. append current "by" to the rootBy
+                // -> it should allow to search via regular driver and fluent waits - getBy()
+                this.by = (By) byContextField.get(locator);
 
-				byContextField = locator.getClass().getDeclaredField("by");
-				byContextField.setAccessible(true);
-				//TODO: identify if it is a child element and 
-				//	1. get rootBy
-				//  2. append current "by" to the rootBy 
-				// -> it should allow to search via regular driver and fluent waits - getBy() 
-				this.by = (By) byContextField.get(locator);
+                if (this.caseInsensitive) {
+                    this.by = LocatorConverter.toCaseInsensitive(this.by);
+                }
 
-				while (tempSearchContext instanceof Proxy) {
-					innerProxy = Proxy.getInvocationHandler(((Proxy) tempSearchContext));
+                while (tempSearchContext instanceof Proxy) {
+                    innerProxy = Proxy.getInvocationHandler(((Proxy) tempSearchContext));
 
 					locatorField = innerProxy.getClass().getDeclaredField("locator");
 					locatorField.setAccessible(true);
@@ -268,7 +270,7 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     
-    
+
     public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext, Object[] formatValues) {
         this(by, name, driver, searchContext);
         this.formatValues = Arrays.toString(formatValues);
@@ -378,22 +380,24 @@ public class ExtendedWebElement implements IWebElement {
         // to use only searchContext we must remove all findExtendedWebElement(s) methods in DriverHelper which is not so simple
         if (searchContext != null) {
             //element = searchContext.findElement(by);
-            List <WebElement> elements = searchContext.findElements(by);
-            if (!elements.isEmpty()) {
-                this.element = elements.get(0);
-            } else {
+            List<WebElement> elements = searchContext.findElements(by);
+
+            if (elements.isEmpty()) {
                 throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
             }
+            this.element = elements.get(0);
         } else {
             // No way to remove this else piece as several projects play with this part of finder
             //LOGGER.warn("Please, inform Carina team about this warn providing logs...");
-            List <WebElement> elements = getDriver().findElements(by);
-            if (!elements.isEmpty()) {
-                this.element = elements.get(0);
-            } else {
+            List<WebElement> elements = getDriver().findElements(by);
+
+            if (elements.isEmpty()) {
                 throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
             }
+
+            this.element = elements.get(0);
         }
+
         return element;
     }
     
@@ -423,29 +427,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return By by
      */
     public By getBy() {
-        By value = by;
-
-        if (caseInsensitive) {
-            // trying to get part of locator that gives information of it's type
-            String locator = by.toString();
-
-            if (locator.startsWith("By.xpath:")) {
-                value = ExtendedElementLocator.xpathToCaseInsensitive(by.toString());
-            }
-
-            if (locator.startsWith("By.id:")) {
-                value = ExtendedElementLocator.idToXpathCaseInsensitive(by.toString());
-            }
-
-            if (locator.startsWith("By.name:")) {
-                value = ExtendedElementLocator.nameToXpathCaseInsensitive(by.toString());
-            }
-
-            if (locator.startsWith("By.linkText:")) {
-                value = ExtendedElementLocator.linkTextToXpathCaseInsensitive(by.toString());
-            }
-        }
-        return value;
+        return by;
     }
 
     public void setBy(By by) {
@@ -468,7 +450,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return String text
      */
     public String getText() {
-    	return (String) doAction(ACTION_NAME.GET_TEXT, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        return (String) doAction(ACTION_NAME.GET_TEXT, EXPLICIT_TIMEOUT, getDefaultCondition(by));
     }
 
     /**
@@ -477,7 +459,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return Point location
      */
     public Point getLocation() {
-    	return (Point) doAction(ACTION_NAME.GET_LOCATION, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        return (Point) doAction(ACTION_NAME.GET_LOCATION, EXPLICIT_TIMEOUT, getDefaultCondition(by));
     }
 
     /**
@@ -486,7 +468,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return Dimension size
      */
     public Dimension getSize() {
-    	return (Dimension) doAction(ACTION_NAME.GET_SIZE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        return (Dimension) doAction(ACTION_NAME.GET_SIZE, EXPLICIT_TIMEOUT, getDefaultCondition(by));
     }
 
     /**
@@ -496,7 +478,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return String attribute value
      */
     public String getAttribute(String name) {
-    	return (String) doAction(ACTION_NAME.GET_ATTRIBUTE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), name);
+        return (String) doAction(ACTION_NAME.GET_ATTRIBUTE, EXPLICIT_TIMEOUT, getDefaultCondition(by), name);
     }
 
     /**
@@ -512,7 +494,7 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout to wait
      */
     public void click(long timeout) {
-        click(timeout, getDefaultCondition(getBy()));
+        click(timeout, getDefaultCondition(by));
     }
     
 	/**
@@ -539,7 +521,7 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout to wait
      */
     public void clickByJs(long timeout) {
-        clickByJs(timeout, getDefaultCondition(getBy()));
+        clickByJs(timeout, getDefaultCondition(by));
     }
     
     /**
@@ -566,7 +548,7 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout to wait
      */
     public void clickByActions(long timeout) {
-        clickByActions(timeout, getDefaultCondition(getBy()));
+        clickByActions(timeout, getDefaultCondition(by));
     }
     
     /**
@@ -593,7 +575,7 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout to wait
      */
     public void doubleClick(long timeout) {
-    	doubleClick(timeout, getDefaultCondition(getBy()));
+        doubleClick(timeout, getDefaultCondition(by));
     }
     /**
      * Double Click on element.
@@ -620,7 +602,7 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout to wait
      */
     public void rightClick(long timeout) {
-    	rightClick(timeout, getDefaultCondition(getBy()));
+        rightClick(timeout, getDefaultCondition(by));
     }
     
     /**
@@ -648,7 +630,7 @@ public class ExtendedWebElement implements IWebElement {
 	 * @param yOffset y offset for moving
      */
     public void hover(Integer xOffset, Integer yOffset) {
-    	doAction(ACTION_NAME.HOVER, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), xOffset, yOffset);
+        doAction(ACTION_NAME.HOVER, EXPLICIT_TIMEOUT, getDefaultCondition(by), xOffset, yOffset);
     }
     
     /**
@@ -692,7 +674,7 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout to wait
      */
     public void sendKeys(Keys keys, long timeout) {
-    	sendKeys(keys, timeout, getDefaultCondition(getBy()));
+        sendKeys(keys, timeout, getDefaultCondition(by));
     }
     
 	/**
@@ -724,7 +706,7 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout to wait
      */
     public void type(String text, long timeout) {
-    	type(text, timeout, getDefaultCondition(getBy()));
+        type(text, timeout, getDefaultCondition(by));
     }
     
 	/**
@@ -771,7 +753,7 @@ public class ExtendedWebElement implements IWebElement {
      * @param filePath path
      */
     public void attachFile(String filePath) {
-    	doAction(ACTION_NAME.ATTACH_FILE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), filePath);
+        doAction(ACTION_NAME.ATTACH_FILE, EXPLICIT_TIMEOUT, getDefaultCondition(by), filePath);
     }
 
     /**
@@ -780,7 +762,7 @@ public class ExtendedWebElement implements IWebElement {
      * for checkbox Element
      */
     public void check() {
-    	doAction(ACTION_NAME.CHECK, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        doAction(ACTION_NAME.CHECK, EXPLICIT_TIMEOUT, getDefaultCondition(by));
     }
 
     /**
@@ -789,7 +771,7 @@ public class ExtendedWebElement implements IWebElement {
      * for checkbox Element
      */
     public void uncheck() {
-    	doAction(ACTION_NAME.UNCHECK, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        doAction(ACTION_NAME.UNCHECK, EXPLICIT_TIMEOUT, getDefaultCondition(by));
     }
 
     /**
@@ -798,7 +780,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return - current state
      */
     public boolean isChecked() {
-    	return (boolean) doAction(ACTION_NAME.IS_CHECKED, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        return (boolean) doAction(ACTION_NAME.IS_CHECKED, EXPLICIT_TIMEOUT, getDefaultCondition(by));
     }
 
     /**
@@ -807,7 +789,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return selected value
      */
     public String getSelectedValue() {
-    	return (String) doAction(ACTION_NAME.GET_SELECTED_VALUE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        return (String) doAction(ACTION_NAME.GET_SELECTED_VALUE, EXPLICIT_TIMEOUT, getDefaultCondition(by));
     }
 
     /**
@@ -817,7 +799,7 @@ public class ExtendedWebElement implements IWebElement {
      */
     @SuppressWarnings("unchecked")
 	public List<String> getSelectedValues() {
-    	return (List<String>) doAction(ACTION_NAME.GET_SELECTED_VALUES, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        return (List<String>) doAction(ACTION_NAME.GET_SELECTED_VALUES, EXPLICIT_TIMEOUT, getDefaultCondition(by));
     }
 
     /**
@@ -827,7 +809,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return true if item selected, otherwise false.
      */
     public boolean select(final String selectText) {
-    	return (boolean) doAction(ACTION_NAME.SELECT, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), selectText);
+        return (boolean) doAction(ACTION_NAME.SELECT, EXPLICIT_TIMEOUT, getDefaultCondition(by), selectText);
     }
 
     /**
@@ -837,7 +819,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return boolean.
      */
     public boolean select(final String[] values) {
-    	return (boolean) doAction(ACTION_NAME.SELECT_VALUES, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), values);
+        return (boolean) doAction(ACTION_NAME.SELECT_VALUES, EXPLICIT_TIMEOUT, getDefaultCondition(by), values);
     }
 
     /**
@@ -853,7 +835,7 @@ public class ExtendedWebElement implements IWebElement {
      *         } };
      */
     public boolean selectByMatcher(final BaseMatcher<String> matcher) {
-    	return (boolean) doAction(ACTION_NAME.SELECT_BY_MATCHER, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), matcher);
+        return (boolean) doAction(ACTION_NAME.SELECT_BY_MATCHER, EXPLICIT_TIMEOUT, getDefaultCondition(by), matcher);
     }
 
     /**
@@ -863,7 +845,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return true if item selected, otherwise false.
      */
     public boolean selectByPartialText(final String partialSelectText) {
-    	return (boolean) doAction(ACTION_NAME.SELECT_BY_PARTIAL_TEXT, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), partialSelectText);
+        return (boolean) doAction(ACTION_NAME.SELECT_BY_PARTIAL_TEXT, EXPLICIT_TIMEOUT, getDefaultCondition(by), partialSelectText);
     }
 
     /**
@@ -873,7 +855,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return true if item selected, otherwise false.
      */
     public boolean select(final int index) {
-    	return (boolean) doAction(ACTION_NAME.SELECT_BY_INDEX, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), index);
+        return (boolean) doAction(ACTION_NAME.SELECT_BY_INDEX, EXPLICIT_TIMEOUT, getDefaultCondition(by), index);
     }
 
     // --------------------------------------------------------------------------
@@ -948,7 +930,7 @@ public class ExtendedWebElement implements IWebElement {
 		if (element != null) {
 			waitCondition = ExpectedConditions.elementToBeClickable(element);
 		} else {
-			waitCondition = ExpectedConditions.elementToBeClickable(getBy());
+            waitCondition = ExpectedConditions.elementToBeClickable(by);
 		}
 		
     	return waitUntil(waitCondition, timeout);
@@ -972,15 +954,15 @@ public class ExtendedWebElement implements IWebElement {
 	public boolean isVisible(long timeout) {
 		ExpectedCondition<?> waitCondition;
 
-		if (element != null) {
-			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(getBy()),
-			        ExpectedConditions.visibilityOf(element));
-		} else {
-			waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
-		}
-		
-		return waitUntil(waitCondition, timeout);
-	}
+        if (element != null) {
+            waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(by),
+                    ExpectedConditions.visibilityOf(element));
+        } else {
+            waitCondition = ExpectedConditions.visibilityOfElementLocated(by);
+        }
+
+        return waitUntil(waitCondition, timeout);
+    }
 
 	
     /**
@@ -1006,7 +988,7 @@ public class ExtendedWebElement implements IWebElement {
 		if (element != null) {
 			textCondition = ExpectedConditions.textToBePresentInElement(element, decryptedText);
 		} else {
-			textCondition = ExpectedConditions.textToBePresentInElementLocated(getBy(), decryptedText);
+            textCondition = ExpectedConditions.textToBePresentInElementLocated(by, decryptedText);
 		}
 		return waitUntil(textCondition, timeout);
     	//TODO: restore below code as only projects are migrated to "isElementWithContainTextPresent"
@@ -1150,39 +1132,19 @@ public class ExtendedWebElement implements IWebElement {
         By by = null;
 
         if (locator.startsWith("By.id:")) {
-            if (caseInsensitive) {
-                by = ExtendedElementLocator.idToXpathCaseInsensitive(locator);
-            } else {
                 by = By.id(String.format(StringUtils.remove(locator, "By.id: "), objects));
-            }
         }
 
         if (locator.startsWith("By.name:")) {
-            if (caseInsensitive) {
-                by = ExtendedElementLocator.nameToXpathCaseInsensitive(locator);
-            } else {
                 by = By.id(String.format(StringUtils.remove(locator, "By.name: "), objects));
-            }
         }
 
         if (locator.startsWith("By.xpath:")) {
-            if (caseInsensitive) {
-                // return by using toCaseInsensitive(locator) method. To avoid double By.xpath during formatting
-                by = ExtendedElementLocator.xpathToCaseInsensitive(locator);
-            } else {
-                // generate xpath from locator string
-                by = By.xpath(String.format(StringUtils.remove(locator, "By.xpath: "), objects));
-            }
+            by = By.xpath(String.format(StringUtils.remove(locator, "By.xpath: "), objects));
         }
 
         if (locator.startsWith("By.linkText:")) {
-            if (caseInsensitive) {
-                // return by using toCaseInsensitive(locator) method. To avoid double By.xpath during formatting
-                by = ExtendedElementLocator.linkTextToXpathCaseInsensitive(locator);
-            } else {
-                // generate xpath from locator string
                 by = By.xpath(String.format(StringUtils.remove(locator, "By.linkText: "), objects));
-            }
         }
 
         if (locator.startsWith("partialLinkText: ")) {
