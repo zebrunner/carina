@@ -32,7 +32,7 @@ public class LocatorConverter {
             by = nameToXpathCaseInsensitive(locator);
         }
 
-        if (locator.startsWith("linkText:")) {
+        if (locator.startsWith("By.linkText:")) {
             by = linkTextToXpathCaseInsensitive(locator);
         }
         LOGGER.debug("Locator after converting to be case-insensitive: {}", by);
@@ -95,7 +95,7 @@ public class LocatorConverter {
             String delimiter = "=";
 
             String replacement =
-                    "//*[translate(" + attribute + ", " + quote + value.toUpperCase() + quote + ", " + quote
+                    ".//*[translate(" + attribute + ", " + quote + value.toUpperCase() + quote + ", " + quote
                             + value.toLowerCase() + quote + ")" + delimiter
                             + "translate(" + quote + value + quote + ", " + quote + value.toUpperCase()
                             + quote + ", " + quote + value.toLowerCase() + quote
@@ -122,7 +122,7 @@ public class LocatorConverter {
             String delimiter = "=";
 
             String replacement =
-                    "//*[translate(" + attribute + ", " + quote + value.toUpperCase() + quote + ", " + quote
+                    ".//*[translate(" + attribute + ", " + quote + value.toUpperCase() + quote + ", " + quote
                             + value.toLowerCase() + quote + ")" + delimiter
                             + "translate(" + quote + value + quote + ", " + quote + value.toUpperCase()
                             + quote + ", " + quote + value.toLowerCase() + quote
@@ -135,7 +135,6 @@ public class LocatorConverter {
         return By.xpath(sb.toString());
     }
 
-    // FIXME not work
     private static By linkTextToXpathCaseInsensitive(String locator) {
         String xpath = StringUtils.remove(locator, "By.linkText: ");
         String attributePattern = "^.*$";
@@ -147,14 +146,14 @@ public class LocatorConverter {
             String attribute = "text()";
             String value = matcher.group();
             String quote = "'";
-            String delimiter = ",";
+            String delimiter = "=";
 
             String replacement =
-                    "//a[contains(translate(" + attribute + ", " + quote + value.toUpperCase() + quote + ", " + quote
+                    ".//a[translate(" + attribute + ", " + quote + value.toUpperCase() + quote + ", " + quote
                             + value.toLowerCase() + quote + ")" + delimiter
                             + "translate(" + quote + value + quote + ", " + quote + value.toUpperCase()
                             + quote + ", " + quote + value.toLowerCase() + quote
-                            + "))]";
+                            + ")]";
 
             replacement = replacement.replaceAll("\\$", "\\\\\\$");
             matcher.appendReplacement(sb, replacement);
