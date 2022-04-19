@@ -13,6 +13,9 @@ public class LocatorConverter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    private LocatorConverter() {
+    }
+
     /**
      * Can be used to convert: xpath (@text, text()), id, name to be case-insensitive
      */
