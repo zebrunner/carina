@@ -202,6 +202,13 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             Label.attachToTestRun("sha1", sha1);
         }
         
+        LOGGER.info("CARINA_CORE_VERSION: " + getCarinaVersion());
+    }
+
+	@Override
+    public void onStart(ITestContext context) {
+        LOGGER.debug("CarinaListener->OnTestStart(ITestContext context): " + context.getName());
+        
         /*
          * To support multi-suite declaration as below we have to init test run labels at once only!
          * <suite-files>
@@ -211,16 +218,10 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
          */
         
         if (!this.isRunLabelsRegistered) {
-            attachTestRunLabels(suite);
+            attachTestRunLabels(context.getSuite());
             this.isRunLabelsRegistered = true;
         }
-
-        LOGGER.info("CARINA_CORE_VERSION: " + getCarinaVersion());
-    }
-
-	@Override
-    public void onStart(ITestContext context) {
-        LOGGER.debug("CarinaListener->OnTestStart(ITestContext context): " + context.getName());
+        
         super.onStart(context);
     }
 
