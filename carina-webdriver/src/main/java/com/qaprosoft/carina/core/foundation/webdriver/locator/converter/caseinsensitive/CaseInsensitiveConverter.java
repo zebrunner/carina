@@ -14,15 +14,15 @@ public class CaseInsensitiveConverter implements LocatorConverter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     // Contains type of locator as key and start part of locator as value
-    private static final List<String> listOfConvertableLocators = new ArrayList<>();
+    private static final List<LocatorType> listOfConvertableLocators = new ArrayList<>();
     private final IPlatformDependsConverter platformDependsConverter;
     private ParamsToConvert paramsToConvert;
 
     {
-        listOfConvertableLocators.add("By.xpath: ");
-        listOfConvertableLocators.add("By.id: ");
-        listOfConvertableLocators.add("By.name: ");
-        listOfConvertableLocators.add("By.linkText: ");
+        listOfConvertableLocators.add(LocatorType.ID);
+        listOfConvertableLocators.add(LocatorType.NAME);
+        listOfConvertableLocators.add(LocatorType.XPATH);
+        listOfConvertableLocators.add(LocatorType.LINKTEXT);
     }
 
     public CaseInsensitiveConverter(ParamsToConvert paramsToConvert, Platform platform) {
@@ -49,14 +49,14 @@ public class CaseInsensitiveConverter implements LocatorConverter {
         By byToConvert = by;
         String locator = by.toString();
 
-        if (locator.startsWith("By.id: ")) {
+        if (locator.startsWith(LocatorType.ID.getStartsWith())) {
             byToConvert = platformDependsConverter.idToXpath(byToConvert);
         }
-        if (locator.startsWith("By.name: ")) {
+        if (locator.startsWith(LocatorType.NAME.getStartsWith())) {
             byToConvert = platformDependsConverter.nameToXpath(byToConvert);
         }
 
-        if (locator.startsWith("By.linkText: ")) {
+        if (locator.startsWith(LocatorType.LINKTEXT.getStartsWith())) {
             byToConvert = platformDependsConverter.linkTextToXpath(byToConvert);
         }
 
@@ -105,7 +105,7 @@ public class CaseInsensitiveConverter implements LocatorConverter {
     private boolean isConvertibleToXpath(By by) {
         String locator = by.toString();
         return listOfConvertableLocators.stream()
-                .anyMatch(locator::startsWith);
+                .anyMatch(locatorType -> locator.startsWith(locatorType.getStartsWith()));
     }
 
     public void setParamsToConvert(ParamsToConvert paramsToConvert) {

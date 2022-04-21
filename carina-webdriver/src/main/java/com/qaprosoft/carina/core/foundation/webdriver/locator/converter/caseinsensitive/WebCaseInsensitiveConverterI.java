@@ -10,7 +10,7 @@ class WebCaseInsensitiveConverterI extends AbstractPlatformDependsConverter impl
 
     @Override
     public By idToXpath(By by) {
-        String cleanXPath = StringUtils.remove(by.toString(), "By.id: ");
+        String cleanXPath = StringUtils.remove(by.toString(), LocatorType.ID.getStartsWith());
 
         Matcher matcher = Pattern.compile(ATTRIBUTE_SINGLE_PATTERN)
                 .matcher(cleanXPath);
@@ -26,7 +26,7 @@ class WebCaseInsensitiveConverterI extends AbstractPlatformDependsConverter impl
 
     @Override
     public By nameToXpath(By by) {
-        String cleanXpath = StringUtils.remove(by.toString(), "By.name: ");
+        String cleanXpath = StringUtils.remove(by.toString(), LocatorType.NAME.getStartsWith());
 
         Matcher matcher = Pattern.compile(ATTRIBUTE_SINGLE_PATTERN)
                 .matcher(cleanXpath);
@@ -42,7 +42,7 @@ class WebCaseInsensitiveConverterI extends AbstractPlatformDependsConverter impl
 
     @Override
     public By linkTextToXpath(By by) {
-        String cleanXPath = StringUtils.remove(by.toString(), "By.linkText: ");
+        String cleanXPath = StringUtils.remove(by.toString(), LocatorType.LINKTEXT.getStartsWith());
 
         Matcher matcher = Pattern.compile(ATTRIBUTE_SINGLE_PATTERN)
                 .matcher(cleanXPath);
