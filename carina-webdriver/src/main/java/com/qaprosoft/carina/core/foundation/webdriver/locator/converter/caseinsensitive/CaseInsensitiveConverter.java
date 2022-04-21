@@ -1,5 +1,6 @@
 package com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive;
 
+import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.LocatorConverter;
 import org.openqa.selenium.By;
 import org.openqa.selenium.InvalidArgumentException;

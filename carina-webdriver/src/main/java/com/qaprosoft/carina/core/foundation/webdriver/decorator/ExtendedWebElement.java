@@ -30,6 +30,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.CaseInsensitiveConverter;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.ParamsToConvert;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.Platform;
@@ -1138,20 +1139,20 @@ public class ExtendedWebElement implements IWebElement {
         String locator = by.toString();
         By by = null;
 
-        if (locator.startsWith("By.id:")) {
-                by = By.id(String.format(StringUtils.remove(locator, "By.id: "), objects));
+        if (locator.startsWith(LocatorType.ID.getStartsWith())) {
+                by = By.id(String.format(StringUtils.remove(locator, LocatorType.ID.getStartsWith()), objects));
         }
 
-        if (locator.startsWith("By.name:")) {
-                by = By.id(String.format(StringUtils.remove(locator, "By.name: "), objects));
+        if (locator.startsWith(LocatorType.NAME.getStartsWith())) {
+                by = By.id(String.format(StringUtils.remove(locator, LocatorType.NAME.getStartsWith()), objects));
         }
 
-        if (locator.startsWith("By.xpath:")) {
-            by = By.xpath(String.format(StringUtils.remove(locator, "By.xpath: "), objects));
+        if (locator.startsWith(LocatorType.XPATH.getStartsWith())) {
+            by = By.xpath(String.format(StringUtils.remove(locator, LocatorType.XPATH.getStartsWith()), objects));
         }
 
-        if (locator.startsWith("By.linkText:")) {
-                by = By.xpath(String.format(StringUtils.remove(locator, "By.linkText: "), objects));
+        if (locator.startsWith(LocatorType.LINKTEXT.getStartsWith())) {
+                by = By.xpath(String.format(StringUtils.remove(locator, LocatorType.LINKTEXT.getStartsWith()), objects));
         }
 
         if (locator.startsWith("partialLinkText: ")) {
@@ -1679,19 +1680,19 @@ public class ExtendedWebElement implements IWebElement {
         String locator = by.toString();
         By resBy = null;
 
-        if (locator.startsWith("By.id: ")) {
-            resBy = By.id(StringUtils.remove(locator, "By.id: ") + "[" + index + "]");
+        if (locator.startsWith(LocatorType.ID.getStartsWith())) {
+            resBy = By.id(StringUtils.remove(locator, LocatorType.ID.getStartsWith()) + "[" + index + "]");
         }
 
-        if (locator.startsWith("By.name: ")) {
-        	resBy = By.name(StringUtils.remove(locator, "By.name: ") + "[" + index + "]");
+        if (locator.startsWith(LocatorType.NAME.getStartsWith())) {
+        	resBy = By.name(StringUtils.remove(locator, LocatorType.NAME.getStartsWith()) + "[" + index + "]");
         }
 
-        if (locator.startsWith("By.xpath: ")) {
-        	resBy = By.xpath(StringUtils.remove(locator, "By.xpath: ") + "[" + index + "]");
+        if (locator.startsWith(LocatorType.XPATH.getStartsWith())) {
+        	resBy = By.xpath(StringUtils.remove(locator, LocatorType.XPATH.getStartsWith()) + "[" + index + "]");
         }
-        if (locator.startsWith("linkText: ")) {
-        	resBy = By.linkText(StringUtils.remove(locator, "linkText: ") + "[" + index + "]");
+        if (locator.startsWith(LocatorType.LINKTEXT.getStartsWith())) {
+        	resBy = By.linkText(StringUtils.remove(locator, LocatorType.LINKTEXT.getStartsWith()) + "[" + index + "]");
         }
 
         if (locator.startsWith("partialLinkText: ")) {
