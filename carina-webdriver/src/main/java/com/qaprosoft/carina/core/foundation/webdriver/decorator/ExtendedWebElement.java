@@ -27,9 +27,12 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
-import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorConverter;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.CaseInsensitiveConverter;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.ParamsToConvert;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.Platform;
 import com.sun.jersey.core.util.Base64;
 import io.appium.java_client.MobileBy;
 import org.apache.commons.lang3.StringUtils;
@@ -73,6 +76,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -92,7 +96,7 @@ public class ExtendedWebElement implements IWebElement {
     // searchContext is used for searching element by default
     private WebDriver driver;
     private SearchContext searchContext;
-    
+
     private CryptoTool cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
 
     private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
@@ -100,13 +104,13 @@ public class ExtendedWebElement implements IWebElement {
     private WebElement element = null;
     private String name;
     private By by;
-    
+
     private boolean caseInsensitive;
 
     private ElementLoadingStrategy loadingStrategy = ElementLoadingStrategy.valueOf(Configuration.get(Parameter.ELEMENT_LOADING_STRATEGY));
 
     private boolean isLocalized = false;
-    
+
     // Converted array of objects to String for dynamic element locators
     private String formatValues = "";
 
@@ -190,7 +194,10 @@ public class ExtendedWebElement implements IWebElement {
                 this.by = (By) byContextField.get(locator);
 
                 if (this.caseInsensitive) {
-                    this.by = LocatorConverter.toCaseInsensitive(this.by);
+                    CaseInsensitiveXPath csx = locator.getCaseInsensitiveXPath();
+                    Platform platform = Objects.equals(Configuration.getMobileApp(), "") ? Platform.WEB : Platform.MOBILE;
+                    this.by = new CaseInsensitiveConverter(new ParamsToConvert(csx.id(), csx.name(), csx.text(), csx.classAttr()), platform)
+                            .convert(this.by);
                 }
 
                 while (tempSearchContext instanceof Proxy) {

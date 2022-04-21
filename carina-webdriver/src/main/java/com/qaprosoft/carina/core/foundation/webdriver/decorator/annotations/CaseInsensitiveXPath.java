@@ -23,4 +23,12 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.FIELD, ElementType.TYPE })
 public @interface CaseInsensitiveXPath {
+
+    boolean id() default false;
+
+    boolean name() default false;
+
+    boolean text() default true;
+
+    boolean classAttr() default false;
 }

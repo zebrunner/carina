@@ -16,8 +16,12 @@
 package com.qaprosoft.carina.core.foundation.webdriver.locator;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Localized;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.CaseInsensitiveConverter;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.ParamsToConvert;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.Platform;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
@@ -30,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The default element locator, which will lazily locate an element or an
@@ -44,7 +49,7 @@ public class ExtendedElementLocator implements ElementLocator {
     private final SearchContext searchContext;
     private By by;
     private String className;
-    
+    private CaseInsensitiveXPath caseInsensitiveXPath;
     private boolean caseInsensitive = false;
     private boolean localized = false;
     
@@ -64,8 +69,14 @@ public class ExtendedElementLocator implements ElementLocator {
             LocalizedAnnotations annotations = new LocalizedAnnotations(field);
             this.by = annotations.buildBy();
             if (field.isAnnotationPresent(CaseInsensitiveXPath.class)) {
+                caseInsensitiveXPath = field.getAnnotation(CaseInsensitiveXPath.class);
+                CaseInsensitiveXPath csx = field.getAnnotation(CaseInsensitiveXPath.class);
+                Platform platform = Objects.equals(Configuration.getMobileApp(), "") ? Platform.WEB : Platform.MOBILE;
+
+                this.by = new CaseInsensitiveConverter(new ParamsToConvert(csx.id(), csx.name(),
+                        csx.text(), csx.classAttr()), platform)
+                        .convert(this.by);
                 caseInsensitive = true;
-                by = LocatorConverter.toCaseInsensitive(by);
             }
 
             if (field.isAnnotationPresent(Localized.class)) {
@@ -136,4 +147,7 @@ public class ExtendedElementLocator implements ElementLocator {
         return className;
     }
 
+    public CaseInsensitiveXPath getCaseInsensitiveXPath() {
+        return caseInsensitiveXPath;
+    }
 }
