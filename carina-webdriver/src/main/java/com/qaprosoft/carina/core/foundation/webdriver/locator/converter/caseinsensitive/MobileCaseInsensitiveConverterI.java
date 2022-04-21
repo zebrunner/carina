@@ -11,7 +11,7 @@ class MobileCaseInsensitiveConverterI extends AbstractPlatformDependsConverter i
     @Override
     public By idToXpath(By by) {
         String cleanXPath = StringUtils.remove(by.toString(), "By.id: ");
-        Matcher matcher = Pattern.compile(attributeSinglePattern)
+        Matcher matcher = Pattern.compile(ATTRIBUTE_SINGLE_PATTERN)
                 .matcher(cleanXPath);
         StringBuilder sb = new StringBuilder();
 
@@ -36,7 +36,7 @@ class MobileCaseInsensitiveConverterI extends AbstractPlatformDependsConverter i
     @Override
     public By nameToXpath(By by) {
         String cleanXPath = StringUtils.remove(by.toString(), "By.name: ");
-        Matcher matcher = Pattern.compile(attributeSinglePattern)
+        Matcher matcher = Pattern.compile(ATTRIBUTE_SINGLE_PATTERN)
                 .matcher(cleanXPath);
         StringBuilder sb = new StringBuilder();
 
@@ -52,7 +52,7 @@ class MobileCaseInsensitiveConverterI extends AbstractPlatformDependsConverter i
     @Override
     public By linkTextToXpath(By by) {
         String cleanXPath = StringUtils.remove(by.toString(), "By.linkText: ");
-        Matcher matcher = Pattern.compile(attributeSinglePattern)
+        Matcher matcher = Pattern.compile(ATTRIBUTE_SINGLE_PATTERN)
                 .matcher(cleanXPath);
         StringBuilder sb = new StringBuilder();
 

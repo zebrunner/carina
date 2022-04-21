@@ -12,7 +12,7 @@ class WebCaseInsensitiveConverterI extends AbstractPlatformDependsConverter impl
     public By idToXpath(By by) {
         String cleanXPath = StringUtils.remove(by.toString(), "By.id: ");
 
-        Matcher matcher = Pattern.compile(attributeSinglePattern)
+        Matcher matcher = Pattern.compile(ATTRIBUTE_SINGLE_PATTERN)
                 .matcher(cleanXPath);
         StringBuilder sb = new StringBuilder();
 
@@ -28,7 +28,7 @@ class WebCaseInsensitiveConverterI extends AbstractPlatformDependsConverter impl
     public By nameToXpath(By by) {
         String cleanXpath = StringUtils.remove(by.toString(), "By.name: ");
 
-        Matcher matcher = Pattern.compile(attributeSinglePattern)
+        Matcher matcher = Pattern.compile(ATTRIBUTE_SINGLE_PATTERN)
                 .matcher(cleanXpath);
         StringBuilder sb = new StringBuilder();
 
@@ -44,7 +44,7 @@ class WebCaseInsensitiveConverterI extends AbstractPlatformDependsConverter impl
     public By linkTextToXpath(By by) {
         String cleanXPath = StringUtils.remove(by.toString(), "By.linkText: ");
 
-        Matcher matcher = Pattern.compile(attributeSinglePattern)
+        Matcher matcher = Pattern.compile(ATTRIBUTE_SINGLE_PATTERN)
                 .matcher(cleanXPath);
         StringBuilder sb = new StringBuilder();
 

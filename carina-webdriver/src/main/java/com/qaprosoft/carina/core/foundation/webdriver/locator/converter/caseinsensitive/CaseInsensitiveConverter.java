@@ -86,20 +86,20 @@ public class CaseInsensitiveConverter implements LocatorConverter {
     }
 
     private IPlatformDependsConverter getConverterDependsOnPlatform(Platform platform) {
-        IPlatformDependsConverter platformDependsConverter;
+        IPlatformDependsConverter converter;
 
         switch (platform) {
         case WEB:
-            platformDependsConverter = new WebCaseInsensitiveConverterI();
+            converter = new WebCaseInsensitiveConverterI();
             break;
         case MOBILE:
-            platformDependsConverter = new MobileCaseInsensitiveConverterI();
+            converter = new MobileCaseInsensitiveConverterI();
             break;
         default:
             throw new InvalidArgumentException("Platform " + platform + " is not supported");
         }
 
-        return platformDependsConverter;
+        return converter;
     }
 
     private boolean isConvertibleToXpath(By by) {

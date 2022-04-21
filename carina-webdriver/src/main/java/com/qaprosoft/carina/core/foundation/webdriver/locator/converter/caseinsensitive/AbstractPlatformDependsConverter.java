@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 public abstract class AbstractPlatformDependsConverter implements IPlatformDependsConverter {
 
     // Can be used for any type of locator except xpath
-    protected static final String attributeSinglePattern = "^.*$";
+    protected static final String ATTRIBUTE_SINGLE_PATTERN = "^.*$";
 
     protected By caseInsensitiveXpathByAttribute(By by, String attributeRegex) {
         String locator = by.toString();
