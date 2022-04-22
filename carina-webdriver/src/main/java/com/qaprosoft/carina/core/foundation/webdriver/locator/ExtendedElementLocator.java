@@ -92,7 +92,7 @@ public class ExtendedElementLocator implements ElementLocator {
     public WebElement findElement() {
 
         if (by == null) {
-            throw new RuntimeException("By cannot be null");        // todo change to informative exception
+            throw new NullPointerException("By cannot be null");
         }
 
         //TODO: test how findElements work for web and android
