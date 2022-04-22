@@ -1,15 +1,16 @@
 package com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive;
 
-import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
-import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.LocatorConverter;
+import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.InvalidArgumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.List;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.LocatorConverter;
 
 public class CaseInsensitiveConverter implements LocatorConverter {
 

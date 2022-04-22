@@ -1,11 +1,12 @@
 package com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive;
 
-import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
 
 class MobileCaseInsensitiveConverterI extends AbstractPlatformDependsConverter implements IPlatformDependsConverter {
 

@@ -1,10 +1,10 @@
 package com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive;
 
-import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.By;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.By;
 
 public abstract class AbstractPlatformDependsConverter implements IPlatformDependsConverter {
 

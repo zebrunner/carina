@@ -15,13 +15,11 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.locator;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Localized;
-import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.CaseInsensitiveConverter;
-import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.ParamsToConvert;
-import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.Platform;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Objects;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
@@ -31,10 +29,13 @@ import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Objects;
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Localized;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.CaseInsensitiveConverter;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.ParamsToConvert;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.Platform;
 
 /**
  * The default element locator, which will lazily locate an element or an
