@@ -9,6 +9,10 @@ theme:
 repo_url: https://github.com/zebrunner/carina
 repo_name: carina
 
+markdown_extensions:
+  - attr_list
+  - md_in_html
+
 copyright: 2022 Zebrunner, Inc. All Rights Reserved
 extra:
   homepage: https://zebrunner.com
