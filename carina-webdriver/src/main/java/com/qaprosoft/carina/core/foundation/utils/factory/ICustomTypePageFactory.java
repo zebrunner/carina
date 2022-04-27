@@ -141,7 +141,6 @@ public interface ICustomTypePageFactory extends IDriverPool {
         }
     }
 
-    // TODO: make it private after migration to Java 9
     /**
      * Get constructor from clazz that satisfy specific range of parameters
      * (using Reflection)
@@ -210,7 +209,6 @@ public interface ICustomTypePageFactory extends IDriverPool {
         return (Constructor<? extends T>) requiredCtor;
     }
 
-    // TODO: make it private after migration to Java 9
     /**
      * Method to compare primitives with corresponding wrappers
      * 

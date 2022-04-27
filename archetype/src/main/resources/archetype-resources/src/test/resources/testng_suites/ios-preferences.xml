@@ -14,7 +14,6 @@
 	<parameter name="jenkinsMobileDefaultPool" value="ANY" />
 
  	<parameter name="jenkinsRegressionPipeline" value="mobile_regression" />
-	<parameter name="jenkinsPipelineEnvironments" value="DEMO" />
 	<parameter name="jenkinsJobExecutionOrder" value="4" />
 	<parameter name="jenkinsJobExecutionMode" value="continue" />
 	<parameter name="jenkinsAutoScreenshot" value="true"/>

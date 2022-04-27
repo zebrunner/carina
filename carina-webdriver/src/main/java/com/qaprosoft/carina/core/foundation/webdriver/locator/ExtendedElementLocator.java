@@ -31,6 +31,7 @@ import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Localized;
 
@@ -81,34 +82,30 @@ public class ExtendedElementLocator implements ElementLocator {
     public WebElement findElement() {
         WebElement element = null;
         List<WebElement> elements = null;
-        NoSuchElementException exception = null;
         // Finding element using Selenium
         if (by != null) {
             if (caseInsensitive && !by.toString().contains("translate(")) {
                 by = toCaseInsensitive(by.toString());
             }
-            try {
-                element = searchContext.findElement(by);
-            } catch (NoSuchElementException e) {
-                exception = e;
-                //TODO: on iOS findElement return nothing but findElements return valid single item
-                // maybe migrate to the latest appium java driver
-                elements = searchContext.findElements(by);
-                if (!elements.isEmpty()) {
-                    exception = null;
-                    element = elements.get(0);
-                }
-                // hide below debug message as it is to often displayed in logs due to the fluent waits etc
-                //LOGGER.debug("Unable to find element: " + e.getMessage());
+            
+            //TODO: test how findElements work for web and android
+            // maybe migrate to the latest appium java driver and reuse original findElement!
+            elements = searchContext.findElements(by);
+            if (elements.size() == 1) {
+                element = elements.get(0);
+            } else if (elements.size() > 1) {
+                element = elements.get(0);
+                LOGGER.debug(elements.size() + " elements detected by: " + by.toString());
             }
+            
         }
         
         // If no luck throw general NoSuchElementException
-        if (element == null) {
-            throw exception != null ? exception : new NoSuchElementException("Unable to find element");
+        if (element != null) {
+            return element;
         }
-        
-        return element;
+
+        throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by);
     }
 
     /**
@@ -125,11 +122,8 @@ public class ExtendedElementLocator implements ElementLocator {
 
         // If no luck throw general NoSuchElementException
         if (elements == null) {
-            throw new NoSuchElementException("Unable to find elements");
+            throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
         }
-
-        // we can't enable cache for lists by default as we can't handle/catch list.get(index).action(). And for all dynamic lists
-        // As result for all dynamic lists we have too often out of bound index exceptions
 
         return elements;
     }

@@ -1,5 +1,36 @@
 site_name: Carina
-pages:
+
+theme:
+  name: material
+  palette:
+    scheme: zebrunner
+  logo: assets/logo.svg
+  favicon: assets/favicon.svg
+repo_url: https://github.com/zebrunner/carina
+repo_name: carina
+
+markdown_extensions:
+  - attr_list
+  - md_in_html
+
+copyright: 2022 Zebrunner, Inc. All Rights Reserved
+extra:
+  homepage: https://zebrunner.com
+  generator: false
+  social:
+    - icon: fontawesome/brands/twitter 
+      link: https://twitter.com/zebrunner
+    - icon: fontawesome/brands/linkedin 
+      link: https://linkedin.com/company/zebrunner
+    - icon: fontawesome/brands/facebook 
+      link: https://facebook.com/zebrunner
+    - icon: fontawesome/brands/telegram 
+      link: https://t.me/zebrunner
+
+extra_css:
+  - stylesheets/extra.css
+
+nav:
     - Overview: index.md
     - Getting started: getting_started.md
     - Project structure: project_structure.md
@@ -22,7 +53,4 @@ pages:
       - Zebrunner: integration/zebrunner.md
     - Cucumber: cucumber.md
     - Contribution: contribution.md
-theme:
-  name: 'material'
-repo_url: https://github.com/zebrunner/carina
-repo_name: Github
+

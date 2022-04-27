@@ -1,0 +1,17 @@
+[data-md-color-scheme="zebrunner"] {
+  
+    --md-primary-fg-color:        #06c27e;
+    --md-primary-fg-color--light: #06c27e;
+    --md-primary-fg-color--dark:  #06c27e; 
+    --md-accent-fg-color:                #06c27e;
+    --md-accent-fg-color--transparent:   #D5F2ED;
+  }
+
+  
+.md-typeset p, ol, ul, dl {
+  font-size: .7rem;
+}
+
+.md-typeset code {
+  font-size: .75em;
+}

@@ -16,6 +16,10 @@ import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
 import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
 import com.qaprosoft.carina.core.foundation.utils.tag.Priority;
 import com.qaprosoft.carina.core.foundation.utils.tag.TestPriority;
+import com.qaprosoft.carina.core.foundation.api.APIMethodPoller;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.time.temporal.ChronoUnit;
+
 import ${package}.carina.demo.api.DeleteUserMethod;
 import ${package}.carina.demo.api.GetUserMethods;
 import ${package}.carina.demo.api.PostUserMethod;
@@ -35,8 +39,17 @@ public class APISampleTest implements IAbstractTest {
         LOGGER.info("test");
         setCases("4555,54545");
         PostUserMethod api = new PostUserMethod();
-        api.expectResponseStatus(HttpResponseStatusType.CREATED_201);
-        api.callAPI();
+        api.setProperties("api/users/user.properties");
+
+        AtomicInteger counter = new AtomicInteger(0);
+
+        api.callAPIWithRetry()
+                .withLogStrategy(APIMethodPoller.LogStrategy.ALL)
+                .peek(rs -> counter.getAndIncrement())
+                .until(rs -> counter.get() == 4)
+                .pollEvery(1, ChronoUnit.SECONDS)
+                .stopAfter(10, ChronoUnit.SECONDS)
+                .execute();
         api.validateResponse();
     }
 

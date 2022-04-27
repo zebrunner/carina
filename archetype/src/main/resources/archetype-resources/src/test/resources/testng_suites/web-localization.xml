@@ -11,7 +11,6 @@
     <parameter name="jenkinsEmail" value="demo@qaprosoft.com"/>
 
     <parameter name="jenkinsRegressionPipeline" value="web_regression, full_regression"/>
-    <parameter name="jenkinsPipelineEnvironments" value="DEMO"/>
 
     <parameter name="jenkinsRegressionMatrix_full_regression" value="browser: chrome, locale: en_US; browser: chrome, locale: es_ES; browser: chrome, locale: de_DE; browser: chrome, locale: ja_JP; browser: chrome, locale: zh_CN; browser: chrome, locale: ru_RU; browser: chrome, locale: hu_HU"/>
     <parameter name="jenkinsJobExecutionOrder" value="1"/>

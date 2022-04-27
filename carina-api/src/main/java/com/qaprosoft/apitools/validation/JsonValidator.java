@@ -52,7 +52,7 @@ public class JsonValidator {
 
 	public static void validateJson(String expectedJson, String actualJson, JSONCompareMode jsonCompareMode, JsonComparatorContext comparatorContext) {
 		try {
-			JSONAssert.assertEquals(expectedJson, actualJson, new JsonKeywordsComparator(jsonCompareMode, comparatorContext));
+			JSONAssert.assertEquals(expectedJson, actualJson, new JsonKeywordsComparator(actualJson, jsonCompareMode, comparatorContext));
 		} catch (JSONException e) {
 			throw new AssertionError(e);
 		}

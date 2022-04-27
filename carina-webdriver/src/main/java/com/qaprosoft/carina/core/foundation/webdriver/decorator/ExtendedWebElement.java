@@ -24,21 +24,24 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -53,6 +56,7 @@ import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.Sleeper;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
@@ -95,7 +99,6 @@ public class ExtendedWebElement implements IWebElement {
     private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
 
     private WebElement element = null;
-    private Throwable originalException;
     private String name;
     private By by;
     
@@ -104,6 +107,9 @@ public class ExtendedWebElement implements IWebElement {
     private ElementLoadingStrategy loadingStrategy = ElementLoadingStrategy.valueOf(Configuration.get(Parameter.ELEMENT_LOADING_STRATEGY));
 
     private boolean isLocalized = false;
+    
+    // Converted array of objects to String for dynamic element locators
+    private String formatValues = "";
 
     public ExtendedWebElement(WebElement element, String name, By by) {
         this(element, name);
@@ -263,9 +269,16 @@ public class ExtendedWebElement implements IWebElement {
     	}
     }
 
+    
+    
+    public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext, Object[] formatValues) {
+        this(by, name, driver, searchContext);
+        this.formatValues = Arrays.toString(formatValues);
+    }
+
     public WebElement getElement() {
         if (this.element == null) {
-            this.element = findElement();
+            this.element = this.findElement();
         }
         
         return this.element;
@@ -318,25 +331,47 @@ public class ExtendedWebElement implements IWebElement {
         }
         boolean result = false;
 
-        Wait<WebDriver> wait = new WebDriverWait(getDriver(), timeout, RETRY_TIME)
+//      Wait<WebDriver> wait = new WebDriverWait(getDriver(), timeout, RETRY_TIME)
+        //try to use better tickMillis clock 
+        Wait<WebDriver> wait = new WebDriverWait(getDriver(), java.time.Clock.tickMillis(java.time.ZoneId.systemDefault()), Sleeper.SYSTEM_SLEEPER, timeout, RETRY_TIME)
                 .ignoring(WebDriverException.class)
-                .ignoring(NoSuchSessionException.class)
                 .ignoring(NoSuchElementException.class);
 
         // [VD] Notes:
-        // StaleElementReferenceException is handled by selenium ExpectedConditions in many methods
         // do not ignore TimeoutException or NoSuchSessionException otherwise you can wait for minutes instead of timeout!
-
         // [VD] note about NoSuchSessionException is pretty strange. Let's ignore here and return false only in case of
         // TimeoutException putting details into the debug log message. All the rest shouldn't be ignored
+        
+        // 7.3.17-SNAPSHOT. Removed NoSuchSessionException (Mar-11-2022)
+        //.ignoring(NoSuchSessionException.class) // why do we ignore noSuchSession? Just to minimize errors?
 
         LOGGER.debug("waitUntil: starting... timeout: " + timeout);
+        
+        Future<?> future = Executors.newSingleThreadExecutor().submit(new Callable<Boolean>() {
+            public Boolean call() throws Exception {
+                boolean res = false;
+                try {
+                    wait.until(condition);
+                    res = true;
+                } catch (TimeoutException e) {
+                    LOGGER.debug("waitUntil: org.openqa.selenium.TimeoutException", e);
+                }
+                return res;
+            }
+        });
+        
+     // make future process timeout 10s longer
+        long processTimeout = timeout + 10;
         try {
-            wait.until(condition);
-            result = true;
-        } catch (TimeoutException e) {
-            LOGGER.debug("waitUntil: TimeoutException", e);
+            result = (boolean) future.get(processTimeout, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (java.util.concurrent.TimeoutException e) {
+            LOGGER.error("waitUntil: java.util.concurrent.TimeoutException: " + processTimeout + "s", e);
+        } catch (ExecutionException e) {
+            LOGGER.error(e.getMessage(), e);
         }
+        
         return result;
     }
 
@@ -344,9 +379,22 @@ public class ExtendedWebElement implements IWebElement {
         // as we still provide several ways to init ExtendedWebElement without searchContext we have to use "if" operator and getDriver()
         // to use only searchContext we must remove all findExtendedWebElement(s) methods in DriverHelper which is not so simple
         if (searchContext != null) {
-            element = searchContext.findElement(by);
+            //element = searchContext.findElement(by);
+            List <WebElement> elements = searchContext.findElements(by);
+            if (!elements.isEmpty()) {
+                this.element = elements.get(0);
+            } else {
+                throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
+            }
         } else {
-            element = getDriver().findElement(by);
+            // No way to remove this else piece as several projects play with this part of finder
+            //LOGGER.warn("Please, inform Carina team about this warn providing logs...");
+            List <WebElement> elements = getDriver().findElements(by);
+            if (!elements.isEmpty()) {
+                this.element = elements.get(0);
+            } else {
+                throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
+            }
         }
         return element;
     }
@@ -356,11 +404,15 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     public String getName() {
-        return name != null ? name : String.format(" (%s)", by);
+        return this.name + this.formatValues;
     }
 
     public String getNameWithLocator() {
-        return by != null ? name + String.format(" (%s)", by) : name + " (n/a)";
+        if (this.by != null) {
+            return this.name + this.formatValues + String.format(" (%s)", by);
+        } else {
+            return this.name + this.formatValues + " (n/a)";
+        }
     }
 
     public void setName(String name) {
@@ -682,7 +734,7 @@ public class ExtendedWebElement implements IWebElement {
             return;
         }
         try {
-            Locatable locatableElement = (Locatable) findElement();
+            Locatable locatableElement = (Locatable) this.findElement();
             // [VD] onScreen should be updated onto onPage as only 2nd one
             // returns real coordinates without scrolling... read below material
             // for details
@@ -846,23 +898,6 @@ public class ExtendedWebElement implements IWebElement {
         // has a height and width greater than 0.
     	
         waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
-		boolean tmpResult = waitUntil(waitCondition, 1);
-
-		if (tmpResult) {
-			return true;
-		}
-
-		if (originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
-			LOGGER.debug("StaleElementReferenceException detected in isElementPresent!");
-			try {
-				element = findElement();
-                waitCondition = ExpectedConditions.visibilityOf(element);
-			} catch (NoSuchElementException e) {
-				// search element based on By if exception was thrown
-				waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
-			}
-		}
-
     	return waitUntil(waitCondition, timeout);
     }
 
@@ -953,20 +988,6 @@ public class ExtendedWebElement implements IWebElement {
     	final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
 		ExpectedCondition<Boolean> textCondition;
 		if (element != null) {
-			ExpectedCondition<Boolean>  tmpCondition = ExpectedConditions.and(ExpectedConditions.visibilityOf(element));
-			boolean tmpResult = waitUntil(tmpCondition, 1);
-			
-			if (!tmpResult && originalException != null && StaleElementReferenceException.class.equals(originalException.getClass())) {
-				LOGGER.debug("StaleElementReferenceException detected in isElementWithTextPresent!");
-				try {
-					findElement();
-					textCondition = ExpectedConditions.textToBePresentInElement(element, decryptedText);
-				} catch (NoSuchElementException e) {
-					// search element based on By if exception was thrown
-					textCondition = ExpectedConditions.textToBePresentInElementLocated(getBy(), decryptedText);
-				}
-			}
-			
 			textCondition = ExpectedConditions.textToBePresentInElement(element, decryptedText);
 		} else {
 			textCondition = ExpectedConditions.textToBePresentInElementLocated(getBy(), decryptedText);
@@ -1048,7 +1069,7 @@ public class ExtendedWebElement implements IWebElement {
         if (isPresent(by, timeout)) {
             return new ExtendedWebElement(by, name, this.driver, this.searchContext);
         } else {
-        	throw new NoSuchElementException("Unable to find dynamic element using By: " + by.toString());
+        	throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
         }
     }
 
@@ -1063,7 +1084,7 @@ public class ExtendedWebElement implements IWebElement {
         if (isPresent(by, timeout)) {
             webElements = getElement().findElements(by);
         } else {
-        	throw new NoSuchElementException("Unable to find dynamic elements using By: " + by.toString());
+        	throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
         }
 
         int i = 1;
@@ -1181,7 +1202,7 @@ public class ExtendedWebElement implements IWebElement {
             by = MobileBy.AndroidUIAutomator(String.format(StringUtils.remove(locator, "By.AndroidUIAutomator: "), objects));
             LOGGER.debug("Formatted locator is : " + by.toString());
         }
-        return new ExtendedWebElement(by, name, this.driver, this.searchContext);
+        return new ExtendedWebElement(by, name, this.driver, this.searchContext, objects);
     }
 
 
@@ -1248,78 +1269,84 @@ public class ExtendedWebElement implements IWebElement {
 		List<String> doGetSelectedValues();
 	}
 
-	private Object executeAction(ACTION_NAME actionName, ActionSteps actionSteps, Object...inputArgs) {
-		Object result = null;
-		switch (actionName) {
-		case CLICK:
-			actionSteps.doClick();
-			break;
-		case DOUBLE_CLICK:
-			actionSteps.doDoubleClick();
-			break;
-		case HOVER:
-			actionSteps.doHover((Integer) inputArgs[0], (Integer) inputArgs[1]);
-			break;
-		case RIGHT_CLICK:
-			actionSteps.doRightClick();
-			break;
-		case GET_TEXT:
-			result = actionSteps.doGetText();
-			break;
-		case GET_LOCATION:
-			result = actionSteps.doGetLocation();
-			break;
-		case GET_SIZE:
-			result = actionSteps.doGetSize();
-			break;
-		case GET_ATTRIBUTE:
-			result = actionSteps.doGetAttribute((String) inputArgs[0]);
-			break;
-		case SEND_KEYS:
-			actionSteps.doSendKeys((Keys) inputArgs[0]);
-			break;
-		case TYPE:
-			actionSteps.doType((String) inputArgs[0]);
-			break;
-		case ATTACH_FILE:
-			actionSteps.doAttachFile((String) inputArgs[0]);
-			break;
-		case CHECK:
-			actionSteps.doCheck();
-			break;
-		case UNCHECK:
-			actionSteps.doUncheck();
-			break;
-		case IS_CHECKED:
-			result = actionSteps.doIsChecked();
-			break;
-		case SELECT:
-			result = actionSteps.doSelect((String) inputArgs[0]);
-			break;
-		case SELECT_VALUES:
-			result = actionSteps.doSelectValues((String[]) inputArgs);
-			break;
-		case SELECT_BY_MATCHER:
-			result = actionSteps.doSelectByMatcher((BaseMatcher<String>) inputArgs[0]);
-			break;
-		case SELECT_BY_PARTIAL_TEXT:
-			result = actionSteps.doSelectByPartialText((String) inputArgs[0]);
-			break;
-		case SELECT_BY_INDEX:
-			result = actionSteps.doSelectByIndex((int) inputArgs[0]);
-			break;
-		case GET_SELECTED_VALUE:
-			result = actionSteps.doGetSelectedValue();
-			break;
-		case GET_SELECTED_VALUES:
-			result = actionSteps.doGetSelectedValues();
-			break;
-		default:
-			Assert.fail("Unsupported UI action name" + actionName.toString());
-			break;
-		}
-		return result;
-	}
+    private Object executeAction(ACTION_NAME actionName, ActionSteps actionSteps, Object... inputArgs) {
+        Object result = null;
+        switch (actionName) {
+        case CLICK:
+            actionSteps.doClick();
+            break;
+        case CLICK_BY_JS:
+            actionSteps.doClickByJs();
+            break;
+        case CLICK_BY_ACTIONS:
+            actionSteps.doClickByActions();
+            break;
+        case DOUBLE_CLICK:
+            actionSteps.doDoubleClick();
+            break;
+        case HOVER:
+            actionSteps.doHover((Integer) inputArgs[0], (Integer) inputArgs[1]);
+            break;
+        case RIGHT_CLICK:
+            actionSteps.doRightClick();
+            break;
+        case GET_TEXT:
+            result = actionSteps.doGetText();
+            break;
+        case GET_LOCATION:
+            result = actionSteps.doGetLocation();
+            break;
+        case GET_SIZE:
+            result = actionSteps.doGetSize();
+            break;
+        case GET_ATTRIBUTE:
+            result = actionSteps.doGetAttribute((String) inputArgs[0]);
+            break;
+        case SEND_KEYS:
+            actionSteps.doSendKeys((Keys) inputArgs[0]);
+            break;
+        case TYPE:
+            actionSteps.doType((String) inputArgs[0]);
+            break;
+        case ATTACH_FILE:
+            actionSteps.doAttachFile((String) inputArgs[0]);
+            break;
+        case CHECK:
+            actionSteps.doCheck();
+            break;
+        case UNCHECK:
+            actionSteps.doUncheck();
+            break;
+        case IS_CHECKED:
+            result = actionSteps.doIsChecked();
+            break;
+        case SELECT:
+            result = actionSteps.doSelect((String) inputArgs[0]);
+            break;
+        case SELECT_VALUES:
+            result = actionSteps.doSelectValues((String[]) inputArgs);
+            break;
+        case SELECT_BY_MATCHER:
+            result = actionSteps.doSelectByMatcher((BaseMatcher<String>) inputArgs[0]);
+            break;
+        case SELECT_BY_PARTIAL_TEXT:
+            result = actionSteps.doSelectByPartialText((String) inputArgs[0]);
+            break;
+        case SELECT_BY_INDEX:
+            result = actionSteps.doSelectByIndex((int) inputArgs[0]);
+            break;
+        case GET_SELECTED_VALUE:
+            result = actionSteps.doGetSelectedValue();
+            break;
+        case GET_SELECTED_VALUES:
+            result = actionSteps.doGetSelectedValues();
+            break;
+        default:
+            Assert.fail("Unsupported UI action name" + actionName.toString());
+            break;
+        }
+        return result;
+    }
 
 	/**
 	 * doAction on element.
@@ -1343,8 +1370,9 @@ public class ExtendedWebElement implements IWebElement {
 			Object...inputArgs) {
 		
 		if (waitCondition != null) {
-			//do verification only if waitCondition is fine
+			//do verification only if waitCondition is not null
 			if (!waitUntil(waitCondition, timeout)) {
+				//TODO: think about raising exception otherwise we do extra call and might wait and hangs especially for mobile/appium
 				LOGGER.error(Messager.ELEMENT_CONDITION_NOT_VERIFIED.getMessage(actionName.getKey(), getNameWithLocator()));
 			}
 		}
@@ -1354,21 +1382,8 @@ public class ExtendedWebElement implements IWebElement {
             L10N.verify(this);
         }
 
-		Object output = null;
-
-		try {
-			this.element = getElement();
-			output = overrideAction(actionName, inputArgs);
-		} catch (StaleElementReferenceException | InvalidElementStateException | ClassCastException e) {
-		    //TODO: test removal of the exceptions catch in this place!
-			//sometime Appium instead printing valid StaleElementException generate java.lang.ClassCastException: com.google.common.collect.Maps$TransformedEntriesMap cannot be cast to java.lang.String
-			LOGGER.debug("catched StaleElementReferenceException: ", e);
-			// try to find again using driver
-			element = findElement();
-			output = overrideAction(actionName, inputArgs);
-		}
-
-		return output;
+        this.element = getElement();
+        return overrideAction(actionName, inputArgs);
 	}
 
 	// single place for all supported UI actions in carina core

@@ -1,18 +1,22 @@
-![Alt text](img/carina.png "Carina Logo")
+# Overview
+
+![Zebrunner Ecosystem](img/carina.png){ width="600" }
 
 Carina is a Java-based test automation framework that unites all testing layers: Mobile applications (web, native, hybrid), WEB applications, REST services, Databases.
 
+<figure markdown>
 <B>[TRY DEMO PROJECT NOW](https://github.com/zebrunner/carina-demo)</B>
+</figure>
 
 ![Alt text](img/carina_overview.png "Carina Overview")
 
-* Carina framework is built on top of the most popular open-source solutions like Selenium, Appium, TestNG allowing to reduce dependence on the specific technology stack.
+* Carina Framework is built on top of the most popular open-source solutions like Selenium, Appium, TestNG allowing to reduce dependence on the specific technology stack.
 
 * Carina supports all popular browsers (IE, Edge, Safari, Chrome, Firefox) and mobile devices (iOS/Android). A special feature for a mobile domain: it reuses test automation code between IOS/Android up to 70-80%.
 
-* As far as our framework is built in Java, it is cross-platform. Tests may be easily executed both on Unix or Windows OS. All you need is JDK 11 installed.
+* Carina is cross-platform. Tests may be easily executed both on Unix or Windows OS. All you need is JDK 11 installed.
 
-* The framework supports different types of databases - both relational and nonrelational (MySQL, SQL Server, Oracle, PostgreSQL), providing amazing experience of DAO layer implementation using MyBatis ORM framework.
+* The framework supports different types of databases - both relational and non-relational (MySQL, SQL Server, Oracle, PostgreSQL), providing amazing experience of DAO layer implementation using MyBatis ORM framework.
 
 * API testing is based on a Freemarker template engine. It enables great flexibility in generating REST requests, and responses are dynamically changed by incoming arguments.
 

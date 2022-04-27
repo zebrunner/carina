@@ -186,5 +186,6 @@ public class SpecialKeywords {
     public static final String CUCUMBER_REPORT_FOLDER = "cucumber-reports";
     public static final String CUCUMBER_REPORT_SUBFOLDER = "cucumber-html-reports";
     public static final String CUCUMBER_REPORT_FILE_NAME = "overview-features.html";
-    
+
+    public static final String NO_SUCH_ELEMENT_ERROR="no such element ";
 }

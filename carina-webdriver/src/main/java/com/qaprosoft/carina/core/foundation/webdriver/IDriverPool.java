@@ -329,8 +329,8 @@ public interface IDriverPool {
                 }
             });
             
-            // default timeout for driver quit 1/3 of explicit
-            long timeout = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / 3;
+            // default timeout for driver quit 1/2 of explicit
+            long timeout = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / 2;
             try {
                 future.get(timeout, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
@@ -404,17 +404,18 @@ public interface IDriverPool {
                 }
                 
                 drv = DriverFactory.create(name, capabilities, seleniumHost);
-
-                if (device.isNull()) {
-                    // During driver creation we choose device and assign it to
-                    // the test thread
-                    device = getDevice(drv);
+                
+                if (currentDevice.get() != null) {
+                    device = currentDevice.get();
                 }
                 
-                // moved proxy start logic here since device will be initialized here only
+                CarinaDriver carinaDriver = new CarinaDriver(name, drv, device, TestPhase.getActivePhase(), threadId);
+                driversPool.add(carinaDriver);
+                POOL_LOGGER.debug("initDriver finish...");
+                
                 if (Configuration.getBoolean(Parameter.BROWSERMOB_PROXY)) {
                     if (!device.isNull()) {
-                    	int proxyPort;
+                        int proxyPort;
                         try {
                             proxyPort = Integer.parseInt(device.getProxyPort());
                         } catch (NumberFormatException e) {
@@ -427,20 +428,18 @@ public interface IDriverPool {
                     }
                 }
 
-                
-                // new 6.0 approach to manipulate drivers via regular Set
-                CarinaDriver carinaDriver = new CarinaDriver(name, drv, device, TestPhase.getActivePhase(), threadId);
-                driversPool.add(carinaDriver);
-                POOL_LOGGER.debug("initDriver finish...");
             } catch (Exception e) {
                 device.disconnectRemote();
                 //TODO: [VD] think about excluding device from pool for explicit reasons like out of space etc
                 // but initially try to implement it on selenium-hub level
                 String msg = String.format("Driver initialization '%s' FAILED! Retry %d of %d time - %s", name, count,
                         maxCount, e.getMessage());
-                POOL_LOGGER.error(msg, e);
+                
                 if (count == maxCount) {
                     throw e;
+                } else {
+                    // do not provide huge stacktrace as more retries exists. Only latest will generate full error + stacktrace
+                    POOL_LOGGER.error(msg);    
                 }
                 CommonUtils.pause(Configuration.getInt(Parameter.INIT_RETRY_INTERVAL));
             }
@@ -523,7 +522,8 @@ public interface IDriverPool {
         
         for (CarinaDriver carinaDriver : driversPool) {
             if (carinaDriver.getDriver().equals(drv)) {
-                device = carinaDriver.getDevice(); 
+                device = carinaDriver.getDevice();
+                break;
             }
         }
         

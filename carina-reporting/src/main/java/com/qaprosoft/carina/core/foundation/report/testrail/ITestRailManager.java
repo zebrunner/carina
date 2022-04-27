@@ -35,11 +35,6 @@ public interface ITestRailManager extends ITestCases {
 
         int suiteID = getTestRailSuiteIdFromSuite(result.getTestContext().getSuite());
 
-        if (suiteID == -1) {
-            // no sense to return something as integration data not provided
-            return testCases;
-        }
-
         // Get a handle to the class and method
         Class<?> testClass;
         try {

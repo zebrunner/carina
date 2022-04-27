@@ -22,20 +22,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import com.qaprosoft.apitools.builder.PropertiesProcessor;
+import com.qaprosoft.apitools.validation.JsonComparatorContext;
+import com.qaprosoft.apitools.validation.JsonKeywordsComparator;
+import com.qaprosoft.apitools.validation.JsonValidator;
+import com.qaprosoft.apitools.validation.XmlCompareMode;
+import com.qaprosoft.apitools.validation.XmlValidator;
+import com.qaprosoft.carina.core.foundation.api.log.LoggingOutputStream;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.apitools.builder.PropertiesProcessor;
 import com.qaprosoft.apitools.builder.PropertiesProcessorMain;
 import com.qaprosoft.apitools.message.TemplateMessage;
-import com.qaprosoft.apitools.validation.JsonComparatorContext;
-import com.qaprosoft.apitools.validation.JsonKeywordsComparator;
-import com.qaprosoft.apitools.validation.JsonValidator;
-import com.qaprosoft.apitools.validation.XmlCompareMode;
-import com.qaprosoft.apitools.validation.XmlValidator;
 import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
 import com.qaprosoft.carina.core.foundation.api.annotation.RequestTemplatePath;
 import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePath;
@@ -117,8 +118,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         this.rsPath = path;
     }
 
-    @Override
-    public Response callAPI() {
+    private void initBodyContent() {
         if (rqPath != null) {
             TemplateMessage tm = new TemplateMessage();
             tm.setIgnoredPropertiesProcessorClasses(ignoredPropertiesProcessorClasses);
@@ -126,10 +126,36 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
             tm.setPropertiesStorage(properties);
             setBodyContent(tm.getMessageText());
         }
+    }
+
+    @Override
+    public Response callAPI() {
+        initBodyContent();
         Response rs = super.callAPI();
         actualRsBody = rs.asString();
         return rs;
     }
+
+    @Override
+    Response callAPI(LoggingOutputStream outputStream) {
+        initBodyContent();
+        Response rs = super.callAPI(outputStream);
+        actualRsBody = rs.asString();
+        return rs;
+    }
+
+    /**
+     * Allows to create an api request with repetition, timeout and condition of successful response, as well as setting
+     * a logging strategy
+     *
+     * @return APIMethodPoller object
+     */
+    public APIMethodPoller callAPIWithRetry() {
+        initBodyContent();
+        return APIMethodPoller.builder(this)
+                .doAfterExecute(response -> actualRsBody = response.asString());
+    }
+
 
     /**
      * Calls API expecting http status in response taken from @SuccessfulHttpStatus value
@@ -255,7 +281,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         tm.setPropertiesStorage(properties);
         String expectedRs = tm.getMessageText();
         try {
-            JSONAssert.assertEquals(expectedRs, actualRsBody, new JsonKeywordsComparator(mode, comparatorContext, validationFlags));
+            JSONAssert.assertEquals(expectedRs, actualRsBody, new JsonKeywordsComparator(actualRsBody, mode, comparatorContext, validationFlags));
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }

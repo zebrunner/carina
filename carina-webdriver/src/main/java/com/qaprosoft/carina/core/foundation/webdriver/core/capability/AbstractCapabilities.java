@@ -69,6 +69,9 @@ public abstract class AbstractCapabilities {
     }
 
     protected DesiredCapabilities initCapabilities(DesiredCapabilities capabilities) {
+        ArrayList<String> numericCaps = new ArrayList<String>(
+                Arrays.asList("idleTimeout", "waitForIdleTimeout"));
+        
         // read all properties which starts from "capabilities.*" prefix and add them into desired capabilities.
         final String prefix = SpecialKeywords.CAPABILITIES + ".";
         @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -78,8 +81,8 @@ public abstract class AbstractCapabilities {
                 String value = R.CONFIG.get(entry.getKey());                
                 if (!value.isEmpty()) {
                     String cap = entry.getKey().replaceAll(prefix, "");
-                    if ("idleTimeout".equalsIgnoreCase(cap) && isNumber(value)) {
-                        LOGGER.debug("Adding idleTimeout to capabilities as integer");
+                    if (numericCaps.contains(cap) && isNumber(value)) {
+                        LOGGER.debug("Adding " + cap + " to capabilities as integer");
                         capabilities.setCapability(cap, Integer.parseInt(value));
                     } else if ("false".equalsIgnoreCase(value)) {
                         capabilities.setCapability(cap, false);

@@ -213,6 +213,28 @@ public class APISampleTest implements IAbstractTest {
 ### Useful features
 The framework contains a list of useful features for building requests and validation of responses. It makes the support of such tests easier and at the same time minimizes the amount of test data.
 
+#### Repeating API calling with the condition
+Sometimes we should do a lot of API calls waiting for particular artifact in response. In this case, you can use `callAPIWithRetry`method in 
+`AbstractApiMethodV2` class.
+This method provides us an object of `APIMethodPoller` class. Methods of this object give us an ability to set an interval for api calling, 
+timeout, logging strategy, actions that should be executed immediately after the api calling, condition under which the
+response is considered successful, action that will be executed after all api callings.
+
+[Example](https://github.com/zebrunner/carina-demo/blob/98ecd27e28b323050cc9b37cb9627ae3164f47a7/src/test/java/com/qaprosoft/carina/demo/APISampleTest.java#L55) of using:
+```
+    @Test
+    public void testCreateUserWaitingResponseContainsAddress() {
+        PostUserMethod api = new PostUserMethod();
+        api.expectResponseStatus(HttpResponseStatusType.CREATED_201);
+
+        Optional<Response> response = api.callAPIWithRetry()
+                .withLogStrategy(APIMethodPoller.LogStrategy.LAST_ONLY)
+                .until(rs -> rs.getBody().asString().contains("address"))
+                .execute();
+        api.validateResponse();
+        Assert.assertFalse(response.isEmpty(), "Response should exists");
+    }
+```
 #### Wildcards
 In some cases, you may need to generate data in the request to make the request data unique. The best way to do this is to use wildcards for data generation:
 ```
@@ -230,14 +252,15 @@ Wildcards are also useful for response validation. In several cases, you may nee
     "id": "skip",                                           // Will skip actual value validation and just verify id key presence
     "signup_date": "regex:\\d{4}-\\d{2}-\\d{2}",            // Will validate date value by specified regex
     "age": "type:Integer",                                  // Will validate age value by specified Java type simple name
-    "annual_income": "ognl:#root != null && #root > 10",    // Will validate annual_income value using provided OGNL expression
+    "annual_income": "ognl:#val != null && #val > 10",    // Will validate annual_income value using provided OGNL expression
     "created_date": "predicate:isDateValid",                // Will validate created_date value by specified name of Predicate which is stored in JsonComparatorContext
 }
 ```
 *OGNL*
 
 To learn about Apache Object Graph Navigation Library follow this [article](https://commons.apache.org/proper/commons-ognl/language-guide.html).
-Using this option you have the ability to validate a response value with expression approach. Actual value is represented as `#root`.
+Using this option you have the ability to validate a response value with expression approach. Actual value is represented as `#val`.
+Also you have an access to full json tree using `#root` keyword.
 
 *Predicate*
 

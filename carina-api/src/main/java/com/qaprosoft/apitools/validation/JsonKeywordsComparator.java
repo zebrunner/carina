@@ -29,16 +29,18 @@ import org.skyscreamer.jsonassert.comparator.DefaultComparator;
 
 public class JsonKeywordsComparator extends DefaultComparator {
 
+    private final String actualRsBody;
     private final String[] validationFlags;
     private final List<JsonKeywordComparator> comparators;
     private final JsonComparatorContext context;
 
-    public JsonKeywordsComparator(JSONCompareMode mode, String... validationFlags) {
-        this(mode, null, validationFlags);
+    public JsonKeywordsComparator(String actualRsBody, JSONCompareMode mode, String... validationFlags) {
+        this(actualRsBody, mode, null, validationFlags);
     }
 
-    public JsonKeywordsComparator(JSONCompareMode mode, JsonComparatorContext context, String... validationFlags) {
+    public JsonKeywordsComparator(String actualRsBody, JSONCompareMode mode, JsonComparatorContext context, String... validationFlags) {
         super(mode);
+        this.actualRsBody = actualRsBody;
         this.validationFlags = validationFlags;
         this.context = context;
         this.comparators = new ArrayList<>();
@@ -50,7 +52,7 @@ public class JsonKeywordsComparator extends DefaultComparator {
         this.comparators.add(new SkipKeywordComparator());
         this.comparators.add(new TypeKeywordComparator());
         this.comparators.add(new RegexKeywordComparator());
-        this.comparators.add(new OgnlKeywordsComparator());
+        this.comparators.add(new OgnlKeywordsComparator(actualRsBody));
 
         ServiceLoader.load(JsonKeywordComparator.class)
                 .forEach(this.comparators::add);

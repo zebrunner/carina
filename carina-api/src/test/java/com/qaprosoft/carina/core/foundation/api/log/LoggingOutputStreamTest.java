@@ -24,8 +24,6 @@ import org.slf4j.event.Level;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.api.log.LoggingOutputStream;
-
 public class LoggingOutputStreamTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
