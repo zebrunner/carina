@@ -9,19 +9,19 @@ class WebCaseInsensitiveConverter extends AbstractPlatformDependsConverter imple
     @Override
     public By idToXpath(By by) {
         return locatorToXpath(by, LocatorType.ID,
-                (value) -> createXpathFromAnotherTypeOfLocator(".", "*", "@id", "'", value));
+                value -> createXpathFromAnotherTypeOfLocator(".", "*", "@id", "'", value));
     }
 
     @Override
     public By nameToXpath(By by) {
         return locatorToXpath(by, LocatorType.NAME,
-                (value) -> createXpathFromAnotherTypeOfLocator(".", "*", "@name", "'", value));
+                value -> createXpathFromAnotherTypeOfLocator(".", "*", "@name", "'", value));
     }
 
     @Override
     public By linkTextToXpath(By by) {
         return locatorToXpath(by, LocatorType.LINKTEXT,
-                (value) -> createXpathFromAnotherTypeOfLocator(".", "a", "text()", "'", value));
+                value -> createXpathFromAnotherTypeOfLocator(".", "a", "text()", "'", value));
     }
 
     @Override

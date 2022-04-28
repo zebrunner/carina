@@ -1,6 +1,7 @@
 package com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive;
 
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,7 +17,7 @@ public abstract class AbstractPlatformDependsConverter implements IPlatformDepen
 
     protected By caseInsensitiveXpathByAttribute(By by, String attributeRegex) {
         String locator = by.toString();
-        String cleanXPath = StringUtils.remove(locator, "By.xpath: ");
+        String cleanXPath = StringUtils.remove(locator, LocatorType.XPATH.getStartsWith());
         String attributePattern =
                 "(?<!(translate\\())((" + attributeRegex + ")\\s*(\\,|\\=)\\s*((['\"])((?:(?!\\6|\\\\).|\\\\.)*)\\6))";
 
@@ -49,7 +50,7 @@ public abstract class AbstractPlatformDependsConverter implements IPlatformDepen
                 .replaceAll("%S", "%s");
     }
 
-    protected By locatorToXpath(By by, LocatorType locatorType, Function<String, String> replacementFunc) {
+    protected By locatorToXpath(By by, LocatorType locatorType, UnaryOperator<String> replacementFunc) {
         String cleanXPath = StringUtils.remove(by.toString(), locatorType.getStartsWith());
 
         Matcher matcher = Pattern.compile(ATTRIBUTE_SINGLE_PATTERN)

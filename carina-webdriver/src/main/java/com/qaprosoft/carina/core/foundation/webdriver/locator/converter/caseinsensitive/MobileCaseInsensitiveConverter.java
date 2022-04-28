@@ -9,7 +9,7 @@ class MobileCaseInsensitiveConverter extends AbstractPlatformDependsConverter im
     @Override
     public By idToXpath(By by) {
         return locatorToXpath(by, LocatorType.ID,
-                (value) -> {
+                value -> {
                     String quote = value.contains("'") ? "\"" : "'";
                     return "//*[ends-with(" + "@resource-id" + ", " + quote + ":id/" + value + quote + ")]";
                 });
@@ -18,13 +18,13 @@ class MobileCaseInsensitiveConverter extends AbstractPlatformDependsConverter im
     @Override
     public By nameToXpath(By by) {
         return locatorToXpath(by, LocatorType.NAME,
-                (value) -> createXpathFromAnotherTypeOfLocator("", "*", "@name", "'", value));
+                value -> createXpathFromAnotherTypeOfLocator("", "*", "@name", "'", value));
     }
 
     @Override
     public By linkTextToXpath(By by) {
         return locatorToXpath(by, LocatorType.LINKTEXT,
-                (value) -> createXpathFromAnotherTypeOfLocator("", "a", "text()", "'", value));
+                value -> createXpathFromAnotherTypeOfLocator("", "a", "text()", "'", value));
     }
 
     @Override
