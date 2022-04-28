@@ -37,34 +37,14 @@ class MobileCaseInsensitiveConverterI extends AbstractPlatformDependsConverter i
 
     @Override
     public By nameToXpath(By by) {
-        String cleanXPath = StringUtils.remove(by.toString(), LocatorType.NAME.getStartsWith());
-        Matcher matcher = Pattern.compile(ATTRIBUTE_SINGLE_PATTERN)
-                .matcher(cleanXPath);
-        StringBuilder sb = new StringBuilder();
-
-        while (matcher.find()) {
-            String replacement = createXpathFromAnotherTypeOfLocator("", "*",
-                    "@name", "'", matcher.group());
-            matcher.appendReplacement(sb, replacement);
-        }
-        matcher.appendTail(sb);
-        return By.xpath(sb.toString());
+        return locatorToXpath(by, LocatorType.NAME,
+                (value) -> createXpathFromAnotherTypeOfLocator("", "*", "@name", "'", value));
     }
 
     @Override
     public By linkTextToXpath(By by) {
-        String cleanXPath = StringUtils.remove(by.toString(), LocatorType.LINKTEXT.getStartsWith());
-        Matcher matcher = Pattern.compile(ATTRIBUTE_SINGLE_PATTERN)
-                .matcher(cleanXPath);
-        StringBuilder sb = new StringBuilder();
-
-        while (matcher.find()) {
-            String replacement = createXpathFromAnotherTypeOfLocator("", "a",
-                    "text()", "'", matcher.group());
-            matcher.appendReplacement(sb, replacement);
-        }
-        matcher.appendTail(sb);
-        return By.xpath(sb.toString());
+        return locatorToXpath(by, LocatorType.LINKTEXT,
+                (value) -> createXpathFromAnotherTypeOfLocator("", "a", "text()", "'", value));
     }
 
     @Override

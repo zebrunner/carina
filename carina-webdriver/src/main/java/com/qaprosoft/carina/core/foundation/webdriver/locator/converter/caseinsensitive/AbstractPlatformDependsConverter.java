@@ -1,10 +1,13 @@
 package com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive;
 
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
+
+import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
 
 public abstract class AbstractPlatformDependsConverter implements IPlatformDependsConverter {
 
@@ -44,5 +47,19 @@ public abstract class AbstractPlatformDependsConverter implements IPlatformDepen
                 .replaceAll("\\$", "\\\\\\$")
                 // Because after translating it will be upper-case
                 .replaceAll("%S", "%s");
+    }
+
+    protected By locatorToXpath(By by, LocatorType locatorType, Function<String, String> replacementFunc) {
+        String cleanXPath = StringUtils.remove(by.toString(), locatorType.getStartsWith());
+
+        Matcher matcher = Pattern.compile(ATTRIBUTE_SINGLE_PATTERN)
+                .matcher(cleanXPath);
+        StringBuilder sb = new StringBuilder();
+        while (matcher.find()) {
+            String replacement = replacementFunc.apply(matcher.group());
+            matcher.appendReplacement(sb, replacement);
+        }
+        matcher.appendTail(sb);
+        return By.xpath(sb.toString());
     }
 }

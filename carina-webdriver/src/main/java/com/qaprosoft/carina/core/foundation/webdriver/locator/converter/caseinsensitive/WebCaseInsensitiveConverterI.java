@@ -1,9 +1,5 @@
 package com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
@@ -12,50 +8,20 @@ class WebCaseInsensitiveConverterI extends AbstractPlatformDependsConverter impl
 
     @Override
     public By idToXpath(By by) {
-        String cleanXPath = StringUtils.remove(by.toString(), LocatorType.ID.getStartsWith());
-
-        Matcher matcher = Pattern.compile(ATTRIBUTE_SINGLE_PATTERN)
-                .matcher(cleanXPath);
-        StringBuilder sb = new StringBuilder();
-
-        while (matcher.find()) {
-            String replacement = createXpathFromAnotherTypeOfLocator(".", "*", "@id", "'", matcher.group());
-            matcher.appendReplacement(sb, replacement);
-        }
-        matcher.appendTail(sb);
-        return By.xpath(sb.toString());
+        return locatorToXpath(by, LocatorType.ID,
+                (value) -> createXpathFromAnotherTypeOfLocator(".", "*", "@id", "'", value));
     }
 
     @Override
     public By nameToXpath(By by) {
-        String cleanXpath = StringUtils.remove(by.toString(), LocatorType.NAME.getStartsWith());
-
-        Matcher matcher = Pattern.compile(ATTRIBUTE_SINGLE_PATTERN)
-                .matcher(cleanXpath);
-        StringBuilder sb = new StringBuilder();
-
-        while (matcher.find()) {
-            String replacement = createXpathFromAnotherTypeOfLocator(".", "*", "@name", "'", matcher.group());
-            matcher.appendReplacement(sb, replacement);
-        }
-        matcher.appendTail(sb);
-        return By.xpath(sb.toString());
+        return locatorToXpath(by, LocatorType.NAME,
+                (value) -> createXpathFromAnotherTypeOfLocator(".", "*", "@name", "'", value));
     }
 
     @Override
     public By linkTextToXpath(By by) {
-        String cleanXPath = StringUtils.remove(by.toString(), LocatorType.LINKTEXT.getStartsWith());
-
-        Matcher matcher = Pattern.compile(ATTRIBUTE_SINGLE_PATTERN)
-                .matcher(cleanXPath);
-        StringBuilder sb = new StringBuilder();
-
-        while (matcher.find()) {
-            String replacement = createXpathFromAnotherTypeOfLocator(".", "a", "text()", "'", matcher.group());
-            matcher.appendReplacement(sb, replacement);
-        }
-        matcher.appendTail(sb);
-        return By.xpath(sb.toString());
+        return locatorToXpath(by, LocatorType.LINKTEXT,
+                (value) -> createXpathFromAnotherTypeOfLocator(".", "a", "text()", "'", value));
     }
 
     @Override
