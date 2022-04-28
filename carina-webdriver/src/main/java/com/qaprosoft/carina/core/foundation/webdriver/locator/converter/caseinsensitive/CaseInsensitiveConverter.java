@@ -92,10 +92,10 @@ public class CaseInsensitiveConverter implements LocatorConverter {
 
         switch (platform) {
         case WEB:
-            converter = new WebCaseInsensitiveConverterI();
+            converter = new WebCaseInsensitiveConverter();
             break;
         case MOBILE:
-            converter = new MobileCaseInsensitiveConverterI();
+            converter = new MobileCaseInsensitiveConverter();
             break;
         default:
             throw new InvalidArgumentException("Platform " + platform + " is not supported");

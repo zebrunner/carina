@@ -4,7 +4,7 @@ import org.openqa.selenium.By;
 
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
 
-class WebCaseInsensitiveConverterI extends AbstractPlatformDependsConverter implements IPlatformDependsConverter {
+class WebCaseInsensitiveConverter extends AbstractPlatformDependsConverter implements IPlatformDependsConverter {
 
     @Override
     public By idToXpath(By by) {
