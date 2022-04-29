@@ -1,6 +1,5 @@
 package com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive;
 
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
