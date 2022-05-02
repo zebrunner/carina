@@ -26,6 +26,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -75,8 +76,14 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.LocatorConverter;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.CaseInsensitiveConverter;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.ParamsToConvert;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.Platform;
 import com.sun.jersey.core.util.Base64;
 
 import io.appium.java_client.MobileBy;
@@ -93,7 +100,7 @@ public class ExtendedWebElement implements IWebElement {
     // searchContext is used for searching element by default
     private WebDriver driver;
     private SearchContext searchContext;
-    
+
     private CryptoTool cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
 
     private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
@@ -101,15 +108,17 @@ public class ExtendedWebElement implements IWebElement {
     private WebElement element = null;
     private String name;
     private By by;
-    
+
     private boolean caseInsensitive;
 
     private ElementLoadingStrategy loadingStrategy = ElementLoadingStrategy.valueOf(Configuration.get(Parameter.ELEMENT_LOADING_STRATEGY));
 
     private boolean isLocalized = false;
-    
+
     // Converted array of objects to String for dynamic element locators
     private String formatValues = "";
+
+    private LocatorConverter caseInsensitiveConverter;
 
     public ExtendedWebElement(WebElement element, String name, By by) {
         this(element, name);
@@ -140,15 +149,15 @@ public class ExtendedWebElement implements IWebElement {
         
         //read searchContext from not null elements only
         if (element == null) {
-        	// it seems like we have to specify WebElement or By annotation! Add verification that By is valid in this case!
-        	if (getBy() == null) {
-				try {
-					throw new RuntimeException("review stacktrace to analyze why tempBy is not populated correctly via reflection!");
-				} catch (Throwable thr) {
-				    LOGGER.warn("getBy() is null!", thr);
-				}
-        	}
-        	return;
+            // it seems like we have to specify WebElement or By annotation! Add verification that By is valid in this case!
+            if (getBy() == null) {
+                try {
+                    throw new RuntimeException("review stacktrace to analyze why tempBy is not populated correctly via reflection!");
+                } catch (Throwable thr) {
+                    LOGGER.warn("getBy() is null!", thr);
+                }
+            }
+            return;
         }
 
 		try {
@@ -170,11 +179,11 @@ public class ExtendedWebElement implements IWebElement {
 				locatorField = innerProxy.getClass().getDeclaredField("locator");
 				locatorField.setAccessible(true);
 
-				ExtendedElementLocator locator = (ExtendedElementLocator) locatorField.get(innerProxy);
-				this.isLocalized = locator.isLocalized();
+                ExtendedElementLocator locator = (ExtendedElementLocator) locatorField.get(innerProxy);
+                this.isLocalized = locator.isLocalized();
 
-				if (isLocalized){
-    			    this.name = locator.getClassName() + "." + name;
+                if (isLocalized) {
+                    this.name = locator.getClassName() + "." + name;
                 }
 
 				searchContextField = locator.getClass().getDeclaredField("searchContext");
@@ -185,16 +194,16 @@ public class ExtendedWebElement implements IWebElement {
                 caseInsensitiveContextField.setAccessible(true);
                 this.caseInsensitive = (Boolean) caseInsensitiveContextField.get(locator);
 
-				byContextField = locator.getClass().getDeclaredField("by");
-				byContextField.setAccessible(true);
-				//TODO: identify if it is a child element and 
-				//	1. get rootBy
-				//  2. append current "by" to the rootBy 
-				// -> it should allow to search via regular driver and fluent waits - getBy() 
-				this.by = (By) byContextField.get(locator);
+                byContextField = locator.getClass().getDeclaredField("by");
+                byContextField.setAccessible(true);
+                //TODO: identify if it is a child element and
+                //	1. get rootBy
+                //  2. append current "by" to the rootBy
+                // -> it should allow to search via regular driver and fluent waits - getBy()
+                this.by = (By) byContextField.get(locator);
 
-				while (tempSearchContext instanceof Proxy) {
-					innerProxy = Proxy.getInvocationHandler(((Proxy) tempSearchContext));
+                while (tempSearchContext instanceof Proxy) {
+                    innerProxy = Proxy.getInvocationHandler(((Proxy) tempSearchContext));
 
 					locatorField = innerProxy.getClass().getDeclaredField("locator");
 					locatorField.setAccessible(true);
@@ -209,6 +218,13 @@ public class ExtendedWebElement implements IWebElement {
                     caseInsensitiveContextField = locator.getClass().getDeclaredField("caseInsensitive");
                     caseInsensitiveContextField.setAccessible(true);
                     this.caseInsensitive = (Boolean) caseInsensitiveContextField.get(locator);
+
+                    if (this.caseInsensitive) {
+                        CaseInsensitiveXPath csx = locator.getCaseInsensitiveXPath();
+                        Platform platform = Objects.equals(Configuration.getMobileApp(), "") ? Platform.WEB : Platform.MOBILE;
+                        caseInsensitiveConverter = new CaseInsensitiveConverter(
+                                new ParamsToConvert(csx.id(), csx.name(), csx.text(), csx.classAttr()), platform);
+                    }
 				}
 			}
 
@@ -270,7 +286,7 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     
-    
+
     public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext, Object[] formatValues) {
         this(by, name, driver, searchContext);
         this.formatValues = Arrays.toString(formatValues);
@@ -380,22 +396,24 @@ public class ExtendedWebElement implements IWebElement {
         // to use only searchContext we must remove all findExtendedWebElement(s) methods in DriverHelper which is not so simple
         if (searchContext != null) {
             //element = searchContext.findElement(by);
-            List <WebElement> elements = searchContext.findElements(by);
-            if (!elements.isEmpty()) {
-                this.element = elements.get(0);
-            } else {
+            List<WebElement> elements = searchContext.findElements(by);
+
+            if (elements.isEmpty()) {
                 throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
             }
+            this.element = elements.get(0);
         } else {
             // No way to remove this else piece as several projects play with this part of finder
             //LOGGER.warn("Please, inform Carina team about this warn providing logs...");
-            List <WebElement> elements = getDriver().findElements(by);
-            if (!elements.isEmpty()) {
-                this.element = elements.get(0);
-            } else {
+            List<WebElement> elements = getDriver().findElements(by);
+
+            if (elements.isEmpty()) {
                 throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
             }
+
+            this.element = elements.get(0);
         }
+
         return element;
     }
     
@@ -425,9 +443,10 @@ public class ExtendedWebElement implements IWebElement {
      * @return By by
      */
     public By getBy() {
+        // todo move this code from getter
         By value = by;
-        if (caseInsensitive) {
-            value = ExtendedElementLocator.toCaseInsensitive(by.toString());
+        if (caseInsensitiveConverter != null) {
+           value = caseInsensitiveConverter.convert(this.by);
         }
         return value;
     }
@@ -452,7 +471,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return String text
      */
     public String getText() {
-    	return (String) doAction(ACTION_NAME.GET_TEXT, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        return (String) doAction(ACTION_NAME.GET_TEXT, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
     }
 
     /**
@@ -461,7 +480,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return Point location
      */
     public Point getLocation() {
-    	return (Point) doAction(ACTION_NAME.GET_LOCATION, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        return (Point) doAction(ACTION_NAME.GET_LOCATION, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
     }
 
     /**
@@ -470,7 +489,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return Dimension size
      */
     public Dimension getSize() {
-    	return (Dimension) doAction(ACTION_NAME.GET_SIZE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        return (Dimension) doAction(ACTION_NAME.GET_SIZE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
     }
 
     /**
@@ -480,7 +499,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return String attribute value
      */
     public String getAttribute(String name) {
-    	return (String) doAction(ACTION_NAME.GET_ATTRIBUTE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), name);
+        return (String) doAction(ACTION_NAME.GET_ATTRIBUTE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), name);
     }
 
     /**
@@ -577,7 +596,7 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout to wait
      */
     public void doubleClick(long timeout) {
-    	doubleClick(timeout, getDefaultCondition(getBy()));
+        doubleClick(timeout, getDefaultCondition(getBy()));
     }
     /**
      * Double Click on element.
@@ -604,7 +623,7 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout to wait
      */
     public void rightClick(long timeout) {
-    	rightClick(timeout, getDefaultCondition(getBy()));
+        rightClick(timeout, getDefaultCondition(getBy()));
     }
     
     /**
@@ -632,7 +651,7 @@ public class ExtendedWebElement implements IWebElement {
 	 * @param yOffset y offset for moving
      */
     public void hover(Integer xOffset, Integer yOffset) {
-    	doAction(ACTION_NAME.HOVER, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), xOffset, yOffset);
+        doAction(ACTION_NAME.HOVER, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), xOffset, yOffset);
     }
     
     /**
@@ -676,7 +695,7 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout to wait
      */
     public void sendKeys(Keys keys, long timeout) {
-    	sendKeys(keys, timeout, getDefaultCondition(getBy()));
+        sendKeys(keys, timeout, getDefaultCondition(getBy()));
     }
     
 	/**
@@ -708,7 +727,7 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout to wait
      */
     public void type(String text, long timeout) {
-    	type(text, timeout, getDefaultCondition(getBy()));
+        type(text, timeout, getDefaultCondition(getBy()));
     }
     
 	/**
@@ -755,7 +774,7 @@ public class ExtendedWebElement implements IWebElement {
      * @param filePath path
      */
     public void attachFile(String filePath) {
-    	doAction(ACTION_NAME.ATTACH_FILE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), filePath);
+        doAction(ACTION_NAME.ATTACH_FILE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), filePath);
     }
 
     /**
@@ -764,7 +783,7 @@ public class ExtendedWebElement implements IWebElement {
      * for checkbox Element
      */
     public void check() {
-    	doAction(ACTION_NAME.CHECK, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        doAction(ACTION_NAME.CHECK, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
     }
 
     /**
@@ -773,7 +792,7 @@ public class ExtendedWebElement implements IWebElement {
      * for checkbox Element
      */
     public void uncheck() {
-    	doAction(ACTION_NAME.UNCHECK, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        doAction(ACTION_NAME.UNCHECK, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
     }
 
     /**
@@ -782,7 +801,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return - current state
      */
     public boolean isChecked() {
-    	return (boolean) doAction(ACTION_NAME.IS_CHECKED, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        return (boolean) doAction(ACTION_NAME.IS_CHECKED, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
     }
 
     /**
@@ -791,7 +810,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return selected value
      */
     public String getSelectedValue() {
-    	return (String) doAction(ACTION_NAME.GET_SELECTED_VALUE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        return (String) doAction(ACTION_NAME.GET_SELECTED_VALUE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
     }
 
     /**
@@ -801,7 +820,7 @@ public class ExtendedWebElement implements IWebElement {
      */
     @SuppressWarnings("unchecked")
 	public List<String> getSelectedValues() {
-    	return (List<String>) doAction(ACTION_NAME.GET_SELECTED_VALUES, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        return (List<String>) doAction(ACTION_NAME.GET_SELECTED_VALUES, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
     }
 
     /**
@@ -811,7 +830,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return true if item selected, otherwise false.
      */
     public boolean select(final String selectText) {
-    	return (boolean) doAction(ACTION_NAME.SELECT, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), selectText);
+        return (boolean) doAction(ACTION_NAME.SELECT, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), selectText);
     }
 
     /**
@@ -821,7 +840,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return boolean.
      */
     public boolean select(final String[] values) {
-    	return (boolean) doAction(ACTION_NAME.SELECT_VALUES, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), values);
+        return (boolean) doAction(ACTION_NAME.SELECT_VALUES, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), values);
     }
 
     /**
@@ -837,7 +856,7 @@ public class ExtendedWebElement implements IWebElement {
      *         } };
      */
     public boolean selectByMatcher(final BaseMatcher<String> matcher) {
-    	return (boolean) doAction(ACTION_NAME.SELECT_BY_MATCHER, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), matcher);
+        return (boolean) doAction(ACTION_NAME.SELECT_BY_MATCHER, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), matcher);
     }
 
     /**
@@ -847,7 +866,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return true if item selected, otherwise false.
      */
     public boolean selectByPartialText(final String partialSelectText) {
-    	return (boolean) doAction(ACTION_NAME.SELECT_BY_PARTIAL_TEXT, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), partialSelectText);
+        return (boolean) doAction(ACTION_NAME.SELECT_BY_PARTIAL_TEXT, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), partialSelectText);
     }
 
     /**
@@ -857,7 +876,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return true if item selected, otherwise false.
      */
     public boolean select(final int index) {
-    	return (boolean) doAction(ACTION_NAME.SELECT_BY_INDEX, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), index);
+        return (boolean) doAction(ACTION_NAME.SELECT_BY_INDEX, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), index);
     }
 
     // --------------------------------------------------------------------------
@@ -932,7 +951,7 @@ public class ExtendedWebElement implements IWebElement {
 		if (element != null) {
 			waitCondition = ExpectedConditions.elementToBeClickable(element);
 		} else {
-			waitCondition = ExpectedConditions.elementToBeClickable(getBy());
+            waitCondition = ExpectedConditions.elementToBeClickable(getBy());
 		}
 		
     	return waitUntil(waitCondition, timeout);
@@ -956,15 +975,15 @@ public class ExtendedWebElement implements IWebElement {
 	public boolean isVisible(long timeout) {
 		ExpectedCondition<?> waitCondition;
 
-		if (element != null) {
-			waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(getBy()),
-			        ExpectedConditions.visibilityOf(element));
-		} else {
-			waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
-		}
-		
-		return waitUntil(waitCondition, timeout);
-	}
+        if (element != null) {
+            waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(getBy()),
+                    ExpectedConditions.visibilityOf(element));
+        } else {
+            waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
+        }
+
+        return waitUntil(waitCondition, timeout);
+    }
 
 	
     /**
@@ -990,7 +1009,7 @@ public class ExtendedWebElement implements IWebElement {
 		if (element != null) {
 			textCondition = ExpectedConditions.textToBePresentInElement(element, decryptedText);
 		} else {
-			textCondition = ExpectedConditions.textToBePresentInElementLocated(getBy(), decryptedText);
+            textCondition = ExpectedConditions.textToBePresentInElementLocated(getBy(), decryptedText);
 		}
 		return waitUntil(textCondition, timeout);
     	//TODO: restore below code as only projects are migrated to "isElementWithContainTextPresent"
@@ -1133,27 +1152,36 @@ public class ExtendedWebElement implements IWebElement {
         String locator = by.toString();
         By by = null;
 
-        if (locator.startsWith("By.id: ")) {
-            by = By.id(String.format(StringUtils.remove(locator, "By.id: "), objects));
-        }
-
-        if (locator.startsWith("By.name: ")) {
-            by = By.name(String.format(StringUtils.remove(locator, "By.name: "), objects));
-        }
-
-        if (locator.startsWith("By.xpath: ")) {
-            locator = String.format(StringUtils.remove(locator, "By.xpath: "), objects);
-            if (!caseInsensitive) {
-                // generate xpath from locator string
-                by = By.xpath(locator);
+        if (locator.startsWith(LocatorType.ID.getStartsWith())) {
+            if (caseInsensitiveConverter != null) {
+                by = caseInsensitiveConverter.convert(by);
             } else {
-                // return by using toCaseInsensitive(locator) method. To avoid double By.xpath during formatting
-                by = ExtendedElementLocator.toCaseInsensitive(locator);
+                by = By.id(String.format(StringUtils.remove(locator, LocatorType.ID.getStartsWith()), objects));
             }
         }
-        
-        if (locator.startsWith("linkText: ")) {
-            by = By.linkText(String.format(StringUtils.remove(locator, "linkText: "), objects));
+
+        if (locator.startsWith(LocatorType.NAME.getStartsWith())) {
+            if (caseInsensitiveConverter != null) {
+                by = caseInsensitiveConverter.convert(by);
+            } else {
+                by = By.id(String.format(StringUtils.remove(locator, LocatorType.NAME.getStartsWith()), objects));
+            }
+        }
+
+        if (locator.startsWith(LocatorType.XPATH.getStartsWith())) {
+            if (caseInsensitiveConverter != null) {
+                by = caseInsensitiveConverter.convert(by);
+            } else {
+                by = By.xpath(String.format(StringUtils.remove(locator, LocatorType.XPATH.getStartsWith()), objects));
+            }
+        }
+
+        if (locator.startsWith(LocatorType.LINKTEXT.getStartsWith())) {
+            if (caseInsensitiveConverter != null) {
+                by = caseInsensitiveConverter.convert(by);
+            } else {
+                by = By.xpath(String.format(StringUtils.remove(locator, LocatorType.LINKTEXT.getStartsWith()), objects));
+            }
         }
 
         if (locator.startsWith("partialLinkText: ")) {
@@ -1174,7 +1202,7 @@ public class ExtendedWebElement implements IWebElement {
         if (locator.startsWith("By.IosClassChain: **")) {
             by = MobileBy.iOSClassChain(String.format(StringUtils.remove(locator, "By.IosClassChain: "), objects));
         }
-        
+
         if (locator.startsWith("By.IosNsPredicate: **")) {
             by = MobileBy.iOSNsPredicateString(String.format(StringUtils.remove(locator, "By.IosNsPredicate: "), objects));
         }
@@ -1182,7 +1210,7 @@ public class ExtendedWebElement implements IWebElement {
         if (locator.startsWith("By.AccessibilityId: ")) {
             by = MobileBy.AccessibilityId(String.format(StringUtils.remove(locator, "By.AccessibilityId: "), objects));
         }
-        
+
         if (locator.startsWith("By.Image: ")) {
             String formattedLocator = String.format(StringUtils.remove(locator, "By.Image: "), objects);
             Path path = Paths.get(formattedLocator);
@@ -1202,6 +1230,7 @@ public class ExtendedWebElement implements IWebElement {
             by = MobileBy.AndroidUIAutomator(String.format(StringUtils.remove(locator, "By.AndroidUIAutomator: "), objects));
             LOGGER.debug("Formatted locator is : " + by.toString());
         }
+
         return new ExtendedWebElement(by, name, this.driver, this.searchContext, objects);
     }
 
@@ -1680,19 +1709,19 @@ public class ExtendedWebElement implements IWebElement {
         String locator = by.toString();
         By resBy = null;
 
-        if (locator.startsWith("By.id: ")) {
-            resBy = By.id(StringUtils.remove(locator, "By.id: ") + "[" + index + "]");
+        if (locator.startsWith(LocatorType.ID.getStartsWith())) {
+            resBy = By.id(StringUtils.remove(locator, LocatorType.ID.getStartsWith()) + "[" + index + "]");
         }
 
-        if (locator.startsWith("By.name: ")) {
-        	resBy = By.name(StringUtils.remove(locator, "By.name: ") + "[" + index + "]");
+        if (locator.startsWith(LocatorType.NAME.getStartsWith())) {
+        	resBy = By.name(StringUtils.remove(locator, LocatorType.NAME.getStartsWith()) + "[" + index + "]");
         }
 
-        if (locator.startsWith("By.xpath: ")) {
-        	resBy = By.xpath(StringUtils.remove(locator, "By.xpath: ") + "[" + index + "]");
+        if (locator.startsWith(LocatorType.XPATH.getStartsWith())) {
+        	resBy = By.xpath(StringUtils.remove(locator, LocatorType.XPATH.getStartsWith()) + "[" + index + "]");
         }
-        if (locator.startsWith("linkText: ")) {
-        	resBy = By.linkText(StringUtils.remove(locator, "linkText: ") + "[" + index + "]");
+        if (locator.startsWith(LocatorType.LINKTEXT.getStartsWith())) {
+        	resBy = By.linkText(StringUtils.remove(locator, LocatorType.LINKTEXT.getStartsWith()) + "[" + index + "]");
         }
 
         if (locator.startsWith("partialLinkText: ")) {
