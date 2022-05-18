@@ -5,6 +5,7 @@ import io.restassured.response.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
+import com.qaprosoft.carina.core.foundation.retry.ActionPoller;
 
 import java.lang.invoke.MethodHandles;
 import java.time.temporal.TemporalUnit;

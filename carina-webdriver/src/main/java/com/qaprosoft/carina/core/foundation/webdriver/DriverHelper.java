@@ -23,21 +23,25 @@ import java.lang.invoke.MethodHandles;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.qaprosoft.carina.core.foundation.retry.ActionPoller;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptException;
@@ -473,6 +477,55 @@ public class DriverHelper {
         }
         if (!clicked) {
             throw new RuntimeException("Unable to click onto any elements from array: " + Arrays.toString(elements));
+        }
+    }
+
+    /**
+     * Clicking the first clickable element found
+     *
+     * Recommendation: when using it for the first time, try to use the minimum interval and maximum timeout.
+     * The algorithm iterates over all elements, and if it does not find a clickable one, it increases the timeout for
+     * one element (on each attempt). If the clickable element is found, then the logs will indicate a warning about the
+     * best ratio interval and timeout.
+     *
+     * @param interval timeout for one element that it is clickable
+     * @param timeout total search time for the clickable element
+     * @param elements one of the presented elements is expected to be clicked
+     */
+    public void clickAny(Duration interval, Duration timeout, ExtendedWebElement... elements) {
+        final long increaseIntervalSeconds = 1;
+        final long intervalSeconds = interval.toSeconds();
+        final long timeoutSeconds = timeout.toSeconds();
+        AtomicInteger attempts = new AtomicInteger(0);
+
+        ActionPoller<Optional<ExtendedWebElement>> actionPoller = ActionPoller.builder();
+
+        Optional<Optional<ExtendedWebElement>> availableElement = actionPoller
+                .task(() -> {
+                    attempts.getAndIncrement();
+                    return Arrays.stream(elements)
+                            .filter(element -> element.isPresent(intervalSeconds + (attempts.get() * increaseIntervalSeconds)))
+                            .findAny();
+                })
+                .until(Optional::isPresent)
+                .pollEvery(intervalSeconds + (attempts.get() * increaseIntervalSeconds), ChronoUnit.SECONDS)
+                .stopAfter(timeoutSeconds, ChronoUnit.SECONDS)
+                .execute();
+
+        if(availableElement.isEmpty()) {
+            throw new RuntimeException(String.format("Any of element, presented in elements, is not clickable. Amount of attempts: %d. "
+                            + "Interval on last attempt: %d sec.",
+                    attempts.get(), intervalSeconds + (attempts.get() * increaseIntervalSeconds)));
+        }
+
+        availableElement.get()
+                .get()
+                .clickIfPresent();      // try to use just click
+
+        if(attempts.get() > 1) {
+            LOGGER.warn("Try to set timeout to {} and interval to {} seconds",
+                    (intervalSeconds + increaseIntervalSeconds * attempts.get()) * elements.length,
+                    intervalSeconds + increaseIntervalSeconds * attempts.get());
         }
     }
     
