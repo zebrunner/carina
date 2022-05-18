@@ -504,7 +504,7 @@ public class DriverHelper {
                 .task(() -> {
                     attempts.getAndIncrement();
                     return Arrays.stream(elements)
-                            .filter(element -> element.isElementPresent(intervalSeconds + (attempts.get() * increaseIntervalSeconds)))
+                            .filter(element -> element.isPresent(intervalSeconds + (attempts.get() * increaseIntervalSeconds)))
                             .findAny();
                 })
                 .until(Optional::isPresent)
@@ -520,7 +520,7 @@ public class DriverHelper {
 
         availableElement.get()
                 .get()
-                .click();      // try to use just click
+                .clickIfPresent();      // try to use just click
 
         if(attempts.get() > 1) {
             LOGGER.warn("Try to set timeout to {} and interval to {} seconds",
