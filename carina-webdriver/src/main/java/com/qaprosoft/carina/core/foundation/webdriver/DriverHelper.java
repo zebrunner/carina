@@ -15,7 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver;
 
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -73,12 +73,12 @@ import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
+import com.qaprosoft.carina.core.foundation.retry.ActionPoller;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.LogicUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
-import com.qaprosoft.carina.core.foundation.retry.ActionPoller;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.gui.AbstractPage;
@@ -465,24 +465,23 @@ public class DriverHelper {
     public void clickAny(long timeout, ExtendedWebElement... elements) {
         // Method which quickly looks for any element and click during timeout
         // sec
-        long interval = 1;
-        long increaseInterval = 1;
+        WebDriver drv = getDriver();
         AtomicInteger attempts = new AtomicInteger(0);
-        ActionPoller<ExtendedWebElement> actionPoller = ActionPoller.builder();
+        ActionPoller<WebElement> actionPoller = ActionPoller.builder();
 
-        Optional<ExtendedWebElement> searchableElement = actionPoller.task(() -> {
-                    ExtendedWebElement possiblyFoundElement = null;
+        Optional<WebElement> searchableElement = actionPoller.task(() -> {
+            WebElement possiblyFoundElement = null;
 
-                    for (ExtendedWebElement element : elements) {
-                        if (element.isElementPresent(interval + increaseInterval * attempts.get())) {
-                            possiblyFoundElement = element;
-                            break;
-                        }
-                    }
-
-                    attempts.getAndIncrement();
-                    return possiblyFoundElement;
-                })
+            for (ExtendedWebElement element : elements) {
+                List<WebElement> foundElements = drv.findElements(element.getBy());
+                if (foundElements.size() > 0) {
+                    possiblyFoundElement = foundElements.get(0);
+                    break;
+                }
+            }
+            attempts.getAndIncrement();
+            return possiblyFoundElement;
+        })
                 .until(Objects::nonNull)
                 .pollEvery(0, ChronoUnit.SECONDS)
                 .stopAfter(timeout, ChronoUnit.SECONDS)
