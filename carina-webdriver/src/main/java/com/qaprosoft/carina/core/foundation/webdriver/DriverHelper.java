@@ -484,7 +484,7 @@ public class DriverHelper {
                     return possiblyFoundElement;
                 })
                 .until(Objects::nonNull)
-                .pollEvery((interval + increaseInterval * attempts.get()) * elements.length, ChronoUnit.SECONDS)
+                .pollEvery(0, ChronoUnit.SECONDS)
                 .stopAfter(timeout, ChronoUnit.SECONDS)
                 .execute();
 
