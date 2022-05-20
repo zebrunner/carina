@@ -15,7 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver;
 
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -23,10 +23,13 @@ import java.lang.invoke.MethodHandles;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -69,6 +72,7 @@ import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
+import com.qaprosoft.carina.core.foundation.retry.ActionPoller;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.LogicUtils;
@@ -460,20 +464,32 @@ public class DriverHelper {
     public void clickAny(long timeout, ExtendedWebElement... elements) {
         // Method which quickly looks for any element and click during timeout
         // sec
-        int index = 0;
-        boolean clicked = false;
-        int counts = 10;
-        while (!clicked && index++ < counts) {
-            for (int i = 0; i < elements.length; i++) {
-                clicked = elements[i].clickIfPresent(timeout / counts);
-                if (clicked) {
+        WebDriver drv = getDriver();
+        ActionPoller<WebElement> actionPoller = ActionPoller.builder();
+
+        Optional<WebElement> searchableElement = actionPoller.task(() -> {
+            WebElement possiblyFoundElement = null;
+
+            for (ExtendedWebElement element : elements) {
+                List<WebElement> foundElements = drv.findElements(element.getBy());
+                if (foundElements.size() > 0) {
+                    possiblyFoundElement = foundElements.get(0);
                     break;
                 }
             }
-        }
-        if (!clicked) {
+            return possiblyFoundElement;
+        })
+                .until(Objects::nonNull)
+                .pollEvery(0, ChronoUnit.SECONDS)
+                .stopAfter(timeout, ChronoUnit.SECONDS)
+                .execute();
+
+        if (searchableElement.isEmpty()) {
             throw new RuntimeException("Unable to click onto any elements from array: " + Arrays.toString(elements));
         }
+
+        searchableElement.get()
+                .click();
     }
     
     /*
