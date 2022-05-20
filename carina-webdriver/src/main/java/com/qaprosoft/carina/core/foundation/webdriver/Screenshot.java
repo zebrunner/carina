@@ -625,6 +625,7 @@ public class Screenshot {
 		}
 		// disable screenshot if error message contains any of this info
 		boolean isContains = message.contains("StaleObjectException")
+		        || message.contains("NoSuchSessionException")
 				|| message.contains("StaleElementReferenceException")
 				|| message.contains("stale_element_reference.html")
 				|| message.contains("Error executing JavaScript")

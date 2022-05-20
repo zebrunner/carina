@@ -18,10 +18,8 @@ package com.qaprosoft.carina.core.foundation.webdriver.locator;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Objects;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
@@ -32,8 +30,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Localized;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.CaseInsensitiveConverter;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.ParamsToConvert;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.Platform;
 
 /**
  * The default element locator, which will lazily locate an element or an
@@ -48,7 +50,7 @@ public class ExtendedElementLocator implements ElementLocator {
     private final SearchContext searchContext;
     private By by;
     private String className;
-    
+    private CaseInsensitiveXPath caseInsensitiveXPath;
     private boolean caseInsensitive = false;
     private boolean localized = false;
     
@@ -68,8 +70,16 @@ public class ExtendedElementLocator implements ElementLocator {
             LocalizedAnnotations annotations = new LocalizedAnnotations(field);
             this.by = annotations.buildBy();
             if (field.isAnnotationPresent(CaseInsensitiveXPath.class)) {
-                this.caseInsensitive = true;
+                caseInsensitiveXPath = field.getAnnotation(CaseInsensitiveXPath.class);
+                CaseInsensitiveXPath csx = field.getAnnotation(CaseInsensitiveXPath.class);
+                Platform platform = Objects.equals(Configuration.getMobileApp(), "") ? Platform.WEB : Platform.MOBILE;
+
+                this.by = new CaseInsensitiveConverter(new ParamsToConvert(csx.id(), csx.name(),
+                        csx.text(), csx.classAttr()), platform)
+                        .convert(this.by);
+                caseInsensitive = true;
             }
+
             if (field.isAnnotationPresent(Localized.class)) {
                 this.localized = true;
             }
@@ -80,32 +90,27 @@ public class ExtendedElementLocator implements ElementLocator {
      * Find the element.
      */
     public WebElement findElement() {
-        WebElement element = null;
-        List<WebElement> elements = null;
-        // Finding element using Selenium
-        if (by != null) {
-            if (caseInsensitive && !by.toString().contains("translate(")) {
-                by = toCaseInsensitive(by.toString());
-            }
-            
-            //TODO: test how findElements work for web and android
-            // maybe migrate to the latest appium java driver and reuse original findElement!
-            elements = searchContext.findElements(by);
-            if (elements.size() == 1) {
-                element = elements.get(0);
-            } else if (elements.size() > 1) {
-                element = elements.get(0);
-                LOGGER.debug(elements.size() + " elements detected by: " + by.toString());
-            }
-            
-        }
-        
-        // If no luck throw general NoSuchElementException
-        if (element != null) {
-            return element;
+
+        if (by == null) {
+            throw new NullPointerException("By cannot be null");
         }
 
-        throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by);
+        //TODO: test how findElements work for web and android
+        // maybe migrate to the latest appium java driver and reuse original findElement!
+        List<WebElement> elements = searchContext.findElements(by);
+
+        WebElement element = null;
+        if (elements.size() == 1) {
+            element = elements.get(0);
+        } else if (elements.size() > 1) {
+            element = elements.get(0);
+            LOGGER.debug(elements.size() + " elements detected by: " + by.toString());
+        }
+
+        if (element == null) {
+            throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by);
+        }
+        return element;
     }
 
     /**
@@ -120,60 +125,30 @@ public class ExtendedElementLocator implements ElementLocator {
             LOGGER.debug("Unable to find elements: " + e.getMessage());
         }
 
-        // If no luck throw general NoSuchElementException
         if (elements == null) {
             throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
         }
 
         return elements;
     }
-    
-    /**
-     * Transform XPath locator to case insensitive
-     * 
-     * @param locator - locator as a String
-     * @return By
-     */
-    public static By toCaseInsensitive(String locator) {
-        String xpath = StringUtils.remove(locator, "By.xpath: ");
-        String attributePattern = "((@text|text\\(\\)|@content-desc)\\s*(\\,|\\=)\\s*(\\'|\\\")(.+?)(\\'|\\\")(\\)(\\s*\\bor\\b\\s*)?|\\]|\\)\\]))";
-        //TODO: test when xpath globally are declared inside single quota
-        
-        // @text of text() - group(2)
-        // , or = - group(3)
-        // ' or " - group(4)
-        // value - group(5)
-        // ' or " - group(6)
-        // ] or ) - group(7)
-        
-        // double translate is needed to make xpath and value case insensitive.
-        // For example on UI we have "Inscription", so with a single translate we must convert in page object all those values to lowercase
-        // double translate allow to use as is and convert everywhere
-        
-        // Expected xpath for both side translate
-        // *[translate(@text, '$U', '$l')=translate("Inscription", "inscription".UPPER, "inscription".LOWER)]
-        
-        Matcher matcher = Pattern.compile(attributePattern).matcher(xpath);
-        StringBuffer sb = new StringBuffer();
-        while (matcher.find()) {
-            String value = matcher.group(5);
-            String replacement = "translate(" + matcher.group(2) + ", " + matcher.group(4) + value.toUpperCase() + matcher.group(4) + ", " + matcher.group(4) + value.toLowerCase() + matcher.group(4) + ")" + matcher.group(3)
-                    + "translate(" + matcher.group(4) + value + matcher.group(4)+ ", " + matcher.group(4) + value.toUpperCase() + matcher.group(4) + ", " + matcher.group(4) + value.toLowerCase() + matcher.group(6)
-                    + ")" + matcher.group(7);
-            replacement = replacement.replaceAll("\\$", "\\\\\\$");
-            LOGGER.debug(replacement);
-            matcher.appendReplacement(sb, replacement);
-        }
-        matcher.appendTail(sb);
-        return By.xpath(sb.toString());
+
+    public SearchContext getSearchContext() {
+        return searchContext;
     }
 
     public boolean isLocalized() {
         return localized;
     }
 
-    public String getClassName(){
+    public boolean isCaseInsensitive() {
+        return caseInsensitive;
+    }
+
+    public String getClassName() {
         return className;
     }
 
+    public CaseInsensitiveXPath getCaseInsensitiveXPath() {
+        return caseInsensitiveXPath;
+    }
 }

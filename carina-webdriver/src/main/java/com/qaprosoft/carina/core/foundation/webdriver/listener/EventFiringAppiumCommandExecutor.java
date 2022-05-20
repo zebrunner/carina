@@ -19,7 +19,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Optional.ofNullable;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.net.ConnectException;
 import java.net.URL;
@@ -39,8 +38,6 @@ import org.openqa.selenium.remote.http.HttpResponse;
 //import org.openqa.selenium.remote.http.W3CHttpCommandCodec;
 import org.openqa.selenium.remote.codec.w3c.W3CHttpCommandCodec;
 import org.openqa.selenium.remote.service.DriverService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
@@ -90,7 +87,7 @@ public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
         this(additionalCommands, null, checkNotNull(addressOfRemoteServer), httpClientFactory);
     }
 
-    //TODO import latest java-appium client 
+    //TODO import latest java-appium client
 /*    public EventFiringAppiumCommandExecutor(Map<String, CommandInfo> additionalCommands,
             URL addressOfRemoteServer) {
         this(additionalCommands, addressOfRemoteServer, new HttpClientFactoryCustom());
@@ -154,27 +151,7 @@ public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
 
         Response response = null;
         try {
-            int retry = 10; //max attempts to repeit
-            Number pause = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / retry;
-            while (retry > 0) {
-                response = super.execute(command);
-                if (response.getValue() instanceof WebDriverException) {
-                    LOGGER.debug("CarinaCommandExecutor catched: " + response.getValue().toString());
-                    String msg = response.getValue().toString();
-                    if (msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED)
-                            || msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED2)) {
-                        LOGGER.warn("Enabled command executor retries: " + msg);
-                        CommonUtils.pause(pause);
-                    } else {
-                        // do not retry if not driver connection refused detected!
-                        break;
-                    }
-                } else {
-                    // do nothing as response already contains all the information we need
-                    break;
-                }
-                retry--;
-            }
+            response = super.execute(command);
         } catch (Throwable t) {
             Throwable rootCause = Throwables.getRootCause(t);
             if (rootCause instanceof ConnectException

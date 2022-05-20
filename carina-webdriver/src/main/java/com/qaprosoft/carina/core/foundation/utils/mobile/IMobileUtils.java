@@ -112,8 +112,9 @@ public interface IMobileUtils extends IDriverPool {
         int width = size.getWidth();
         int height = size.getHeight();
 
-        int x = elem.getLocation().getX() + width / 2;
-        int y = elem.getLocation().getY() + height / 2;
+        Point point = elem.getLocation();
+        int x = point.getX() + width / 2;
+        int y = point.getY() + height / 2;
         try {
             swipe(x, y, x, y, 2500);
         } catch (Exception e) {

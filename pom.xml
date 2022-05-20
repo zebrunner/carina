@@ -509,6 +509,12 @@
                 <groupId>io.appium</groupId>
                 <artifactId>java-client</artifactId>
                 <version>${appium.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>spring-context</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>com.amazonaws</groupId>
