@@ -62,7 +62,7 @@ import io.appium.java_client.remote.AppiumW3CHttpCommandCodec;
  */
 @SuppressWarnings({ "unchecked" })
 public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    //private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final Optional<DriverService> serviceOptional;
 
