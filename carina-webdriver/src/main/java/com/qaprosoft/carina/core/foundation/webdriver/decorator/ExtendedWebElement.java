@@ -23,6 +23,7 @@ import java.lang.reflect.Proxy;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -349,7 +350,7 @@ public class ExtendedWebElement implements IWebElement {
 
 //      Wait<WebDriver> wait = new WebDriverWait(getDriver(), timeout, RETRY_TIME)
         //try to use better tickMillis clock 
-        Wait<WebDriver> wait = new WebDriverWait(getDriver(), java.time.Clock.tickMillis(java.time.ZoneId.systemDefault()), Sleeper.SYSTEM_SLEEPER, timeout, RETRY_TIME)
+        Wait<WebDriver> wait = new WebDriverWait(getDriver(), Duration.ofSeconds(timeout), Duration.ofSeconds(RETRY_TIME),  java.time.Clock.tickMillis(java.time.ZoneId.systemDefault()), Sleeper.SYSTEM_SLEEPER)
                 .ignoring(WebDriverException.class)
                 .ignoring(NoSuchElementException.class);
 

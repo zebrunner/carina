@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
 
+import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -24,7 +25,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCa
 public class OperaCapabilities extends AbstractCapabilities {
     public DesiredCapabilities getCapability(String testName) {
         DesiredCapabilities capabilities = new DesiredCapabilities();
-        capabilities = initBaseCapabilities(capabilities, BrowserType.OPERA_BLINK, testName);
+        capabilities = initBaseCapabilities(capabilities, Browser.OPERA.browserName(), testName);
         capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
         capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
         

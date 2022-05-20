@@ -30,6 +30,8 @@ import java.net.HttpURLConnection;
 import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -311,7 +313,7 @@ public class ReportContext {
         String username = getField(url, 1);
         String password = getField(url, 2);
         try {
-            return new WebDriverWait(driver, timeout).until((k) -> checkArtifactUsingHttp(url, username, password));
+            return new WebDriverWait(driver, Duration.ofSeconds(timeout)).until((k) -> checkArtifactUsingHttp(url, username, password));
         } catch (Exception e) {
             LOGGER.debug("", e);
             return false;

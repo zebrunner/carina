@@ -115,7 +115,7 @@ public class DesktopCapabilitiesTest {
         OperaCapabilities operaCapabilities = new OperaCapabilities();
         DesiredCapabilities capabilities = operaCapabilities.getCapability(testName);
 
-        Assert.assertEquals(capabilities.getBrowserName(), BrowserType.OPERA_BLINK, "Returned browser name is not valid!");
+        Assert.assertEquals(capabilities.getBrowserName(), Browser.OPERA.browserName(), "Returned browser name is not valid!");
 
         Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
 

@@ -960,7 +960,7 @@ public class DriverHelper {
      */
     public void acceptAlert() {
         WebDriver drv = getDriver();
-        Wait<WebDriver> wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
+        Wait<WebDriver> wait = new WebDriverWait(drv, Duration.ofSeconds(EXPLICIT_TIMEOUT), Duration.ofSeconds(RETRY_TIME));
         try {
             wait.until((Function<WebDriver, Object>) dr -> isAlertPresent());
             drv.switchTo().alert().accept();
@@ -975,7 +975,7 @@ public class DriverHelper {
      */
     public void cancelAlert() {
         WebDriver drv = getDriver();
-        Wait<WebDriver> wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
+        Wait<WebDriver> wait = new WebDriverWait(drv, Duration.ofSeconds(EXPLICIT_TIMEOUT), Duration.ofSeconds(RETRY_TIME));
         try {
             wait.until((Function<WebDriver, Object>) dr -> isAlertPresent());
             drv.switchTo().alert().dismiss();
@@ -1009,7 +1009,7 @@ public class DriverHelper {
     public boolean isPageOpened(final AbstractPage page, long timeout) {
         boolean result;
         final WebDriver drv = getDriver();
-        Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME);
+        Wait<WebDriver> wait = new WebDriverWait(drv, Duration.ofSeconds(timeout), Duration.ofSeconds(RETRY_TIME));
         try {
             wait.until((Function<WebDriver, Object>) dr -> LogicUtils.isURLEqual(page.getPageURL(), drv.getCurrentUrl()));
             result = true;
@@ -1240,7 +1240,7 @@ public class DriverHelper {
 		boolean result;
         long startMillis = 0;
 		final WebDriver drv = getDriver();
-		Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME)
+		Wait<WebDriver> wait = new WebDriverWait(drv, Duration.ofSeconds(timeout), Duration.ofSeconds(RETRY_TIME))
 		        .ignoring(WebDriverException.class)
 				.ignoring(NoSuchSessionException.class);
 		try {

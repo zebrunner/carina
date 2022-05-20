@@ -359,7 +359,7 @@ public abstract class AbstractCapabilities {
             firefoxPorts.remove(0);
         }
 
-        profile.setPreference(FirefoxProfile.PORT_PREFERENCE, newPort);
+        profile.setPreference("webdriver_firefox_port", newPort);
         LOGGER.debug("FireFox profile will use '" + newPort + "' port number.");
 
         profile.setPreference("dom.max_chrome_script_run_time", 0);

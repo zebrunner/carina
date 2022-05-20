@@ -61,7 +61,7 @@
         <httpclient.version>4.5.13</httpclient.version>
         <jna.version>3.0.9</jna.version>
         <!-- Selenium -->
-        <selenium.version>4.1.0</selenium.version>
+        <selenium.version>4.1.4</selenium.version>
         <appium.version>7.6.0</appium.version>
         <!-- Zebrunner integrations -->
         <zebrunner-testng-pluggable.version>1.6.7</zebrunner-testng-pluggable.version>

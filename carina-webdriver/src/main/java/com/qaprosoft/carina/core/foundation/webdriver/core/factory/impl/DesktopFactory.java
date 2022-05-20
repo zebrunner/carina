@@ -27,6 +27,7 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 //import org.openqa.selenium.remote.Browser;
+import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -93,7 +94,7 @@ public class DesktopFactory extends AbstractFactory {
             return new SafariCapabilities().getCapability(name);
         } else if (BrowserType.CHROME.equalsIgnoreCase(browser)) {
             return new ChromeCapabilities().getCapability(name);
-        } else if (BrowserType.OPERA_BLINK.equalsIgnoreCase(browser) || BrowserType.OPERA.equalsIgnoreCase(browser)) {
+        } else if (BrowserType.OPERA.equalsIgnoreCase(browser)) {
             return new OperaCapabilities().getCapability(name);
         } else if (BrowserType.EDGE.equalsIgnoreCase(browser) || "edge".equalsIgnoreCase(browser)) {
             return new EdgeCapabilities().getCapability(name);

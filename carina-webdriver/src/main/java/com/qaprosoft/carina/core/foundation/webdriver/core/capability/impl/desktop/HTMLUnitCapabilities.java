@@ -22,7 +22,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCa
 public class HTMLUnitCapabilities extends AbstractCapabilities {
 
     public DesiredCapabilities getCapability(String testName) {
-        DesiredCapabilities capabilities = DesiredCapabilities.htmlUnit();
+        DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setJavascriptEnabled(true);
         return capabilities;
     }
