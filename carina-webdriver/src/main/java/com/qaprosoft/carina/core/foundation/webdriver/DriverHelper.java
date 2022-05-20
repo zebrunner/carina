@@ -36,7 +36,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
@@ -466,7 +465,6 @@ public class DriverHelper {
         // Method which quickly looks for any element and click during timeout
         // sec
         WebDriver drv = getDriver();
-        AtomicInteger attempts = new AtomicInteger(0);
         ActionPoller<WebElement> actionPoller = ActionPoller.builder();
 
         Optional<WebElement> searchableElement = actionPoller.task(() -> {
@@ -479,7 +477,6 @@ public class DriverHelper {
                     break;
                 }
             }
-            attempts.getAndIncrement();
             return possiblyFoundElement;
         })
                 .until(Objects::nonNull)
