@@ -101,6 +101,7 @@ public class ConfigurationTest {
         Assert.assertEquals(Configuration.getDriverType(), "mobile", "Can't find out device type");
     }
 
+    /*
     @Test
     public void testDesktopDeviceTypeWithDesiredCapabilities() {
         DesiredCapabilities capabilities = DesiredCapabilities.safari();
@@ -109,7 +110,7 @@ public class ConfigurationTest {
 
         Assert.assertEquals(Configuration.getDriverType(capabilities), "desktop", "Can't find out device type");
     }
-
+*/
     @Test
     public void testMobileApp() {
         String mobileApp = "https://qaprosoft.s3-us-west-2.amazonaws.com/carinademoexample.apk";

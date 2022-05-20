@@ -34,26 +34,36 @@ import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.Response;
 import org.openqa.selenium.remote.http.HttpClient;
 import org.openqa.selenium.remote.http.HttpRequest;
-import org.openqa.selenium.remote.http.W3CHttpCommandCodec;
+import org.openqa.selenium.remote.http.HttpResponse;
+//import org.openqa.selenium.remote.http.W3CHttpCommandCodec;
+import org.openqa.selenium.remote.codec.w3c.W3CHttpCommandCodec;
 import org.openqa.selenium.remote.service.DriverService;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
-import com.qaprosoft.carina.core.foundation.webdriver.httpclient.HttpClientFactoryCustom;
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
+//import com.qaprosoft.carina.core.foundation.webdriver.httpclient.HttpClientFactoryCustom;
 
 import io.appium.java_client.MobileCommand;
 import io.appium.java_client.remote.AppiumCommandExecutor;
 import io.appium.java_client.remote.AppiumW3CHttpCommandCodec;
 
+//import io.appium.java_client.remote.NewAppiumSessionPayload;
+
+
 /**
  * EventFiringAppiumCommandExecutor triggers event listener before/after execution of the command.
  * Please track {@link AppiumCommandExecutor} for latest changes.
- * 
+ *
  * @author akhursevich
  */
 @SuppressWarnings({ "unchecked" })
 public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
-    
+    //private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private final Optional<DriverService> serviceOptional;
 
     private EventFiringAppiumCommandExecutor(Map<String, CommandInfo> additionalCommands, DriverService service,
@@ -77,18 +87,20 @@ public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
         this(additionalCommands, null, checkNotNull(addressOfRemoteServer), httpClientFactory);
     }
 
-    public EventFiringAppiumCommandExecutor(Map<String, CommandInfo> additionalCommands,
+    //TODO import latest java-appium client
+/*    public EventFiringAppiumCommandExecutor(Map<String, CommandInfo> additionalCommands,
             URL addressOfRemoteServer) {
         this(additionalCommands, addressOfRemoteServer, new HttpClientFactoryCustom());
-    }
+    }*/
 
-    public EventFiringAppiumCommandExecutor(Map<String, CommandInfo> additionalCommands,
+/*    public EventFiringAppiumCommandExecutor(Map<String, CommandInfo> additionalCommands,
             DriverService service) {
         this(additionalCommands, service, new HttpClientFactoryCustom());
-    }
+    }*/
 
     public EventFiringAppiumCommandExecutor(URL addressOfRemoteServer) {
-        this(MobileCommand.commandRepository, addressOfRemoteServer, new HttpClientFactoryCustom());
+    	this(MobileCommand.commandRepository, addressOfRemoteServer, HttpClient.Factory.createDefault());
+        //this(MobileCommand.commandRepository, addressOfRemoteServer, new HttpClientFactoryCustom());
     }
 
     private <B> B getPrivateFieldValue(String fieldName, Class<B> fieldType) {
@@ -152,7 +164,7 @@ public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
                     return new WebDriverException("The appium server has accidentally died!", rootCause);
                 }).orElseGet((Supplier<WebDriverException>) () -> new WebDriverException(rootCause.getMessage(), rootCause));
             }
-            // [VD] never enable throwIfUnchecked as it generates RuntimeException and corrupt TestNG main thread!   
+            // [VD] never enable throwIfUnchecked as it generates RuntimeException and corrupt TestNG main thread!
             // throwIfUnchecked(t);
             throw new WebDriverException(t);
         } finally {
@@ -161,11 +173,13 @@ public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
             }
         }
 
-        if (DriverCommand.NEW_SESSION.equals(command.getName())
+        //TODO [MS] this issue solved with appium java-client 8.0 +
+/*        if (DriverCommand.NEW_SESSION.equals(command.getName())
                 && getCommandCodec() instanceof W3CHttpCommandCodec) {
             setCommandCodec(new AppiumW3CHttpCommandCodec());
             getAdditionalCommands().forEach(this::defineCommand);
-        }
+        }*/
+
 
         return response;
     }

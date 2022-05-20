@@ -22,9 +22,13 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCa
 
 public class SafariCapabilities extends AbstractCapabilities {
 
+	
     public DesiredCapabilities getCapability(String testName) {
-        DesiredCapabilities capabilities = DesiredCapabilities.safari();
+        /*DesiredCapabilities capabilities = DesiredCapabilities.safari();
         capabilities = initBaseCapabilities(capabilities, BrowserType.SAFARI, testName);
         return capabilities;
+        */
+        return null;
     }
+    
 }

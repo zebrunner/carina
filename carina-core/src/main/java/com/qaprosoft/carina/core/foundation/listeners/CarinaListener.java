@@ -186,7 +186,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         onHealthCheck(suite);
         
         if (Configuration.getPlatform().equalsIgnoreCase(SpecialKeywords.API)) {
-            CurrentTestRun.setPlatform(SpecialKeywords.API);
+        //TODO: investigate this possible problem.
+           // CurrentTestRun.setPlatform(SpecialKeywords.API);
         }
 
         String mobileApp = Configuration.getMobileApp();
