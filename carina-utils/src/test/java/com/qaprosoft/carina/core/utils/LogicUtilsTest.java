@@ -29,11 +29,17 @@ public class LogicUtilsTest {
 
     private static final String URL1 = "http://www.example.com/item/$ignore?param=lamp";
     private static final String URL1_1 = "http://www.example.com/item/$ignore?param=lamp";
+    private static final String URL1_2 = "http://www.example.com/item/lamp/led";
     private static final String URL1_UPPER = "http://www.EXAMPLE.com/ITEM/$ignore?param=lamp";
     private static final String URL2 = "http://www.shop.com/item?param=laptop";
 
     private static final boolean[] CASES1 = {true, true, true};
     private static final boolean[] CASES2 = {true, false, true};
+
+    @Test
+    public void testDifferentUrlLevels() {
+        Assert.assertTrue(LogicUtils.isURLEqual(URL1, URL1_2), URL1 + " is not equal " + URL1_2);
+    }
 
     @Test
     public void testUrlsIsEqual() {
