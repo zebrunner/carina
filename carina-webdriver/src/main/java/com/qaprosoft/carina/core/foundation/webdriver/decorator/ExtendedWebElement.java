@@ -328,10 +328,10 @@ public class ExtendedWebElement implements IWebElement {
 	 *            - timeout.
 	 * @return element existence status.
 	 */
-    public boolean isPresent(By by, long timeout) {
-        ExpectedCondition<?> waitCondition = ExpectedConditions.presenceOfElementLocated(by);
-        return waitUntil(waitCondition, timeout);
-    }
+	public boolean isPresent(By by, long timeout) {
+		return waitUntil(getDefaultCondition(by), timeout);
+	}
+	
 	
     /**
      * Wait until any condition happens.
