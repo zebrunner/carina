@@ -176,6 +176,10 @@ public class ExtendedWebElement implements IWebElement {
 				searchContextField.setAccessible(true);
 				this.searchContext = tempSearchContext = (SearchContext) searchContextField.get(locator);
 
+                caseInsensitiveContextField = locator.getClass().getDeclaredField("caseInsensitive");
+                caseInsensitiveContextField.setAccessible(true);
+                boolean caseInsensitive = (Boolean) caseInsensitiveContextField.get(locator);
+
                 byContextField = locator.getClass().getDeclaredField("by");
                 byContextField.setAccessible(true);
                 //TODO: identify if it is a child element and
