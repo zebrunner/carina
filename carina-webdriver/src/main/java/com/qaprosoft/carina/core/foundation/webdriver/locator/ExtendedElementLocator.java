@@ -50,7 +50,6 @@ public class ExtendedElementLocator implements ElementLocator {
     private final SearchContext searchContext;
     private By by;
     private String className;
-    private CaseInsensitiveConverter caseInsensitiveConverter;
     private boolean localized = false;
     
     /**
@@ -71,7 +70,7 @@ public class ExtendedElementLocator implements ElementLocator {
             LocalizedAnnotations annotations = new LocalizedAnnotations(field);
             this.by = annotations.buildBy();
             if (field.isAnnotationPresent(CaseInsensitiveXPath.class)) {
-                this.caseInsensitiveConverter = createCaseInsensitiveConverter(field);
+                this.by = convertByToCaseInsensitiveIfCIAnnotationPresent(field, this.by);
             }
 
             if (field.isAnnotationPresent(Localized.class)) {
@@ -80,12 +79,12 @@ public class ExtendedElementLocator implements ElementLocator {
         }
     }
 
-    private CaseInsensitiveConverter createCaseInsensitiveConverter(Field field) {
+    private By convertByToCaseInsensitiveIfCIAnnotationPresent(Field field, By by) {
         CaseInsensitiveXPath csx = field.getAnnotation(CaseInsensitiveXPath.class);
         Platform platform = Objects.equals(Configuration.getMobileApp(), "") ? Platform.WEB : Platform.MOBILE;
 
         return new CaseInsensitiveConverter(new ParamsToConvert(csx.id(), csx.name(),
-                csx.text(), csx.classAttr()), platform);
+                csx.text(), csx.classAttr()), platform).convert(by);
     }
 
     /**
@@ -144,9 +143,5 @@ public class ExtendedElementLocator implements ElementLocator {
 
     public String getClassName() {
         return className;
-    }
-
-    public CaseInsensitiveConverter getCaseInsensitiveConverter() {
-        return caseInsensitiveConverter;
     }
 }
