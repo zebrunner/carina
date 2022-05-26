@@ -342,7 +342,7 @@ public class ExtendedWebElement implements IWebElement {
 
 //      Wait<WebDriver> wait = new WebDriverWait(getDriver(), timeout, RETRY_TIME)
         //try to use better tickMillis clock 
-        Wait<WebDriver> wait = new WebDriverWait(((RemoteWebElement) element).getWrappedDriver(), java.time.Clock.tickMillis(java.time.ZoneId.systemDefault()), Sleeper.SYSTEM_SLEEPER, timeout, RETRY_TIME)
+        Wait<WebDriver> wait = new WebDriverWait(getDriver(), java.time.Clock.tickMillis(java.time.ZoneId.systemDefault()), Sleeper.SYSTEM_SLEEPER, timeout, RETRY_TIME)
                 .ignoring(WebDriverException.class)
                 .ignoring(NoSuchElementException.class);
 
