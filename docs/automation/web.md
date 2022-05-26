@@ -136,6 +136,40 @@ public class HomePage extends AbstractPage {
 * You should call the super constructor **super(driver, searchContext)** where searchContext is an instance of **org.openqa.selenium.SearchContext**
 * Locate UI Object classes in src/main/java source folder
 
+### Work with iframe
+Before working with an iframe, you need to understand that an iframe is a separate page. Therefore, if we need to work with the internal structure of an iframe, we need to create a separate class for it inherited from AbstractPage, in which we already paint its internal structure, for example:
+
+```
+public class Frame extends AbstractPage {
+
+    @FindBy(xpath = "//div[@class='tag-of-element']")
+    private ExtendedWebElement component;
+
+    public Frame(WebDriver driver) {
+        super(driver);
+    }
+
+    public void click() {
+        component.click();
+    }
+}
+```
+
+Suppose the iframe is a page component or another component. Then we have to designate it as ExtendedWebElement, for example:
+```
+ @FindBy(xpath = ".//iframe")
+ private ExtendedWebElement iframe;
+```
+
+If we need to perform actions on iframe components, we can do:
+
+```
+Frame frame = new Frame(driver);
+driver.switchTo().frame(iframe.getElement());
+frame.click();
+getDriver().switchTo().defaultContent();
+```
+
 ### Implementation of tests
 Carina framework uses TestNG for test organization. In general, test represents a manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:
 ```
