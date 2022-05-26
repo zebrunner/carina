@@ -50,8 +50,7 @@ public class ExtendedElementLocator implements ElementLocator {
     private final SearchContext searchContext;
     private By by;
     private String className;
-    private CaseInsensitiveXPath caseInsensitiveXPath;
-    private boolean caseInsensitive = false;
+    private CaseInsensitiveConverter caseInsensitiveConverter;
     private boolean localized = false;
     
     /**
@@ -63,27 +62,30 @@ public class ExtendedElementLocator implements ElementLocator {
      */
     public ExtendedElementLocator(SearchContext searchContext, Field field) {
         this.searchContext = searchContext;
-        String[] classPath = field.getDeclaringClass().toString().split("\\.");
+        String[] classPath = field.getDeclaringClass()
+                .toString()
+                .split("\\.");
         this.className = classPath[classPath.length-1];
 
         if (field.isAnnotationPresent(FindBy.class) || field.isAnnotationPresent(ExtendedFindBy.class)) {
             LocalizedAnnotations annotations = new LocalizedAnnotations(field);
             this.by = annotations.buildBy();
             if (field.isAnnotationPresent(CaseInsensitiveXPath.class)) {
-                caseInsensitiveXPath = field.getAnnotation(CaseInsensitiveXPath.class);
-                CaseInsensitiveXPath csx = field.getAnnotation(CaseInsensitiveXPath.class);
-                Platform platform = Objects.equals(Configuration.getMobileApp(), "") ? Platform.WEB : Platform.MOBILE;
-
-                this.by = new CaseInsensitiveConverter(new ParamsToConvert(csx.id(), csx.name(),
-                        csx.text(), csx.classAttr()), platform)
-                        .convert(this.by);
-                caseInsensitive = true;
+                this.caseInsensitiveConverter = createCaseInsensitiveConverter(field);
             }
 
             if (field.isAnnotationPresent(Localized.class)) {
                 this.localized = true;
             }
         }
+    }
+
+    private CaseInsensitiveConverter createCaseInsensitiveConverter(Field field) {
+        CaseInsensitiveXPath csx = field.getAnnotation(CaseInsensitiveXPath.class);
+        Platform platform = Objects.equals(Configuration.getMobileApp(), "") ? Platform.WEB : Platform.MOBILE;
+
+        return new CaseInsensitiveConverter(new ParamsToConvert(csx.id(), csx.name(),
+                csx.text(), csx.classAttr()), platform);
     }
 
     /**
@@ -140,15 +142,11 @@ public class ExtendedElementLocator implements ElementLocator {
         return localized;
     }
 
-    public boolean isCaseInsensitive() {
-        return caseInsensitive;
-    }
-
     public String getClassName() {
         return className;
     }
 
-    public CaseInsensitiveXPath getCaseInsensitiveXPath() {
-        return caseInsensitiveXPath;
+    public CaseInsensitiveConverter getCaseInsensitiveConverter() {
+        return caseInsensitiveConverter;
     }
 }
