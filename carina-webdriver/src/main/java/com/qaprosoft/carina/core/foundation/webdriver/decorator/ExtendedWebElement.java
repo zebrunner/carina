@@ -200,6 +200,14 @@ public class ExtendedWebElement implements IWebElement {
 					searchContextField = locator.getClass().getDeclaredField("searchContext");
 					searchContextField.setAccessible(true);
 					tempSearchContext = (SearchContext) searchContextField.get(locator);
+
+                    caseInsensitiveContextField = locator.getClass().getDeclaredField("caseInsensitiveConverter");
+                    caseInsensitiveContextField.setAccessible(true);
+                    CaseInsensitiveConverter caseInsensitiveConverter = (CaseInsensitiveConverter) caseInsensitiveContextField.get(locator);
+
+                    if (caseInsensitiveConverter != null) {
+                        this.by = caseInsensitiveConverter.convert(this.by);
+                    }
 				}
 			}
 
