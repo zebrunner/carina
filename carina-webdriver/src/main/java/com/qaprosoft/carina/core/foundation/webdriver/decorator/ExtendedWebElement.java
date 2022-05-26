@@ -158,7 +158,10 @@ public class ExtendedWebElement implements IWebElement {
 			SearchContext tempSearchContext = null;
 
 			if (element.getClass().toString().contains("EventFiringWebDriver$EventFiringWebElement")) {
-				element = transformEventFiringToRemoteWebElement(element);
+				// reuse reflection to get internal fields
+				locatorField = element.getClass().getDeclaredField("underlyingElement");
+				locatorField.setAccessible(true);
+				element = (RemoteWebElement) locatorField.get(element);
 			}
 
 			if (element instanceof RemoteWebElement) {
@@ -275,15 +278,11 @@ public class ExtendedWebElement implements IWebElement {
     	}
     }
 
+    
+
     public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext, Object[] formatValues) {
         this(by, name, driver, searchContext);
         this.formatValues = Arrays.toString(formatValues);
-    }
-
-    public RemoteWebElement transformEventFiringToRemoteWebElement(WebElement element) throws IllegalAccessException, NoSuchFieldException {
-        Field locatorField = element.getClass().getDeclaredField("underlyingElement");
-        locatorField.setAccessible(true);
-        return (RemoteWebElement) locatorField.get(element);
     }
 
     public WebElement getElement() {
