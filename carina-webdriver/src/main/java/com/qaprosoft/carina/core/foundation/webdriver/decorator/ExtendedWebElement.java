@@ -89,35 +89,28 @@ import com.sun.jersey.core.util.Base64;
 import io.appium.java_client.MobileBy;
 
 public class ExtendedWebElement implements IWebElement {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
     private static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
-
     private static final long RETRY_TIME = Configuration.getLong(Parameter.RETRY_INTERVAL);
-    
+    private static final Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
+    private final CryptoTool CRYPTO_TOOL = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
+    private final ElementLoadingStrategy loadingStrategy = ElementLoadingStrategy.valueOf(Configuration.get(Parameter.ELEMENT_LOADING_STRATEGY));
+
     // we should keep both properties: driver and searchContext obligatory
     // driver is used for actions, javascripts execution etc
     // searchContext is used for searching element by default
     private WebDriver driver;
     private SearchContext searchContext;
 
-    private CryptoTool cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
-
-    private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
-
     private WebElement element = null;
     private String name;
     private By by;
-
-    private boolean caseInsensitive;
-
-    private ElementLoadingStrategy loadingStrategy = ElementLoadingStrategy.valueOf(Configuration.get(Parameter.ELEMENT_LOADING_STRATEGY));
 
     private boolean isLocalized = false;
 
     // Converted array of objects to String for dynamic element locators
     private String formatValues = "";
-
     private LocatorConverter caseInsensitiveConverter;
 
     public ExtendedWebElement(WebElement element, String name, By by) {
@@ -189,7 +182,7 @@ public class ExtendedWebElement implements IWebElement {
 
                 caseInsensitiveContextField = locator.getClass().getDeclaredField("caseInsensitive");
                 caseInsensitiveContextField.setAccessible(true);
-                this.caseInsensitive = (Boolean) caseInsensitiveContextField.get(locator);
+                boolean caseInsensitive = (Boolean) caseInsensitiveContextField.get(locator);
 
                 byContextField = locator.getClass().getDeclaredField("by");
                 byContextField.setAccessible(true);
@@ -214,9 +207,9 @@ public class ExtendedWebElement implements IWebElement {
 
                     caseInsensitiveContextField = locator.getClass().getDeclaredField("caseInsensitive");
                     caseInsensitiveContextField.setAccessible(true);
-                    this.caseInsensitive = (Boolean) caseInsensitiveContextField.get(locator);
+                    caseInsensitive = (Boolean) caseInsensitiveContextField.get(locator);
 
-                    if (this.caseInsensitive) {
+                    if (caseInsensitive) {
                         CaseInsensitiveXPath csx = locator.getCaseInsensitiveXPath();
                         Platform platform = Objects.equals(Configuration.getMobileApp(), "") ? Platform.WEB : Platform.MOBILE;
                         caseInsensitiveConverter = new CaseInsensitiveConverter(
@@ -1005,7 +998,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return element with text existence status.
      */
     public boolean isElementWithTextPresent(final String text, long timeout) {
-    	final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
+        final String decryptedText = CRYPTO_TOOL.decryptByPattern(text, CRYPTO_PATTERN);
 		ExpectedCondition<Boolean> textCondition;
 		if (element != null) {
 			textCondition = ExpectedConditions.textToBePresentInElement(element, decryptedText);
@@ -1480,7 +1473,7 @@ public class ExtendedWebElement implements IWebElement {
 
 			@Override
 			public void doType(String text) {
-				final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
+                final String decryptedText = CRYPTO_TOOL.decryptByPattern(text, CRYPTO_PATTERN);
 
 /*				if (!element.getText().isEmpty()) {
     				DriverListener.setMessages(Messager.KEYS_CLEARED_IN_ELEMENT.getMessage(getName()),
@@ -1503,7 +1496,7 @@ public class ExtendedWebElement implements IWebElement {
 
 			@Override
 			public void doAttachFile(String filePath) {
-				final String decryptedText = cryptoTool.decryptByPattern(filePath, CRYPTO_PATTERN);
+                final String decryptedText = CRYPTO_TOOL.decryptByPattern(filePath, CRYPTO_PATTERN);
 
 				String textLog = (!decryptedText.equals(filePath) ? "********" : filePath);
 
@@ -1594,7 +1587,7 @@ public class ExtendedWebElement implements IWebElement {
 			
 			@Override
 			public boolean doSelect(String text) {
-				final String decryptedSelectText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
+                final String decryptedSelectText = CRYPTO_TOOL.decryptByPattern(text, CRYPTO_PATTERN);
 				
 				String textLog = (!decryptedSelectText.equals(text) ? "********" : text);
 				
