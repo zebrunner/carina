@@ -333,10 +333,25 @@ public class ReportContext {
         return downloadArtifact(driver, name, timeout, true);
     }
 
+    /**
+     * download artifact from selenoid to local java machine by pattern
+     * 
+     * @param driver WebDriver
+     * @param pattern regex by with we will filter artifacts that will be downloaded
+     * @return list of artifact files
+     */
     public static List<File> downloadArtifacts(WebDriver driver, String pattern) {
         return downloadArtifacts(driver, pattern, true);
     }
 
+    /**
+     * download artifact from selenoid to local java machine by pattern
+     * 
+     * @param driver WebDriver
+     * @param pattern regex by with we will filter artifacts that will be downloaded
+     * @param attachToTestRun boolean
+     * @return list of artifact files
+     */
     public static List<File> downloadArtifacts(WebDriver driver, String pattern, boolean attachToTestRun) {
         List<String> filteredFilesNames = listArtifacts(driver)
                 .stream()
