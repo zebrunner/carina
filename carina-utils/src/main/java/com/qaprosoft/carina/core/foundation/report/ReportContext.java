@@ -38,15 +38,16 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
-import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -62,6 +63,7 @@ import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.FileManager;
@@ -76,7 +78,7 @@ import com.zebrunner.agent.core.registrar.Artifact;
 
 public class ReportContext {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
+    private static final long ARTIFACT_WAITING_TIMEOUT_SEC = 5;
     public static final String ARTIFACTS_FOLDER = "artifacts";
 
     private static final String GALLERY_ZIP = "gallery-lib.zip";
@@ -233,6 +235,64 @@ public class ReportContext {
         return false;
     }
 
+    private static List<String> listArtifacts(WebDriver driver) {
+        String hostUrl = Configuration.getSeleniumUrl().replace("wd/hub", "download/");
+        String username = getField(hostUrl, 1);
+        String password = getField(hostUrl, 2);
+
+        boolean getLocalArtifacts = false;
+
+        List<String> artifactNames = new ArrayList<>();
+
+        try {
+            HttpURLConnection.setFollowRedirects(false);
+            // note : you may also need
+            // HttpURLConnection.setInstanceFollowRedirects(false)
+            HttpURLConnection con = (HttpURLConnection) new URL(hostUrl).openConnection();
+
+            con.setRequestMethod("HEAD");
+
+            if (!username.isEmpty() && !password.isEmpty()) {
+                String usernameColonPassword = username + ":" + password;
+                String basicAuthPayload = "Basic " + Base64.getEncoder().encodeToString(usernameColonPassword.getBytes());
+                con.addRequestProperty("Authorization", basicAuthPayload);
+            }
+
+            int responseCode = con.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_NOT_FOUND &&
+                    con.getResponseMessage().contains("\"error\":\"invalid session id\",\"message\":\"unknown session")) {
+                throw new RuntimeException("Invalid session id. Something wrong with driver");
+            }
+            if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
+                getLocalArtifacts = true;
+            }
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                String hrefAttributePattern = "href=([\"'])((?:(?!\\1)[^\\\\]|(?:\\\\\\\\)*\\\\[^\\\\])*)\\1";
+                System.out.println(con.getResponseMessage()); // todo delete
+
+                Pattern pattern = Pattern.compile(hrefAttributePattern);
+                Matcher matcher = pattern.matcher(con.getResponseMessage());
+                while (matcher.find()) {
+                    artifactNames.add(matcher.group(2));
+                }
+            }
+
+        } catch (IOException e) {
+            LOGGER.error("Something went wrong when try to get artifacts from remote");
+            getLocalArtifacts = true;
+        } finally {
+            if (getLocalArtifacts) {
+                artifactNames = Arrays.stream(Objects.requireNonNull(getArtifactsFolder().listFiles()))
+                        .map(File::getName)
+                        .collect(Collectors.toList());
+            }
+        }
+
+        return artifactNames;
+    }
+
     public static List<File> getAllArtifacts() {
         return Arrays.asList(getArtifactsFolder().listFiles());
     }
@@ -247,6 +307,22 @@ public class ReportContext {
      */
     public static File downloadArtifact(WebDriver driver, String name, long timeout) {
         return downloadArtifact(driver, name, timeout, true);
+    }
+
+    public static List<File> downloadArtifacts(WebDriver driver, String pattern) {
+        List<String> filteredFilesNames = listArtifacts(driver)
+                .stream()
+                // ignore directories
+                .filter(fileName -> !fileName.endsWith("/"))
+                .filter(fileName -> fileName.matches(pattern))
+                .collect(Collectors.toList());
+
+        List<File> downloadedArtifacts = new ArrayList<>();
+
+        for (String fileName : filteredFilesNames) {
+            downloadedArtifacts.add(downloadArtifact(driver, fileName, ARTIFACT_WAITING_TIMEOUT_SEC, true));
+        }
+        return downloadedArtifacts;
     }
 
     public static File downloadArtifact(WebDriver driver, String name, long timeout, boolean artifact) {
