@@ -334,6 +334,10 @@ public class ReportContext {
     }
 
     public static List<File> downloadArtifacts(WebDriver driver, String pattern) {
+        return downloadArtifacts(driver, pattern, true);
+    }
+
+    public static List<File> downloadArtifacts(WebDriver driver, String pattern, boolean attachToTestRun) {
         List<String> filteredFilesNames = listArtifacts(driver)
                 .stream()
                 // ignore directories
@@ -344,7 +348,7 @@ public class ReportContext {
         List<File> downloadedArtifacts = new ArrayList<>();
 
         for (String fileName : filteredFilesNames) {
-            downloadedArtifacts.add(downloadArtifact(driver, fileName, ARTIFACT_WAITING_TIMEOUT_SEC, false));
+            downloadedArtifacts.add(downloadArtifact(driver, fileName, ARTIFACT_WAITING_TIMEOUT_SEC, attachToTestRun));
         }
         return downloadedArtifacts;
     }
