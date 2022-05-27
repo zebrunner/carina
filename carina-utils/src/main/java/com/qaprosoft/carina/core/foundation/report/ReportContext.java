@@ -17,12 +17,14 @@ package com.qaprosoft.carina.core.foundation.report;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
 import java.net.Authenticator;
@@ -250,7 +252,6 @@ public class ReportContext {
             // note : you may also need
             // HttpURLConnection.setInstanceFollowRedirects(false)
             HttpURLConnection con = (HttpURLConnection) new URL(hostUrl).openConnection();
-
             con.setRequestMethod("HEAD");
 
             if (!username.isEmpty() && !password.isEmpty()) {
@@ -260,9 +261,9 @@ public class ReportContext {
             }
 
             int responseCode = con.getResponseCode();
-
+            String responseBody = readStream(con.getInputStream());
             if (responseCode == HttpURLConnection.HTTP_NOT_FOUND &&
-                    con.getResponseMessage().contains("\"error\":\"invalid session id\",\"message\":\"unknown session")) {
+                    responseBody.contains("\"error\":\"invalid session id\",\"message\":\"unknown session")) {
                 throw new RuntimeException("Invalid session id. Something wrong with driver");
             }
             if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
@@ -271,10 +272,10 @@ public class ReportContext {
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 String hrefAttributePattern = "href=([\"'])((?:(?!\\1)[^\\\\]|(?:\\\\\\\\)*\\\\[^\\\\])*)\\1";
-                System.out.println(con.getResponseMessage()); // todo delete
+                System.out.println(responseBody); // todo delete
 
                 Pattern pattern = Pattern.compile(hrefAttributePattern);
-                Matcher matcher = pattern.matcher(con.getResponseMessage());
+                Matcher matcher = pattern.matcher(responseBody);
                 while (matcher.find()) {
                     artifactNames.add(matcher.group(2));
                 }
@@ -292,6 +293,30 @@ public class ReportContext {
         }
 
         return artifactNames;
+    }
+
+    // Converting InputStream to String
+    private static String readStream(InputStream in) {
+        BufferedReader reader = null;
+        StringBuffer response = new StringBuffer();
+        try {
+            reader = new BufferedReader(new InputStreamReader(in));
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return response.toString();
     }
 
     public static List<File> getAllArtifacts() {
