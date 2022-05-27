@@ -272,8 +272,6 @@ public class ReportContext {
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 String hrefAttributePattern = "href=([\"'])((?:(?!\\1)[^\\\\]|(?:\\\\\\\\)*\\\\[^\\\\])*)\\1";
-                System.out.println(responseBody); // todo delete
-
                 Pattern pattern = Pattern.compile(hrefAttributePattern);
                 Matcher matcher = pattern.matcher(responseBody);
                 while (matcher.find()) {
@@ -346,7 +344,7 @@ public class ReportContext {
         List<File> downloadedArtifacts = new ArrayList<>();
 
         for (String fileName : filteredFilesNames) {
-            downloadedArtifacts.add(downloadArtifact(driver, fileName, ARTIFACT_WAITING_TIMEOUT_SEC, true));
+            downloadedArtifacts.add(downloadArtifact(driver, fileName, ARTIFACT_WAITING_TIMEOUT_SEC, false));
         }
         return downloadedArtifacts;
     }
