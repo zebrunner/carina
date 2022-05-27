@@ -1079,6 +1079,7 @@ public class ExtendedWebElement implements IWebElement {
      */
     public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
         if (isPresent(by, timeout)) {
+            getElement().findElement(by);
             return new ExtendedWebElement(by, name, this.driver, this.searchContext);
         } else {
         	throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
@@ -1711,7 +1712,7 @@ public class ExtendedWebElement implements IWebElement {
         }
 
         if (locator.startsWith(LocatorType.XPATH.getStartsWith())) {
-        	resBy = By.xpath(StringUtils.remove(locator, LocatorType.XPATH.getStartsWith()) + "[" + index + "]");
+        	resBy = By.xpath("(" + StringUtils.remove(locator, LocatorType.XPATH.getStartsWith()) + ")[" + index + "]");
         }
         if (locator.startsWith(LocatorType.LINKTEXT.getStartsWith())) {
         	resBy = By.linkText(StringUtils.remove(locator, LocatorType.LINKTEXT.getStartsWith()) + "[" + index + "]");
