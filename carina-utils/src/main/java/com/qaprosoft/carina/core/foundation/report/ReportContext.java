@@ -236,7 +236,8 @@ public class ReportContext {
     }
 
     private static List<String> listArtifacts(WebDriver driver) {
-        String hostUrl = Configuration.getSeleniumUrl().replace("wd/hub", "download/");
+        // We don't need name because we get root folder of artifacts
+        String hostUrl = getUrl(driver, "");
         String username = getField(hostUrl, 1);
         String password = getField(hostUrl, 2);
 
