@@ -252,7 +252,7 @@ public class ReportContext {
             // note : you may also need
             // HttpURLConnection.setInstanceFollowRedirects(false)
             HttpURLConnection con = (HttpURLConnection) new URL(hostUrl).openConnection();
-            con.setRequestMethod("HEAD");
+            con.setRequestMethod("GET");
 
             if (!username.isEmpty() && !password.isEmpty()) {
                 String usernameColonPassword = username + ":" + password;
