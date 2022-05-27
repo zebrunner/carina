@@ -304,13 +304,13 @@ public class ReportContext {
                 response.append(line);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            // do noting
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    // do nothing
                 }
             }
         }
