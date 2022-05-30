@@ -40,6 +40,7 @@ public class ConfigurationTest {
     @Test
     public void testConfigOverride() {
         R.CONFIG.put("env", "UNITTEST");
+        R.CONFIG.put("UNITTEST.override", "override_me");
         Assert.assertEquals(Configuration.getEnvArg("override"), "override_me");
         R.CONFIG.put("UNITTEST.override", "i_am_overriden");
         Assert.assertEquals(Configuration.getEnvArg("override"), "i_am_overriden");
