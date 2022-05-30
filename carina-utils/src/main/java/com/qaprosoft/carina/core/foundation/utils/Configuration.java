@@ -45,32 +45,32 @@ public class Configuration {
          * Base application URL <br/>
          * <tt>Example: http://qaprosoft.com</tt>
          */
-        URL("url"),
+        URL("url", true),
 
         /**
          * Environment specific configuration <br/>
          * <tt>Example: STAG, PROD, DEMO</tt>
          */
-        ENV("env"),
+        ENV("env", true),
 
         /**
          * Browser for testing <br/>
          * <tt>Example: chrome, firefox, safari, iexplore</tt>
          */
-        BROWSER("browser"),
+        BROWSER("browser", true),
 
         /**
          * Browser language <br/>
          * If it is empty - english version used by default <br/>
          * <tt>Example: es, fr</tt>
          */
-        BROWSER_LANGUAGE("browser_language"),
+        BROWSER_LANGUAGE("browser_language", false),
 
         /**
          * Selenium/Appium server url<br/>
          * <tt>Example: http://localhost:4444/wd/hub</tt>
          */
-        SELENIUM_URL("selenium_url"),
+        SELENIUM_URL("selenium_url", true),
 
         /**
          * Comma-separated list of extra driver listeners.
@@ -78,79 +78,79 @@ public class Configuration {
          * to be the instances of WebDriverEventListener<br/>
          * <tt>Example: com.some_company.core.EventListener</tt>
          */
-        DRIVER_EVENT_LISTENERS("driver_event_listeners"),
+        DRIVER_EVENT_LISTENERS("driver_event_listeners", false),
 
         /**
          * Max number of drivers per thread.<br/>
          * <tt>Default: 3</tt>
          */
-        MAX_DRIVER_COUNT("max_driver_count"),
+        MAX_DRIVER_COUNT("max_driver_count", false),
 
         /**
          * If enabled turns off webdriver shutdown after test finishing by any reason.<br/>
          * <tt>Default: false</tt>
          */
-        FORCIBLY_DISABLE_DRIVER_QUIT("forcibly_disable_driver_quit"),
+        FORCIBLY_DISABLE_DRIVER_QUIT("forcibly_disable_driver_quit", false),
 
         /**
          * Name of a properties file with custom capabilities (key-value)<br/>
          * <tt>Example: custom.properties</tt>
          */
-        CUSTOM_CAPABILITIES("custom_capabilities"),
+        CUSTOM_CAPABILITIES("custom_capabilities", false),
 
         /**
          * todo add description
          */
-        CHROME_ARGS("chrome_args"),
+        CHROME_ARGS("chrome_args", false),
 
         /**
          * todo add description
          */
-        CHROME_EXPERIMENTAL_OPTS("chrome_experimental_opts"),
+        CHROME_EXPERIMENTAL_OPTS("chrome_experimental_opts", false),
 
         /**
          * todo add description
          */
-        CHROME_MOBILE_EMULATION_OPTS("chrome_mobile_emulation_opts"),
+        CHROME_MOBILE_EMULATION_OPTS("chrome_mobile_emulation_opts", false),
 
         /**
          * todo add description
          */
-        CHROME_CLOSURE("chrome_closure"),
+        CHROME_CLOSURE("chrome_closure", false),
 
         /**
          * todo add description
          */
-        FIREFOX_ARGS("firefox_args"),
+        FIREFOX_ARGS("firefox_args", false),
 
         /**
          * todo add description
          */
-        FIREFOX_PREFERENCES("firefox_preferences"),
+        FIREFOX_PREFERENCES("firefox_preferences", false),
 
         /**
          * Run tests in headless browser mode. Enabled when headless=true.<br/>
          * <tt>Default: false.</tt>
          */
-        HEADLESS("headless"),
+        HEADLESS("headless", false),
 
         /**
          * Application version/build number for reporting<br/>
          * <tt>Example: 1.2.5</tt>
          */
-        APP_VERSION("app_version"),
+        APP_VERSION("app_version", true),
 
         /**
          * Hostname of the server<br/>
          * <tt>Example: host.example.com</tt>
          */
-        PROXY_HOST("proxy_host"),
+        PROXY_HOST("proxy_host", false),
 
         /**
          * Port number<br/>
          * <tt>Example: 80</tt>
          */
-        PROXY_PORT("proxy_port"),
+        PROXY_PORT("proxy_port", false),
 
         /**
          * Comma-separated list of internet protocols used to carry the connection information
@@ -158,25 +158,25 @@ public class Configuration {
          * was requested.<br/>
          * <tt>Example: http, https, ftp, socks</tt>
          */
-        PROXY_PROTOCOLS("proxy_protocols"),
+        PROXY_PROTOCOLS("proxy_protocols", false),
 
         /**
          * Excluded hostname(s) for communication via proxy. Available only when
          * proxy_host and proxy_port are declared! <br/>
          * <tt>Example: localhost.example.com</tt>
          */
-        NO_PROXY("no_proxy"),
+        NO_PROXY("no_proxy", false),
 
         /**
          * Boolean parameter which enables or disables the automatic BrowserMob proxy launch
          */
-        BROWSERMOB_PROXY("browsermob_proxy"),
+        BROWSERMOB_PROXY("browsermob_proxy", false),
 
         /**
          * Port number for BrowserMob proxy<br/>
          * <tt>(if nothing or 0 specified, then any free port will be reused)</tt>
          */
-        BROWSERMOB_PORT("browsermob_port"),
+        BROWSERMOB_PORT("browsermob_port", false),
 
         /**
          * Range of ports that will be used for starting of browsermob proxy.
@@ -184,333 +184,340 @@ public class Configuration {
          * will wait for the first freed port. <br/>
          * <tt>Example: 8001:8003</tt>
          */
-        BROWSERMOB_PORTS_RANGE("browsermob_ports_range"),
+        BROWSERMOB_PORTS_RANGE("browsermob_ports_range", false),
 
         /**
          * todo add description
          */
-        BROWSERMOB_MITM("browsermob_disabled_mitm"),
+        BROWSERMOB_MITM("browsermob_disabled_mitm", false),
 
         /**
          * Boolean parameter which enables or disables the setup of a proxy
          */
-        PROXY_SET_TO_SYSTEM("proxy_set_to_system"),
+        PROXY_SET_TO_SYSTEM("proxy_set_to_system", false),
 
         /**
          * Direct HTTP link to Jenkins workspace report folder. <b>Automatically</b> specified by CI <br/>
          * <tt>Example: http://localhost:8888/job /my_project/1/eTAF_Report</tt>
          */
-        REPORT_URL("report_url"),
+        REPORT_URL("report_url", false),
 
         /**
          * Global switch for taking screenshots. When disabled, screenshots will be captured only after failures
          */
-        AUTO_SCREENSHOT("auto_screenshot"),
+        AUTO_SCREENSHOT("auto_screenshot", false),
 
         /**
          * Timeout is seconds to wait for a certain condition to occur before proceeding further in the code
          */
-        EXPLICIT_TIMEOUT("explicit_timeout"),
+        EXPLICIT_TIMEOUT("explicit_timeout", false),
 
         /**
          * The enabled parameter prevents downloading a dialog and downloading a file automatically.
          * The feature is currently available for Chrome and FireFox
          */
-        AUTO_DOWNLOAD("auto_download"),
+        AUTO_DOWNLOAD("auto_download", false),
 
         /**
          * MIME types / Internet Media Types. The parameter is needed only to configure auto downloading for Firefox<br/>
          * <tt>Examples: <a href="https://freeformatter.com/mime-types-list.html">Mime types</a></tt>
          */
-        AUTO_DOWNLOAD_APPS("auto_download_apps"),
+        AUTO_DOWNLOAD_APPS("auto_download_apps", false),
 
         /**
          * Path to auto download folder for Chrome and Firefox browsers.
          * If nothing specified custom_artifacts_folder or default artifacts folder is used
          */
-        AUTO_DOWNLOAD_FOLDER("auto_download_folder"),
+        AUTO_DOWNLOAD_FOLDER("auto_download_folder", false),
 
         /**
          * todo add description
          */
-        CUSTOM_ARTIFACTS_FOLDER("custom_artifacts_folder"),
+        CUSTOM_ARTIFACTS_FOLDER("custom_artifacts_folder", false),
 
         /**
          * Timeout interval between calling HTML DOM for the element<br/>
          * <b>Note</b>: in ms. For mobile automation specify a number from 500-1000 range
          */
-        RETRY_INTERVAL("retry_interval"),
+        RETRY_INTERVAL("retry_interval", false),
 
         /**
          * Path to a folder where the testing report will be saved<br/>
          * <tt>Example: ./reports</tt>
          */
-        PROJECT_REPORT_DIRECTORY("project_report_directory"),
+        PROJECT_REPORT_DIRECTORY("project_report_directory", false),
 
         /**
          * Max number of reports artifacts saving in history <br/>
          * <tt>Default: 10</tt>
          */
-        MAX_SCREENSHOOT_HISTORY("max_screen_history"),
+        MAX_SCREENSHOOT_HISTORY("max_screen_history", false),
 
         /**
          * Screenshots will be resized according to this width if their own width is bigger<br/>
          * <tt>Default: -1 to keep existing size.</tt>
          */
-        BIG_SCREEN_WIDTH("big_screen_width"),
+        BIG_SCREEN_WIDTH("big_screen_width", false),
 
         /**
          * Screenshots will be resized according to this height if their own height is bigger<br/>
          * <tt>Default: -1 to keep existing size.</tt>
          */
-        BIG_SCREEN_HEIGHT("big_screen_height"),
+        BIG_SCREEN_HEIGHT("big_screen_height", false),
 
         /**
          * Number of attempts to create a driver<br/>
          * <tt>The default value 0 means that there will be only 1 attempt</tt>
          */
-        INIT_RETRY_COUNT("init_retry_count"),
+        INIT_RETRY_COUNT("init_retry_count", false),
 
         /**
          * Interval in seconds between the attempts to create a driver <br/>
          */
-        INIT_RETRY_INTERVAL("init_retry_interval"),
+        INIT_RETRY_INTERVAL("init_retry_interval", false),
 
         /**
          * Number of test-retryings in case of failure. <br/>
          * <tt>The default value 0 means that a test will be performed only once</tt>
          */
-        RETRY_COUNT("retry_count"),
+        RETRY_COUNT("retry_count", false),
 
         /**
          * Locale for using L10N feature <br/>
          * <tt>Example: en_GB,de_DE,fr_FR</tt>
          */
-        LOCALE("locale"),
+        LOCALE("locale", true),
 
         /**
          * Default number of threads to use when running tests in parallel.
          * Set thread-count=custom to disable any updates on carina side.
          */
-        THREAD_COUNT("thread_count"),
+        THREAD_COUNT("thread_count", true),
 
         /**
          * Default number of threads to use for data providers when running tests in parallel.
          */
-        DATA_PROVIDER_THREAD_COUNT("data_provider_thread_count"),
+        DATA_PROVIDER_THREAD_COUNT("data_provider_thread_count", true),
 
         /**
          * Level for Carina logging<br/>
          * <tt>Example: ALL, DEBUG, ERROR, WARN, FATAL, INFO, OFF, TRACE</tt>
          */
-        CORE_LOG_LEVEL("core_log_level"),
+        CORE_LOG_LEVEL("core_log_level", true),
 
         /**
          * API response will be logged in JSON format<br/>
          * <tt>Default: true</tt>
          */
-        LOG_ALL_JSON("log_all_json"),
+        LOG_ALL_JSON("log_all_json", false),
 
         /**
          * Date format for DateUtils.class<br/>
          * <tt>Example: HH:mm:ss dd/MM/yyyy, HH:mm MM/dd/yyyy</tt>
          */
-        DATE_FORMAT("date_format"),
+        DATE_FORMAT("date_format", false),
 
         /**
          * Date format for DateUtils.class<br/>
          * <tt>Example: HH:mm:ss.SSS, HH:mm a zzz</tt>
          */
-        TIME_FORMAT("time_format"),
+        TIME_FORMAT("time_format", false),
 
         /**
          * Path to a file with a crypto key<br/>
          * <tt>Example: ./src/main/resources/crypto.key</tt>
          */
-        CRYPTO_KEY_PATH("crypto_key_path"),
+        // Do not log by security
+        CRYPTO_KEY_PATH("crypto_key_path", false),
 
         /**
          * Suite name for the report and TestRail. If this parameter is NULL, will
          * be taken from TestNG xml (the parameter suite name) or _email.properties (the title)
          */
-        SUITE_NAME("suite_name"),
+        SUITE_NAME("suite_name", false),
 
         /**
          * todo add description
          */
-        TEST_NAMING_PATTERN("test_naming_pattern"),
+        TEST_NAMING_PATTERN("test_naming_pattern", false),
 
         /**
          * Determines how carina detects appearing of web elements on page: by presence in
          * DOM model or by visibility or by any of these conditions<br/>
          * <tt>Example: BY_PRESENCE, BY_VISIBILITY, BY_PRESENCE_OR_VISIBILITY</tt>
          */
-        ELEMENT_LOADING_STRATEGY("element_loading_strategy"),
+        ELEMENT_LOADING_STRATEGY("element_loading_strategy", true),
 
         /**
          * Determines how carina detects whether expected page is opened: by expected url pattern,
          * by marker element loading state or by both these conditions <br/>
          * <tt>BY_ELEMENT, BY_URL, BY_URL_AND_ELEMENT</tt>
          */
-        PAGE_OPENING_STRATEGY("page_opening_strategy"),
+        PAGE_OPENING_STRATEGY("page_opening_strategy", true),
 
         /**
          * Amazon
          * todo add description
          */
-        S3_BUCKET_NAME("s3_bucket_name"),
+        S3_BUCKET_NAME("s3_bucket_name", false),
 
         /**
          * Access key id for Amazon S3 build uploader <br/>
          * <tt>Example: gkhcvdgvceUYF67897hbjsbdc</tt>
          * <a href="https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys">More info here</a>
          */
-        ACCESS_KEY_ID("access_key_id"),
+        ACCESS_KEY_ID("access_key_id", false),
 
         /**
          * Secret key for Amazon S3 build uploader<br/>
          * <tt>Example: gkhcvdgvceUYF67897hbjsbdc</tt>
          * <a href="https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys">More info here</a>
          */
-        SECRET_KEY("secret_key"),
+        SECRET_KEY("secret_key", false),
 
         /**
          * Azure
          * todo add description
          */
-        AZURE_ACCOUNT_NAME("azure_account_name"),
+        AZURE_ACCOUNT_NAME("azure_account_name", false),
 
         /**
          * todo add description
          */
-        AZURE_CONTAINER_NAME("azure_container_name"),
+        AZURE_CONTAINER_NAME("azure_container_name", false),
 
         /**
          * todo add description
          */
-        AZURE_BLOB_URL("azure_blob_url"),
+        AZURE_BLOB_URL("azure_blob_url", false),
 
         /**
          * todo add description
          */
-        AZURE_ACCESS_KEY_TOKEN("azure_access_key_token"),
+        AZURE_ACCESS_KEY_TOKEN("azure_access_key_token", false),
 
         /**
          * todo add description
          */
-        AZURE_LOCAL_STORAGE("azure_local_storage"),
+        AZURE_LOCAL_STORAGE("azure_local_storage", false),
 
         /**
          * Token for authentication in Hockey App <br/>
          * <tt>Example: gkhcvdgvceUYF67897hbjsbdc</tt>
          */
-        APPCENTER_TOKEN("appcenter_token"),
+        APPCENTER_TOKEN("appcenter_token", false),
 
         //
         /**
          * For localization parser
          * todo add description
          */
-        LOCALIZATION_ENCODING("localization_encoding"),
+        LOCALIZATION_ENCODING("localization_encoding", false),
 
         /**
          * Enables auto verification for elements that are marked with @Localized
          */
-        LOCALIZATION_TESTING("localization_testing"),
+        LOCALIZATION_TESTING("localization_testing", false),
 
         /**
          * TLS<br/>
          * Path to a directory with tls secure keys<br/>
          * <tt>Example: ./tls/keysecure</tt>
          */
-        TLS_KEYSECURE_LOCATION("tls_keysecure_location"),
+        TLS_KEYSECURE_LOCATION("tls_keysecure_location", false),
 
         /**
          *  HealthCheck<br/>
          *  Class to execute health checks<br/>
           */
-        HEALTH_CHECK_CLASS("health_check_class"),
+        HEALTH_CHECK_CLASS("health_check_class", false),
 
         /**
          * Comma-separated list of methods of health_check_class to execute preliminarily<br/>
          * <tt>Example: doThis, doThat</tt>
          */
-        HEALTH_CHECK_METHODS("health_check_methods"),
+        HEALTH_CHECK_METHODS("health_check_methods", false),
 
         /**
          * todo add description
          */
-        UNINSTALL_RELATED_APPS("uninstall_related_apps"),
+        UNINSTALL_RELATED_APPS("uninstall_related_apps", false),
 
         /**
          * For Device default timezone and language
          * todo add description
          */
-        DEFAULT_DEVICE_TIMEZONE("default_device_timezone"),
+        DEFAULT_DEVICE_TIMEZONE("default_device_timezone", false),
 
         /**
          * todo add description
          */
-        DEFAULT_DEVICE_TIME_FORMAT("default_device_time_format"),
+        DEFAULT_DEVICE_TIME_FORMAT("default_device_time_format", false),
 
         /**
          * todo add description
          */
-        DEFAULT_DEVICE_LANGUAGE("default_device_language"),
+        DEFAULT_DEVICE_LANGUAGE("default_device_language", false),
 
         /**
          * Ignore SSL <br/>
          * API requests/responses to ignore SSL errors.<br/>
          * <tt>Default: false</tt>
          */
-        IGNORE_SSL("ignore_ssl"),
+        IGNORE_SSL("ignore_ssl", false),
 
         /** Test Execution Filter rules<br/>
          * Executing rules logic: test_run_rules={RULE_NAME_ENUM}=>{RULE_VALUE1}&&{RULE_VALUE2};;... <br/>
          * <tt>Example: test_run_rules=PRIORITY=>P1&&P2&&P4;;OWNER=>owner;;TAGS=>tag1=temp||!!feature=reg</tt>
          */
-        TEST_RUN_RULES("test_run_rules"),
+        TEST_RUN_RULES("test_run_rules", false),
 
         /**
          * Test Rail
          * todo add description
          */
-        TESTRAIL_ENABLED("testrail_enabled"),
+        TESTRAIL_ENABLED("testrail_enabled", false),
 
         /**
          * todo add description
          */
-        INCLUDE_ALL("include_all"),
+        INCLUDE_ALL("include_all", false),
 
         /**
          * todo add description
          */
-        MILESTONE("milestone"),
+        MILESTONE("milestone", false),
 
         /**
          * todo add description
          */
-        RUN_NAME("run_name"),
+        RUN_NAME("run_name", false),
 
         /**
          * todo add description
          */
-        ASSIGNEE("assignee"),
+        ASSIGNEE("assignee", false),
 
         /**
          * sha1
          * todo add description
          */
-        GIT_HASH("git_hash");
+        GIT_HASH("git_hash", false);
         
         private final String key;
+        private final boolean isLogable;
 
-        Parameter(String key) {
+        Parameter(String key, boolean isLogable) {
             this.key = key;
+            this.isLogable = isLogable;
         }
 
         public String getKey() {
             return key;
+        }
+
+        public boolean isLogable() {
+            return isLogable;
         }
     }
 
@@ -523,7 +530,7 @@ public class Configuration {
      */
     public static String get(Parameter param) {
         String value = R.CONFIG.get(param.getKey());
-        return !(value == null || value.equalsIgnoreCase(SpecialKeywords.NULL)) ? value : StringUtils.EMPTY;
+        return (value == null || value.equalsIgnoreCase(SpecialKeywords.NULL)) ? StringUtils.EMPTY : value;
     }
 
     public static int getInt(Parameter param) {
@@ -546,20 +553,28 @@ public class Configuration {
         return Boolean.valueOf(value);
     }
 
-    public static String asString() {
+    private static StringBuilder testConfigurationAsString() {
         StringBuilder asString = new StringBuilder();
         asString.append("\n============= Test configuration =============\n");
+
         for (Parameter param : Parameter.values()) {
-            //#1451 hide WARN! Value not resolved by key: azure_container_name
+            // todo why contains?
+            // #1451 hide WARN! Value not resolved by key: azure_container_name
             if (Parameter.AZURE_BLOB_URL.equals(param) && Configuration.get(param).toLowerCase().contains(SpecialKeywords.NULL.toLowerCase())) {
                 // do nothing
                 continue;
             }
-            if (!Parameter.CRYPTO_KEY_PATH.equals(param) && !Configuration.get(param).isEmpty()) {
-                asString.append(String.format("%s=%s%n", param.getKey(), Configuration.get(param)));
+
+            String parameterValue = Configuration.get(param);
+            if (param.isLogable() && !parameterValue.isEmpty()) {
+                asString.append(String.format("%s=%s%n", param.getKey(), parameterValue));
             }
         }
+        return asString;
+    }
 
+    private static StringBuilder driverCapabilitiesAsString() {
+        StringBuilder asString = new StringBuilder();
         // write into the log extra information about selenium_url together with capabilities
         asString.append(String.format("%s=%s%n", "selenium_url", getSeleniumUrl()));
         asString.append("\n------------- Driver capabilities -----------\n");
@@ -572,7 +587,13 @@ public class Configuration {
                 asString.append(String.format("%s=%s%n", entry.getKey(), R.CONFIG.get(entry.getKey())));
             }
         }
+        return asString;
+    }
 
+    public static String asString() {
+        StringBuilder asString = new StringBuilder();
+        asString.append(testConfigurationAsString());
+        asString.append(driverCapabilitiesAsString());
         asString.append("================================================\n");
         return asString.toString();
     }
