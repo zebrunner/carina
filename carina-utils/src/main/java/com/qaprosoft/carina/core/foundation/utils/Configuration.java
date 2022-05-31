@@ -715,7 +715,6 @@ public class Configuration {
             // default "browser=value" should be used to determine current browser
             browser = Configuration.get(Parameter.BROWSER);
         }
-
         // redefine browser if capabilities.browserName is available
         if (!R.CONFIG.get("capabilities.browserName").isEmpty() && !"null".equalsIgnoreCase(R.CONFIG.get("capabilities.browserName"))) {
             browser = R.CONFIG.get("capabilities.browserName");
