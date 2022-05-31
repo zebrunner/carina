@@ -1765,34 +1765,69 @@ public class ExtendedWebElement implements IWebElement {
         // generate the most popular waitCondition to check if element visible or present
         ExpectedCondition<?> waitCondition = null;
         // need to get root element from with we will try to find element by By
-        WebElement contextElement = searchContext.findElement(By.xpath("."));
         switch (loadingStrategy) {
         case BY_PRESENCE: {
             if (element != null) {
-                waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by),
-                        ExpectedConditions.visibilityOf(element));
+                if (searchContext instanceof RemoteWebElement) {
+                    WebElement contextElement = searchContext.findElement(By.xpath("."));
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by),
+                            ExpectedConditions.visibilityOf(element));
+                } else {
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
+                            ExpectedConditions.visibilityOf(element));
+                }
             } else {
-                waitCondition = ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by);
+                if (searchContext instanceof RemoteWebElement) {
+                    WebElement contextElement = searchContext.findElement(By.xpath("."));
+                    waitCondition = ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by);
+                } else {
+                    waitCondition = ExpectedConditions.presenceOfElementLocated(by);
+
+                }
             }
             break;
         }
         case BY_VISIBILITY: {
             if (element != null) {
-                waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by),
-                        ExpectedConditions.visibilityOf(element));
+                if (searchContext instanceof RemoteWebElement) {
+                    WebElement contextElement = searchContext.findElement(By.xpath("."));
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by),
+                            ExpectedConditions.visibilityOf(element));
+                } else {
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(by),
+                            ExpectedConditions.visibilityOf(element));
+                }
             } else {
-                waitCondition = ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by);
+                if (searchContext instanceof RemoteWebElement) {
+                    WebElement contextElement = searchContext.findElement(By.xpath("."));
+                    waitCondition = ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by);
+                } else {
+                    waitCondition = ExpectedConditions.visibilityOfElementLocated(by);
+                }
             }
             break;
         }
         case BY_PRESENCE_OR_VISIBILITY:
             if (element != null) {
-                waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by),
-                        ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by),
-                        ExpectedConditions.visibilityOf(element));
+                if (searchContext instanceof RemoteWebElement) {
+                    WebElement contextElement = searchContext.findElement(By.xpath("."));
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by),
+                            ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by),
+                            ExpectedConditions.visibilityOf(element));
+                } else {
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
+                            ExpectedConditions.visibilityOfElementLocated(by),
+                            ExpectedConditions.visibilityOf(element));
+                }
             } else {
-                waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by),
-                        ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by));
+                if (searchContext instanceof RemoteWebElement) {
+                    WebElement contextElement = searchContext.findElement(By.xpath("."));
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by),
+                            ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by));
+                } else {
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
+                            ExpectedConditions.visibilityOfElementLocated(by));
+                }
             }
             break;
         }
