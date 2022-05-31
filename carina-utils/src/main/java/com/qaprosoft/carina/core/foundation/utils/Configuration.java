@@ -45,7 +45,7 @@ public class Configuration {
          * Base application URL <br/>
          * <tt>Example: http://qaprosoft.com</tt>
          */
-        URL("url", true),
+        URL("url", false),
 
         /**
          * Environment specific configuration <br/>
@@ -200,7 +200,7 @@ public class Configuration {
          * Direct HTTP link to Jenkins workspace report folder. <b>Automatically</b> specified by CI <br/>
          * <tt>Example: http://localhost:8888/job /my_project/1/eTAF_Report</tt>
          */
-        REPORT_URL("report_url", false),
+        REPORT_URL("report_url", true),
 
         /**
          * Global switch for taking screenshots. When disabled, screenshots will be captured only after failures
@@ -245,7 +245,7 @@ public class Configuration {
          * Path to a folder where the testing report will be saved<br/>
          * <tt>Example: ./reports</tt>
          */
-        PROJECT_REPORT_DIRECTORY("project_report_directory", false),
+        PROJECT_REPORT_DIRECTORY("project_report_directory", true),
 
         /**
          * Max number of reports artifacts saving in history <br/>
