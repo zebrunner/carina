@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -298,6 +299,38 @@ public class ExtendedWebElement implements IWebElement {
         }
         
         return this.element;
+    }
+
+    private Optional<WebElement> findWebElement() {
+        Optional<WebElement> findedWebElement = Optional.empty();
+        List<WebElement> elements = searchContext.findElements(by);
+        if (elements.size() > 0) {
+            findedWebElement = Optional.of(elements.get(0));
+            if (elements.size() > 1) {
+                LOGGER.warn("There are more than one element found when try to refresh element " + getName());
+            }
+        }
+        return findedWebElement;
+    }
+
+    public boolean refresh() {
+        if (getBy() == null) {
+            throw new RuntimeException("'By' is not initialized in element " + name);
+        }
+
+        Optional<WebElement> foundElement = findWebElement();
+        if (foundElement.isPresent()) {
+            element = foundElement.get();
+            return true;
+        }
+        if (waitUntil(getDefaultCondition(getBy()), EXPLICIT_TIMEOUT)) {
+            element = searchContext.findElement(getBy());
+            if (element == null) {
+                throw new RuntimeException("Something went wrong when try to reinitialize element after successful waiting");
+            }
+            return true;
+        }
+        return false;
     }
     
     /**
