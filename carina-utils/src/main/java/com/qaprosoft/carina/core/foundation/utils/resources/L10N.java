@@ -209,6 +209,8 @@ public class L10N {
      */       
     public static void assertAll() {
         mistakes.assertAll();
+        // #1679: L10N: made assertion threads dependent 
+        mistakes = new SoftAssert();
     }    
     
     /**
