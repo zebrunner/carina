@@ -42,59 +42,59 @@ public class Configuration {
      */
     public enum Parameter {
         /**
-         * Base application URL <br/>
-         * <tt>Example: http://qaprosoft.com</tt>
+         * Base application URL
+         * Example: http://qaprosoft.com
          */
         URL("url", false),
 
         /**
-         * Environment specific configuration <br/>
-         * <tt>Example: STAG, PROD, DEMO</tt>
+         * Environment specific configuration
+         * Example: STAG, PROD, DEMO
          */
         ENV("env", true),
 
         /**
-         * Browser for testing <br/>
-         * <tt>Example: chrome, firefox, safari, iexplore</tt>
+         * Browser for testing
+         * Example: chrome, firefox, safari, iexplore
          */
         BROWSER("browser", true),
 
         /**
-         * Browser language <br/>
-         * If it is empty - english version used by default <br/>
-         * <tt>Example: es, fr</tt>
+         * Browser language
+         * If it is empty - english version used by default
+         * Example: es, fr
          */
         BROWSER_LANGUAGE("browser_language", false),
 
         /**
-         * Selenium/Appium server url<br/>
-         * <tt>Example: http://localhost:4444/wd/hub</tt>
+         * Selenium/Appium server url
+         * Example: http://localhost:4444/wd/hub
          */
         SELENIUM_URL("selenium_url", true),
 
         /**
          * Comma-separated list of extra driver listeners.
          * Listeners provide extra custom actions for WebDriver and have
-         * to be the instances of WebDriverEventListener<br/>
-         * <tt>Example: com.some_company.core.EventListener</tt>
+         * to be the instances of WebDriverEventListener
+         * Example: com.some_company.core.EventListener
          */
         DRIVER_EVENT_LISTENERS("driver_event_listeners", false),
 
         /**
-         * Max number of drivers per thread.<br/>
-         * <tt>Default: 3</tt>
+         * Max number of drivers per thread.
+         * Default: 3
          */
         MAX_DRIVER_COUNT("max_driver_count", false),
 
         /**
-         * If enabled turns off webdriver shutdown after test finishing by any reason.<br/>
-         * <tt>Default: false</tt>
+         * If enabled turns off webdriver shutdown after test finishing by any reason.
+         * Default: false
          */
         FORCIBLY_DISABLE_DRIVER_QUIT("forcibly_disable_driver_quit", false),
 
         /**
-         * Name of a properties file with custom capabilities (key-value)<br/>
-         * <tt>Example: custom.properties</tt>
+         * Name of a properties file with custom capabilities (key-value)
+         * Example: custom.properties
          */
         CUSTOM_CAPABILITIES("custom_capabilities", false),
 
@@ -129,41 +129,41 @@ public class Configuration {
         FIREFOX_PREFERENCES("firefox_preferences", false),
 
         /**
-         * Run tests in headless browser mode. Enabled when headless=true.<br/>
-         * <tt>Default: false.</tt>
+         * Run tests in headless browser mode. Enabled when headless=true.
+         * Default: false.
          */
         HEADLESS("headless", false),
 
         /**
-         * Application version/build number for reporting<br/>
-         * <tt>Example: 1.2.5</tt>
+         * Application version/build number for reporting
+         * Example: 1.2.5
          */
         APP_VERSION("app_version", true),
 
         /**
-         * Hostname of the server<br/>
-         * <tt>Example: host.example.com</tt>
+         * Hostname of the server
+         * Example: host.example.com
          */
         PROXY_HOST("proxy_host", false),
 
         /**
-         * Port number<br/>
-         * <tt>Example: 80</tt>
+         * Port number
+         * Example: 80
          */
         PROXY_PORT("proxy_port", false),
 
         /**
          * Comma-separated list of internet protocols used to carry the connection information
          * from the source requesting the connection to the destination for which the connection
-         * was requested.<br/>
-         * <tt>Example: http, https, ftp, socks</tt>
+         * was requested.
+         * Example: http, https, ftp, socks
          */
         PROXY_PROTOCOLS("proxy_protocols", false),
 
         /**
          * Excluded hostname(s) for communication via proxy. Available only when
-         * proxy_host and proxy_port are declared! <br/>
-         * <tt>Example: localhost.example.com</tt>
+         * proxy_host and proxy_port are declared!
+         * Example: localhost.example.com
          */
         NO_PROXY("no_proxy", false),
 
@@ -173,16 +173,16 @@ public class Configuration {
         BROWSERMOB_PROXY("browsermob_proxy", false),
 
         /**
-         * Port number for BrowserMob proxy<br/>
-         * <tt>(if nothing or 0 specified, then any free port will be reused)</tt>
+         * Port number for BrowserMob proxy
+         * (if nothing or 0 specified, then any free port will be reused)
          */
         BROWSERMOB_PORT("browsermob_port", false),
 
         /**
          * Range of ports that will be used for starting of browsermob proxy.
          * First available port from the range will be used. If all ports are used then test
-         * will wait for the first freed port. <br/>
-         * <tt>Example: 8001:8003</tt>
+         * will wait for the first freed port.
+         * Example: 8001:8003
          */
         BROWSERMOB_PORTS_RANGE("browsermob_ports_range", false),
 
@@ -197,8 +197,8 @@ public class Configuration {
         PROXY_SET_TO_SYSTEM("proxy_set_to_system", false),
 
         /**
-         * Direct HTTP link to Jenkins workspace report folder. <b>Automatically</b> specified by CI <br/>
-         * <tt>Example: http://localhost:8888/job /my_project/1/eTAF_Report</tt>
+         * Direct HTTP link to Jenkins workspace report folder. Automatically specified by CI
+         * Example: http://localhost:8888/job /my_project/1/eTAF_Report
          */
         REPORT_URL("report_url", true),
 
@@ -219,8 +219,8 @@ public class Configuration {
         AUTO_DOWNLOAD("auto_download", false),
 
         /**
-         * MIME types / Internet Media Types. The parameter is needed only to configure auto downloading for Firefox<br/>
-         * <tt>Examples: <a href="https://freeformatter.com/mime-types-list.html">Mime types</a></tt>
+         * MIME types / Internet Media Types. The parameter is needed only to configure auto downloading for Firefox
+         * https://freeformatter.com/mime-types-list.html
          */
         AUTO_DOWNLOAD_APPS("auto_download_apps", false),
 
@@ -236,55 +236,55 @@ public class Configuration {
         CUSTOM_ARTIFACTS_FOLDER("custom_artifacts_folder", false),
 
         /**
-         * Timeout interval between calling HTML DOM for the element<br/>
-         * <b>Note</b>: in ms. For mobile automation specify a number from 500-1000 range
+         * Timeout interval between calling HTML DOM for the element
+         * Note: in ms. For mobile automation specify a number from 500-1000 range
          */
         RETRY_INTERVAL("retry_interval", false),
 
         /**
-         * Path to a folder where the testing report will be saved<br/>
-         * <tt>Example: ./reports</tt>
+         * Path to a folder where the testing report will be saved
+         * Example: ./reports
          */
         PROJECT_REPORT_DIRECTORY("project_report_directory", true),
 
         /**
-         * Max number of reports artifacts saving in history <br/>
-         * <tt>Default: 10</tt>
+         * Max number of reports artifacts saving in history
+         * Default: 10
          */
         MAX_SCREENSHOOT_HISTORY("max_screen_history", false),
 
         /**
-         * Screenshots will be resized according to this width if their own width is bigger<br/>
-         * <tt>Default: -1 to keep existing size.</tt>
+         * Screenshots will be resized according to this width if their own width is bigger
+         * Default: -1 to keep existing size.
          */
         BIG_SCREEN_WIDTH("big_screen_width", false),
 
         /**
-         * Screenshots will be resized according to this height if their own height is bigger<br/>
-         * <tt>Default: -1 to keep existing size.</tt>
+         * Screenshots will be resized according to this height if their own height is bigger
+         * Default: -1 to keep existing size.
          */
         BIG_SCREEN_HEIGHT("big_screen_height", false),
 
         /**
-         * Number of attempts to create a driver<br/>
-         * <tt>The default value 0 means that there will be only 1 attempt</tt>
+         * Number of attempts to create a driver
+         * The default value 0 means that there will be only 1 attempt
          */
         INIT_RETRY_COUNT("init_retry_count", false),
 
         /**
-         * Interval in seconds between the attempts to create a driver <br/>
+         * Interval in seconds between the attempts to create a driver
          */
         INIT_RETRY_INTERVAL("init_retry_interval", false),
 
         /**
-         * Number of test-retryings in case of failure. <br/>
-         * <tt>The default value 0 means that a test will be performed only once</tt>
+         * Number of test-retryings in case of failure.
+         * The default value 0 means that a test will be performed only once
          */
         RETRY_COUNT("retry_count", false),
 
         /**
-         * Locale for using L10N feature <br/>
-         * <tt>Example: en_GB,de_DE,fr_FR</tt>
+         * Locale for using L10N feature
+         * Example: en_GB,de_DE,fr_FR
          */
         LOCALE("locale", true),
 
@@ -300,32 +300,32 @@ public class Configuration {
         DATA_PROVIDER_THREAD_COUNT("data_provider_thread_count", true),
 
         /**
-         * Level for Carina logging<br/>
-         * <tt>Example: ALL, DEBUG, ERROR, WARN, FATAL, INFO, OFF, TRACE</tt>
+         * Level for Carina logging
+         * Example: ALL, DEBUG, ERROR, WARN, FATAL, INFO, OFF, TRACE
          */
         CORE_LOG_LEVEL("core_log_level", true),
 
         /**
-         * API response will be logged in JSON format<br/>
-         * <tt>Default: true</tt>
+         * API response will be logged in JSON format
+         * Default: true
          */
         LOG_ALL_JSON("log_all_json", false),
 
         /**
-         * Date format for DateUtils.class<br/>
-         * <tt>Example: HH:mm:ss dd/MM/yyyy, HH:mm MM/dd/yyyy</tt>
+         * Date format for DateUtils.class
+         * Example: HH:mm:ss dd/MM/yyyy, HH:mm MM/dd/yyyy
          */
         DATE_FORMAT("date_format", false),
 
         /**
-         * Date format for DateUtils.class<br/>
-         * <tt>Example: HH:mm:ss.SSS, HH:mm a zzz</tt>
+         * Date format for DateUtils.class
+         * Example: HH:mm:ss.SSS, HH:mm a zzz
          */
         TIME_FORMAT("time_format", false),
 
         /**
-         * Path to a file with a crypto key<br/>
-         * <tt>Example: ./src/main/resources/crypto.key</tt>
+         * Path to a file with a crypto key
+         * Example: ./src/main/resources/crypto.key
          */
         // Do not log by security
         CRYPTO_KEY_PATH("crypto_key_path", false),
@@ -343,15 +343,15 @@ public class Configuration {
 
         /**
          * Determines how carina detects appearing of web elements on page: by presence in
-         * DOM model or by visibility or by any of these conditions<br/>
-         * <tt>Example: BY_PRESENCE, BY_VISIBILITY, BY_PRESENCE_OR_VISIBILITY</tt>
+         * DOM model or by visibility or by any of these conditions
+         * Example: BY_PRESENCE, BY_VISIBILITY, BY_PRESENCE_OR_VISIBILITY
          */
         ELEMENT_LOADING_STRATEGY("element_loading_strategy", true),
 
         /**
          * Determines how carina detects whether expected page is opened: by expected url pattern,
-         * by marker element loading state or by both these conditions <br/>
-         * <tt>BY_ELEMENT, BY_URL, BY_URL_AND_ELEMENT</tt>
+         * by marker element loading state or by both these conditions
+         * BY_ELEMENT, BY_URL, BY_URL_AND_ELEMENT
          */
         PAGE_OPENING_STRATEGY("page_opening_strategy", true),
 
@@ -362,16 +362,16 @@ public class Configuration {
         S3_BUCKET_NAME("s3_bucket_name", false),
 
         /**
-         * Access key id for Amazon S3 build uploader <br/>
-         * <tt>Example: gkhcvdgvceUYF67897hbjsbdc</tt>
-         * <a href="https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys">More info here</a>
+         * Access key id for Amazon S3 build uploader
+         * Example: gkhcvdgvceUYF67897hbjsbdc
+         * https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys"
          */
         ACCESS_KEY_ID("access_key_id", false),
 
         /**
-         * Secret key for Amazon S3 build uploader<br/>
-         * <tt>Example: gkhcvdgvceUYF67897hbjsbdc</tt>
-         * <a href="https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys">More info here</a>
+         * Secret key for Amazon S3 build uploader
+         * Example: gkhcvdgvceUYF67897hbjsbdc
+         * https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys
          */
         SECRET_KEY("secret_key", false),
 
@@ -402,8 +402,8 @@ public class Configuration {
         AZURE_LOCAL_STORAGE("azure_local_storage", false),
 
         /**
-         * Token for authentication in Hockey App <br/>
-         * <tt>Example: gkhcvdgvceUYF67897hbjsbdc</tt>
+         * Token for authentication in Hockey App
+         * Example: gkhcvdgvceUYF67897hbjsbdc
          */
         APPCENTER_TOKEN("appcenter_token", false),
 
@@ -420,21 +420,21 @@ public class Configuration {
         LOCALIZATION_TESTING("localization_testing", false),
 
         /**
-         * TLS<br/>
-         * Path to a directory with tls secure keys<br/>
-         * <tt>Example: ./tls/keysecure</tt>
+         * TLS
+         * Path to a directory with tls secure keys
+         * Example: ./tls/keysecure
          */
         TLS_KEYSECURE_LOCATION("tls_keysecure_location", false),
 
         /**
-         *  HealthCheck<br/>
-         *  Class to execute health checks<br/>
-          */
+         * HealthCheck
+         * Class to execute health checks
+         */
         HEALTH_CHECK_CLASS("health_check_class", false),
 
         /**
-         * Comma-separated list of methods of health_check_class to execute preliminarily<br/>
-         * <tt>Example: doThis, doThat</tt>
+         * Comma-separated list of methods of health_check_class to execute preliminarily
+         * Example: doThis, doThat
          */
         HEALTH_CHECK_METHODS("health_check_methods", false),
 
@@ -460,15 +460,16 @@ public class Configuration {
         DEFAULT_DEVICE_LANGUAGE("default_device_language", false),
 
         /**
-         * Ignore SSL <br/>
-         * API requests/responses to ignore SSL errors.<br/>
-         * <tt>Default: false</tt>
+         * Ignore SSL
+         * API requests/responses to ignore SSL errors.
+         * Default: false
          */
         IGNORE_SSL("ignore_ssl", false),
 
-        /** Test Execution Filter rules<br/>
-         * Executing rules logic: test_run_rules={RULE_NAME_ENUM}=>{RULE_VALUE1}&&{RULE_VALUE2};;... <br/>
-         * <tt>Example: test_run_rules=PRIORITY=>P1&&P2&&P4;;OWNER=>owner;;TAGS=>tag1=temp||!!feature=reg</tt>
+        /**
+         * Test Execution Filter rules
+         * Executing rules logic: test_run_rules={RULE_NAME_ENUM}=>{RULE_VALUE1}&&{RULE_VALUE2};;...
+         * Example: test_run_rules=PRIORITY=>P1&&P2&&P4;;OWNER=>owner;;TAGS=>tag1=temp||!!feature=reg
          */
         TEST_RUN_RULES("test_run_rules", false),
 
