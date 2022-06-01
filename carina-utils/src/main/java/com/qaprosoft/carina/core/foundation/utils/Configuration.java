@@ -553,7 +553,6 @@ public class Configuration {
     public static String asString() {
         StringBuilder asString = new StringBuilder();
         asString.append(testConfigurationAsString());
-        asString.append("================================================\n");
         asString.append(driverCapabilitiesAsString());
         asString.append("================================================\n");
         return asString.toString();
