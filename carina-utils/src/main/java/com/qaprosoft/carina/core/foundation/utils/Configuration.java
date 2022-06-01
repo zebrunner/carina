@@ -537,9 +537,7 @@ public class Configuration {
 
     private static StringBuilder driverCapabilitiesAsString() {
         StringBuilder asString = new StringBuilder();
-        // write into the log extra information about selenium_url together with capabilities
-        asString.append(String.format("%s=%s%n", "selenium_url", getSeleniumUrl()));
-        asString.append("\n------------- Driver capabilities -----------\n");
+        asString.append("\n============= Driver capabilities =============\n");
         // read all properties from config.properties and use "capabilities.*"
         final String prefix = SpecialKeywords.CAPABILITIES + ".";
         @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -555,6 +553,7 @@ public class Configuration {
     public static String asString() {
         StringBuilder asString = new StringBuilder();
         asString.append(testConfigurationAsString());
+        asString.append("================================================\n");
         asString.append(driverCapabilitiesAsString());
         asString.append("================================================\n");
         return asString.toString();
