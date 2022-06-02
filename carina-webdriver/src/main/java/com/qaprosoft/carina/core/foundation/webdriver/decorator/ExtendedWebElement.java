@@ -314,6 +314,10 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     public boolean refresh() {
+        return refresh(EXPLICIT_TIMEOUT);
+    }
+
+    public boolean refresh(long timeout) {
         if (getBy() == null) {
             throw new RuntimeException("'By' is not initialized in element " + name);
         }
@@ -323,7 +327,7 @@ public class ExtendedWebElement implements IWebElement {
             element = foundElement.get();
             return true;
         }
-        if (waitUntil(getDefaultCondition(getBy()), EXPLICIT_TIMEOUT)) {
+        if (waitUntil(getDefaultCondition(getBy()), timeout)) {
             element = searchContext.findElement(getBy());
             if (element == null) {
                 throw new RuntimeException("Something went wrong when try to reinitialize element after successful waiting");
