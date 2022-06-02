@@ -330,7 +330,8 @@ public class ExtendedWebElement implements IWebElement {
         if (waitUntil(getDefaultCondition(getBy()), timeout)) {
             element = searchContext.findElement(getBy());
             if (element == null) {
-                throw new RuntimeException("Something went wrong when try to reinitialize element after successful waiting");
+                LOGGER.warn("Something went wrong when try to reinitialize element after successful waiting");
+                return false;
             }
             return true;
         }
