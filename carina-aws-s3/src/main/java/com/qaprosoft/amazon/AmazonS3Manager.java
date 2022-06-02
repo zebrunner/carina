@@ -312,8 +312,9 @@ public class AmazonS3Manager {
                     }
                 }
             }
+            boolean isTruncated = objBuilds.isTruncated();
             objBuilds = s3client.listNextBatchOfObjects(objBuilds);
-        } while (objBuilds.isTruncated() && ++i < limit);
+        } while (isTruncated && ++i < limit);
 
         if (latestBuild == null) {
             LOGGER.error("Unable to find S3 build artifact by pattern: " + pattern);
