@@ -304,10 +304,10 @@ public class ExtendedWebElement implements IWebElement {
     private Optional<WebElement> findWebElement() {
         Optional<WebElement> findedWebElement = Optional.empty();
         List<WebElement> elements = searchContext.findElements(by);
-        if (elements.size() > 0) {
+        if (!elements.isEmpty()) {
             findedWebElement = Optional.of(elements.get(0));
             if (elements.size() > 1) {
-                LOGGER.warn("There are more than one element found when try to refresh element " + getName());
+                LOGGER.warn("There are more than one element found when try to refresh element {}", getName());
             }
         }
         return findedWebElement;
