@@ -209,6 +209,7 @@ public class L10N {
      */       
     public static void assertAll() {
         mistakes.get().assertAll();
+        mistakes.remove();
         mistakes.set(new SoftAssert());
     }    
     
