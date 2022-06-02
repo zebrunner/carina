@@ -349,6 +349,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#work-with-iframe" class="md-nav__link">
+    Work with iframe
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#implementation-of-tests" class="md-nav__link">
     Implementation of tests
   </a>
@@ -709,6 +716,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#work-with-iframe" class="md-nav__link">
+    Work with iframe
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#implementation-of-tests" class="md-nav__link">
     Implementation of tests
   </a>
@@ -915,6 +929,35 @@ assertEquals(&quot;MyCityName&quot;, city.getText());
 <li>You should call the super constructor <strong>super(driver, searchContext)</strong> where searchContext is an instance of <strong>org.openqa.selenium.SearchContext</strong></li>
 <li>Locate UI Object classes in src/main/java source folder</li>
 </ul>
+<h3 id="work-with-iframe">Work with iframe</h3>
+<p>Before working with an iframe, you need to understand that an iframe is a separate page. Therefore, if we need to work with the internal structure of an iframe, we need to create a separate class for it inherited from AbstractPage, in which we already paint its internal structure, for example:</p>
+<pre><code>public class Frame extends AbstractPage {
+
+    @FindBy(xpath = &quot;//div[@class='tag-of-element']&quot;)
+    private ExtendedWebElement component;
+
+    public Frame(WebDriver driver) {
+        super(driver);
+    }
+
+    public void click() {
+        component.click();
+    }
+}
+</code></pre>
+
+<p>Suppose the iframe is a page component or another component. Then we have to designate it as ExtendedWebElement, for example:</p>
+<pre><code> @FindBy(xpath = &quot;.//iframe&quot;)
+ private ExtendedWebElement iframe;
+</code></pre>
+
+<p>If we need to perform actions on iframe components, we can do:</p>
+<pre><code>Frame frame = new Frame(driver);
+driver.switchTo().frame(iframe.getElement());
+frame.click();
+getDriver().switchTo().defaultContent();
+</code></pre>
+
 <h3 id="implementation-of-tests">Implementation of tests</h3>
 <p>Carina framework uses TestNG for test organization. In general, test represents a manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:</p>
 <pre><code>public class WebSampleTest implements IAbstractTest {

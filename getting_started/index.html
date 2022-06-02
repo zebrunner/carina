@@ -677,7 +677,7 @@
 <li>Download the latest version of <a href="http://www.eclipse.org/downloads/">Eclipse</a> and install <a href="http://testng.org/doc/download.html">TestNG plugin</a>, maven-dependency-plugin connector and optionally lombok</li>
 </ul>
 <h3 id="generating-project">Generating project</h3>
-<p>The easiest way to initialize a new project is to use Carina archetype, you will get correct project structure along with test samples. Run below command from any empty folder:</p>
+<p>The easiest way to initialize a new project is to use Carina archetype, you will get correct project structure along with test samples. Run below command from any <b>empty folder</b>:</p>
 <pre><code>mvn archetype:generate -DarchetypeGroupId=com.qaprosoft \
                        -DarchetypeArtifactId=carina-archetype \
                        -DarchetypeVersion=RELEASE \
@@ -722,6 +722,9 @@
     </tr>
 </table>
 
+<blockquote>
+<p>To generate Cucumber Demo project use <code>-DarchetypeArtifactId=carina-cucumber-archetype</code> in above maven command.</p>
+</blockquote>
 <h3 id="import-to-eclipse">Import to Eclipse</h3>
 <p>If the generation is successfully complete, you will see a new project folder with a name equal to the artifactId attribute specified during the generation, so navigate to this folder (where pom.xml is located) and execute the following Maven task:</p>
 <pre><code>mvn clean eclipse:eclipse
