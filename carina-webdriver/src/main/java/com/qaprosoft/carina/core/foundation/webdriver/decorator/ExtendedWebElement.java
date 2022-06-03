@@ -45,7 +45,6 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Locatable;
@@ -348,9 +347,9 @@ public class ExtendedWebElement implements IWebElement {
         boolean result = false;
 
 //      Wait<WebDriver> wait = new WebDriverWait(getDriver(), timeout, RETRY_TIME)
-        //try to use better tickMillis clock 
+        //try to use better tickMillis clock
+        //TODO: test removal ".ignoring(NoSuchElementException.class);" as NotFoundException ignored b ywaiter itself
         Wait<WebDriver> wait = new WebDriverWait(getDriver(), java.time.Clock.tickMillis(java.time.ZoneId.systemDefault()), Sleeper.SYSTEM_SLEEPER, timeout, RETRY_TIME)
-                .ignoring(WebDriverException.class)
                 .ignoring(NoSuchElementException.class);
 
         // [VD] Notes:
@@ -360,6 +359,9 @@ public class ExtendedWebElement implements IWebElement {
         
         // 7.3.17-SNAPSHOT. Removed NoSuchSessionException (Mar-11-2022)
         //.ignoring(NoSuchSessionException.class) // why do we ignore noSuchSession? Just to minimize errors?
+        
+        // 7.3.20.1686-SNAPSHOT. Removed ignoring WebDriverException (Jun-03-2022).
+        // Goal to test if inside timeout happens first and remove interruption and future call
 
         LOGGER.debug("waitUntil: starting... timeout: " + timeout);
         
@@ -371,12 +373,15 @@ public class ExtendedWebElement implements IWebElement {
                     res = true;
                 } catch (TimeoutException e) {
                     LOGGER.debug("waitUntil: org.openqa.selenium.TimeoutException", e);
+                } finally {
+                    //TODO: remove or hide on debug log level
+                    LOGGER.info("waiter is finished. conditions: " + condition);
                 }
                 return res;
             }
         });
         
-     // make future process timeout 10s longer
+        // make future process timeout 10s longer
         long processTimeout = timeout + 10;
         try {
             result = (boolean) future.get(processTimeout, TimeUnit.SECONDS);
