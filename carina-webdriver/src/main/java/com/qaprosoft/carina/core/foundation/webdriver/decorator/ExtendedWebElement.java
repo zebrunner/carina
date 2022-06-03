@@ -23,15 +23,11 @@ import java.lang.reflect.Proxy;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -344,13 +340,14 @@ public class ExtendedWebElement implements IWebElement {
             LOGGER.error("Fluent wait with 0 and less timeout might hangs! Updating to 1 sec.");
             timeout = 1;
         }
-        boolean result = false;
-
-//      Wait<WebDriver> wait = new WebDriverWait(getDriver(), timeout, RETRY_TIME)
+        // Wait<WebDriver> wait = new WebDriverWait(getDriver(), timeout, RETRY_TIME)
         //try to use better tickMillis clock
-        //TODO: test removal ".ignoring(NoSuchElementException.class);" as NotFoundException ignored b ywaiter itself
-        Wait<WebDriver> wait = new WebDriverWait(getDriver(), java.time.Clock.tickMillis(java.time.ZoneId.systemDefault()), Sleeper.SYSTEM_SLEEPER, timeout, RETRY_TIME)
-                .ignoring(NoSuchElementException.class);
+        Wait<WebDriver> wait = new WebDriverWait(getDriver(), 
+                java.time.Clock.tickMillis(java.time.ZoneId.systemDefault()), 
+                Sleeper.SYSTEM_SLEEPER, 
+                timeout, 
+                RETRY_TIME)
+                .withTimeout(Duration.ofSeconds(timeout));
 
         // [VD] Notes:
         // do not ignore TimeoutException or NoSuchSessionException otherwise you can wait for minutes instead of timeout!
@@ -362,39 +359,22 @@ public class ExtendedWebElement implements IWebElement {
         
         // 7.3.20.1686-SNAPSHOT. Removed ignoring WebDriverException (Jun-03-2022).
         // Goal to test if inside timeout happens first and remove interruption and future call
+        // removed ".ignoring(NoSuchElementException.class);" as NotFoundException ignored by waiter itself
+        // added explicit .withTimeout(Duration.ofSeconds(timeout));        
 
         LOGGER.debug("waitUntil: starting... timeout: " + timeout);
-        
-        Future<?> future = Executors.newSingleThreadExecutor().submit(new Callable<Boolean>() {
-            public Boolean call() throws Exception {
-                boolean res = false;
-                try {
-                    wait.until(condition);
-                    res = true;
-                } catch (TimeoutException e) {
-                    LOGGER.debug("waitUntil: org.openqa.selenium.TimeoutException", e);
-                } finally {
-                    //TODO: remove or hide on debug log level
-                    LOGGER.info("waiter is finished. conditions: " + condition);
-                }
-                return res;
-            }
-        });
-        
-        // make future process timeout 10s longer
-        long processTimeout = timeout + 10;
+        boolean res = false;
         try {
-            result = (boolean) future.get(processTimeout, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        } catch (java.util.concurrent.TimeoutException e) {
-            LOGGER.error("waitUntil: java.util.concurrent.TimeoutException: " + processTimeout + "s", e);
-            future.cancel(true);
-        } catch (ExecutionException e) {
-            LOGGER.error(e.getMessage(), e);
+            wait.until(condition);
+            res = true;
+        } catch (TimeoutException e) {
+            LOGGER.debug("waitUntil: org.openqa.selenium.TimeoutException", e);
+        } finally {
+            //TODO: remove or hide on debug log level
+            LOGGER.info("waiter is finished. conditions: " + condition);
         }
+        return res;
         
-        return result;
     }
 
     private WebElement findElement() {
