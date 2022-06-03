@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -301,41 +300,14 @@ public class ExtendedWebElement implements IWebElement {
         return this.element;
     }
 
-    private Optional<WebElement> findWebElement() {
-        Optional<WebElement> findedWebElement = Optional.empty();
-        List<WebElement> elements = searchContext.findElements(by);
-        if (!elements.isEmpty()) {
-            findedWebElement = Optional.of(elements.get(0));
-            if (elements.size() > 1) {
-                LOGGER.warn("There are more than one element found when try to refresh element {}", getName());
-            }
-        }
-        return findedWebElement;
-    }
-
-    public boolean refresh() {
-        return refresh(EXPLICIT_TIMEOUT);
-    }
-
-    public boolean refresh(long timeout) {
-        if (getBy() == null) {
-            throw new RuntimeException("'By' is not initialized in element " + name);
-        }
-
-        Optional<WebElement> foundElement = findWebElement();
-        if (foundElement.isPresent()) {
-            element = foundElement.get();
-            return true;
-        }
-        if (waitUntil(getDefaultCondition(getBy()), timeout)) {
-            element = searchContext.findElement(getBy());
-            if (element == null) {
-                LOGGER.warn("Something went wrong when try to reinitialize element after successful waiting");
-                return false;
-            }
-            return true;
-        }
-        return false;
+    /**
+     * Reinitializes the element
+     *
+     * @throws NoSuchElementException if the element is not found
+     */
+    public void refresh() {
+        // try to override element
+        element = this.findElement();
     }
     
     /**
@@ -432,25 +404,12 @@ public class ExtendedWebElement implements IWebElement {
     private WebElement findElement() {
         // as we still provide several ways to init ExtendedWebElement without searchContext we have to use "if" operator and getDriver()
         // to use only searchContext we must remove all findExtendedWebElement(s) methods in DriverHelper which is not so simple
-        if (searchContext != null) {
-            //element = searchContext.findElement(by);
             List<WebElement> elements = searchContext.findElements(by);
 
             if (elements.isEmpty()) {
                 throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
             }
             this.element = elements.get(0);
-        } else {
-            // No way to remove this else piece as several projects play with this part of finder
-            //LOGGER.warn("Please, inform Carina team about this warn providing logs...");
-            List<WebElement> elements = getDriver().findElements(by);
-
-            if (elements.isEmpty()) {
-                throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
-            }
-
-            this.element = elements.get(0);
-        }
 
         return element;
     }
