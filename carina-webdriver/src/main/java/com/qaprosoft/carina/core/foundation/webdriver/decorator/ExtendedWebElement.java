@@ -867,7 +867,8 @@ public class ExtendedWebElement implements IWebElement {
      * @return true if item selected, otherwise false.
      */
     public boolean selectByPartialText(final String partialSelectText) {
-        return (boolean) doAction(ACTION_NAME.SELECT_BY_PARTIAL_TEXT, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), partialSelectText);
+        return (boolean) doAction(ACTION_NAME.SELECT_BY_PARTIAL_TEXT, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()),
+                partialSelectText);
     }
 
     /**
@@ -1757,42 +1758,77 @@ public class ExtendedWebElement implements IWebElement {
         }
         return resBy;
     }
-    
-/*	private ExpectedCondition<?> getDefaultCondition(By myBy) {
-        // generate the most popular wiatCondition to check if element visible or present
-        return ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
-                ExpectedConditions.visibilityOfElementLocated(myBy));
-    }*/
 
-    // old functionality to remove completely after successfull testing
-    private ExpectedCondition<?> getDefaultCondition(By myBy) {
+    /**
+     * Get element waiting condition depends on element loading strategy
+     */
+    private ExpectedCondition<?> getDefaultCondition(By by) {
         // generate the most popular waitCondition to check if element visible or present
         ExpectedCondition<?> waitCondition = null;
+        // need to get root element from with we will try to find element by By
         switch (loadingStrategy) {
         case BY_PRESENCE: {
             if (element != null) {
-                waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy), ExpectedConditions.visibilityOf(element));
+                if (searchContext instanceof RemoteWebElement) {
+                    WebElement contextElement = searchContext.findElement(By.xpath("."));
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by),
+                            ExpectedConditions.visibilityOf(element));
+                } else {
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
+                            ExpectedConditions.visibilityOf(element));
+                }
             } else {
-                waitCondition = ExpectedConditions.presenceOfElementLocated(myBy);
+                if (searchContext instanceof RemoteWebElement) {
+                    WebElement contextElement = searchContext.findElement(By.xpath("."));
+                    waitCondition = ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by);
+                } else {
+                    waitCondition = ExpectedConditions.presenceOfElementLocated(by);
+
+                }
             }
             break;
         }
         case BY_VISIBILITY: {
             if (element != null) {
-                waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(myBy), ExpectedConditions.visibilityOf(element));
+                if (searchContext instanceof RemoteWebElement) {
+                    WebElement contextElement = searchContext.findElement(By.xpath("."));
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by),
+                            ExpectedConditions.visibilityOf(element));
+                } else {
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(by),
+                            ExpectedConditions.visibilityOf(element));
+                }
             } else {
-                waitCondition = ExpectedConditions.visibilityOfElementLocated(myBy);
+                if (searchContext instanceof RemoteWebElement) {
+                    WebElement contextElement = searchContext.findElement(By.xpath("."));
+                    waitCondition = ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by);
+                } else {
+                    waitCondition = ExpectedConditions.visibilityOfElementLocated(by);
+                }
             }
             break;
         }
         case BY_PRESENCE_OR_VISIBILITY:
             if (element != null) {
-                waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
-                        ExpectedConditions.visibilityOfElementLocated(myBy),
-                        ExpectedConditions.visibilityOf(element));
+                if (searchContext instanceof RemoteWebElement) {
+                    WebElement contextElement = searchContext.findElement(By.xpath("."));
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by),
+                            ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by),
+                            ExpectedConditions.visibilityOf(element));
+                } else {
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
+                            ExpectedConditions.visibilityOfElementLocated(by),
+                            ExpectedConditions.visibilityOf(element));
+                }
             } else {
-                waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
-                        ExpectedConditions.visibilityOfElementLocated(myBy));
+                if (searchContext instanceof RemoteWebElement) {
+                    WebElement contextElement = searchContext.findElement(By.xpath("."));
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by),
+                            ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by));
+                } else {
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
+                            ExpectedConditions.visibilityOfElementLocated(by));
+                }
             }
             break;
         }
