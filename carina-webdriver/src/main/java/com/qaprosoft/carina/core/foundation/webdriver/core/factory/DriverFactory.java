@@ -78,7 +78,7 @@ public class DriverFactory {
 		LOGGER.info("Starting driver session...");
 		WebDriver driver = factory.create(testName, capabilities, seleniumHost);
         driver = factory.registerListeners(driver, getEventListeners());
-		
+        LOGGER.info("Driver session started.");
 		LOGGER.debug("DriverFactory finish...");
 
 		return driver;
