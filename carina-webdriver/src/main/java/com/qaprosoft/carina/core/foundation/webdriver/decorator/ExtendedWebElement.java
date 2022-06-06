@@ -378,8 +378,7 @@ public class ExtendedWebElement implements IWebElement {
         } catch (TimeoutException e) {
             LOGGER.debug("waitUntil: org.openqa.selenium.TimeoutException", e);
         } finally {
-            //TODO: remove or hide on debug log level
-            LOGGER.info("waiter is finished. conditions: " + condition);
+            LOGGER.debug("waiter is finished. conditions: " + condition);
         }
         return res;
         
