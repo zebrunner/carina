@@ -344,7 +344,6 @@ public interface IDriverPool {
                 }
             } catch (java.util.concurrent.TimeoutException e) {
                 POOL_LOGGER.error("Unable to quit driver for " + timeout + "sec!", e);
-                future.cancel(true);
             }
         } catch (WebDriverException e) {
             POOL_LOGGER.debug("Error message detected during driver quit!", e);

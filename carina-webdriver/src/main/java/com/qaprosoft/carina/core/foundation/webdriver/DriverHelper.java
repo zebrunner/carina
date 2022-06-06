@@ -173,7 +173,6 @@ public class DriverHelper {
         } catch (java.util.concurrent.TimeoutException e) {
             String message = "Unable to open url during " + timeout + "sec!";
             LOGGER.error(message);
-            future.cancel(true);
             Assert.fail(message, e);
         } catch (InterruptedException e) {
             String message = "Unable to open url during " + timeout + "sec!";
@@ -586,7 +585,6 @@ public class DriverHelper {
             url = (String) future.get(timeout, TimeUnit.SECONDS);
         } catch (java.util.concurrent.TimeoutException e) {
             LOGGER.debug("Unable to get driver url during " + timeout + "sec!", e);
-            future.cancel(true);
         } catch (InterruptedException e) {
             LOGGER.debug("Unable to get driver url during " + timeout + "sec!", e);
             Thread.currentThread().interrupt();
