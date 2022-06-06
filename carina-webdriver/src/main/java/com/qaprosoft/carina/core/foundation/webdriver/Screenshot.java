@@ -528,11 +528,9 @@ public class Screenshot {
             LOGGER.debug("starting full size screenshot capturing...");
             screenShot = (BufferedImage) future.get(timeout, TimeUnit.SECONDS);
         } catch (java.util.concurrent.TimeoutException e) {
-            String message = "Unable to capture full screenshot during " + timeout + "sec!";
-            LOGGER.error(message);
+            LOGGER.error("Unable to capture full screenshot during " + timeout + "sec!");
         } catch (InterruptedException e) {
-            String message = "Unable to capture full screenshot during " + timeout + "sec!";
-            LOGGER.error(message);
+            LOGGER.error("Unable to capture full screenshot during " + timeout + "sec!");
             Thread.currentThread().interrupt();
         } catch (ExecutionException e) {
             if (e.getMessage() != null) {
@@ -578,8 +576,7 @@ public class Screenshot {
             LOGGER.debug("starting screenshot capturing...");
             screenShot = (BufferedImage) future.get(timeout, TimeUnit.SECONDS);
         } catch (java.util.concurrent.TimeoutException e) {
-            String message = "Unable to capture screenshot during " + timeout + " sec!";
-            LOGGER.warn(message);
+            LOGGER.warn("Unable to capture screenshot during " + timeout + " sec!");
         } catch (InterruptedException e) {
             String message = "Unable to capture screenshot during " + timeout + " sec!";
             LOGGER.warn(message);

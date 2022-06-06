@@ -295,6 +295,7 @@ public class AmazonS3Manager {
 
         int i = 0;
         int limit = 100;
+        boolean isTruncated = false;
         // by default S3 return only 1000 objects summary so need while cycle here
         do {
             LOGGER.info("looking for s3 artifact using iteration #" + i);
@@ -312,8 +313,9 @@ public class AmazonS3Manager {
                     }
                 }
             }
+            isTruncated = objBuilds.isTruncated();
             objBuilds = s3client.listNextBatchOfObjects(objBuilds);
-        } while (objBuilds.isTruncated() && ++i < limit);
+        } while (isTruncated && ++i < limit);
 
         if (latestBuild == null) {
             LOGGER.error("Unable to find S3 build artifact by pattern: " + pattern);
