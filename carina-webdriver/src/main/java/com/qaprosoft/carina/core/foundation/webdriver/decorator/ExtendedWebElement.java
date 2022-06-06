@@ -336,9 +336,17 @@ public class ExtendedWebElement implements IWebElement {
      * @return true if condition happen.
      */
     private boolean waitUntil(ExpectedCondition<?> condition, long timeout) {
-        if (timeout <= 0) {
-            LOGGER.error("Fluent wait with 0 and less timeout might hangs! Updating to 1 sec.");
+        long retryInterval = RETRY_TIME;
+        if (timeout < 1) {
+            LOGGER.warn("Fluent wait less than 1sec timeout might hangs! Updating to 1 sec.");
             timeout = 1;
+        }
+        
+        if (timeout >= 3 && timeout <= 10) {
+            retryInterval = 500;
+        }
+        if (timeout > 10) {
+            retryInterval = 1000;
         }
         // Wait<WebDriver> wait = new WebDriverWait(getDriver(), timeout, RETRY_TIME)
         //try to use better tickMillis clock
@@ -346,7 +354,7 @@ public class ExtendedWebElement implements IWebElement {
                 java.time.Clock.tickMillis(java.time.ZoneId.systemDefault()), 
                 Sleeper.SYSTEM_SLEEPER, 
                 timeout, 
-                RETRY_TIME)
+                retryInterval)
                 .withTimeout(Duration.ofSeconds(timeout));
 
         // [VD] Notes:
