@@ -39,6 +39,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -324,7 +325,14 @@ public class ExtendedWebElement implements IWebElement {
 	 * @return element existence status.
 	 */
 	public boolean isPresent(By by, long timeout) {
-		return waitUntil(getDefaultCondition(by), timeout);
+	    boolean res = false;
+	    try {
+	        res = waitUntil(getDefaultCondition(by), timeout);
+        } catch (StaleElementReferenceException e) {
+            // there is no sense to continue as StaleElementReferenceException captured
+            LOGGER.debug("waitUntil: StaleElementReferenceException", e);
+        }
+	    return res;
 	}
 	
 	
