@@ -295,6 +295,16 @@ public class ExtendedWebElement implements IWebElement {
         
         return this.element;
     }
+
+    /**
+     * Reinitializes the element
+     *
+     * @throws NoSuchElementException if the element is not found
+     */
+    public void refresh() {
+        // try to override element
+        element = this.findElement();
+    }
     
     /**
      * Check that element present or visible.
@@ -395,25 +405,12 @@ public class ExtendedWebElement implements IWebElement {
     private WebElement findElement() {
         // as we still provide several ways to init ExtendedWebElement without searchContext we have to use "if" operator and getDriver()
         // to use only searchContext we must remove all findExtendedWebElement(s) methods in DriverHelper which is not so simple
-        if (searchContext != null) {
-            //element = searchContext.findElement(by);
             List<WebElement> elements = searchContext.findElements(by);
 
             if (elements.isEmpty()) {
                 throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
             }
             this.element = elements.get(0);
-        } else {
-            // No way to remove this else piece as several projects play with this part of finder
-            //LOGGER.warn("Please, inform Carina team about this warn providing logs...");
-            List<WebElement> elements = getDriver().findElements(by);
-
-            if (elements.isEmpty()) {
-                throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
-            }
-
-            this.element = elements.get(0);
-        }
 
         return element;
     }
