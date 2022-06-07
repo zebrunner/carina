@@ -132,7 +132,6 @@ public class ExtendedWebElement implements IWebElement {
         this.name = name;
         this.driver = driver;
         this.searchContext = searchContext;
-        this.element = this.searchContext.findElement(this.by);
     }
 
     public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext, Object[] formatValues) {
