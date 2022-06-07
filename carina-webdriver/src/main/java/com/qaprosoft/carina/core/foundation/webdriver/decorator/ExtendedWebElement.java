@@ -399,14 +399,15 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     private WebElement findElement() {
-        // as we still provide several ways to init ExtendedWebElement without searchContext we have to use "if" operator and getDriver()
-        // to use only searchContext we must remove all findExtendedWebElement(s) methods in DriverHelper which is not so simple
-            List<WebElement> elements = searchContext.findElements(by);
-
-            if (elements.isEmpty()) {
-                throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
-            }
-            this.element = elements.get(0);
+        List<WebElement> elements = searchContext.findElements(this.by);
+        if (elements.isEmpty()) {
+            throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + this.by.toString());
+        }
+        if (elements.size() > 1) {
+            //TODO: think about moving into the debug or info level
+            LOGGER.warn(String.format("returned first but found %d elements by xpath: %s", elements.size(), getBy()));
+        }
+        this.element = elements.get(0);
 
         return element;
     }
@@ -1414,8 +1415,22 @@ public class ExtendedWebElement implements IWebElement {
             L10N.verify(this);
         }
 
-        this.element = getElement();
-        return overrideAction(actionName, inputArgs);
+        Object output = null;
+
+        try {
+            this.element = getElement();
+            output = overrideAction(actionName, inputArgs);
+        } catch (StaleElementReferenceException e) {
+            //TODO: analyze mobil testing for staled elements. Potentially it should be fixed by appium java client already
+            // sometime Appium instead printing valid StaleElementException generate java.lang.ClassCastException:
+            // com.google.common.collect.Maps$TransformedEntriesMap cannot be cast to java.lang.String
+            LOGGER.debug("catched StaleElementReferenceException: ", e);
+            // try to find again using driver
+            element = this.findElement();
+            output = overrideAction(actionName, inputArgs);
+        }
+
+        return output;
 	}
 
 	// single place for all supported UI actions in carina core
