@@ -44,7 +44,7 @@
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <jacoco-maven-plugin>0.8.7</jacoco-maven-plugin>
         <!-- Testings -->
-        <testng.version>7.4.0</testng.version>
+        <testng.version>7.5</testng.version>
         <testng-foundation.version>2.0.1</testng-foundation.version>
         <!-- Logging -->
         <slf4j.version>1.7.30</slf4j.version>
@@ -64,7 +64,7 @@
         <selenium.version>3.141.59</selenium.version>
         <appium.version>7.6.0</appium.version>
         <!-- Zebrunner integrations -->
-        <zebrunner-testng-pluggable.version>1.6.7</zebrunner-testng-pluggable.version>
+        <zebrunner-testng-pluggable.version>1.7.0.282-SNAPSHOT</zebrunner-testng-pluggable.version>
         <!-- Others -->
         <azure-storage-blob.version>12.7.0</azure-storage-blob.version>
         <aws-java-sdk.version>1.11.923</aws-java-sdk.version>
