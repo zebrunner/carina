@@ -124,7 +124,7 @@ public class ExtendedWebElement implements IWebElement {
             throw new RuntimeException("driver couldn't be null!");
         }
 
-        if (this.searchContext == null) {
+        if (searchContext == null) {
             throw new RuntimeException("review stacktrace to analyze why searchContext is null");
         }
 
