@@ -117,14 +117,22 @@ public class ExtendedWebElement implements IWebElement {
     private LocatorConverter caseInsensitiveConverter;
     
     public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext) {
-        this.by = by;
-        this.name = name;
-        this.driver = driver;
-        this.searchContext = searchContext;
+        if (by == null) {
+            throw new RuntimeException("By couldn't be null!");
+        }
+        if (driver == null) {
+            throw new RuntimeException("driver couldn't be null!");
+        }
 
         if (this.searchContext == null) {
             throw new RuntimeException("review stacktrace to analyze why searchContext is null");
         }
+
+        this.by = by;
+        this.name = name;
+        this.driver = driver;
+        this.searchContext = searchContext;
+        this.element = this.searchContext.findElement(this.by);
     }
 
     public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext, Object[] formatValues) {
