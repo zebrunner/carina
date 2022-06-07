@@ -1182,7 +1182,7 @@ public class DriverHelper {
     		return null;
     	}
 
-    	return new ExtendedWebElement(by, name, getDriver());
+    	return new ExtendedWebElement(by, name, getDriver(), getDriver());
     }
 
     /**

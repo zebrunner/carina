@@ -115,30 +115,35 @@ public class ExtendedWebElement implements IWebElement {
     private String formatValues = "";
 
     private LocatorConverter caseInsensitiveConverter;
+    
+    public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext) {
+        if (by == null) {
+            throw new RuntimeException("By couldn't be null!");
+        }
+        if (driver == null) {
+            throw new RuntimeException("driver couldn't be null!");
+        }
+
+        if (this.searchContext == null) {
+            throw new RuntimeException("review stacktrace to analyze why searchContext is null");
+        }
+
+        this.by = by;
+        this.name = name;
+        this.driver = driver;
+        this.searchContext = searchContext;
+    }
+
+    public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext, Object[] formatValues) {
+        this(by, name, driver, searchContext);
+        this.formatValues = Arrays.toString(formatValues);
+    }
 
     public ExtendedWebElement(WebElement element, String name, By by) {
         this(element, name);
         this.by = by;
     }
 
-    public ExtendedWebElement(By by, String name) {
-    	this.by = by;
-    	this.name = name;
-    }
-    
-    public ExtendedWebElement(By by, String name, WebDriver driver) {
-    	this.by = by;
-    	this.name = name;
-    	this.driver = driver;
-    }
-    
-    public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext) {
-        this.by = by;
-        this.name = name;
-        this.driver = driver;
-        this.searchContext = searchContext;
-    }
-    
     public ExtendedWebElement(WebElement element, String name) {
     	this.name = name;
         this.element = element;
@@ -270,23 +275,14 @@ public class ExtendedWebElement implements IWebElement {
 		} catch (Throwable thr) {
 			thr.printStackTrace();
 			LOGGER.error("Unable to get Driver, searchContext and By via reflection!", thr);
-		}
-		
-    	if (this.searchContext == null) {
-			try {
-				throw new RuntimeException("review stacktrace to analyze why searchContext is not populated correctly via reflection!");
-			} catch (Throwable thr) {
-			    LOGGER.warn("this.searchContext is null!", thr);
-			}
-    	}
+        } finally {
+            if (this.searchContext == null) {
+                throw new RuntimeException("review stacktrace to analyze why searchContext is not populated correctly via reflection!");
+            }
+        }
+
     }
 
-    
-
-    public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext, Object[] formatValues) {
-        this(by, name, driver, searchContext);
-        this.formatValues = Arrays.toString(formatValues);
-    }
 
     public WebElement getElement() {
         if (this.element == null) {
