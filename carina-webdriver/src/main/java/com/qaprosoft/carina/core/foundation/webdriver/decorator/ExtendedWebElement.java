@@ -981,7 +981,15 @@ public class ExtendedWebElement implements IWebElement {
             waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
         }
 
-        return waitUntil(waitCondition, timeout);
+        boolean res = false;
+        try {
+            res = waitUntil(waitCondition, timeout);
+        } catch (StaleElementReferenceException e) {
+            // there is no sense to continue as StaleElementReferenceException captured
+            LOGGER.debug("waitUntil: StaleElementReferenceException", e);
+        }
+        
+        return res;
     }
 
 	
