@@ -121,6 +121,10 @@ public class ExtendedWebElement implements IWebElement {
         this.name = name;
         this.driver = driver;
         this.searchContext = searchContext;
+
+        if (this.searchContext == null) {
+            throw new RuntimeException("review stacktrace to analyze why searchContext is null");
+        }
     }
 
     public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext, Object[] formatValues) {
@@ -264,15 +268,12 @@ public class ExtendedWebElement implements IWebElement {
 		} catch (Throwable thr) {
 			thr.printStackTrace();
 			LOGGER.error("Unable to get Driver, searchContext and By via reflection!", thr);
-		}
-		
-    	if (this.searchContext == null) {
-			try {
-				throw new RuntimeException("review stacktrace to analyze why searchContext is not populated correctly via reflection!");
-			} catch (Throwable thr) {
-			    LOGGER.warn("this.searchContext is null!", thr);
-			}
-    	}
+        } finally {
+            if (this.searchContext == null) {
+                throw new RuntimeException("review stacktrace to analyze why searchContext is not populated correctly via reflection!");
+            }
+        }
+
     }
 
 
