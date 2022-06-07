@@ -1424,7 +1424,8 @@ public class ExtendedWebElement implements IWebElement {
             //TODO: analyze mobil testing for staled elements. Potentially it should be fixed by appium java client already
             // sometime Appium instead printing valid StaleElementException generate java.lang.ClassCastException:
             // com.google.common.collect.Maps$TransformedEntriesMap cannot be cast to java.lang.String
-            LOGGER.debug("catched StaleElementReferenceException: ", e);
+            //TODO: hide stale element exception onto debug
+            LOGGER.warn("catched StaleElementReferenceException: ", e);
             // try to find again using driver
             element = this.findElement();
             output = overrideAction(actionName, inputArgs);
