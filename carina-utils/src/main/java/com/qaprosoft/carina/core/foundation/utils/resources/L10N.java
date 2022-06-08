@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
@@ -192,6 +193,9 @@ public class L10N {
                     ". Actual: '" + actualText + "', length=" + actualText.length() + ".";
 
             LOGGER.error(error);
+            if (Objects.isNull(mistakes)) {
+                mistakes = ThreadLocal.withInitial(SoftAssert::new);
+            }
             mistakes.get().fail(error);
 
             String newItem = key + "=" + actualText;
@@ -210,8 +214,7 @@ public class L10N {
     public static void assertAll() {
         mistakes.get().assertAll();
         mistakes.remove();
-        mistakes.set(new SoftAssert());
-    }    
+    }
     
     /**
      * Override default locale.
