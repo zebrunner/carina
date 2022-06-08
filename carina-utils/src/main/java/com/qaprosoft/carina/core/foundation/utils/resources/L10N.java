@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
@@ -56,7 +55,7 @@ public class L10N {
     private static ArrayList<ResourceBundle> resBoundles = new ArrayList<ResourceBundle>();
     private static Properties missedResources = new Properties();
     
-    private static ThreadLocal<SoftAssert> mistakes = ThreadLocal.withInitial(SoftAssert::new);
+    private static final ThreadLocal<SoftAssert> mistakes = ThreadLocal.withInitial(SoftAssert::new);
 
     /**
      * Load L10N resource bundle.
@@ -156,6 +155,9 @@ public class L10N {
      */
     static public String getText(String key) {
         LOGGER.debug("getText: L10N bundle size: " + resBoundles.size());
+        if (mistakes.get() == null) {
+            mistakes.set(new SoftAssert());
+        }
         Iterator<ResourceBundle> iter = resBoundles.iterator();
         while (iter.hasNext()) {
             ResourceBundle bundle = iter.next();
@@ -193,9 +195,6 @@ public class L10N {
                     ". Actual: '" + actualText + "', length=" + actualText.length() + ".";
 
             LOGGER.error(error);
-            if (Objects.isNull(mistakes)) {
-                mistakes = ThreadLocal.withInitial(SoftAssert::new);
-            }
             mistakes.get().fail(error);
 
             String newItem = key + "=" + actualText;
@@ -214,6 +213,7 @@ public class L10N {
     public static void assertAll() {
         mistakes.get().assertAll();
         mistakes.remove();
+        mistakes.set(null);
     }
     
     /**
