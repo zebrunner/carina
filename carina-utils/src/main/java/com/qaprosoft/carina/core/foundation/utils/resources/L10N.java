@@ -89,13 +89,13 @@ public class L10N {
                     continue;
                 }
 
-                if (fileName.lastIndexOf('_') == fileName.length() - 3
-                        || fileName.lastIndexOf('_') == fileName.length() - 5) {
-                    LOGGER.debug(String
-                            .format("'%s' resource IGNORED as it looks like localized resource!",
-                                    fileName));
-                    continue;
-                }
+//                if (fileName.lastIndexOf('_') == fileName.length() - 3
+//                        || fileName.lastIndexOf('_') == fileName.length() - 5) {
+//                    LOGGER.debug(String
+//                            .format("'%s' resource IGNORED as it looks like localized resource!",
+//                                    fileName));
+//                    continue;
+//                }
                 /*
                  * convert "file: <REPO>\target\classes\L10N\messages.properties" to "L10N.messages"
                  */
