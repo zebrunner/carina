@@ -55,7 +55,11 @@ public class L10N {
     private static ArrayList<ResourceBundle> resBoundles = new ArrayList<ResourceBundle>();
     private static Properties missedResources = new Properties();
     
-    private static volatile SoftAssert mistakes = new SoftAssert();
+    private static SoftAssert mistakes = new SoftAssert();
+
+    public static void setSoftAssert(SoftAssert softAssert) {
+        mistakes = softAssert;
+    }
 
     /**
      * Load L10N resource bundle.
@@ -209,7 +213,6 @@ public class L10N {
      */       
     public static void assertAll() {
         mistakes.assertAll();
-        mistakes = new SoftAssert();
     }
     
     /**
