@@ -55,7 +55,7 @@ public class L10N {
     private static ArrayList<ResourceBundle> resBoundles = new ArrayList<ResourceBundle>();
     private static Properties missedResources = new Properties();
     
-    private static final ThreadLocal<SoftAssert> mistakes = ThreadLocal.withInitial(SoftAssert::new);
+    private static SoftAssert mistakes;
 
     /**
      * Load L10N resource bundle.
@@ -155,8 +155,8 @@ public class L10N {
      */
     static public String getText(String key) {
         LOGGER.debug("getText: L10N bundle size: " + resBoundles.size());
-        if (mistakes.get() == null) {
-            mistakes.set(new SoftAssert());
+        if (mistakes == null) {
+            mistakes = new SoftAssert();
         }
         Iterator<ResourceBundle> iter = resBoundles.iterator();
         while (iter.hasNext()) {
@@ -195,7 +195,7 @@ public class L10N {
                     ". Actual: '" + actualText + "', length=" + actualText.length() + ".";
 
             LOGGER.error(error);
-            mistakes.get().fail(error);
+            mistakes.fail(error);
 
             String newItem = key + "=" + actualText;
             LOGGER.info("Making new localization string: " + newItem);
@@ -211,9 +211,8 @@ public class L10N {
      * Raise summarized asserts for mistakes in localization  
      */       
     public static void assertAll() {
-        mistakes.get().assertAll();
-        mistakes.remove();
-        mistakes.set(null);
+        mistakes.assertAll();
+        mistakes = null;
     }
     
     /**
