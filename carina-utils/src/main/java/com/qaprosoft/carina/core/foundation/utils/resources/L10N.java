@@ -51,11 +51,11 @@ import com.qaprosoft.carina.core.foundation.utils.IWebElement;
 public class L10N {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     
-    private static Locale locale = getLocale(Configuration.get(Configuration.Parameter.LOCALE));
-    private static ArrayList<ResourceBundle> resBoundles = new ArrayList<ResourceBundle>();
+    private static ThreadLocal<Locale> locale = ThreadLocal.withInitial(() -> getLocale(Configuration.get(Configuration.Parameter.LOCALE)));
+    private static ThreadLocal<ArrayList<ResourceBundle>> resBoundles = ThreadLocal.withInitial(ArrayList::new);
     private static Properties missedResources = new Properties();
     
-    private static SoftAssert mistakes;
+    private static ThreadLocal<SoftAssert> mistakes = ThreadLocal.withInitial(SoftAssert::new);
 
     /**
      * Load L10N resource bundle.
@@ -118,7 +118,7 @@ public class L10N {
                         LOGGER.debug(String.format("Adding '%s' resource...",
                                 resource));
                         
-                        resBoundles.add(ResourceBundle.getBundle(resource, locale));
+                        resBoundles.get().add(ResourceBundle.getBundle(resource, locale.get()));
                         LOGGER.debug(String
                                 .format("Resource '%s' added.", resource));
                     } catch (MissingResourceException e) {
@@ -130,7 +130,7 @@ public class L10N {
                                     resource));
                 }
             }
-            LOGGER.debug("init: L10N bundle size: " + resBoundles.size());
+            LOGGER.debug("init: L10N bundle size: " + resBoundles.get().size());
         } catch (IllegalArgumentException e) {
             LOGGER.debug("L10N folder with resources is missing!");
         }
@@ -143,7 +143,7 @@ public class L10N {
      *
      */    
     public static void load(ArrayList<ResourceBundle> resources) {
-        resBoundles = resources;
+        resBoundles.set(resources);
     }
     
     /**
@@ -154,11 +154,8 @@ public class L10N {
      * @return String
      */
     static public String getText(String key) {
-        LOGGER.debug("getText: L10N bundle size: " + resBoundles.size());
-        if (mistakes == null) {
-            mistakes = new SoftAssert();
-        }
-        Iterator<ResourceBundle> iter = resBoundles.iterator();
+        LOGGER.debug("getText: L10N bundle size: " + resBoundles.get().size());
+        Iterator<ResourceBundle> iter = resBoundles.get().iterator();
         while (iter.hasNext()) {
             ResourceBundle bundle = iter.next();
             try {
@@ -195,7 +192,7 @@ public class L10N {
                     ". Actual: '" + actualText + "', length=" + actualText.length() + ".";
 
             LOGGER.error(error);
-            mistakes.fail(error);
+            mistakes.get().fail(error);
 
             String newItem = key + "=" + actualText;
             LOGGER.info("Making new localization string: " + newItem);
@@ -211,8 +208,7 @@ public class L10N {
      * Raise summarized asserts for mistakes in localization  
      */       
     public static void assertAll() {
-        mistakes.assertAll();
-        mistakes = null;
+        mistakes.get().assertAll();
     }
     
     /**
@@ -223,7 +219,7 @@ public class L10N {
      */       
     public static void setLocale(String loc) {
         LOGGER.warn("Default locale: " + locale + " was overriden by " + loc);
-        locale = getLocale(loc);
+        locale.set(getLocale(loc));
     }    
     
     /**
