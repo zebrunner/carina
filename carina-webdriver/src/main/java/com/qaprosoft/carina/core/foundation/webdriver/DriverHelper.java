@@ -168,6 +168,8 @@ public class DriverHelper {
         } catch (Exception e) {
             Assert.fail("Undefined error on open url detected: " + e.getMessage(), e);
         } finally {
+            //restore infinit default driver timeout
+            drv.manage().timeouts().pageLoadTimeout(0, TimeUnit.SECONDS);
             LOGGER.debug("finished driver.get call.");            
         }
     }
