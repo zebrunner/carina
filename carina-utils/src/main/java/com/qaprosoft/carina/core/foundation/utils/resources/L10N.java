@@ -60,8 +60,7 @@ public class L10N {
 
     /**
      * Load L10N resource bundle corresponding to a specific locale.
-     * If the locale in config.properties changes or called setLocale function in the test,
-     * must be called to reload resources
+     * If called setLocale function in the test, must be called to reload resources
      */    
     public static void load() {
         // #1679 fix
