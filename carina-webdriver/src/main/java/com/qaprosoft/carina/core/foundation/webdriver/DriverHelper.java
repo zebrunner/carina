@@ -169,7 +169,7 @@ public class DriverHelper {
             Assert.fail("Undefined error on open url detected: " + e.getMessage(), e);
         } finally {
             //restore infinit default driver timeout
-            drv.manage().timeouts().pageLoadTimeout(0, TimeUnit.SECONDS);
+            drv.manage().timeouts().pageLoadTimeout(-1, TimeUnit.SECONDS);
             LOGGER.debug("finished driver.get call.");            
         }
     }
