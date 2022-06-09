@@ -1134,7 +1134,7 @@ public class DriverHelper {
      *            Selenium By locator
      * @return ExtendedWebElement if exists otherwise null.
      */
-    @Deprecated
+    @Deprecated(since = "7.4.21")
     public ExtendedWebElement findExtendedWebElement(By by) {
         return findExtendedWebElement(by, by.toString(), EXPLICIT_TIMEOUT);
     }
@@ -1148,7 +1148,7 @@ public class DriverHelper {
      * @param timeout to wait
      * @return ExtendedWebElement if exists otherwise null.
      */
-    @Deprecated
+    @Deprecated(since = "7.4.21")
     public ExtendedWebElement findExtendedWebElement(By by, long timeout) {
         return findExtendedWebElement(by, by.toString(), timeout);
     }
@@ -1163,7 +1163,7 @@ public class DriverHelper {
      *            Element name
      * @return ExtendedWebElement if exists otherwise null.
      */
-    @Deprecated
+    @Deprecated(since = "7.4.21")
     public ExtendedWebElement findExtendedWebElement(final By by, String name) {
         return findExtendedWebElement(by, name, EXPLICIT_TIMEOUT);
     }
@@ -1180,7 +1180,7 @@ public class DriverHelper {
      *            Timeout to find
      * @return ExtendedWebElement if exists otherwise null.
      */
-    @Deprecated
+    @Deprecated(since = "7.4.21")
     public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
 		DriverListener.setMessages(Messager.ELEMENT_FOUND.getMessage(name),
 				Messager.ELEMENT_NOT_FOUND.getMessage(name));
@@ -1201,7 +1201,7 @@ public class DriverHelper {
      *            Selenium By locator
      * @return List of ExtendedWebElement.
      */
-    @Deprecated
+    @Deprecated(since = "7.4.21")
     public List<ExtendedWebElement> findExtendedWebElements(By by) {
         return findExtendedWebElements(by, EXPLICIT_TIMEOUT);
     }
@@ -1217,7 +1217,7 @@ public class DriverHelper {
      *            Timeout to find
      * @return List of ExtendedWebElement.
      */
-    @Deprecated
+    @Deprecated(since = "7.4.21")
     public List<ExtendedWebElement> findExtendedWebElements(final By by, long timeout) {
         List<ExtendedWebElement> extendedWebElements = new ArrayList<ExtendedWebElement>();
         List<WebElement> webElements = new ArrayList<WebElement>();
