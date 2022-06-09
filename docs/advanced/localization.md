@@ -108,7 +108,7 @@ xpath = "//*[text()='Willkommen bei Wikipedia'"
 ```
 ## Creation of multi-language tests
 If one or a group of tests checks several language versions of the site, then you need to do the following:
-1. (Optional) if you need to change the language version of the site, you can overwrite the locale parameter:
+1. [Optional] if you need to change the language version of the site, you can overwrite the locale parameter:
 ```
 # overwrites locale value with de_DE for this test only
 R.CONFIG.put("locale", "de_DE", true);

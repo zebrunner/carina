@@ -63,7 +63,7 @@ public class L10N {
      * If called setLocale function in the test, must be called to reload resources
      */    
     public static void load() {
-        // #1679 fix
+        // #1679: L10N: made assertion threads dependent
         mistakes = new SoftAssert();
         List<String> loadedResources = new ArrayList<String>();
         try {
@@ -147,7 +147,7 @@ public class L10N {
      *
      */    
     public static void load(ArrayList<ResourceBundle> resources) {
-        // #1679 fix
+        // #1679: L10N: made assertion threads dependent
         mistakes = new SoftAssert();
         resBoundles = resources;
     }
