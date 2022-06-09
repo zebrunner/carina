@@ -70,14 +70,13 @@ import ru.yandex.qatools.ashot.shooting.ShootingStrategy;
  * @author Alex Khursevich
  */
 public class Screenshot {
+    //TODO: deprecate and later move to provate all capture methods allowing to do captureByRule only.
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static List<IScreenshotRule> rules = Collections.synchronizedList(new ArrayList<IScreenshotRule>());
     
     private static final String ERROR_STACKTRACE = "Error stacktrace: ";
     
-    protected static boolean defaultCapturer = true;
-
     private Screenshot() {
     	//hide default constructor
     }
@@ -127,9 +126,8 @@ public class Screenshot {
      * Clear all rules and disable all kind of screenshots even for failures!
      */
     public static void clearRules() {
-        LOGGER.debug("All screenshot capture rules will be deleted. Automatic capturing disabled even for failures!");
+        LOGGER.warn("All screenshot capture rules will be deleted. Automatic capturing disabled even for failures!");
         rules.clear();
-        defaultCapturer = false;
     }
 
     /**
@@ -142,14 +140,29 @@ public class Screenshot {
      * @return screenshot name.
      */
     public static String captureByRule(WebDriver driver, String comment) {
+        return captureByRule(driver, comment, false);
+    }
+    
+    /**
+     * Captures screenshot explicitly by any rule, creates thumbnail and copies both images to specified screenshots
+     * location.
+     *
+     * @param driver
+     *            instance used for capturing.
+     * @param comment String
+     * @param isFullSize boolean
+     * @return screenshot name.
+     */
+    public static String captureByRule(WebDriver driver, String comment, boolean isFullSize) {
         boolean isTakeScreenshotRules = false;
         for (IScreenshotRule iScreenshotRule : rules) {
             isTakeScreenshotRules = iScreenshotRule.isTakeScreenshot();
             if (isTakeScreenshotRules) {
+                isFullSize = isFullSize && iScreenshotRule.isAllowFullSize(); 
                 break;
             }
         }
-        return capture(driver, isTakeScreenshotRules, comment, false);
+        return capture(driver, isTakeScreenshotRules, comment, isFullSize);
     }
 
     /**
@@ -177,18 +190,6 @@ public class Screenshot {
      */
     public static String capture(WebDriver driver, String comment, boolean isFullSize) {
         return capture(driver, true, comment, isFullSize);
-    }
-    
-    /**
-     * Verify if default screenshot capturing rules are available
-     * 
-     * @return boolean.
-     */    
-    public static boolean isEnabled() {
-        if (!defaultCapturer) {
-            LOGGER.info("Default carina screenshot capturing rules are disabled!");
-        }
-        return defaultCapturer;
     }
     
     /**

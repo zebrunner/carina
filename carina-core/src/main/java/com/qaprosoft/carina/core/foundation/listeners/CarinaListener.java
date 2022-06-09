@@ -982,9 +982,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                     drv = ((EventFiringWebDriver) drv).getWrappedDriver();
                 }
 
-                if (Screenshot.isEnabled()) {
-                    screenId = Screenshot.capture(drv, driverName + ": " + msg, isFullSize); // in case of failure
-                }
+                screenId = Screenshot.captureByRule(drv, driverName + ": " + msg, isFullSize);
             }
         } catch (Throwable thr) {
             LOGGER.error("Failure detected on screenshot generation after failure: ", thr);

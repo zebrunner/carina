@@ -72,6 +72,11 @@ All the project configuration properties are located in a **_config.properties**
 		<td>Boolean</td>
 	</tr>
 	<tr>
+		<td>allow_fullsize_screenshot</td>
+		<td>Global switch for allowing full size screenshots on failures. Default: false</td>
+		<td>Boolean</td>
+	</tr>
+	<tr>
 		<td>report_url</td>
 		<td>Direct HTTP link to Jenkins workspace report folder. Automatically specified by CI</td>
 		<td>http://localhost:8888/job /my_project/1/eTAF_Report</td>
