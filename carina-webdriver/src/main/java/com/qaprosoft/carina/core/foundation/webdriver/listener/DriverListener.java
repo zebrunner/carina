@@ -282,12 +282,10 @@ public class DriverListener implements WebDriverEventListener, IDriverPool {
         try {
             if (errorMessage) {
                 LOGGER.error(comment);
-                if (Screenshot.isEnabled()) {
-                    String screenName = Screenshot.capture(driver, comment, true); // in case of failure
-                    // do not generate UI dump if no screenshot
-                    if (!screenName.isEmpty()) {
-                        generateDump(driver, screenName);
-                    }
+                String screenName = Screenshot.captureByRule(driver, comment, true); // in case of failure try full size if allowed
+                // do not generate UI dump if no screenshot
+                if (!screenName.isEmpty()) {
+                    generateDump(driver, screenName);
                 }
             } else {
                 LOGGER.info(comment);

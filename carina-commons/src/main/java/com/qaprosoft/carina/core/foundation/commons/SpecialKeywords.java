@@ -113,7 +113,6 @@ public class SpecialKeywords {
     
     public final static String DRIVER_CONNECTION_REFUSED = "Driver connection refused";
     public final static String DRIVER_CONNECTION_REFUSED2 = "Expected to read a START_MAP but instead have: END. Last 0 characters read";
-    public final static String DRIVER_TARGET_FRAME_DETACHED = "target frame detached";
     public final static String DRIVER_NO_SUCH_WINDOW = "no such window: window was already closed";
 
     
