@@ -210,7 +210,7 @@ public class ExtendedWebElement implements IWebElement {
 					locatorField.setAccessible(true);
 
 					locator = (ExtendedElementLocator) locatorField.get(innerProxy);
-					this.isLocalized = locator.isLocalized();
+					//this.isLocalized = locator.isLocalized();
 
 					searchContextField = locator.getClass().getDeclaredField("searchContext");
 					searchContextField.setAccessible(true);
