@@ -151,43 +151,22 @@ public class DriverHelper {
         final String decryptedURL = getEnvArgURL(cryptoTool.decryptByPattern(url, CRYPTO_PATTERN));
         this.pageURL = decryptedURL;
         WebDriver drv = getDriver();
+        
+        drv.manage().timeouts().pageLoadTimeout(timeout, TimeUnit.SECONDS);
         DriverListener.setMessages(Messager.OPENED_URL.getMessage(url), Messager.NOT_OPENED_URL.getMessage(url));
         
         // [VD] there is no sense to use fluent wait here as selenium just don't return something until page is ready!
         // explicitly limit time for the openURL operation
-        Future<?> future = Executors.newSingleThreadExecutor().submit(new Callable<Void>() {
-            public Void call() {
-                try {
-                    Messager.OPENING_URL.info(url);
-                    drv.get(decryptedURL);
-                } catch (UnhandledAlertException e) {
-                    drv.switchTo().alert().accept();
-                }
-                return null;
-            }
-        });
-
         try {
-            LOGGER.debug("starting driver.get call...");
-            future.get(timeout, TimeUnit.SECONDS);
-        } catch (java.util.concurrent.TimeoutException e) {
+            Messager.OPENING_URL.info(url);
+            drv.get(decryptedURL);
+        } catch (UnhandledAlertException e) {
+            drv.switchTo().alert().accept();
+        } catch (TimeoutException e) {
             trigger("window.stop();"); //try to cancel page loading
-            String message = "Unable to open url during " + timeout + "sec!";
-            LOGGER.error(message);
-            Assert.fail(message, e);
-        } catch (InterruptedException e) {
-            String message = "Unable to open url during " + timeout + "sec!";
-            LOGGER.error(message);
-            Assert.fail(message, e);
-            Thread.currentThread().interrupt();
-        } catch (ExecutionException e) {
-            String message = "ExecutionException error on open url: " + e.getMessage();
-            LOGGER.error(message);
-            Assert.fail(message, e);
+            Assert.fail("Unable to open url during " + timeout + "sec!");
         } catch (Exception e) {
-            String message = "Undefined error on open url detected: " + e.getMessage();
-            LOGGER.error(message);
-            Assert.fail(message, e);
+            Assert.fail("Undefined error on open url detected: " + e.getMessage(), e);
         } finally {
             LOGGER.debug("finished driver.get call.");            
         }
