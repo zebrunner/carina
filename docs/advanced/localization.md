@@ -106,3 +106,23 @@ xpath = "//*[text()='{L10N:HomePage.welcomeText}'"
 # actual value at run-time:
 xpath = "//*[text()='Willkommen bei Wikipedia'"
 ```
+## Creation of multi-language tests
+If one or a group of tests checks several language versions of the site, then you need to do the following:
+1. [Optional] if you need to change the language version of the site, you can overwrite the locale parameter:
+```
+# overwrites locale value with de_DE for this test only
+R.CONFIG.put("locale", "de_DE", true);
+```
+2. Call the setLocale function and pass the locale to it:
+```
+# overwrites the default locale in the file to 'de_DE'
+L10N.setLocale("de_DE")
+```
+3. Call the load function to download the localized resource of the current locale:
+```
+L10N.load();
+```
+4. When you need to get a list of locale errors, call assertAll:
+```
+L10N.assertAll();
+```
