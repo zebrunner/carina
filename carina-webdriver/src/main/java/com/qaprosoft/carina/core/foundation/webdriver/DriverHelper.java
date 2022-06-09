@@ -77,6 +77,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.LogicUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
@@ -169,7 +170,7 @@ public class DriverHelper {
             Assert.fail("Undefined error on open url detected: " + e.getMessage(), e);
         } finally {
             //restore default pageLoadTimeout driver timeout
-            drv.manage().timeouts().pageLoadTimeout(300, TimeUnit.SECONDS);
+            drv.manage().timeouts().pageLoadTimeout(getPageLoadTimeout(), TimeUnit.SECONDS);
             LOGGER.debug("finished driver.get call.");
         }
     }
@@ -1292,6 +1293,17 @@ public class DriverHelper {
             url = Configuration.getEnvArg(Parameter.URL.getKey());
         }
         return url;
+    }
+    
+    private long getPageLoadTimeout() {
+        long timeout = 300;
+        if (!R.CONFIG.get("capabilities.idleTimeout").isEmpty()) {
+            long idleTimeout = R.CONFIG.getLong("capabilities.idleTimeout");
+            if (idleTimeout < timeout) {
+                timeout = idleTimeout;
+            }
+        }
+        return timeout;
     }
 	
 }
