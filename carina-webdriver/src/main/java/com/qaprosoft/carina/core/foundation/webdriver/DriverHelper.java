@@ -171,6 +171,7 @@ public class DriverHelper {
             LOGGER.debug("starting driver.get call...");
             future.get(timeout, TimeUnit.SECONDS);
         } catch (java.util.concurrent.TimeoutException e) {
+            trigger("window.stop();"); //try to cancel page loading
             String message = "Unable to open url during " + timeout + "sec!";
             LOGGER.error(message);
             Assert.fail(message, e);
