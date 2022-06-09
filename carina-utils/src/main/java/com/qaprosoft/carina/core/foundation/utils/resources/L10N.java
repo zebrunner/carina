@@ -55,17 +55,8 @@ public class L10N {
     private static ArrayList<ResourceBundle> resBoundles = new ArrayList<ResourceBundle>();
     private static Properties missedResources = new Properties();
     
-    private static SoftAssert mistakes = new SoftAssert();
+    private static SoftAssert mistakes;
 
-    /**
-     * SoftAssert initialization for concrete test. This is necessary so that the assert results are unique
-     * for each test. Must be called at the start of a test
-     * 
-     * @param softAssert SoftAssert object to be used for validation
-     */
-    public static void initSoftAssert(SoftAssert softAssert) {
-        mistakes = softAssert;
-    }
 
     /**
      * Load L10N resource bundle corresponding to a specific locale.
@@ -73,6 +64,8 @@ public class L10N {
      * must be called to reload resources
      */    
     public static void load() {
+        // #1679 fix
+        mistakes = new SoftAssert();
         List<String> loadedResources = new ArrayList<String>();
         try {
 
@@ -155,6 +148,8 @@ public class L10N {
      *
      */    
     public static void load(ArrayList<ResourceBundle> resources) {
+        // #1679 fix
+        mistakes = new SoftAssert();
         resBoundles = resources;
     }
     
