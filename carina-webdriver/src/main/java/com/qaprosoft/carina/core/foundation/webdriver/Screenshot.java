@@ -199,6 +199,20 @@ public class Screenshot {
      * @param driver
      *          instance used for capturing.
      * @param comment 
+     *          String comment
+     * @return screenshot name.
+     */    
+    public static BufferedImage captureFullSize(WebDriver driver, String comment) {
+        return captureFullSize(driver, comment, false);
+    }
+    
+    /**
+     * Captures full size screenshot based on auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots
+     * location.
+     *
+     * @param driver
+     *          instance used for capturing.
+     * @param comment 
      * 			String comment
      * @param artifact
      * 			boolean artifact
@@ -277,10 +291,6 @@ public class Screenshot {
             LOGGER.debug("Screenshot->captureFullSize finished.");
         }
         return screen;
-    }
-
-    public static BufferedImage captureFullSize(WebDriver driver, String comment) {
-        return captureFullSize(driver, comment, false);
     }
 
     /**
@@ -591,7 +601,7 @@ public class Screenshot {
                 } else if (msg.contains(SpecialKeywords.DRIVER_NO_SUCH_WINDOW)) {
                     LOGGER.error("ExecutionException error on capture screenshot due to the " + SpecialKeywords.DRIVER_NO_SUCH_WINDOW);
                 } else {
-                    LOGGER.error("ExecutionException error detected on capture full screenshot!", e);
+                    LOGGER.error("ExecutionException error detected on capture visible screenshot!", e);
                 }
             }
         } catch (Exception e) {
