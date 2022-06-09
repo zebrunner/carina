@@ -601,7 +601,9 @@ public class Screenshot {
                 } else if (msg.contains(SpecialKeywords.DRIVER_NO_SUCH_WINDOW)) {
                     LOGGER.error("ExecutionException error on capture screenshot due to the " + SpecialKeywords.DRIVER_NO_SUCH_WINDOW);
                 } else {
-                    LOGGER.error("ExecutionException error detected on capture visible screenshot!", e);
+                    //TODO: clear log messages
+                    LOGGER.error("ExecutionException error detected on capture visible screenshot: " + e.getMessage(), e);
+                    LOGGER.info(e.getCause().toString());
                 }
             }
         } catch (Exception e) {
