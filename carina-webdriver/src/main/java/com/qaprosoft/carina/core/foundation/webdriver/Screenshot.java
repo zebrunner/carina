@@ -755,12 +755,13 @@ public class Screenshot {
     
     private static long getPageLoadTimeout() {
         long timeout = 300;
-        if (!R.CONFIG.get("capabilities.idleTimeout").isEmpty()) {
-            long idleTimeout = R.CONFIG.getLong("capabilities.idleTimeout");
-            if (idleTimeout < timeout) {
-                timeout = idleTimeout;
-            }
-        }
+        // #1705: limit pageLoadTimeout driver timeout by idleTimeout
+//      if (!R.CONFIG.get("capabilities.idleTimeout").isEmpty()) {
+//          long idleTimeout = R.CONFIG.getLong("capabilities.idleTimeout");
+//          if (idleTimeout < timeout) {
+//              timeout = idleTimeout;
+//          }
+//      }
         return timeout;
     }
     
