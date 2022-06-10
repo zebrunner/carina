@@ -386,6 +386,8 @@ public class Screenshot {
                             .takeScreenshot(augmentedDriver);
                     screenShot = screenshot.getImage();
             }
+        } catch (TimeoutException e) {
+            LOGGER.warn("Unable to capture screenshot during " + timeout + " sec!");
         } catch (Exception e) {
             // for undefined failure keep full stacktrace to handle later correctly!
             LOGGER.error("Undefined error on capture full screenshot detected!", e);
