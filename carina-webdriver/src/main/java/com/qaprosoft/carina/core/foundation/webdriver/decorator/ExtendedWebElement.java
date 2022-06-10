@@ -1139,9 +1139,9 @@ public class ExtendedWebElement implements IWebElement {
             }
         }
 
-        return waitUntil(ExpectedConditions.or(ExpectedConditions.not(getDefaultCondition(getBy())),
-                ExpectedConditions.stalenessOf(this.element),
-                ExpectedConditions.invisibilityOf(this.element)), timeout);
+        return waitUntil(ExpectedConditions.or(ExpectedConditions.stalenessOf(this.element),
+                ExpectedConditions.invisibilityOf(this.element)),
+                timeout);
     }
 
     public ExtendedWebElement format(Object... objects) {
