@@ -1132,7 +1132,7 @@ public class ExtendedWebElement implements IWebElement {
     		//do direct selenium/appium search without any extra validations
             // TODO: use-case when format method is used. Need investigate howto init context in this case as well
             element = searchContext.findElement(by);
-    	} catch (NoSuchElementException e) {
+    	} catch (NoSuchElementException | StaleElementReferenceException e) {
     		//element not present so means disappear
     		return true;
     	}
