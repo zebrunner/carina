@@ -96,8 +96,6 @@ public class ReportContext {
 
     private static File artifactsDirectory;
 
-    private static File metaDataDirectory;
-
     private static long rootID;
 
     private static final ThreadLocal<File> testDirectory = new InheritableThreadLocal<>();
@@ -202,22 +200,6 @@ public class ReportContext {
             }
         }
         return artifactsDirectory;
-    }
-
-    public static synchronized File getMetadataFolder() {
-        if (metaDataDirectory == null) {
-            String absolutePath = getBaseDir().getAbsolutePath();
-            try {
-                metaDataDirectory = new File(String.format("%s/%s/metadata", URLDecoder.decode(absolutePath, "utf-8"), ARTIFACTS_FOLDER));
-            } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException("Artifacts metadata folder is not created in base dir: " + absolutePath);
-            }
-            boolean isCreated = metaDataDirectory.mkdir();
-            if (!isCreated) {
-                throw new RuntimeException("Artifacts metadata folder is not created in base dir: " + absolutePath);
-            }
-        }
-        return metaDataDirectory;
     }
 
     /**
