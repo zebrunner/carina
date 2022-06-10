@@ -1128,20 +1128,25 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     public boolean waitUntilElementDisappear(final long timeout) {
-        if (this.element == null) {
-            try {
-                // do direct selenium/appium search without any extra validations
-                // TODO: use-case when format method is used. Need investigate howto init context in this case as well
+        try {
+            if (this.element == null) {
+                // if element not found it will cause NoSuchElementException
                 findElement();
-            } catch (NoSuchElementException | StaleElementReferenceException e) {
-                // element not present so means disappear
-                return true;
+            } else {
+                // if element is stale, it will cause StaleElementReferenceException
+                this.element.isDisplayed();
             }
+
+            return waitUntil(ExpectedConditions.or(ExpectedConditions.stalenessOf(this.element),
+                    ExpectedConditions.invisibilityOf(this.element)),
+                    timeout);
+
+        } catch (NoSuchElementException | StaleElementReferenceException e) {
+            // element not present so means disappear
+            return true;
         }
 
-        return waitUntil(ExpectedConditions.or(ExpectedConditions.stalenessOf(this.element),
-                ExpectedConditions.invisibilityOf(this.element)),
-                timeout);
+
     }
 
     public ExtendedWebElement format(Object... objects) {
