@@ -190,107 +190,6 @@ public class Screenshot {
     }
     
     /**
-     * Captures full size screenshot based on auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots
-     * location.
-     *
-     * @param driver
-     *          instance used for capturing.
-     * @param comment 
-     *          String comment
-     * @return screenshot name.
-     */    
-    public static BufferedImage captureFullSize(WebDriver driver, String comment) {
-        return captureFullSize(driver, comment, false);
-    }
-    
-    /**
-     * Captures full size screenshot based on auto_screenshot global parameter, creates thumbnail and copies both images to specified screenshots
-     * location.
-     *
-     * @param driver
-     *          instance used for capturing.
-     * @param comment 
-     * 			String comment
-     * @param artifact
-     * 			boolean artifact
-     * @return screenshot name.
-     */
-    public static BufferedImage captureFullSize(WebDriver driver, String comment, boolean artifact) {
-        String screenName;
-        BufferedImage screen = null;
-
-        try {
-            if (!isCaptured(comment)) {
-                // [VD] do not write something to log as this original exception is used as original exception for failure
-                //LOGGER.debug("Unable to capture screenshot as driver seems invalid: " + comment);
-                return null;
-            }
-
-            LOGGER.debug("Screenshot->captureFullSize starting...");
-            driver = castDriver(driver); // remove all DriverListener casting to WebDriver
-            
-            // Define test screenshot root
-            File testScreenRootDir = ReportContext.getTestDir();
-
-            // Capture full page screenshot and resize
-            screenName = comment + ".png";
-            String screenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
-
-            WebDriver augmentedDriver = driver;
-
-            if (!driver.toString().contains("AppiumNativeDriver")) {
-                // do not augment for Appium 1.x anymore
-                augmentedDriver = new DriverAugmenter().augment(driver);
-            }
-
-            screen = takeFullScreenshot(driver, augmentedDriver);
-
-            if (screen == null) {
-                //do nothing and return empty
-                return null;
-            }
-
-            if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1
-                    && Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) {
-                resizeImg(screen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH),
-                        Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT), screenPath);
-            }
-
-            File screenshot = new File(screenPath);
-
-            ImageIO.write(screen, "PNG", screenshot);
-
-            // Uploading screenshot to Amazon S3
-            if (artifact) {
-                com.zebrunner.agent.core.registrar.Artifact.attachToTest(comment + ".png", screenshot);
-            } else {
-                com.zebrunner.agent.core.registrar.Screenshot.upload(Files.readAllBytes(screenshot.toPath()), Instant.now().toEpochMilli());
-            }
-            
-            // add screenshot comment to collector
-            ReportContext.addScreenshotComment(screenName, comment);
-            return screen;
-        } catch (IOException e) {
-            LOGGER.error("Unable to capture screenshot due to the I/O issues!", e);
-        } catch (WebDriverException e) {
-            if (isCaptured(e.getMessage())) {
-                // display exception as we suspect to make screenshot for this use-case
-                LOGGER.warn("Unable to capture screenshot due to the WebDriverException!");
-                LOGGER.debug(ERROR_STACKTRACE, e);
-            } else {
-                // Do not display exception by default as we don't suspect to make screenshot for this use-case
-                LOGGER.debug("Unable to capture screenshot due to the WebDriverException!", e);
-            }
-        } catch (Exception e) {
-            LOGGER.warn("Unable to capture screenshot due to the Exception!");
-            LOGGER.debug(ERROR_STACKTRACE, e);
-        } finally {
-            LOGGER.debug("Screenshot->captureFullSize finished.");
-        }
-        return screen;
-    }
-
-    /**
      * Captures application screenshot, creates thumbnail and copies both images to specified screenshots location.
      *
      * @param driver
@@ -303,7 +202,6 @@ public class Screenshot {
      *            Boolean
      * @return screenshot name.
      */
-
     private static String capture(WebDriver driver, boolean isTakeScreenshot, String comment, boolean fullSize) {
         String screenName = "";
         
