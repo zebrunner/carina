@@ -1128,13 +1128,11 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     public boolean waitUntilElementDisappear(final long timeout) {
-        if (element == null) {
-            // if the element already exists, it makes no sense to overwrite it,
-            // because overwriting is done by the first element that comes across
+        if (this.element == null) {
             try {
                 // do direct selenium/appium search without any extra validations
                 // TODO: use-case when format method is used. Need investigate howto init context in this case as well
-                this.element = searchContext.findElement(getBy());
+                findElement();
             } catch (NoSuchElementException | StaleElementReferenceException e) {
                 // element not present so means disappear
                 return true;
@@ -1142,8 +1140,8 @@ public class ExtendedWebElement implements IWebElement {
         }
 
         return waitUntil(ExpectedConditions.or(ExpectedConditions.not(getDefaultCondition(getBy())),
-                ExpectedConditions.stalenessOf(element),
-                ExpectedConditions.invisibilityOf(element)), timeout);
+                ExpectedConditions.stalenessOf(this.element),
+                ExpectedConditions.invisibilityOf(this.element)), timeout);
     }
 
     public ExtendedWebElement format(Object... objects) {
