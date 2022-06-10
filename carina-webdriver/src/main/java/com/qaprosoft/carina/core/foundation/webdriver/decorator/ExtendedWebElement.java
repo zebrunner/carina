@@ -1129,15 +1129,9 @@ public class ExtendedWebElement implements IWebElement {
 
     public boolean waitUntilElementDisappear(final long timeout) {
     	try {
-        	//TODO: investigate maybe searchContext better to use here!
     		//do direct selenium/appium search without any extra validations
-            if (searchContext != null) {
-                //TODO: use-case when format method is used. Need investigate howto init context in this case as well
-                element = searchContext.findElement(by);
-            } else {
-                LOGGER.debug("waitUntilElementDisappear: searchContext is null for " + getNameWithLocator());
-                element = getDriver().findElement(by);  
-            }
+            // TODO: use-case when format method is used. Need investigate howto init context in this case as well
+            element = searchContext.findElement(by);
     	} catch (NoSuchElementException e) {
     		//element not present so means disappear
     		return true;
@@ -1147,7 +1141,7 @@ public class ExtendedWebElement implements IWebElement {
     		return true;
     	}
 
-        return waitUntil(ExpectedConditions.or(ExpectedConditions.invisibilityOfElementLocated(getBy()),
+        return waitUntil(ExpectedConditions.or(ExpectedConditions.not(getDefaultCondition(getBy())),
                 ExpectedConditions.stalenessOf(element),
                 ExpectedConditions.invisibilityOf(element)), timeout);
     }
