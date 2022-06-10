@@ -1135,10 +1135,6 @@ public class ExtendedWebElement implements IWebElement {
     	} catch (NoSuchElementException e) {
     		//element not present so means disappear
     		return true;
-    	} catch (Exception e) {
-    		//element not present so means disappear
-    		LOGGER.error("Investigate use-case with disappeared element later!", e);
-    		return true;
     	}
 
         return waitUntil(ExpectedConditions.or(ExpectedConditions.not(getDefaultCondition(getBy())),
