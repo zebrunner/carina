@@ -338,8 +338,8 @@ public class Screenshot {
      */
     private static BufferedImage takeFullScreenshot(WebDriver driver, WebDriver augmentedDriver) throws Exception {
         BufferedImage screenShot = null;
-        // default timeout for driver quit 1/3 of explicit
-        long timeout = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / 3;
+        // default timeout for full size screenshoting is EXPLICIT_TIMEOUT /2
+        long timeout = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / 2;
         augmentedDriver.manage().timeouts().pageLoadTimeout(timeout, TimeUnit.SECONDS);
         try {
             LOGGER.debug("starting full size screenshot capturing...");
