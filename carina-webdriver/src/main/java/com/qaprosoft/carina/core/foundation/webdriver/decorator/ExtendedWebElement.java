@@ -210,7 +210,9 @@ public class ExtendedWebElement implements IWebElement {
 					locatorField.setAccessible(true);
 
 					locator = (ExtendedElementLocator) locatorField.get(innerProxy);
-					this.isLocalized = locator.isLocalized();
+                    // #1691 fix L10N Localized annotation does not work when elements are nested and the
+                    // parent element does not have an annotation.
+					//this.isLocalized = locator.isLocalized();
 
 					searchContextField = locator.getClass().getDeclaredField("searchContext");
 					searchContextField.setAccessible(true);
