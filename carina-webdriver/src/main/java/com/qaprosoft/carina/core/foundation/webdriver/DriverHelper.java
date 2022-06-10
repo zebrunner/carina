@@ -1112,22 +1112,26 @@ public class DriverHelper {
     /**
      * Find Extended Web Element on page using By.
      * 
+     * @deprecated
      * @param by
      *            Selenium By locator
      * @return ExtendedWebElement if exists otherwise null.
      */
+    @Deprecated(since = "7.4.21", forRemoval = true)
     public ExtendedWebElement findExtendedWebElement(By by) {
         return findExtendedWebElement(by, by.toString(), EXPLICIT_TIMEOUT);
     }
 
     /**
      * Find Extended Web Element on page using By.
-     * 
+     *
+     * @deprecated
      * @param by
      *            Selenium By locator
      * @param timeout to wait
      * @return ExtendedWebElement if exists otherwise null.
      */
+    @Deprecated(since = "7.4.21", forRemoval = true)
     public ExtendedWebElement findExtendedWebElement(By by, long timeout) {
         return findExtendedWebElement(by, by.toString(), timeout);
     }
@@ -1135,19 +1139,22 @@ public class DriverHelper {
     /**
      * Find Extended Web Element on page using By.
      * 
+     * @deprecated
      * @param by
      *            Selenium By locator
      * @param name
      *            Element name
      * @return ExtendedWebElement if exists otherwise null.
      */
+    @Deprecated(since = "7.4.21", forRemoval = true)
     public ExtendedWebElement findExtendedWebElement(final By by, String name) {
         return findExtendedWebElement(by, name, EXPLICIT_TIMEOUT);
     }
 
     /**
      * Find Extended Web Element on page using By.
-     * 
+     *
+     * @deprecated
      * @param by
      *            Selenium By locator
      * @param name
@@ -1156,6 +1163,7 @@ public class DriverHelper {
      *            Timeout to find
      * @return ExtendedWebElement if exists otherwise null.
      */
+    @Deprecated(since = "7.4.21", forRemoval = true)
     public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
 		DriverListener.setMessages(Messager.ELEMENT_FOUND.getMessage(name),
 				Messager.ELEMENT_NOT_FOUND.getMessage(name));
@@ -1170,17 +1178,21 @@ public class DriverHelper {
 
     /**
      * Find List of Extended Web Elements on page using By and explicit timeout.
-     * 
+     *
+     * @deprecated
      * @param by
      *            Selenium By locator
      * @return List of ExtendedWebElement.
      */
+    @Deprecated(since = "7.4.21", forRemoval = true)
     public List<ExtendedWebElement> findExtendedWebElements(By by) {
         return findExtendedWebElements(by, EXPLICIT_TIMEOUT);
     }
 
     /**
      * Find List of Extended Web Elements on page using By.
+     *
+     * @deprecated
      * 
      * @param by
      *            Selenium By locator
@@ -1188,6 +1200,7 @@ public class DriverHelper {
      *            Timeout to find
      * @return List of ExtendedWebElement.
      */
+    @Deprecated(since = "7.4.21", forRemoval = true)
     public List<ExtendedWebElement> findExtendedWebElements(final By by, long timeout) {
         List<ExtendedWebElement> extendedWebElements = new ArrayList<ExtendedWebElement>();
         List<WebElement> webElements = new ArrayList<WebElement>();
