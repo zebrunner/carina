@@ -489,6 +489,7 @@ public class Screenshot {
 				|| message.contains("Illegal base64 character 2e")
 				|| message.contains("javascript error: Cannot read property 'outerHTML' of null")
 				|| message.contains("Driver connection refused")
+                || message.contains("tab crashed")				
 				// carina based errors which means that driver is not ready for screenshoting
 				|| message.contains("Unable to open url during");
 
