@@ -37,7 +37,6 @@ import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -619,7 +618,7 @@ public class Screenshot {
     private static void setPageLoadTimeout(WebDriver drv, long timeout) {
         try {
             drv.manage().timeouts().pageLoadTimeout(timeout, TimeUnit.SECONDS);
-        } catch (UnsupportedCommandException e) {
+        } catch (WebDriverException e) {
             //TODO: review upcoming appium 2.0 changes
             LOGGER.debug("Appium: Not implemented yet for pageLoad timeout!");
         }
