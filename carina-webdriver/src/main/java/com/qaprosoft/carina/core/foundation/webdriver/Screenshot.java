@@ -37,6 +37,7 @@ import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -414,7 +415,7 @@ public class Screenshot {
         BufferedImage screenShot = null;
         // default timeout for driver quit 1/3 of explicit
         long timeout = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / 3;
-        augmentedDriver.manage().timeouts().pageLoadTimeout(timeout, TimeUnit.SECONDS);
+        setPageLoadTimeout(augmentedDriver, timeout);
         
         try {
             LOGGER.debug("starting screenshot capturing...");
@@ -426,7 +427,7 @@ public class Screenshot {
             LOGGER.error(message);
         } finally {
             //restore default pageLoadTimeout driver timeout
-            augmentedDriver.manage().timeouts().pageLoadTimeout(getPageLoadTimeout(), TimeUnit.SECONDS);
+            setPageLoadTimeout(augmentedDriver, getPageLoadTimeout());
             LOGGER.debug("finished screenshot call.");
         }
         return screenShot;        
@@ -618,7 +619,7 @@ public class Screenshot {
     private static void setPageLoadTimeout(WebDriver drv, long timeout) {
         try {
             drv.manage().timeouts().pageLoadTimeout(timeout, TimeUnit.SECONDS);
-        } catch (WebDriverException e) {
+        } catch (UnsupportedCommandException e) {
             //TODO: review upcoming appium 2.0 changes
             LOGGER.debug("Appium: Not implemented yet for pageLoad timeout!");
         }
