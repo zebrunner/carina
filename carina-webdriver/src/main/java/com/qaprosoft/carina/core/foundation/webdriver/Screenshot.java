@@ -37,6 +37,7 @@ import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -52,8 +53,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
 
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.windows.WindowsDriver;
 import ru.yandex.qatools.ashot.AShot;
 import ru.yandex.qatools.ashot.comparison.DiffMarkupPolicy;
@@ -618,17 +617,13 @@ public class Screenshot {
     }
     
     private static void setPageLoadTimeout(WebDriver drv, long timeout) {
-        if (!isAppium(drv)) {
+        try {
             drv.manage().timeouts().pageLoadTimeout(timeout, TimeUnit.SECONDS);
-        } else {
-            //TODO: review upcoming appium 2.0
+        } catch (UnsupportedCommandException e) {
+            //TODO: review upcoming appium 2.0 changes
             LOGGER.debug("Appium: Not implemented yet for pageLoad timeout!");
         }
         
-    }
-    
-    private static boolean isAppium(WebDriver drv) {
-        return (drv instanceof IOSDriver) || (drv instanceof AndroidDriver) || (drv instanceof AppiumDriver);
     }
 
     private static long getPageLoadTimeout() {
