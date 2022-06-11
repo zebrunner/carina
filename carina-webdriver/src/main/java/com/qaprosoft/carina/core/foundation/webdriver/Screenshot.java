@@ -52,6 +52,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
 
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.windows.WindowsDriver;
 import ru.yandex.qatools.ashot.AShot;
 import ru.yandex.qatools.ashot.comparison.DiffMarkupPolicy;
@@ -340,7 +342,8 @@ public class Screenshot {
         BufferedImage screenShot = null;
         // default timeout for full size screenshoting is EXPLICIT_TIMEOUT /2
         long timeout = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / 2;
-        augmentedDriver.manage().timeouts().pageLoadTimeout(timeout, TimeUnit.SECONDS);
+        
+        setPageLoadTimeout(augmentedDriver, timeout);
         try {
             LOGGER.debug("starting full size screenshot capturing...");
             if (driver.getClass().toString().contains("windows")) {
@@ -393,7 +396,7 @@ public class Screenshot {
             LOGGER.error("Undefined error on capture full screenshot detected!", e);
         } finally {
             //restore default pageLoadTimeout driver timeout
-            augmentedDriver.manage().timeouts().pageLoadTimeout(getPageLoadTimeout(), TimeUnit.SECONDS);
+            setPageLoadTimeout(augmentedDriver, getPageLoadTimeout());
             LOGGER.debug("finished full size screenshot call.");
         }
         return screenShot;
@@ -614,6 +617,20 @@ public class Screenshot {
         return drv;
     }
     
+    private static void setPageLoadTimeout(WebDriver drv, long timeout) {
+        if (!isAppium(drv)) {
+            drv.manage().timeouts().pageLoadTimeout(timeout, TimeUnit.SECONDS);
+        } else {
+            //TODO: review upcoming appium 2.0
+            LOGGER.debug("Appium: Not implemented yet for pageLoad timeout!");
+        }
+        
+    }
+    
+    private static boolean isAppium(WebDriver drv) {
+        return (drv instanceof IOSDriver) || (drv instanceof AndroidDriver) || (drv instanceof AppiumDriver);
+    }
+
     private static long getPageLoadTimeout() {
         long timeout = 300;
         // #1705: limit pageLoadTimeout driver timeout by idleTimeout
@@ -625,5 +642,4 @@ public class Screenshot {
 //      }
         return timeout;
     }
-    
 }
