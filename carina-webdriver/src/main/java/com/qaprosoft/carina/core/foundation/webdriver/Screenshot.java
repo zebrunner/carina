@@ -417,7 +417,12 @@ public class Screenshot {
         
         try {
             LOGGER.debug("starting screenshot capturing...");
-            screenShot = ImageIO.read(((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE));
+            if (augmentedDriver.getClass().toString().contains("java_client")) {
+                // Mobile Native app
+                screenShot = ImageIO.read(((AppiumDriver<?>) augmentedDriver).getScreenshotAs(OutputType.FILE));
+            } else {
+                screenShot = ImageIO.read(((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE));
+            }
         } catch (TimeoutException e) {
             LOGGER.warn("Unable to capture screenshot during " + timeout + " sec!");
         } catch (Exception e) {
