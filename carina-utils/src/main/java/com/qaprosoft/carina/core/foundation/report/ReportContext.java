@@ -81,7 +81,6 @@ import com.zebrunner.agent.core.registrar.Artifact;
 public class ReportContext {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public static final String ARTIFACTS_FOLDER = "artifacts";
-    private static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
     private static final String GALLERY_ZIP = "gallery-lib.zip";
     private static final String REPORT_NAME = "/report.html";
@@ -344,7 +343,7 @@ public class ReportContext {
      * @return list of artifact files
      */
     public static List<File> downloadArtifacts(WebDriver driver, String pattern, boolean attachToTestRun) {
-        return downloadArtifacts(driver, pattern, EXPLICIT_TIMEOUT, attachToTestRun);
+        return downloadArtifacts(driver, pattern, Configuration.getLong(Parameter.EXPLICIT_TIMEOUT), attachToTestRun);
     }
 
     /**
