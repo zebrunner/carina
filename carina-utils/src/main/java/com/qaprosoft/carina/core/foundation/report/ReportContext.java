@@ -80,7 +80,6 @@ import com.zebrunner.agent.core.registrar.Artifact;
 
 public class ReportContext {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final long ARTIFACT_WAITING_TIMEOUT_SEC = 5;
     public static final String ARTIFACTS_FOLDER = "artifacts";
 
     private static final String GALLERY_ZIP = "gallery-lib.zip";
@@ -320,10 +319,11 @@ public class ReportContext {
      * 
      * @param driver WebDriver
      * @param pattern regex by with we will filter artifacts that will be downloaded
+     * @param timeout timeout for waiting one artifact
      * @return list of artifact files
      */
-    public static List<File> downloadArtifacts(WebDriver driver, String pattern) {
-        return downloadArtifacts(driver, pattern, true);
+    public static List<File> downloadArtifacts(WebDriver driver, String pattern, long timeout) {
+        return downloadArtifacts(driver, pattern, timeout, true);
     }
 
     /**
@@ -331,10 +331,11 @@ public class ReportContext {
      * 
      * @param driver WebDriver
      * @param pattern regex by with we will filter artifacts that will be downloaded
+     * @param timeout timeout for waiting one artifact
      * @param attachToTestRun boolean
      * @return list of artifact files
      */
-    public static List<File> downloadArtifacts(WebDriver driver, String pattern, boolean attachToTestRun) {
+    public static List<File> downloadArtifacts(WebDriver driver, String pattern, long timeout, boolean attachToTestRun) {
         List<String> filteredFilesNames = listArtifacts(driver)
                 .stream()
                 // ignore directories
@@ -345,7 +346,7 @@ public class ReportContext {
         List<File> downloadedArtifacts = new ArrayList<>();
 
         for (String fileName : filteredFilesNames) {
-            downloadedArtifacts.add(downloadArtifact(driver, fileName, ARTIFACT_WAITING_TIMEOUT_SEC, attachToTestRun));
+            downloadedArtifacts.add(downloadArtifact(driver, fileName, timeout, attachToTestRun));
         }
         return downloadedArtifacts;
     }
