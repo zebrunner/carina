@@ -202,9 +202,29 @@ public class ReportContext {
         return artifactsDirectory;
     }
 
+    public static synchronized File getAutoDownloadFolder() {
+        String autoDownloadFolderPath = Configuration.get(Parameter.AUTO_DOWNLOAD_FOLDER);
+        File autoDownloadFolder;
+
+        if (autoDownloadFolderPath.isEmpty()) {
+            autoDownloadFolder = ReportContext.getArtifactsFolder();
+        } else {
+            autoDownloadFolder = new File(autoDownloadFolderPath);
+        }
+        if (!(autoDownloadFolder.exists() && autoDownloadFolder.isDirectory())) {
+            LOGGER.error("Auto download folder is not exists or it is not a directory. Creating an empty folder by path: {} ",
+                    autoDownloadFolder.getAbsolutePath());
+            boolean isCreated = autoDownloadFolder.mkdir();
+            if (!isCreated) {
+                throw new RuntimeException("Auto download folder is not created: " + autoDownloadFolder.getAbsolutePath());
+            }
+        }
+        return autoDownloadFolder;
+    }
+
     /**
      * Check that Artifacts Folder exists.
-     * 
+     *
      * @return boolean
      */
     public static boolean isArtifactsFolderExists() {
@@ -266,7 +286,7 @@ public class ReportContext {
             getLocalArtifacts = true;
         } finally {
             if (getLocalArtifacts) {
-                artifactNames = Arrays.stream(Objects.requireNonNull(getArtifactsFolder().listFiles()))
+                artifactNames = Arrays.stream(Objects.requireNonNull(getAutoDownloadFolder().listFiles()))
                         .map(File::getName)
                         .collect(Collectors.toList());
             }
@@ -377,7 +397,7 @@ public class ReportContext {
                 Assert.fail("Unable to find artifact: " + name);
             }
 
-            file = new File(getArtifactsFolder() + File.separator + name);
+            file = new File(getAutoDownloadFolder() + File.separator + name);
             String path = file.getAbsolutePath();
             LOGGER.debug("artifact file to download: " + path);
 
