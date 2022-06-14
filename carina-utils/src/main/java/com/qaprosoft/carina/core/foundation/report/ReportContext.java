@@ -319,7 +319,7 @@ public class ReportContext {
     }
 
     public static List<File> getAllArtifacts() {
-        return Arrays.asList(getArtifactsFolder().listFiles());
+        return Arrays.asList(getAutoDownloadFolder().listFiles());
     }
 
     /**
@@ -539,7 +539,7 @@ public class ReportContext {
     }
 
     public static void saveArtifact(String name, InputStream source) throws IOException {
-        File artifact = new File(String.format("%s/%s", getArtifactsFolder(), name));
+        File artifact = new File(String.format("%s/%s", getAutoDownloadFolder(), name));
         artifact.createNewFile();
         FileUtils.writeByteArrayToFile(artifact, IOUtils.toByteArray(source));
         
@@ -547,7 +547,7 @@ public class ReportContext {
     }
 
     public static void saveArtifact(File source) throws IOException {
-        File artifact = new File(String.format("%s/%s", getArtifactsFolder(), source.getName()));
+        File artifact = new File(String.format("%s/%s", getAutoDownloadFolder(), source.getName()));
         artifact.createNewFile();
         FileUtils.copyFile(source, artifact);
         
