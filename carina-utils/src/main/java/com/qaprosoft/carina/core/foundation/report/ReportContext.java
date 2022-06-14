@@ -202,10 +202,11 @@ public class ReportContext {
     }
 
     public static synchronized File getAutoDownloadFolder() {
+        boolean isAutoDownload = Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD);
         String autoDownloadFolderPath = Configuration.get(Parameter.AUTO_DOWNLOAD_FOLDER);
         File autoDownloadFolder;
 
-        if (autoDownloadFolderPath.isEmpty()) {
+        if (autoDownloadFolderPath.isEmpty() || !isAutoDownload) {
             autoDownloadFolder = ReportContext.getArtifactsFolder();
         } else {
             autoDownloadFolder = new File(autoDownloadFolderPath);
