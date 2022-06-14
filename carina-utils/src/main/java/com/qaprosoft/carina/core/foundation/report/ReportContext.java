@@ -214,9 +214,10 @@ public class ReportContext {
         String autoDownloadFolderPath = Configuration.get(Parameter.AUTO_DOWNLOAD_FOLDER);
         File autoDownloadFolder;
 
-        if (isAutoDownload && autoDownloadFolderPath.isEmpty()) {
-            LOGGER.warn("auto_download parameter defined but  auto_download_folder parameter not specified");
-        }
+        // a lot of warnings in console - move this check
+        // if (isAutoDownload && autoDownloadFolderPath.isEmpty()) {
+        // LOGGER.warn("auto_download parameter defined but auto_download_folder parameter not specified");
+        // }
 
         if (autoDownloadFolderPath.isEmpty() || !isAutoDownload) {
             autoDownloadFolder = ReportContext.getArtifactsFolder();
