@@ -81,6 +81,7 @@ import com.zebrunner.agent.core.registrar.Artifact;
 public class ReportContext {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public static final String ARTIFACTS_FOLDER = "artifacts";
+    private static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
     private static final String GALLERY_ZIP = "gallery-lib.zip";
     private static final String REPORT_NAME = "/report.html";
@@ -312,6 +313,18 @@ public class ReportContext {
      */
     public static File downloadArtifact(WebDriver driver, String name, long timeout) {
         return downloadArtifact(driver, name, timeout, true);
+    }
+
+    /**
+     * download artifact from selenoid to local java machine by pattern
+     *
+     * @param driver WebDriver
+     * @param pattern regex by with we will filter artifacts that will be downloaded
+     * @param attachToTestRun boolean
+     * @return list of artifact files
+     */
+    public static List<File> downloadArtifacts(WebDriver driver, String pattern, boolean attachToTestRun) {
+        return downloadArtifacts(driver, pattern, EXPLICIT_TIMEOUT, attachToTestRun);
     }
 
     /**
