@@ -201,10 +201,22 @@ public class ReportContext {
         return artifactsDirectory;
     }
 
+    /**
+     * Returns the auto download folder. Depends on three configuration parameters: auto_download, auto_download_folder, custom_artifacts_folder.
+     * If the auto_download parameter is true and auto_download_folder is specified, then returns the file referring to the auto_download_folder
+     * directory. If not, then returns the file referring to the directory corresponding to the custom_artifacts_folder parameter.
+     * If custom_artifacts_folder is not defined, then it creates a default folder
+     * 
+     * @return auto download folder file
+     */
     public static synchronized File getAutoDownloadFolder() {
         boolean isAutoDownload = Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD);
         String autoDownloadFolderPath = Configuration.get(Parameter.AUTO_DOWNLOAD_FOLDER);
         File autoDownloadFolder;
+
+        if (isAutoDownload && autoDownloadFolderPath.isEmpty()) {
+            LOGGER.warn("auto_download parameter defined but  auto_download_folder parameter not specified");
+        }
 
         if (autoDownloadFolderPath.isEmpty() || !isAutoDownload) {
             autoDownloadFolder = ReportContext.getArtifactsFolder();
