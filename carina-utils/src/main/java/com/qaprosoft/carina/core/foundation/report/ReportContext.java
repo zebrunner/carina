@@ -413,7 +413,6 @@ public class ReportContext {
         file = new File(getArtifactsFolder() + File.separator + name);
         String path = file.getAbsolutePath();
         LOGGER.debug("artifact file to download: " + path);
-        // attempt to verify and download file from selenoid
 
         if (autoDownloadArtifactExists(name)) {
             try {
