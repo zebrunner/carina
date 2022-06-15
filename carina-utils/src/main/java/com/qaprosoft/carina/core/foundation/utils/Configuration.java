@@ -109,6 +109,8 @@ public class Configuration {
 
         CUSTOM_ARTIFACTS_FOLDER("custom_artifacts_folder"),
 
+        ARTIFACT_AVAILABILITY_TIMEOUT("artifact_availability_timeout"),
+
         RETRY_INTERVAL("retry_interval"),
 
         PROJECT_REPORT_DIRECTORY("project_report_directory"),

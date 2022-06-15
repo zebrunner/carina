@@ -80,7 +80,6 @@ import com.zebrunner.agent.core.registrar.Artifact;
 
 public class ReportContext {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final long ARTIFACT_WAITING_TIMEOUT_SEC = 5;
     public static final String ARTIFACTS_FOLDER = "artifacts";
 
     private static final String GALLERY_ZIP = "gallery-lib.zip";
@@ -203,8 +202,42 @@ public class ReportContext {
     }
 
     /**
-     * Check that Artifacts Folder exists.
+     * Returns the auto download folder. Depends on three configuration parameters: auto_download, auto_download_folder, custom_artifacts_folder.
+     * If the auto_download parameter is true and auto_download_folder is specified, then returns the file referring to the auto_download_folder
+     * directory. If not, then returns the file referring to the directory corresponding to the custom_artifacts_folder parameter.
+     * If custom_artifacts_folder is not defined, then it returns the file referring to the artifacts directory
      * 
+     * @return auto download folder file
+     */
+    public static synchronized File getAutoDownloadFolder() {
+        boolean isAutoDownload = Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD);
+        String autoDownloadFolderPath = Configuration.get(Parameter.AUTO_DOWNLOAD_FOLDER);
+        File autoDownloadFolder;
+
+        // a lot of warnings in console - move this check
+        // if (isAutoDownload && autoDownloadFolderPath.isEmpty()) {
+        // LOGGER.warn("auto_download parameter defined but auto_download_folder parameter not specified");
+        // }
+
+        if (autoDownloadFolderPath.isEmpty() || !isAutoDownload) {
+            autoDownloadFolder = ReportContext.getArtifactsFolder();
+        } else {
+            autoDownloadFolder = new File(autoDownloadFolderPath);
+        }
+        if (!(autoDownloadFolder.exists() && autoDownloadFolder.isDirectory())) {
+            LOGGER.error("Auto download folder is not exists or it is not a directory. Creating an empty folder by path: {} ",
+                    autoDownloadFolder.getAbsolutePath());
+            boolean isCreated = autoDownloadFolder.mkdir();
+            if (!isCreated) {
+                throw new RuntimeException("Auto download folder is not created: " + autoDownloadFolder.getAbsolutePath());
+            }
+        }
+        return autoDownloadFolder;
+    }
+
+    /**
+     * Check that Artifacts Folder exists.
+     *
      * @return boolean
      */
     public static boolean isArtifactsFolderExists() {
@@ -219,7 +252,15 @@ public class ReportContext {
         return false;
     }
 
-    private static List<String> listArtifacts(WebDriver driver) {
+    /**
+     * Returns a list of artifact names from an auto download folder. If a selenoid is used,
+     * it will try to take a list of filenames from it. If we do not have a selenoid
+     * or an error occurred when trying to access it, then the method returns a list
+     * of file names from an auto download folder on the local machine
+     * 
+     * @return list of file and directories names
+     */
+    public static List<String> listAutoDownloadArtifacts(WebDriver driver) {
         // We don't need name because we get root folder of artifacts
         String hostUrl = getUrl(driver, "");
         String username = getField(hostUrl, 1);
@@ -266,7 +307,7 @@ public class ReportContext {
             getLocalArtifacts = true;
         } finally {
             if (getLocalArtifacts) {
-                artifactNames = Arrays.stream(Objects.requireNonNull(getArtifactsFolder().listFiles()))
+                artifactNames = Arrays.stream(Objects.requireNonNull(getAutoDownloadFolder().listFiles()))
                         .map(File::getName)
                         .collect(Collectors.toList());
             }
@@ -328,6 +369,7 @@ public class ReportContext {
 
     /**
      * download artifact from selenoid to local java machine by pattern
+     * Ignore directories
      * 
      * @param driver WebDriver
      * @param pattern regex by with we will filter artifacts that will be downloaded
@@ -335,7 +377,8 @@ public class ReportContext {
      * @return list of artifact files
      */
     public static List<File> downloadArtifacts(WebDriver driver, String pattern, boolean attachToTestRun) {
-        List<String> filteredFilesNames = listArtifacts(driver)
+        final long artifactAvailabilityTimeout = Configuration.getLong(Parameter.ARTIFACT_AVAILABILITY_TIMEOUT);
+        List<String> filteredFilesNames = listAutoDownloadArtifacts(driver)
                 .stream()
                 // ignore directories
                 .filter(fileName -> !fileName.endsWith("/"))
@@ -345,11 +388,23 @@ public class ReportContext {
         List<File> downloadedArtifacts = new ArrayList<>();
 
         for (String fileName : filteredFilesNames) {
-            downloadedArtifacts.add(downloadArtifact(driver, fileName, ARTIFACT_WAITING_TIMEOUT_SEC, attachToTestRun));
+            downloadedArtifacts
+                    .add(downloadArtifact(driver, fileName, artifactAvailabilityTimeout, attachToTestRun));
         }
         return downloadedArtifacts;
     }
 
+    /**
+     * Looks for an artifact in the artifacts folder. If it does not find it,
+     * then it turns to the selenoid (if it is used) and tries to download
+     * the artifact from there to the artifacts folder
+     *
+     * @param driver WebDriver
+     * @param name filename
+     * @param timeout artifact availability check time
+     * @param artifact boolean - attach to test run
+     * @return
+     */
     public static File downloadArtifact(WebDriver driver, String name, long timeout, boolean artifact) {
         File file = getArtifact(name);
         if (file == null) {
