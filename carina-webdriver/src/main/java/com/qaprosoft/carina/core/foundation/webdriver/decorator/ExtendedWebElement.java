@@ -352,19 +352,13 @@ public class ExtendedWebElement implements IWebElement {
      * @return true if condition happen.
      */
     private boolean waitUntil(ExpectedCondition<?> condition, long timeout) {
-        long retryInterval = RETRY_TIME;
         if (timeout < 1) {
             LOGGER.warn("Fluent wait less than 1sec timeout might hangs! Updating to 1 sec.");
             timeout = 1;
         }
         
-        if (timeout >= 3 && timeout <= 10) {
-            retryInterval = 500;
-        }
-        if (timeout > 10) {
-            retryInterval = 1000;
-        }
-        // Wait<WebDriver> wait = new WebDriverWait(getDriver(), timeout, RETRY_TIME)
+        long retryInterval = getRetryInterval(timeout);
+        
         //try to use better tickMillis clock
         Wait<WebDriver> wait = new WebDriverWait(getDriver(), 
                 java.time.Clock.tickMillis(java.time.ZoneId.systemDefault()), 
@@ -1849,4 +1843,16 @@ public class ExtendedWebElement implements IWebElement {
         }
         return waitCondition;
     }
+    
+    private long getRetryInterval(long timeout) {
+        long retryInterval = RETRY_TIME;
+        if (timeout >= 3 && timeout <= 10) {
+            retryInterval = 500;
+        }
+        if (timeout > 10) {
+            retryInterval = 1000;
+        }
+        return retryInterval;
+    }
+
 }

@@ -15,7 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver;
 
-import java.awt.*;
+import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -48,11 +48,11 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.ScriptTimeoutException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
+import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -77,7 +77,6 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.LogicUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
-import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
@@ -153,7 +152,7 @@ public class DriverHelper {
         this.pageURL = decryptedURL;
         WebDriver drv = getDriver();
         
-        drv.manage().timeouts().pageLoadTimeout(timeout, TimeUnit.SECONDS);
+        setPageLoadTimeout(drv, timeout);
         DriverListener.setMessages(Messager.OPENED_URL.getMessage(url), Messager.NOT_OPENED_URL.getMessage(url));
         
         // [VD] there is no sense to use fluent wait here as selenium just don't return something until page is ready!
@@ -170,7 +169,7 @@ public class DriverHelper {
             Assert.fail("Undefined error on open url detected: " + e.getMessage(), e);
         } finally {
             //restore default pageLoadTimeout driver timeout
-            drv.manage().timeouts().pageLoadTimeout(getPageLoadTimeout(), TimeUnit.SECONDS);
+            setPageLoadTimeout(drv, getPageLoadTimeout());
             LOGGER.debug("finished driver.get call.");
         }
     }
@@ -959,7 +958,8 @@ public class DriverHelper {
      */
     public void acceptAlert() {
         WebDriver drv = getDriver();
-        Wait<WebDriver> wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
+        long retryInterval = getRetryInterval(EXPLICIT_TIMEOUT);
+        Wait<WebDriver> wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, retryInterval);
         try {
             wait.until((Function<WebDriver, Object>) dr -> isAlertPresent());
             drv.switchTo().alert().accept();
@@ -974,7 +974,8 @@ public class DriverHelper {
      */
     public void cancelAlert() {
         WebDriver drv = getDriver();
-        Wait<WebDriver> wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, RETRY_TIME);
+        long retryInterval = getRetryInterval(EXPLICIT_TIMEOUT);
+        Wait<WebDriver> wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, retryInterval);
         try {
             wait.until((Function<WebDriver, Object>) dr -> isAlertPresent());
             drv.switchTo().alert().dismiss();
@@ -1008,7 +1009,9 @@ public class DriverHelper {
     public boolean isPageOpened(final AbstractPage page, long timeout) {
         boolean result;
         final WebDriver drv = getDriver();
-        Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME);
+        
+        long retryInterval = getRetryInterval(timeout);        
+        Wait<WebDriver> wait = new WebDriverWait(drv, timeout, retryInterval);
         try {
             wait.until((Function<WebDriver, Object>) dr -> LogicUtils.isURLEqual(page.getPageURL(), drv.getCurrentUrl()));
             result = true;
@@ -1252,9 +1255,9 @@ public class DriverHelper {
 		boolean result;
         long startMillis = 0;
 		final WebDriver drv = getDriver();
-		Wait<WebDriver> wait = new WebDriverWait(drv, timeout, RETRY_TIME)
-		        .ignoring(WebDriverException.class)
-				.ignoring(NoSuchSessionException.class);
+		
+		long retryInterval = getRetryInterval(timeout);
+		Wait<WebDriver> wait = new WebDriverWait(drv, timeout, retryInterval);
 		try {
 		    startMillis = System.currentTimeMillis();
 			wait.until(condition);
@@ -1308,6 +1311,17 @@ public class DriverHelper {
         return url;
     }
     
+    private static void setPageLoadTimeout(WebDriver drv, long timeout) {
+        try {
+            drv.manage().timeouts().pageLoadTimeout(timeout, TimeUnit.SECONDS);
+        } catch (UnsupportedCommandException e) {
+            //TODO: review upcoming appium 2.0 changes
+            LOGGER.debug("Appium: Not implemented yet for pageLoad timeout!");
+        }
+        
+    }
+
+    
     private long getPageLoadTimeout() {
         long timeout = 300;
         // #1705: limit pageLoadTimeout driver timeout by idleTimeout
@@ -1319,5 +1333,15 @@ public class DriverHelper {
 //        }
         return timeout;
     }
-	
+
+    private long getRetryInterval(long timeout) {
+        long retryInterval = RETRY_TIME;
+        if (timeout >= 3 && timeout <= 10) {
+            retryInterval = 500;
+        }
+        if (timeout > 10) {
+            retryInterval = 1000;
+        }
+        return retryInterval;
+    }
 }
