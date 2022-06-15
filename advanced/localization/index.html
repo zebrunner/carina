@@ -494,6 +494,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#creation-of-multi-language-tests" class="md-nav__link">
+    Creation of multi-language tests
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -681,6 +688,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#creation-of-multi-language-tests" class="md-nav__link">
+    Creation of multi-language tests
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -805,6 +819,32 @@ private ExtendedWebElement discussionBtn;
 <pre><code>xpath = &quot;//*[text()='{L10N:HomePage.welcomeText}'&quot;
 # actual value at run-time:
 xpath = &quot;//*[text()='Willkommen bei Wikipedia'&quot;
+</code></pre>
+
+<h2 id="creation-of-multi-language-tests">Creation of multi-language tests</h2>
+<p>If one or a group of tests checks several language versions of the site, then you need to do the following:
+1. [Optional] if you need to change the language version of the site, you can overwrite the locale parameter:</p>
+<pre><code># overwrites locale value with de_DE for this test only
+R.CONFIG.put(&quot;locale&quot;, &quot;de_DE&quot;, true);
+</code></pre>
+
+<ol>
+<li>Call the setLocale function and pass the locale to it:</li>
+</ol>
+<pre><code># overwrites the default locale in the file to 'de_DE'
+L10N.setLocale(&quot;de_DE&quot;)
+</code></pre>
+
+<ol>
+<li>Call the load function to download the localized resource of the current locale:</li>
+</ol>
+<pre><code>L10N.load();
+</code></pre>
+
+<ol>
+<li>When you need to get a list of locale errors, call assertAll:</li>
+</ol>
+<pre><code>L10N.assertAll();
 </code></pre>
 
               
