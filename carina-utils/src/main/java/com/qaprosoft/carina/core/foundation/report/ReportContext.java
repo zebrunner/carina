@@ -424,7 +424,7 @@ public class ReportContext {
                     }
                 }
 
-                FileUtils.copyFileToDirectory(artifactToDownload, file);
+                FileUtils.copyFile(artifactToDownload, file);
                 LOGGER.debug("Successfully copied artifact from auto download folder: {}", name);
             } catch (IOException e) {
                 LOGGER.error("Artifact: " + name + " wasn't copied from auto download folder to " + path, e);
