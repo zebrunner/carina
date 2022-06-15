@@ -202,7 +202,7 @@ public class ReportContext {
     }
 
     /**
-     * Returns the auto download folder. Depends on two configuration parameters: auto_download, auto_download_folder, custom_artifacts_folder.
+     * Returns the auto download folder. Depends on three configuration parameters: auto_download, auto_download_folder, custom_artifacts_folder.
      * If the auto_download parameter is true and auto_download_folder is specified, then returns the file referring to the auto_download_folder
      * directory. If not, then returns the file referring to the directory corresponding to the custom_artifacts_folder parameter.
      * If custom_artifacts_folder is not defined, then it returns the file referring to the artifacts directory
@@ -253,10 +253,10 @@ public class ReportContext {
     }
 
     /**
-     * Returns a list of artifact names from a auto download folder. If a selenoid is used,
+     * Returns a list of artifact names from an auto download folder. If a selenoid is used,
      * it will try to take a list of filenames from it. If we do not have a selenoid
      * or an error occurred when trying to access it, then the method returns a list
-     * of file names from a auto download folder on the local machine
+     * of file names from an auto download folder on the local machine
      * 
      * @return list of file and directories names
      */
@@ -358,26 +358,13 @@ public class ReportContext {
 
     /**
      * download artifact from selenoid to local java machine by pattern
-     *
-     * @param driver WebDriver
-     * @param pattern regex by with we will filter artifacts that will be downloaded
-     * @param attachToTestRun boolean
-     * @return list of artifact files
-     */
-    public static List<File> downloadArtifacts(WebDriver driver, String pattern, boolean attachToTestRun) {
-        return downloadArtifacts(driver, pattern, Configuration.getLong(Parameter.EXPLICIT_TIMEOUT), attachToTestRun);
-    }
-
-    /**
-     * download artifact from selenoid to local java machine by pattern
      * 
      * @param driver WebDriver
      * @param pattern regex by with we will filter artifacts that will be downloaded
-     * @param timeout timeout for waiting one artifact
      * @return list of artifact files
      */
-    public static List<File> downloadArtifacts(WebDriver driver, String pattern, long timeout) {
-        return downloadArtifacts(driver, pattern, timeout, true);
+    public static List<File> downloadArtifacts(WebDriver driver, String pattern) {
+        return downloadArtifacts(driver, pattern, true);
     }
 
     /**
@@ -386,11 +373,11 @@ public class ReportContext {
      * 
      * @param driver WebDriver
      * @param pattern regex by with we will filter artifacts that will be downloaded
-     * @param timeout timeout for waiting one artifact
      * @param attachToTestRun boolean
      * @return list of artifact files
      */
-    public static List<File> downloadArtifacts(WebDriver driver, String pattern, long timeout, boolean attachToTestRun) {
+    public static List<File> downloadArtifacts(WebDriver driver, String pattern, boolean attachToTestRun) {
+        final long artifactAvailabilityTimeout = Configuration.getLong(Parameter.ARTIFACT_AVAILABILITY_TIMEOUT);
         List<String> filteredFilesNames = listAutoDownloadArtifacts(driver)
                 .stream()
                 // ignore directories
@@ -401,7 +388,8 @@ public class ReportContext {
         List<File> downloadedArtifacts = new ArrayList<>();
 
         for (String fileName : filteredFilesNames) {
-            downloadedArtifacts.add(downloadArtifact(driver, fileName, timeout, attachToTestRun));
+            downloadedArtifacts
+                    .add(downloadArtifact(driver, fileName, artifactAvailabilityTimeout, attachToTestRun));
         }
         return downloadedArtifacts;
     }
