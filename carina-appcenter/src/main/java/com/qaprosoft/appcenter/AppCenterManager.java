@@ -215,8 +215,8 @@ public class AppCenterManager {
         for (String currentApp : apps.keySet()) {
             LOGGER.info("Scanning App " + currentApp);
             MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
-            queryParams.add("published_only", "true");
-            queryParams.add("scope", "tester");
+//            queryParams.add("published_only", "true");
+//            queryParams.add("scope", "tester");
 
             RequestEntity<String> retrieveList = buildRequestEntity(
                     HOST_URL,
