@@ -202,10 +202,10 @@ public class ReportContext {
     }
 
     /**
-     * Returns the auto download folder. Depends on three configuration parameters: auto_download, auto_download_folder, custom_artifacts_folder.
+     * Returns the auto download folder. Depends on two configuration parameters: auto_download, auto_download_folder, custom_artifacts_folder.
      * If the auto_download parameter is true and auto_download_folder is specified, then returns the file referring to the auto_download_folder
      * directory. If not, then returns the file referring to the directory corresponding to the custom_artifacts_folder parameter.
-     * If custom_artifacts_folder is not defined, then it creates a default folder
+     * If custom_artifacts_folder is not defined, then it returns the file referring to the artifacts directory
      * 
      * @return auto download folder file
      */
@@ -252,7 +252,15 @@ public class ReportContext {
         return false;
     }
 
-    private static List<String> listArtifacts(WebDriver driver) {
+    /**
+     * Returns a list of artifact names from a auto download folder. If a selenoid is used,
+     * it will try to take a list of filenames from it. If we do not have a selenoid
+     * or an error occurred when trying to access it, then the method returns a list
+     * of file names from a auto download folder on the local machine
+     * 
+     * @return list of file and directories names
+     */
+    public static List<String> listAutoDownloadArtifacts(WebDriver driver) {
         // We don't need name because we get root folder of artifacts
         String hostUrl = getUrl(driver, "");
         String username = getField(hostUrl, 1);
@@ -333,7 +341,7 @@ public class ReportContext {
     }
 
     public static List<File> getAllArtifacts() {
-        return Arrays.asList(getAutoDownloadFolder().listFiles());
+        return Arrays.asList(getArtifactsFolder().listFiles());
     }
 
     /**
@@ -374,6 +382,7 @@ public class ReportContext {
 
     /**
      * download artifact from selenoid to local java machine by pattern
+     * Ignore directories
      * 
      * @param driver WebDriver
      * @param pattern regex by with we will filter artifacts that will be downloaded
@@ -382,7 +391,7 @@ public class ReportContext {
      * @return list of artifact files
      */
     public static List<File> downloadArtifacts(WebDriver driver, String pattern, long timeout, boolean attachToTestRun) {
-        List<String> filteredFilesNames = listArtifacts(driver)
+        List<String> filteredFilesNames = listAutoDownloadArtifacts(driver)
                 .stream()
                 // ignore directories
                 .filter(fileName -> !fileName.endsWith("/"))
@@ -397,6 +406,17 @@ public class ReportContext {
         return downloadedArtifacts;
     }
 
+    /**
+     * Looks for an artifact in the artifacts folder. If it does not find it,
+     * then it turns to the selenoid (if it is used) and tries to download
+     * the artifact from there to the artifacts folder
+     *
+     * @param driver WebDriver
+     * @param name filename
+     * @param timeout artifact availability check time
+     * @param artifact boolean - attach to test run
+     * @return
+     */
     public static File downloadArtifact(WebDriver driver, String name, long timeout, boolean artifact) {
         File file = getArtifact(name);
         if (file == null) {
@@ -410,7 +430,7 @@ public class ReportContext {
                 Assert.fail("Unable to find artifact: " + name);
             }
 
-            file = new File(getAutoDownloadFolder() + File.separator + name);
+            file = new File(getArtifactsFolder() + File.separator + name);
             String path = file.getAbsolutePath();
             LOGGER.debug("artifact file to download: " + path);
 
@@ -553,7 +573,7 @@ public class ReportContext {
     }
 
     public static void saveArtifact(String name, InputStream source) throws IOException {
-        File artifact = new File(String.format("%s/%s", getAutoDownloadFolder(), name));
+        File artifact = new File(String.format("%s/%s", getArtifactsFolder(), name));
         artifact.createNewFile();
         FileUtils.writeByteArrayToFile(artifact, IOUtils.toByteArray(source));
         
@@ -561,7 +581,7 @@ public class ReportContext {
     }
 
     public static void saveArtifact(File source) throws IOException {
-        File artifact = new File(String.format("%s/%s", getAutoDownloadFolder(), source.getName()));
+        File artifact = new File(String.format("%s/%s", getArtifactsFolder(), source.getName()));
         artifact.createNewFile();
         FileUtils.copyFile(source, artifact);
         
