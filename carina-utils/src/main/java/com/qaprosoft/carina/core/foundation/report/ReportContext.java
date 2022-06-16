@@ -407,20 +407,31 @@ public class ReportContext {
      */
     public static File downloadArtifact(WebDriver driver, String name, long timeout, boolean artifact) {
         File file = getArtifact(name);
-        if (file == null) {
-            // attempt to verify and download file from selenoid
+        if (file != null) {
+            return file;
+        }
+        file = new File(getArtifactsFolder() + File.separator + name);
+        String path = file.getAbsolutePath();
+        LOGGER.debug("artifact file to download: " + path);
 
+        if (autoDownloadArtifactExists(name)) {
+            try {
+                File artifactToDownload = null;
+                for (File f : Objects.requireNonNull(getAutoDownloadFolder().listFiles())) {
+                    if (f.getName().equals(name)) {
+                        artifactToDownload = f;
+                    }
+                }
+
+                FileUtils.copyFile(artifactToDownload, file);
+                LOGGER.debug("Successfully copied artifact from auto download folder: {}", name);
+            } catch (IOException e) {
+                LOGGER.error("Artifact: " + name + " wasn't copied from auto download folder to " + path, e);
+            }
+        } else if (artifactExists(driver, name, timeout)) {
             String url = getUrl(driver, name);
             String username = getField(url, 1);
             String password = getField(url, 2);
-
-            if (!artifactExists(driver, name, timeout)) {
-                Assert.fail("Unable to find artifact: " + name);
-            }
-
-            file = new File(getArtifactsFolder() + File.separator + name);
-            String path = file.getAbsolutePath();
-            LOGGER.debug("artifact file to download: " + path);
 
             if (!username.isEmpty() && !password.isEmpty()) {
                 Authenticator.setDefault(new CustomAuthenticator(username, password));
@@ -428,13 +439,16 @@ public class ReportContext {
 
             try {
                 FileUtils.copyURLToFile(new URL(url), file);
-                LOGGER.debug("Successfully downloaded artifact: " + name);
-                if (artifact) {
-                    Artifact.attachToTest(name, file); // publish as test artifact to Zebrunner Reporting
-                }
+                LOGGER.debug("Successfully downloaded artifact: {}", name);
             } catch (IOException e) {
                 LOGGER.error("Artifact: " + url + " wasn't downloaded to " + path, e);
             }
+        } else {
+            Assert.fail("Unable to find artifact: " + name);
+        }
+
+        if (artifact) {
+            Artifact.attachToTest(name, file); // publish as test artifact to Zebrunner Reporting
         }
         return file;
     }
@@ -455,7 +469,7 @@ public class ReportContext {
     }
 
     /**
-     * check if artifact exists
+     * check if artifact exists in selenoid
      * 
      * @param driver WebDriver
      * @param name String
@@ -472,6 +486,15 @@ public class ReportContext {
             LOGGER.debug("", e);
             return false;
         }
+    }
+
+    /**
+     * check if artifact exists in auto download folder
+     *
+     **/
+    public static boolean autoDownloadArtifactExists(String name) {
+        return Arrays.stream(Objects.requireNonNull(getAutoDownloadFolder().listFiles()))
+                .anyMatch(artifact -> artifact.getName().equals(name));
     }
 
     /**
