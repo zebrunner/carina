@@ -59,7 +59,6 @@ import org.imgscalr.Scalr;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -146,10 +145,6 @@ public class ReportContext {
         return baseDirectory;
     }
 
-    public static boolean isBaseDirCreated() {
-        return baseDirectory != null;
-    }
-
     public static synchronized File getTempDir() {
         if (tempDirectory == null) {
             tempDirectory = new File(String.format("%s/%s", getBaseDir().getAbsolutePath(), TEMP_FOLDER));
@@ -189,7 +184,7 @@ public class ReportContext {
             if (!isCreated) {
                 isCreated = artifactsDirectory.mkdir();
             } else {
-                LOGGER.info("Artifacts folder already exists: " + artifactsDirectory.getAbsolutePath());
+                LOGGER.debug("Artifacts folder already exists: " + artifactsDirectory.getAbsolutePath());
             }
 
             if (!isCreated) {
@@ -202,74 +197,18 @@ public class ReportContext {
     }
 
     /**
-     * Returns the auto download folder. Depends on three configuration parameters: auto_download, auto_download_folder, custom_artifacts_folder.
-     * If the auto_download parameter is true and auto_download_folder is specified, then returns the file referring to the auto_download_folder
-     * directory. If not, then returns the file referring to the directory corresponding to the custom_artifacts_folder parameter.
-     * If custom_artifacts_folder is not defined, then it returns the file referring to the artifacts directory
-     * 
-     * @return auto download folder file
-     */
-    public static synchronized File getAutoDownloadFolder() {
-        boolean isAutoDownload = Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD);
-        String autoDownloadFolderPath = Configuration.get(Parameter.AUTO_DOWNLOAD_FOLDER);
-        File autoDownloadFolder;
-
-        // a lot of warnings in console - move this check
-        // if (isAutoDownload && autoDownloadFolderPath.isEmpty()) {
-        // LOGGER.warn("auto_download parameter defined but auto_download_folder parameter not specified");
-        // }
-
-        if (autoDownloadFolderPath.isEmpty() || !isAutoDownload) {
-            autoDownloadFolder = ReportContext.getArtifactsFolder();
-        } else {
-            autoDownloadFolder = new File(autoDownloadFolderPath);
-        }
-        if (!(autoDownloadFolder.exists() && autoDownloadFolder.isDirectory())) {
-            LOGGER.error("Auto download folder is not exists or it is not a directory. Creating an empty folder by path: {} ",
-                    autoDownloadFolder.getAbsolutePath());
-            boolean isCreated = autoDownloadFolder.mkdir();
-            if (!isCreated) {
-                throw new RuntimeException("Auto download folder is not created: " + autoDownloadFolder.getAbsolutePath());
-            }
-        }
-        return autoDownloadFolder;
-    }
-
-    /**
-     * Check that Artifacts Folder exists.
-     *
-     * @return boolean
-     */
-    public static boolean isArtifactsFolderExists() {
-        try {
-            File f = new File(String.format("%s/%s", getBaseDir().getAbsolutePath(), ARTIFACTS_FOLDER));
-            if (f.exists() && f.isDirectory()) {
-                return true;
-            }
-        } catch (Exception e) {
-            LOGGER.debug("Error happen during checking that Artifactory Folder exists or not. Error: " + e.getMessage());
-        }
-        return false;
-    }
-
-    /**
-     * Returns a list of artifact names from an auto download folder. If a selenoid is used,
-     * it will try to take a list of filenames from it. If we do not have a selenoid
-     * or an error occurred when trying to access it, then the method returns a list
-     * of file names from an auto download folder on the local machine
-     * 
+     * Returns consolidated list of auto downloaded filenames from local artifacts folder or from remote Selenium session
      * @return list of file and directories names
      */
-    public static List<String> listAutoDownloadArtifacts(WebDriver driver) {
-        // We don't need name because we get root folder of artifacts
+    public static List<String> listArtifacts(WebDriver driver) {
+        List<String> artifactNames = Arrays.stream(Objects.requireNonNull(getArtifactsFolder().listFiles()))
+                .map(File::getName)
+                .collect(Collectors.toList());
+
         String hostUrl = getUrl(driver, "");
         String username = getField(hostUrl, 1);
         String password = getField(hostUrl, 2);
-
-        boolean getLocalArtifacts = false;
-
-        List<String> artifactNames = new ArrayList<>();
-
+        
         try {
             HttpURLConnection.setFollowRedirects(false);
             // note : you may also need
@@ -289,9 +228,7 @@ public class ReportContext {
                     responseBody.contains("\"error\":\"invalid session id\",\"message\":\"unknown session")) {
                 throw new RuntimeException("Invalid session id. Something wrong with driver");
             }
-            if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
-                getLocalArtifacts = true;
-            }
+
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 String hrefAttributePattern = "href=([\"'])((?:(?!\\1)[^\\\\]|(?:\\\\\\\\)*\\\\[^\\\\])*)\\1";
@@ -304,139 +241,60 @@ public class ReportContext {
 
         } catch (IOException e) {
             LOGGER.error("Something went wrong when try to get artifacts from remote");
-            getLocalArtifacts = true;
-        } finally {
-            if (getLocalArtifacts) {
-                artifactNames = Arrays.stream(Objects.requireNonNull(getAutoDownloadFolder().listFiles()))
-                        .map(File::getName)
-                        .collect(Collectors.toList());
-            }
-        }
+        } 
 
         return artifactNames;
     }
-
-    // Converting InputStream to String
-    private static String readStream(InputStream in) {
-        BufferedReader reader = null;
-        StringBuffer response = new StringBuffer();
-        try {
-            reader = new BufferedReader(new InputStreamReader(in));
-            String line = "";
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
-            }
-        } catch (IOException e) {
-            // do noting
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    // do nothing
-                }
-            }
-        }
-        return response.toString();
-    }
-
-    public static List<File> getAllArtifacts() {
-        return Arrays.asList(getArtifactsFolder().listFiles());
-    }
-
+    
     /**
-     * download artifact from selenoid to local java machine
+     * Get artifacts from auto download folder of local or remove driver session by pattern
      * 
      * @param driver WebDriver
-     * @param name String
-     * @param timeout long
-     * @return artifact File
-     */
-    public static File downloadArtifact(WebDriver driver, String name, long timeout) {
-        return downloadArtifact(driver, name, timeout, true);
-    }
-
-    /**
-     * download artifact from selenoid to local java machine by pattern
-     * 
-     * @param driver WebDriver
-     * @param pattern regex by with we will filter artifacts that will be downloaded
+     * @param regex pattern for artifacts 
      * @return list of artifact files
      */
-    public static List<File> downloadArtifacts(WebDriver driver, String pattern) {
-        return downloadArtifacts(driver, pattern, true);
-    }
-
-    /**
-     * download artifact from selenoid to local java machine by pattern
-     * Ignore directories
-     * 
-     * @param driver WebDriver
-     * @param pattern regex by with we will filter artifacts that will be downloaded
-     * @param attachToTestRun boolean
-     * @return list of artifact files
-     */
-    public static List<File> downloadArtifacts(WebDriver driver, String pattern, boolean attachToTestRun) {
-        final long artifactAvailabilityTimeout = Configuration.getLong(Parameter.ARTIFACT_AVAILABILITY_TIMEOUT);
-        List<String> filteredFilesNames = listAutoDownloadArtifacts(driver)
+    public static List<File> getArtifacts(WebDriver driver, String pattern) {
+        List<String> filteredFilesNames = listArtifacts(driver)
                 .stream()
                 // ignore directories
                 .filter(fileName -> !fileName.endsWith("/"))
                 .filter(fileName -> fileName.matches(pattern))
                 .collect(Collectors.toList());
 
-        List<File> downloadedArtifacts = new ArrayList<>();
+        List<File> artifacts = new ArrayList<>();
 
         for (String fileName : filteredFilesNames) {
-            downloadedArtifacts
-                    .add(downloadArtifact(driver, fileName, artifactAvailabilityTimeout, attachToTestRun));
+            artifacts
+                    .add(getArtifact(driver, fileName));
         }
-        return downloadedArtifacts;
-    }
+        return artifacts;
+    }    
 
     /**
-     * Looks for an artifact in the artifacts folder. If it does not find it,
-     * then it turns to the selenoid (if it is used) and tries to download
-     * the artifact from there to the artifacts folder
-     *
+     * Get artifact from auto download folder of local or remove driver session by name
+     * 
      * @param driver WebDriver
-     * @param name filename
-     * @param timeout artifact availability check time
-     * @param artifact boolean - attach to test run
-     * @return
+     * @param name String - filename with extension
+     * @return artifact File
      */
-    public static File downloadArtifact(WebDriver driver, String name, long timeout, boolean artifact) {
-        File file = getArtifact(name);
-        if (file != null) {
+    public static File getArtifact(WebDriver driver, String name) {
+        File file = new File(getArtifactsFolder() + File.separator + name);
+        if (file.exists()) {
             return file;
         }
-        file = new File(getArtifactsFolder() + File.separator + name);
+        
         String path = file.getAbsolutePath();
         LOGGER.debug("artifact file to download: " + path);
 
-        if (autoDownloadArtifactExists(name)) {
-            try {
-                File artifactToDownload = null;
-                for (File f : Objects.requireNonNull(getAutoDownloadFolder().listFiles())) {
-                    if (f.getName().equals(name)) {
-                        artifactToDownload = f;
-                    }
-                }
+        String url = getUrl(driver, name);
+        String username = getField(url, 1);
+        String password = getField(url, 2);
+        
+        if (!username.isEmpty() && !password.isEmpty()) {
+            Authenticator.setDefault(new CustomAuthenticator(username, password));
+        }        
 
-                FileUtils.copyFile(artifactToDownload, file);
-                LOGGER.debug("Successfully copied artifact from auto download folder: {}", name);
-            } catch (IOException e) {
-                LOGGER.error("Artifact: " + name + " wasn't copied from auto download folder to " + path, e);
-            }
-        } else if (artifactExists(driver, name, timeout)) {
-            String url = getUrl(driver, name);
-            String username = getField(url, 1);
-            String password = getField(url, 2);
-
-            if (!username.isEmpty() && !password.isEmpty()) {
-                Authenticator.setDefault(new CustomAuthenticator(username, password));
-            }
-
+        if (checkArtifactUsingHttp(url, username, password)) {
             try {
                 FileUtils.copyURLToFile(new URL(url), file);
                 LOGGER.debug("Successfully downloaded artifact: {}", name);
@@ -447,54 +305,10 @@ public class ReportContext {
             Assert.fail("Unable to find artifact: " + name);
         }
 
-        if (artifact) {
-            Artifact.attachToTest(name, file); // publish as test artifact to Zebrunner Reporting
-        }
+        // publish as test artifact to Zebrunner Reporting
+        Artifact.attachToTest(name, file); 
+
         return file;
-    }
-
-    public static class CustomAuthenticator extends Authenticator {
-
-        String username;
-        String password;
-
-        public CustomAuthenticator(String username, String password) {
-            this.username = username;
-            this.password = password;
-        }
-
-        protected PasswordAuthentication getPasswordAuthentication() {
-            return new PasswordAuthentication(username, password.toCharArray());
-        }
-    }
-
-    /**
-     * check if artifact exists in selenoid
-     * 
-     * @param driver WebDriver
-     * @param name String
-     * @param timeout long
-     * @return boolean
-     */
-    public static boolean artifactExists(WebDriver driver, String name, long timeout) {
-        String url = getUrl(driver, name);
-        String username = getField(url, 1);
-        String password = getField(url, 2);
-        try {
-            return new WebDriverWait(driver, timeout).until((k) -> checkArtifactUsingHttp(url, username, password));
-        } catch (Exception e) {
-            LOGGER.debug("", e);
-            return false;
-        }
-    }
-
-    /**
-     * check if artifact exists in auto download folder
-     *
-     **/
-    public static boolean autoDownloadArtifactExists(String name) {
-        return Arrays.stream(Objects.requireNonNull(getAutoDownloadFolder().listFiles()))
-                .anyMatch(artifact -> artifact.getName().equals(name));
     }
 
     /**
@@ -555,32 +369,6 @@ public class ReportContext {
         String url = seleniumHost + sessionId + "/" + name;
         LOGGER.debug("url: " + url);
         return url;
-    }
-
-    public static File getArtifact(String name) {
-        File artifact = null;
-        for (File file : getAllArtifacts()) {
-            if (file.getName().equals(name)) {
-                artifact = file;
-                break;
-            }
-        }
-        return artifact;
-    }
-
-    public static void deleteAllArtifacts() {
-        for (File file : getAllArtifacts()) {
-            file.delete();
-        }
-    }
-
-    public static void deleteArtifact(String name) {
-        for (File file : getAllArtifacts()) {
-            if (file.getName().equals(name)) {
-                file.delete();
-                break;
-            }
-        }
     }
 
     public static void saveArtifact(String name, InputStream source) throws IOException {
@@ -1034,5 +822,45 @@ public class ReportContext {
         }
         return null;
     }
+    
+
+    // Converting InputStream to String
+    private static String readStream(InputStream in) {
+        BufferedReader reader = null;
+        StringBuffer response = new StringBuffer();
+        try {
+            reader = new BufferedReader(new InputStreamReader(in));
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
+            }
+        } catch (IOException e) {
+            // do noting
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    // do nothing
+                }
+            }
+        }
+        return response.toString();
+    }
+    
+    public static class CustomAuthenticator extends Authenticator {
+
+        String username;
+        String password;
+
+        public CustomAuthenticator(String username, String password) {
+            this.username = username;
+            this.password = password;
+        }
+
+        protected PasswordAuthentication getPasswordAuthentication() {
+            return new PasswordAuthentication(username, password.toCharArray());
+        }
+    }    
 
 }

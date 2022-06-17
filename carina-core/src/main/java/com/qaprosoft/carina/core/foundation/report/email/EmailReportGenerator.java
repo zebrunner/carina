@@ -299,8 +299,7 @@ public class EmailReportGenerator {
     private String getArtifactsLinkHTML() {
         String result = "";
 
-        if (!ReportContext.getAllArtifacts().isEmpty()) {
-
+        if (ReportContext.getArtifactsFolder().listFiles().length > 0) {
             String link = ReportContext.getTestArtifactsLink();
             LOGGER.debug("Artifacts gallery link: " + link);
             result = String.format(
