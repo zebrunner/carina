@@ -198,6 +198,8 @@ public class ReportContext {
 
     /**
      * Returns consolidated list of auto downloaded filenames from local artifacts folder or from remote Selenium session
+     * 
+     * @param driver WebDriver
      * @return list of file and directories names
      */
     public static List<String> listArtifacts(WebDriver driver) {
@@ -250,7 +252,7 @@ public class ReportContext {
      * Get artifacts from auto download folder of local or remove driver session by pattern
      * 
      * @param driver WebDriver
-     * @param regex pattern for artifacts 
+     * @param pattern String - regex for artifacts 
      * @return list of artifact files
      */
     public static List<File> getArtifacts(WebDriver driver, String pattern) {
