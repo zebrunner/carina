@@ -51,7 +51,6 @@ import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -79,7 +78,7 @@ import com.zebrunner.agent.core.registrar.Artifact;
 
 public class ReportContext {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    public static final String ARTIFACTS_FOLDER = "artifacts";
+    public static final String ARTIFACTS_FOLDER = "downloads"; //renamed to downloads to avoid automatic upload on our old Zebrunner ci-pipeline versions
 
     private static final String GALLERY_ZIP = "gallery-lib.zip";
     private static final String REPORT_NAME = "/report.html";
@@ -92,8 +91,6 @@ public class ReportContext {
 
     private static File tempDirectory;
 
-    private static File artifactsDirectory;
-
     private static long rootID;
 
     private static final ThreadLocal<File> testDirectory = new InheritableThreadLocal<>();
@@ -104,15 +101,9 @@ public class ReportContext {
     // Collects screenshot comments. Screenshot comments are associated using screenshot file name.
     private static Map<String, String> screenSteps = Collections.synchronizedMap(new HashMap<String, String>());
 
-    public static long getRootID() {
-        return rootID;
-    }
-
     /**
-     * Crates new screenshot directory at first call otherwise returns created directory. Directory is specific for any
-     * new test suite launch.
-     * 
-     * @return root screenshot folder for test launch.
+     * Creates base directory for tests execution to save screenshots, logs etc 
+     * @return base root folder for run.
      */
     public static File getBaseDir() {
         try {
@@ -145,6 +136,10 @@ public class ReportContext {
         return baseDirectory;
     }
 
+    /**
+     * Creates temp directory for tests execution 
+     * @return temp folder for run.
+     */
     public static synchronized File getTempDir() {
         if (tempDirectory == null) {
             tempDirectory = new File(String.format("%s/%s", getBaseDir().getAbsolutePath(), TEMP_FOLDER));
@@ -156,44 +151,104 @@ public class ReportContext {
         return tempDirectory;
     }
 
-    public static synchronized void removeTempDir() {
-        if (tempDirectory != null) {
-            try {
-                FileUtils.deleteDirectory(tempDirectory);
-            } catch (IOException e) {
-                LOGGER.debug("Unable to remove artifacts temp directory!", e);
-            }
-        }
+    /**
+     * Creates unique test directory for test
+     * 
+     * @return test log/screenshot folder.
+     */
+    public static File getTestDir() {
+        return getTestDir(StringUtils.EMPTY);
     }
 
-    public static synchronized File getArtifactsFolder() {
-        if (artifactsDirectory == null) {
-            String absolutePath = getBaseDir().getAbsolutePath();
+    /**
+     * Creates unique test directory for test
+     * 
+     * @param dirName String 
+     * @return test log/screenshot folder.
+     */
+    private static File getTestDir(String dirName) {
+        File testDir = testDirectory.get();
+        if (testDir == null) {
+            testDir = createTestDir(dirName);
+        }
+        return testDir;
+    }
 
-            try {
-                if (Configuration.get(Parameter.CUSTOM_ARTIFACTS_FOLDER).isEmpty()) {
-                    artifactsDirectory = new File(String.format("%s/%s", URLDecoder.decode(absolutePath, "utf-8"), ARTIFACTS_FOLDER));
-                } else {
-                    artifactsDirectory = new File(Configuration.get(Parameter.CUSTOM_ARTIFACTS_FOLDER));
-                }
-            } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException("Artifacts folder not created in base dir: " + absolutePath);
-            }
+    /**
+     * Rename test directory to custom name.
+     * 
+     * @param dirName String
+     * @return test report dir
+     */
+    public synchronized static File setCustomTestDirName(String dirName) {
+        isCustomTestDirName.set(Boolean.FALSE);
+        File testDir = testDirectory.get();
+        if (testDir == null) {
+            LOGGER.debug("Test dir will be created.");
+            testDir = getTestDir(dirName);
+        } else {
+            LOGGER.debug("Test dir will be renamed to custom name.");
+            renameTestDir(dirName);
+        }
+        isCustomTestDirName.set(Boolean.TRUE);
+        return testDir;
+    }
 
-            boolean isCreated = artifactsDirectory.exists() && artifactsDirectory.isDirectory();
-            if (!isCreated) {
-                isCreated = artifactsDirectory.mkdir();
-            } else {
-                LOGGER.debug("Artifacts folder already exists: " + artifactsDirectory.getAbsolutePath());
-            }
+    public static void emptyTestDirData() {
+        testDirectory.remove();
+        isCustomTestDirName.set(Boolean.FALSE);
+        stopThreadLogAppender();
+    }
 
-            if (!isCreated) {
-                throw new RuntimeException("Artifacts folder not created: " + artifactsDirectory.getAbsolutePath());
-            } else {
-                LOGGER.debug(("Artifacts folder created: " + artifactsDirectory.getAbsolutePath()));
+    public static synchronized File createTestDir() {
+        return createTestDir(UUID.randomUUID().toString());
+    }
+
+    private static synchronized File createTestDir(String dirName) {
+        File testDir;
+        String directory = String.format("%s/%s", getBaseDir(), dirName);
+
+        testDir = new File(directory);
+        if (!testDir.exists()) {
+            testDir.mkdirs();
+            if (!testDir.exists()) {
+                throw new RuntimeException("Test Folder(s) not created: " + testDir.getAbsolutePath());
             }
         }
-        return artifactsDirectory;
+        
+        testDirectory.set(testDir);
+        return testDir;
+    }
+
+
+    public static synchronized File getArtifactsFolder() {
+        File dir = null;
+        try {
+            // artifacts directory should use canonical path otherwise auto download feature is broken in browsers 
+            if (!Configuration.get(Parameter.CUSTOM_ARTIFACTS_FOLDER).isEmpty()) {
+                dir = new File(Configuration.get(Parameter.CUSTOM_ARTIFACTS_FOLDER)).getCanonicalFile();
+            } else {
+                dir = new File(getTestDir().getCanonicalPath() + File.separator + ARTIFACTS_FOLDER);
+            }
+
+            if (!dir.exists()) {
+                if (!dir.mkdir()) {
+                    throw new RuntimeException("Artifacts folder not created: " + dir.getAbsolutePath());
+                } else {
+                    LOGGER.debug(("Artifacts folder created: " + dir.getAbsolutePath()));
+                }
+            } else {
+                LOGGER.debug("Artifacts folder already exists: " + dir.getAbsolutePath());
+            }
+            
+            if (!dir.isDirectory()) {
+                throw new RuntimeException("Artifacts folder is not a folder: " + dir.getAbsolutePath());
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException("Artifacts folder not created!");
+        }
+        return dir;
     }
 
     /**
@@ -212,10 +267,8 @@ public class ReportContext {
         String password = getField(hostUrl, 2);
         
         try {
-            HttpURLConnection.setFollowRedirects(false);
-            // note : you may also need
-            // HttpURLConnection.setInstanceFollowRedirects(false)
             HttpURLConnection con = (HttpURLConnection) new URL(hostUrl).openConnection();
+            con.setInstanceFollowRedirects(true); //explicitly define as true because default value doesn't work and return 301 status
             con.setRequestMethod("GET");
 
             if (!username.isEmpty() && !password.isEmpty()) {
@@ -237,12 +290,14 @@ public class ReportContext {
                 Pattern pattern = Pattern.compile(hrefAttributePattern);
                 Matcher matcher = pattern.matcher(responseBody);
                 while (matcher.find()) {
-                    artifactNames.add(matcher.group(2));
+                    if (!artifactNames.contains(matcher.group(2))) {
+                        artifactNames.add(matcher.group(2));
+                    }
                 }
             }
 
         } catch (IOException e) {
-            LOGGER.error("Something went wrong when try to get artifacts from remote");
+            LOGGER.debug("Something went wrong when try to get artifacts from remote", e);
         } 
 
         return artifactNames;
@@ -371,87 +426,6 @@ public class ReportContext {
         String url = seleniumHost + sessionId + "/" + name;
         LOGGER.debug("url: " + url);
         return url;
-    }
-
-    public static void saveArtifact(String name, InputStream source) throws IOException {
-        File artifact = new File(String.format("%s/%s", getArtifactsFolder(), name));
-        artifact.createNewFile();
-        FileUtils.writeByteArrayToFile(artifact, IOUtils.toByteArray(source));
-        
-        Artifact.attachToTest(name, IOUtils.toByteArray(source));
-    }
-
-    public static void saveArtifact(File source) throws IOException {
-        File artifact = new File(String.format("%s/%s", getArtifactsFolder(), source.getName()));
-        artifact.createNewFile();
-        FileUtils.copyFile(source, artifact);
-        
-        Artifact.attachToTest(source.getName(), artifact);
-    }
-
-    /**
-     * Creates new test directory at first call otherwise returns created directory. Directory is specific for any new
-     * test launch.
-     * 
-     * @return test log/screenshot folder.
-     */
-    public static File getTestDir() {
-        return getTestDir(StringUtils.EMPTY);
-    }
-
-    public static File getTestDir(String dirName) {
-        File testDir = testDirectory.get();
-        if (testDir == null) {
-            testDir = createTestDir(dirName);
-        }
-        return testDir;
-    }
-
-    /**
-     * Rename test directory from unique number to custom name.
-     * 
-     * @param dirName String
-     * 
-     * @return test report dir
-     */
-    public synchronized static File setCustomTestDirName(String dirName) {
-        isCustomTestDirName.set(Boolean.FALSE);
-        File testDir = testDirectory.get();
-        if (testDir == null) {
-            LOGGER.debug("Test dir will be created.");
-            testDir = getTestDir(dirName);
-        } else {
-            LOGGER.debug("Test dir will be renamed to custom name.");
-            renameTestDir(dirName);
-        }
-        isCustomTestDirName.set(Boolean.TRUE);
-        return testDir;
-    }
-
-    public static void emptyTestDirData() {
-        testDirectory.remove();
-        isCustomTestDirName.set(Boolean.FALSE);
-        stopThreadLogAppender();
-    }
-
-    public static synchronized File createTestDir() {
-        return createTestDir(UUID.randomUUID().toString());
-    }
-
-    public static synchronized File createTestDir(String dirName) {
-        File testDir;
-        String directory = String.format("%s/%s", getBaseDir(), dirName);
-
-        testDir = new File(directory);
-        if (!testDir.exists()) {
-            testDir.mkdirs();
-            if (!testDir.exists()) {
-                throw new RuntimeException("Test Folder(s) not created: " + testDir.getAbsolutePath());
-            }
-        }
-        
-        testDirectory.set(testDir);
-        return testDir;
     }
 
     private static void stopThreadLogAppender() {
