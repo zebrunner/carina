@@ -13,7 +13,7 @@ Let’s begin the integration!
 
 Navigate to the folder `src/main/resources` and create agent.properties file (if not already created).
 
-###Configure Agent Parameters
+###Configure agent parameters
 Declare integration parameters in agent.properties:
 
 ```
