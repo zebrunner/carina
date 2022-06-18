@@ -395,7 +395,8 @@ test_run_rules=PRIORITY=>!!P1;;OWNER=>Josh&&!!Jake;;TAGS=>feature=web&&!!type=sm
 
 ###F.A.Q.
 1) <i>Where is recommended place to declare configuration parameters?</i><br>
-Declare default parameters in _config.properties. For multi-maven projects you can use extra underscore symbol to override default settings on new layer `__config.properties`, `___config.properties` etc
+Declare default parameters in `_config.properties`. For multi-maven projects you can use extra underscore symbol to override default settings on new layer `__config.properties`, `___config.properties` etc
+
 2) <i>How to override params from the code?</i><br>
 Put method might be used to override parameters globally or for current test only
 ```
@@ -403,9 +404,11 @@ R.CONFIG.put("selenium_url", "http://host1:4444/wd/hub"); //override selenium_ur
 R.CONFIG.put("selenium_url", "http://host2:4444/wd/hub", true); // override selenium_url for current test only
 R.DATABASE.put("db.driver", "org.postgresql.Driver") //override db.driver in_database.properties globally
 ```
+
 3) <i>Crypted values are returned in encrypted format. How can I decrypt them?</i><br>
 Use `R.CONFIG.getDecrypted(String key)` method to read decrypted value. 
 > You should have valid crypto key to be able to decrypt values, for details visit [Security](https://zebrunner.github.io/carina/advanced/security/)
+
 4) <i>Can I override configuration parameters from CI?</i><br>
 Provide updated values via System Properties to override value, for example:
 ```
