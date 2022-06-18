@@ -1028,22 +1028,22 @@ test_run_rules=PRIORITY=&gt;!!P1;;OWNER=&gt;Josh&amp;&amp;!!Jake;;TAGS=&gt;featu
 </code></pre>
 
 <h3 id="faq">F.A.Q.</h3>
-<p><strong>Where is recommended place to declare configuration parameters?</strong><br>
-Declare default parameters in <code>_config.properties</code>. For multi-maven projects you can use extra underscore symbol to override default settings on new layer <code>__config.properties</code>, <code>___config.properties</code> etc</p>
-<p><strong>How to override params from the code?</strong><br>
-Put method might be used to override parameters globally or for current test only</p>
+<p><strong>Where is recommended place to declare configuration parameters?</strong></p>
+<p>Declare default parameters in <code>_config.properties</code>. For multi-maven projects you can use extra underscore symbol to override default settings on new layer <code>__config.properties</code>, <code>___config.properties</code> etc</p>
+<p><strong>How to override params from the code?</strong></p>
+<p>Put method might be used to override parameters globally or for current test only</p>
 <pre><code>R.CONFIG.put(&quot;selenium_url&quot;, &quot;http://host1:4444/wd/hub&quot;); //override selenium_url globally for the rest of tests
 R.CONFIG.put(&quot;selenium_url&quot;, &quot;http://host2:4444/wd/hub&quot;, true); // override selenium_url for current test only
 R.DATABASE.put(&quot;db.driver&quot;, &quot;org.postgresql.Driver&quot;) //override db.driver in_database.properties globally
 </code></pre>
 
-<p><strong>Crypted values are returned in encrypted format. How can I decrypt them?</strong><br>
-Use <code>R.CONFIG.getDecrypted(String key)</code> method to read decrypted value. </p>
+<p><strong>Crypted values are returned in encrypted format. How can I decrypt them?</strong></p>
+<p>Use <code>R.CONFIG.getDecrypted(String key)</code> method to read decrypted value. </p>
 <blockquote>
 <p>You should have valid crypto key to be able to decrypt values, for details visit <a href="https://zebrunner.github.io/carina/advanced/security/">Security</a></p>
 </blockquote>
-<p><strong>Can I override configuration parameters from CI?</strong><br>
-Provide updated values via System Properties to override value, for example:</p>
+<p><strong>Can I override configuration parameters from CI?</strong></p>
+<p>Provide updated values via System Properties to override value, for example:</p>
 <pre><code>mvn -Denv=PROD ...
 </code></pre>
 
