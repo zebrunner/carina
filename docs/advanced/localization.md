@@ -38,7 +38,7 @@ private ExtendedWebElement contribElem;
 @FindBy(xpath = "//nav[@id='p-navigation']/descendant::ul[@class='vector-menu-content-list']/*")
 private List<ExtendedWebElement> pageLinks;
 ```
-Add to the project resources that corresponds to @Localized elements:
+Add to the project resources that corresponds to `@Localized` elements:
 ```
 #!The key from locale file should have Page name + name of variable that needs to be compared.
 WikipediaLocalePage.createAccountElem=fiók létrehozása
@@ -54,7 +54,7 @@ WikipediaLocalePage.pageLinks5=Tudakozó
 ```
 For elements that are operated in test and marked with `@Localized` annotation 
 Carina will automatically compare text from the page with text from your locale_xx_XX.properties file.
-Every mismatch will be collected in L10N.class. 
+Every mismatch will be collected in `L10N` class. 
 >To assert collected assertions use `L10N.assertAll()` method.
 
 If you want to do it manually use [`L10N.getText(key)`](https://github.com/zebrunner/carina-demo/blob/64b63927e8c3a1a76d5e567e28f837be82797d56/src/test/java/com/qaprosoft/carina/demo/WebLocalizationSample.java#L53)
