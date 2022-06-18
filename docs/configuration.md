@@ -325,11 +325,11 @@ Configuration.getEnvArg("url")
 As a result, you switch between the environments just changing the env argument in the **_config.properties** file.
 
 ### Tests execution filter configuration
-The test_run_rules parameter is responsible for filtering tests.
+The `test_run_rules` parameter is responsible for filtering tests.
 There are 3 filter types:
-1) PRIORITY - enum field (from P0 to P6)
-2) OWNER - the test owner
-3) TAGS - custom label
+1) **PRIORITY** - enum field (from P0 to P6)<br>
+2) **OWNER** - the test owner<br>
+3) **TAGS** - custom label<br>
 
 Example of how to attach labels in code:
 ```
@@ -346,7 +346,7 @@ public void t4(){
 }
 ```
 
-test_run_rules parameter parse logic:
+`test_run_rules` parameter parse logic:
 
 1) A simple filter:
 ```
@@ -394,10 +394,10 @@ test_run_rules=PRIORITY=>!!P1;;OWNER=>Josh&&!!Jake;;TAGS=>feature=web&&!!type=sm
 ```
 
 ###F.A.Q.
-<b>Where is recommended place to declare configuration parameters?</b><br>
-Declare default parameters in **_config.properties**. For multi-maven projects you can use extra underscore symbol to override default settings on new layer **__config.properties**, **___config.properties** etc
+**Where is recommended place to declare configuration parameters?**<br>
+Declare default parameters in `_config.properties``. For multi-maven projects you can use extra underscore symbol to override default settings on new layer `__config.properties`, `___config.properties` etc
 
-<b>How to override params from the code?</b><br>
+**How to override params from the code?**<br>
 Put method might be used to override parameters globally or for current test only
 ```
 R.CONFIG.put("selenium_url", "http://host1:4444/wd/hub"); //override selenium_url globally for the rest of tests
@@ -405,11 +405,11 @@ R.CONFIG.put("selenium_url", "http://host2:4444/wd/hub", true); // override sele
 R.DATABASE.put("db.driver", "org.postgresql.Driver") //override db.driver in_database.properties globally
 ```
 
-<b>Crypted values are returned in encrypted format. How can I decrypt them?</b><br>
+**Crypted values are returned in encrypted format. How can I decrypt them?**<br>
 Use `R.CONFIG.getDecrypted(String key)` method to read decrypted value. 
 > You should have valid crypto key to be able to decrypt values, for details visit [Security](https://zebrunner.github.io/carina/advanced/security/)
 
-<b>Can I override configuration parameters from CI?</b><br>
+**Can I override configuration parameters from CI?**<br>
 Provide updated values via System Properties to override value, for example:
 ```
 mvn -Denv=PROD ...`
