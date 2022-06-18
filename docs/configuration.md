@@ -395,16 +395,28 @@ test_run_rules=PRIORITY=>!!P1;;OWNER=>Josh&&!!Jake;;TAGS=>feature=web&&!!type=sm
 
 ###F.A.Q.
 1. Where is recommended place to declare configuration parameters?
-   Declare default parameters in _config.properties. For multi-maven projects you can use extra "_" to override default settings on new layer `__config.properties`, `___config.properties` etc
+
+   Declare default parameters in _config.properties. For multi-maven projects you can use extra underscore symbol to override default settings on new layer `__config.properties`, `___config.properties` etc
+
 2. How to override params from the code?
-   Use `R.CONFIG.put("selenium_url", "http://new_host:4444/wd/hub");` to override parameter globally for the rest of tests or `R.CONFIG.put("selenium_url", "http://localhost:4444/wd/hub", true);` to override for current test only.
-3. Can I use `R` class to get/put other parameters (testdata, api, database etc)? 
-   Use such notation to access other parameters: `R.TESTDATA.get("myParam"), `R.DATABASE.put("db.driver", "org.postgresql.Driver")` etc
-5. Crypted values are returned in encrypted format. How can I decrypt them?
+
+   Put method might be used to override parameters globally or for current test only
+
+   ```
+   R.CONFIG.put("selenium_url", "http://host1:4444/wd/hub"); //override selenium_url globally for the rest of tests
+   R.CONFIG.put("selenium_url", "http://host2:4444/wd/hub", true); // override selenium_url for current test only
+   R.DATABASE.put("db.driver", "org.postgresql.Driver") //override db.driver in_database.properties globally
+   ```
+ 
+3. Crypted values are returned in encrypted format. How can I decrypt them?
+
    Use `R.CONFIG.getDecrypted(String key)` method to read decrypted value. 
    > You should have valid crypto key to be able to decrypt values, for details visit [Security](https://zebrunner.github.io/carina/advanced/security/)
-6. Can I override configuration parameters from CI?
+
+4. Can I override configuration parameters from CI?
+
    Provide updated values via System Properties to override value, for example:
+
    ```
    mvn -Denv=PROD ...`
    ```
