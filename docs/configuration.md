@@ -97,6 +97,11 @@ All the project configuration properties are located in a **_config.properties**
 		<td>ALL, DEBUG, ERROR, WARN, FATAL, INFO, OFF, TRACE</td>
 	</tr>
 	<tr>
+		<td>test_run_rules</td>
+		<td>Executing rules logic: test_run_rules={RULE_NAME_ENUM}=>{RULE_VALUE1}&&{RULE_VALUE2};;...</td>
+		<td>test_run_rules=PRIORITY=>P1&amp;&amp;P2&&P4;;OWNER=>owner;;TAGS=>tag1=temp||!!feature=reg</td>
+	</tr>
+	<tr>
 		<td>retry_interval</td>
 		<td>Timeout interval in **ms** between calling HTML DOM for the element. **Default: 100**. For mobile automation specify in between 500-1000</td>
 		<td>Integer</td>
@@ -123,7 +128,7 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>max_driver_count</td>
-		<td>Max number of drivers per thread. **Default: 3**</td>
+		<td>Max number of [drivers](https://zebrunner.github.io/carina/advanced/driver/#initialization) per thread. **Default: 3**</td>
 		<td>Integer</td>
 	</tr>
 	<tr>
@@ -138,18 +143,28 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>forcibly_disable_driver_quit</td>
-		<td>If enabled turns off webdriver shutdown after test finishing by any reason. **Default: false**</td>
+		<td>If enabled turns off webdriver quit based on [initizalization phase](https://zebrunner.github.io/carina/advanced/driver/#quit). **Default: false**</td>
 		<td>Boolean</td>
 	</tr>
 	<tr>
 		<td>custom_capabilities</td>
-		<td>Path to the properties file with custom key-value capabilities</td>
+		<td>Path to the properties file with custom key-value [capabilities](https://zebrunner.github.io/carina/advanced/driver/#capabilities)</td>
 		<td>browserstack/win/win_10_Edge.properties</td>
 	</tr>
 	<tr>
 		<td>explicit_timeout</td>
 		<td>Timeout is seconds to wait for a certain condition to occur before proceeding further in the code</td>
 		<td>Integer</td>
+	</tr>
+	<tr>
+		<td>page_opening_strategy</td>
+		<td>Determines how carina detects whether expected [page](https://zebrunner.github.io/carina/automation/web/#page-opening-strategy) is opened</td>
+		<td>BY_ELEMENT, BY_URL, BY_URL_AND_ELEMENT</td>
+	</tr>
+	<tr>
+		<td>element_loading_strategy</td>
+		<td>Determines how carina detects appearing of [web elements](https://zebrunner.github.io/carina/automation/web/#element-loading-strategy) on page</td>
+		<td>BY_PRESENCE, BY_VISIBILITY, BY_PRESENCE_OR_VISIBILITY</td>
 	</tr>
 	<tr>
 		<td>auto_download</td>
@@ -240,21 +255,6 @@ All the project configuration properties are located in a **_config.properties**
 		<td>tls_keysecure_location</td>
 		<td>Path to a directory with tls secure keys</td>
 		<td>./tls/keysecure</td>
-	</tr>
-	<tr>
-		<td>test_run_rules</td>
-		<td>Executing rules logic: test_run_rules={RULE_NAME_ENUM}=>{RULE_VALUE1}&&{RULE_VALUE2};;...</td>
-		<td>test_run_rules=PRIORITY=>P1&amp;&amp;P2&&P4;;OWNER=>owner;;TAGS=>tag1=temp||!!feature=reg</td>
-	</tr>
-	<tr>
-		<td>element_loading_strategy</td>
-		<td>Determines how carina detects appearing of web elements on page: by presence in DOM model or by visibility or by any of these conditions</td>
-		<td>BY_PRESENCE, BY_VISIBILITY, BY_PRESENCE_OR_VISIBILITY</td>
-	</tr>
-	<tr>
-		<td>page_opening_strategy</td>
-		<td>Determines how carina detects whether expected page is opened: by expected url pattern, by marker element loading state or by both these conditions</td>
-		<td>BY_ELEMENT, BY_URL, BY_URL_AND_ELEMENT</td>
 	</tr>
 </table>
 Most of the properties may be read in the following way:
