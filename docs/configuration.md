@@ -168,12 +168,12 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>auto_download</td>
-		<td>The enabled parameter prevents downloading a dialog and downloading a file automaticallyinto the test artifact folder. The feature is currently available for Chrome and FireFox</td>
+		<td>The enabled parameter prevents downloading dialog and downloading a file automatically into the test artifact folder. The feature is supported for Chrome and Firefox. Default: false</td>
 		<td>false, true</td>
 	</tr>
 	<tr>
 		<td>custom_artifacts_folder</td>
-		<td>Path to custom auto download folder for Chrome and Firefox browsers.</td>
+		<td>Custom unified path for auto downloaded artifacts for all tests. Default: NULL to download into the unique test artifacts location.</td>
 		<td>String</td>
 	</tr>
 	<tr>
