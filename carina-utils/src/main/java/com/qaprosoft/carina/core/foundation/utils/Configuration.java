@@ -105,11 +105,7 @@ public class Configuration {
 
         AUTO_DOWNLOAD_APPS("auto_download_apps"),
 
-        AUTO_DOWNLOAD_FOLDER("auto_download_folder"),
-
         CUSTOM_ARTIFACTS_FOLDER("custom_artifacts_folder"),
-
-        ARTIFACT_AVAILABILITY_TIMEOUT("artifact_availability_timeout"),
 
         RETRY_INTERVAL("retry_interval"),
 

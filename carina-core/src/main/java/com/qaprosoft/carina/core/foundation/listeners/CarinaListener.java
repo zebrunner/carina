@@ -374,10 +374,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     public void onFinish(ISuite suite) {
         LOGGER.debug("CarinaListener->onFinish(ISuite suite)");
         try {
-            // TODO: quitAllDivers forcibly
-            ReportContext.removeTempDir(); // clean temp artifacts directory
-            // HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
-
             String browser = getBrowser();
             // String suiteName = getSuiteName(context);
             String title = getTitle(suite.getXmlSuite());
