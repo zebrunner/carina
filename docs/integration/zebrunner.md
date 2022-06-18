@@ -9,11 +9,11 @@ Let’s begin the integration!
 
 ![Zebrunner dashboards](../img/zebrDashboards.jpg)
 
-###Step 1. Create agent.propertiesfile
+###Create agent.properties file
 
 Navigate to the folder `src/main/resources` and create agent.properties file (if not already created).
 
-###Step 2. Configure Agent Parameters
+###Configure Agent Parameters
 Declare integration parameters in agent.properties:
 
 ```
