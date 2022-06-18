@@ -270,16 +270,6 @@ All the project configuration properties are located in a **_config.properties**
 		<td>Path to a directory with tls secure keys</td>
 		<td>./tls/keysecure</td>
 	</tr>
-		<tr>
-		<td>health_check_class</td>
-		<td>Class to execute health checks in advance before the tests.</td>
-		<td>Custom class</td>
-	</tr>
-		<tr>
-		<td>health_check_methods</td>
-		<td>Comma-separated list of methods of health_check_class to execute in advance before the tests.</td>
-		<td>doThis, doThat</td>
-	</tr>
 	<tr>
 		<td>test_run_rules</td>
 		<td>Executing rules logic: test_run_rules={RULE_NAME_ENUM}=>{RULE_VALUE1}&&{RULE_VALUE2};;...</td>

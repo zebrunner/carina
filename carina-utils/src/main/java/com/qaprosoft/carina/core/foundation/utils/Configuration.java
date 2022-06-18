@@ -178,8 +178,10 @@ public class Configuration {
         TLS_KEYSECURE_LOCATION("tls_keysecure_location"),
 
         // HealthCheck
+        @Deprecated
         HEALTH_CHECK_CLASS("health_check_class"),
 
+        @Deprecated
         HEALTH_CHECK_METHODS("health_check_methods"),
 
         UNINSTALL_RELATED_APPS("uninstall_related_apps"),
