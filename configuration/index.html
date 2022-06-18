@@ -994,7 +994,7 @@ Configuration.getDouble(Parameter.MAX_DRIVER_COUNT) // returns double value
 </code></pre>
 
 <h3 id="environment-specific-configuration">Environment specific configuration</h3>
-<p>In some cases, it is required to support multiple environments for testing. Let's assume we have STAG and PROD environments which have different application URLs. In this case, we need to specify the following properties in _config.properties:</p>
+<p>In some cases, it is required to support multiple environments for testing. Let's assume we have STAG and PROD environments which have different application URLs. In this case, we need to specify the following properties in <strong>_config.properties</strong>:</p>
 <pre><code>env=PROD
 STAG.url=http://stag-app-server.com
 PROD.url=http://prod-app-server.com
@@ -1004,7 +1004,7 @@ PROD.url=http://prod-app-server.com
 <pre><code>Configuration.getEnvArg(&quot;url&quot;)
 </code></pre>
 
-<p>As a result, you switch between the environments just changing the env argument in the _config.properties file.</p>
+<p>As a result, you switch between the environments just changing the env argument in the <strong>_config.properties</strong> file.</p>
 <h3 id="tests-execution-filter-configuration">Tests execution filter configuration</h3>
 <p>The test_run_rules parameter is responsible for filtering tests.
 There are 3 filter types:
@@ -1071,21 +1071,21 @@ test_run_rules=PRIORITY=&gt;!!P1;;OWNER=&gt;Josh&amp;&amp;!!Jake;;TAGS=&gt;featu
 </code></pre>
 
 <h3 id="faq">F.A.Q.</h3>
-<p>1) <b>Where is recommended place to declare configuration parameters?</b><br>
-Declare default parameters in <code>_config.properties</code>. For multi-maven projects you can use extra underscore symbol to override default settings on new layer <code>__config.properties</code>, <code>___config.properties</code> etc</p>
-<p>2) <b>How to override params from the code?</b><br>
+<p><b>Where is recommended place to declare configuration parameters?</b><br>
+Declare default parameters in <strong>_config.properties</strong>. For multi-maven projects you can use extra underscore symbol to override default settings on new layer <strong>__config.properties</strong>, <strong>___config.properties</strong> etc</p>
+<p><b>How to override params from the code?</b><br>
 Put method might be used to override parameters globally or for current test only</p>
 <pre><code>R.CONFIG.put(&quot;selenium_url&quot;, &quot;http://host1:4444/wd/hub&quot;); //override selenium_url globally for the rest of tests
 R.CONFIG.put(&quot;selenium_url&quot;, &quot;http://host2:4444/wd/hub&quot;, true); // override selenium_url for current test only
 R.DATABASE.put(&quot;db.driver&quot;, &quot;org.postgresql.Driver&quot;) //override db.driver in_database.properties globally
 </code></pre>
 
-<p>3) <b>Crypted values are returned in encrypted format. How can I decrypt them?</b><br>
+<p><b>Crypted values are returned in encrypted format. How can I decrypt them?</b><br>
 Use <code>R.CONFIG.getDecrypted(String key)</code> method to read decrypted value. </p>
 <blockquote>
 <p>You should have valid crypto key to be able to decrypt values, for details visit <a href="https://zebrunner.github.io/carina/advanced/security/">Security</a></p>
 </blockquote>
-<p>4) <b>Can I override configuration parameters from CI?</b><br>
+<p><b>Can I override configuration parameters from CI?</b><br>
 Provide updated values via System Properties to override value, for example:</p>
 <pre><code>mvn -Denv=PROD ...`
 </code></pre>
