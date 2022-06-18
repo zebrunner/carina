@@ -311,7 +311,7 @@ Configuration.getDouble(Parameter.MAX_DRIVER_COUNT) // returns double value
 ```
 
 ### Environment specific configuration
-In some cases, it is required to support multiple environments for testing. Let's assume we have STAG and PROD environments which have different application URLs. In this case, we need to specify the following properties in _config.properties:
+In some cases, it is required to support multiple environments for testing. Let's assume we have STAG and PROD environments which have different application URLs. In this case, we need to specify the following properties in **_config.properties**:
 ```
 env=PROD
 STAG.url=http://stag-app-server.com
@@ -322,7 +322,7 @@ And get an env-specific argument in the test in the following way:
 ```
 Configuration.getEnvArg("url")
 ```
-As a result, you switch between the environments just changing the env argument in the _config.properties file.
+As a result, you switch between the environments just changing the env argument in the **_config.properties** file.
 
 ### Tests execution filter configuration
 The test_run_rules parameter is responsible for filtering tests.
@@ -394,10 +394,10 @@ test_run_rules=PRIORITY=>!!P1;;OWNER=>Josh&&!!Jake;;TAGS=>feature=web&&!!type=sm
 ```
 
 ###F.A.Q.
-1) <b>Where is recommended place to declare configuration parameters?</b><br>
-Declare default parameters in `_config.properties`. For multi-maven projects you can use extra underscore symbol to override default settings on new layer `__config.properties`, `___config.properties` etc
+<b>Where is recommended place to declare configuration parameters?</b><br>
+Declare default parameters in **_config.properties**. For multi-maven projects you can use extra underscore symbol to override default settings on new layer **__config.properties**, **___config.properties** etc
 
-2) <b>How to override params from the code?</b><br>
+<b>How to override params from the code?</b><br>
 Put method might be used to override parameters globally or for current test only
 ```
 R.CONFIG.put("selenium_url", "http://host1:4444/wd/hub"); //override selenium_url globally for the rest of tests
@@ -405,11 +405,11 @@ R.CONFIG.put("selenium_url", "http://host2:4444/wd/hub", true); // override sele
 R.DATABASE.put("db.driver", "org.postgresql.Driver") //override db.driver in_database.properties globally
 ```
 
-3) <b>Crypted values are returned in encrypted format. How can I decrypt them?</b><br>
+<b>Crypted values are returned in encrypted format. How can I decrypt them?</b><br>
 Use `R.CONFIG.getDecrypted(String key)` method to read decrypted value. 
 > You should have valid crypto key to be able to decrypt values, for details visit [Security](https://zebrunner.github.io/carina/advanced/security/)
 
-4) <b>Can I override configuration parameters from CI?</b><br>
+<b>Can I override configuration parameters from CI?</b><br>
 Provide updated values via System Properties to override value, for example:
 ```
 mvn -Denv=PROD ...`
