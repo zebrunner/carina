@@ -159,8 +159,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         IScreenshotRule autoScreenshotsRule = (IScreenshotRule) new AutoScreenshotRule();
         Screenshot.addScreenshotRule(autoScreenshotsRule);
 
-        updateAppPath();
-
         TestNameResolverRegistry.set(new ZebrunnerNameResolver());
         CompositeLabelResolver.addResolver(new TagManager());
         CompositeLabelResolver.addResolver(new PriorityManager());
@@ -182,6 +180,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             logger.setLevel(Level.getLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
         }
 
+        updateAppPath();
+        
         setThreadCount(suite);
         onHealthCheck(suite);
         
