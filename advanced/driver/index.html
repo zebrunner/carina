@@ -557,6 +557,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../../screenshot.md" class="md-nav__link">
+        Screenshot
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../security/" class="md-nav__link">
         Security
       </a>
@@ -893,7 +907,8 @@ chrome_mobile_emulation_opts=
 </code></pre>
 
 <p><strong>May I init page/driver on static layer?</strong></p>
-<p>Initialization of drivers and pages on static layer is prohibited. CarinaListeners not even intergated yet on compilation stage. For details visi <a href="https://github.com/zebrunner/carina/issues/1550">#1550</a></p>
+<p>Initialization of drivers and pages on static layer is prohibited. CarinaListener not even intergated yet on compilation stage. For details visit <a href="https://github.com/zebrunner/carina/issues/1550">#1550</a>.
+The earliest stage you can start driver is <code>@BeforeSuite()</code>.</p>
 
               
             </article>
