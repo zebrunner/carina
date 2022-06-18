@@ -154,4 +154,5 @@ public class TestSample implements IAbstractTest {
 
 **May I init page/driver on static layer?**
 
-Initialization of drivers and pages on static layer is prohibited. CarinaListeners not even intergated yet on compilation stage. For details visi [#1550](https://github.com/zebrunner/carina/issues/1550)
+Initialization of drivers and pages on static layer is prohibited. CarinaListener not even intergated yet on compilation stage. For details visit [#1550](https://github.com/zebrunner/carina/issues/1550).
+The earliest stage you can start driver is `@BeforeSuite()`.
