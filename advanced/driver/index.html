@@ -840,15 +840,15 @@ chrome_mobile_emulation_opts=
 <h2 id="quit">Quit</h2>
 <p>Quit driver operation is executed automatically based on driver init phase, i.e. <strong>no need to do it inside your test code</strong>.</p>
 <ul>
-<li><code>@BeforeSuite</code> drivers belong to all tests/classes and will be closed in <code>@AfterSuite</code> only</li>
-<li><code>@BeforeTest</code> drivers belong to all <code>&lt;test&gt;</code> classes and will be closed in <code>@AfterTest</code>.</li>
-<li><code>@BeforeClass</code> drivers belong to all tests inside current class and will be closed in <code>@AfterClass</code></li>
-<li><code>@BeforeMethod</code> or inside <code>Test Method</code> drivers belong to current test method and will be closed in <code>@AfterMethod</code><blockquote>
-<p>Also driver is saved for all dependent test methods inside test class by default.</p>
+<li><code>@BeforeSuite</code> drivers belong to all tests/classes and will be closed at <code>@AfterSuite</code> only</li>
+<li><code>@BeforeTest</code> drivers belong to all <code>&lt;test&gt;</code> classes and will be closed at <code>@AfterTest</code>.</li>
+<li><code>@BeforeClass</code> drivers belong to all tests inside current class and will be closed at <code>@AfterClass</code></li>
+<li><code>@BeforeMethod</code> or inside <code>Test Method</code> drivers belong to current test method and will be closed at <code>@AfterMethod</code><blockquote>
+<p>For dependent test methods Carina preserve started driver(s) by default.</p>
 </blockquote>
 </li>
 </ul>
-<p>To quit driver forcibly if needed use <strong>quitDriver()</strong> or <strong>quitDriver(name)</strong></p>
+<p>To quit driver forcibly use <strong>quitDriver()</strong> or <strong>quitDriver(name)</strong></p>
 <p>To disable driver quit strategy completely and cotrol drivers init/quit on your own provide <code>forcibly_disable_driver_quit=true</code> or execute from any place of your test code <code>CarinaListener.disableDriversCleanup();</code></p>
 <h2 id="restart">Restart</h2>
 <ul>
@@ -891,6 +891,9 @@ chrome_mobile_emulation_opts=
   }
 }
 </code></pre>
+
+<p><strong>May I init page/driver on static layer?</strong></p>
+<p>Initialization of drivers and pages on static layer is prohibited. CarinaListeners not even intergated yet on compilation stage. For details visi <a href="https://github.com/zebrunner/carina/issues/1550">#1550</a></p>
 
               
             </article>
