@@ -9,11 +9,11 @@ Let’s begin the integration!
 
 ![Zebrunner dashboards](../img/zebrDashboards.jpg)
 
-###Step 1. Create agent.properties or agent.yaml file
+###Step 1. Create agent.propertiesfile
 
 Navigate to the folder `src/main/resources` and create agent.properties file (if not already created).
 
-###Step 2. Configure Zebrunner Agent
+###Step 2. Configure Agent Parameters
 Declare integration parameters in agent.properties:
 
 ```
@@ -36,7 +36,7 @@ Possible parameters in agent.properties:
 More details and examples of Environment variables, Program arguments etc can be found in the 
 [Documentation](https://zebrunner.com/documentation/reporting/carina-testng/). 
 
-###The integration with Zebrunner is in place!
+###The integration is in place!
 
 **Now you can:**
 
