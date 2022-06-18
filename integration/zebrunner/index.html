@@ -698,11 +698,9 @@
 Let’s begin the integration!</p>
 <p><img alt="Zebrunner dashboards" src="../../img/zebrDashboards.jpg" /></p>
 <h3 id="step-1-create-agentproperties-or-agentyaml-file">Step 1. Create agent.properties or agent.yaml file</h3>
-<p>Navigate to the folder <code>src/main/resources</code> and create agent.properties or agent.yaml file (if not already created).</p>
-<p><img alt="Agent Folder" src="../../img/agentFolder.png" /></p>
+<p>Navigate to the folder <code>src/main/resources</code> and create agent.properties file (if not already created).</p>
 <h3 id="step-2-configure-zebrunner-agent">Step 2. Configure Zebrunner Agent</h3>
-<p>In this example, let’s perform the configuration on the basis of properties file.</p>
-<p>Below is a sample configuration file:</p>
+<p>Declare integration parameters in agent.properties:</p>
 <pre><code>reporting.enabled=true
 reporting.server.hostname=bestcompany.zebrunner.com
 reporting.server.access-token=&lt;token&gt;
@@ -714,16 +712,14 @@ reporting.run.environment=QA
 <p>Possible parameters in agent.properties:</p>
 <ul>
 <li><code>reporting.enabled</code> - enables or disables reporting. The default value is false. If disabled, the agent will use no op component implementations that will simply log output for tracing purposes with the trace level;</li>
-<li><code>reporting.server.hostname</code> - mandatory if reporting is enabled. Zebrunner server hostname. Can be obtained in Zebrunner on the 'Account &amp; profile' page under the 'Service URL' section;</li>
+<li><code>reporting.server.hostname</code> - mandatory if reporting is enabled. Zebrunner server hostname. Can be obtained in Zebrunner on the 'Account &amp; Profile' page under the 'Service URL' section;</li>
 <li><code>reporting.server.access-token</code> - mandatory if reporting is enabled. Access token must be used to perform API calls. Can be obtained in Zebrunner on the 'Account &amp; profile' page under the 'Token' section;</li>
 <li><code>reporting.run.display-name</code> - optional value. The display name of the test run. The default value is Default Suite;</li>
 <li><code>reporting.run.build</code> - optional value. The build number that is associated with the test run. It can depict either the test build number or the application build number;</li>
 <li><code>reporting.run.environment</code> - optional value. The environment in which the tests will run.</li>
 </ul>
-<p>Example of the agent.yaml:
-<img alt="agent configuration" src="../../img/agentConfiguration.png" /></p>
 <p>More details and examples of Environment variables, Program arguments etc can be found in the 
-<a href="https://zebrunner.com/documentation/agents/testng">Documentation</a> in the section ‘Tracking of test results’. </p>
+<a href="https://zebrunner.com/documentation/reporting/carina-testng/">Documentation</a>. </p>
 <h3 id="the-integration-with-zebrunner-is-in-place">The integration with Zebrunner is in place!</h3>
 <p><strong>Now you can:</strong></p>
 <ul>
