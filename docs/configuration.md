@@ -381,7 +381,7 @@ test_run_rules=PRIORITY=>!!P1;;OWNER=>Josh&&!!Jake;;TAGS=>feature=web&&!!type=sm
 
 ###F.A.Q.
 **Where is recommended place to declare configuration parameters?**<br>
-Declare default parameters in `_config.properties``. For multi-maven projects you can use extra underscore symbol to override default settings on new layer `__config.properties`, `___config.properties` etc
+Declare default parameters in `_config.properties`. For multi-maven projects you can use extra underscore symbol to override default settings on new layer `__config.properties`, `___config.properties` etc
 
 **How to override params from the code?**<br>
 Put method might be used to override parameters globally or for current test only
@@ -398,5 +398,5 @@ Use `R.CONFIG.getDecrypted(String key)` method to read decrypted value.
 **Can I override configuration parameters from CI?**<br>
 Provide updated values via System Properties to override value, for example:
 ```
-mvn -Denv=PROD ...`
+mvn -Denv=PROD ...
 ```
