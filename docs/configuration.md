@@ -38,12 +38,12 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>headless</td>
-		<td>Run tests in headless browser mode. Default: **false**</td>
+		<td>Run tests in headless browser mode. **Default: false**</td>
 		<td>Boolean</td>
 	</tr>
 	<tr>
 		<td>browser_language</td>
-		<td>Browser language. Default **NULL** to use default browser language.</td>
+		<td>Browser language. **Default: NULL** to use default browser language.</td>
 		<td>"es", "fr"</td>
 	</tr>
 	<tr>
@@ -63,22 +63,22 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>retry_interval</td>
-		<td>Timeout interval between calling HTML DOM for the element. Default: **100**ms. For mobile automation specify in between 500-1000</td>
+		<td>Timeout interval in **ms** between calling HTML DOM for the element. **Default: 100**. For mobile automation specify in between 500-1000</td>
 		<td>Integer</td>
 	</tr>
 	<tr>
 		<td>auto_screenshot</td>
-		<td>Global switch for taking screenshots. When disabled, screenshots will be captured only after failures. Default: **true**. </td>
+		<td>Global switch for taking screenshots. When disabled, screenshots will be captured only after failures. **Default: true**. </td>
 		<td>Boolean</td>
 	</tr>
 	<tr>
 		<td>allow_fullsize_screenshot</td>
-		<td>Global switch for allowing full size screenshots on failures. Default: **false**</td>
+		<td>Global switch for allowing full size screenshots on failures. **Default: false**</td>
 		<td>Boolean</td>
 	</tr>
 	<tr>
 		<td>max_screen_history</td>
-		<td>Max number of reports artifacts saving in history. Default: **10**</td>
+		<td>Max number of reports artifacts saving in history. **Default: 10**</td>
 		<td>Integer</td>
 	</tr>
 	<tr>
@@ -88,7 +88,7 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>ignore_ssl</td>
-		<td>API requests/responses to ignore SSL errors. Default: **false**</td>
+		<td>API requests/responses to ignore SSL errors. **Default: false**</td>
 		<td>Boolean</td>
 	</tr>
 	<tr>
@@ -98,12 +98,12 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>max_driver_count</td>
-		<td>Max number of drivers per thread. Default: **3**</td>
+		<td>Max number of drivers per thread. **Default: 3**</td>
 		<td>Integer</td>
 	</tr>
 	<tr>
 		<td>forcibly_disable_driver_quit</td>
-		<td>If enabled turns off webdriver shutdown after test finishing by any reason. Default: **false**</td>
+		<td>If enabled turns off webdriver shutdown after test finishing by any reason. **Default: false**</td>
 		<td>Boolean</td>
 	</tr>
 	<tr>
@@ -158,12 +158,12 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>auto_download</td>
-		<td>The enabled parameter prevents downloading dialog and downloading a file automatically into the test artifact folder. The feature is supported for Chrome and Firefox. Default: **false**</td>
+		<td>The enabled parameter prevents downloading dialog and downloading a file automatically into the test artifact folder. The feature is supported for Chrome and Firefox. **Default: false**</td>
 		<td>false, true</td>
 	</tr>
 	<tr>
 		<td>custom_artifacts_folder</td>
-		<td>Custom unified path for auto downloaded artifacts for all tests. Default: **NULL** to download into the unique test artifacts location.</td>
+		<td>Custom unified path for auto downloaded artifacts for all tests. **Default: NULL** to download into the unique test artifacts location.</td>
 		<td>String</td>
 	</tr>
 	<tr>
@@ -178,16 +178,16 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>big_screen_width</td>
-		<td>Screenshots will be resized according to this width if their own width is bigger. Default: **-1** to keep existing size.</td>
+		<td>Screenshots will be resized according to this width if their own width is bigger. **Default: -1** to keep existing size.</td>
 		<td>Integer</td>
 	</tr>
 	<tr>
 		<td>big_screen_height</td>
-		<td>Screenshots will be resized according to this height if their own height is bigger. Default: **-1** to keep existing size.</td>
+		<td>Screenshots will be resized according to this height if their own height is bigger. **Default: -1** to keep existing size.</td>
 		<td>Integer</td>
 	<tr>
 		<td>init_retry_count</td>
-		<td>Number of extra attempts to create a driver. Default: **0** means that there will no extra attempts.</td>
+		<td>Number of extra attempts to create a driver. **Default: 0** means that there will no extra attempts.</td>
 		<td>Integer</td>
 	</tr>
 	<tr>
@@ -197,27 +197,27 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>retry_count</td>
-		<td>Number of test-retryings in case of failure. Default **0** means that a test will be performed only once</td>
+		<td>Number of test-retryings in case of failure. **Default: 0** means that a test will be performed only once</td>
 		<td>Integer</td>
 	</tr>
 		<tr>
 		<td>thread_count</td>
-		<td>Default number of threads to use when running tests in parallel. Set `thread_count=custom` to disable any updates on carina side.</td>
+		<td>Number of threads to use when running tests in parallel. Set `thread_count=custom` to disable any updates on carina side.</td>
 		<td>Integer</td>
 	</tr>
 		<tr>
 		<td>data_provider_thread_count</td>
-		<td>Default number of threads to use for data providers when running tests in parallel.</td>
+		<td>Number of threads to use for data providers when running tests in parallel.</td>
 		<td>Integer</td>
 	</tr>
 		<tr>
 		<td>core_log_level</td>
-		<td>Level for Carina logging. Default **INFO**</td>
+		<td>Level for Carina logging. **Default: INFO**</td>
 		<td>ALL, DEBUG, ERROR, WARN, FATAL, INFO, OFF, TRACE</td>
 	</tr>
 		<tr>
 		<td>log_all_json</td>
-		<td>API response will be logged in JSON format. Default: **true**</td>
+		<td>API response will be logged in JSON format. **Default: true**</td>
 		<td>Boolean</td>
 	</tr>
 		<tr>
@@ -321,7 +321,7 @@ As a result, you switch between the environments just changing the env argument 
 
 ### Tests execution filter configuration
 The `test_run_rules` parameter is responsible for filtering tests.
-There are 3 filter types:
+There are 3 filter types:<br>
 1) **PRIORITY** - enum field (from P0 to P6)<br>
 2) **OWNER** - the test owner<br>
 3) **TAGS** - custom label<br>
