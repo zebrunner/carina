@@ -298,22 +298,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#tricks" class="md-nav__link">
-    Tricks
+  <a href="#faq" class="md-nav__link">
+    F.A.Q.
   </a>
-  
-    <nav class="md-nav" aria-label="Tricks">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#pass-params-through-_configproperties-not-in-code" class="md-nav__link">
-    Pass params through _config.properties, not in code.
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -686,22 +673,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#tricks" class="md-nav__link">
-    Tricks
+  <a href="#faq" class="md-nav__link">
+    F.A.Q.
   </a>
-  
-    <nav class="md-nav" aria-label="Tricks">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#pass-params-through-_configproperties-not-in-code" class="md-nav__link">
-    Pass params through _config.properties, not in code.
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1144,20 +1118,25 @@ test_run_rules=PRIORITY=&gt;!!P1;;OWNER=&gt;Josh&amp;&amp;!!Jake;;TAGS=&gt;featu
         <td>empty or any existing name</td>
     </tr>
 </table></p>
-<h3 id="tricks">Tricks</h3>
-<h4 id="pass-params-through-_configproperties-not-in-code">Pass params through _config.properties, not in code.</h4>
-<pre><code>Will work both:
-1) putting parameters in _config.properties :
-   selenium_url=http://localhost:4444/wd/hub
-2) passing them right in the test:
-public void testCompareModels() {
-   R.CONFIG.put(&quot;selenium_url&quot;, &quot;http://localhost:4444/wd/hub&quot;);
-   HomePage homePage = new HomePage(getDriver());
-   homePage.open();
-   ...
-}
-Nevertheless, it is recommended to use the 1st variant for initialization of all the parameters.
-</code></pre>
+<h3 id="faq">F.A.Q.</h3>
+<ol>
+<li>Where is recommended place to declare configuration parameters?
+   Declare default parameters in <em>config.properties. For multi-maven projects you can use extra "</em>" to override default settings on new layer <code>__config.properties</code>, <code>___config.properties</code> etc</li>
+<li>How to override params from the code?
+   Use <code>R.CONFIG.put("selenium_url", "http://new_host:4444/wd/hub");</code> to override parameter globally for the rest of tests or <code>R.CONFIG.put("selenium_url", "http://localhost:4444/wd/hub", true);</code> to override for current test only.</li>
+<li>Can I use <code>R</code> class to get/put other parameters (testdata, api, database etc)? 
+   Use such notation to access other parameters: <code>R.TESTDATA.get("myParam"),</code>R.DATABASE.put("db.driver", "org.postgresql.Driver")` etc</li>
+<li>Can I return non string param values?
+   Primitives type values might be returned using <code>getInt, getLong, getDouble and getBoolean</code> methods</li>
+<li>Crypted values are returned in encrypted format. How can I decrypt them?
+   Use <code>R.CONFIG.getDecrypted(String key)</code> method to read decrypted value. <blockquote>
+<p>You should have valid crypto key to be able to decrypt values, for details visit <a href="https://zebrunner.github.io/carina/advanced/security/">Security</a></p>
+</blockquote>
+</li>
+<li>Can I override configuration parameters from CI?
+   Provide updated values via System Properties to override value, for example:
+   <code>mvn -Denv=PROD ...`</code></li>
+</ol>
 
               
             </article>
