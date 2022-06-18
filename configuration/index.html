@@ -810,12 +810,12 @@ R.TESTDATA.get(&quot;user.email&quot;)
         <tr>
         <td>proxy_protocols</td>
         <td>Comma-separated list of internet protocols used to carry the connection information from the source requesting the connection to the destination for which the connection was requested.</td>
-        <td>http, https, ftp, socks</td>
+        <td>http,https,ftp,socks</td>
     </tr>
         <tr>
         <td>browsermob_proxy</td>
         <td>Boolean parameter which enables or disables the automatic BrowserMob proxy launch</td>
-        <td>true, false</td>
+        <td>Boolean</td>
     </tr>
         <tr>
         <td>browsermob_port</td>
@@ -830,7 +830,7 @@ R.TESTDATA.get(&quot;user.email&quot;)
         <tr>
         <td>proxy_set_to_system</td>
         <td>Boolean parameter which enables or disables the setup of a proxy</td>
-        <td>true, false</td>
+        <td>Boolean</td>
     </tr>
         <tr>
         <td>no_proxy</td>
@@ -938,7 +938,7 @@ R.TESTDATA.get(&quot;user.email&quot;)
     </tr>
         <tr>
         <td>appcenter_token</td>
-        <td>Token for authentication in Hockey App</td>
+        <td>Token for authentication in AppCenter</td>
         <td>gkhcvdgvceUYF67897hbjsbdc</td>
     </tr>
         <tr>
@@ -949,22 +949,12 @@ R.TESTDATA.get(&quot;user.email&quot;)
         <tr>
         <td>localization_testing</td>
         <td>Enables auto verification for elements that are marked with <code>@Localized</code> annotations</td>
-        <td>true, false</td>
+        <td>Boolean</td>
     </tr>
         <tr>
         <td>tls_keysecure_location</td>
         <td>Path to a directory with tls secure keys</td>
         <td>./tls/keysecure</td>
-    </tr>
-        <tr>
-        <td>health_check_class</td>
-        <td>Class to execute health checks in advance before the tests.</td>
-        <td>Custom class</td>
-    </tr>
-        <tr>
-        <td>health_check_methods</td>
-        <td>Comma-separated list of methods of health_check_class to execute in advance before the tests.</td>
-        <td>doThis, doThat</td>
     </tr>
     <tr>
         <td>test_run_rules</td>
