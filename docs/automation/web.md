@@ -201,8 +201,9 @@ It is good practice to implement all elements search logic of Page Object/UI Obj
 
 * Test class should implement **com.qaprosoft.carina.core.foundation.IAbstractTest**
 * Test method should start with **org.testng.annotations.Test** annotation
-* Use **getDriver()** method to get driver instance in the test. 1st call of this method will start a driver based on default capabilities.
-* Locate tests in src/test/java source folder
+* Use **getDriver()** method to get driver instance in the test. 
+  > 1st call of this method will start a driver based on default capabilities.
+* Locate tests in `src/test/java` source folder
 
 ### Test configuration
 There are a few critical properties in a _config.properties file which are required for web test execution:
@@ -245,80 +246,74 @@ Page opening strategy configuration can be set in several places:
 
 1) in [_config.properties](http://zebrunner.github.io/carina/configuration/). This determines whole project page open strategy.
 
-2) In page.class. This overrides global page opening strategy for a specific page.
-
-	```
-	public class Page extends AbstractPage {
-
-	    public Page(WebDriver driver){
+2) In page class. This overrides global page opening strategy for a specific page.
+```
+public class Page extends AbstractPage {
+	public Page(WebDriver driver){
 		super(driver);
 		setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
-	    }
 	}
-	```
+}
+```
 	
-3) In test.class. This also overrides global page opening strategy for a specific page.
-
-	```
-	@Test
-	public void test(){
-		HomePage homePage=new HomePage(getDriver());
-		homePage.open();
-		homePage.setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
-	}
-	```
+3) In test class. This also overrides global page opening strategy for a specific page.
+```
+@Test
+public void test(){
+	HomePage homePage=new HomePage(getDriver());
+	homePage.open();
+	homePage.setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
+}
+```
 
 Strategy usage examples:
 
 By URL
 	
-	```
-	//This is a default value. To use it you need to set a real page urls into your page classes.
-	
-	private final String specificPageUrl = "https://www.gsmarena.com/specific/url";
+```
+//This is a default value. To use it you need to set a real page urls into your page classes.
+private final String specificPageUrl = "https://www.gsmarena.com/specific/url";
 
-	public Page(WebDriver driver) {
-	    super(driver);
-	    setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
+public Page(WebDriver driver) {
+	super(driver);
+	setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
 
-	    setPageAbsoluteURL(specificPageUrl);    //set's full url
-	    //or
-	    setPageURL("/specific/url");            //add's String to url from _config_properties
-	}
-	```
+	setPageAbsoluteURL(specificPageUrl); //set's full url
+	//or
+	setPageURL("/specific/url"); //add's String to url from _config_properties
+}
+```
 
 By Element
-
-	```
-	//To use this strategy, you need to specify ui load marker.
+```
+//To use this strategy, you need to specify ui load marker.
 	
-	@FindBy(id = "id")
-	private ExtendedWebElement element;
+@FindBy(id = "id")
+private ExtendedWebElement element;
 
-	public Page(WebDriver driver) {
-	    super(driver);
+public Page(WebDriver driver) {
+	super(driver);
 
-	    setPageOpeningStrategy(PageOpeningStrategy.BY_ELEMENT);
-	    setUiLoadedMarker(element);
-	}
-	```
+	setPageOpeningStrategy(PageOpeningStrategy.BY_ELEMENT);
+	setUiLoadedMarker(element);
+}
+```
 
 By URL and Element
+```
+private final String specificPageUrl = "https://www.gsmarena.com/specific/url";
 
-	```
-	private final String specificPageUrl = "https://www.gsmarena.com/specific/url";
+@FindBy(id = "id")
+private ExtendedWebElement element;
 
-	@FindBy(id = "id")
-	private ExtendedWebElement element;
+public Page(WebDriver driver) {
+	super(driver);
 
-	public Page(WebDriver driver) {
-	    super(driver);
-
-	    setPageOpeningStrategy(PageOpeningStrategy.BY_URL_AND_ELEMENT);
-	    setUiLoadedMarker(element);
-	    setPageAbsoluteURL(specificPageUrl);
-	}
-	```
+	setPageOpeningStrategy(PageOpeningStrategy.BY_URL_AND_ELEMENT);
+	setUiLoadedMarker(element);
+	setPageAbsoluteURL(specificPageUrl);
+}
+```
 
 ### Element loading strategy
 
@@ -335,11 +330,14 @@ Element loading strategy could be set at the same places as **Page opening strat
 To check if element presence:
 ```
 Component component = Page.getComponent();
-component.assertUIObjectPresent();      // equals to Assert.assertTrue(component.isUIObjectPresent(),"UI object componentName does not present!");
 
-component.assertUIObjectNotPresent();   // equals to Assert.assertTrue(!component.isUIObjectPresent(),"UI object componentName presents!");
+// equals to Assert.assertTrue(component.isUIObjectPresent(),"UI object componentName does not present!");
+component.assertUIObjectPresent();
+
+// equals to Assert.assertTrue(!component.isUIObjectPresent(),"UI object componentName presents!");
+component.assertUIObjectNotPresent(); 
 ```
->Dynamic elements loading. 
+> Dynamic elements loading. 
 **waitForJSToLoad()** method was introduced in AbstractPage class. It uses JS under the hood and helps to wait till all the dynamic web elements on the page are loaded.
 
 ###F.A.Q.
