@@ -60,6 +60,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#faq" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -453,9 +458,38 @@
       
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Program flow
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         Program flow
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#faq" class="md-nav__link">
+    F.A.Q.
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -592,6 +626,21 @@
   
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#faq" class="md-nav__link">
+    F.A.Q.
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -694,6 +743,54 @@ public void createUser() {
 </code></pre>
 
 <p>These are user's classes, samples at carina-demo: <a href="https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/mappers/UserMapper.java">UserMapper</a>, <a href="https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/ConnectionFactory.java">ConnectionFactory</a>, <a href="https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/models/User.java">User</a>.</p>
+<h3 id="faq">F.A.Q.</h3>
+<p><strong>Dependent vs independent tests, Which approach is better?</strong></p>
+<p>Try to develop fully independent tests to reuse all the benefits of the multi-threading execution. For example <a href="https://zebrunner.com/">Zebrunner Selenium Grid</a> provide 1000 threads as default limitation and allow to execute your full regression scenarios in a minutes!
+Use dependent methods via <code>dependsOnMethods</code> Test Annotation only if it is really required by Test logic. Carina will preserve all drivers for dependent methods so you can start driver in one method and procced with the page in another.</p>
+<pre><code>public class WebSampleSingleDriver implements IAbstractTest {
+    HomePage homePage = null;
+    CompareModelsPage comparePage = null;
+    List&lt;ModelSpecs&gt; specs = new ArrayList&lt;&gt;();
+
+    @BeforeSuite
+    public void startDriver() {
+        // Open GSM Arena home page and verify page is opened
+        homePage = new HomePage(getDriver());
+    }
+
+    @Test
+    public void testOpenPage() {
+        homePage.open();
+        Assert.assertTrue(homePage.isPageOpened(), &quot;Home page is not opened&quot;);
+    }
+
+    @Test(dependsOnMethods=&quot;testOpenPage&quot;) //for dependent tests Carina keeps driver sessions by default
+    public void testOpenCompare() {
+        // Open GSM Arena home page and verify page is opened
+        // Open model compare page
+        FooterMenu footerMenu = homePage.getFooterMenu();
+        Assert.assertTrue(footerMenu.isUIObjectPresent(2), &quot;Footer menu wasn't found!&quot;);
+        comparePage = footerMenu.openComparePage();
+
+    }
+
+    @Test(dependsOnMethods=&quot;testOpenCompare&quot;) //for dependent tests Carina keeps driver sessions by default
+    public void testReadSpecs() {
+        // Compare 3 models
+        specs = comparePage.compareModels(&quot;Samsung Galaxy J3&quot;, &quot;Samsung Galaxy J5&quot;, &quot;Samsung Galaxy J7 Pro&quot;);
+    }
+
+    @Test(dependsOnMethods=&quot;testReadSpecs&quot;) //for dependent tests Carina keeps driver sessions by default
+    public void testCompareModels() {
+        // Verify model announced dates
+        SoftAssert() softAssert = new SoftAssert();
+        softAssert.assertEquals(specs.get(0).readSpec(SpecType.ANNOUNCED), &quot;2016, March 31&quot;);
+        softAssert.assertEquals(specs.get(1).readSpec(SpecType.ANNOUNCED), &quot;2015, June 19&quot;);
+        softAssert.assertEquals(specs.get(2).readSpec(SpecType.ANNOUNCED), &quot;2017, June&quot;);
+        softAssert.assertAll();
+    }
+}
+</code></pre>
 
               
             </article>
