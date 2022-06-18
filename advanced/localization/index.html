@@ -754,7 +754,7 @@ private ExtendedWebElement contribElem;
 private List&lt;ExtendedWebElement&gt; pageLinks;
 </code></pre>
 
-<p>Add to the project resources that corresponds to @Localized elements:</p>
+<p>Add to the project resources that corresponds to <code>@Localized</code> elements:</p>
 <pre><code>#!The key from locale file should have Page name + name of variable that needs to be compared.
 WikipediaLocalePage.createAccountElem=fiók létrehozása
 WikipediaLocalePage.contribElem=közreműködések
@@ -770,7 +770,7 @@ WikipediaLocalePage.pageLinks5=Tudakozó
 
 <p>For elements that are operated in test and marked with <code>@Localized</code> annotation 
 Carina will automatically compare text from the page with text from your locale_xx_XX.properties file.
-Every mismatch will be collected in L10N.class. </p>
+Every mismatch will be collected in <code>L10N</code> class. </p>
 <blockquote>
 <p>To assert collected assertions use <code>L10N.assertAll()</code> method.</p>
 </blockquote>

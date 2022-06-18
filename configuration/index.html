@@ -713,9 +713,24 @@ R.TESTDATA.get(&quot;user.email&quot;)
         <th>Example</th>
     </tr>
     <tr>
+        <td>env</td>
+        <td>Environment specific configuration <a href="#environment-specific-configuration">feature</a></td>
+        <td>STAG, PROD, DEMO</td>
+    </tr>
+    <tr>
+        <td>selenium_url</td>
+        <td>Selenium/Appium server url</td>
+        <td>http://localhost:4444/wd/hub</td>
+    </tr>
+    <tr>
+        <td>app_version</td>
+        <td>Application version/build number for reporting</td>
+        <td>1.2.5</td>
+    </tr>
+    <tr>
         <td>url</td>
         <td>Base application URL</td>
-        <td>http://qaprosoft.com</td>
+        <td>https://zebrunner.com</td>
     </tr>
     <tr>
         <td>browser</td>
@@ -733,19 +748,39 @@ R.TESTDATA.get(&quot;user.email&quot;)
         <td>es, fr</td>
     </tr>
     <tr>
-        <td>selenium_url</td>
-        <td>Selenium/Appium server url</td>
-        <td>http://localhost:4444/wd/hub</td>
-    </tr>
-    <tr>
-        <td>app_version</td>
-        <td>Application version/build number for reporting</td>
-        <td>1.2.5</td>
-    </tr>
-    <tr>
         <td>locale</td>
         <td>Locale for using by <a href="https://zebrunner.github.io/carina/advanced/localization/">L10N</a> feature</td>
         <td>en_GB, de_DE, fr_FR</td>
+    </tr>
+    <tr>
+        <td>localization_testing</td>
+        <td>Enables auto verification for elements that are marked with <code>@Localized</code> annotations</td>
+        <td>Boolean</td>
+    </tr>
+    <tr>
+        <td>localization_encoding</td>
+        <td>Encoding for generation of new/missed localization resources</td>
+        <td>UTF-8</td>
+    </tr>
+    <tr>
+        <td>retry_count</td>
+        <td>Number of test-retryings in case of failure. <strong>Default: 0</strong> means that a test will be performed only once</td>
+        <td>Integer</td>
+    </tr>
+    <tr>
+        <td>thread_count</td>
+        <td>Number of threads to use when running tests in parallel. <strong>Default: -1</strong> to use value from TestNG suite xml.</td>
+        <td>Integer</td>
+    </tr>
+    <tr>
+        <td>data_provider_thread_count</td>
+        <td>Number of threads to use for data providers when running tests in parallel. <strong>Default: -1</strong> to use value from TestNG suite xml.</td>
+        <td>Integer</td>
+    </tr>
+    <tr>
+        <td>core_log_level</td>
+        <td>Level for Carina logging. <strong>Default: INFO</strong></td>
+        <td>ALL, DEBUG, ERROR, WARN, FATAL, INFO, OFF, TRACE</td>
     </tr>
     <tr>
         <td>retry_interval</td>
@@ -768,16 +803,6 @@ R.TESTDATA.get(&quot;user.email&quot;)
         <td>Integer</td>
     </tr>
     <tr>
-        <td>env</td>
-        <td>Environment specific configuration <a href="#environment-specific-configuration">feature</a></td>
-        <td>STAG, PROD, DEMO</td>
-    </tr>
-    <tr>
-        <td>ignore_ssl</td>
-        <td>API requests/responses to ignore SSL errors. <strong>Default: false</strong></td>
-        <td>Boolean</td>
-    </tr>
-    <tr>
         <td>driver_event_listeners</td>
         <td>Comma-separated list of extra driver listeners listeners. Listeners provide extra custom actions for WebDriver and have to be the instances of WebDriverEventListener</td>
         <td>com.some_company.core.EventListener</td>
@@ -785,6 +810,16 @@ R.TESTDATA.get(&quot;user.email&quot;)
     <tr>
         <td>max_driver_count</td>
         <td>Max number of drivers per thread. <strong>Default: 3</strong></td>
+        <td>Integer</td>
+    </tr>
+    <tr>
+        <td>init_retry_count</td>
+        <td>Number of extra attempts to create a driver. <strong>Default: 0</strong> means that there will no extra attempts.</td>
+        <td>Integer</td>
+    </tr>
+    <tr>
+        <td>init_retry_interval</td>
+        <td>Interval in seconds between the attempts to create a driver. <strong>Default: 1</strong></td>
         <td>Integer</td>
     </tr>
     <tr>
@@ -796,46 +831,6 @@ R.TESTDATA.get(&quot;user.email&quot;)
         <td>custom_capabilities</td>
         <td>Path to the properties file with custom key-value capabilities</td>
         <td>browserstack/win/win_10_Edge.properties</td>
-    </tr>
-        <tr>
-        <td>proxy_host</td>
-        <td>Hostname of the <a href="https://zebrunner.github.io/carina/advanced/proxy/">proxy</a> server</td>
-        <td>host.example.com</td>
-    </tr>
-        <tr>
-        <td>proxy_port</td>
-        <td>Port number</td>
-        <td>80</td>
-    </tr>
-        <tr>
-        <td>proxy_protocols</td>
-        <td>Comma-separated list of internet protocols used to carry the connection information from the source requesting the connection to the destination for which the connection was requested.</td>
-        <td>http,https,ftp,socks</td>
-    </tr>
-        <tr>
-        <td>browsermob_proxy</td>
-        <td>Boolean parameter which enables or disables the automatic BrowserMob proxy launch</td>
-        <td>Boolean</td>
-    </tr>
-        <tr>
-        <td>browsermob_port</td>
-        <td>Port number for BrowserMob proxy (if nothing or 0 specified, then any free port will be reused)</td>
-        <td>Integer</td>
-    </tr>
-        <tr>
-        <td>browsermob_ports_range</td>
-        <td>Range of ports that will be used for starting of browsermob proxy. First available port from the range will be used. If all ports are used then test will wait for the first freed port.</td>
-        <td>8001:8003</td>
-    </tr>
-        <tr>
-        <td>proxy_set_to_system</td>
-        <td>Boolean parameter which enables or disables the setup of a proxy</td>
-        <td>Boolean</td>
-    </tr>
-        <tr>
-        <td>no_proxy</td>
-        <td>Excluded hostname(s) for communication via proxy. Available only when proxy_host and proxy_port are declared!</td>
-        <td>localhost.example.com</td>
     </tr>
     <tr>
         <td>explicit_timeout</td>
@@ -858,100 +853,76 @@ R.TESTDATA.get(&quot;user.email&quot;)
         <td>application/pdf</td>
     </tr>
     <tr>
+        <td>log_all_json</td>
+        <td>API response will be logged in JSON format. <strong>Default: true</strong></td>
+        <td>Boolean</td>
+    </tr>
+    <tr>
+        <td>ignore_ssl</td>
+        <td>API requests/responses to ignore SSL errors. <strong>Default: false</strong></td>
+        <td>Boolean</td>
+    </tr>
+    <tr>
         <td>project_report_directory</td>
         <td>Path to a folder where the testing report will be saved</td>
         <td>./reports</td>
     </tr>
     <tr>
-        <td>big_screen_width</td>
-        <td>Screenshots will be resized according to this width if their own width is bigger. <strong>Default: -1</strong> to keep existing size.</td>
-        <td>Integer</td>
-    </tr>
-    <tr>
-        <td>big_screen_height</td>
-        <td>Screenshots will be resized according to this height if their own height is bigger. <strong>Default: -1</strong> to keep existing size.</td>
-        <td>Integer</td>
-    <tr>
-        <td>init_retry_count</td>
-        <td>Number of extra attempts to create a driver. <strong>Default: 0</strong> means that there will no extra attempts.</td>
-        <td>Integer</td>
-    </tr>
-    <tr>
-        <td>init_retry_interval</td>
-        <td>Interval in seconds between the attempts to create a driver. <strong>Default: 1</strong></td>
-        <td>Integer</td>
-    </tr>
-    <tr>
-        <td>retry_count</td>
-        <td>Number of test-retryings in case of failure. <strong>Default: 0</strong> means that a test will be performed only once</td>
-        <td>Integer</td>
+        <td>proxy_host</td>
+        <td>Hostname of the <a href="https://zebrunner.github.io/carina/advanced/proxy/">proxy</a> server</td>
+        <td>host.example.com</td>
     </tr>
         <tr>
-        <td>thread_count</td>
-        <td>Number of threads to use when running tests in parallel. Set <code>thread_count=custom</code> to disable any updates on carina side.</td>
-        <td>Integer</td>
+        <td>proxy_port</td>
+        <td>Port number</td>
+        <td>80</td>
     </tr>
-        <tr>
-        <td>data_provider_thread_count</td>
-        <td>Number of threads to use for data providers when running tests in parallel.</td>
-        <td>Integer</td>
+    <tr>
+        <td>proxy_protocols</td>
+        <td>Comma-separated list of internet protocols used to carry the connection information from the source requesting the connection to the destination for which the connection was requested.</td>
+        <td>http,https,ftp,socks</td>
     </tr>
-        <tr>
-        <td>core_log_level</td>
-        <td>Level for Carina logging. <strong>Default: INFO</strong></td>
-        <td>ALL, DEBUG, ERROR, WARN, FATAL, INFO, OFF, TRACE</td>
-    </tr>
-        <tr>
-        <td>log_all_json</td>
-        <td>API response will be logged in JSON format. <strong>Default: true</strong></td>
+    <tr>
+        <td>browsermob_proxy</td>
+        <td>Boolean parameter which enables or disables the automatic BrowserMob proxy launch</td>
         <td>Boolean</td>
     </tr>
-        <tr>
+    <tr>
+        <td>browsermob_port</td>
+        <td>Port number for BrowserMob proxy (if nothing or 0 specified, then any free port will be reused)</td>
+        <td>Integer</td>
+    </tr>
+    <tr>
+        <td>browsermob_ports_range</td>
+        <td>Range of ports that will be used for starting of browsermob proxy. First available port from the range will be used. If all ports are used then test will wait for the first freed port.</td>
+        <td>8001:8003</td>
+    </tr>
+    <tr>
+        <td>proxy_set_to_system</td>
+        <td>Boolean parameter which enables or disables the setup of a proxy</td>
+        <td>Boolean</td>
+    </tr>
+    <tr>
+        <td>no_proxy</td>
+        <td>Excluded hostname(s) for communication via proxy. Available only when proxy_host and proxy_port are declared!</td>
+        <td>localhost.example.com</td>
+    </tr>
+    <tr>
         <td>date_format</td>
         <td>Date format for DateUtils.class</td>
         <td>HH:mm:ss dd/MM/yyyy, HH:mm MM/dd/yyyy</td>
     </tr>
-        <tr>
+    <tr>
         <td>time_format</td>
         <td>Date format for DateUtils.class</td>
         <td>HH:mm:ss.SSS, HH:mm a zzz</td>
     </tr>
-        <tr>
+    <tr>
         <td>crypto_key_path</td>
         <td>Path to a file with a crypto key</td>
         <td>./src/main/resources/crypto.key</td>
     </tr>
-        <tr>
-        <td>suite_name</td>
-        <td>Suite name for the report and TestRail. If this parameter is NULL, will be taken from TestNG xml (the parameter suite name) or _email.properties (the title)</td>
-        <td>Advanced Acceptance</td>
-    </tr>
-        <tr>
-        <td>access_key_id</td>
-        <td>Access key id for Amazon S3 build uploader. More info <a href="https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys">here</a></td>
-        <td>gkhcvdgvceUYF67897hbjsbdc</td>
-    </tr>
-        <tr>
-        <td>secret_key</td>
-        <td>Secret key for Amazon S3 build uploader. More info <a href="https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys">here</a></td>
-        <td>gkhcvdgvceUYF67897hbjsbdc</td>
-    </tr>
-        <tr>
-        <td>appcenter_token</td>
-        <td>Token for authentication in AppCenter</td>
-        <td>gkhcvdgvceUYF67897hbjsbdc</td>
-    </tr>
-        <tr>
-        <td>localization_encoding</td>
-        <td>Encoding for a new localization</td>
-        <td>UTF-8</td>
-    </tr>
-        <tr>
-        <td>localization_testing</td>
-        <td>Enables auto verification for elements that are marked with <code>@Localized</code> annotations</td>
-        <td>Boolean</td>
-    </tr>
-        <tr>
+    <tr>
         <td>tls_keysecure_location</td>
         <td>Path to a directory with tls secure keys</td>
         <td>./tls/keysecure</td>
@@ -970,8 +941,8 @@ R.TESTDATA.get(&quot;user.email&quot;)
         <td>page_opening_strategy</td>
         <td>Determines how carina detects whether expected page is opened: by expected url pattern, by marker element loading state or by both these conditions</td>
         <td>BY_ELEMENT, BY_URL, BY_URL_AND_ELEMENT</td>
-    </tr></p>
-<p></table>
+    </tr>
+</table>
 Most of the properties may be read in the following way:</p>
 <pre><code>Configuration.get(Parameter.URL) // returns string value
 Configuration.getBoolean(Parameter.AUTO_SCREENSHOT) // returns boolean value
@@ -1058,7 +1029,7 @@ test_run_rules=PRIORITY=&gt;!!P1;;OWNER=&gt;Josh&amp;&amp;!!Jake;;TAGS=&gt;featu
 
 <h3 id="faq">F.A.Q.</h3>
 <p><strong>Where is recommended place to declare configuration parameters?</strong><br>
-Declare default parameters in <code>_config.properties``. For multi-maven projects you can use extra underscore symbol to override default settings on new layer</code>__config.properties<code>,</code>___config.properties` etc</p>
+Declare default parameters in <code>_config.properties</code>. For multi-maven projects you can use extra underscore symbol to override default settings on new layer <code>__config.properties</code>, <code>___config.properties</code> etc</p>
 <p><strong>How to override params from the code?</strong><br>
 Put method might be used to override parameters globally or for current test only</p>
 <pre><code>R.CONFIG.put(&quot;selenium_url&quot;, &quot;http://host1:4444/wd/hub&quot;); //override selenium_url globally for the rest of tests
@@ -1073,7 +1044,7 @@ Use <code>R.CONFIG.getDecrypted(String key)</code> method to read decrypted valu
 </blockquote>
 <p><strong>Can I override configuration parameters from CI?</strong><br>
 Provide updated values via System Properties to override value, for example:</p>
-<pre><code>mvn -Denv=PROD ...`
+<pre><code>mvn -Denv=PROD ...
 </code></pre>
 
               
