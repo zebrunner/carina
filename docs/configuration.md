@@ -428,18 +428,20 @@ test_run_rules=PRIORITY=>!!P1;;OWNER=>Josh&&!!Jake;;TAGS=>feature=web&&!!type=sm
 	</tr>
 </table>
 
-###Tricks
-#### Pass params through _config.properties, not in code.
-```
-Will work both:
-1) putting parameters in _config.properties :
-   selenium_url=http://localhost:4444/wd/hub
-2) passing them right in the test:
-public void testCompareModels() {
-   R.CONFIG.put("selenium_url", "http://localhost:4444/wd/hub");
-   HomePage homePage = new HomePage(getDriver());
-   homePage.open();
-   ...
-}
-Nevertheless, it is recommended to use the 1st variant for initialization of all the parameters.
-```
+###F.A.Q.
+1. Where is recommended place to declare configuration parameters?
+   Declare default parameters in _config.properties. For multi-maven projects you can use extra "_" to override default settings on new layer `__config.properties`, `___config.properties` etc
+2. How to override params from the code?
+   Use `R.CONFIG.put("selenium_url", "http://new_host:4444/wd/hub");` to override parameter globally for the rest of tests or `R.CONFIG.put("selenium_url", "http://localhost:4444/wd/hub", true);` to override for current test only.
+3. Can I use `R` class to get/put other parameters (testdata, api, database etc)? 
+   Use such notation to access other parameters: `R.TESTDATA.get("myParam"), `R.DATABASE.put("db.driver", "org.postgresql.Driver")` etc
+4. Can I return non string param values?
+   Primitives type values might be returned using `getInt, getLong, getDouble and getBoolean` methods
+5. Crypted values are returned in encrypted format. How can I decrypt them?
+   Use `R.CONFIG.getDecrypted(String key)` method to read decrypted value. 
+   > You should have valid crypto key to be able to decrypt values, for details visit [Security](https://zebrunner.github.io/carina/advanced/security/)
+6. Can I override configuration parameters from CI?
+   Provide updated values via System Properties to override value, for example:
+   ```
+   mvn -Denv=PROD ...`
+   ```
