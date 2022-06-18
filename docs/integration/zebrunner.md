@@ -18,7 +18,7 @@ Declare integration parameters in agent.properties:
 
 ```
 reporting.enabled=true
-reporting.server.hostname=bestcompany.zebrunner.com
+reporting.server.hostname=https://bestcompany.zebrunner.com
 reporting.server.access-token=<token>
 reporting.run.display-name=Nightly Regression Suite
 reporting.run.build=1.12.1.96-SNAPSHOT
