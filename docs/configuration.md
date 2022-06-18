@@ -124,12 +124,12 @@ All the project configuration properties are located in a **_config.properties**
 		<tr>
 		<td>proxy_protocols</td>
 		<td>Comma-separated list of internet protocols used to carry the connection information from the source requesting the connection to the destination for which the connection was requested.</td>
-		<td>http, https, ftp, socks</td>
+		<td>http,https,ftp,socks</td>
 	</tr>
 		<tr>
 		<td>browsermob_proxy</td>
 		<td>Boolean parameter which enables or disables the automatic BrowserMob proxy launch</td>
-		<td>true, false</td>
+		<td>Boolean</td>
 	</tr>
 		<tr>
 		<td>browsermob_port</td>
@@ -144,7 +144,7 @@ All the project configuration properties are located in a **_config.properties**
 		<tr>
 		<td>proxy_set_to_system</td>
 		<td>Boolean parameter which enables or disables the setup of a proxy</td>
-		<td>true, false</td>
+		<td>Boolean</td>
 	</tr>
 		<tr>
 		<td>no_proxy</td>
@@ -252,7 +252,7 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 		<tr>
 		<td>appcenter_token</td>
-		<td>Token for authentication in Hockey App</td>
+		<td>Token for authentication in AppCenter</td>
 		<td>gkhcvdgvceUYF67897hbjsbdc</td>
 	</tr>
 		<tr>
@@ -263,7 +263,7 @@ All the project configuration properties are located in a **_config.properties**
 		<tr>
 		<td>localization_testing</td>
 		<td>Enables auto verification for elements that are marked with `@Localized` annotations</td>
-		<td>true, false</td>
+		<td>Boolean</td>
 	</tr>
 		<tr>
 		<td>tls_keysecure_location</td>
