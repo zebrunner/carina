@@ -98,13 +98,13 @@ public void someTest() {
 ##Quit
 Quit driver operation is executed automatically based on driver init phase, i.e. **no need to do it inside your test code**.
 
-* `@BeforeSuite` drivers belong to all tests/classes and will be closed in `@AfterSuite` only
-* `@BeforeTest` drivers belong to all `<test>` classes and will be closed in `@AfterTest`.
-* `@BeforeClass` drivers belong to all tests inside current class and will be closed in `@AfterClass`
-* `@BeforeMethod` or inside `Test Method` drivers belong to current test method and will be closed in `@AfterMethod`
-  > Also driver is saved for all dependent test methods inside test class by default.
+* `@BeforeSuite` drivers belong to all tests/classes and will be closed at `@AfterSuite` only
+* `@BeforeTest` drivers belong to all `<test>` classes and will be closed at `@AfterTest`.
+* `@BeforeClass` drivers belong to all tests inside current class and will be closed at `@AfterClass`
+* `@BeforeMethod` or inside `Test Method` drivers belong to current test method and will be closed at `@AfterMethod`
+  > For dependent test methods Carina preserve started driver(s) by default.
 
-To quit driver forcibly if needed use **quitDriver()** or **quitDriver(name)**
+To quit driver forcibly use **quitDriver()** or **quitDriver(name)**
 
 To disable driver quit strategy completely and cotrol drivers init/quit on your own provide `forcibly_disable_driver_quit=true` or execute from any place of your test code `CarinaListener.disableDriversCleanup();`
 
@@ -151,3 +151,7 @@ public class TestSample implements IAbstractTest {
   }
 }
 ```
+
+**May I init page/driver on static layer?**
+
+Initialization of drivers and pages on static layer is prohibited. CarinaListeners not even intergated yet on compilation stage. For details visi [#1550](https://github.com/zebrunner/carina/issues/1550)
