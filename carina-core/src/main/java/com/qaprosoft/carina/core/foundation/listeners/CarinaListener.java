@@ -18,7 +18,6 @@ package com.qaprosoft.carina.core.foundation.listeners;
 import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -50,12 +49,7 @@ import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.SkipException;
-import org.testng.TestListenerAdapter;
-import org.testng.TestNG;
-import org.testng.xml.XmlClass;
-import org.testng.xml.XmlInclude;
 import org.testng.xml.XmlSuite;
-import org.testng.xml.XmlTest;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -183,7 +177,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         updateAppPath();
         
         setThreadCount(suite);
-        onHealthCheck(suite);
         
         if (Configuration.getPlatform().equalsIgnoreCase(SpecialKeywords.API)) {
             CurrentTestRun.setPlatform(SpecialKeywords.API);
@@ -679,95 +672,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     protected void skipExecution(String message) {
         CurrentTest.revertRegistration();
         throw new SkipException(message);
-    }
-
-    protected void onHealthCheck(ISuite suite) {
-        String healthCheckClass = Configuration.get(Parameter.HEALTH_CHECK_CLASS);
-        if (suite.getParameter(Parameter.HEALTH_CHECK_CLASS.getKey()) != null) {
-            // redefine by suite arguments as they have higher priority
-            healthCheckClass = suite.getParameter(Parameter.HEALTH_CHECK_CLASS.getKey());
-        }
-
-        String healthCheckMethods = Configuration.get(Parameter.HEALTH_CHECK_METHODS);
-        if (suite.getParameter(Parameter.HEALTH_CHECK_METHODS.getKey()) != null) {
-            // redefine by suite arguments as they have higher priority
-            healthCheckMethods = suite.getParameter(Parameter.HEALTH_CHECK_METHODS.getKey());
-        }
-
-        String[] healthCheckMethodsArray = null;
-        if (!healthCheckMethods.isEmpty()) {
-            healthCheckMethodsArray = healthCheckMethods.split(",");
-        }
-        checkHealth(suite, healthCheckClass, healthCheckMethodsArray);
-    }
-
-    private void checkHealth(ISuite suite, String className, String[] methods) {
-
-        if (className.isEmpty()) {
-            return;
-        }
-
-        // create runtime XML suite for health check
-        XmlSuite xmlSuite = new XmlSuite();
-        xmlSuite.setName("HealthCheck XmlSuite - " + className);
-
-        XmlTest xmlTest = new XmlTest(xmlSuite);
-        xmlTest.setName("HealthCheck TestCase");
-        XmlClass xmlHealthCheckClass = new XmlClass();
-        xmlHealthCheckClass.setName(className);
-
-        // TestNG do not execute missed methods so we have to calulate expected
-        // methods count to handle potential mistakes in methods naming
-        int expectedMethodsCount = -1;
-        if (methods != null) {
-            // declare particular methods if they are provided
-            List<XmlInclude> methodsToRun = constructIncludes(methods);
-            expectedMethodsCount = methodsToRun.size();
-            xmlHealthCheckClass.setIncludedMethods(methodsToRun);
-        }
-
-        xmlTest.setXmlClasses(Arrays.asList(new XmlClass[] { xmlHealthCheckClass }));
-        xmlSuite.setTests(Arrays.asList(new XmlTest[] { xmlTest }));
-
-        LOGGER.info("HealthCheck '" + className + "' is started.");
-        LOGGER.debug("HealthCheck suite content:" + xmlSuite.toXml());
-
-        // Second TestNG process to run HealthCheck
-        TestNG testng = new TestNG();
-        testng.setXmlSuites(Arrays.asList(xmlSuite));
-
-        TestListenerAdapter tla = new TestListenerAdapter();
-        testng.addListener(tla);
-
-        testng.run();
-        synchronized (this) {
-            boolean passed = false;
-            if (expectedMethodsCount == -1) {
-                if (tla.getPassedTests().size() > 0 && tla.getFailedTests().size() == 0
-                        && tla.getSkippedTests().size() == 0) {
-                    passed = true;
-                }
-            } else {
-                LOGGER.info("Expected passed tests count: " + expectedMethodsCount);
-                if (tla.getPassedTests().size() == expectedMethodsCount && tla.getFailedTests().size() == 0
-                        && tla.getSkippedTests().size() == 0) {
-                    passed = true;
-                }
-            }
-            if (passed) {
-                LOGGER.info("HealthCheck suite '" + className + "' is finished successfully.");
-            } else {
-                throw new SkipException("Skip test(s) due to health check failures for '" + className + "'");
-            }
-        }
-    }
-
-    private List<XmlInclude> constructIncludes(String... methodNames) {
-        List<XmlInclude> includes = new ArrayList<XmlInclude>();
-        for (String eachMethod : methodNames) {
-            includes.add(new XmlInclude(eachMethod));
-        }
-        return includes;
     }
 
     /*
