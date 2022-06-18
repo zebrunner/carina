@@ -89,3 +89,55 @@ public void createUser() {
 ```  
 
 These are user's classes, samples at carina-demo: [UserMapper](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/mappers/UserMapper.java), [ConnectionFactory](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/ConnectionFactory.java), [User](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/models/User.java).
+
+###F.A.Q.
+
+**Dependent vs independent tests, Which approach is better?**
+
+Try to develop fully independent tests to reuse all the benefits of the multi-threading execution. For example [Zebrunner Selenium Grid](https://zebrunner.com/) provide 1000 threads as default limitation and allow to execute your full regression scenarios in a minutes!
+Use dependent methods via `dependsOnMethods` Test Annotation only if it is really required by Test logic. Carina will preserve all drivers for dependent methods so you can start driver in one method and procced with the page in another.
+```
+public class WebSampleSingleDriver implements IAbstractTest {
+    HomePage homePage = null;
+    CompareModelsPage comparePage = null;
+    List<ModelSpecs> specs = new ArrayList<>();
+
+    @BeforeSuite
+    public void startDriver() {
+        // Open GSM Arena home page and verify page is opened
+        homePage = new HomePage(getDriver());
+    }
+    
+    @Test
+    public void testOpenPage() {
+        homePage.open();
+        Assert.assertTrue(homePage.isPageOpened(), "Home page is not opened");
+    }
+    
+    @Test(dependsOnMethods="testOpenPage") //for dependent tests Carina keeps driver sessions by default
+    public void testOpenCompare() {
+        // Open GSM Arena home page and verify page is opened
+        // Open model compare page
+        FooterMenu footerMenu = homePage.getFooterMenu();
+        Assert.assertTrue(footerMenu.isUIObjectPresent(2), "Footer menu wasn't found!");
+        comparePage = footerMenu.openComparePage();
+
+    }
+    
+    @Test(dependsOnMethods="testOpenCompare") //for dependent tests Carina keeps driver sessions by default
+    public void testReadSpecs() {
+        // Compare 3 models
+        specs = comparePage.compareModels("Samsung Galaxy J3", "Samsung Galaxy J5", "Samsung Galaxy J7 Pro");
+    }
+    
+    @Test(dependsOnMethods="testReadSpecs") //for dependent tests Carina keeps driver sessions by default
+    public void testCompareModels() {
+        // Verify model announced dates
+        SoftAssert() softAssert = new SoftAssert();
+        softAssert.assertEquals(specs.get(0).readSpec(SpecType.ANNOUNCED), "2016, March 31");
+        softAssert.assertEquals(specs.get(1).readSpec(SpecType.ANNOUNCED), "2015, June 19");
+        softAssert.assertEquals(specs.get(2).readSpec(SpecType.ANNOUNCED), "2017, June");
+        softAssert.assertAll();
+    }
+}
+```
