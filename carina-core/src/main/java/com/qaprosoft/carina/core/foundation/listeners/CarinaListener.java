@@ -837,11 +837,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
          * To make possible to parse correctly we had to reuse external parser and private getAttributeValue
         */
         
-        if (SpecialKeywords.CUSTOM.equalsIgnoreCase(R.CONFIG.get(Parameter.THREAD_COUNT.getKey()))) {
-            LOGGER.info("Custom thread count manipulation is enabled. Carina will skip any updates with thread count...");
-            return;
-        }
-
         if (Configuration.getThreadCount()>= 1) {
             // use thread-count from config.properties
             suite.getXmlSuite().setThreadCount(Configuration.getThreadCount());
