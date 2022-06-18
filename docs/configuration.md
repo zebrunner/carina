@@ -34,7 +34,7 @@ All the project configuration properties are located in a **_config.properties**
 	<tr>
 		<td>browser</td>
 		<td>Browser for testing</td>
-		<td>chrome / firefox / safari / iexplore</td>
+		<td>chrome, firefox, MicrosoftEdge, safari</td>
 	</tr>
 	<tr>
 		<td>headless</td>
@@ -44,7 +44,7 @@ All the project configuration properties are located in a **_config.properties**
 	<tr>
 		<td>browser_language</td>
 		<td>Browser language. **Default: NULL** to use default browser language.</td>
-		<td>"es", "fr"</td>
+		<td>es, fr</td>
 	</tr>
 	<tr>
 		<td>selenium_url</td>
@@ -58,8 +58,8 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>locale</td>
-		<td>Locale for using L10N feature</td>
-		<td>en_GB,de_DE,fr_FR</td>
+		<td>Locale for using by [L10N](https://zebrunner.github.io/carina/advanced/localization/) feature</td>
+		<td>en_GB, de_DE, fr_FR</td>
 	</tr>
 	<tr>
 		<td>retry_interval</td>
@@ -83,7 +83,7 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>env</td>
-		<td>Environment specific configuration. More about this [feature](#environment-specific-configuration)</td>
+		<td>Environment specific configuration [feature](#environment-specific-configuration)</td>
 		<td>STAG, PROD, DEMO</td>
 	</tr>
 	<tr>
@@ -113,7 +113,7 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 		<tr>
 		<td>proxy_host</td>
-		<td>Hostname of the server</td>
+		<td>Hostname of the [proxy](https://zebrunner.github.io/carina/advanced/proxy/) server</td>
 		<td>host.example.com</td>
 	</tr>
 		<tr>
@@ -168,8 +168,8 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>auto_download_apps</td>
-		<td>MIME types / Internet Media Types. The parameter is needed only to configure auto downloading for FireFox</td>
-		<td>application/pdf, list of [values](https://freeformatter.com/mime-types-list.html)</td>
+		<td>MIME types / Internet Media Types. The parameter is needed only to configure auto downloading for FireFox. List of [values](https://freeformatter.com/mime-types-list.html)</td>
+		<td>application/pdf</td>
 	</tr>
 	<tr>
 		<td>project_report_directory</td>
@@ -192,7 +192,7 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>init_retry_interval</td>
-		<td>Interval in seconds between the attempts to create a driver</td>
+		<td>Interval in seconds between the attempts to create a driver. **Default: 1**</td>
 		<td>Integer</td>
 	</tr>
 	<tr>
@@ -256,12 +256,13 @@ All the project configuration properties are located in a **_config.properties**
 		<td>gkhcvdgvceUYF67897hbjsbdc</td>
 	</tr>
 		<tr>
+		<td>localization_encoding</td>
 		<td>Encoding for a new localization</td>
 		<td>UTF-8</td>
 	</tr>
 		<tr>
 		<td>localization_testing</td>
-		<td>Enables auto verification for elements that are marked with @Localized</td>
+		<td>Enables auto verification for elements that are marked with `@Localized` annotations</td>
 		<td>true, false</td>
 	</tr>
 		<tr>
@@ -271,12 +272,12 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 		<tr>
 		<td>health_check_class</td>
-		<td>Class to execute health checks</td>
+		<td>Class to execute health checks in advance before the tests.</td>
 		<td>Custom class</td>
 	</tr>
 		<tr>
 		<td>health_check_methods</td>
-		<td>Comma-separated list of methods of health_check_class to execute preliminarily</td>
+		<td>Comma-separated list of methods of health_check_class to execute in advance before the tests.</td>
 		<td>doThis, doThat</td>
 	</tr>
 	<tr>
