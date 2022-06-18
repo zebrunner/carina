@@ -494,22 +494,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#tricks" class="md-nav__link">
-    Tricks
+  <a href="#faq" class="md-nav__link">
+    F.A.Q.
   </a>
-  
-    <nav class="md-nav" aria-label="Tricks">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#init-pages-and-drivers-in-places-where-they-are-used" class="md-nav__link">
-    Init pages and drivers in places where they are used
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -728,22 +715,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#tricks" class="md-nav__link">
-    Tricks
+  <a href="#faq" class="md-nav__link">
+    F.A.Q.
   </a>
-  
-    <nav class="md-nav" aria-label="Tricks">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#init-pages-and-drivers-in-places-where-they-are-used" class="md-nav__link">
-    Init pages and drivers in places where they are used
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -777,7 +751,9 @@ To access this functionality from another places like your services just impleme
 <ul>
 <li>
 <p><strong>getDriver()</strong> is the core method to start any Selenium/Appium session. It will create a RemoteWebDriver named "default" based on default capabilities from configuration.</p>
+<blockquote>
 <p>1st call of the method in current thread should start new driver. Next calls will return existing object.</p>
+</blockquote>
 </li>
 <li>
 <p><strong>getDriver(String name)</strong> start named driver session using default capabilities from configuration. That's allow to start several drivers (up to 3 according to <code>max_driver_count</code> property)</p>
@@ -879,9 +855,9 @@ chrome_mobile_emulation_opts=
 <li><strong>restartDriver()</strong> quit the current driver and start a new one with the same capabilities</li>
 <li><strong>restartDriver(boolean isSameDevice)</strong> quit the current driver and start a new one on the same device using <code>uuid</code> capability. It is fully compatible with <a href="https://github.com/zebrunner/mcloud">MCloud</a> farm.</li>
 </ul>
-<h2 id="tricks">Tricks</h2>
-<h3 id="init-pages-and-drivers-in-places-where-they-are-used">Init pages and drivers in places where they are used</h3>
-<p>The correct way:</p>
+<h2 id="faq">F.A.Q.</h2>
+<p><strong>Where is valid place to init drivers and pages?</strong></p>
+<p>Init pages and drivers inside test methods where they actually used. Escape declaring pages and drivers on class level as it produce extra complexity in execution, maintenance and support!</p>
 <pre><code>public class TestSample implements IAbstractTest {
   @Test(){
   public void someTest(){
@@ -895,7 +871,7 @@ chrome_mobile_emulation_opts=
 }
 </code></pre>
 
-<p>An unwanted approach:</p>
+<p>Anti-pattern:</p>
 <pre><code>public class TestSample implements IAbstractTest {
   HomePage homePage = new HomePage(driver);
   WebDriver driver;
