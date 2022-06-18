@@ -783,6 +783,11 @@ R.TESTDATA.get(&quot;user.email&quot;)
         <td>ALL, DEBUG, ERROR, WARN, FATAL, INFO, OFF, TRACE</td>
     </tr>
     <tr>
+        <td>test_run_rules</td>
+        <td>Executing rules logic: test_run_rules={RULE_NAME_ENUM}=&gt;{RULE_VALUE1}&amp;&amp;{RULE_VALUE2};;...</td>
+        <td>test_run_rules=PRIORITY=&gt;P1&amp;&amp;P2&amp;&P4;;OWNER=&gt;owner;;TAGS=&gt;tag1=temp||!!feature=reg</td>
+    </tr>
+    <tr>
         <td>retry_interval</td>
         <td>Timeout interval in <strong>ms</strong> between calling HTML DOM for the element. <strong>Default: 100</strong>. For mobile automation specify in between 500-1000</td>
         <td>Integer</td>
@@ -809,7 +814,7 @@ R.TESTDATA.get(&quot;user.email&quot;)
     </tr>
     <tr>
         <td>max_driver_count</td>
-        <td>Max number of drivers per thread. <strong>Default: 3</strong></td>
+        <td>Max number of <a href="https://zebrunner.github.io/carina/advanced/driver/#initialization">drivers</a> per thread. <strong>Default: 3</strong></td>
         <td>Integer</td>
     </tr>
     <tr>
@@ -824,18 +829,28 @@ R.TESTDATA.get(&quot;user.email&quot;)
     </tr>
     <tr>
         <td>forcibly_disable_driver_quit</td>
-        <td>If enabled turns off webdriver shutdown after test finishing by any reason. <strong>Default: false</strong></td>
+        <td>If enabled turns off webdriver quit based on <a href="https://zebrunner.github.io/carina/advanced/driver/#quit">initizalization phase</a>. <strong>Default: false</strong></td>
         <td>Boolean</td>
     </tr>
     <tr>
         <td>custom_capabilities</td>
-        <td>Path to the properties file with custom key-value capabilities</td>
+        <td>Path to the properties file with custom key-value <a href="https://zebrunner.github.io/carina/advanced/driver/#capabilities">capabilities</a></td>
         <td>browserstack/win/win_10_Edge.properties</td>
     </tr>
     <tr>
         <td>explicit_timeout</td>
         <td>Timeout is seconds to wait for a certain condition to occur before proceeding further in the code</td>
         <td>Integer</td>
+    </tr>
+    <tr>
+        <td>page_opening_strategy</td>
+        <td>Determines how carina detects whether expected <a href="https://zebrunner.github.io/carina/automation/web/#page-opening-strategy">page</a> is opened</td>
+        <td>BY_ELEMENT, BY_URL, BY_URL_AND_ELEMENT</td>
+    </tr>
+    <tr>
+        <td>element_loading_strategy</td>
+        <td>Determines how carina detects appearing of <a href="https://zebrunner.github.io/carina/automation/web/#element-loading-strategy">web elements</a> on page</td>
+        <td>BY_PRESENCE, BY_VISIBILITY, BY_PRESENCE_OR_VISIBILITY</td>
     </tr>
     <tr>
         <td>auto_download</td>
@@ -926,21 +941,6 @@ R.TESTDATA.get(&quot;user.email&quot;)
         <td>tls_keysecure_location</td>
         <td>Path to a directory with tls secure keys</td>
         <td>./tls/keysecure</td>
-    </tr>
-    <tr>
-        <td>test_run_rules</td>
-        <td>Executing rules logic: test_run_rules={RULE_NAME_ENUM}=&gt;{RULE_VALUE1}&amp;&amp;{RULE_VALUE2};;...</td>
-        <td>test_run_rules=PRIORITY=&gt;P1&amp;&amp;P2&amp;&P4;;OWNER=&gt;owner;;TAGS=&gt;tag1=temp||!!feature=reg</td>
-    </tr>
-    <tr>
-        <td>element_loading_strategy</td>
-        <td>Determines how carina detects appearing of web elements on page: by presence in DOM model or by visibility or by any of these conditions</td>
-        <td>BY_PRESENCE, BY_VISIBILITY, BY_PRESENCE_OR_VISIBILITY</td>
-    </tr>
-    <tr>
-        <td>page_opening_strategy</td>
-        <td>Determines how carina detects whether expected page is opened: by expected url pattern, by marker element loading state or by both these conditions</td>
-        <td>BY_ELEMENT, BY_URL, BY_URL_AND_ELEMENT</td>
     </tr>
 </table>
 Most of the properties may be read in the following way:</p>
