@@ -393,36 +393,6 @@ test_run_rules=PRIORITY=>!!P1;;OWNER=>Josh&&!!Jake;;TAGS=>feature=web&&!!type=sm
 #and if they are for not smoke web or if they are for android.
 ```
 
-### [Zebrunner Reporting](https://zebrunner.com/documentation/agents/testng) configuration
-[**agent.properties**](https://github.com/zebrunner/carina-demo/blob/master/src/main/resources/agent.properties) file is used for Zebrunner Reporting integration, here you should specify some values for a proper integration:
-<table>	
-	<tr>
-		<th>Attribute</th>
-		<th>Meaning</th>
-		<th>Example</th>
-	</tr>
-	<tr>
-		<td>reporting.enabled</td>
-		<td>Root switch</td>
-		<td>true/false</td>
-	</tr>
-	<tr>
-		<td>reporting.server.hostname</td>
-		<td>Service URL</td>
-		<td>https://mycompany.zebrunner.com</td>
-	</tr>
-	<tr>
-		<td>reporting.server.access-token</td>
-		<td>Access Token</td>
-		<td>eyJhbGciOiJIUzUxMiJ9...</td>
-	</tr>
-	<tr>
-		<td>reporting.projectKey</td>
-		<td>Project Name</td>
-		<td>empty or any existing name</td>
-	</tr>
-</table>
-
 ###F.A.Q.
 1. Where is recommended place to declare configuration parameters?
    Declare default parameters in _config.properties. For multi-maven projects you can use extra "_" to override default settings on new layer `__config.properties`, `___config.properties` etc
@@ -430,8 +400,6 @@ test_run_rules=PRIORITY=>!!P1;;OWNER=>Josh&&!!Jake;;TAGS=>feature=web&&!!type=sm
    Use `R.CONFIG.put("selenium_url", "http://new_host:4444/wd/hub");` to override parameter globally for the rest of tests or `R.CONFIG.put("selenium_url", "http://localhost:4444/wd/hub", true);` to override for current test only.
 3. Can I use `R` class to get/put other parameters (testdata, api, database etc)? 
    Use such notation to access other parameters: `R.TESTDATA.get("myParam"), `R.DATABASE.put("db.driver", "org.postgresql.Driver")` etc
-4. Can I return non string param values?
-   Primitives type values might be returned using `getInt, getLong, getDouble and getBoolean` methods
 5. Crypted values are returned in encrypted format. How can I decrypt them?
    Use `R.CONFIG.getDecrypted(String key)` method to read decrypted value. 
    > You should have valid crypto key to be able to decrypt values, for details visit [Security](https://zebrunner.github.io/carina/advanced/security/)
