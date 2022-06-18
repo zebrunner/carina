@@ -1071,29 +1071,24 @@ test_run_rules=PRIORITY=&gt;!!P1;;OWNER=&gt;Josh&amp;&amp;!!Jake;;TAGS=&gt;featu
 </code></pre>
 
 <h3 id="faq">F.A.Q.</h3>
-<ol>
-<li>Where is recommended place to declare configuration parameters?</li>
-</ol>
-<p>Declare default parameters in _config.properties. For multi-maven projects you can use extra underscore symbol to override default settings on new layer <code>__config.properties</code>, <code>___config.properties</code> etc</p>
-<ol>
-<li>How to override params from the code?</li>
-</ol>
-<p>Put method might be used to override parameters globally or for current test only</p>
-<p><code>R.CONFIG.put("selenium_url", "http://host1:4444/wd/hub"); //override selenium_url globally for the rest of tests
-   R.CONFIG.put("selenium_url", "http://host2:4444/wd/hub", true); // override selenium_url for current test only
-   R.DATABASE.put("db.driver", "org.postgresql.Driver") //override db.driver in_database.properties globally</code></p>
-<ol>
-<li>Crypted values are returned in encrypted format. How can I decrypt them?</li>
-</ol>
-<p>Use <code>R.CONFIG.getDecrypted(String key)</code> method to read decrypted value. </p>
+<p>1) Where is recommended place to declare configuration parameters?
+Declare default parameters in _config.properties. For multi-maven projects you can use extra underscore symbol to override default settings on new layer <code>__config.properties</code>, <code>___config.properties</code> etc
+2) How to override params from the code?
+Put method might be used to override parameters globally or for current test only</p>
+<pre><code>R.CONFIG.put(&quot;selenium_url&quot;, &quot;http://host1:4444/wd/hub&quot;); //override selenium_url globally for the rest of tests
+R.CONFIG.put(&quot;selenium_url&quot;, &quot;http://host2:4444/wd/hub&quot;, true); // override selenium_url for current test only
+R.DATABASE.put(&quot;db.driver&quot;, &quot;org.postgresql.Driver&quot;) //override db.driver in_database.properties globally
+</code></pre>
+
+<p>3) Crypted values are returned in encrypted format. How can I decrypt them?
+Use <code>R.CONFIG.getDecrypted(String key)</code> method to read decrypted value. </p>
 <blockquote>
-<p>You should have valid crypto key to be able to decrypt values, for details visit <a href="https://zebrunner.github.io/carina/advanced/security/">Security</a></p>
+<p>You should have valid crypto key to be able to decrypt values, for details visit <a href="https://zebrunner.github.io/carina/advanced/security/">Security</a>
+4) Can I override configuration parameters from CI?
+Provide updated values via System Properties to override value, for example:</p>
 </blockquote>
-<ol>
-<li>Can I override configuration parameters from CI?</li>
-</ol>
-<p>Provide updated values via System Properties to override value, for example:</p>
-<p><code>mvn -Denv=PROD ...`</code></p>
+<pre><code>mvn -Denv=PROD ...`
+</code></pre>
 
               
             </article>
