@@ -8,8 +8,7 @@ Supported Browsers: Chrome, Firefox, Internet Explorer, Microsoft Edge, Opera, S
 ##Initialization
 
 * **getDriver()** is the core method to start any Selenium/Appium session. It will create a RemoteWebDriver named "default" based on default capabilities from configuration.
-
-    1st call of the method in current thread should start new driver. Next calls will return existing object.
+  > 1st call of the method in current thread should start new driver. Next calls will return existing object.
 
 * **getDriver(String name)** start named driver session using default capabilities from configuration. That's allow to start several drivers (up to 3 according to `max_driver_count` property)
 
@@ -112,9 +111,11 @@ To disable driver quit strategy completely and cotrol drivers init/quit on your 
 ##Restart
 * **restartDriver()** quit the current driver and start a new one with the same capabilities
 * **restartDriver(boolean isSameDevice)** quit the current driver and start a new one on the same device using `uuid` capability. It is fully compatible with [MCloud](https://github.com/zebrunner/mcloud) farm.
-##Tricks
-###Init pages and drivers in places where they are used
-The correct way:
+
+##F.A.Q.
+**Where is valid place to init drivers and pages?**
+
+Init pages and drivers inside test methods where they actually used. Escape declaring pages and drivers on class level as it produce extra complexity in execution, maintenance and support!
 ```
 public class TestSample implements IAbstractTest {
   @Test(){
@@ -128,7 +129,8 @@ public class TestSample implements IAbstractTest {
   }
 }
 ```
-An unwanted approach:
+
+Anti-pattern:
 ```
 public class TestSample implements IAbstractTest {
   HomePage homePage = new HomePage(driver);
