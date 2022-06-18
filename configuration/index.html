@@ -724,12 +724,12 @@ R.TESTDATA.get(&quot;user.email&quot;)
     </tr>
     <tr>
         <td>headless</td>
-        <td>Run tests in headless browser mode. Default: <strong>false</strong></td>
+        <td>Run tests in headless browser mode. <strong>Default: false</strong></td>
         <td>Boolean</td>
     </tr>
     <tr>
         <td>browser_language</td>
-        <td>Browser language. Default <strong>NULL</strong> to use default browser language.</td>
+        <td>Browser language. <strong>Default: NULL</strong> to use default browser language.</td>
         <td>"es", "fr"</td>
     </tr>
     <tr>
@@ -749,22 +749,22 @@ R.TESTDATA.get(&quot;user.email&quot;)
     </tr>
     <tr>
         <td>retry_interval</td>
-        <td>Timeout interval between calling HTML DOM for the element. Default: <strong>100</strong>ms. For mobile automation specify in between 500-1000</td>
+        <td>Timeout interval in <strong>ms</strong> between calling HTML DOM for the element. <strong>Default: 100</strong>. For mobile automation specify in between 500-1000</td>
         <td>Integer</td>
     </tr>
     <tr>
         <td>auto_screenshot</td>
-        <td>Global switch for taking screenshots. When disabled, screenshots will be captured only after failures. Default: <strong>true</strong>. </td>
+        <td>Global switch for taking screenshots. When disabled, screenshots will be captured only after failures. <strong>Default: true</strong>. </td>
         <td>Boolean</td>
     </tr>
     <tr>
         <td>allow_fullsize_screenshot</td>
-        <td>Global switch for allowing full size screenshots on failures. Default: <strong>false</strong></td>
+        <td>Global switch for allowing full size screenshots on failures. <strong>Default: false</strong></td>
         <td>Boolean</td>
     </tr>
     <tr>
         <td>max_screen_history</td>
-        <td>Max number of reports artifacts saving in history. Default: <strong>10</strong></td>
+        <td>Max number of reports artifacts saving in history. <strong>Default: 10</strong></td>
         <td>Integer</td>
     </tr>
     <tr>
@@ -774,7 +774,7 @@ R.TESTDATA.get(&quot;user.email&quot;)
     </tr>
     <tr>
         <td>ignore_ssl</td>
-        <td>API requests/responses to ignore SSL errors. Default: <strong>false</strong></td>
+        <td>API requests/responses to ignore SSL errors. <strong>Default: false</strong></td>
         <td>Boolean</td>
     </tr>
     <tr>
@@ -784,12 +784,12 @@ R.TESTDATA.get(&quot;user.email&quot;)
     </tr>
     <tr>
         <td>max_driver_count</td>
-        <td>Max number of drivers per thread. Default: <strong>3</strong></td>
+        <td>Max number of drivers per thread. <strong>Default: 3</strong></td>
         <td>Integer</td>
     </tr>
     <tr>
         <td>forcibly_disable_driver_quit</td>
-        <td>If enabled turns off webdriver shutdown after test finishing by any reason. Default: <strong>false</strong></td>
+        <td>If enabled turns off webdriver shutdown after test finishing by any reason. <strong>Default: false</strong></td>
         <td>Boolean</td>
     </tr>
     <tr>
@@ -844,12 +844,12 @@ R.TESTDATA.get(&quot;user.email&quot;)
     </tr>
     <tr>
         <td>auto_download</td>
-        <td>The enabled parameter prevents downloading dialog and downloading a file automatically into the test artifact folder. The feature is supported for Chrome and Firefox. Default: <strong>false</strong></td>
+        <td>The enabled parameter prevents downloading dialog and downloading a file automatically into the test artifact folder. The feature is supported for Chrome and Firefox. <strong>Default: false</strong></td>
         <td>false, true</td>
     </tr>
     <tr>
         <td>custom_artifacts_folder</td>
-        <td>Custom unified path for auto downloaded artifacts for all tests. Default: <strong>NULL</strong> to download into the unique test artifacts location.</td>
+        <td>Custom unified path for auto downloaded artifacts for all tests. <strong>Default: NULL</strong> to download into the unique test artifacts location.</td>
         <td>String</td>
     </tr>
     <tr>
@@ -864,16 +864,16 @@ R.TESTDATA.get(&quot;user.email&quot;)
     </tr>
     <tr>
         <td>big_screen_width</td>
-        <td>Screenshots will be resized according to this width if their own width is bigger. Default: <strong>-1</strong> to keep existing size.</td>
+        <td>Screenshots will be resized according to this width if their own width is bigger. <strong>Default: -1</strong> to keep existing size.</td>
         <td>Integer</td>
     </tr>
     <tr>
         <td>big_screen_height</td>
-        <td>Screenshots will be resized according to this height if their own height is bigger. Default: <strong>-1</strong> to keep existing size.</td>
+        <td>Screenshots will be resized according to this height if their own height is bigger. <strong>Default: -1</strong> to keep existing size.</td>
         <td>Integer</td>
     <tr>
         <td>init_retry_count</td>
-        <td>Number of extra attempts to create a driver. Default: <strong>0</strong> means that there will no extra attempts.</td>
+        <td>Number of extra attempts to create a driver. <strong>Default: 0</strong> means that there will no extra attempts.</td>
         <td>Integer</td>
     </tr>
     <tr>
@@ -883,27 +883,27 @@ R.TESTDATA.get(&quot;user.email&quot;)
     </tr>
     <tr>
         <td>retry_count</td>
-        <td>Number of test-retryings in case of failure. Default <strong>0</strong> means that a test will be performed only once</td>
+        <td>Number of test-retryings in case of failure. <strong>Default: 0</strong> means that a test will be performed only once</td>
         <td>Integer</td>
     </tr>
         <tr>
         <td>thread_count</td>
-        <td>Default number of threads to use when running tests in parallel. Set <code>thread_count=custom</code> to disable any updates on carina side.</td>
+        <td>Number of threads to use when running tests in parallel. Set <code>thread_count=custom</code> to disable any updates on carina side.</td>
         <td>Integer</td>
     </tr>
         <tr>
         <td>data_provider_thread_count</td>
-        <td>Default number of threads to use for data providers when running tests in parallel.</td>
+        <td>Number of threads to use for data providers when running tests in parallel.</td>
         <td>Integer</td>
     </tr>
         <tr>
         <td>core_log_level</td>
-        <td>Level for Carina logging. Default <strong>INFO</strong></td>
+        <td>Level for Carina logging. <strong>Default: INFO</strong></td>
         <td>ALL, DEBUG, ERROR, WARN, FATAL, INFO, OFF, TRACE</td>
     </tr>
         <tr>
         <td>log_all_json</td>
-        <td>API response will be logged in JSON format. Default: <strong>true</strong></td>
+        <td>API response will be logged in JSON format. <strong>Default: true</strong></td>
         <td>Boolean</td>
     </tr>
         <tr>
@@ -1002,7 +1002,7 @@ PROD.url=http://prod-app-server.com
 <p>As a result, you switch between the environments just changing the env argument in the <strong>_config.properties</strong> file.</p>
 <h3 id="tests-execution-filter-configuration">Tests execution filter configuration</h3>
 <p>The <code>test_run_rules</code> parameter is responsible for filtering tests.
-There are 3 filter types:
+There are 3 filter types:<br>
 1) <strong>PRIORITY</strong> - enum field (from P0 to P6)<br>
 2) <strong>OWNER</strong> - the test owner<br>
 3) <strong>TAGS</strong> - custom label<br></p>
