@@ -220,7 +220,6 @@ public class EmailReportGenerator {
         int failed = 0;
         int failedKnownIssue = 0;
         int skipped = 0;
-        int skipped_already_passed = 0;
 
         for (TestResultItem ri : ris) {
             if (ri.isConfig()) {
@@ -237,23 +236,16 @@ public class EmailReportGenerator {
             case SKIP:
                 skipped++;
                 break;
-            case SKIP_ALL:
-                // do nothing
-                break;
             default:
                 // do nothing
                 break;
             }
         }
         TestResultType result;
-        if (passed == 0 && failed == 0 && skipped == 0 && skipped_already_passed > 0) {
-            result = TestResultType.SKIP_ALL_ALREADY_PASSED; // it was re-run of the suite where all tests passed during previous run
-        } else if (passed > 0 && failedKnownIssue == 0 && failed == 0 && skipped == 0) {
+        if (passed > 0 && failedKnownIssue == 0 && failed == 0 && skipped == 0) {
             result = TestResultType.PASS;
         } else if (passed >= 0 && failedKnownIssue > 0 && failed == 0 && skipped == 0) {
             result = TestResultType.PASS_WITH_KNOWN_ISSUES;
-        } else if (passed == 0 && failed == 0 && skipped > 0) {
-            result = TestResultType.SKIP_ALL;
         } else if (passed >= 0 && failed == 0 && skipped > 0) {
             result = TestResultType.SKIP;
         } else {
