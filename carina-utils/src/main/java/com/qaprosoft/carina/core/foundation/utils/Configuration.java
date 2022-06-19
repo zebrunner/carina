@@ -149,6 +149,8 @@ public class Configuration {
         
         // Amazon
         S3_BUCKET_NAME("s3_bucket_name"),
+        
+        S3_REGION("s3_region"),
 
         ACCESS_KEY_ID("access_key_id"),
 
@@ -169,7 +171,6 @@ public class Configuration {
         APPCENTER_TOKEN("appcenter_token"),
 
         // For localization parser
-
         LOCALIZATION_ENCODING("localization_encoding"),
 
         LOCALIZATION_TESTING("localization_testing"),

@@ -27,10 +27,12 @@ import org.slf4j.LoggerFactory;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.HttpMethod;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
-import com.amazonaws.auth.SystemPropertiesCredentialsProvider;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.GetObjectRequest;
@@ -58,16 +60,26 @@ public class AmazonS3Manager {
     public synchronized static AmazonS3Manager getInstance() {
         if (instance == null) {
             instance = new AmazonS3Manager();
+            
             CryptoTool cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
             Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
-                    
+
+            AmazonS3ClientBuilder builder = AmazonS3ClientBuilder.standard();
+            
             String accessKey = cryptoTool.decryptByPattern(Configuration.get(Parameter.ACCESS_KEY_ID), CRYPTO_PATTERN);
             String secretKey = cryptoTool.decryptByPattern(Configuration.get(Parameter.SECRET_KEY), CRYPTO_PATTERN);
-
-            System.setProperty("aws.accessKeyId", accessKey);
-            System.setProperty("aws.secretKey", secretKey);
-
-            s3client = new AmazonS3Client(new SystemPropertiesCredentialsProvider());
+            if (!accessKey.isEmpty() && !secretKey.isEmpty()) {
+                BasicAWSCredentials creds = new BasicAWSCredentials(accessKey, secretKey);
+                builder.withCredentials(new AWSStaticCredentialsProvider(creds)).build();
+            }
+            
+            String s3region = Configuration.get(Parameter.S3_REGION);
+            if (!s3region.isEmpty()) {
+                builder.withRegion(Regions.fromName(s3region));
+            }
+            
+            s3client = builder.build();
+            
         }
         return instance;
     }
