@@ -816,7 +816,7 @@ public void desiredCapsTest() {
 </code></pre>
 
 <h3 id="capabilities">Capabilities</h3>
-<p>Simple key value Selenium/Appium pairs can be provided in <code>_config.properties</code> using <code>capabilities.name=value</code> , for example:</p>
+<p>Primitive Selenium/Appium capabilities can be provided in <code>_config.properties</code> using <code>capabilities.name=value</code>:</p>
 <pre><code>capabilities.automationName=uiautomator2
 capabilities.deviceName=Samsung_Galaxy_S10
 capabilities.platformName=ANDROID
@@ -824,7 +824,35 @@ capabilities.app=https://qaprosoft.s3-us-west-2.amazonaws.com/carinademoexample.
 capabilities.newCommandTimeout=180
 </code></pre>
 
-<p>Visit <a href="https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities">selenium</a> or <a href="https://appium.io/docs/en/writing-running-appium/caps/">appium</a> to see all capabilities.</p>
+<p>Visit <a href="https://www.selenium.dev/documentation/legacy/desired_capabilities/">selenium</a> or <a href="https://appium.io/docs/en/writing-running-appium/caps/">appium</a> to see all capabilities.</p>
+<p>Most popular capabilities sets might be declared in properties files and reused via <code>custom_capabilities</code> configuration parameter.
+It might be convenient for external hub providers like Zebrunner Device Farm, BrowserStack, SauceLabs etc
+1. Collect device/browser specific capabilities and put into <code>src/main/resources/browserstack-iphone_12.properties</code>:</p>
+<pre><code>capabilities.realMobile=true
+capabilities.platformName=iOS
+capabilities.deviceName=iPhone 12
+capabilities.osVersion=14
+
+#capabilities.app=bs://444bd0308813ae0dc236f8cd461c02d3afa7901d
+#capabilities.browserstack.local=false
+#capabilities.appiumVersion=1.20.2
+#capabilities.deviceOrientation=portrait
+</code></pre>
+
+<ol>
+<li>Put into the <strong>_config.properties</strong> <code>custom_capabilities=browserstack-iphone_12.properties</code> to start all tests on this device</li>
+<li>Or use <code>CapabilitiesLoader</code> to manage capabilities at run-time:</li>
+</ol>
+<pre><code>// Update default capabilities globally to start future drivers **for all tests** on iPhone_12 
+new CapabilitiesLoader().loadCapabilities(&quot;browserstack-iphone_12.properties&quot;);
+
+// Update default capabilities to start future drivers **for this test only** on iPhone_12 
+new CapabilitiesLoader().loadCapabilities(&quot;browserstack-iphone_12.properties&quot;, true);
+
+// start new driver with generated capabilities from properties file:
+ WebDriver drv = getDriver(&quot;iPhone12&quot;, new CapabilitiesLoader().getCapabilities(&quot;browserstack-iphone_12.properties&quot;))
+</code></pre>
+
 <h3 id="options">Options</h3>
 <p>Options and arguments could be provided through <code>_config.properties</code> using comma separated values for multiple options/args, for example:</p>
 <pre><code>firefox_args=--no-first-run,--disable-notifications
