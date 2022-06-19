@@ -24,9 +24,7 @@ public enum TestResultType {
     PASS("PASSED"),
     PASS_WITH_KNOWN_ISSUES("PASSED (known issues)"),
     FAIL("FAILED"),
-    SKIP("SKIPPED"),
-    SKIP_ALL("SKIP_ALL"),
-    SKIP_ALL_ALREADY_PASSED("SKIP_ALL_ALREADY_PASSED");
+    SKIP("SKIPPED");
 
     private String result;
 

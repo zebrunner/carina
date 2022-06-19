@@ -41,7 +41,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.Assert;
 import org.testng.IClassListener;
 import org.testng.ISuite;
 import org.testng.ISuiteListener;
@@ -410,18 +409,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
             printExecutionSummary(EmailReportItemCollector.getTestResults());
 
-            TestResultType suiteResult = EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
-            switch (suiteResult) {
-            case SKIP_ALL:
-                Assert.fail("All tests were skipped! Analyze logs to determine possible configuration issues.");
-                break;
-            case SKIP_ALL_ALREADY_PASSED:
-                LOGGER.info(
-                        "Nothing was executed in rerun mode because all tests already passed and registered in Zafira Repoting Service!");
-                break;
-            default:
-                // do nothing
-            }
             LOGGER.debug("Finish email report generation.");
 
         } catch (Exception e) {
