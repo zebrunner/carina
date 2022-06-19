@@ -526,19 +526,19 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         
         String mobileAppPath = Configuration.getMobileApp();
         Matcher matcher = S3_BUCKET_PATTERN.matcher(mobileAppPath);
-        LOGGER.info("Analyzing if mobile app is located on S3...");
+        LOGGER.debug("Analyzing if mobile app is located on S3...");
         if (matcher.find()) {
             mobileAppPath = updateS3AppPath(mobileAppPath);
         }
 
         matcher = AZURE_CONTAINER_PATTERN.matcher(mobileAppPath);
-        LOGGER.info("Analyzing if mobile app is located on Azure...");
+        LOGGER.debug("Analyzing if mobile app is located on Azure...");
         if (matcher.find()) {
             mobileAppPath = updateAzureAppPath(mobileAppPath);
         }
         
         matcher = APPCENTER_PATTERN.matcher(mobileAppPath);
-        LOGGER.info("Analyzing if mobile_app is located on AppCenter...");
+        LOGGER.debug("Analyzing if mobile_app is located on AppCenter...");
         if (matcher.find()) {
             mobileAppPath = updateAppCenterAppPath(mobileAppPath);
         }
