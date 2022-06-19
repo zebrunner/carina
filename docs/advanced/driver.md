@@ -69,30 +69,20 @@ Visit [selenium](https://www.selenium.dev/documentation/legacy/desired_capabilit
 Most popular capabilities sets might be declared in properties files and reused via `custom_capabilities` configuration parameter.
 It might be convenient for external hub providers like Zebrunner Device Farm, BrowserStack, SauceLabs etc
 
-1. Collect device/browser specific capabilities and put into `src/main/resources/browserstack-iphone_12.properties`:
-   ```
-   capabilities.realMobile=true
-   capabilities.platformName=iOS
-   capabilities.deviceName=iPhone 12
-   capabilities.osVersion=14
-   #capabilities.app=bs://444bd0308813ae0dc236f8cd461c02d3afa7901d
-   #capabilities.browserstack.local=false
-   #capabilities.appiumVersion=1.20.2
-   #capabilities.deviceOrientation=portrait
-   ```
+Collect device/browser specific capabilities and put into `src/main/resources/browserstack-iphone_12.properties`:
 
-2. Put into the **_config.properties** `custom_capabilities=browserstack-iphone_12.properties` to start all tests on this device
-3. Or use `CapabilitiesLoader` to manage capabilities at run-time:
-   ```
-   // Update default capabilities globally to start future drivers **for all tests** on iPhone_12 
-   new CapabilitiesLoader().loadCapabilities("browserstack-iphone_12.properties");
-   
-   // Update default capabilities to start future drivers **for this test only** on iPhone_12 
-   new CapabilitiesLoader().loadCapabilities("browserstack-iphone_12.properties", true);
-   
-   // start new driver with generated capabilities from properties file:
-    WebDriver drv = getDriver("iPhone12", new CapabilitiesLoader().getCapabilities("browserstack-iphone_12.properties"))
-   ```
+```
+capabilities.realMobile=true
+capabilities.platformName=iOS
+capabilities.deviceName=iPhone 12
+capabilities.osVersion=14
+#capabilities.app=bs://444bd0308813ae0dc236f8cd461c02d3afa7901d
+#capabilities.browserstack.local=false
+#capabilities.appiumVersion=1.20.2
+#capabilities.deviceOrientation=portrait
+```
+
+Put into the **_config.properties** `custom_capabilities=browserstack-iphone_12.properties` to start all tests on this device.
 
 ###Options 
 
@@ -184,3 +174,18 @@ public class TestSample implements IAbstractTest {
 
 Initialization of drivers and pages on static layer is prohibited. CarinaListener not even intergated yet on compilation stage. For details visit [#1550](https://github.com/zebrunner/carina/issues/1550).
 The earliest stage you can start driver is `@BeforeSuite()`.
+
+** How to start different tests on different devices?**
+
+Start driver with custom DesiredCapabilities to launch on different device. Also you can use `CapabilitiesLoader` to manage capabilities at run-time:
+
+```
+// Update default capabilities globally to start future drivers **for all tests** on iPhone_12 
+new CapabilitiesLoader().loadCapabilities("browserstack-iphone_12.properties");
+
+// Update default capabilities to start future drivers **for this test only** on iPhone_12 
+new CapabilitiesLoader().loadCapabilities("browserstack-iphone_12.properties", true);
+
+// start new driver with generated capabilities from properties file:
+WebDriver drv = getDriver("iPhone12", new CapabilitiesLoader().getCapabilities("browserstack-iphone_12.properties"))
+```
