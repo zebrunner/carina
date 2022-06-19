@@ -502,22 +502,27 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         }
     }
 
+    @Deprecated
     protected void putS3Artifact(String key, String path) {
         AmazonS3Manager.getInstance().put(Configuration.get(Parameter.S3_BUCKET_NAME), key, path);
     }
 
+    @Deprecated
     protected S3Object getS3Artifact(String bucket, String key) {
         return AmazonS3Manager.getInstance().get(Configuration.get(Parameter.S3_BUCKET_NAME), key);
     }
 
+    @Deprecated
     protected S3Object getS3Artifact(String key) {
         return getS3Artifact(Configuration.get(Parameter.S3_BUCKET_NAME), key);
     }
 
+    @Deprecated
     protected void putAzureArtifact(String remotePath, String localPath) {
         AzureManager.getInstance().put(Configuration.get(Parameter.AZURE_CONTAINER_NAME), remotePath, localPath);
     }
 
+    @Deprecated
     protected void getAzureArtifact(String bucket, String remotePath, File localPath) {
         AzureManager.getInstance().download(bucket, remotePath, localPath);
     }
