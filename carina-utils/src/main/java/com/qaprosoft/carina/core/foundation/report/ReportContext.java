@@ -51,6 +51,7 @@ import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -411,6 +412,33 @@ public class ReportContext {
         return matcher.find() ? matcher.group(position) : "";
 
     }
+    
+    /**
+     * Generate file in artifacts location and register in Zebrunner Reporting
+     * 
+     * @param name String
+     * @param source InputStream
+     */    
+    public static void saveArtifact(String name, InputStream source) throws IOException {
+        File artifact = new File(String.format("%s/%s", getArtifactsFolder(), name));
+        artifact.createNewFile();
+        FileUtils.writeByteArrayToFile(artifact, IOUtils.toByteArray(source));
+        
+        Artifact.attachToTest(name, IOUtils.toByteArray(source));
+    }
+
+    /**
+     * Copy file into artifacts location and register in Zebrunner Reporting
+     * @param source File
+     */    
+
+    public static void saveArtifact(File source) throws IOException {
+        File artifact = new File(String.format("%s/%s", getArtifactsFolder(), source.getName()));
+        artifact.createNewFile();
+        FileUtils.copyFile(source, artifact);
+        
+        Artifact.attachToTest(source.getName(), artifact);
+    }    
 
     /**
      * generate url for artifact by name
