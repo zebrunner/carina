@@ -55,7 +55,7 @@ public void desiredCapsTest() {
 
 ###Capabilities 
 
-Simple key value Selenium/Appium pairs can be provided in `_config.properties` using `capabilities.name=value` , for example:
+Primitive Selenium/Appium capabilities can be provided in `_config.properties` using `capabilities.name=value`:
 ```
 capabilities.automationName=uiautomator2
 capabilities.deviceName=Samsung_Galaxy_S10
@@ -64,7 +64,35 @@ capabilities.app=https://qaprosoft.s3-us-west-2.amazonaws.com/carinademoexample.
 capabilities.newCommandTimeout=180
 ```
 
-Visit [selenium](https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities) or [appium](https://appium.io/docs/en/writing-running-appium/caps/) to see all capabilities.
+Visit [selenium](https://www.selenium.dev/documentation/legacy/desired_capabilities/) or [appium](https://appium.io/docs/en/writing-running-appium/caps/) to see all capabilities.
+
+Most popular capabilities sets might be declared in properties files and reused via `custom_capabilities` configuration parameter.
+It might be convenient for external hub providers like Zebrunner Device Farm, BrowserStack, SauceLabs etc
+1. Collect device/browser specific capabilities and put into `src/main/resources/browserstack-iphone_12.properties`:
+```
+capabilities.realMobile=true
+capabilities.platformName=iOS
+capabilities.deviceName=iPhone 12
+capabilities.osVersion=14
+
+#capabilities.app=bs://444bd0308813ae0dc236f8cd461c02d3afa7901d
+#capabilities.browserstack.local=false
+#capabilities.appiumVersion=1.20.2
+#capabilities.deviceOrientation=portrait
+```
+
+2. Put into the **_config.properties** `custom_capabilities=browserstack-iphone_12.properties` to start all tests on this device
+3. Or use `CapabilitiesLoader` to manage capabilities at run-time:
+```
+// Update default capabilities globally to start future drivers **for all tests** on iPhone_12 
+new CapabilitiesLoader().loadCapabilities("browserstack-iphone_12.properties");
+
+// Update default capabilities to start future drivers **for this test only** on iPhone_12 
+new CapabilitiesLoader().loadCapabilities("browserstack-iphone_12.properties", true);
+
+// start new driver with generated capabilities from properties file:
+ WebDriver drv = getDriver("iPhone12", new CapabilitiesLoader().getCapabilities("browserstack-iphone_12.properties"))
+```
 
 ###Options 
 
