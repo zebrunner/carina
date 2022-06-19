@@ -113,6 +113,13 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     protected static boolean automaticDriversCleanup = true;
     
     protected boolean isRunLabelsRegistered = false;
+    
+    
+    private static final Pattern S3_BUCKET_PATTERN = Pattern.compile("s3:\\/\\/([a-zA-Z-0-9][^\\/]*)\\/(.*)");
+    private static final Pattern AZURE_CONTAINER_PATTERN = Pattern.compile("\\/\\/([a-z0-9]{3,24})\\.blob.core.windows.net\\/(?:(\\$root|(?:[a-z0-9](?!.*--)[a-z0-9-]{1,61}[a-z0-9]))\\/)?(.{1,1024})");
+    // appcenter://appName/platformName/buildType/version
+    private static final Pattern APPCENTER_PATTERN = Pattern.compile(
+            "appcenter:\\/\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)");
 
     public CarinaListener() {
         // Add shutdown hook
@@ -516,31 +523,34 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     }
 
     private static void updateAppPath() {
-        if (!Configuration.get(Parameter.AZURE_ACCESS_KEY_TOKEN).isEmpty()) {
-            updateAzureAppPath();
+        
+        String mobileAppPath = Configuration.getMobileApp();
+        Matcher matcher = S3_BUCKET_PATTERN.matcher(mobileAppPath);
+        LOGGER.info("Analyzing if mobile app is located on S3...");
+        if (matcher.find()) {
+            mobileAppPath = updateS3AppPath(mobileAppPath);
         }
 
-        if (!Configuration.get(Parameter.APPCENTER_TOKEN).isEmpty()) {
-            updateAppCenterAppPath();
+        matcher = AZURE_CONTAINER_PATTERN.matcher(mobileAppPath);
+        LOGGER.info("Analyzing if mobile app is located on Azure...");
+        if (matcher.find()) {
+            mobileAppPath = updateAzureAppPath(mobileAppPath);
         }
-
-        // AWS S3 is preferable and has higher priority
-        if (!Configuration.get(Parameter.ACCESS_KEY_ID).isEmpty()) {
-            updateS3AppPath();
+        
+        matcher = APPCENTER_PATTERN.matcher(mobileAppPath);
+        LOGGER.info("Analyzing if mobile_app is located on AppCenter...");
+        if (matcher.find()) {
+            mobileAppPath = updateAppCenterAppPath(mobileAppPath);
         }
+        
+        Configuration.setMobileApp(mobileAppPath);
     }
 
     /**
      * Method to update MOBILE_APP path in case if apk is located in Hockey App.
      */
-    private static void updateAppCenterAppPath() {
-        // appcenter://appName/platformName/buildType/version
-        Pattern APPCENTER_PATTERN = Pattern.compile(
-                "appcenter:\\/\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)");
-        String mobileAppPath = Configuration.getMobileApp();
+    private static String updateAppCenterAppPath(String mobileAppPath) {
         Matcher matcher = APPCENTER_PATTERN.matcher(mobileAppPath);
-
-        LOGGER.info("Analyzing if mobile_app is located on AppCenter...");
         if (matcher.find()) {
             LOGGER.info("app artifact is located on AppCenter...");
             String appName = matcher.group(1);
@@ -549,25 +559,22 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             String version = matcher.group(4);
 
             //TODO: test if generated appcenter download url is valid
-            String presignedAppUrl = AppCenterManager.getInstance().getDownloadUrl(appName, platformName, buildType,
+            mobileAppPath = AppCenterManager.getInstance().getDownloadUrl(appName, platformName, buildType,
                     version);
 
-            Configuration.setMobileApp(presignedAppUrl);
-
+        } else {
+            LOGGER.error("Unable to parse '{}' path using AppCenter pattern", mobileAppPath);
         }
+        return mobileAppPath;
     }
 
     /**
      * Method to update MOBILE_APP path in case if apk is located in s3 bucket.
      */
-    private static void updateS3AppPath() {
-        Pattern S3_BUCKET_PATTERN = Pattern.compile("s3:\\/\\/([a-zA-Z-0-9][^\\/]*)\\/(.*)");
+    private static String updateS3AppPath(String mobileAppPath) {
         // get app path to be sure that we need(do not need) to download app
         // from s3 bucket
-        String mobileAppPath = Configuration.getMobileApp();
         Matcher matcher = S3_BUCKET_PATTERN.matcher(mobileAppPath);
-
-        LOGGER.info("Analyzing if mobile app is located on S3...");
         if (matcher.find()) {
             LOGGER.info("app artifact is located on s3...");
             String bucketName = matcher.group(1);
@@ -594,22 +601,19 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
             // generate presign url explicitly to register link as run artifact
             long hours = 72L*1000*60*60; // generate presigned url for nearest 3 days
-            String presignedAppUrl = AmazonS3Manager.getInstance().generatePreSignUrl(bucketName, key, hours).toString();
-            Configuration.setMobileApp(presignedAppUrl);
+            mobileAppPath = AmazonS3Manager.getInstance().generatePreSignUrl(bucketName, key, hours).toString();
+        } else {
+            LOGGER.error("Unable to parse '{}' path using S3 pattern", mobileAppPath);
         }
+        
+        return mobileAppPath;
     }
 
     /**
      * Method to update MOBILE_APP path in case if apk is located in Azure storage.
      */
-    private static void updateAzureAppPath() {
-        Pattern AZURE_CONTAINER_PATTERN = Pattern.compile("\\/\\/([a-z0-9]{3,24})\\.blob.core.windows.net\\/(?:(\\$root|(?:[a-z0-9](?!.*--)[a-z0-9-]{1,61}[a-z0-9]))\\/)?(.{1,1024})");
-
-        String mobileAppPath = Configuration.getMobileApp();
+    private static String updateAzureAppPath(String mobileAppPath) {
         Matcher matcher = AZURE_CONTAINER_PATTERN.matcher(mobileAppPath);
-
-        LOGGER.info("Analyzing if mobile app is located on Azure...");
-
         if (matcher.find()) {
             LOGGER.info("app artifact is located on Azure...");
             String accountName = matcher.group(1);
@@ -646,14 +650,18 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 LOGGER.error("Azure app path update exception detected!", exception);
             }
 
-            Configuration.setMobileApp(file.getAbsolutePath());
+            mobileAppPath = file.getAbsolutePath();
 
             // try to redefine app_version if it's value is latest or empty
             String appVersion = Configuration.get(Parameter.APP_VERSION);
             if (appVersion.equals("latest") || appVersion.isEmpty()) {
                 Configuration.setBuild(file.getName());
             }
+        } else {
+            LOGGER.error("Unable to parse '{}' path using Azure pattern", mobileAppPath);
         }
+        
+        return mobileAppPath;
     }
 
     protected void skipExecution(String message) {
