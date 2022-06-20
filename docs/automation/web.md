@@ -340,19 +340,19 @@ component.assertUIObjectNotPresent();
 > Dynamic elements loading. 
 **waitForJSToLoad()** method was introduced in AbstractPage class. It uses JS under the hood and helps to wait till all the dynamic web elements on the page are loaded.
 
-###F.A.Q.
+###FAQ
 **What's the benefits of the AbstractUIObject?**
 
 The biggest advantage of AbstractUIObject(s) is that you have single place of truth to declare elements and later can change updated locator in one place.
-That's allow also significantly speedup all kind of refactoring especially after significant changes by developers:)
+That's allowed also significantly speedup all kinds of refactoring, especially after significant changes by developers:)
  
 **Is it possible to automate WebApp written on React, Angular, Vue, Flutter, Google Web Toolkit and other popular and not frameworks?**
 
-Carina is Selenium based framework so no limitations at this point. Moreover, playing with page opening and element loading strategies you can tune this test automation framework to any toolset.
+Carina is a Selenium based framework so no limitations at this point. Moreover, playing with the page opening and element loading strategies you can tune this test automation framework to any tool set.
 
 **Can I operate with Page elements on test classes layer?**
 
-In general it is not prohibited but **not recommended!** Isolating page elements by `private` access modificator allow you to control the implementation in the single Page Object class. 
+In general, it is not prohibited, but **not recommended!** Isolating page elements by `private` access modificator allow you to control the implementation in the single Page Object class. 
 ```
 //In the page class:
 @FindBy(id = "js-lang-list-button")
