@@ -785,7 +785,7 @@ WebElement city = driver.findElement(By.id(&quot;city&quot;));
 assertEquals(&quot;MyCityName&quot;, city.getText());
 </code></pre>
 
-<p>Some of the typical problems for this type of Selenium test are:</p>
+<p>Some of the typical problems for this type of Selenium tests are:</p>
 <ul>
 <li>Test cases are difficult to read</li>
 <li>Changes in the UI break multiple tests, often in several places</li>
@@ -920,7 +920,7 @@ assertEquals(&quot;MyCityName&quot;, city.getText());
 }
 </code></pre>
 
-<p>Suppose the iframe is a page component or another component. Then we have to designate it as ExtendedWebElement, for example:</p>
+<p>Let's suppose the iframe is a page component or another component. Then we have to designate it as ExtendedWebElement, for example:</p>
 <pre><code> @FindBy(xpath = &quot;.//iframe&quot;)
  private ExtendedWebElement iframe;
 </code></pre>
@@ -933,7 +933,7 @@ getDriver().switchTo().defaultContent();
 </code></pre>
 
 <h3 id="implementation-of-tests">Implementation of tests</h3>
-<p>Carina framework uses TestNG for test organization. In general, test represents a manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:</p>
+<p>Carina framework uses TestNG for test organization. In general, a test represents a manipulation with Page Objects and additional validations of UI events. Here is a sample test implementation:</p>
 <pre><code>public class WebSampleTest implements IAbstractTest {
     @Test()
     @MethodOwner(owner = &quot;qpsdemo&quot;)
@@ -989,20 +989,20 @@ capabilities.browserName=chrome
 </code></pre>
 
 <h3 id="page-opening-strategy">Page opening strategy</h3>
-<p>Determines how carina detects whether expected page is opened:</p>
+<p>Determines how Carina detects whether the expected page is opened:</p>
 <ul>
 <li>By Url. (by default)</li>
 <li>By Element presence on the page</li>
 <li>By URL and Element</li>
 </ul>
-<p>To check if page was opened is used: </p>
+<p>To check if a page was opened, you can use the following: </p>
 <pre><code>page.isPageOpened();
 //or
 page.assertPageOpened();  // equals Assert.assertTrue(page.isPageOpened(),&quot;PageName not loaded: reason);
 </code></pre>
 
 <p>Page opening strategy configuration can be set in several places:</p>
-<p>1) in <a href="http://zebrunner.github.io/carina/configuration/">_config.properties</a>. This determines whole project page open strategy.</p>
+<p>1) in <a href="http://zebrunner.github.io/carina/configuration/">_config.properties</a>. This determines the whole project page open strategy.</p>
 <p>2) In page class. This overrides global page opening strategy for a specific page.</p>
 <pre><code>public class Page extends AbstractPage {
     public Page(WebDriver driver){
@@ -1023,7 +1023,7 @@ public void test(){
 
 <p>Strategy usage examples:</p>
 <p>By URL</p>
-<pre><code>//This is a default value. To use it you need to set a real page urls into your page classes.
+<pre><code>//This is a default value. To use it, you need to set a real page URLs into your page classes.
 private final String specificPageUrl = &quot;https://www.gsmarena.com/specific/url&quot;;
 
 public Page(WebDriver driver) {
@@ -1066,17 +1066,17 @@ public Page(WebDriver driver) {
 </code></pre>
 
 <h3 id="element-loading-strategy">Element loading strategy</h3>
-<p>Determines how carina detects appearing of web elements on page</p>
+<p>Determines how carina detects appearing of web elements on page:</p>
 <ul>
 <li>By presence. Carina waits for appearance of web elements in page DOM model.</li>
-<li>By visibility. Carina waits until web elements would be visible in page.</li>
+<li>By visibility. Carina waits until web elements are visible in page.</li>
 <li>By presence or visibility (default).</li>
 </ul>
 <blockquote>
-<p>It is recommended to use <em>element_loading_strategy=BY_VISIBILITY</em> because in some cases condition with presence happens faster but elements are still not accessible due to invisibility at this short period of time.</p>
+<p>It is recommended to use <em>element_loading_strategy=BY_VISIBILITY</em> because in some cases, condition with presence happens faster but elements are still not accessible due to invisibility at this short period of time.</p>
 </blockquote>
-<p>Element loading strategy could be set at the same places as <strong>Page opening strategy</strong>.</p>
-<p>To check if element presence:</p>
+<p>Element loading strategy can be set at the same places as <strong>Page opening strategy</strong>.</p>
+<p>To check if the element is present:</p>
 <pre><code>Component component = Page.getComponent();
 
 // equals to Assert.assertTrue(component.isUIObjectPresent(),&quot;UI object componentName does not present!&quot;);
@@ -1091,13 +1091,13 @@ component.assertUIObjectNotPresent();
 <strong>waitForJSToLoad()</strong> method was introduced in AbstractPage class. It uses JS under the hood and helps to wait till all the dynamic web elements on the page are loaded.</p>
 </blockquote>
 <h3 id="faq">FAQ</h3>
-<p><strong>What's the benefits of the AbstractUIObject?</strong></p>
-<p>The biggest advantage of AbstractUIObject(s) is that you have single place of truth to declare elements and later can change updated locator in one place.
-That's allowed also significantly speedup all kinds of refactoring, especially after significant changes by developers:)</p>
+<p><strong>What are the benefits of the AbstractUIObject?</strong></p>
+<p>The biggest advantage of AbstractUIObject(s) is that you have a single place of truth to declare elements and later change the updated locator in one place.
+It also allows to considerably speed up all kinds of refactoring, especially after significant changes by developers:)</p>
 <p><strong>Is it possible to automate WebApp written on React, Angular, Vue, Flutter, Google Web Toolkit and other popular and not frameworks?</strong></p>
-<p>Carina is a Selenium based framework so no limitations at this point. Moreover, playing with the page opening and element loading strategies you can tune this test automation framework to any tool set.</p>
+<p>Carina is a Selenium-based framework so no limitations at this point. Moreover, playing with the page opening and element loading strategies, you can tune this test automation framework to any tool set.</p>
 <p><strong>Can I operate with Page elements on test classes layer?</strong></p>
-<p>In general, it is not prohibited, but <strong>not recommended!</strong> Isolating page elements by <code>private</code> access modificator allow you to control the implementation in the single Page Object class. </p>
+<p>In general, it is not prohibited, but <strong>not recommended!</strong> Isolating page elements by <code>private</code> access modificator allows you to control the implementation in the single Page Object class. </p>
 <pre><code>//In the page class:
 @FindBy(id = &quot;js-lang-list-button&quot;)
 private ExtendedWebElement langListBtn;

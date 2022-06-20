@@ -755,28 +755,28 @@
 
   <h1>Driver</h1>
 
-<p>All described methods are implemented inside <code>IDriverPool</code> interface and accessible by default from any test class. 
-To access this functionality from another places like your services just implement this interface.</p>
+<p>All the described methods are implemented inside <code>IDriverPool</code> interface and accessible by default from any test class. 
+To access this functionality from another places like your services, just implement this interface.</p>
 <blockquote>
 <p>Each thread has their own named driver pool</p>
 </blockquote>
-<p>Supported Browsers: Chrome, Firefox, Internet Explorer, Microsoft Edge, Opera, Safari etc</p>
+<p>Supported Browsers: Chrome, Firefox, Internet Explorer, Microsoft Edge, Opera, Safari, etc.</p>
 <h2 id="initialization">Initialization</h2>
 <ul>
 <li>
-<p><strong>getDriver()</strong> is the core method to start any Selenium/Appium session. It will create a RemoteWebDriver named "default" based on default capabilities from configuration.</p>
+<p><strong>getDriver()</strong> is the core method to start any Selenium/Appium session. It will create a RemoteWebDriver named "default" based on the default capabilities from configuration.</p>
 <blockquote>
-<p>1st call of the method in current thread should start new driver. Next calls will return existing object.</p>
+<p>1st call of the method in the current thread should starta  new driver. Next calls will return existing object.</p>
 </blockquote>
 </li>
 <li>
-<p><strong>getDriver(String name)</strong> start named driver session using default capabilities from configuration. That's allow to start several drivers (up to 3 according to <code>max_driver_count</code> property)</p>
+<p><strong>getDriver(String name)</strong> start named driver session using default capabilities from configuration. This allows to start several drivers (up to 3 according to <code>max_driver_count</code> property).</p>
 </li>
 <li>
 <p><strong>getDriver(String name, DesiredCapabilities capabilities)</strong> start named driver session using custom capabilities.</p>
 </li>
 <li>
-<p><strong>getDriver(String name, DesiredCapabilities capabilities, String seleniumHost)</strong> start named driver session using custom capabilities vs custom selenium url.</p>
+<p><strong>getDriver(String name, DesiredCapabilities capabilities, String seleniumHost)</strong> start named driver session using custom capabilities vs custom selenium URL.</p>
 </li>
 </ul>
 <p>Example:</p>
@@ -824,9 +824,9 @@ capabilities.app=https://qaprosoft.s3-us-west-2.amazonaws.com/carinademoexample.
 capabilities.newCommandTimeout=180
 </code></pre>
 
-<p>Visit <a href="https://www.selenium.dev/documentation/legacy/desired_capabilities/">selenium</a> or <a href="https://appium.io/docs/en/writing-running-appium/caps/">appium</a> to see all capabilities.</p>
-<p>Most popular capabilities sets might be declared in properties files and reused via <code>custom_capabilities</code> configuration parameter.
-It might be convenient for external hub providers like Zebrunner Device Farm, BrowserStack, SauceLabs etc</p>
+<p>Visit <a href="https://www.selenium.dev/documentation/legacy/desired_capabilities/">Selenium</a> or <a href="https://appium.io/docs/en/writing-running-appium/caps/">Appium</a> to see all capabilities.</p>
+<p>The most popular capabilities sets can be declared in properties files and reused via <code>custom_capabilities</code> configuration parameter.
+It can be convenient for external hub providers like Zebrunner Device Farm, BrowserStack, Sauce Labs, etc.</p>
 <p>Collect device/browser specific capabilities and put into <code>src/main/resources/browserstack-iphone_12.properties</code>:</p>
 <pre><code>capabilities.realMobile=true
 capabilities.platformName=iOS
@@ -838,9 +838,9 @@ capabilities.osVersion=14
 #capabilities.deviceOrientation=portrait
 </code></pre>
 
-<p>Put into the <strong>_config.properties</strong> <code>custom_capabilities=browserstack-iphone_12.properties</code> to start all tests on this device.</p>
+<p>Put <code>custom_capabilities=browserstack-iphone_12.properties</code> into the <strong>_config.properties</strong> to start all tests on this device.</p>
 <h3 id="options">Options</h3>
-<p>Options and arguments could be provided through <code>_config.properties</code> using comma separated values for multiple options/args, for example:</p>
+<p>Options and arguments can be provided through <code>_config.properties</code> using comma-separated values for multiple options/args, for example:</p>
 <pre><code>firefox_args=--no-first-run,--disable-notifications
 firefox_preferences=
 chrome_args=
@@ -848,7 +848,7 @@ chrome_experimental_opts=
 chrome_mobile_emulation_opts=
 </code></pre>
 
-<p>To provide complicated structures use advanced approach to build capabilities/options/arguments:</p>
+<p>To provide complicated structures, use the advanced approach to build capabilities/options/arguments:</p>
 <pre><code>public void someTest() {
     FirefoxOptions options = new FirefoxOptions();
     options.addArguments(&quot;--no-first-run&quot;);
@@ -866,7 +866,7 @@ chrome_mobile_emulation_opts=
 </code></pre>
 
 <h2 id="quit">Quit</h2>
-<p>Quit driver operation is executed automatically based on driver init phase, i.e. <strong>no need to do it inside your test code</strong>.</p>
+<p>Quit driver operation is executed automatically based on the driver init phase, i.e. <strong>no need to do it inside your test code</strong>.</p>
 <ul>
 <li><code>@BeforeSuite</code> drivers belong to all tests/classes and will be closed at <code>@AfterSuite</code> only</li>
 <li><code>@BeforeTest</code> drivers belong to all <code>&lt;test&gt;</code> classes and will be closed at <code>@AfterTest</code>.</li>
@@ -876,8 +876,8 @@ chrome_mobile_emulation_opts=
 </blockquote>
 </li>
 </ul>
-<p>To quit driver forcibly use <strong>quitDriver()</strong> or <strong>quitDriver(name)</strong></p>
-<p>To disable driver quit strategy completely and cotrol drivers init/quit on your own provide <code>forcibly_disable_driver_quit=true</code> or execute from any place of your test code <code>CarinaListener.disableDriversCleanup();</code></p>
+<p>To quit driver forcibly, use <strong>quitDriver()</strong> or <strong>quitDriver(name)</strong></p>
+<p>To disable driver quit strategy completely and cotrol drivers init/quit on your own, provide <code>forcibly_disable_driver_quit=true</code> or execute from any place of your test code <code>CarinaListener.disableDriversCleanup();</code></p>
 <h2 id="restart">Restart</h2>
 <ul>
 <li><strong>restartDriver()</strong> quit the current driver and start a new one with the same capabilities</li>
@@ -885,7 +885,7 @@ chrome_mobile_emulation_opts=
 </ul>
 <h2 id="faq">FAQ</h2>
 <p><strong>Where is a valid place to init drivers and pages?</strong></p>
-<p>Init pages and drivers inside test methods where they actually used. Escape declaring pages and drivers on class level as it produces extra complexity in execution, maintenance and support!</p>
+<p>Init pages and drivers inside test methods where they are actually used. Escape declaring pages and drivers on the class level as it produces extra complexity in execution, maintenance and support!</p>
 <pre><code>public class TestSample implements IAbstractTest {
   @Test(){
   public void someTest(){
@@ -921,10 +921,10 @@ chrome_mobile_emulation_opts=
 </code></pre>
 
 <p><strong>May I init page/driver on static layer?</strong></p>
-<p>Initialization of drivers and pages on static layer is prohibited. CarinaListener not even integrated yet on compilation stage. For details visit <a href="https://github.com/zebrunner/carina/issues/1550">#1550</a>.
+<p>Initialization of drivers and pages on the static layer is prohibited. CarinaListener cannot be even integrated at the compilation stage. For details, please visit <a href="https://github.com/zebrunner/carina/issues/1550">#1550</a>.
 The earliest stage you can start driver is <code>@BeforeSuite()</code>.</p>
-<p><strong> How to start different tests on different devices?</strong></p>
-<p>Start driver with custom DesiredCapabilities to launch on different device. Also you can use <code>CapabilitiesLoader</code> to manage capabilities at run-time:</p>
+<p><strong>How to start different tests on different devices?</strong></p>
+<p>Start driver with custom DesiredCapabilities to launch on different devices. Also, you can use <code>CapabilitiesLoader</code> to manage capabilities at run-time:</p>
 <pre><code>// Update default capabilities globally to start future drivers **for all tests** on iPhone_12 
 new CapabilitiesLoader().loadCapabilities(&quot;browserstack-iphone_12.properties&quot;);
 
