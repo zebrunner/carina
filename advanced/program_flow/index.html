@@ -680,14 +680,13 @@ which will create, sort and attach <a href="https://github.com/zebrunner/carina/
 <p>These listeners being attached and created when transform(IListenersAnnotation annotation, Class testClass) method is called.</p>
 <ul>
 <li>
-<p><a href="https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/FilterTestsListener.java">FilterTestsListener</a> which is resposible for tets execution <a href="https://zebrunner.github.io/carina/configuration/#tests-execution-filter-configuration">rules</a></p>
+<p><a href="https://github.com/zebrunner/carina/blob/1202f5f7a660e53ab463548dd111682b310be261/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/FilterTestsListener.java#L33">FilterTestsListener</a> which is resposible for tets execution <a href="https://zebrunner.github.io/carina/configuration/#tests-execution-filter-configuration">rules</a></p>
 </li>
 <li>
 <p><code>TestRunListener</code> which is implemented in zebrunner agent. </p>
 </li>
 <li>
-<p><a href="https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListener.java">CarinaListener</a>
-which is the main Carina TestNG listener.</p>
+<p><a href="https://github.com/zebrunner/carina/blob/1202f5f7a660e53ab463548dd111682b310be261/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListener.java#L105">CarinaListener</a> which is the main Carina TestNG listener.</p>
 </li>
 </ul>
 <p>Because CarinaListener object created, the class static field is initialized in it. There are several important steps inside:</p>
@@ -698,14 +697,16 @@ which is the main Carina TestNG listener.</p>
 </ul>
 <p>Then standard listeners according to their implementations in TestNG:</p>
 <p><img alt="Report link" src="../../img/debug_entry_point1.png" /></p>
-<p>Then overridden TestNG methods 
-* FilterTestsListener-&gt;onStart(ISuite suite)</p>
+<p>Then overridden TestNG methods</p>
 <ul>
 <li>
-<p>TestRunListener-&gt;onStart(ISuite suite)</p>
+<p><code>FilterTestsListener-&gt;onStart(ISuite suite)</code></p>
 </li>
 <li>
-<p>CarinaListener-&gt;onStart(ISuite suite) </p>
+<p><code>TestRunListener-&gt;onStart(ISuite suite)</code></p>
+</li>
+<li>
+<p><code>CarinaListener-&gt;onStart(ISuite suite)</code></p>
 </li>
 <li>
 <p>Now your test class is considered initialized and onStart(ITestContext testContext) method is called. Udid is generated there.</p>
