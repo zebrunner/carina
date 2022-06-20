@@ -709,16 +709,16 @@ which will create, sort and attach <a href="https://github.com/zebrunner/carina/
 <p><code>CarinaListener-&gt;onStart(ISuite suite)</code></p>
 </li>
 <li>
-<p>Now your test class is considered initialized and onStart(ITestContext testContext) method is called. Udid is generated there.</p>
+<p>Now your test class is considered initialized and <code>onStart(ITestContext testContext)</code> method is called.</p>
 </li>
 <li>
-<p>onBeforeClass(ITestClass testClass). Complete the steps described in @BeforeClass annotation from your test.</p>
+<p><code>onBeforeClass(ITestClass testClass)</code>. Complete the steps described in <code>@BeforeClass</code> annotation from your test.</p>
 </li>
 <li>
-<p>onTestStart(ITestResult result) provides described data to test.</p>
+<p><code>onTestStart(ITestResult result)</code> provides described data to test.</p>
 </li>
 </ul>
-<p>Next, TestRunner.class runs code described in your test.class. The following route depends on what you are doing in your test:</p>
+<p>Next, <code>TestRunner.class</code> runs code described in your test class. The following route depends on what you are doing in your test:</p>
 <p><strong>UI (web, mobile)</strong></p>
 <pre><code>@Test @MethodOwner()
 public void webTest() {
