@@ -676,12 +676,8 @@
 <p>Under the hood Carina uses TestNG framework, so the first class to initialize is <code>RemoteTestNGStarter</code> class. Program life cycle logic could be observed at <code>TestNG</code> <a href="https://github.com/cbeust/testng/blob/c394d371224b7d1aa3872c34c1f7818e2b9335f9/testng-core/src/main/java/org/testng/TestNG.java#L1058">run()</a> method.</p>
 <p>The initializing turn comes to Carina when <a href="https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListenerChain.java">CarinaListenerChain</a> object created.
 It extends <a href="http://javadox.com/com.nordstrom.tools/testng-foundation/1.10.0/com/nordstrom/automation/testng/package-summary.html">ListenerChain</a>
-which will create, sort and attach <a href="https://github.com/zebrunner/carina/blob/60bea823c0921cb808e4c68eb6c056710a72b847/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/IAbstractTest.java#L49">IAbstractTest</a> listeners. This whole sequence is described in <code>TestRunner</code> <a href="https://github.com/cbeust/testng/blob/c394d371224b7d1aa3872c34c1f7818e2b9335f9/testng-core/src/main/java/org/testng/TestRunner.java#L229">init()</a> method.</p>
-<p><a href="https://github.com/zebrunner/carina/blob/60bea823c0921cb808e4c68eb6c056710a72b847/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/IAbstractTest.java#L49">IAbstractTest</a> listeners are:</p>
-<pre><code>@LinkedListeners({ CarinaListener.class, TestRunListener.class, FilterTestsListener.class })
-</code></pre>
-
-<p>Theese listeners being attached and created when transform(IListenersAnnotation annotation, Class testClass) method is called.</p>
+which will create, sort and attach <a href="https://github.com/zebrunner/carina/blob/60bea823c0921cb808e4c68eb6c056710a72b847/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/IAbstractTest.java#L49">IAbstractTest</a> listeners <code>CarinaListener.class, TestRunListener.class, FilterTestsListener.class</code>. This whole sequence is described in <code>TestRunner</code> <a href="https://github.com/cbeust/testng/blob/c394d371224b7d1aa3872c34c1f7818e2b9335f9/testng-core/src/main/java/org/testng/TestRunner.java#L229">init()</a> method.</p>
+<p>These listeners being attached and created when transform(IListenersAnnotation annotation, Class testClass) method is called.</p>
 <ul>
 <li>
 <p><a href="https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/FilterTestsListener.java">FilterTestsListener</a> which is resposible for tets execution <a href="https://zebrunner.github.io/carina/configuration/#tests-execution-filter-configuration">rules</a></p>
