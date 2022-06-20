@@ -676,35 +676,34 @@
 <p>Under the hood Carina uses TestNG framework, so the first class to initialize is RemoteTestNGStarter.class. Program life cycle logic could be observed at <a href="https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestNG.java">TestNG.class</a> run() method.</p>
 <p>The initializing turn comes to Carina when <a href="https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListenerChain.java">CarinaListenerChain.class</a> object created.
 It extends <a href="http://javadox.com/com.nordstrom.tools/testng-foundation/1.10.0/com/nordstrom/automation/testng/package-summary.html">ListenerChain.class</a>
-which will create, sort and attach <a href="https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/AbstractTest.java">AbstractTest.class</a> listeners. This whole sequence is described in <a href="https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestRunner.java">TestRunner.class</a> init() method.</p>
-<p><a href="https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/AbstractTest.java">AbstractTest.class</a> listeners are:</p>
-<pre><code>@LinkedListeners({ CarinaListener.class, TestRunListener.class, DataProviderInterceptor.class })
+which will create, sort and attach <a href="https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/IAbstractTest.java">IAbstractTest.class</a> listeners. This whole sequence is described in <a href="https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestRunner.java">TestRunner.class</a> init() method.</p>
+<p><a href="https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/IAbstractTest.java">IAbstractTest.class</a> listeners are:</p>
+<pre><code>@LinkedListeners({ CarinaListener.class, TestRunListener.class, FilterTestsListener.class })
 </code></pre>
 
 <p>Theese listeners being attached and created when transform(IListenersAnnotation annotation, Class testClass) method is called.</p>
 <ul>
 <li>
-<p><code>TestRunListener.class</code> and <code>DataProviderInterceptor.class</code> are implemented in zebrunner. </p>
+<p><a href="https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/FilterTestsListener.java">FilterTestsListener</a> which is resposible for tets execution <a href="https://zebrunner.github.io/carina/configuration/#tests-execution-filter-configuration">rules</a></p>
 </li>
 <li>
-<p><a href="https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListener.java">CarinaListener.class</a>
-as it comes from the name is a Carina's listener.</p>
+<p><code>TestRunListener</code> which is implemented in zebrunner agent. </p>
+</li>
+<li>
+<p><a href="https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListener.java">CarinaListener</a>
+which is the main Carina TestNG listener.</p>
 </li>
 </ul>
 <p>Because CarinaListener object created, the class static field is initialized in it. There are several important steps inside:</p>
 <ul>
-<li>R.reinit(). This method load's default values for all parameters from <a href="https://github.com/zebrunner/carina/blob/master/carina-core/src/main/resources">carina-core</a>
-   , then override's them with users configuration (api.properties, config.properties, testdata.properties, email.properties, report.properties, database.properties).</li>
-<li>Configure log4j properties </li>
-<li>Initializing L10N feature.</li>
+<li>R.reinit(). This method load's default values for all parameters from <a href="https://github.com/zebrunner/carina/blob/master/carina-core/src/main/resources">carina-core</a>, then override's them with users configuration (_api.properties, _config.properties, _testdata.properties, _email.properties, _report.properties, _database.properties).</li>
+<li>Configure log4j2x properties </li>
+<li>Initialize L10N feature.</li>
 </ul>
-<p>Then listeners attached to different Lists according to their implementations in TestNG:</p>
+<p>Then standard listeners according to their implementations in TestNG:</p>
 <p><img alt="Report link" src="../../img/debug_entry_point1.png" /></p>
-<p>After that methods are called in appropriate order in the <a href="http://javadox.com/com.nordstrom.tools/testng-foundation/1.10.0/com/nordstrom/automation/testng/package-summary.html">ListenerChain.class</a>:</p>
+<p>Then overridden TestNG methods <code>FilterTestsListener-&gt;onStart(ISuite suite)</code>, <code>TestRunListener-&gt;onStart(ISuite suite)</code> and <code>CarinaListener-&gt;onStart(ISuite suite)</code>. </p>
 <ul>
-<li>
-<p>onStart(ISuite suite). There is called every ISuiteListener's onStart() method that where mentioned in AbstractTest.class (CarinaListener and TestRunListener). CarinaListener.class onStart(ISuite suite) method will configure logging level and thread count.</p>
-</li>
 <li>
 <p>now your test class is considered initialized and onStart(ITestContext testContext) method is called. Udid is generated there.</p>
 </li>
