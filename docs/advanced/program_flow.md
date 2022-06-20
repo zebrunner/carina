@@ -1,6 +1,6 @@
-Under the hood Carina uses TestNG framework, so the first class to initialize is RemoteTestNGStarter.class. Program life cycle logic could be observed at [TestNG.class](https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestNG.java) run() method.
+Under the hood, Carina uses the TestNG framework, so the first class to initialize is RemoteTestNGStarter.class. Program lifecycle logic can be observed at [TestNG.class](https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestNG.java) run() method.
 
-The initializing turn comes to Carina when [CarinaListenerChain.class](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListenerChain.java) object created.
+The initializing turn comes to Carina when [CarinaListenerChain.class](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListenerChain.java) object is created.
 It extends [ListenerChain.class](http://javadox.com/com.nordstrom.tools/testng-foundation/1.10.0/com/nordstrom/automation/testng/package-summary.html)
 which will create, sort and attach [IAbstractTest.class](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/IAbstractTest.java) listeners. This whole sequence is described in [TestRunner.class](https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestRunner.java) init() method.
 
@@ -10,18 +10,18 @@ which will create, sort and attach [IAbstractTest.class](https://github.com/zebr
 @LinkedListeners({ CarinaListener.class, TestRunListener.class, FilterTestsListener.class })
 ```
 
-Theese listeners being attached and created when transform(IListenersAnnotation annotation, Class testClass) method is called.
+These listeners are being attached and created when transform(IListenersAnnotation annotation, Class testClass) method is called.
 
-* [FilterTestsListener](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/FilterTestsListener.java) which is resposible for tets execution [rules]( https://zebrunner.github.io/carina/configuration/#tests-execution-filter-configuration)
+* [FilterTestsListener](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/FilterTestsListener.java) which is resposible for test execution [rules]( https://zebrunner.github.io/carina/configuration/#tests-execution-filter-configuration)
 
-* `TestRunListener` which is implemented in zebrunner agent. 
+* `TestRunListener` which is implemented in the Zebrunner agent. 
 
 * [CarinaListener](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListener.java)
 which is the main Carina TestNG listener.
 
-Because CarinaListener object created, the class static field is initialized in it. There are several important steps inside:
+Because CarinaListener object is created, the class static field is initialized in it. There are several important steps inside:
 
-* R.reinit(). This method load's default values for all parameters from [carina-core](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/resources), then override's them with users configuration (_api.properties, _config.properties, _testdata.properties, _email.properties, _report.properties, _database.properties).
+* R.reinit(). This method loads default values for all parameters from [carina-core](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/resources), then overrides them with user's configurations (_api.properties, _config.properties, _testdata.properties, _email.properties, _report.properties, _database.properties).
 * Configure log4j2x properties 
 * Initialize L10N feature.
 
@@ -31,13 +31,13 @@ Then standard listeners according to their implementations in TestNG:
 
 Then overridden TestNG methods `FilterTestsListener->onStart(ISuite suite)`, `TestRunListener->onStart(ISuite suite)` and `CarinaListener->onStart(ISuite suite)`. 
 
-* now your test class is considered initialized and onStart(ITestContext testContext) method is called. Udid is generated there.
+* Now your test class is considered initialized and onStart(ITestContext testContext) method is called. Udid is generated there.
 
-* onBeforeClass(ITestClass testClass). Complete steps described in @BeforeClass annotation from your test.
+* onBeforeClass(ITestClass testClass). Complete the steps described in @BeforeClass annotation from your test.
 
-* onTestStart(ITestResult result) provide described data to test.
+* onTestStart(ITestResult result) provides described data to test.
 
-Next TestRunner.class runs code described in your test.class. The following route depends on what you are doing in your test:
+Next, TestRunner.class runs code described in your test.class. The following route depends on what you are doing in your test:
 
 **UI (web, mobile)**
 
@@ -89,12 +89,12 @@ public void createUser() {
 
 These are user's classes, samples at carina-demo: [UserMapper](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/mappers/UserMapper.java), [ConnectionFactory](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/ConnectionFactory.java), [User](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/models/User.java).
 
-###FAQ
+### FAQ
 
 **Dependent vs. independent tests. Which approach is better?**
 
-Try to develop fully independent tests to reuse all the benefits of the multi-threading execution. For example [Zebrunner Selenium Grid](https://zebrunner.com/) provides 1000 threads as default limitation and allow to execute your full regression scenarios in minutes!
-Use dependent methods via `dependsOnMethods` Test Annotation only if it is really required by Test logic. Carina will preserve all drivers for dependent methods so you can start driver in one method and proceed to with the page in another.
+Try to develop fully independent tests to reuse all the benefits of the multi-threading execution. For example, [Zebrunner Selenium Grid](https://zebrunner.com/) provides 1000 threads as default limitation and allows to execute your full regression scenarios in minutes!
+Use dependent methods via `dependsOnMethods` Test Annotation only if it is really required by Test logic. Carina will preserve all drivers for dependent methods so you can start a driver in one method and proceed with the page in another.
 ```
 public class WebSampleSingleDriver implements IAbstractTest {
     HomePage homePage = null;
