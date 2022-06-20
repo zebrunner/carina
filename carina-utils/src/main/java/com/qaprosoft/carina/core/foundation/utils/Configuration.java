@@ -139,6 +139,8 @@ public class Configuration {
 
         CRYPTO_KEY_PATH("crypto_key_path"),
 
+        CRYPTO_KEY_VALUE("crypto_key_value"),
+
         SUITE_NAME("suite_name"),
 
         TEST_NAMING_PATTERN("test_naming_pattern"),
