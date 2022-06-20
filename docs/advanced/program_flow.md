@@ -1,10 +1,10 @@
-Under the hood Carina uses TestNG framework, so the first class to initialize is RemoteTestNGStarter.class. Program life cycle logic could be observed at `TestNG.class` [run()](https://github.com/cbeust/testng/blob/c394d371224b7d1aa3872c34c1f7818e2b9335f9/testng-core/src/main/java/org/testng/TestNG.java#L1058) method.
+Under the hood Carina uses TestNG framework, so the first class to initialize is RemoteTestNGStarter.class. Program life cycle logic could be observed at `TestNG` [run()](https://github.com/cbeust/testng/blob/c394d371224b7d1aa3872c34c1f7818e2b9335f9/testng-core/src/main/java/org/testng/TestNG.java#L1058) method.
 
-The initializing turn comes to Carina when [CarinaListenerChain.class](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListenerChain.java) object created.
-It extends [ListenerChain.class](http://javadox.com/com.nordstrom.tools/testng-foundation/1.10.0/com/nordstrom/automation/testng/package-summary.html)
-which will create, sort and attach [IAbstractTest.class](https://github.com/zebrunner/carina/blob/60bea823c0921cb808e4c68eb6c056710a72b847/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/IAbstractTest.java#L49) listeners. This whole sequence is described in [TestRunner.class](https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestRunner.java) init() method.
+The initializing turn comes to Carina when [CarinaListenerChain](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListenerChain.java) object created.
+It extends [ListenerChain](http://javadox.com/com.nordstrom.tools/testng-foundation/1.10.0/com/nordstrom/automation/testng/package-summary.html)
+which will create, sort and attach [IAbstractTest](https://github.com/zebrunner/carina/blob/60bea823c0921cb808e4c68eb6c056710a72b847/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/IAbstractTest.java#L49) listeners. This whole sequence is described in `TestRunner` [init()](https://github.com/cbeust/testng/blob/c394d371224b7d1aa3872c34c1f7818e2b9335f9/testng-core/src/main/java/org/testng/TestRunner.java#L229) method.
 
-[IAbstractTest.class](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/IAbstractTest.java) listeners are:
+[IAbstractTest](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/IAbstractTest.java) listeners are:
 
 ```
 @LinkedListeners({ CarinaListener.class, TestRunListener.class, FilterTestsListener.class })
