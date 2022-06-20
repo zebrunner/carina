@@ -26,7 +26,7 @@ Screenshot.capture(getDriver(), "my page screenshot");
 Screenshot.capture(getDriver(), "Captureg full size screenshot", true);
 ```
 
-###F.A.Q.
+###FAQ
 **How can I find all places where automatic screenshot capturing is performed?**
 
 You can take a look into the [DriverListener](https://github.com/zebrunner/carina/blob/1c9b50202e9254545600488e13f326eaa564e034/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/webdriver/listener/DriverListener.java#L276) 
