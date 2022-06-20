@@ -2,15 +2,9 @@ Under the hood Carina uses TestNG framework, so the first class to initialize is
 
 The initializing turn comes to Carina when [CarinaListenerChain](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListenerChain.java) object created.
 It extends [ListenerChain](http://javadox.com/com.nordstrom.tools/testng-foundation/1.10.0/com/nordstrom/automation/testng/package-summary.html)
-which will create, sort and attach [IAbstractTest](https://github.com/zebrunner/carina/blob/60bea823c0921cb808e4c68eb6c056710a72b847/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/IAbstractTest.java#L49) listeners. This whole sequence is described in `TestRunner` [init()](https://github.com/cbeust/testng/blob/c394d371224b7d1aa3872c34c1f7818e2b9335f9/testng-core/src/main/java/org/testng/TestRunner.java#L229) method.
+which will create, sort and attach [IAbstractTest](https://github.com/zebrunner/carina/blob/60bea823c0921cb808e4c68eb6c056710a72b847/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/IAbstractTest.java#L49) listeners `CarinaListener.class, TestRunListener.class, FilterTestsListener.class`. This whole sequence is described in `TestRunner` [init()](https://github.com/cbeust/testng/blob/c394d371224b7d1aa3872c34c1f7818e2b9335f9/testng-core/src/main/java/org/testng/TestRunner.java#L229) method.
 
-[IAbstractTest](https://github.com/zebrunner/carina/blob/60bea823c0921cb808e4c68eb6c056710a72b847/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/IAbstractTest.java#L49) listeners are:
-
-```
-@LinkedListeners({ CarinaListener.class, TestRunListener.class, FilterTestsListener.class })
-```
-
-Theese listeners being attached and created when transform(IListenersAnnotation annotation, Class testClass) method is called.
+These listeners being attached and created when transform(IListenersAnnotation annotation, Class testClass) method is called.
 
 * [FilterTestsListener](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/FilterTestsListener.java) which is resposible for tets execution [rules]( https://zebrunner.github.io/carina/configuration/#tests-execution-filter-configuration)
 
