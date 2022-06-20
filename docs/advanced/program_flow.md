@@ -1,8 +1,8 @@
-Under the hood Carina uses TestNG framework, so the first class to initialize is RemoteTestNGStarter.class. Program life cycle logic could be observed at [TestNG.class](https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestNG.java) run() method.
+Under the hood Carina uses TestNG framework, so the first class to initialize is RemoteTestNGStarter.class. Program life cycle logic could be observed at `TestNG.class` [run()](https://github.com/cbeust/testng/blob/c394d371224b7d1aa3872c34c1f7818e2b9335f9/testng-core/src/main/java/org/testng/TestNG.java#L1058) method.
 
 The initializing turn comes to Carina when [CarinaListenerChain.class](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListenerChain.java) object created.
 It extends [ListenerChain.class](http://javadox.com/com.nordstrom.tools/testng-foundation/1.10.0/com/nordstrom/automation/testng/package-summary.html)
-which will create, sort and attach [IAbstractTest.class](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/IAbstractTest.java) listeners. This whole sequence is described in [TestRunner.class](https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestRunner.java) init() method.
+which will create, sort and attach [IAbstractTest.class](https://github.com/zebrunner/carina/blob/60bea823c0921cb808e4c68eb6c056710a72b847/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/IAbstractTest.java#L49) listeners. This whole sequence is described in [TestRunner.class](https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestRunner.java) init() method.
 
 [IAbstractTest.class](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/IAbstractTest.java) listeners are:
 
@@ -29,9 +29,14 @@ Then standard listeners according to their implementations in TestNG:
 
 ![Report link](../img/debug_entry_point1.png)
 
-Then overridden TestNG methods `FilterTestsListener->onStart(ISuite suite)`, `TestRunListener->onStart(ISuite suite)` and `CarinaListener->onStart(ISuite suite)`. 
+Then overridden TestNG methods 
+* FilterTestsListener->onStart(ISuite suite)
 
-* now your test class is considered initialized and onStart(ITestContext testContext) method is called. Udid is generated there.
+* TestRunListener->onStart(ISuite suite)
+
+* CarinaListener->onStart(ISuite suite) 
+
+* Now your test class is considered initialized and onStart(ITestContext testContext) method is called. Udid is generated there.
 
 * onBeforeClass(ITestClass testClass). Complete steps described in @BeforeClass annotation from your test.
 
