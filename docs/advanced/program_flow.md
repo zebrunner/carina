@@ -1,6 +1,6 @@
-Under the hood Carina uses TestNG framework, so the first class to initialize is RemoteTestNGStarter.class. Program life cycle logic could be observed at [TestNG.class](https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestNG.java) run() method.
+Under the hood, Carina uses the TestNG framework, so the first class to initialize is RemoteTestNGStarter.class. Program lifecycle logic can be observed at [TestNG.class](https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestNG.java) run() method.
 
-The initializing turn comes to Carina when [CarinaListenerChain.class](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListenerChain.java) object created.
+The initializing turn comes to Carina when [CarinaListenerChain.class](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListenerChain.java) object is created.
 It extends [ListenerChain.class](http://javadox.com/com.nordstrom.tools/testng-foundation/1.10.0/com/nordstrom/automation/testng/package-summary.html)
 which will create, sort and attach [AbstractTest.class](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/AbstractTest.java) listeners. This whole sequence is described in [TestRunner.class](https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestRunner.java) init() method.
 
@@ -10,25 +10,25 @@ which will create, sort and attach [AbstractTest.class](https://github.com/zebru
 @LinkedListeners({ CarinaListener.class, TestRunListener.class, DataProviderInterceptor.class })
 ```
 
-Theese listeners being attached and created when transform(IListenersAnnotation annotation, Class testClass) method is called.
+These listeners are being attached and created when transform(IListenersAnnotation annotation, Class testClass) method is called.
 
-* `TestRunListener.class` and `DataProviderInterceptor.class` are implemented in zebrunner. 
+* `TestRunListener.class` and `DataProviderInterceptor.class` are implemented in Zebrunner. 
 
-* [CarinaListener.class](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListener.java)
-as it comes from the name is a Carina's listener.
+* [CarinaListener.class](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListener.java),
+as it comes from the name, is a Carina's listener.
 
-Because CarinaListener object created, the class static field is initialized in it. There are several important steps inside:
+Because CarinaListener object is created, the class static field is initialized in it. There are several important steps inside:
 
-* R.reinit(). This method load's default values for all parameters from [carina-core](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/resources)
-   , then override's them with users configuration (api.properties, config.properties, testdata.properties, email.properties, report.properties, database.properties).
+* R.reinit(). This method loads the default values for all parameters from [carina-core](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/resources)
+   , then overrides them with user's configurations (api.properties, config.properties, testdata.properties, email.properties, report.properties, database.properties).
 * Configure log4j properties 
-* Initializing L10N feature.
+* Initialize L10N feature.
 
-Then listeners attached to different Lists according to their implementations in TestNG:
+Then listeners are attached to different Lists according to their implementations in TestNG:
 
 ![Report link](../img/debug_entry_point1.png)
 
-After that methods are called in appropriate order in the [ListenerChain.class](http://javadox.com/com.nordstrom.tools/testng-foundation/1.10.0/com/nordstrom/automation/testng/package-summary.html):
+After that, methods are called in the appropriate order in the [ListenerChain.class](http://javadox.com/com.nordstrom.tools/testng-foundation/1.10.0/com/nordstrom/automation/testng/package-summary.html):
 
 * onStart(ISuite suite). There is called every ISuiteListener's onStart() method that where mentioned in AbstractTest.class (CarinaListener and TestRunListener). CarinaListener.class onStart(ISuite suite) method will configure logging level and thread count.
 
@@ -94,8 +94,8 @@ These are user's classes, samples at carina-demo: [UserMapper](https://github.co
 
 **Dependent vs. independent tests. Which approach is better?**
 
-Try to develop fully independent tests to reuse all the benefits of the multi-threading execution. For example [Zebrunner Selenium Grid](https://zebrunner.com/) provides 1000 threads as default limitation and allow to execute your full regression scenarios in minutes!
-Use dependent methods via `dependsOnMethods` Test Annotation only if it is really required by Test logic. Carina will preserve all drivers for dependent methods so you can start driver in one method and proceed to with the page in another.
+Try to develop fully independent tests to reuse all the benefits of the multi-threaded execution. For example, [Zebrunner Selenium Grid](https://zebrunner.com/) provides 1000 threads as default limitation and allows to execute your full regression scenarios in minutes!
+Use dependent methods via `dependsOnMethods` Test Annotation only if it is really required by Test logic. Carina will preserve all drivers for dependent methods so you can start driver in one method and proceed with the page in another.
 ```
 public class WebSampleSingleDriver implements IAbstractTest {
     HomePage homePage = null;
