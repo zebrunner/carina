@@ -40,7 +40,7 @@ public class CryptoTool {
     private Cipher cipher;
     private Key key;
 
-    public CryptoTool(String cryptoAlgorithm, String cryptoKeyType, Key key) {
+    public CryptoTool(String cryptoAlgorithm, Key key) {
         this.algorithm = cryptoAlgorithm;
 
         this.key = key;
@@ -52,8 +52,19 @@ public class CryptoTool {
         }
     }
 
-    public CryptoTool() {
-        this(SpecialKeywords.CRYPTO_ALGORITHM, SpecialKeywords.CRYPTO_KEY_TYPE, SpecialKeywords.CRYPTO_KEY_PATH);
+    public CryptoTool(CryptoParams cryptoParams) {
+        this.algorithm = SpecialKeywords.CRYPTO_ALGORITHM;
+        // crypto key have priority onto crypto key path
+        if (!cryptoParams.getCryptoKey().isEmpty()) {
+            this.key = SecretKeyManager.getKey(cryptoParams.getCryptoKey(), SpecialKeywords.CRYPTO_KEY_TYPE);
+        } else {
+            try {
+                this.key = SecretKeyManager.loadKey(new File(cryptoParams.getCryptoPath()), SpecialKeywords.CRYPTO_KEY_TYPE);
+            } catch (IOException e) {
+                LOGGER.error("Can't load secret key!", e);
+            }
+        }
+        initCipher();
     }
 
     public CryptoTool(String cryptoKeyPath) {
@@ -68,8 +79,12 @@ public class CryptoTool {
         } catch (IOException e) {
             LOGGER.error("Can't load secret key!", e);
         }
+        initCipher();
+    }
+
+    private void initCipher() {
         try {
-            this.cipher = Cipher.getInstance(algorithm);
+            this.cipher = Cipher.getInstance(this.algorithm);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
             LOGGER.error("Exception on getting cipher instance", e);
         }
