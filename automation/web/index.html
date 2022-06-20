@@ -385,7 +385,7 @@
       
         <li class="md-nav__item">
   <a href="#faq" class="md-nav__link">
-    F.A.Q.
+    FAQ
   </a>
   
 </li>
@@ -746,7 +746,7 @@
       
         <li class="md-nav__item">
   <a href="#faq" class="md-nav__link">
-    F.A.Q.
+    FAQ
   </a>
   
 </li>
@@ -1090,14 +1090,14 @@ component.assertUIObjectNotPresent();
 <p>Dynamic elements loading. 
 <strong>waitForJSToLoad()</strong> method was introduced in AbstractPage class. It uses JS under the hood and helps to wait till all the dynamic web elements on the page are loaded.</p>
 </blockquote>
-<h3 id="faq">F.A.Q.</h3>
+<h3 id="faq">FAQ</h3>
 <p><strong>What's the benefits of the AbstractUIObject?</strong></p>
 <p>The biggest advantage of AbstractUIObject(s) is that you have single place of truth to declare elements and later can change updated locator in one place.
-That's allow also significantly speedup all kind of refactoring especially after significant changes by developers:)</p>
+That's allowed also significantly speedup all kinds of refactoring, especially after significant changes by developers:)</p>
 <p><strong>Is it possible to automate WebApp written on React, Angular, Vue, Flutter, Google Web Toolkit and other popular and not frameworks?</strong></p>
-<p>Carina is Selenium based framework so no limitations at this point. Moreover, playing with page opening and element loading strategies you can tune this test automation framework to any toolset.</p>
+<p>Carina is a Selenium based framework so no limitations at this point. Moreover, playing with the page opening and element loading strategies you can tune this test automation framework to any tool set.</p>
 <p><strong>Can I operate with Page elements on test classes layer?</strong></p>
-<p>In general it is not prohibited but <strong>not recommended!</strong> Isolating page elements by <code>private</code> access modificator allow you to control the implementation in the single Page Object class. </p>
+<p>In general, it is not prohibited, but <strong>not recommended!</strong> Isolating page elements by <code>private</code> access modificator allow you to control the implementation in the single Page Object class. </p>
 <pre><code>//In the page class:
 @FindBy(id = &quot;js-lang-list-button&quot;)
 private ExtendedWebElement langListBtn;
