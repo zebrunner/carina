@@ -762,7 +762,7 @@ public void createUser() {
 <p>These are user's classes, samples at carina-demo: <a href="https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/mappers/UserMapper.java">UserMapper</a>, <a href="https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/ConnectionFactory.java">ConnectionFactory</a>, <a href="https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/models/User.java">User</a>.</p>
 <h3 id="faq">FAQ</h3>
 <p><strong>Dependent vs. independent tests. Which approach is better?</strong></p>
-<p>Try to develop fully independent tests to reuse all the benefits of the multi-threading execution. For example, <a href="https://zebrunner.com/">Zebrunner Selenium Grid</a> provides 1000 threads as default limitation and allows to execute your full regression scenarios in minutes!
+<p>Try to develop fully independent tests to reuse all the benefits of the multi-threading execution. For example, <a href="https://zebrunner.com/">Zebrunner Selenium Grid</a> provides <strong>1000 threads</strong> as default limitation and allows to execute your full regression scenarios in minutes!
 Use dependent methods via <code>dependsOnMethods</code> Test Annotation only if it is really required by Test logic. Carina will preserve all drivers for dependent methods so you can start a driver in one method and proceed with the page in another.</p>
 <pre><code>public class WebSampleSingleDriver implements IAbstractTest {
     HomePage homePage = null;

@@ -719,7 +719,7 @@ R.TESTDATA.get(&quot;user.email&quot;)
 <pre><code>Configuration.get(Parameter.BROWSER)
 </code></pre>
 
-<p>All the project configuration properties are located in a <strong>_config.properties</strong> file. In the table below we are providing a description of most of the parameters:
+<p>All the project configuration properties are located in a <strong>_config.properties</strong> file. In the table below, please see the description of most of the parameters:
 <table>
     <tr>
         <th>Attribute</th>
@@ -733,7 +733,7 @@ R.TESTDATA.get(&quot;user.email&quot;)
     </tr>
     <tr>
         <td>selenium_url</td>
-        <td>Selenium/Appium server url</td>
+        <td>Selenium/Appium server URL</td>
         <td>http://localhost:4444/wd/hub</td>
     </tr>
     <tr>
@@ -818,12 +818,12 @@ R.TESTDATA.get(&quot;user.email&quot;)
     </tr>
     <tr>
         <td>max_screen_history</td>
-        <td>Max number of reports artifacts saving in history. <strong>Default: 10</strong></td>
+        <td>Max number of reports artifacts saved in history. <strong>Default: 10</strong></td>
         <td>Integer</td>
     </tr>
     <tr>
         <td>driver_event_listeners</td>
-        <td>Comma-separated list of extra driver listeners listeners. Listeners provide extra custom actions for WebDriver and have to be the instances of WebDriverEventListener</td>
+        <td>Comma-separated list of extra driver listeners. Listeners provide extra custom actions for WebDriver and have to be the instances of WebDriverEventListener</td>
         <td>com.some_company.core.EventListener</td>
     </tr>
     <tr>
@@ -833,7 +833,7 @@ R.TESTDATA.get(&quot;user.email&quot;)
     </tr>
     <tr>
         <td>init_retry_count</td>
-        <td>Number of extra attempts to create a driver. <strong>Default: 0</strong> means that there will no extra attempts.</td>
+        <td>Number of extra attempts to create a driver. <strong>Default: 0</strong> means that there will be no extra attempts.</td>
         <td>Integer</td>
     </tr>
     <tr>
@@ -843,7 +843,7 @@ R.TESTDATA.get(&quot;user.email&quot;)
     </tr>
     <tr>
         <td>forcibly_disable_driver_quit</td>
-        <td>If enabled turns off webdriver quit based on <a href="https://zebrunner.github.io/carina/advanced/driver/#quit">initizalization phase</a>. <strong>Default: false</strong></td>
+        <td>If enabled, turns off webdriver quit based on <a href="https://zebrunner.github.io/carina/advanced/driver/#quit">initizalization phase</a>. <strong>Default: false</strong></td>
         <td>Boolean</td>
     </tr>
     <tr>
@@ -858,7 +858,7 @@ R.TESTDATA.get(&quot;user.email&quot;)
     </tr>
     <tr>
         <td>page_opening_strategy</td>
-        <td>Determines how carina detects whether expected <a href="https://zebrunner.github.io/carina/automation/web/#page-opening-strategy">page</a> is opened</td>
+        <td>Determines how carina detects whether the expected <a href="https://zebrunner.github.io/carina/automation/web/#page-opening-strategy">page</a> is opened</td>
         <td>BY_ELEMENT, BY_URL, BY_URL_AND_ELEMENT</td>
     </tr>
     <tr>
@@ -873,12 +873,12 @@ R.TESTDATA.get(&quot;user.email&quot;)
     </tr>
     <tr>
         <td>custom_artifacts_folder</td>
-        <td>Custom unified path for auto downloaded artifacts for all tests. <strong>Default: NULL</strong> to download into the unique test artifacts location.</td>
+        <td>Custom unified path for auto-downloaded artifacts for all tests. <strong>Default: NULL</strong> to download into the unique test artifacts location.</td>
         <td>String</td>
     </tr>
     <tr>
         <td>auto_download_apps</td>
-        <td>MIME types / Internet Media Types. The parameter is needed only to configure auto downloading for FireFox. List of <a href="https://freeformatter.com/mime-types-list.html">values</a></td>
+        <td>MIME types / Internet Media Types. The parameter is needed only to configure auto-downloading for FireFox. List of <a href="https://freeformatter.com/mime-types-list.html">values</a></td>
         <td>application/pdf</td>
     </tr>
     <tr>
@@ -923,7 +923,7 @@ R.TESTDATA.get(&quot;user.email&quot;)
     </tr>
     <tr>
         <td>browsermob_ports_range</td>
-        <td>Range of ports that will be used for starting of browsermob proxy. First available port from the range will be used. If all ports are used then test will wait for the first freed port.</td>
+        <td>Range of ports that will be used for starting of browsermob proxy. The first available port from the range will be used. If all ports are used, then a test will wait for the first freed port.</td>
         <td>8001:8003</td>
     </tr>
     <tr>
@@ -1024,7 +1024,7 @@ test_run_rules=OWNER=&gt;Josh&amp;&amp;Jake||Peter
 #So test will be executed if it has at least (Josh and Jake) or (Peter) as owner
 </code></pre>
 
-<p>4) To add more tags to the rule use ";;", example:</p>
+<p>4) To add more tags to the rule, use ";;", for example:</p>
 <pre><code>#;; works as &amp;&amp; (AND) but for tags
 
 test_run_rules=PRIORITY=&gt;!!P1;;OWNER=&gt;Josh&amp;&amp;!!Jake;;TAGS=&gt;feature=web&amp;&amp;!!type=smoke||feature=android
@@ -1037,15 +1037,15 @@ test_run_rules=PRIORITY=&gt;!!P1;;OWNER=&gt;Josh&amp;&amp;!!Jake;;TAGS=&gt;featu
 #3) (@TestTag(name = &quot;feature&quot;, value = &quot;web&quot;) without @TestTag(name = &quot;type&quot;, value = &quot;smoke&quot;))
         or @TestTag(name = &quot;feature&quot;, value = &quot;android&quot;)        
 
-#In other words, will be executed tests with Priority that differs from P1, with Josh as owner if there no Jake 
-#and if they are for not smoke web or if they are for android.
+#In other words, tests will be executed only with Priority that differs from P1, with Josh as owner if there is no Jake 
+#and if they are not for smoke web or if they are for android.
 </code></pre>
 
 <h3 id="faq">FAQ</h3>
-<p><strong>Where is recommended place to declare configuration parameters?</strong></p>
-<p>Declare default parameters in <code>_config.properties</code>. For multi-maven projects you can use extra underscore symbol to override default settings on new layer <code>__config.properties</code>, <code>___config.properties</code> etc</p>
+<p><strong>Where is a recommended place to declare configuration parameters?</strong></p>
+<p>Declare default parameters in <code>_config.properties</code>. For multi-maven projects, you can use extra underscore symbol to override default settings on new layer <code>__config.properties</code>, <code>___config.properties</code> etc</p>
 <p><strong>How to override params from the code?</strong></p>
-<p>The put method might be used to override parameters globally or for current test only</p>
+<p>Put method might be used to override parameters globally or for a current test only</p>
 <pre><code>R.CONFIG.put(&quot;selenium_url&quot;, &quot;http://host1:4444/wd/hub&quot;); //override selenium_url globally for the rest of tests
 R.CONFIG.put(&quot;selenium_url&quot;, &quot;http://host2:4444/wd/hub&quot;, true); // override selenium_url for current test only
 R.DATABASE.put(&quot;db.driver&quot;, &quot;org.postgresql.Driver&quot;) //override db.driver in_database.properties globally
@@ -1054,10 +1054,10 @@ R.DATABASE.put(&quot;db.driver&quot;, &quot;org.postgresql.Driver&quot;) //overr
 <p><strong>Crypted values are returned in encrypted format. How can I decrypt them?</strong></p>
 <p>Use <code>R.CONFIG.getDecrypted(String key)</code> method to read decrypted value. </p>
 <blockquote>
-<p>You should have a valid crypto key to be able to decrypt values, for details visit <a href="https://zebrunner.github.io/carina/advanced/security/">Security</a></p>
+<p>You should have valid crypto key to be able to decrypt values. For details, visit <a href="https://zebrunner.github.io/carina/advanced/security/">Security</a></p>
 </blockquote>
 <p><strong>Can I override configuration parameters from CI?</strong></p>
-<p>Provide updated values via System Properties to override value, for example:</p>
+<p>Provide updated values via System Properties to override a value, for example:</p>
 <pre><code>mvn -Denv=PROD ...
 </code></pre>
 
