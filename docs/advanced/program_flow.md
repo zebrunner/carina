@@ -92,7 +92,7 @@ These are user's classes, samples at carina-demo: [UserMapper](https://github.co
 
 **Dependent vs. independent tests. Which approach is better?**
 
-Try to develop fully independent tests to reuse all the benefits of the multi-threading execution. For example, [Zebrunner Selenium Grid](https://zebrunner.com/) provides 1000 threads as default limitation and allows to execute your full regression scenarios in minutes!
+Try to develop fully independent tests to reuse all the benefits of the multi-threading execution. For example, [Zebrunner Selenium Grid](https://zebrunner.com/) provides **1000 threads** as default limitation and allows to execute your full regression scenarios in minutes!
 Use dependent methods via `dependsOnMethods` Test Annotation only if it is really required by Test logic. Carina will preserve all drivers for dependent methods so you can start a driver in one method and proceed with the page in another.
 ```
 public class WebSampleSingleDriver implements IAbstractTest {
