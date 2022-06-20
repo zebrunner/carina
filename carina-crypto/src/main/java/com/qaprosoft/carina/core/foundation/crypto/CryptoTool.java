@@ -40,7 +40,7 @@ public class CryptoTool {
     private Cipher cipher;
     private Key key;
 
-    public CryptoTool(String cryptoAlgorithm, String cryptoKeyType, Key key) {
+    public CryptoTool(String cryptoAlgorithm, Key key) {
         this.algorithm = cryptoAlgorithm;
 
         this.key = key;
