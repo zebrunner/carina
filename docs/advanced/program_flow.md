@@ -30,13 +30,13 @@ Then overridden TestNG methods
 
 * `CarinaListener->onStart(ISuite suite)`
 
-* Now your test class is considered initialized and onStart(ITestContext testContext) method is called. Udid is generated there.
+* Now your test class is considered initialized and `onStart(ITestContext testContext)` method is called.
 
-* onBeforeClass(ITestClass testClass). Complete the steps described in @BeforeClass annotation from your test.
+* `onBeforeClass(ITestClass testClass)`. Complete the steps described in `@BeforeClass` annotation from your test.
 
-* onTestStart(ITestResult result) provides described data to test.
+* `onTestStart(ITestResult result)` provides described data to test.
 
-Next, TestRunner.class runs code described in your test.class. The following route depends on what you are doing in your test:
+Next, `TestRunner.class` runs code described in your test class. The following route depends on what you are doing in your test:
 
 **UI (web, mobile)**
 
