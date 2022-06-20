@@ -6,12 +6,11 @@ which will create, sort and attach [IAbstractTest](https://github.com/zebrunner/
 
 These listeners being attached and created when transform(IListenersAnnotation annotation, Class testClass) method is called.
 
-* [FilterTestsListener](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/FilterTestsListener.java) which is resposible for tets execution [rules]( https://zebrunner.github.io/carina/configuration/#tests-execution-filter-configuration)
+* [FilterTestsListener](https://github.com/zebrunner/carina/blob/1202f5f7a660e53ab463548dd111682b310be261/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/FilterTestsListener.java#L33) which is resposible for tets execution [rules]( https://zebrunner.github.io/carina/configuration/#tests-execution-filter-configuration)
 
 * `TestRunListener` which is implemented in zebrunner agent. 
 
-* [CarinaListener](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListener.java)
-which is the main Carina TestNG listener.
+* [CarinaListener](https://github.com/zebrunner/carina/blob/1202f5f7a660e53ab463548dd111682b310be261/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListener.java#L105) which is the main Carina TestNG listener.
 
 Because CarinaListener object created, the class static field is initialized in it. There are several important steps inside:
 
@@ -23,12 +22,13 @@ Then standard listeners according to their implementations in TestNG:
 
 ![Report link](../img/debug_entry_point1.png)
 
-Then overridden TestNG methods 
-* FilterTestsListener->onStart(ISuite suite)
+Then overridden TestNG methods
 
-* TestRunListener->onStart(ISuite suite)
+* `FilterTestsListener->onStart(ISuite suite)`
 
-* CarinaListener->onStart(ISuite suite) 
+* `TestRunListener->onStart(ISuite suite)`
+
+* `CarinaListener->onStart(ISuite suite)`
 
 * Now your test class is considered initialized and onStart(ITestContext testContext) method is called. Udid is generated there.
 
