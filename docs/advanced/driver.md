@@ -130,10 +130,10 @@ To disable driver quit strategy completely and cotrol drivers init/quit on your 
 * **restartDriver()** quit the current driver and start a new one with the same capabilities
 * **restartDriver(boolean isSameDevice)** quit the current driver and start a new one on the same device using `uuid` capability. It is fully compatible with [MCloud](https://github.com/zebrunner/mcloud) farm.
 
-##F.A.Q.
-**Where is valid place to init drivers and pages?**
+##FAQ
+**Where is a valid place to init drivers and pages?**
 
-Init pages and drivers inside test methods where they actually used. Escape declaring pages and drivers on class level as it produce extra complexity in execution, maintenance and support!
+Init pages and drivers inside test methods where they actually used. Escape declaring pages and drivers on class level as it produces extra complexity in execution, maintenance and support!
 ```
 public class TestSample implements IAbstractTest {
   @Test(){
@@ -172,7 +172,7 @@ public class TestSample implements IAbstractTest {
 
 **May I init page/driver on static layer?**
 
-Initialization of drivers and pages on static layer is prohibited. CarinaListener not even intergated yet on compilation stage. For details visit [#1550](https://github.com/zebrunner/carina/issues/1550).
+Initialization of drivers and pages on static layer is prohibited. CarinaListener not even integrated yet on compilation stage. For details visit [#1550](https://github.com/zebrunner/carina/issues/1550).
 The earliest stage you can start driver is `@BeforeSuite()`.
 
 ** How to start different tests on different devices?**
