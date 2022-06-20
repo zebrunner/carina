@@ -673,10 +673,10 @@
 
   <h1>Program flow</h1>
 
-<p>Under the hood Carina uses TestNG framework, so the first class to initialize is RemoteTestNGStarter.class. Program life cycle logic could be observed at <a href="https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestNG.java">TestNG.class</a> run() method.</p>
+<p>Under the hood Carina uses TestNG framework, so the first class to initialize is RemoteTestNGStarter.class. Program life cycle logic could be observed at <code>TestNG.class</code> <a href="https://github.com/cbeust/testng/blob/c394d371224b7d1aa3872c34c1f7818e2b9335f9/testng-core/src/main/java/org/testng/TestNG.java#L1058">run()</a> method.</p>
 <p>The initializing turn comes to Carina when <a href="https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListenerChain.java">CarinaListenerChain.class</a> object created.
 It extends <a href="http://javadox.com/com.nordstrom.tools/testng-foundation/1.10.0/com/nordstrom/automation/testng/package-summary.html">ListenerChain.class</a>
-which will create, sort and attach <a href="https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/IAbstractTest.java">IAbstractTest.class</a> listeners. This whole sequence is described in <a href="https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestRunner.java">TestRunner.class</a> init() method.</p>
+which will create, sort and attach <a href="https://github.com/zebrunner/carina/blob/60bea823c0921cb808e4c68eb6c056710a72b847/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/IAbstractTest.java#L49">IAbstractTest.class</a> listeners. This whole sequence is described in <a href="https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestRunner.java">TestRunner.class</a> init() method.</p>
 <p><a href="https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/IAbstractTest.java">IAbstractTest.class</a> listeners are:</p>
 <pre><code>@LinkedListeners({ CarinaListener.class, TestRunListener.class, FilterTestsListener.class })
 </code></pre>
@@ -702,10 +702,17 @@ which is the main Carina TestNG listener.</p>
 </ul>
 <p>Then standard listeners according to their implementations in TestNG:</p>
 <p><img alt="Report link" src="../../img/debug_entry_point1.png" /></p>
-<p>Then overridden TestNG methods <code>FilterTestsListener-&gt;onStart(ISuite suite)</code>, <code>TestRunListener-&gt;onStart(ISuite suite)</code> and <code>CarinaListener-&gt;onStart(ISuite suite)</code>. </p>
+<p>Then overridden TestNG methods 
+* FilterTestsListener-&gt;onStart(ISuite suite)</p>
 <ul>
 <li>
-<p>now your test class is considered initialized and onStart(ITestContext testContext) method is called. Udid is generated there.</p>
+<p>TestRunListener-&gt;onStart(ISuite suite)</p>
+</li>
+<li>
+<p>CarinaListener-&gt;onStart(ISuite suite) </p>
+</li>
+<li>
+<p>Now your test class is considered initialized and onStart(ITestContext testContext) method is called. Udid is generated there.</p>
 </li>
 <li>
 <p>onBeforeClass(ITestClass testClass). Complete steps described in @BeforeClass annotation from your test.</p>
