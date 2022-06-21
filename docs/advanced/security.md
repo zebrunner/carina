@@ -1,8 +1,10 @@
-Security functionality in Carina framework is required for sensitive data that should be hidden in test configurations and logging. It uses a symmetric key encryption algorithm for security implementation, which means that anyone may encrypt/decrypt the data in the same way, using the same key. In Carina framework, AES encryption is used by default with a 128-bit security key.
+Security functionality in Carina framework is required for sensitive data that should be hidden in test configurations and logging. It uses a symmetric key encryption algorithm for security implementation, which means that anyone may encrypt/decrypt the data in the same way, using the same key. In Carina framework, AES encryption is used with a 128-bit security key.
 
 ![Security Algorithm](../img/security-alg.png)
 
-Anyone may generate their own security key and encrypt the data using this key, so that the decrypted valid data may be used in the test only if the valid key is specified in the test configuration. Also, one may use the default common key located in test resources, giving access to all other users for secured data decryption.
+Anyone may generate their own security key and encrypt the data using this key, so that the decrypted valid data may be used in the test only if the valid key is specified in the test configuration.
+
+[DEPRECATED] Also, one may use the default common key located in test resources, giving access to all other users for secured data decryption.
 
 ## Secured data preparation
 For secured data preparation, we implemented a special tool that helps to generate crypto keys and encrypt/decrypt test data files. Here is a usage tip:
@@ -47,13 +49,26 @@ Go to “Run configuration”, navigate to the arguments tab and execute the enc
 You may use encrypted values, both in test configuration and test data files; pay attention to the fact that there is no explicit BeforeTest listener for data decryption, so there is no way to find out later in the test if the data is sensitive or not. All the decryption logic is located in WebDriverHelper that wraps Selenium WebDriver methods for interaction with UI and encapsulates action logging logic. Every method that receives a text tests if the text contains {crypt:...} pattern, and if it does, decrypts it and passes it to UI- logging, and screenshots are populated with hidden characters:
 ![Security Config 11](../img/security-config-11.png)
 
+After specifying the encrypted data in test configuration and test data files, you need to write the key in config.properties.
+The key is specified as a parameter `crypto_key_value` and contains a string representation of the encryption key.
+In Carina, including version 7.4.21, the encryption key was specified as a file `crypto.key` that should have been located along the path `{project}/src/main/resources`, however, starting from Carina version 7.4.22,
+this method is deprecated and will be removed in future versions.
+
+At the moment, thanks to the ability to pass the key to the configuration file directly as a string, you can specify it through CI.
+You can provide security key via System Properties to override it, for example:
+```
+mvn -Dcrypto_key_value=OIujpEmIVZ0C9kOkXniFRw==
+```
+## Advanced decryption
 Сarina also supports advanced decryption. This means that you can decrypt only the part of the string that you need. This the `decryptByPattern` method of the CryptoTool class.
 To decrypt your string use it like this:
 ```
 String value = "test@gmail.com/{crypt:8O9iA4+f3nMzz85szmvKmQ==}"
 
-CryptoTool cryptoTool = new CryptoTool("path_to_your_crypto_key");
+CryptoTool cryptoTool = new CryptoTool(Configuration.getCryptoParams());
 Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
 String decryptedValue = cryptoTool.decryptByPattern(value, CRYPTO_PATTERN);
 ```
 As a result `decryptedValue` will be `test@gmail.com/EncryptMe`.
+
+
