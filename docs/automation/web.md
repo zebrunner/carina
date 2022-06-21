@@ -231,7 +231,7 @@ The implemented test cases should be placed in a TestNG xml file according to th
 
 Determines how Carina detects whether the expected page is opened:
 
-* By Url. (by default)
+* By URL (by default)
 * By Element presence on the page
 * By URL and Element
 
