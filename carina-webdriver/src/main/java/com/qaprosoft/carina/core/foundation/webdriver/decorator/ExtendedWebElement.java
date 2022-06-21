@@ -97,7 +97,7 @@ public class ExtendedWebElement implements IWebElement {
     private WebDriver driver;
     private SearchContext searchContext;
 
-    private CryptoTool cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
+    private CryptoTool cryptoTool = new CryptoTool(Configuration.getCryptoParams());
 
     private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
 

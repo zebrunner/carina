@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.crypto.CryptoParams;
 import com.zebrunner.agent.core.registrar.CurrentTestRun;
 
 /**
@@ -138,6 +139,8 @@ public class Configuration {
         TIME_FORMAT("time_format"),
 
         CRYPTO_KEY_PATH("crypto_key_path"),
+
+        CRYPTO_KEY_VALUE("crypto_key_value"),
 
         SUITE_NAME("suite_name"),
 
@@ -502,6 +505,13 @@ public class Configuration {
 
     public static int getDataProviderThreadCount() {
         return Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT);
+    }
+
+    public static CryptoParams getCryptoParams() {
+        CryptoParams cryptoParams = new CryptoParams();
+        cryptoParams.setCryptoKey(Configuration.get(Parameter.CRYPTO_KEY_VALUE));
+        cryptoParams.setCryptoPath(Configuration.get(Parameter.CRYPTO_KEY_PATH));
+        return cryptoParams;
     }
 
 }

@@ -19,7 +19,7 @@ The default config properties can be obtained by
 Configuration.get(Parameter.BROWSER)
 ```
 
-All the project configuration properties are located in a **_config.properties** file. In the table below we are providing a description of most of the parameters:
+All the project configuration properties are located in a **_config.properties** file. In the table below, please see the description of most of the parameters:
 <table>
 	<tr>
 		<th>Attribute</th>
@@ -33,7 +33,7 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>selenium_url</td>
-		<td>Selenium/Appium server url</td>
+		<td>Selenium/Appium server URL</td>
 		<td>http://localhost:4444/wd/hub</td>
 	</tr>
 	<tr>
@@ -118,12 +118,12 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>max_screen_history</td>
-		<td>Max number of reports artifacts saving in history. **Default: 10**</td>
+		<td>Max number of reports artifacts saved in history. **Default: 10**</td>
 		<td>Integer</td>
 	</tr>
 	<tr>
 		<td>driver_event_listeners</td>
-		<td>Comma-separated list of extra driver listeners listeners. Listeners provide extra custom actions for WebDriver and have to be the instances of WebDriverEventListener</td>
+		<td>Comma-separated list of extra driver listeners. Listeners provide extra custom actions for WebDriver and have to be the instances of WebDriverEventListener</td>
 		<td>com.some_company.core.EventListener</td>
 	</tr>
 	<tr>
@@ -133,7 +133,7 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>init_retry_count</td>
-		<td>Number of extra attempts to create a driver. **Default: 0** means that there will no extra attempts.</td>
+		<td>Number of extra attempts to create a driver. **Default: 0** means that there will be no extra attempts.</td>
 		<td>Integer</td>
 	</tr>
 	<tr>
@@ -143,7 +143,7 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>forcibly_disable_driver_quit</td>
-		<td>If enabled turns off webdriver quit based on [initizalization phase](https://zebrunner.github.io/carina/advanced/driver/#quit). **Default: false**</td>
+		<td>If enabled, turns off webdriver quit based on [initizalization phase](https://zebrunner.github.io/carina/advanced/driver/#quit). **Default: false**</td>
 		<td>Boolean</td>
 	</tr>
 	<tr>
@@ -158,7 +158,7 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>page_opening_strategy</td>
-		<td>Determines how carina detects whether expected [page](https://zebrunner.github.io/carina/automation/web/#page-opening-strategy) is opened</td>
+		<td>Determines how carina detects whether the expected [page](https://zebrunner.github.io/carina/automation/web/#page-opening-strategy) is opened</td>
 		<td>BY_ELEMENT, BY_URL, BY_URL_AND_ELEMENT</td>
 	</tr>
 	<tr>
@@ -173,12 +173,12 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>custom_artifacts_folder</td>
-		<td>Custom unified path for auto downloaded artifacts for all tests. **Default: NULL** to download into the unique test artifacts location.</td>
+		<td>Custom unified path for auto-downloaded artifacts for all tests. **Default: NULL** to download into the unique test artifacts location.</td>
 		<td>String</td>
 	</tr>
 	<tr>
 		<td>auto_download_apps</td>
-		<td>MIME types / Internet Media Types. The parameter is needed only to configure auto downloading for FireFox. List of [values](https://freeformatter.com/mime-types-list.html)</td>
+		<td>MIME types / Internet Media Types. The parameter is needed only to configure auto-downloading for FireFox. List of [values](https://freeformatter.com/mime-types-list.html)</td>
 		<td>application/pdf</td>
 	</tr>
 	<tr>
@@ -223,7 +223,7 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>browsermob_ports_range</td>
-		<td>Range of ports that will be used for starting of browsermob proxy. First available port from the range will be used. If all ports are used then test will wait for the first freed port.</td>
+		<td>Range of ports that will be used for starting of browsermob proxy. The first available port from the range will be used. If all ports are used, then a test will wait for the first freed port.</td>
 		<td>8001:8003</td>
 	</tr>
 	<tr>
@@ -331,7 +331,7 @@ test_run_rules=OWNER=>Josh&&Jake||Peter
 #test_run_rules=OWNER=>((Josh&&Jake)||Peter)
 #So test will be executed if it has at least (Josh and Jake) or (Peter) as owner
 ```
-4) To add more tags to the rule use ";;", example:
+4) To add more tags to the rule, use ";;", for example:
 ```
 #;; works as && (AND) but for tags
 
@@ -345,18 +345,18 @@ test_run_rules=PRIORITY=>!!P1;;OWNER=>Josh&&!!Jake;;TAGS=>feature=web&&!!type=sm
 #3) (@TestTag(name = "feature", value = "web") without @TestTag(name = "type", value = "smoke"))
 	 	or @TestTag(name = "feature", value = "android")	 	
 
-#In other words, will be executed tests with Priority that differs from P1, with Josh as owner if there no Jake 
-#and if they are for not smoke web or if they are for android.
+#In other words, tests will be executed only with Priority that differs from P1, with Josh as owner if there is no Jake 
+#and if they are not for smoke web or if they are for android.
 ```
 
-###F.A.Q.
-**Where is recommended place to declare configuration parameters?**
+###FAQ
+**Where is a recommended place to declare configuration parameters?**
 
-Declare default parameters in `_config.properties`. For multi-maven projects you can use extra underscore symbol to override default settings on new layer `__config.properties`, `___config.properties` etc
+Declare default parameters in `_config.properties`. For multi-maven projects, you can use extra underscore symbol to override default settings on new layer `__config.properties`, `___config.properties` etc
 
 **How to override params from the code?**
 
-Put method might be used to override parameters globally or for current test only
+Put method might be used to override parameters globally or for a current test only
 ```
 R.CONFIG.put("selenium_url", "http://host1:4444/wd/hub"); //override selenium_url globally for the rest of tests
 R.CONFIG.put("selenium_url", "http://host2:4444/wd/hub", true); // override selenium_url for current test only
@@ -366,11 +366,12 @@ R.DATABASE.put("db.driver", "org.postgresql.Driver") //override db.driver in_dat
 **Crypted values are returned in encrypted format. How can I decrypt them?**
 
 Use `R.CONFIG.getDecrypted(String key)` method to read decrypted value. 
-> You should have valid crypto key to be able to decrypt values, for details visit [Security](https://zebrunner.github.io/carina/advanced/security/)
+
+> You should have valid crypto key to be able to decrypt values. For details, visit [Security](https://zebrunner.github.io/carina/advanced/security/)
 
 **Can I override configuration parameters from CI?**
 
-Provide updated values via System Properties to override value, for example:
+Provide updated values via System Properties to override a value, for example:
 ```
 mvn -Denv=PROD ...
 ```

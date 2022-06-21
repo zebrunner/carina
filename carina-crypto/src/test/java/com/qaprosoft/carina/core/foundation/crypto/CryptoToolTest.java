@@ -85,7 +85,7 @@ public class CryptoToolTest {
 
     @Test(dependsOnMethods= {"testDecrypt"})
     public void testInitializationFromKey() {
-        cryptoTool = new CryptoTool(SpecialKeywords.CRYPTO_ALGORITHM, SpecialKeywords.CRYPTO_KEY_TYPE, key);
+        cryptoTool = new CryptoTool(SpecialKeywords.CRYPTO_ALGORITHM, key);
         Assert.assertNotNull(cryptoTool.getAlgorithm());
         Assert.assertNotNull(cryptoTool.getCipher());
         Assert.assertEquals(SpecialKeywords.CRYPTO_ALGORITHM, cryptoTool.getAlgorithm());
