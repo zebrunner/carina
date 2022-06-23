@@ -352,7 +352,7 @@ test_run_rules=PRIORITY=>!!P1;;OWNER=>Josh&&!!Jake;;TAGS=>feature=web&&!!type=sm
 ###FAQ
 **Where is a recommended place to declare configuration parameters?**
 
-Declare default parameters in `_config.properties`. For multi-maven projects, you can use extra underscore symbol to override default settings on new layer `__config.properties`, `___config.properties` etc
+Declare default parameters in `_config.properties`. For multi-maven projects, you can use extra underscore symbol to override default settings on new layer `__config.properties`, `___config.properties`, etc.
 
 **How to override params from the code?**
 

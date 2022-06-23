@@ -138,6 +138,7 @@ public class Configuration {
 
         TIME_FORMAT("time_format"),
 
+        @Deprecated(since = "7.4.22", forRemoval = true)
         CRYPTO_KEY_PATH("crypto_key_path"),
 
         CRYPTO_KEY_VALUE("crypto_key_value"),

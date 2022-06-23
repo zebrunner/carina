@@ -66,16 +66,16 @@ public class AmazonS3Manager {
 
             AmazonS3ClientBuilder builder = AmazonS3ClientBuilder.standard();
             
+            String s3region = Configuration.get(Parameter.S3_REGION);
+            if (!s3region.isEmpty()) {
+                builder.withRegion(Regions.fromName(s3region));
+            }
+            
             String accessKey = cryptoTool.decryptByPattern(Configuration.get(Parameter.ACCESS_KEY_ID), CRYPTO_PATTERN);
             String secretKey = cryptoTool.decryptByPattern(Configuration.get(Parameter.SECRET_KEY), CRYPTO_PATTERN);
             if (!accessKey.isEmpty() && !secretKey.isEmpty()) {
                 BasicAWSCredentials creds = new BasicAWSCredentials(accessKey, secretKey);
                 builder.withCredentials(new AWSStaticCredentialsProvider(creds)).build();
-            }
-            
-            String s3region = Configuration.get(Parameter.S3_REGION);
-            if (!s3region.isEmpty()) {
-                builder.withRegion(Regions.fromName(s3region));
             }
             
             s3client = builder.build();
