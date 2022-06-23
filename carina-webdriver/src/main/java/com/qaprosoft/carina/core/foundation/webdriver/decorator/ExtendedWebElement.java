@@ -1038,8 +1038,6 @@ public class ExtendedWebElement implements IWebElement {
 		}
     }
 
-
-
     /**
      * Find Extended Web Element on page using By starting search from this
      * object.
@@ -1123,25 +1121,40 @@ public class ExtendedWebElement implements IWebElement {
         return extendedWebElements;
     }
 
+    /**
+     * Wait until element disappear
+     *
+     * @param timeout long
+     * @return boolean true if element disappeared and false if still visible
+     */
     public boolean waitUntilElementDisappear(final long timeout) {
+        boolean res = false;
         try {
             if (this.element == null) {
                 // if element not found it will cause NoSuchElementException
                 findElement();
-            } else {
-                // if element is stale, it will cause StaleElementReferenceException
-                this.element.isDisplayed();
             }
-
-            return waitUntil(ExpectedConditions.or(ExpectedConditions.stalenessOf(this.element),
+            
+            // if element is stale, it will cause StaleElementReferenceException
+            if (this.element.isDisplayed()) {
+                LOGGER.info("Element {} detected. Waiting until disappear...", this.element.getTagName());
+            } else {
+                LOGGER.info("Element {} is not detected, i.e. disappeared", this.element.getTagName());
+                // no sense to continue as element is not displayed so return asap
+                return true;
+            }
+            
+            res = waitUntil(ExpectedConditions.or(ExpectedConditions.stalenessOf(this.element),
                     ExpectedConditions.invisibilityOf(this.element)),
                     timeout);
-
+            
         } catch (NoSuchElementException | StaleElementReferenceException e) {
             // element not present so means disappear
-            return true;
+            LOGGER.debug("Element disappeared as exception catched: {}", e.getMessage());
+            res = true;
         }
 
+        return res;
 
     }
 
