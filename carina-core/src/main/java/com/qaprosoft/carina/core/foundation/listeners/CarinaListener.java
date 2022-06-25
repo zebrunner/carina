@@ -548,7 +548,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             mobileAppPath = updateAppCenterAppPath(mobileAppPath);
         }
         
-        Configuration.setMobileApp(mobileAppPath);
+        if (!mobileAppPath.isEmpty()) {
+            Configuration.setMobileApp(mobileAppPath);
+        }
     }
 
     /**
