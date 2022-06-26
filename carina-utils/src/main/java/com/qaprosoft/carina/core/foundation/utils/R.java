@@ -95,6 +95,7 @@ public enum R {
                 for (Object key : properties.keySet()) {
                     String systemValue = System.getenv((String) key);
                     if (!StringUtils.isEmpty(systemValue)) {
+                        LOGGER.warn("Override property {} suing env var value {}.", key, systemValue);
                         properties.put(key, systemValue);
                     }
                 }
