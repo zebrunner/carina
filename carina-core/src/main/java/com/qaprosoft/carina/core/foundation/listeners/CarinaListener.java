@@ -292,7 +292,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     @Override
     public void onTestFailure(ITestResult result) {
         LOGGER.debug("CarinaListener->onTestFailure");
-        String errorMessage = getFailureReason(result);
         takeScreenshot();
         onTestFinish(result);
         super.onTestFailure(result);
@@ -301,7 +300,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     @Override
     public void onTestSkipped(ITestResult result) {
         LOGGER.debug("CarinaListener->onTestSkipped");
-        String errorMessage = getFailureReason(result);
         takeScreenshot();
         onTestFinish(result);
         super.onTestSkipped(result);
