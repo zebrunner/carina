@@ -292,8 +292,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     @Override
     public void onTestFailure(ITestResult result) {
         LOGGER.debug("CarinaListener->onTestFailure");
-        String errorMessage = getFailureReason(result);
-        takeScreenshot("TEST FAILED - " + errorMessage);
+        takeScreenshot();
         onTestFinish(result);
         super.onTestFailure(result);
     }
@@ -301,8 +300,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     @Override
     public void onTestSkipped(ITestResult result) {
         LOGGER.debug("CarinaListener->onTestSkipped");
-        String errorMessage = getFailureReason(result);
-        takeScreenshot("TEST SKIPPED - " + errorMessage, false);
+        takeScreenshot();
         onTestFinish(result);
         super.onTestSkipped(result);
     }
@@ -861,30 +859,32 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         }
     }
     
-    private String takeScreenshot(String msg) {
-        return takeScreenshot(msg, true);
-    }
-    
-    private String takeScreenshot(String msg, boolean isFullSize) {
-        String screenId = "";
-
+    /*
+     * Capture screenshots for all available drivers after test fail/skip.
+     * Request full size error screenshots if allowed by IScreenshotRules (allow_fullsize_screenshot property)
+     * 
+     * @param msg String comment
+     *  
+     */
+    private void takeScreenshot() {
         ConcurrentHashMap<String, CarinaDriver> drivers = getDrivers();
 
         try {
             for (Map.Entry<String, CarinaDriver> entry : drivers.entrySet()) {
-                String driverName = entry.getKey();
                 WebDriver drv = entry.getValue().getDriver();
 
                 if (drv instanceof EventFiringWebDriver) {
                     drv = ((EventFiringWebDriver) drv).getWrappedDriver();
                 }
 
-                screenId = Screenshot.captureByRule(drv, driverName + ": " + msg, isFullSize);
+                R.CONFIG.put(Parameter.ERROR_SCREENSHOT.getKey(), "true", true);
+                Screenshot.captureByRule(drv, "", true);
             }
         } catch (Throwable thr) {
             LOGGER.error("Failure detected on screenshot generation after failure: ", thr);
+        } finally {
+            R.CONFIG.put(Parameter.ERROR_SCREENSHOT.getKey(), "false", true);
         }
-        return screenId;
     }    
 
     public static class ShutdownHook extends Thread {

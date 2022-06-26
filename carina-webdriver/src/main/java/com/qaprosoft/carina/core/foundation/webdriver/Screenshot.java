@@ -273,13 +273,13 @@ public class Screenshot {
 
                 ImageIO.write(screen, "PNG", screenshot);
 
+                if (!comment.isEmpty()) {
+                    LOGGER.info(comment);
+                    // add screenshot comment to collector
+                    ReportContext.addScreenshotComment(screenName, comment);
+                }
+                //upload screenshot to Zebrunner Reporting
                 com.zebrunner.agent.core.registrar.Screenshot.upload(Files.readAllBytes(screenshot.toPath()), Instant.now().toEpochMilli());
-                
-                // [VD] do not print log message as it double lines in reporting 
-                // LOGGER.info(comment);
-
-                // add screenshot comment to collector
-                ReportContext.addScreenshotComment(screenName, comment);
             } catch (NoSuchWindowException e) {
                 LOGGER.warn("Unable to capture screenshot due to NoSuchWindowException!");
                 LOGGER.debug(ERROR_STACKTRACE, e);

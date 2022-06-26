@@ -97,7 +97,9 @@ public class Configuration {
         REPORT_URL("report_url"),
 
         AUTO_SCREENSHOT("auto_screenshot"),
-        
+
+        ERROR_SCREENSHOT("error_screenshot"),
+
         ALLOW_FULLSIZE_SCREENSHOT("allow_fullsize_screenshot"),
 
         EXPLICIT_TIMEOUT("explicit_timeout"),

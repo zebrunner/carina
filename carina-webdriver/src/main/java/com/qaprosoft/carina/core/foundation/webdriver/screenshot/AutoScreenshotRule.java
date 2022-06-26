@@ -21,8 +21,8 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 public class AutoScreenshotRule implements IScreenshotRule {
     @Override
     public boolean isTakeScreenshot() {
-        // enabled or not screenshot generation for every call if auto_screenshots=true
-        return Configuration.getBoolean(Parameter.AUTO_SCREENSHOT);
+        // enabled or not screenshot generation for driver action or test failure
+        return Configuration.getBoolean(Parameter.AUTO_SCREENSHOT) || Configuration.getBoolean(Parameter.ERROR_SCREENSHOT);
     }
 
     @Override
