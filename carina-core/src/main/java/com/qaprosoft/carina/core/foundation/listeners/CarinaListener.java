@@ -807,7 +807,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         // register testrail cases...
         Set<String> trCases = getTestRailCasesUuid(result);
         for (String trCase : trCases) {
-            TestRail.setCaseId(trCase);
+            TestRail.setTestCaseId(trCase);
         }
 
         // register qtest cases...
