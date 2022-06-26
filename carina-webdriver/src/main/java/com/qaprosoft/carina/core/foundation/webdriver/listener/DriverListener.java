@@ -31,6 +31,8 @@ import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.FileManager;
+import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 import com.zebrunner.agent.core.registrar.Artifact;
@@ -282,6 +284,7 @@ public class DriverListener implements WebDriverEventListener, IDriverPool {
         try {
             if (errorMessage) {
                 LOGGER.error(comment);
+                R.CONFIG.put(Parameter.ERROR_SCREENSHOT.getKey(), "true", true);
                 String screenName = Screenshot.captureByRule(driver, comment, true); // in case of failure try full size if allowed
                 // do not generate UI dump if no screenshot
                 if (!screenName.isEmpty()) {
@@ -294,6 +297,7 @@ public class DriverListener implements WebDriverEventListener, IDriverPool {
         } catch (Exception e) {
             LOGGER.debug("Unrecognized failure detected in DriverListener->captureScreenshot!", e);
         } finally {
+            R.CONFIG.put(Parameter.ERROR_SCREENSHOT.getKey(), "false", true);
             resetMessages();
         }
     }

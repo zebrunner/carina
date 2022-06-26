@@ -273,6 +273,7 @@ public class Screenshot {
 
                 ImageIO.write(screen, "PNG", screenshot);
 
+                LOGGER.info(comment);
                 com.zebrunner.agent.core.registrar.Screenshot.upload(Files.readAllBytes(screenshot.toPath()), Instant.now().toEpochMilli());
                 
                 // [VD] do not print log message as it double lines in reporting 

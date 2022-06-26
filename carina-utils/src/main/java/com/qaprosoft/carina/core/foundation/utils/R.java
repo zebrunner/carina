@@ -170,8 +170,11 @@ public enum R {
      */
     public void put(String key, String value, boolean currentTestOnly) {
         if (currentTestOnly) {
+            // do not warn user about this system property update
+            if (!Parameter.ERROR_SCREENSHOT.getKey().equals(key)) {
+                LOGGER.warn("Override property for current test '" + key + "=" + value + "'!");
+            }
             //declare temporary property key
-            LOGGER.warn("Override property for current test '" + key + "=" + value + "'!");
             getTestProperties().put(key, value);
         } else {
             // override globally configuration map property 
@@ -200,7 +203,10 @@ public enum R {
     public String get(String key) {
         String value = getTestProperties().getProperty(key);
         if (value != null) {
-            System.out.println("Overridden '" + key + "=" + value + "' property will be used for current test!");
+            // do not warn user about this system property update
+            if (!Parameter.ERROR_SCREENSHOT.getKey().equals(key)) {
+                System.out.println("Overridden '" + key + "=" + value + "' property will be used for current test!");
+            }
             return value;
         }
         

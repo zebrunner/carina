@@ -302,7 +302,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     public void onTestSkipped(ITestResult result) {
         LOGGER.debug("CarinaListener->onTestSkipped");
         String errorMessage = getFailureReason(result);
-        takeScreenshot("TEST SKIPPED - " + errorMessage, false);
+        takeScreenshot("TEST SKIPPED - " + errorMessage);
         onTestFinish(result);
         super.onTestSkipped(result);
     }
@@ -861,13 +861,14 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         }
     }
     
-    private String takeScreenshot(String msg) {
-        return takeScreenshot(msg, true);
-    }
-    
-    private String takeScreenshot(String msg, boolean isFullSize) {
-        String screenId = "";
-
+    /*
+     * Capture screenshots for all available drivers after test fail/skip.
+     * Request full size error screenshots if allowed by IScreenshotRules (allow_fullsize_screenshot property)
+     * 
+     * @param msg String comment
+     *  
+     */
+    private void takeScreenshot(String msg) {
         ConcurrentHashMap<String, CarinaDriver> drivers = getDrivers();
 
         try {
@@ -879,12 +880,14 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                     drv = ((EventFiringWebDriver) drv).getWrappedDriver();
                 }
 
-                screenId = Screenshot.captureByRule(drv, driverName + ": " + msg, isFullSize);
+                R.CONFIG.put(Parameter.ERROR_SCREENSHOT.getKey(), "true", true);
+                Screenshot.captureByRule(drv, driverName + ": " + msg, true);
             }
         } catch (Throwable thr) {
             LOGGER.error("Failure detected on screenshot generation after failure: ", thr);
+        } finally {
+            R.CONFIG.put(Parameter.ERROR_SCREENSHOT.getKey(), "false", true);
         }
-        return screenId;
     }    
 
     public static class ShutdownHook extends Thread {
