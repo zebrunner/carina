@@ -91,7 +91,15 @@ public enum R {
                     resourceName = OVERRIDE_SIGN + resourceName;
                 }
 
-                // Overrides properties by systems values
+                // Overrides properties by env variables
+                for (Object key : properties.keySet()) {
+                    String systemValue = System.getenv((String) key);
+                    if (!StringUtils.isEmpty(systemValue)) {
+                        properties.put(key, systemValue);
+                    }
+                }
+                
+                // Overrides properties by systems properties (java arguments)
                 for (Object key : properties.keySet()) {
                     String systemValue = System.getProperty((String) key);
                     if (!StringUtils.isEmpty(systemValue)) {
@@ -112,6 +120,7 @@ public enum R {
                 if (resource.resourceFile.contains("config.properties")) {
                     // no need to read env variables using System.getenv()
                     final String prefix = SpecialKeywords.CAPABILITIES + ".";
+                    
                     // read all java arguments and redefine capabilities.* items
                     @SuppressWarnings({ "unchecked", "rawtypes" })
                     Map<String, String> javaProperties = new HashMap(System.getProperties());
