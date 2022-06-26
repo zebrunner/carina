@@ -293,7 +293,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     public void onTestFailure(ITestResult result) {
         LOGGER.debug("CarinaListener->onTestFailure");
         String errorMessage = getFailureReason(result);
-        takeScreenshot("TEST FAILED - " + errorMessage);
+        takeScreenshot();
         onTestFinish(result);
         super.onTestFailure(result);
     }
@@ -302,7 +302,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     public void onTestSkipped(ITestResult result) {
         LOGGER.debug("CarinaListener->onTestSkipped");
         String errorMessage = getFailureReason(result);
-        takeScreenshot("TEST SKIPPED - " + errorMessage);
+        takeScreenshot();
         onTestFinish(result);
         super.onTestSkipped(result);
     }
@@ -868,12 +868,11 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
      * @param msg String comment
      *  
      */
-    private void takeScreenshot(String msg) {
+    private void takeScreenshot() {
         ConcurrentHashMap<String, CarinaDriver> drivers = getDrivers();
 
         try {
             for (Map.Entry<String, CarinaDriver> entry : drivers.entrySet()) {
-                String driverName = entry.getKey();
                 WebDriver drv = entry.getValue().getDriver();
 
                 if (drv instanceof EventFiringWebDriver) {
@@ -881,7 +880,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 }
 
                 R.CONFIG.put(Parameter.ERROR_SCREENSHOT.getKey(), "true", true);
-                Screenshot.captureByRule(drv, driverName + ": " + msg, true);
+                Screenshot.captureByRule(drv, "", true);
             }
         } catch (Throwable thr) {
             LOGGER.error("Failure detected on screenshot generation after failure: ", thr);

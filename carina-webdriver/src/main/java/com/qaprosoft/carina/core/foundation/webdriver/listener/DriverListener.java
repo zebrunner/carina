@@ -285,14 +285,14 @@ public class DriverListener implements WebDriverEventListener, IDriverPool {
             if (errorMessage) {
                 LOGGER.error(comment);
                 R.CONFIG.put(Parameter.ERROR_SCREENSHOT.getKey(), "true", true);
-                String screenName = Screenshot.captureByRule(driver, comment, true); // in case of failure try full size if allowed
+                String screenName = Screenshot.captureByRule(driver, "", true); // in case of failure try full size if allowed
                 // do not generate UI dump if no screenshot
                 if (!screenName.isEmpty()) {
                     generateDump(driver, screenName);
                 }
             } else {
                 LOGGER.info(comment);
-                Screenshot.captureByRule(driver, comment);
+                Screenshot.captureByRule(driver, "");
             }
         } catch (Exception e) {
             LOGGER.debug("Unrecognized failure detected in DriverListener->captureScreenshot!", e);
