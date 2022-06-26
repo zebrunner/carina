@@ -80,14 +80,12 @@ public enum R {
                 URL baseResource = ClassLoader.getSystemResource(resource.resourceFile);
                 if (baseResource != null) {
                     properties.load(baseResource.openStream());
-                    LOGGER.debug("Base properties loaded: " + resource.resourceFile);
                 }
 
                 URL overrideResource;
                 String resourceName = OVERRIDE_SIGN + resource.resourceFile;
                 while ((overrideResource = ClassLoader.getSystemResource(resourceName)) != null) {
                     properties.load(overrideResource.openStream());
-                    LOGGER.debug("Override properties loaded: " + resourceName);
                     resourceName = OVERRIDE_SIGN + resourceName;
                 }
 
@@ -95,7 +93,6 @@ public enum R {
                 for (Object key : properties.keySet()) {
                     String systemValue = System.getenv((String) key);
                     if (!StringUtils.isEmpty(systemValue)) {
-                        LOGGER.warn("Override property {} suing env var value {}.", key, systemValue);
                         properties.put(key, systemValue);
                     }
                 }
