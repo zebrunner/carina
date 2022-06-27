@@ -110,6 +110,8 @@ public abstract class AbstractCapabilities {
             capabilities = addFirefoxOptions(capabilities);
         } else if (BrowserType.CHROME.equalsIgnoreCase(browser)) {
             capabilities = addChromeOptions(capabilities);
+        } else if (BrowserType.EDGE.equalsIgnoreCase(browser)) {
+            capabilities = addChromeOptions(capabilities);
         }
 
         if (Configuration.getBoolean(Parameter.HEADLESS)) {
