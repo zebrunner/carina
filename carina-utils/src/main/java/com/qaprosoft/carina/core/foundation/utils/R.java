@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils;
 
+import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.util.HashMap;
@@ -80,9 +81,11 @@ public enum R {
 
                 URL baseResource = ClassLoader.getSystemResource(resource.resourceFile);
                 if (baseResource != null) {
-                    properties.load(baseResource.openStream());
                     Properties defaultProperties = new Properties();
-                    defaultProperties.putAll(defaultProperties);
+                    try (InputStream stream = baseResource.openStream()) {
+                        properties.load(stream);
+                        defaultProperties.load(stream);
+                    }
                     defaultPropertiesHolder.put(resource.resourceFile, defaultProperties);
                 }
 
