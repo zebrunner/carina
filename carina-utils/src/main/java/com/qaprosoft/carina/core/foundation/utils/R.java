@@ -81,7 +81,7 @@ public enum R {
                 URL baseResource = ClassLoader.getSystemResource(resource.resourceFile);
                 if (baseResource != null) {
                     properties.load(baseResource.openStream());
-                    defaultPropertiesHolder.put(resource.resourceFile, properties);
+                    defaultPropertiesHolder.put(resource.resourceFile, new Properties(properties));
                 }
 
                 URL overrideResource;
