@@ -84,8 +84,8 @@ public enum R {
                     Properties defaultProperties = new Properties();
                     try (InputStream stream = baseResource.openStream()) {
                         properties.load(stream);
-                        defaultProperties.load(stream);
                     }
+                    defaultProperties.putAll(properties);
                     defaultPropertiesHolder.put(resource.resourceFile, defaultProperties);
                 }
 
