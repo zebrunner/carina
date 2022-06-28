@@ -110,6 +110,8 @@ public abstract class AbstractCapabilities {
             capabilities = addFirefoxOptions(capabilities);
         } else if (BrowserType.CHROME.equalsIgnoreCase(browser)) {
             capabilities = addChromeOptions(capabilities);
+        } else if (BrowserType.EDGE.equalsIgnoreCase(browser)) {
+            capabilities = addEdgeOptions(capabilities);
         }
 
         if (Configuration.getBoolean(Parameter.HEADLESS)) {
@@ -175,7 +177,30 @@ public abstract class AbstractCapabilities {
 
         return null;
     }
-    
+
+    private DesiredCapabilities addEdgeOptions(DesiredCapabilities caps) {
+        Map<String, Object> prefs = new HashMap<>();
+        Map<String, Object> edgeOptions = new HashMap<>();
+
+        boolean needsPrefs = false;
+
+        if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD)) {
+            prefs.put("download.prompt_for_download", false);
+            if (!"zebrunner".equalsIgnoreCase(R.CONFIG.get("capabilities.provider"))) {
+                prefs.put("download.default_directory",
+                        ReportContext.getArtifactsFolder().getAbsolutePath());
+            }
+            needsPrefs = true;
+        }
+
+        if (needsPrefs) {
+            edgeOptions.put("prefs", prefs);
+        }
+        caps.setCapability("ms:edgeChrominum", true);
+        caps.setCapability("ms:edgeOptions", edgeOptions);
+
+        return caps;
+    }
 
     private DesiredCapabilities addChromeOptions(DesiredCapabilities caps) {
         // add default carina options and arguments
