@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.net.PortProber;
@@ -111,7 +112,7 @@ public abstract class AbstractCapabilities {
         } else if (BrowserType.CHROME.equalsIgnoreCase(browser)) {
             capabilities = addChromeOptions(capabilities);
         } else if (BrowserType.EDGE.equalsIgnoreCase(browser)) {
-            capabilities = addChromeOptions(capabilities);
+            capabilities = addEdgeOptions(capabilities);
         }
 
         if (Configuration.getBoolean(Parameter.HEADLESS)) {
@@ -176,6 +177,34 @@ public abstract class AbstractCapabilities {
         }
 
         return null;
+    }
+
+    private DesiredCapabilities addEdgeOptions(DesiredCapabilities caps) {
+        EdgeOptions options = new EdgeOptions();
+        Map<String, Object> prefs = new HashMap<>();
+        Map<String, Object> edgeOptions = new HashMap<>();
+
+        boolean needsPrefs = false;
+
+        if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD)) {
+            prefs.put("download.prompt_for_download", false);
+            prefs.put("profile.default_content_settings.popups", 0);
+            if (!"zebrunner".equalsIgnoreCase(R.CONFIG.get("capabilities.provider"))) {
+                prefs.put("download.default_directory",
+                        ReportContext.getArtifactsFolder().getAbsolutePath());
+            }
+            needsPrefs = true;
+        }
+
+        if (needsPrefs) {
+            edgeOptions.put("prefs", prefs);
+            edgeOptions.put("useAutomationExtension", false);
+
+        }
+        caps.setCapability("ms:edgeChrominum", true);
+        caps.setCapability("ms:edgeOptions", edgeOptions);
+
+        return caps;
     }
     
 
