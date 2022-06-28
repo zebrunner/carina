@@ -67,11 +67,10 @@ public class CryptoTool {
         initCipher();
     }
 
-    @Deprecated(since = "7.4.22", forRemoval = true)
     public CryptoTool(String cryptoKeyPath) {
         this(SpecialKeywords.CRYPTO_ALGORITHM, SpecialKeywords.CRYPTO_KEY_TYPE, cryptoKeyPath);
     }
-    @Deprecated(since = "7.4.22", forRemoval = true)
+
     public CryptoTool(String cryptoAlgorithm, String cryptoKeyType, String cryptoKeyPath) {
         this.algorithm = cryptoAlgorithm;
 
