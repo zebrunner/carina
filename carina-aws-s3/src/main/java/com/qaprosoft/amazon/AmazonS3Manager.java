@@ -61,7 +61,7 @@ public class AmazonS3Manager {
         if (instance == null) {
             instance = new AmazonS3Manager();
             
-            CryptoTool cryptoTool = new CryptoTool(Configuration.getCryptoParams());
+            CryptoTool cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
             Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
 
             AmazonS3ClientBuilder builder = AmazonS3ClientBuilder.standard();
