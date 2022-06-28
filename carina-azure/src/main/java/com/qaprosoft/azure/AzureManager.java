@@ -15,13 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.azure;
 
-import java.io.File;
-import java.lang.invoke.MethodHandles;
-import java.util.regex.Pattern;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
@@ -32,6 +25,12 @@ import com.azure.storage.common.StorageSharedKeyCredential;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.lang.invoke.MethodHandles;
+import java.util.regex.Pattern;
 
 public class AzureManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -43,7 +42,7 @@ public class AzureManager {
     public synchronized static AzureManager getInstance() {
         if (instance == null) {
             instance = new AzureManager();
-            CryptoTool cryptoTool = new CryptoTool(Configuration.getCryptoParams());
+            CryptoTool cryptoTool = new CryptoTool(Configuration.get(Configuration.Parameter.CRYPTO_KEY_PATH));
             Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
 
             String accountName = Configuration.get(Configuration.Parameter.AZURE_ACCOUNT_NAME);

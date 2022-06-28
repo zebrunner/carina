@@ -108,7 +108,7 @@ public class DriverHelper {
     protected static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
 
     public DriverHelper() {
-        cryptoTool = new CryptoTool(Configuration.getCryptoParams());
+        cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
     }
 
     public DriverHelper(WebDriver driver) {
