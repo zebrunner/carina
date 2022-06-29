@@ -1084,7 +1084,7 @@ public class ExtendedWebElement implements IWebElement {
      */
     public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
         if (isPresent(by, timeout)) {
-            return new ExtendedWebElement(by, name, this.driver, this.searchContext);
+            return new ExtendedWebElement(by, name, this.driver, getElement());
         } else {
         	throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
         }
