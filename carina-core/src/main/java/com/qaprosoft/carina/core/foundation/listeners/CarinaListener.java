@@ -132,7 +132,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         // Technically, this happen when the maven-surefire-plugin has not set inherited program arguments (passed to mvn process).
         // That is why it is necessary to reinit R class here when TestNG loads the CarinaListener class.
         R.reinit();
-        updateAppPath();
         
         LOGGER.info(Configuration.asString());
         // Configuration.validateConfiguration();
@@ -181,6 +180,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             logger.setLevel(Level.getLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
         }
 
+        updateAppPath();
+        
         setThreadCount(suite);
         
         if (Configuration.getPlatform().equalsIgnoreCase(SpecialKeywords.API)) {
