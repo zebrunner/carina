@@ -407,7 +407,7 @@ private ExtendedWebElement cell;
 private ExtendedWebElement cellLink
 ```
 
-In code where these elements will be used, use the `format` function to format the locator and create an ExtendedWebElement based on it for later use:
+2) In code where these elements will be used, use the `format` method to format the locator and create an ExtendedWebElement based on it for later use:
 ```
 // a link that have the text "My link"
 link.format("My link")
@@ -418,7 +418,7 @@ cell.format(2)
 // a link that have the text "My link" that  is in the td tag with class 'nfo' by index 2
 cellLink.format(2, "My link");
 ```
-As a result of calling this function, we get a specific ExtendedWebElement, which we can use in the future, for example:
+3) As a result of calling this method, we get a specific ExtendedWebElement, which we can use in the future, for example:
 ```
 //getting text of element
 cell.format("My link").getText();

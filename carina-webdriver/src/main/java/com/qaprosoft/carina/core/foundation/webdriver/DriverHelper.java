@@ -1115,7 +1115,7 @@ public class DriverHelper {
     /**
      * Find Extended Web Element on page using By.
      *
-     * @deprecated {@link ExtendedWebElement#format(Object...) "Use format func instead"}
+     * @deprecated {@link ExtendedWebElement#format(Object...) "Use format method instead"}
      * @param by
      *            Selenium By locator
      * @return ExtendedWebElement if exists otherwise null.
@@ -1128,7 +1128,7 @@ public class DriverHelper {
     /**
      * Find Extended Web Element on page using By.
      *
-     * @deprecated {@link ExtendedWebElement#format(Object...) "Use format func instead"}
+     * @deprecated {@link ExtendedWebElement#format(Object...) "Use format method instead"}
      * @param by
      *            Selenium By locator
      * @param timeout to wait
@@ -1142,7 +1142,7 @@ public class DriverHelper {
     /**
      * Find Extended Web Element on page using By.
      *
-     * @deprecated {@link ExtendedWebElement#format(Object...) "Use format func instead"}
+     * @deprecated {@link ExtendedWebElement#format(Object...) "Use format method instead"}
      * @param by
      *            Selenium By locator
      * @param name
@@ -1157,7 +1157,7 @@ public class DriverHelper {
     /**
      * Find Extended Web Element on page using By.
      *
-     * @deprecated {@link ExtendedWebElement#format(Object...) "Use format func instead"}
+     * @deprecated {@link ExtendedWebElement#format(Object...) "Use format method instead"}
      * @param by
      *            Selenium By locator
      * @param name
@@ -1182,7 +1182,7 @@ public class DriverHelper {
     /**
      * Find List of Extended Web Elements on page using By and explicit timeout.
      *
-     * @deprecated {@link ExtendedWebElement#format(Object...) "Use format func instead"}
+     * @deprecated {@link ExtendedWebElement#format(Object...) "Use format method instead"}
      * @param by
      *            Selenium By locator
      * @return List of ExtendedWebElement.
@@ -1195,7 +1195,7 @@ public class DriverHelper {
     /**
      * Find List of Extended Web Elements on page using By.
      *
-     * @deprecated {@link ExtendedWebElement#format(Object...) "Use format func instead"}
+     * @deprecated {@link ExtendedWebElement#format(Object...) "Use format method instead"}
      * 
      * @param by
      *            Selenium By locator
