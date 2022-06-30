@@ -15,7 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver;
 
-import java.awt.*;
+import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -1157,7 +1157,6 @@ public class DriverHelper {
     /**
      * Find Extended Web Element on page using By.
      *
-     * @see
      * @deprecated {@link ExtendedWebElement#format(Object...) "Use format func instead"}
      * @param by
      *            Selenium By locator
