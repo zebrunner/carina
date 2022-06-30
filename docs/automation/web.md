@@ -395,7 +395,9 @@ In previous versions of Carina, it was possible to search for an element using a
    ExtendedWebElement spec = findExtendedWebElement(By.xpath(
                         String.format("//td[@class='nfo'][%d]//a[text()='%s']", "My link", 1)));
 ```
+
 However, this element search format is now deprecated and not recommended to use. There is more convenient way to search:
+
 1) Declare an element using the `@FindBy` annotation and specify a locator based on the convention used by the [Formatter](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Formatter.html):
 ```
 @FindBy(xpath = "//a[text()='%s']")
@@ -419,6 +421,7 @@ cell.format(2)
 // a link that have the text "My link" that  is in the td tag with class 'nfo' by index 2
 cellLink.format(2, "My link");
 ```
+
 3) As a result of calling this method, we get a specific ExtendedWebElement, which we can use in the future, for example:
 ```
 //getting text of element
