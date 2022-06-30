@@ -389,6 +389,7 @@ public void someTest() {
 }
 ```
 **How to declare and use an ExtendedWebElement with dynamic xpath?**
+
 In previous versions of Carina, it was possible to search for an element using a dynamic xpath using such code:
 ```
    ExtendedWebElement spec = findExtendedWebElement(By.xpath(
