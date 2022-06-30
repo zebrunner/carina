@@ -1158,6 +1158,11 @@ public class ExtendedWebElement implements IWebElement {
 
     }
 
+    /**
+     * Used to format locator
+     * 
+     * @return ExtendedWebElement
+     */
     public ExtendedWebElement format(Object... objects) {
         String locator = by.toString();
         By by = null;
