@@ -1139,8 +1139,8 @@ public void someTest() {
                         String.format(&quot;//td[@class='nfo'][%d]//a[text()='%s']&quot;, &quot;My link&quot;, 1)));
 </code></pre>
 
-<p>However, this element search format is now deprecated and not recommended to use. There is more convenient way to search:
-1) Declare an element using the <code>@FindBy</code> annotation and specify a locator based on the convention used by the <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Formatter.html">Formatter</a>:</p>
+<p>However, this element search format is now deprecated and not recommended to use. There is more convenient way to search:</p>
+<p>1) Declare an element using the <code>@FindBy</code> annotation and specify a locator based on the convention used by the <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Formatter.html">Formatter</a>:</p>
 <pre><code>@FindBy(xpath = &quot;//a[text()='%s']&quot;)
 private ExtendedWebElement link;
 
