@@ -212,7 +212,7 @@ public enum R {
         if (value != null) {
             // do not warn user about this system property update
             if (!Parameter.ERROR_SCREENSHOT.getKey().equals(key)) {
-                LOGGER.warn("Overridden '{}={}' property will be used for current test!", key, value);
+                System.out.println("Overridden '" + key + "=" + value + "' property will be used for current test!");
             }
             return value;
         }
