@@ -1133,6 +1133,40 @@ public void someTest() {
 }
 </code></pre>
 
+<p><strong>How to declare and use an ExtendedWebElement with dynamic xpath?</strong>
+In previous versions of Carina, it was possible to search for an element using a dynamic xpath using such code:</p>
+<pre><code>   ExtendedWebElement spec = findExtendedWebElement(By.xpath(
+                        String.format(&quot;//td[@class='nfo'][%d]//a[text()='%s']&quot;, &quot;My link&quot;, 1)));
+</code></pre>
+
+<p>However, this element search format is now deprecated and not recommended to use. There is more convenient way to search:
+1) Declare an element using the <code>@FindBy</code> annotation and specify a locator based on the convention used by the <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Formatter.html">Formatter</a>:</p>
+<pre><code>@FindBy(xpath = &quot;//a[text()='%s']&quot;)
+private ExtendedWebElement link;
+
+@FindBy(xpath = &quot;//td[@class='nfo'][%d]&quot;)
+private ExtendedWebElement cell;
+
+@FindBy(xpath = &quot;//td[@class='nfo'][%d]//a[text()='%s']&quot;)
+private ExtendedWebElement cellLink
+</code></pre>
+
+<p>2) In code where these elements will be used, use the <code>format</code> method to format the locator and create an ExtendedWebElement based on it for later use:</p>
+<pre><code>// a link that have the text &quot;My link&quot;
+link.format(&quot;My link&quot;)
+
+// td tag with class 'nfo' by index 2
+cell.format(2)
+
+// a link that have the text &quot;My link&quot; that  is in the td tag with class 'nfo' by index 2
+cellLink.format(2, &quot;My link&quot;);
+</code></pre>
+
+<p>3) As a result of calling this method, we get a specific ExtendedWebElement, which we can use in the future, for example:</p>
+<pre><code>//getting text of element
+cell.format(&quot;My link&quot;).getText();
+</code></pre>
+
               
             </article>
           </div>
