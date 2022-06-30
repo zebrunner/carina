@@ -171,7 +171,7 @@ public enum R {
      * @param key name of property
      * @return true if current value equals default value, otherwise false
      */
-    public boolean isOverwriten(String key) {
+    public boolean isOverwritten(String key) {
         String currentValue = get(key);
         String defaultValue = defaultPropertiesHolder.get(resourceFile).getProperty(key);
         if (defaultValue == null) {
