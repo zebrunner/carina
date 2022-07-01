@@ -88,7 +88,7 @@ public class LocalizedAnnotations extends Annotations {
                 "(By\\.(id|name|xpath|linkText|partialLinkText|css|cssSelector|className|tagName): )))");
         Matcher matcher = pattern.matcher(resultLocator);
 
-        if (!matcher.find()) {
+        if (!matcher.matches()) {
             throw new RuntimeException(String.format("Unable to generate By using locator: '%s'!", resultLocator));
         }
         String prefix = matcher.group("prefix");
