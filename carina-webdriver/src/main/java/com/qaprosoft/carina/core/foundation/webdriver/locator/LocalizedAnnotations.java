@@ -84,7 +84,7 @@ public class LocalizedAnnotations extends Annotations {
     private By createBy(String locator) {
         String resultLocator = locator;
         // Example: id=, name=, By.linkText: , By.className: , cssSelector=
-        Pattern pattern = Pattern.compile("^(?<prefix>(((id|name|xpath|linkText|partialLinkText|cssSelector|css|tagName|className)=)|(By\\\\.(id|name|xpath|linkText|partialLinkText|css|cssSelector|className|tagName): )))");
+        Pattern pattern = Pattern.compile("^(?<prefix>(((id|name|xpath|linkText|partialLinkText|cssSelector|css|tagName|className)=)|(By[.](id|name|xpath|linkText|partialLinkText|css|cssSelector|className|tagName): )))");
         Matcher matcher = pattern.matcher(resultLocator);
 
         if (!matcher.find()) {
