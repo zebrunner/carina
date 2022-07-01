@@ -1753,6 +1753,10 @@ public class ExtendedWebElement implements IWebElement {
         	resBy = By.linkText(StringUtils.remove(locator, LocatorType.LINKTEXT.getStartsWith()) + "[" + index + "]");
         }
 
+        if (locator.startsWith(LocatorType.CLASSNAME.getStartsWith())) {
+            resBy = By.className(StringUtils.remove(locator, LocatorType.CLASSNAME.getStartsWith()) + "[" + index + "]");
+        }
+
         if (locator.startsWith("partialLinkText: ")) {
         	resBy = By.partialLinkText(StringUtils.remove(locator, "partialLinkText: ") + "[" + index + "]");
         }
