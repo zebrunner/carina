@@ -36,7 +36,7 @@ import io.appium.java_client.MobileBy;
 
 public class LocalizedAnnotations extends Annotations {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static Pattern L10N_PATTERN = Pattern.compile(SpecialKeywords.L10N_PATTERN);
+    private static final Pattern L10N_PATTERN = Pattern.compile(SpecialKeywords.L10N_PATTERN);
 
     public LocalizedAnnotations(Field field) {
         super(field);
@@ -56,24 +56,25 @@ public class LocalizedAnnotations extends Annotations {
             String key = param.substring(start, end);
             param = StringUtils.replace(param, matcher.group(), L10N.getText(key));
         }
+        Field field = getField();
 
-        if (getField().isAnnotationPresent(Predicate.class)) {
+        if (field.isAnnotationPresent(Predicate.class)) {
             // TODO: analyze howto determine iOS or Android predicate
             param = StringUtils.remove(param, "By.xpath: ");
             by = MobileBy.iOSNsPredicateString(param);
             // by = MobileBy.AndroidUIAutomator(param);
-        } else if (getField().isAnnotationPresent(ClassChain.class)) {
+        } else if (field.isAnnotationPresent(ClassChain.class)) {
             param = StringUtils.remove(param, "By.xpath: ");
             by = MobileBy.iOSClassChain(param);
-        } else if (getField().isAnnotationPresent(AccessibilityId.class)) {
+        } else if (field.isAnnotationPresent(AccessibilityId.class)) {
             param = StringUtils.remove(param, "By.name: ");
             by = MobileBy.AccessibilityId(param);
-        } else if (getField().isAnnotationPresent(ExtendedFindBy.class)) {
+        } else if (field.isAnnotationPresent(ExtendedFindBy.class)) {
             By extendedBy = createExtendedBy(param);
             if (extendedBy != null) {
                 by = extendedBy;
             }
-            LOGGER.debug("Annotation ExtendedFindBy has been detected. Returning locator : " + by);
+            LOGGER.debug("Annotation ExtendedFindBy has been detected. Returning locator : {}", by);
         } else {
             by = createBy(param);
         }
@@ -81,45 +82,57 @@ public class LocalizedAnnotations extends Annotations {
     }
 
     private By createBy(String locator) {
-        if (locator.startsWith("id=")) {
-            return By.id(StringUtils.remove(locator, "id="));
-        } else if (locator.startsWith("name=")) {
-            return By.name(StringUtils.remove(locator, "name="));
-        } else if (locator.startsWith("xpath=")) {
-            return By.xpath(StringUtils.remove(locator, "xpath="));
-        } else if (locator.startsWith("linkText=")) {
-            return By.linkText(StringUtils.remove(locator, "linkText="));
-        } else if (locator.startsWith("partialLinkText=")) {
-            return By.partialLinkText(StringUtils.remove(locator, "partialLinkText="));
-        } else if (locator.startsWith("cssSelector=")) {
-            return By.cssSelector(StringUtils.remove(locator, "cssSelector="));
-        } else if (locator.startsWith("css=")) {
-            return By.cssSelector(StringUtils.remove(locator, "css="));
-        } else if (locator.startsWith("tagName=")) {
-            return By.tagName(StringUtils.remove(locator, "tagName="));
-        } else if (locator.startsWith("className=")) {
-            return By.className(StringUtils.remove(locator, "className="));
-        } else if (locator.startsWith("By.id: ")) {
-            return By.id(StringUtils.remove(locator, "By.id: "));
-        } else if (locator.startsWith("By.name: ")) {
-            return By.name(StringUtils.remove(locator, "By.name: "));
-        } else if (locator.startsWith("By.xpath: ")) {
-            return By.xpath(StringUtils.remove(locator, "By.xpath: "));
-        } else if (locator.startsWith("By.linkText: ")) {
-            return By.linkText(StringUtils.remove(locator, "By.linkText: "));
-        } else if (locator.startsWith("By.partialLinkText: ")) {
-            return By.partialLinkText(StringUtils.remove(locator, "By.partialLinkText: "));
-        } else if (locator.startsWith("By.css: ")) {
-            return By.cssSelector(StringUtils.remove(locator, "By.css: "));
-        } else if (locator.startsWith("By.cssSelector: ")) {
-            return By.cssSelector(StringUtils.remove(locator, "By.cssSelector: "));
-        } else if (locator.startsWith("By.className: ")) {
-            return By.className(StringUtils.remove(locator, "By.className: "));
-        } else if (locator.startsWith("By.tagName: ")) {
-            return By.tagName(StringUtils.remove(locator, "By.tagName: "));
-        }       
+        String resultLocator = locator;
+        // Example: id=, name=, By.linkText: , By.className: , cssSelector=
+        Pattern patternWithEquals = Pattern.compile("^(?<prefix>(((id|name|xpath|linkText|partialLinkText|cssSelector|css|tagName|className)=)|" +
+                "(By\\.(id|name|linkText|partialLinkText|css|cssSelector|className|tagName): )))");
+        Matcher matcherWithEquals = patternWithEquals.matcher(locator);
 
-        throw new RuntimeException(String.format("Unable to generate By using locator: '%s'!", locator));
+        if (!matcherWithEquals.find()) {
+            throw new RuntimeException(String.format("Unable to generate By using locator: '%s'!", locator));
+        }
+        String prefix = matcherWithEquals.group("prefix");
+        resultLocator = StringUtils.replace(resultLocator, prefix, "");
+        By by;
+        switch (prefix) {
+        case "id=":
+        case "By.id: ":
+            by = By.id(resultLocator);
+            break;
+        case "name=":
+        case "By.name: ":
+            by = By.name(resultLocator);
+            break;
+        case "xpath=":
+        case "By.xpath: ":
+            by = By.xpath(resultLocator);
+            break;
+        case "linkText=":
+        case "By.linkText: ":
+            by = By.linkText(resultLocator);
+            break;
+        case "partialLinkText=":
+        case "By.partialLinkText: ":
+            by = By.partialLinkText(resultLocator);
+            break;
+        case "cssSelector=":
+        case "By.cssSelector: ":
+        case "css=":
+        case "By.css: ":
+            by = By.cssSelector(resultLocator);
+            break;
+        case "tagName=":
+        case "By.tagName: ":
+            by = By.tagName(resultLocator);
+            break;
+        case "className=":
+        case "By.className: ":
+            by = By.className(resultLocator);
+            break;
+        default:
+            throw new RuntimeException(String.format("Unable to generate By with prefix: '%s'!", prefix));
+        }
+        return by;
     }
 
     private By createExtendedBy(String locator) {
