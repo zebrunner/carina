@@ -84,15 +84,15 @@ public class LocalizedAnnotations extends Annotations {
     private By createBy(String locator) {
         String resultLocator = locator;
         // Example: id=, name=, By.linkText: , By.className: , cssSelector=
-        Pattern patternWithEquals = Pattern.compile("^(?<prefix>(((id|name|xpath|linkText|partialLinkText|cssSelector|css|tagName|className)=)|" +
+        Pattern pattern = Pattern.compile("^(?<prefix>(((id|name|xpath|linkText|partialLinkText|cssSelector|css|tagName|className)=)|" +
                 "(By\\.(id|name|xpath|linkText|partialLinkText|css|cssSelector|className|tagName): )))");
-        Matcher matcherWithEquals = patternWithEquals.matcher(locator);
+        Matcher matcher = pattern.matcher(resultLocator);
 
-        if (!matcherWithEquals.find()) {
-            throw new RuntimeException(String.format("Unable to generate By using locator: '%s'!", locator));
+        if (!matcher.find()) {
+            throw new RuntimeException(String.format("Unable to generate By using locator: '%s'!", resultLocator));
         }
-        String prefix = matcherWithEquals.group("prefix");
-        resultLocator = StringUtils.replace(resultLocator, prefix, "");
+        String prefix = matcher.group("prefix");
+        resultLocator = StringUtils.replaceOnce(resultLocator, prefix, "");
         By by;
         switch (prefix) {
         case "id=":
