@@ -15,10 +15,15 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils;
 
+import java.io.File;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
@@ -35,7 +40,16 @@ import com.zebrunner.agent.core.registrar.CurrentTestRun;
  */
 public class Configuration {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+    private static final Pattern S3_BUCKET_PATTERN = Pattern.compile("s3:\\/\\/([a-zA-Z-0-9][^\\/]*)\\/(.*)");
+    private static final Pattern AZURE_CONTAINER_PATTERN = Pattern
+            .compile("\\/\\/([a-z0-9]{3,24})\\.blob.core.windows.net\\/(?:(\\$root|(?:[a-z0-9](?!.*--)[a-z0-9-]{1,61}[a-z0-9]))\\/)?(.{1,1024})");
+    // appcenter://appName/platformName/buildType/version
+    private static final Pattern APPCENTER_PATTERN = Pattern.compile(
+            "appcenter:\\/\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)");
+
     private static IEnvArgResolver envArgResolver = new DefaultEnvArgResolver();
+
 
     /**
      * All available configuration parameter keys along with default values.
@@ -473,8 +487,9 @@ public class Configuration {
     }
 
     public static void setMobileApp(String mobileApp) {
-        R.CONFIG.put(SpecialKeywords.CAPABILITIES + ".app", mobileApp);
-        LOGGER.info("Updated mobile app: " + mobileApp);
+        String updatedAppPath = updateAppPath(mobileApp);
+        R.CONFIG.put(SpecialKeywords.CAPABILITIES + ".app", updatedAppPath);
+        LOGGER.info("Updated mobile app: {}", updatedAppPath);
     }
 
     public static Object getCapability(String name) {
@@ -506,4 +521,183 @@ public class Configuration {
         return Configuration.getInt(Parameter.DATA_PROVIDER_THREAD_COUNT);
     }
 
+    private static String updateAppPath(String mobileAppPath) {
+
+        try {
+            Matcher matcher = S3_BUCKET_PATTERN.matcher(mobileAppPath);
+            LOGGER.debug("Analyzing if mobile app is located on S3...");
+            if (matcher.find()) {
+                mobileAppPath = updateS3AppPath(mobileAppPath);
+            }
+
+            matcher = AZURE_CONTAINER_PATTERN.matcher(mobileAppPath);
+            LOGGER.debug("Analyzing if mobile app is located on Azure...");
+            if (matcher.find()) {
+                mobileAppPath = updateAzureAppPath(mobileAppPath);
+            }
+
+            matcher = APPCENTER_PATTERN.matcher(mobileAppPath);
+            LOGGER.debug("Analyzing if mobile_app is located on AppCenter...");
+            if (matcher.find()) {
+                mobileAppPath = updateAppCenterAppPath(mobileAppPath);
+            }
+
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Cannot find class using reflection: " + e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException("Cannot find method using reflection: " + e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Illegal access using reflection: " + e);
+        }
+
+        return mobileAppPath;
+    }
+
+    /**
+     * Method to update MOBILE_APP path in case if apk is located in Hockey App.
+     */
+    private static String updateAppCenterAppPath(String mobileAppPath)
+            throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Matcher matcher = APPCENTER_PATTERN.matcher(mobileAppPath);
+        if (matcher.find()) {
+            LOGGER.info("app artifact is located on AppCenter...");
+            String appName = matcher.group(1);
+            String platformName = matcher.group(2);
+            String buildType = matcher.group(3);
+            String version = matcher.group(4);
+
+            // TODO: test if generated appcenter download url is valid
+            Object instance = Class.forName("com.qaprosoft.appcenter.AppCenterManager")
+                    .getDeclaredMethod("getInstance")
+                    .invoke(null);
+            mobileAppPath = (String) instance.getClass()
+                    .getMethod("getDownloadUrl", String.class, String.class, String.class, String.class)
+                    .invoke(instance, appName, platformName, buildType, version);
+
+        } else {
+            LOGGER.error("Unable to parse '{}' path using AppCenter pattern", mobileAppPath);
+        }
+        return mobileAppPath;
+    }
+
+    /**
+     * Method to update MOBILE_APP path in case if apk is located in s3 bucket.
+     */
+    private static String updateS3AppPath(String mobileAppPath)
+            throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        // get app path to be sure that we need(do not need) to download app
+        // from s3 bucket
+        Matcher matcher = S3_BUCKET_PATTERN.matcher(mobileAppPath);
+        if (matcher.find()) {
+            LOGGER.info("app artifact is located on s3...");
+            String bucketName = matcher.group(1);
+            String key = matcher.group(2);
+            Pattern pattern = Pattern.compile(key);
+
+            Object amazonS3Manager = Class.forName("com.qaprosoft.amazon.AmazonS3Manager")
+                    .getDeclaredMethod("getInstance")
+                    .invoke(null);
+
+            // analyze if we have any pattern inside mobile_app to make extra
+            // search in AWS
+            int position = key.indexOf(".*");
+            if (position > 0) {
+                // /android/develop/dfgdfg.*/Mapmyrun.apk
+                int slashPosition = key.substring(0, position).lastIndexOf("/");
+                if (slashPosition > 0) {
+                    key = key.substring(0, slashPosition);
+
+                    Object lastBuild = amazonS3Manager.getClass()
+                            .getDeclaredMethod("getLatestBuildArtifact", String.class, String.class, Pattern.class)
+                            .invoke(amazonS3Manager, bucketName, key, pattern);
+
+                    key = (String) lastBuild.getClass().getDeclaredMethod("getKey").invoke(lastBuild);
+                }
+
+            } else {
+                Object s3Object = amazonS3Manager.getClass()
+                        .getDeclaredMethod("get", String.class, String.class)
+                        .invoke(amazonS3Manager, bucketName, key);
+
+                key = (String) s3Object.getClass().getDeclaredMethod("getKey").invoke(s3Object);
+            }
+            LOGGER.info("next s3 app key will be used: " + key);
+
+            // generate presign url explicitly to register link as run artifact
+            long hours = 72L * 1000 * 60 * 60; // generate presigned url for nearest 3 days
+            mobileAppPath = amazonS3Manager.getClass()
+                    .getDeclaredMethod("generatePreSignUrl", String.class, String.class, long.class)
+                    .invoke(amazonS3Manager, bucketName, key, hours)
+                    .toString();
+        } else {
+            LOGGER.error("Unable to parse '{}' path using S3 pattern", mobileAppPath);
+        }
+
+        return mobileAppPath;
+    }
+
+    /**
+     * Method to update MOBILE_APP path in case if apk is located in Azure storage.
+     */
+    private static String updateAzureAppPath(String mobileAppPath)
+            throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Matcher matcher = AZURE_CONTAINER_PATTERN.matcher(mobileAppPath);
+        if (matcher.find()) {
+            LOGGER.info("app artifact is located on Azure...");
+            String accountName = matcher.group(1);
+            String containerName = matcher.group(2) == null ? "$root" : matcher.group(2);
+            String remoteFilePath = matcher.group(3);
+
+            LOGGER.info(
+                    "Account: " + accountName + "\n" +
+                            "Container: " + containerName + "\n" +
+                            "RemotePath: " + remoteFilePath + "\n");
+
+            R.CONFIG.put(Parameter.AZURE_ACCOUNT_NAME.getKey(), accountName);
+            Object azureManager = Class.forName("com.qaprosoft.azure.AzureManager").getDeclaredMethod("getInstance")
+                    .invoke(null);
+            Object blobProperties = azureManager.getClass()
+                    .getDeclaredMethod("get", String.class, String.class)
+                    .invoke(azureManager, containerName, remoteFilePath);
+
+            String azureLocalStorage = Configuration.get(Parameter.AZURE_LOCAL_STORAGE);
+            String localFilePath = azureLocalStorage + File.separator + StringUtils.substringAfterLast(remoteFilePath, "/");
+
+            File file = new File(localFilePath);
+
+            try {
+                byte[] contentMd5 = (byte[]) blobProperties.getClass()
+                        .getDeclaredMethod("getContentMd5")
+                        .invoke(blobProperties);
+                // verify requested artifact by checking the checksum
+                if (file.exists() && FileManager.getFileChecksum(FileManager.Checksum.MD5, file)
+                        .equals(Base64.encodeBase64String(contentMd5))) {
+                    LOGGER.info("build artifact with the same checksum already downloaded: " + file.getAbsolutePath());
+                } else {
+                    LOGGER.info("Following data was extracted: container: {}, remotePath: {}, local file: {}",
+                            containerName, remoteFilePath, file.getAbsolutePath());
+
+                    azureManager.getClass().getDeclaredMethod("download", String.class, String.class, File.class)
+                            .invoke(azureManager, containerName, remoteFilePath, file);
+                }
+
+            } catch (Exception exception) {
+                LOGGER.error("Azure app path update exception detected!", exception);
+            }
+
+            mobileAppPath = file.getAbsolutePath();
+
+            // try to redefine app_version if it's value is latest or empty
+            String appVersion = Configuration.get(Parameter.APP_VERSION);
+            if (appVersion.equals("latest") || appVersion.isEmpty()) {
+                Configuration.setBuild(file.getName());
+            }
+        } else {
+            LOGGER.error("Unable to parse '{}' path using Azure pattern", mobileAppPath);
+        }
+
+        return mobileAppPath;
+    }
 }
