@@ -51,18 +51,18 @@ import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 
 public class AmazonS3Manager {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final CryptoTool CRYPTO_TOOL = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
-    private static final Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
-
     private static volatile AmazonS3Manager instance = null;
     private static AmazonS3 s3client = null;
 
     private AmazonS3Manager() {
     }
 
-    public static synchronized AmazonS3Manager getInstance() {
+    public synchronized static AmazonS3Manager getInstance() {
         if (instance == null) {
             instance = new AmazonS3Manager();
+            
+            CryptoTool cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
+            Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
 
             AmazonS3ClientBuilder builder = AmazonS3ClientBuilder.standard();
             
@@ -71,15 +71,15 @@ public class AmazonS3Manager {
                 builder.withRegion(Regions.fromName(s3region));
             }
             
-            String accessKey = CRYPTO_TOOL.decryptByPattern(Configuration.get(Parameter.ACCESS_KEY_ID), CRYPTO_PATTERN);
-            String secretKey = CRYPTO_TOOL.decryptByPattern(Configuration.get(Parameter.SECRET_KEY), CRYPTO_PATTERN);
+            String accessKey = cryptoTool.decryptByPattern(Configuration.get(Parameter.ACCESS_KEY_ID), CRYPTO_PATTERN);
+            String secretKey = cryptoTool.decryptByPattern(Configuration.get(Parameter.SECRET_KEY), CRYPTO_PATTERN);
             if (!accessKey.isEmpty() && !secretKey.isEmpty()) {
-                BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(accessKey, secretKey);
-                builder.withCredentials(new AWSStaticCredentialsProvider(basicAWSCredentials))
-                        .build();
+                BasicAWSCredentials creds = new BasicAWSCredentials(accessKey, secretKey);
+                builder.withCredentials(new AWSStaticCredentialsProvider(creds)).build();
             }
             
             s3client = builder.build();
+            
         }
         return instance;
     }
@@ -91,9 +91,13 @@ public class AmazonS3Manager {
     /**
      * Put any file to Amazon S3 storage.
      * 
-     * @param bucket - S3 bucket name
-     * @param key - S3 storage path. Example: DEMO/TestSuiteName/TestMethodName/file.txt
-     * @param filePath - local storage path. Example: C:/Temp/file.txt
+     * @param bucket
+     *            - S3 bucket name
+     * @param key
+     *            - S3 storage path. Example:
+     *            DEMO/TestSuiteName/TestMethodName/file.txt
+     * @param filePath
+     *            - local storage path. Example: C:/Temp/file.txt
      * 
      */
     public void put(String bucket, String key, String filePath) {
@@ -103,10 +107,15 @@ public class AmazonS3Manager {
     /**
      * Put any file to Amazon S3 storage.
      * 
-     * @param bucket - S3 bucket name
-     * @param key - S3 storage path. Example: DEMO/TestSuiteName/TestMethodName/file.txt
-     * @param filePath - local storage path. Example: C:/Temp/file.txt
-     * @param metadata - custom tags metadata like name etc
+     * @param bucket
+     *            - S3 bucket name
+     * @param key
+     *            - S3 storage path. Example:
+     *            DEMO/TestSuiteName/TestMethodName/file.txt
+     * @param filePath
+     *            - local storage path. Example: C:/Temp/file.txt
+     * @param metadata
+     *            - custom tags metadata like name etc
      * 
      */
     public void put(String bucket, String key, String filePath, ObjectMetadata metadata) {
@@ -140,7 +149,8 @@ public class AmazonS3Manager {
         }
 
         try {
-            LOGGER.debug("Uploading a new object to S3 from a file: {}", filePath);
+            LOGGER.debug("Uploading a new object to S3 from a file: "
+                    + filePath);
 
             PutObjectRequest object = new PutObjectRequest(bucket, key, file);
             if (metadata != null) {
@@ -148,7 +158,8 @@ public class AmazonS3Manager {
             }
 
             s3client.putObject(object);
-            LOGGER.debug("Uploaded to S3: '{}' with key '{}'", filePath, key);
+            LOGGER.debug("Uploaded to S3: '" + filePath + "' with key '" + key
+                    + "'");
 
         } catch (AmazonServiceException ase) {
             LOGGER.error("Caught an AmazonServiceException, which "
@@ -172,8 +183,11 @@ public class AmazonS3Manager {
     /**
      * Get any file from Amazon S3 storage as S3Object.
      * 
-     * @param bucket - S3 Bucket name.
-     * @param key - S3 storage path. Example: DEMO/TestSuiteName/TestMethodName/file.txt
+     * @param bucket
+     *            - S3 Bucket name.
+     * @param key
+     *            - S3 storage path. Example:
+     *            DEMO/TestSuiteName/TestMethodName/file.txt
      * @return S3Object
      */
     public S3Object get(String bucket, String key) {
@@ -238,8 +252,11 @@ public class AmazonS3Manager {
     /**
      * Delete file from Amazon S3 storage.
      * 
-     * @param bucket - S3 Bucket name.
-     * @param key - S3 storage path. Example: DEMO/TestSuiteName/TestMethodName/file.txt
+     * @param bucket
+     *            - S3 Bucket name.
+     * @param key
+     *            - S3 storage path. Example:
+     *            DEMO/TestSuiteName/TestMethodName/file.txt
      */
     public void delete(String bucket, String key) {
         if (key == null) {
@@ -269,9 +286,14 @@ public class AmazonS3Manager {
     /**
      * Get latest build artifact from Amazon S3 storage as S3Object.
      * 
-     * @param bucket - S3 Bucket name.
-     * @param key - S3 storage path to your project. Example: android/MyProject
-     * @param pattern - pattern to find single build artifact Example: .*prod-google-release.*
+     * @param bucket
+     *            - S3 Bucket name.
+     * @param key
+     *            - S3 storage path to your project. Example:
+     *            android/MyProject
+     * @param pattern
+     *            - pattern to find single build artifact Example:
+     *            .*prod-google-release.*
      * @return S3ObjectSummary
      */
     public S3ObjectSummary getLatestBuildArtifact(String bucket, String key, Pattern pattern) {
