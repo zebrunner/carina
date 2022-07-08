@@ -15,7 +15,15 @@
  *******************************************************************************/
 package com.qaprosoft.carina.proxy;
 
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.Socket;
+import java.net.SocketAddress;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -44,7 +52,7 @@ public class SystemProxy {
 
                 System.setProperty("http.proxyHost", proxyHost);
                 System.setProperty("http.proxyPort", proxyPort);
-                
+
                 if (!noProxy.isEmpty()) {
                     System.setProperty("http.nonProxyHosts", proxyPort);
                 }
@@ -55,7 +63,7 @@ public class SystemProxy {
 
                 System.setProperty("https.proxyHost", proxyHost);
                 System.setProperty("https.proxyPort", proxyPort);
-                
+
                 if (!noProxy.isEmpty()) {
                     System.setProperty("https.nonProxyHosts", proxyPort);
                 }
@@ -66,7 +74,7 @@ public class SystemProxy {
 
                 System.setProperty("ftp.proxyHost", proxyHost);
                 System.setProperty("ftp.proxyPort", proxyPort);
-                
+
                 if (!noProxy.isEmpty()) {
                     System.setProperty("ftp.nonProxyHosts", proxyPort);
                 }
@@ -76,15 +84,89 @@ public class SystemProxy {
                 LOGGER.info(String.format("HTTP client will use socks proxies: %s:%s", proxyHost, proxyPort));
                 System.setProperty("socksProxyHost", proxyHost);
                 System.setProperty("socksProxyPort", proxyPort);
-                
+
                 /*
                  * http://docs.oracle.com/javase/8/docs/technotes/guides/net/proxies.html
                  * Once a SOCKS proxy is specified in this manner, all TCP connections will be attempted through the proxy.
                  * i.e. There is no provision for setting non-proxy hosts via the socks properties.
                  */
             }
-            
+
         }
+    }
+
+    /**
+     * Checks if a proxy server is available
+     * 
+     * @param address ip address
+     * @param port int
+     * @param timeoutMillis int
+     * @return true if proxy is available at the specified id and port, and false otherwise
+     * @throws UnknownHostException if address is not correct
+     */
+    public static boolean isProxyAlive(String address, int port, int timeoutMillis) throws UnknownHostException {
+        boolean isAlive = false;
+        InetAddress proxyAddress = InetAddress.getByName(address);
+        try (Socket socket = new Socket()) {
+            socket.connect(new InetSocketAddress(proxyAddress, port), timeoutMillis);
+            isAlive = true;
+        } catch (IOException e) {
+            // do nothing
+        }
+        return isAlive;
+    }
+
+    /**
+     * Checks the availability of a resource through a proxy
+     * 
+     * @param proxyAddress ip address
+     * @param proxyPort int
+     * @param protocol HTTP or SOCKS (for FTP use SOCKS)
+     * @param destinationAddress ip resource address or url (for example google.com)
+     * @param destinationPort resource port
+     * @param timeoutMillis int
+     * @return true if resource is available through proxy and false otherwise
+     * @throws UnknownHostException
+     */
+    public static boolean isResourceAvailableUsingProxy(String proxyAddress, int proxyPort, Proxy.Type protocol,
+            String destinationAddress, int destinationPort, int timeoutMillis) throws UnknownHostException {
+        boolean isAvailable = false;
+
+        InetAddress inetProxyAddress;
+        try {
+            inetProxyAddress = InetAddress.getByName(proxyAddress);
+        } catch (UnknownHostException e) {
+            LOGGER.error("Proxy address is not correct");
+            throw e;
+        }
+
+        SocketAddress proxySocketAddress = new InetSocketAddress(inetProxyAddress, proxyPort);
+        Proxy proxy;
+        try {
+            proxy = new Proxy(protocol, proxySocketAddress);
+        } catch (IllegalArgumentException e) {
+            LOGGER.warn(e.getMessage());
+            return false;
+        }
+
+        InetAddress inetDestinationAddress;
+        try {
+            inetDestinationAddress = InetAddress.getByName(destinationAddress);
+        } catch (UnknownHostException e) {
+            LOGGER.error("Destination address is not correct");
+            throw e;
+        }
+
+        try (Socket socket = new Socket(proxy)) {
+            socket.connect(new InetSocketAddress(inetDestinationAddress, destinationPort), timeoutMillis);
+            isAvailable = true;
+        } catch (SocketTimeoutException e) {
+            LOGGER.error("Timeout when try to connect to {} by port {} with proxy {} by port {}",
+                    destinationAddress, destinationPort, proxyAddress, proxyPort);
+        } catch (IOException | InternalError e) {
+            // do nothing
+        }
+        return isAvailable;
     }
 
 }
