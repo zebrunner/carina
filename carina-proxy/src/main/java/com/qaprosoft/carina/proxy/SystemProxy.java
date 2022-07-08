@@ -95,19 +95,16 @@ public class SystemProxy {
         }
     }
 
-    public static boolean isProxyAlive(String host, Integer port, Integer timeoutMillis) {
+    public static boolean isProxyAlive(String host, Integer timeoutMillis) {
         boolean isHostReachable = false;
-
-        if (port == null || port < 0) {
-            throw new RuntimeException("Port is not valid - cannot be less than 0 or be null");
-        }
 
         if (timeoutMillis == null || timeoutMillis < 0) {
             throw new RuntimeException("Timeout is not valid -  cannot be less than 0 or be null");
         }
 
         try {
-            InetAddress proxyHostAddress = InetAddress.getByName(String.format("%s:%d", host, port));
+
+            InetAddress proxyHostAddress = InetAddress.getByName(host);
             isHostReachable = proxyHostAddress.isReachable(timeoutMillis);
 
         } catch (UnknownHostException e) {
@@ -120,7 +117,7 @@ public class SystemProxy {
 
     public static boolean isProxyAvailable(String proxyHost, Integer proxyPort, Integer timeoutMillis, Proxy.Type protocol,
             URL hostCheck) {
-        if (!isProxyAlive(proxyHost, proxyPort, timeoutMillis)) {
+        if (!isProxyAlive(proxyHost, timeoutMillis)) {
             LOGGER.warn("Proxy is not alive");
             return false;
         }
