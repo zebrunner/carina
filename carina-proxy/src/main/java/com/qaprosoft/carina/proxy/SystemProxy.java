@@ -15,7 +15,15 @@
  *******************************************************************************/
 package com.qaprosoft.carina.proxy;
 
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.SocketAddress;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -85,6 +93,49 @@ public class SystemProxy {
             }
             
         }
+    }
+
+    public static boolean isProxyAlive(String host, Integer port, Integer timeoutMillis) {
+        boolean isHostReachable = false;
+
+        if (port == null || port < 0) {
+            throw new RuntimeException("Port is not valid - cannot be less than 0 or be null");
+        }
+
+        if (timeoutMillis == null || timeoutMillis < 0) {
+            throw new RuntimeException("Timeout is not valid -  cannot be less than 0 or be null");
+        }
+
+        try {
+            InetAddress proxyHostAddress = InetAddress.getByName(String.format("%s:%d", host, port));
+            isHostReachable = proxyHostAddress.isReachable(timeoutMillis);
+
+        } catch (UnknownHostException e) {
+            throw new RuntimeException("Invalid host", e);
+        } catch (IOException e) {
+            // do nothing
+        }
+        return isHostReachable;
+    }
+
+    public static boolean isProxyAvailable(String proxyHost, Integer proxyPort, Integer timeoutMillis, Proxy.Type protocol,
+            URL hostCheck) {
+        if (!isProxyAlive(proxyHost, proxyPort, timeoutMillis)) {
+            LOGGER.warn("Proxy is not alive");
+            return false;
+        }
+        boolean isProxyAvailable = false;
+        SocketAddress socketAddress = new InetSocketAddress(proxyHost, proxyPort);
+        Proxy proxy = new Proxy(protocol, socketAddress);
+
+        try {
+            URLConnection conn = hostCheck.openConnection(proxy);
+            conn.connect();
+            isProxyAvailable = true;
+        } catch (IOException e) {
+            isProxyAvailable = false;
+        }
+        return isProxyAvailable;
     }
 
 }

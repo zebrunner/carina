@@ -50,7 +50,7 @@ public final class ProxyPool {
 		initProxyPortsRange();
 	}
 	
-	public static void initProxyPortsRange() {
+    static void initProxyPortsRange() {
 		if (!Configuration.get(Parameter.BROWSERMOB_PORTS_RANGE).isEmpty()) {
 			try {
 				String[] ports = Configuration.get(Parameter.BROWSERMOB_PORTS_RANGE).split(":");
