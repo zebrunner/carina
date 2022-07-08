@@ -95,6 +95,15 @@ public class SystemProxy {
         }
     }
 
+    /**
+     * Checks if a proxy server is available
+     * 
+     * @param address ip address
+     * @param port int
+     * @param timeoutMillis int
+     * @return true if proxy is available at the specified id and port, and false otherwise
+     * @throws UnknownHostException if address is not correct
+     */
     public static boolean isProxyAlive(String address, int port, int timeoutMillis) throws UnknownHostException {
         boolean isAlive = false;
         InetAddress proxyAddress = InetAddress.getByName(address);
@@ -107,6 +116,18 @@ public class SystemProxy {
         return isAlive;
     }
 
+    /**
+     * Checks the availability of a resource through a proxy
+     * 
+     * @param proxyAddress ip address
+     * @param proxyPort int
+     * @param protocol HTTP or SOCKS (for FTP use SOCKS)
+     * @param destinationAddress ip resource address or url (for example google.com)
+     * @param destinationPort resource port
+     * @param timeoutMillis int
+     * @return true if resource is available through proxy and false otherwise
+     * @throws UnknownHostException
+     */
     public static boolean isResourceAvailableUsingProxy(String proxyAddress, int proxyPort, Proxy.Type protocol,
             String destinationAddress, int destinationPort, int timeoutMillis) throws UnknownHostException {
         boolean isAvailable = false;
