@@ -262,7 +262,7 @@ public class Configuration {
                 // do nothing
                 continue;
             }
-            if (!Parameter.CRYPTO_KEY_PATH.equals(param) && !Configuration.get(param).isEmpty()) {
+            if (!Parameter.CRYPTO_KEY_PATH.equals(param) && !Configuration.get(param).isEmpty() && R.CONFIG.isOverwritten(param.getKey())) {
                 asString.append(String.format("%s=%s%n", param.getKey(), Configuration.get(param)));
             }
         }
