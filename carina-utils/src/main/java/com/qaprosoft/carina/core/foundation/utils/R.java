@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils;
 
+import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.util.HashMap;
@@ -64,6 +65,7 @@ public enum R {
     // temporary thread/test properties which is cleaned on afterTest phase for current thread. It can override any value from below R enum maps
     private static ThreadLocal<Properties> testProperties = new ThreadLocal<>();
 
+    private static Map<String, Properties> defaultPropertiesHolder = new HashMap<>();
     // permanent global configuration map 
     private static Map<String, Properties> propertiesHolder = new HashMap<>();
     
@@ -79,7 +81,12 @@ public enum R {
 
                 URL baseResource = ClassLoader.getSystemResource(resource.resourceFile);
                 if (baseResource != null) {
-                    properties.load(baseResource.openStream());
+                    Properties defaultProperties = new Properties();
+                    try (InputStream stream = baseResource.openStream()) {
+                        properties.load(stream);
+                    }
+                    defaultProperties.putAll(properties);
+                    defaultPropertiesHolder.put(resource.resourceFile, defaultProperties);
                 }
 
                 URL overrideResource;
@@ -156,6 +163,22 @@ public enum R {
 
     R(String resourceKey) {
         this.resourceFile = resourceKey;
+    }
+
+    /**
+     * Compares the current value of property with the default value
+     * 
+     * @param key name of property
+     * @return true if current value equals default value, otherwise false
+     */
+    public boolean isOverwritten(String key) {
+        String currentValue = get(key);
+        String defaultValue = defaultPropertiesHolder.get(resourceFile).getProperty(key);
+        if (defaultValue == null) {
+            defaultValue = StringUtils.EMPTY;
+        }
+
+        return !currentValue.equals(defaultValue);
     }
 
     /**
