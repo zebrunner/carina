@@ -382,7 +382,7 @@ public interface IDriverPool {
         Device device = nullDevice;
         int initRetryCount = Configuration.getInt(Parameter.INIT_RETRY_COUNT);
         if (initRetryCount > 2) {
-            POOL_LOGGER.warn("init_retry_count will be limited by {}", initRetryCount);
+            POOL_LOGGER.warn("init_retry_count will be limited by 2");
         }
         // 1 - is default run without retry
         int maxCount = initRetryCount + 1;
