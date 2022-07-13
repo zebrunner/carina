@@ -16,11 +16,13 @@
 package com.qaprosoft.carina.core.foundation.listeners;
 
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
@@ -103,23 +105,10 @@ public class TestNamingService {
             name = result.getTestContext().getCurrentXmlTest().getName();
         }
 
-        // TODO: find the bext way to calculate TUID/hash
-        if (result.getTestContext().getCurrentXmlTest().getAllParameters().containsKey(SpecialKeywords.EXCEL_DS_CUSTOM_PROVIDER) ||
-                result.getTestContext().getCurrentXmlTest().getAllParameters().containsKey(SpecialKeywords.DS_CUSTOM_PROVIDER)) {
-            // AUTO-274 "Pass"ing status set on emailable report when a test step fails
-            String methodUID = "";
-            for (int i = 0; i < result.getParameters().length; i++) {
-                if (result.getParameters()[i] != null) {
-                    if (result.getParameters()[i].toString().contains(SpecialKeywords.TUID + ":")) {
-                        methodUID = result.getParameters()[i].toString().replace(SpecialKeywords.TUID + ":", "");
-                        break; // first TUID: parameter is used
-                    }
-                }
-            }
+        String methodUID = getMethodUID(result);
             if (!methodUID.isEmpty()) {
                 name = methodUID + " - " + name;
             }
-        }
 
         name = name + " - " + getMethodName(result);
         LOGGER.debug("testName: " + name);
@@ -131,6 +120,38 @@ public class TestNamingService {
         
         testName.set(name);
         return testName.get();
+    }
+
+    private static String getMethodUID(ITestResult result) {
+        String methodUID = StringUtils.EMPTY;
+
+        try {
+            ITestNGMethod testNGMethod = result.getMethod();
+
+            Parameter[] parameters = result.getTestClass()
+                    .getRealClass()
+                    .getMethod(testNGMethod.getMethodName(),
+                            testNGMethod.getParameterTypes())
+                    .getParameters();
+
+            for (int i = 0; i < parameters.length; i++) {
+                if (parameters[i].getName().equalsIgnoreCase(SpecialKeywords.TUID)) {
+                    // AUTO-274 "Pass"ing status set on emailable report when a test step fails
+                    if (result.getParameters()[i] == null) {
+                        break;
+                    }
+
+                    methodUID = result.getParameters()[i].toString();
+                    if (methodUID.contains(SpecialKeywords.TUID + ":")) {
+                        methodUID = methodUID.replace(SpecialKeywords.TUID + ":", "");
+                    }
+                    break;
+                }
+            }
+        } catch (NoSuchMethodException e) {
+            LOGGER.error("For some reason test method not found using reflection: {}", result.getMethod().getMethodName());
+        }
+        return methodUID;
     }
     
     /**
