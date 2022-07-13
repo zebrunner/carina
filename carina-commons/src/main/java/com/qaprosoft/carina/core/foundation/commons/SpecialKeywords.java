@@ -43,8 +43,9 @@ public class SpecialKeywords {
     public static final String EXCEL_DS_FLAG = "{excel_ds_flag}";
     public static final String EXCEL_DS_FILE = "{excel_ds_file}";
     public static final String EXCEL_DS_SHEET = "{excel_ds_sheet}";
-
+    @Deprecated
     public static final String EXCEL_DS_CUSTOM_PROVIDER = "{excel_ds_custom_provider}";
+    @Deprecated
     public static final String DS_CUSTOM_PROVIDER = "{ds_custom_provider}";
     public static final String DS_ARGS = "{ds_args}";
     public static final String DS_UID = "{ds_uid}";
