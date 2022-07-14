@@ -85,6 +85,9 @@
 				<version>3.10.1</version>
 				<configuration>
 					<release>${java.version}</release>
+					<compilerArgs>
+						<arg>-parameters</arg>
+					</compilerArgs>
 				</configuration>
 			</plugin>
 			<plugin>
