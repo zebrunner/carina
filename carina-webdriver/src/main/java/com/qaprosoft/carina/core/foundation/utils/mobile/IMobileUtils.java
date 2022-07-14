@@ -18,7 +18,6 @@ package com.qaprosoft.carina.core.foundation.utils.mobile;
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 
-import io.appium.java_client.*;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
@@ -38,7 +37,9 @@ import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 
 import io.appium.java_client.AppiumDriver;
-//import io.appium.java_client. .MobileDriver;
+import io.appium.java_client.MultiTouchAction;
+import io.appium.java_client.PerformsTouchActions;
+import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.appmanagement.ApplicationState;
 import io.appium.java_client.ios.IOSDriver;
@@ -708,9 +709,16 @@ public interface IMobileUtils extends IDriverPool {
     /**
      * Hide keyboard if needed
      */
-    default public void hideKeyboard() {
+    default void hideKeyboard() {
         try {
-            ((MobileDriver<?>) castDriver()).hideKeyboard();
+            WebDriver driver = castDriver();
+            if (driver instanceof IOSDriver) {
+                ((IOSDriver) castDriver()).hideKeyboard();
+            } else if (driver instanceof AndroidDriver) {
+                ((AndroidDriver) castDriver()).hideKeyboard();
+            } else {
+                throw new RuntimeException("Unsupported driver");
+            }
         } catch (Exception e) {
             if (!e.getMessage().contains("Soft keyboard not present, cannot hide keyboard")) {
                 UTILS_LOGGER.error("Exception appears during hideKeyboard: " + e);
@@ -724,38 +732,40 @@ public interface IMobileUtils extends IDriverPool {
      *
      * @return boolean
      */
-    default public boolean isKeyboardShown() {
-        MobileDriver<?> driver = (MobileDriver<?>) castDriver();
+    default boolean isKeyboardShown() {
+        AppiumDriver driver = (AppiumDriver) castDriver();
         if (driver instanceof IOSDriver) {
-            return ((IOSDriver<?>) castDriver()).isKeyboardShown();
+            return ((IOSDriver) castDriver()).isKeyboardShown();
         }
         else if (driver instanceof AndroidDriver) {
-            return ((AndroidDriver<?>) castDriver()).isKeyboardShown();
+            return ((AndroidDriver) castDriver()).isKeyboardShown();
         }
         return false;
     }
 
-    default public void zoom(Zoom type) {
-        UTILS_LOGGER.info("Zoom will be performed :" + type);
-        MobileDriver<?> driver = (MobileDriver<?>) castDriver();
+    default void zoom(Zoom type) {
+        UTILS_LOGGER.info("Zoom will be performed :{}", type);
+
+        AppiumDriver driver = (AppiumDriver) castDriver();
+
         Dimension scrSize = driver.manage().window().getSize();
         int height = scrSize.getHeight();
         int width = scrSize.getWidth();
-        UTILS_LOGGER.debug("Screen height : " + height);
-        UTILS_LOGGER.debug("Screen width : " + width);
+
+        UTILS_LOGGER.debug("Screen height : {}", height);
+        UTILS_LOGGER.debug("Screen width : {}", width);
+
         Point point1 = new Point(width / 2, height / 2 - 30);
         Point point2 = new Point(width / 2, height / 10 * 3);
         Point point3 = new Point(width / 2, height / 2 + 30);
         Point point4 = new Point(width / 2, (7 * height) / 10);
-        switch (type) {
-        case OUT:
+
+        if (type == Zoom.OUT) {
             zoom(point1.getX(), point1.getY(), point2.getX(), point2.getY(), point3.getX(), point3.getY(), point4.getX(), point4.getY(),
                     DEFAULT_TOUCH_ACTION_DURATION);
-            break;
-        case IN:
+        } else if (type == Zoom.IN) {
             zoom(point2.getX(), point2.getY(), point1.getX(), point1.getY(), point4.getX(), point4.getY(), point3.getX(), point3.getY(),
                     DEFAULT_TOUCH_ACTION_DURATION);
-            break;
         }
     }
 
@@ -763,13 +773,13 @@ public interface IMobileUtils extends IDriverPool {
         UTILS_LOGGER.debug(String.format(
                 "Zoom action will be performed with parameters : startX1 : %s ;  startY1: %s ; endX1: %s ; endY1: %s; startX2 : %s ;  startY2: %s ; endX2: %s ; endY2: %s",
                 startx1, starty1, endx1, endy1, startx2, starty2, endx2, endy2));
-        MobileDriver<?> driver = (MobileDriver<?>) castDriver();
+        AppiumDriver driver = (AppiumDriver) castDriver();
         try {
-            MultiTouchAction multiTouch = new MultiTouchAction(driver);
+            MultiTouchAction multiTouch = new MultiTouchAction((PerformsTouchActions) driver);
             @SuppressWarnings("rawtypes")
-            TouchAction<?> tAction0 = new TouchAction(driver);
+            TouchAction<?> tAction0 = new TouchAction((PerformsTouchActions) driver);
             @SuppressWarnings("rawtypes")
-            TouchAction<?> tAction1 = new TouchAction(driver);
+            TouchAction<?> tAction1 = new TouchAction((PerformsTouchActions) driver);
 
             PointOption<?> startPoint1 = PointOption.point(startx1, starty1);
             PointOption<?> endPoint1 = PointOption.point(endx1, endy1);
@@ -797,9 +807,9 @@ public interface IMobileUtils extends IDriverPool {
         String os = getDevice().getOs();
         // get bundleId or appId of the application started by driver
         if (os.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
-            bundleId = ((AppiumDriver<?>) castDriver()).getSessionDetail(SpecialKeywords.APP_PACKAGE).toString();
+            bundleId = ((AndroidDriver) castDriver()).getCapabilities().getCapability(SpecialKeywords.APP_PACKAGE).toString();
         } else if (os.equalsIgnoreCase(SpecialKeywords.IOS) || os.equalsIgnoreCase(SpecialKeywords.MAC) || os.equalsIgnoreCase(SpecialKeywords.TVOS)) {
-            bundleId = ((AppiumDriver<?>) castDriver()).getSessionDetail(SpecialKeywords.BUNDLE_ID).toString();
+            bundleId = ((IOSDriver) castDriver()).getCapabilities().getCapability(SpecialKeywords.BUNDLE_ID).toString();
         }
 
         return isAppRunning(bundleId);
@@ -811,8 +821,18 @@ public interface IMobileUtils extends IDriverPool {
      * @param bundleId the bundle identifier for iOS (or appPackage for Android) of the app to query the state of.
      * @return boolean
      */
-    default public boolean isAppRunning(String bundleId) {
-        ApplicationState actualApplicationState = ((MobileDriver<?>) castDriver()).queryAppState(bundleId);
+    default boolean isAppRunning(String bundleId) {
+        AppiumDriver driver = (AppiumDriver) castDriver();
+        ApplicationState actualApplicationState;
+
+        if (driver instanceof IOSDriver) {
+            actualApplicationState = ((IOSDriver) castDriver()).queryAppState(bundleId);
+        } else if (driver instanceof AndroidDriver) {
+            actualApplicationState = ((AndroidDriver) castDriver()).queryAppState(bundleId);
+        } else {
+            throw new RuntimeException("Unsupported driver");
+        }
+
         return ApplicationState.RUNNING_IN_FOREGROUND.equals(actualApplicationState);
     }
 
@@ -825,11 +845,12 @@ public interface IMobileUtils extends IDriverPool {
 
         // get bundleId or appId of the application started by driver
         if (os.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
-            bundleId = ((AppiumDriver<?>) castDriver()).getSessionDetail(SpecialKeywords.APP_PACKAGE).toString();
+            // todo investigate changes is work
+            bundleId = ((AndroidDriver) castDriver()).getCapabilities().getCapability(SpecialKeywords.APP_PACKAGE).toString();
         } else if (os.equalsIgnoreCase(SpecialKeywords.IOS) || os.equalsIgnoreCase(SpecialKeywords.MAC) || os.equalsIgnoreCase(SpecialKeywords.TVOS)) {
-            bundleId = ((AppiumDriver<?>) castDriver()).getSessionDetail(SpecialKeywords.BUNDLE_ID).toString();
+            // todo investigate changes is work
+            bundleId = ((AppiumDriver) castDriver()).getCapabilities().getCapability(SpecialKeywords.BUNDLE_ID).toString();
         }
-
         terminateApp(bundleId);
     }
 
@@ -839,7 +860,7 @@ public interface IMobileUtils extends IDriverPool {
      * @param bundleId the bundle identifier for iOS (or appPackage for Android) of the app to terminate.
      */
     default public void terminateApp(String bundleId) {
-        ((MobileDriver<?>) castDriver()).terminateApp(bundleId);
+        ((AndroidDriver) castDriver()).terminateApp(bundleId);
     }
     
     /**
@@ -849,7 +870,7 @@ public interface IMobileUtils extends IDriverPool {
      */
     default public void closeApp() {
         UTILS_LOGGER.info("Application will be closed to background");
-        ((MobileDriver<?>) castDriver()).closeApp();
+        ((AndroidDriver) castDriver()).closeApp();
     }
 
 
@@ -882,7 +903,7 @@ public interface IMobileUtils extends IDriverPool {
         int width = size.getWidth();
 
         PointOption<?> option = PointOption.point((int) (width * 0.915), (int) (height * 0.945));
-        new TouchAction((MobileDriver<?>) castDriver()).tap(option).perform();
+        new TouchAction((PerformsTouchActions) castDriver()).tap(option).perform();
     }
 
     default public boolean isChecked(final ExtendedWebElement element) {
@@ -900,8 +921,17 @@ public interface IMobileUtils extends IDriverPool {
      * 
      * @return boolean
      */
-    default public boolean isApplicationInstalled(String packageName) {
-        boolean installed = ((MobileDriver<?>) castDriver()).isAppInstalled(packageName);
+    default boolean isApplicationInstalled(String packageName) {
+        boolean installed;
+        WebDriver driver = castDriver();
+        if (driver instanceof IOSDriver) {
+            installed = ((IOSDriver) castDriver()).isAppInstalled(packageName);
+        } else if (driver instanceof AndroidDriver) {
+            installed = ((AndroidDriver) castDriver()).isAppInstalled(packageName);
+        } else {
+            throw new RuntimeException("Unsupported driver");
+        }
+
         UTILS_LOGGER.info(String.format("Application by package name (%s) installed: ", packageName) + installed);
         return installed;
     }
@@ -918,7 +948,14 @@ public interface IMobileUtils extends IDriverPool {
      */
     default public void startApp(String packageName) {
         UTILS_LOGGER.info("Starting " + packageName);
-        ((MobileDriver<?>) castDriver()).activateApp(packageName);
+        WebDriver driver = castDriver();
+        if (driver instanceof IOSDriver) {
+            ((IOSDriver) castDriver()).activateApp(packageName);
+        } else if (driver instanceof AndroidDriver) {
+            ((AndroidDriver) castDriver()).activateApp(packageName);
+        } else {
+            throw new RuntimeException("Unsupported driver");
+        }
     }
 
     /**
@@ -928,7 +965,14 @@ public interface IMobileUtils extends IDriverPool {
      */
     default public void installApp(String apkPath) {
         UTILS_LOGGER.info("Will install application with apk-file from " + apkPath);
-        ((MobileDriver<?>) castDriver()).installApp(apkPath);
+        WebDriver driver = castDriver();
+        if (driver instanceof IOSDriver) {
+            ((IOSDriver) castDriver()).installApp(apkPath);
+        } else if (driver instanceof AndroidDriver) {
+            ((AndroidDriver) castDriver()).installApp(apkPath);
+        } else {
+            throw new RuntimeException("Unsupported driver");
+        }
     }
 
     /**
@@ -939,8 +983,16 @@ public interface IMobileUtils extends IDriverPool {
      *
      * @return true if succeed
      */
-    default public boolean removeApp(String packageName) {
-        boolean removed = ((MobileDriver<?>) castDriver()).removeApp(packageName);
+    default boolean removeApp(String packageName) {
+        boolean removed;
+        WebDriver driver = castDriver();
+        if (driver instanceof IOSDriver) {
+            removed = ((IOSDriver) castDriver()).removeApp(packageName);
+        } else if (driver instanceof AndroidDriver) {
+            removed = ((AndroidDriver) castDriver()).removeApp(packageName);
+        } else {
+            throw new RuntimeException("Unsupported driver");
+        }
         UTILS_LOGGER.info(String.format("Application (%s) is successfuly removed: ", packageName) + removed);
         return removed;
     }
@@ -953,6 +1005,13 @@ public interface IMobileUtils extends IDriverPool {
      */
     default public void clearAppCache() {
         UTILS_LOGGER.info("Initiation application reset...");
-        ((MobileDriver<?>) castDriver()).resetApp();
+        WebDriver driver = castDriver();
+        if (driver instanceof IOSDriver) {
+            ((IOSDriver) castDriver()).resetApp();
+        } else if (driver instanceof AndroidDriver) {
+            ((AndroidDriver) castDriver()).resetApp();
+        } else {
+            throw new RuntimeException("Unsupported driver");
+        }
     }
 }

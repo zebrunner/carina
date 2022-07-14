@@ -31,7 +31,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.windo
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 
 import io.appium.java_client.windows.WindowsDriver;
-import io.appium.java_client.windows.WindowsElement;
 
 /**
  * WindowsFactory creates instance {@link WebDriver} for Windows native application testing.
@@ -54,7 +53,7 @@ public class WindowsFactory extends AbstractFactory {
             throw new RuntimeException(String.format("Driver type %s is not applicable for Windows driver", driverType));
         }
 
-        WindowsDriver<WindowsElement> driver = null;
+        WindowsDriver driver = null;
         if (isCapabilitiesEmpty(capabilities)) {
             capabilities = getCapabilities(name);
         }
@@ -65,7 +64,7 @@ public class WindowsFactory extends AbstractFactory {
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed appium URL!", e);
         }
-        driver = new WindowsDriver<WindowsElement>(url, capabilities);
+        driver = new WindowsDriver(url, capabilities);
 
         return driver;
     }
