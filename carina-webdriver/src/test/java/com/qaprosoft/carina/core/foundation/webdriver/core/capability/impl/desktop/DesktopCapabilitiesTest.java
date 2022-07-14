@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.ie.InternetExplorerDriver;
 //import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.BrowserType;
@@ -162,8 +163,8 @@ public class DesktopCapabilitiesTest {
 
         Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
 
-//        Assert.assertTrue((Boolean) capabilities.getCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS),
-//                "Returned capability value is not valid!");
+        Assert.assertTrue((Boolean) capabilities.getCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS),
+                "Returned capability value is not valid!");
 
         Assert.assertTrue((Boolean) capabilities.getCapability(CapabilityType.ACCEPT_SSL_CERTS), "Returned capability value is not valid!");
 

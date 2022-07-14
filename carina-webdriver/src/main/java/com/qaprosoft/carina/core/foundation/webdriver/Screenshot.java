@@ -474,11 +474,11 @@ public class Screenshot {
             public BufferedImage call() throws IOException {
                 BufferedImage screenShot;
                 if (driver.getClass().toString().contains("windows")) {
-                    File screenshot = ((WindowsDriver) driver).getScreenshotAs(OutputType.FILE);
+                    File screenshot = ((WindowsDriver<?>) driver).getScreenshotAs(OutputType.FILE);
                     screenShot = ImageIO.read(screenshot);
                 } else if (driver.getClass().toString().contains("java_client")) {
                     // Mobile Native app
-                    File screenshot = ((AppiumDriver) driver).getScreenshotAs(OutputType.FILE);
+                    File screenshot = ((AppiumDriver<?>) driver).getScreenshotAs(OutputType.FILE);
                     screenShot = ImageIO.read(screenshot);
                 } else if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
                     ru.yandex.qatools.ashot.Screenshot screenshot;

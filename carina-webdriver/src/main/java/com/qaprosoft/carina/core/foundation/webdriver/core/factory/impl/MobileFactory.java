@@ -37,7 +37,9 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 
 import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.android.AndroidElement;
 import io.appium.java_client.ios.IOSDriver;
+import io.appium.java_client.ios.IOSElement;
 
 /**
  * MobileFactory creates instance {@link WebDriver} for mobile testing.
@@ -84,10 +86,10 @@ public class MobileFactory extends AbstractFactory {
             EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
             
             if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
-                driver = new AndroidDriver(ce, capabilities);
+                driver = new AndroidDriver<AndroidElement>(ce, capabilities);
             } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.IOS)
                     || mobilePlatformName.equalsIgnoreCase(SpecialKeywords.TVOS)) {
-                driver = new IOSDriver(ce, capabilities);
+                driver = new IOSDriver<IOSElement>(ce, capabilities);
             } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.CUSTOM)) {
                 // that's a case for custom mobile capabilities like browserstack or saucelabs
                 driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);
