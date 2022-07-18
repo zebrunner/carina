@@ -15,15 +15,16 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
 
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.MutableCapabilities;
 
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
-public class HTMLUnitCapabilities extends AbstractCapabilities {
+public class HTMLUnitCapabilities extends AbstractCapabilities<MutableCapabilities> {
 
-    public DesiredCapabilities getCapability(String testName) {
-        DesiredCapabilities capabilities = new DesiredCapabilities();
-        capabilities.setJavascriptEnabled(true);
+    public MutableCapabilities getCapability(String testName) {
+        MutableCapabilities capabilities = new MutableCapabilities();
+        // setJavascriptEnabled deprecated and is not supported in selenium 4.*
+        // capabilities.setJavascriptEnabled(true);
         return capabilities;
     }
 }

@@ -20,6 +20,7 @@ import java.lang.invoke.MethodHandles;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
@@ -34,7 +35,7 @@ import com.qaprosoft.carina.core.foundation.utils.R;
  * 
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
-public abstract class AbstractFactory {
+public abstract class AbstractFactory<T extends MutableCapabilities> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     /**
      * Creates new instance of {@link WebDriver} according to specified {@link DesiredCapabilities}.
@@ -44,7 +45,7 @@ public abstract class AbstractFactory {
      * @param seleniumHost - selenium server URL
      * @return instance of {@link WebDriver}
      */
-    abstract public WebDriver create(String testName, DesiredCapabilities capabilities, String seleniumHost);
+    abstract public WebDriver create(String testName, T capabilities, String seleniumHost);
 
     /**
      * If any listeners specified, converts RemoteWebDriver to EventFiringWebDriver and registers all listeners.

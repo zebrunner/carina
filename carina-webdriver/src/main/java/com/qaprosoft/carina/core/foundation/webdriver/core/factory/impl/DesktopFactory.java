@@ -21,15 +21,13 @@ import java.net.URL;
 import java.time.Duration;
 
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
-//import org.openqa.selenium.remote.Browser;
-import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.BrowserType;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Wait;
@@ -42,19 +40,18 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.ChromeCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.EdgeCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.FirefoxCapabilities;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.IECapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.OperaCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.SafariCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
 
-public class DesktopFactory extends AbstractFactory {
+public class DesktopFactory extends AbstractFactory<MutableCapabilities> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static DesiredCapabilities staticCapabilities;
+    private static MutableCapabilities staticCapabilities;
 
     @Override
-    public WebDriver create(String name, DesiredCapabilities capabilities, String seleniumHost) {
+    public WebDriver create(String name, MutableCapabilities capabilities, String seleniumHost) {
         RemoteWebDriver driver = null;
         if (seleniumHost == null) {
             seleniumHost = Configuration.getSeleniumUrl();
@@ -83,13 +80,11 @@ public class DesktopFactory extends AbstractFactory {
     }
 
     @SuppressWarnings("deprecation")
-    public DesiredCapabilities getCapabilities(String name) {
+    public MutableCapabilities getCapabilities(String name) {
         String browser = Configuration.getBrowser();
         
         if (BrowserType.FIREFOX.equalsIgnoreCase(browser)) {
             return new FirefoxCapabilities().getCapability(name);
-        } else if (BrowserType.IE.equalsIgnoreCase(browser) || "ie".equalsIgnoreCase(browser)) {
-            return new IECapabilities().getCapability(name);
         } else if (BrowserType.SAFARI.equalsIgnoreCase(browser)) {
             return new SafariCapabilities().getCapability(name);
         } else if (BrowserType.CHROME.equalsIgnoreCase(browser)) {
@@ -105,7 +100,7 @@ public class DesktopFactory extends AbstractFactory {
 
     public static void addStaticCapability(String name, Object value) {
         if (staticCapabilities == null) {
-            staticCapabilities = new DesiredCapabilities();
+            staticCapabilities = new MutableCapabilities();
         }
         staticCapabilities.setCapability(name, value);
     }
@@ -117,7 +112,7 @@ public class DesktopFactory extends AbstractFactory {
      * @param driver - instance of desktop @WebDriver
      * @param capabilities - driver capabilities
      */
-    private void resizeBrowserWindow(WebDriver driver, DesiredCapabilities capabilities) {
+    private void resizeBrowserWindow(WebDriver driver, MutableCapabilities capabilities) {
         try {
             Wait<WebDriver> wait = new FluentWait<WebDriver>(driver)
                     .pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)))

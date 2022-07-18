@@ -29,8 +29,8 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,9 +107,9 @@ public class Device implements IDriverPool {
         }
         setType(deviceType);
 
-        setOs(Configuration.getPlatform(new DesiredCapabilities(capabilities)));
+        setOs(Configuration.getPlatform(new MutableCapabilities(capabilities)));
         
-        setOsVersion(Configuration.getPlatformVersion(new DesiredCapabilities(capabilities)));
+        setOsVersion(Configuration.getPlatformVersion(new MutableCapabilities(capabilities)));
 
         String deviceUdid = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_UDID);
         if (capabilities.getCapability("udid") != null) {

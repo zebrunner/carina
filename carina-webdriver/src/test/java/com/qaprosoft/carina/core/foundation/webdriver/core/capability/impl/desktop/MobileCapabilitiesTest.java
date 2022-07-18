@@ -15,13 +15,15 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
 
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileCapabilities;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.testng.Assert;
-import org.testng.annotations.Test;
+
+import io.appium.java_client.android.options.UiAutomator2Options;
 
 public class MobileCapabilitiesTest {
 
@@ -41,10 +43,11 @@ public class MobileCapabilitiesTest {
         String testName = "mobile - getCapabilityWithLocaleTest";
 
         MobileCapabilities mobileCapabilities = new MobileCapabilities();
-        DesiredCapabilities capabilities = mobileCapabilities.getCapability(testName);
+        UiAutomator2Options capabilities = mobileCapabilities.getCapability(testName);
 
-        Assert.assertEquals(capabilities.getCapability(LOCALE_KEY), LOCALE, "Locale capability is not valid");
-        Assert.assertNull(capabilities.getCapability(LANGUAGE_KEY), "Language capability is not empty");
+        Assert.assertTrue(capabilities.getLocale().isPresent(), "Locale capability should present");
+        Assert.assertEquals(capabilities.getLocale().get(), LOCALE, "Locale capability is not valid");
+        Assert.assertTrue(capabilities.getLanguage().isEmpty(), "Language capability should not present");
     }
 
     @Test(dependsOnGroups = {"AppleTVTestClass"})
@@ -55,10 +58,12 @@ public class MobileCapabilitiesTest {
         String testName = "mobile - getCapabilityWithLocaleAndLanguageSeparatelyTest";
 
         MobileCapabilities mobileCapabilities = new MobileCapabilities();
-        DesiredCapabilities capabilities = mobileCapabilities.getCapability(testName);
+        UiAutomator2Options capabilities = mobileCapabilities.getCapability(testName);
 
-        Assert.assertEquals(capabilities.getCapability(LOCALE_KEY), LOCALE, "Locale capability is not valid");
-        Assert.assertEquals(capabilities.getCapability(LANGUAGE_KEY), LANGUAGE, "Language capability is not valid");
+        Assert.assertTrue(capabilities.getLocale().isPresent(), "Locale capability should present");
+        Assert.assertEquals(capabilities.getLocale().get(), LOCALE, "Locale capability is not valid");
+        Assert.assertTrue(capabilities.getLanguage().isPresent(), "Language capability should present");
+        Assert.assertEquals(capabilities.getLanguage().get(), LANGUAGE, "Language capability is not valid");
     }
 
     @Test(dependsOnGroups = {"AppleTVTestClass"})
@@ -69,10 +74,12 @@ public class MobileCapabilitiesTest {
         String testName = "mobile - getAndroidCapabilityWithLocaleAndLanguageTogetherTest";
 
         MobileCapabilities mobileCapabilities = new MobileCapabilities();
-        DesiredCapabilities capabilities = mobileCapabilities.getCapability(testName);
+        UiAutomator2Options capabilities = mobileCapabilities.getCapability(testName);
 
-        Assert.assertEquals(capabilities.getCapability(LOCALE_KEY), LOCALE, "Locale capability is not valid");
-        Assert.assertEquals(capabilities.getCapability(LANGUAGE_KEY), LANGUAGE, "Language capability is not valid");
+        Assert.assertTrue(capabilities.getLocale().isPresent(), "Locale capability should present");
+        Assert.assertEquals(capabilities.getLocale().get(), LOCALE, "Locale capability is not valid");
+        Assert.assertTrue(capabilities.getLanguage().isPresent(), "Language capability should present");
+        Assert.assertEquals(capabilities.getLanguage().get(), LANGUAGE, "Language capability is not valid");
     }
 
     @Test(dependsOnGroups = {"AppleTVTestClass"})
@@ -83,9 +90,11 @@ public class MobileCapabilitiesTest {
         String testName = "mobile - getIOSCapabilityWithLocaleAndLanguageTogetherTest";
 
         MobileCapabilities mobileCapabilities = new MobileCapabilities();
-        DesiredCapabilities capabilities = mobileCapabilities.getCapability(testName);
+        UiAutomator2Options capabilities = mobileCapabilities.getCapability(testName);
 
-        Assert.assertEquals(capabilities.getCapability(LOCALE_KEY), LOCALE_LANGUAGE, "Locale capability is not valid");
-        Assert.assertEquals(capabilities.getCapability(LANGUAGE_KEY), LANGUAGE, "Language capability is not valid");
+        Assert.assertTrue(capabilities.getLocale().isPresent(), "Locale capability should present");
+        Assert.assertEquals(capabilities.getLocale().get(), LOCALE_LANGUAGE, "Locale capability is not valid");
+        Assert.assertTrue(capabilities.getLanguage().isPresent(), "Language capability should present");
+        Assert.assertEquals(capabilities.getLanguage().get(), LANGUAGE, "Language capability is not valid");
     }
 }

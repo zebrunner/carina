@@ -22,7 +22,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +36,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 
 import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.android.options.UiAutomator2Options;
 import io.appium.java_client.ios.IOSDriver;
 
 /**
@@ -44,11 +44,11 @@ import io.appium.java_client.ios.IOSDriver;
  * 
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
-public class MobileFactory extends AbstractFactory {
+public class MobileFactory extends AbstractFactory<UiAutomator2Options> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public WebDriver create(String name, DesiredCapabilities capabilities, String seleniumHost) {
+    public WebDriver create(String name, UiAutomator2Options capabilities, String seleniumHost) {
 
         if (seleniumHost == null) {
             seleniumHost = Configuration.getSeleniumUrl();
@@ -135,7 +135,7 @@ public class MobileFactory extends AbstractFactory {
         return driver;
     }
 
-    private DesiredCapabilities getCapabilities(String name) {
+    private UiAutomator2Options getCapabilities(String name) {
         return new MobileCapabilities().getCapability(name);
     }
 

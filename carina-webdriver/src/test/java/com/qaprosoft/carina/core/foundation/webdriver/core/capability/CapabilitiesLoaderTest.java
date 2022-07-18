@@ -15,7 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability;
 
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.MutableCapabilities;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -53,7 +53,7 @@ public class CapabilitiesLoaderTest {
      */
     @Test()
     public void getCapabilitiesTest() {
-        DesiredCapabilities caps = new CapabilitiesLoader().getCapabilities(customCapabilities);
+        MutableCapabilities caps = new CapabilitiesLoader().getCapabilities(customCapabilities);
         String value = (String) caps.getCapability(stringParam);
 
         Assert.assertNotNull(value, "Unable to find '" + stringParam + "' capability!");

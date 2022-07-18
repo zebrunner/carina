@@ -20,7 +20,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,17 +30,18 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.windo
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 
 import io.appium.java_client.windows.WindowsDriver;
+import io.appium.java_client.windows.options.WindowsOptions;
 
 /**
  * WindowsFactory creates instance {@link WebDriver} for Windows native application testing.
  * 
  * @author Sergei Zagriychuk (sergeizagriychuk@gmail.com)
  */
-public class WindowsFactory extends AbstractFactory {
+public class WindowsFactory extends AbstractFactory<WindowsOptions> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public WebDriver create(String name, DesiredCapabilities capabilities, String seleniumHost) {
+    public WebDriver create(String name, WindowsOptions capabilities, String seleniumHost) {
 
         if (seleniumHost == null) {
             seleniumHost = Configuration.getSeleniumUrl();
@@ -69,7 +69,7 @@ public class WindowsFactory extends AbstractFactory {
         return driver;
     }
 
-    private DesiredCapabilities getCapabilities(String name) {
+    private WindowsOptions getCapabilities(String name) {
         return new WindowsCapabilities().getCapability(name);
     }
 

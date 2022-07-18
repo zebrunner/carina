@@ -15,21 +15,27 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
 
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.Browser;
-import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
-public class OperaCapabilities extends AbstractCapabilities {
-    public DesiredCapabilities getCapability(String testName) {
-        DesiredCapabilities capabilities = new DesiredCapabilities();
-        capabilities = initBaseCapabilities(capabilities, Browser.OPERA.browserName(), testName);
-        capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
-        capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
-        
-        //TODO: add support for AUTO_DOWNLOAD and PROXY
+public class OperaCapabilities extends AbstractCapabilities<MutableCapabilities> {
+    public MutableCapabilities getCapability(String testName) {
+        MutableCapabilities capabilities = new MutableCapabilities();
+        capabilities.setCapability(CapabilityType.BROWSER_NAME, Browser.OPERA.browserName());
+        Capabilities baseCapabilities = initBaseCapabilities(testName, capabilities);
+        for (String cName : baseCapabilities.getCapabilityNames()) {
+            capabilities.setCapability(cName, baseCapabilities.getCapability(cName));
+        }
+        // CapabilityType.ACCEPT_SSL_CERTS is not supported in selenium 4.*
+        // capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+        // CapabilityType.TAKES_SCREENSHOT is not supported in selenium 4.*
+        // capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
+
+        // TODO: add support for AUTO_DOWNLOAD and PROXY
         return capabilities;
     }
 }

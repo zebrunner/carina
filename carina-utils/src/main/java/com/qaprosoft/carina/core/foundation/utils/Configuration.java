@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.MutableCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -329,7 +329,7 @@ public class Configuration {
      * @return String platform name
      */
     public static String getPlatform() {
-        return getPlatform(new DesiredCapabilities());
+        return getPlatform(new MutableCapabilities());
     }
 
     /**
@@ -338,7 +338,7 @@ public class Configuration {
      *            DesiredCapabilities
      * @return String platform name
      */
-    public static String getPlatform(DesiredCapabilities caps) {
+    public static String getPlatform(MutableCapabilities caps) {
         // any platform by default
         String platform = "*";
         
@@ -369,10 +369,10 @@ public class Configuration {
     }
     
     public static String getPlatformVersion() {
-        return getPlatformVersion(new DesiredCapabilities());
+        return getPlatformVersion(new MutableCapabilities());
     }
     
-    public static String getPlatformVersion(DesiredCapabilities caps) {
+    public static String getPlatformVersion(MutableCapabilities caps) {
         // default "os_version=value" should be used to determine current platform
         String platformVersion = "";
 
@@ -436,7 +436,7 @@ public class Configuration {
         return SpecialKeywords.DESKTOP;
     }
 
-    public static String getDriverType(DesiredCapabilities capabilities) {
+    public static String getDriverType(MutableCapabilities capabilities) {
         if (capabilities == null) {
             // calculate driver type based on config.properties arguments
             return getDriverType();

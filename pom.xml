@@ -61,7 +61,7 @@
         <httpclient.version>4.5.13</httpclient.version>
         <jna.version>3.0.9</jna.version>
         <!-- Selenium -->
-        <selenium.version>4.1.4</selenium.version>
+        <selenium.version>4.3.0</selenium.version>
         <appium.version>8.1.1</appium.version>
         <!-- Zebrunner integrations -->
         <zebrunner-testng-pluggable.version>1.6.7</zebrunner-testng-pluggable.version>
@@ -75,7 +75,7 @@
         <jackson-databind.version>2.11.0</jackson-databind.version>
         <jackson-annotations.version>2.11.0</jackson-annotations.version>
         <apache-poi.version>4.1.2</apache-poi.version>
-        <guava.version>29.0-jre</guava.version>
+        <guava.version>31.1-jre</guava.version>
         <jaxb-api.version>2.2.2</jaxb-api.version>
         <hamcrest.version>1.3</hamcrest.version>
         <org.json.version>20160810</org.json.version>
