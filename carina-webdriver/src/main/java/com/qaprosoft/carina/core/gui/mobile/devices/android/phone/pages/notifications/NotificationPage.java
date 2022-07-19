@@ -34,7 +34,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.gui.mobile.devices.MobileAbstractPage;
 
-import io.appium.java_client.MobileBy;
+import io.appium.java_client.AppiumBy;
 
 public class NotificationPage extends MobileAbstractPage implements IAndroidUtils {
 
@@ -158,20 +158,20 @@ public class NotificationPage extends MobileAbstractPage implements IAndroidUtil
      */
     public String getItemText(int num) {
         try {
-            LOGGER.info("Visible text:" + lastItemsContent.get(num).findExtendedWebElements(MobileBy.className("android.widget.TextView")).size());
+            LOGGER.info("Visible text:" + lastItemsContent.get(num).findExtendedWebElements(AppiumBy.className("android.widget.TextView")).size());
             if (IDriverPool.getDefaultDevice().getDeviceType() == DeviceType.Type.ANDROID_TABLET) {
                 try {
-                    if (lastItemsContent.get(num).findExtendedWebElement(MobileBy.id(itemText_Tablet_Locator_Text)).isElementNotPresent(1)) {
-                        return lastItemsContent.get(num).findExtendedWebElement(MobileBy.id(itemText_Phone_Locator_Text)).getText();
+                    if (lastItemsContent.get(num).findExtendedWebElement(AppiumBy.id(itemText_Tablet_Locator_Text)).isElementNotPresent(1)) {
+                        return lastItemsContent.get(num).findExtendedWebElement(AppiumBy.id(itemText_Phone_Locator_Text)).getText();
                     } else {
-                        return lastItemsContent.get(num).findExtendedWebElement(MobileBy.id(itemText_Tablet_Locator_Text)).getText();
+                        return lastItemsContent.get(num).findExtendedWebElement(AppiumBy.id(itemText_Tablet_Locator_Text)).getText();
                     }
                 } catch (Exception err) {
                     LOGGER.error("Issue for getting notifications on Tablet.", err);
-                    return lastItemsContent.get(num).findExtendedWebElements(MobileBy.className("android.widget.TextView")).get(2).getText();
+                    return lastItemsContent.get(num).findExtendedWebElements(AppiumBy.className("android.widget.TextView")).get(2).getText();
                 }
             } else {
-                return lastItemsContent.get(num).findExtendedWebElements(MobileBy.className("android.widget.TextView")).get(2).getText();
+                return lastItemsContent.get(num).findExtendedWebElements(AppiumBy.className("android.widget.TextView")).get(2).getText();
             }
         } catch (Exception e) {
             LOGGER.info("Can't get notification text. Exception: ", e);

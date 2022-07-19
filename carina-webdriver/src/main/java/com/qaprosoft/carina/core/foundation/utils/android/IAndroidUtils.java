@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import io.appium.java_client.AppiumBy;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
@@ -51,7 +52,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.nativekey.AndroidKey;
 import io.appium.java_client.android.nativekey.KeyEvent;
@@ -368,7 +368,7 @@ public interface IAndroidUtils extends IMobileUtils {
         for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
 
             try {
-                By scrollBy = MobileBy.AndroidUIAutomator("new UiScrollable("
+                By scrollBy = AppiumBy.androidUIAutomator("new UiScrollable("
                         + getScrollContainerSelector(scrollableContainer, containerSelectorType) + ".instance("
                         + containerInstance + "))" + ".setMaxSearchSwipes(" + SCROLL_MAX_SEARCH_SWIPES + ")"
                         + ".scrollIntoView(" + getScrollToElementSelector(scrollToEle, eleSelectorType) + ")");
@@ -386,7 +386,7 @@ public interface IAndroidUtils extends IMobileUtils {
 
             for (int j = 0; j < i; j++) {
                 checkTimeout(startTime);
-                MobileBy.AndroidUIAutomator(
+                AppiumBy.androidUIAutomator(
                         "new UiScrollable(" + getScrollContainerSelector(scrollableContainer, containerSelectorType)
                                 + ".instance(" + containerInstance + ")).scrollForward()");
                 UTILS_LOGGER.info("Scroller got stuck on a page, scrolling forward to next page of elements..");
@@ -439,7 +439,7 @@ public interface IAndroidUtils extends IMobileUtils {
         for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
 
             try {
-                By scrollBy = MobileBy.AndroidUIAutomator("new UiScrollable("
+                By scrollBy = AppiumBy.androidUIAutomator("new UiScrollable("
                         + getScrollContainerSelector(scrollableContainer, containerSelectorType) + ".instance("
                         + containerInstance + "))" + ".setMaxSearchSwipes(" + SCROLL_MAX_SEARCH_SWIPES + ")"
                         + ".scrollIntoView(" + getScrollToElementSelector(scrollToEle, eleSelectorType) + ".instance("
@@ -458,7 +458,7 @@ public interface IAndroidUtils extends IMobileUtils {
 
             for (int j = 0; j < i; j++) {
                 checkTimeout(startTime);
-                MobileBy.AndroidUIAutomator(
+                AppiumBy.androidUIAutomator(
                         "new UiScrollable(" + getScrollContainerSelector(scrollableContainer, containerSelectorType)
                                 + ".instance(" + containerInstance + ")).scrollForward()");
                 UTILS_LOGGER.info("Scroller got stuck on a page, scrolling forward to next page of elements..");
@@ -506,7 +506,7 @@ public interface IAndroidUtils extends IMobileUtils {
         for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
 
             try {
-                By scrollBy = MobileBy.AndroidUIAutomator(
+                By scrollBy = AppiumBy.androidUIAutomator(
                         "new UiScrollable(" + getScrollContainerSelector(scrollableContainer, containerSelectorType)
                                 + ")" + ".setMaxSearchSwipes(" + SCROLL_MAX_SEARCH_SWIPES + ")" + ".scrollIntoView("
                                 + getScrollToElementSelector(scrollToEle, eleSelectorType) + ")");
@@ -524,7 +524,7 @@ public interface IAndroidUtils extends IMobileUtils {
 
             for (int j = 0; j < i; j++) {
                 checkTimeout(startTime);
-                MobileBy.AndroidUIAutomator("new UiScrollable("
+                AppiumBy.androidUIAutomator("new UiScrollable("
                         + getScrollContainerSelector(scrollableContainer, containerSelectorType) + ").scrollForward()");
                 UTILS_LOGGER.info("Scroller got stuck on a page, scrolling forward to next page of elements..");
             }

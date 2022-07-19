@@ -32,7 +32,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Acce
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.ClassChain;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Predicate;
 
-import io.appium.java_client.MobileBy;
+import io.appium.java_client.AppiumBy;
 
 public class LocalizedAnnotations extends Annotations {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -60,14 +60,14 @@ public class LocalizedAnnotations extends Annotations {
         if (getField().isAnnotationPresent(Predicate.class)) {
             // TODO: analyze howto determine iOS or Android predicate
             param = StringUtils.remove(param, "By.xpath: ");
-            by = MobileBy.iOSNsPredicateString(param);
-            // by = MobileBy.AndroidUIAutomator(param);
+            by = AppiumBy.iOSNsPredicateString(param);
+            // by = AppiumBy.androidUIAutomator(param);
         } else if (getField().isAnnotationPresent(ClassChain.class)) {
             param = StringUtils.remove(param, "By.xpath: ");
-            by = MobileBy.iOSClassChain(param);
+            by = AppiumBy.iOSClassChain(param);
         } else if (getField().isAnnotationPresent(AccessibilityId.class)) {
             param = StringUtils.remove(param, "By.name: ");
-            by = MobileBy.AccessibilityId(param);
+            by = AppiumBy.accessibilityId(param);
         } else if (getField().isAnnotationPresent(ExtendedFindBy.class)) {
             By extendedBy = createExtendedBy(param);
             if (extendedBy != null) {
@@ -124,11 +124,11 @@ public class LocalizedAnnotations extends Annotations {
 
     private By createExtendedBy(String locator) {
         if (locator.startsWith("By.AndroidUIAutomator: ")) {
-            return MobileBy.AndroidUIAutomator(StringUtils.remove(locator, "By.AndroidUIAutomator: "));
+            return AppiumBy.androidUIAutomator(StringUtils.remove(locator, "By.AndroidUIAutomator: "));
         } else if (locator.startsWith("By.IosClassChain: ")) {
-            return MobileBy.iOSClassChain(StringUtils.remove(locator, "By.IosClassChain: "));
+            return AppiumBy.iOSClassChain(StringUtils.remove(locator, "By.IosClassChain: "));
         } else if (locator.startsWith("By.IosNsPredicate: ")) {
-            return MobileBy.iOSNsPredicateString(StringUtils.remove(locator, "By.IosNsPredicate: "));
+            return AppiumBy.iOSNsPredicateString(StringUtils.remove(locator, "By.IosNsPredicate: "));
         } else if (locator.startsWith("By.xpath: ")) { // for @ExtendedFindBy 'text' attribute L10N supporting
             return By.xpath(StringUtils.remove(locator, "By.xpath: "));
         }
