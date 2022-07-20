@@ -82,10 +82,6 @@ public enum R {
                 Properties properties = new Properties();
 
                 if (isResourceExists(resource.resourceFile)) {
-                    Properties collectedProperties = getProperties(resource.resourceFile);
-                    properties.putAll(collectedProperties);
-                    defaultPropertiesHolder.put(resource.resourceFile, collectedProperties);
-                } else {
                     Properties collectedProperties = collect(resource.resourceFile);
                     properties.putAll(collectedProperties);
                     defaultPropertiesHolder.put(resource.resourceFile, collectedProperties);
@@ -188,16 +184,6 @@ public enum R {
                 }
             }
         return assembledProperties;
-    }
-
-    // todo add description
-    private static Properties getProperties(String resourceName) throws IOException {
-        Properties properties = new Properties();
-        URL baseResource = ClassLoader.getSystemResource(resourceName);
-        try (InputStream stream = baseResource.openStream()) {
-            properties.load(stream);
-        }
-        return properties;
     }
 
     private boolean isInit(Parameter parameter, Properties properties){
