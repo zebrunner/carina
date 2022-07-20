@@ -15,9 +15,11 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -79,14 +81,8 @@ public enum R {
             try {
                 Properties properties = new Properties();
 
-                URL baseResource = ClassLoader.getSystemResource(resource.resourceFile);
-                if (baseResource != null) {
-                    Properties defaultProperties = new Properties();
-                    try (InputStream stream = baseResource.openStream()) {
-                        properties.load(stream);
-                    }
-                    defaultProperties.putAll(properties);
-                    defaultPropertiesHolder.put(resource.resourceFile, defaultProperties);
+                if (isResourceExists(resource.resourceFile)) {
+                    defaultPropertiesHolder.put(resource.resourceFile, collect(resource.resourceFile));
                 }
 
                 URL overrideResource;
@@ -154,6 +150,42 @@ public enum R {
                 throw new InvalidConfigurationException("Invalid config in '" + resource + "': " + e.getMessage());
             }
         }
+    }
+
+    /**
+     * Checks for the presence of at least one resource in the classpath
+     * 
+     * @param resourceName the name of the resource being searched for
+     * @return true if at least one resource found, false otherwise
+     */
+    private static boolean isResourceExists(String resourceName) {
+        return ClassLoader.getSystemResource(resourceName) != null;
+    }
+
+    /**
+     * Collect all properties with the same name into a single Properties object
+     * 
+     * @param resourceName resource name, for example config.properties
+     * @return collected properties
+     */
+    private static Properties collect(String resourceName) {
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        Properties assembledProperties = new Properties();
+        try {
+            Enumeration<URL> resourceURLs = classLoader.getResources(resourceName);
+            while (resourceURLs.hasMoreElements()) {
+                Properties tempProperties = new Properties();
+                URL url = resourceURLs.nextElement();
+
+                try (InputStream stream = url.openStream()) {
+                    tempProperties.load(stream);
+                    assembledProperties.putAll(tempProperties);
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(String.format("Something went wrong when try to find resources with name: %s", resourceName), e);
+        }
+        return assembledProperties;
     }
 
     private boolean isInit(Parameter parameter, Properties properties){
