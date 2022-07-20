@@ -82,7 +82,13 @@ public enum R {
                 Properties properties = new Properties();
 
                 if (isResourceExists(resource.resourceFile)) {
-                    defaultPropertiesHolder.put(resource.resourceFile, collect(resource.resourceFile));
+                    Properties collectedProperties = getProperties(resource.resourceFile);
+                    properties.putAll(collectedProperties);
+                    defaultPropertiesHolder.put(resource.resourceFile, collectedProperties);
+                } else {
+                    Properties collectedProperties = collect(resource.resourceFile);
+                    properties.putAll(collectedProperties);
+                    defaultPropertiesHolder.put(resource.resourceFile, collectedProperties);
                 }
 
                 URL overrideResource;
@@ -168,10 +174,9 @@ public enum R {
      * @param resourceName resource name, for example config.properties
      * @return collected properties
      */
-    private static Properties collect(String resourceName) {
+    private static Properties collect(String resourceName) throws IOException {
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
         Properties assembledProperties = new Properties();
-        try {
             Enumeration<URL> resourceURLs = classLoader.getResources(resourceName);
             while (resourceURLs.hasMoreElements()) {
                 Properties tempProperties = new Properties();
@@ -182,10 +187,17 @@ public enum R {
                     assembledProperties.putAll(tempProperties);
                 }
             }
-        } catch (IOException e) {
-            throw new RuntimeException(String.format("Something went wrong when try to find resources with name: %s", resourceName), e);
-        }
         return assembledProperties;
+    }
+
+    // todo add description
+    private static Properties getProperties(String resourceName) throws IOException {
+        Properties properties = new Properties();
+        URL baseResource = ClassLoader.getSystemResource(resourceName);
+        try (InputStream stream = baseResource.openStream()) {
+            properties.load(stream);
+        }
+        return properties;
     }
 
     private boolean isInit(Parameter parameter, Properties properties){
