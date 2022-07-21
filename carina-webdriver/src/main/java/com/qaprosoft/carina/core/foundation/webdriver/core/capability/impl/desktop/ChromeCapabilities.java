@@ -19,7 +19,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,13 +33,8 @@ public class ChromeCapabilities extends AbstractCapabilities<ChromeOptions> {
 
     public ChromeOptions getCapability(String testName) {
         ChromeOptions capabilities = new ChromeOptions();
-        Capabilities baseCapabilities = initBaseCapabilities(testName, capabilities);
-        for (String cName : baseCapabilities.getCapabilityNames()) {
-            capabilities.setCapability(cName, baseCapabilities.getCapability(cName));
-        }
-
+        capabilities = initBaseCapabilities(testName, capabilities);
         capabilities = addChromeOptions(capabilities);
-
         capabilities.addArguments("--start-maximized", "--ignore-ssl-errors");
         // chrome.switches, CapabilityType.ACCEPT_SSL_CERTS and CapabilityType.TAKES_SCREENSHOT is not supported
         // in selenium 4.*

@@ -48,31 +48,26 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
 
     public abstract T getCapability(String testName);
     
-    protected MutableCapabilities initBaseCapabilities(String testName, Capabilities capabilities) {
-
-        MutableCapabilities cap = new MutableCapabilities();
-        if (capabilities.getCapability(SupportsBrowserNameOption.BROWSER_NAME_OPTION) != null) {
-            cap.setCapability(SupportsBrowserNameOption.BROWSER_NAME_OPTION, capabilities.getBrowserName());
-        }
+    protected T initBaseCapabilities(String testName, T capabilities) {
 
         if (!IDriverPool.DEFAULT.equalsIgnoreCase(testName)) {
             // #1573: remove "default" driver name capability registration
-            cap.setCapability("name", testName);
+            capabilities.setCapability("name", testName);
         }
 
         Proxy proxy = setupProxy();
         if (proxy != null) {
-            cap.setCapability(CapabilityType.PROXY, proxy);
+            capabilities.setCapability(CapabilityType.PROXY, proxy);
         }
 
         // add capabilities based on dynamic _config.properties variables
-        return initCapabilities(cap);
+        return initCapabilities(capabilities);
     }
 
-    protected MutableCapabilities initCapabilities(MutableCapabilities capabilities) {
-        ArrayList<String> numericCaps = new ArrayList<String>(
+    protected T initCapabilities(T capabilities) {
+        ArrayList<String> numericCaps = new ArrayList<>(
                 Arrays.asList("idleTimeout", "waitForIdleTimeout"));
-        
+
         // read all properties which starts from "capabilities.*" prefix and add them into desired capabilities.
         final String prefix = SpecialKeywords.CAPABILITIES + ".";
         @SuppressWarnings({ "unchecked", "rawtypes" })

@@ -43,10 +43,7 @@ public class FirefoxCapabilities extends AbstractCapabilities<FirefoxOptions> {
      */
     public FirefoxOptions getCapability(String testName) {
         FirefoxOptions capabilities = new FirefoxOptions();
-        Capabilities baseCapabilities = initBaseCapabilities(testName, capabilities);
-        for (String cName : baseCapabilities.getCapabilityNames()) {
-            capabilities.setCapability(cName, baseCapabilities.getCapability(cName));
-        }
+        capabilities = initBaseCapabilities(testName, capabilities);
         capabilities = addFirefoxOptions(capabilities);
         // CapabilityType.TAKES_SCREENSHOT is not supported by selenium 4.*
         // capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
