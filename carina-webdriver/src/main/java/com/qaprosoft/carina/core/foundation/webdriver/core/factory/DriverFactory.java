@@ -23,6 +23,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +32,11 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.DesktopFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.ChromeDesktopFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.EdgeDesktopFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.FirefoxDesktopFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.MobileFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.SafariDesktopFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.WindowsFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.zebrunner.agent.core.webdriver.RemoteWebDriverFactory;
@@ -59,8 +63,20 @@ public class DriverFactory {
 
 		String driverType = Configuration.getDriverType(capabilities);
 		switch (driverType) {
+
 		case SpecialKeywords.DESKTOP:
-			factory = new DesktopFactory();
+            String browser = Configuration.getBrowser();
+            if (BrowserType.FIREFOX.equalsIgnoreCase(browser)) {
+                factory = new FirefoxDesktopFactory();
+            } else if (BrowserType.SAFARI.equalsIgnoreCase(browser)) {
+                factory = new SafariDesktopFactory();
+            } else if (BrowserType.CHROME.equalsIgnoreCase(browser)) {
+                factory = new ChromeDesktopFactory();
+            } else if (BrowserType.EDGE.equalsIgnoreCase(browser) || "edge".equalsIgnoreCase(browser)) {
+                factory = new EdgeDesktopFactory();
+            } else {
+                throw new RuntimeException("Unsupported browser: " + browser);
+            }
 			break;
 
 		case SpecialKeywords.MOBILE:

@@ -15,22 +15,23 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
 
-import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.CapabilityType;
 
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractBrowserCapabilities;
 
-public class EdgeCapabilities extends AbstractCapabilities<MutableCapabilities> {
+public class EdgeCapabilities extends AbstractBrowserCapabilities<ChromeOptions> {
 
-    public MutableCapabilities getCapability(String testName) {
-        MutableCapabilities capabilities = new MutableCapabilities();
-        capabilities.setCapability(CapabilityType.BROWSER_NAME, Browser.EDGE.browserName());
-        capabilities = initBaseCapabilities(testName, capabilities);
+    @Override
+    public ChromeOptions getCapability(String testName) {
+        ChromeOptions options = new ChromeOptions();
+        options.setCapability(CapabilityType.BROWSER_NAME, Browser.EDGE.browserName());
+        initBaseCapabilities(testName, options);
         // CapabilityType.ACCEPT_SSL_CERTS and CapabilityType.TAKES_SCREENSHOT is not supported in selenium 4.*
         // capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
         // capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
 
-        return capabilities;
+        return options;
     }
 }

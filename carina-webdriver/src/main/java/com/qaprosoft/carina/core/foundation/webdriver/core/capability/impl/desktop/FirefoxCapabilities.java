@@ -18,7 +18,6 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desk
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 
-import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.net.PortProber;
@@ -27,9 +26,9 @@ import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractBrowserCapabilities;
 
-public class FirefoxCapabilities extends AbstractCapabilities<FirefoxOptions> {
+public class FirefoxCapabilities extends AbstractBrowserCapabilities<FirefoxOptions> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static ArrayList<Integer> firefoxPorts = new ArrayList<>();
@@ -37,47 +36,34 @@ public class FirefoxCapabilities extends AbstractCapabilities<FirefoxOptions> {
     /**
      * Generate DesiredCapabilities for Firefox with default Carina FirefoxProfile.
      *
-     * @param testName
-     *            - String.
+     * @param testName - String.
      * @return Firefox desired capabilities.
      */
+    @Override
     public FirefoxOptions getCapability(String testName) {
-        FirefoxOptions capabilities = new FirefoxOptions();
-        capabilities = initBaseCapabilities(testName, capabilities);
-        capabilities = addFirefoxOptions(capabilities);
-        // CapabilityType.TAKES_SCREENSHOT is not supported by selenium 4.*
-        // capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
+        FirefoxOptions cap = new FirefoxOptions();
+        initBaseCapabilities(testName, cap);
+        addFirefoxOptions(cap);
 
         FirefoxProfile profile = new FirefoxProfile();
         profile.setPreference("media.eme.enabled", true);
         profile.setPreference("media.gmp-manager.updateEnabled", true);
-
-        capabilities.setProfile(profile);
-        return capabilities;
+        cap.setProfile(profile);
+        return cap;
     }
 
     /**
      * Generate DesiredCapabilities for Firefox with custom FirefoxProfile.
      *
-     * @param testName
-     *            - String.
-     * @param profile
-     *            - FirefoxProfile.
+     * @param testName String.
+     * @param profile FirefoxProfile.
      * @return Firefox desired capabilities.
      */
     public FirefoxOptions getCapability(String testName, FirefoxProfile profile) {
-        FirefoxOptions capabilities = new FirefoxOptions();
-
-        Capabilities baseCapabilities = initBaseCapabilities(testName, capabilities);
-        for (String cName : baseCapabilities.getCapabilityNames()) {
-            capabilities.setCapability(cName, baseCapabilities.getCapability(cName));
-        }
-
-        // CapabilityType.TAKES_SCREENSHOT is not supported by selenium 4.*
-        // capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
-
-        capabilities.setProfile(profile);
-        return capabilities;
+        FirefoxOptions cap = new FirefoxOptions();
+        initBaseCapabilities(testName, cap);
+        cap.setProfile(profile);
+        return cap;
     }
 
     private FirefoxOptions addFirefoxOptions(FirefoxOptions caps) {

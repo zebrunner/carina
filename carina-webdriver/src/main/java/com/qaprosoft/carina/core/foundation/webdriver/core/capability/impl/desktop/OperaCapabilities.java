@@ -22,10 +22,12 @@ import org.openqa.selenium.remote.CapabilityType;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
 public class OperaCapabilities extends AbstractCapabilities<MutableCapabilities> {
+
+    @Override
     public MutableCapabilities getCapability(String testName) {
         MutableCapabilities capabilities = new MutableCapabilities();
         capabilities.setCapability(CapabilityType.BROWSER_NAME, Browser.OPERA.browserName());
-        capabilities = initBaseCapabilities(testName, capabilities);
+        initBaseCapabilities(testName, capabilities);
         // CapabilityType.ACCEPT_SSL_CERTS is not supported in selenium 4.*
         // capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
         // CapabilityType.TAKES_SCREENSHOT is not supported in selenium 4.*

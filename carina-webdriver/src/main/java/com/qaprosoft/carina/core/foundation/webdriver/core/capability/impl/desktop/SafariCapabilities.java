@@ -15,11 +15,11 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
 
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractDriverCapabilities;
 
 import io.appium.java_client.safari.options.SafariOptions;
 
-public class SafariCapabilities extends AbstractCapabilities<SafariOptions> {
+public class SafariCapabilities extends AbstractDriverCapabilities<SafariOptions> {
 
     public SafariOptions getCapability(String testName) {
         /*DesiredCapabilities capabilities = DesiredCapabilities.safari();

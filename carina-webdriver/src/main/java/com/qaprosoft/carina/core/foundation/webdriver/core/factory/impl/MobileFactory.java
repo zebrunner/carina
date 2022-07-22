@@ -31,24 +31,26 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileCapabilities;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractDriverFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.options.UiAutomator2Options;
 import io.appium.java_client.ios.IOSDriver;
+import io.appium.java_client.remote.options.SupportsUdidOption;
 
 /**
  * MobileFactory creates instance {@link WebDriver} for mobile testing.
  * 
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
-public class MobileFactory extends AbstractFactory<UiAutomator2Options> {
+public class MobileFactory extends AbstractDriverFactory<UiAutomator2Options> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public WebDriver create(String name, UiAutomator2Options capabilities, String seleniumHost) {
+        // todo move to function
 
         if (seleniumHost == null) {
             seleniumHost = Configuration.getSeleniumUrl();
@@ -57,7 +59,6 @@ public class MobileFactory extends AbstractFactory<UiAutomator2Options> {
         String mobilePlatformName = Configuration.getPlatform(capabilities);
 
         // TODO: refactor to be able to remove SpecialKeywords.CUSTOM property completely
-
         // use comparison for custom_capabilities here to localize as possible usage of CUSTOM attribute
         String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
         if (!customCapabilities.isEmpty()
@@ -65,28 +66,27 @@ public class MobileFactory extends AbstractFactory<UiAutomator2Options> {
             mobilePlatformName = SpecialKeywords.CUSTOM;
         }
 
-        LOGGER.debug("selenium: " + seleniumHost);
+        LOGGER.debug("selenium: {}", seleniumHost);
 
         RemoteWebDriver driver = null;
         // if inside capabilities only singly "udid" capability then generate default one and append udid
         if (isCapabilitiesEmpty(capabilities)) {
             capabilities = getCapabilities(name);
-        } else if (capabilities.asMap().size() == 1 && capabilities.getCapability("udid") != null) {
-            String udid = capabilities.getCapability("udid").toString();
+        } else if (capabilities.asMap().size() == 1 && capabilities.getCapability(SupportsUdidOption.UDID_OPTION) != null) {
+            String udid = capabilities.getCapability(SupportsUdidOption.UDID_OPTION).toString();
             capabilities = getCapabilities(name);
-            capabilities.setCapability("udid", udid);
-            LOGGER.debug("Appended udid to cpabilities: " + capabilities);
+            capabilities.setCapability(SupportsUdidOption.UDID_OPTION, udid);
+            LOGGER.debug("Appended udid to cpabilities: {}", capabilities);
         }
 
-        LOGGER.debug("capabilities: " + capabilities);
+        LOGGER.debug("capabilities: {}", capabilities);
 
         try {
             EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
-            
+
             if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
                 driver = new AndroidDriver(ce, capabilities);
-            } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.IOS)
-                    || mobilePlatformName.equalsIgnoreCase(SpecialKeywords.TVOS)) {
+            } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.IOS) || mobilePlatformName.equalsIgnoreCase(SpecialKeywords.TVOS)) {
                 driver = new IOSDriver(ce, capabilities);
             } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.CUSTOM)) {
                 // that's a case for custom mobile capabilities like browserstack or saucelabs

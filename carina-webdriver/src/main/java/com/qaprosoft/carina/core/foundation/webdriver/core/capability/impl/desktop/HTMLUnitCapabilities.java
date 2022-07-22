@@ -21,6 +21,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCa
 
 public class HTMLUnitCapabilities extends AbstractCapabilities<MutableCapabilities> {
 
+    @Override
     public MutableCapabilities getCapability(String testName) {
         MutableCapabilities capabilities = new MutableCapabilities();
         // setJavascriptEnabled deprecated and is not supported in selenium 4.*

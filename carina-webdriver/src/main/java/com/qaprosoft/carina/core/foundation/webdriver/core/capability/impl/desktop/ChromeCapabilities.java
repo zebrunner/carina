@@ -25,24 +25,25 @@ import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractBrowserCapabilities;
 
-public class ChromeCapabilities extends AbstractCapabilities<ChromeOptions> {
+public class ChromeCapabilities extends AbstractBrowserCapabilities<ChromeOptions> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    @Override
     public ChromeOptions getCapability(String testName) {
-        ChromeOptions capabilities = new ChromeOptions();
-        capabilities = initBaseCapabilities(testName, capabilities);
-        capabilities = addChromeOptions(capabilities);
-        capabilities.addArguments("--start-maximized", "--ignore-ssl-errors");
+        ChromeOptions options = new ChromeOptions();
+        initBaseCapabilities(testName, options);
+        addChromeOptions(options);
+        options.addArguments("--start-maximized", "--ignore-ssl-errors");
         // chrome.switches, CapabilityType.ACCEPT_SSL_CERTS and CapabilityType.TAKES_SCREENSHOT is not supported
         // in selenium 4.*
         // capabilities.setCapability("chrome.switches", Arrays.asList());
         // capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
         // capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
-        capabilities.setAcceptInsecureCerts(true);
-        return capabilities;
+        options.setAcceptInsecureCerts(true);
+        return options;
     }
 
     private ChromeOptions addChromeOptions(ChromeOptions options) {

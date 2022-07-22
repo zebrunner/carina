@@ -70,7 +70,7 @@ public abstract class AbstractFactory<T extends MutableCapabilities> {
      * @param capabilities - driver capabilities
      * @return if capabilities empty or null
      */
-    protected boolean isCapabilitiesEmpty(Capabilities capabilities) {
+    protected boolean isCapabilitiesEmpty(T capabilities) {
         return capabilities == null || MapUtils.isEmpty(capabilities.asMap());
     }
 

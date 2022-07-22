@@ -15,17 +15,16 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.windows;
 
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractDriverCapabilities;
 
 import io.appium.java_client.windows.options.WindowsOptions;
 
-public class WindowsCapabilities extends AbstractCapabilities<WindowsOptions> {
-    
+public class WindowsCapabilities extends AbstractDriverCapabilities<WindowsOptions> {
 
     @Override
     public WindowsOptions getCapability(String testName) {
         WindowsOptions capabilities = new WindowsOptions();
-        capabilities = initBaseCapabilities(testName, capabilities);
+        initBaseCapabilities(testName, capabilities);
         return capabilities;
     }    
 }

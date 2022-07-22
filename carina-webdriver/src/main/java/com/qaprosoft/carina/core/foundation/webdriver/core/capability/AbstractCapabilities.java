@@ -23,10 +23,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Proxy;
-import org.openqa.selenium.remote.BrowserType;
+import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.CapabilityType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,16 +39,12 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.proxy.SystemProxy;
 
-import io.appium.java_client.remote.options.SupportsBrowserNameOption;
-
 public abstract class AbstractCapabilities<T extends MutableCapabilities> {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public abstract T getCapability(String testName);
     
     protected T initBaseCapabilities(String testName, T capabilities) {
-
         if (!IDriverPool.DEFAULT.equalsIgnoreCase(testName)) {
             // #1573: remove "default" driver name capability registration
             capabilities.setCapability("name", testName);
@@ -65,8 +60,7 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
     }
 
     protected T initCapabilities(T capabilities) {
-        ArrayList<String> numericCaps = new ArrayList<>(
-                Arrays.asList("idleTimeout", "waitForIdleTimeout"));
+        ArrayList<String> numericCaps = new ArrayList<>(Arrays.asList("idleTimeout", "waitForIdleTimeout"));
 
         // read all properties which starts from "capabilities.*" prefix and add them into desired capabilities.
         final String prefix = SpecialKeywords.CAPABILITIES + ".";
@@ -78,7 +72,7 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
                 if (!value.isEmpty()) {
                     String cap = entry.getKey().replaceAll(prefix, "");
                     if (numericCaps.contains(cap) && isNumber(value)) {
-                        LOGGER.debug("Adding " + cap + " to capabilities as integer");
+                        LOGGER.debug("Adding {} to capabilities as integer", cap);
                         capabilities.setCapability(cap, Integer.parseInt(value));
                     } else if ("false".equalsIgnoreCase(value)) {
                         capabilities.setCapability(cap, false);
@@ -104,17 +98,16 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
         }
 
         if (Configuration.getBoolean(Parameter.HEADLESS)) {
-            if (BrowserType.FIREFOX.equalsIgnoreCase(browser)
-                    || BrowserType.CHROME.equalsIgnoreCase(browser)
-                    && Configuration.getDriverType().equalsIgnoreCase(SpecialKeywords.DESKTOP)) {
+            if (Browser.FIREFOX.browserName().equalsIgnoreCase(browser) ||
+                    Browser.CHROME.browserName().equalsIgnoreCase(browser) &&
+                            Configuration.getDriverType().equalsIgnoreCase(SpecialKeywords.DESKTOP)) {
                 LOGGER.info("Browser will be started in headless mode. VNC and Video will be disabled.");
                 capabilities.setCapability("enableVNC", false);
                 capabilities.setCapability("enableVideo", false);
             } else {
-                LOGGER.error(String.format("Headless mode isn't supported by %s browser / platform.", browser));
+                LOGGER.error("Headless mode isn't supported by {} browser / platform.", browser);
             }
         }
-
         return capabilities;
     }
 

@@ -27,7 +27,7 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.remote.BrowserType;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Wait;
@@ -38,20 +38,16 @@ import com.google.common.base.Function;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.ChromeCapabilities;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.EdgeCapabilities;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.FirefoxCapabilities;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.OperaCapabilities;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.SafariCapabilities;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractBrowserFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
 
-public class DesktopFactory extends AbstractFactory<MutableCapabilities> {
+public class ChromeDesktopFactory extends AbstractBrowserFactory<ChromeOptions> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static MutableCapabilities staticCapabilities;
 
     @Override
-    public WebDriver create(String name, MutableCapabilities capabilities, String seleniumHost) {
+    public WebDriver create(String name, ChromeOptions capabilities, String seleniumHost) {
         RemoteWebDriver driver = null;
         if (seleniumHost == null) {
             seleniumHost = Configuration.getSeleniumUrl();
@@ -63,7 +59,7 @@ public class DesktopFactory extends AbstractFactory<MutableCapabilities> {
 
         if (staticCapabilities != null) {
             LOGGER.info("Static DesiredCapabilities will be merged to basic driver capabilities");
-            capabilities.merge(staticCapabilities);
+            capabilities = capabilities.merge(staticCapabilities);
         }
         
         LOGGER.debug("capabilities: " + capabilities);
@@ -79,23 +75,8 @@ public class DesktopFactory extends AbstractFactory<MutableCapabilities> {
         return driver;
     }
 
-    @SuppressWarnings("deprecation")
-    public MutableCapabilities getCapabilities(String name) {
-        String browser = Configuration.getBrowser();
-        
-        if (BrowserType.FIREFOX.equalsIgnoreCase(browser)) {
-            return new FirefoxCapabilities().getCapability(name);
-        } else if (BrowserType.SAFARI.equalsIgnoreCase(browser)) {
-            return new SafariCapabilities().getCapability(name);
-        } else if (BrowserType.CHROME.equalsIgnoreCase(browser)) {
-            return new ChromeCapabilities().getCapability(name);
-        } else if (BrowserType.OPERA.equalsIgnoreCase(browser)) {
-            return new OperaCapabilities().getCapability(name);
-        } else if (BrowserType.EDGE.equalsIgnoreCase(browser) || "edge".equalsIgnoreCase(browser)) {
-            return new EdgeCapabilities().getCapability(name);
-        } else {
-            throw new RuntimeException("Unsupported browser: " + browser);
-        }
+    public ChromeOptions getCapabilities(String name) {
+        return new ChromeCapabilities().getCapability(name);
     }
 
     public static void addStaticCapability(String name, Object value) {

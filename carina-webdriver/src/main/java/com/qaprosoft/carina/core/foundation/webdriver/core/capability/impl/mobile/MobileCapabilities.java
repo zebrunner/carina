@@ -24,22 +24,22 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractDriverCapabilities;
 
 import io.appium.java_client.android.options.UiAutomator2Options;
 
-public class MobileCapabilities extends AbstractCapabilities<UiAutomator2Options> {
+public class MobileCapabilities extends AbstractDriverCapabilities<UiAutomator2Options> {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public UiAutomator2Options getCapability(String testName) {
-        UiAutomator2Options capabilities = new UiAutomator2Options();
+        UiAutomator2Options caps = new UiAutomator2Options();
         //this step should be executed before initCapabilities() to be able to override this capabilities by default appium approach.
-        capabilities = setLocaleAndLanguage(capabilities);
+        setLocaleAndLanguage(caps);
         // add capabilities based on dynamic _config.properties variables
-        capabilities = initCapabilities(capabilities);
-        return capabilities;
+        initCapabilities(caps);
+        return caps;
     }    
     
     private UiAutomator2Options setLocaleAndLanguage(UiAutomator2Options caps) {
