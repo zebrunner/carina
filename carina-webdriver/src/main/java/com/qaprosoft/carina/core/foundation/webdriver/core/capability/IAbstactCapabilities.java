@@ -59,11 +59,13 @@ public abstract class IAbstactCapabilities<T extends Capabilities> {
 
         Set<String> capabilitiesNames = R.CONFIG.getProperties()
                 .stringPropertyNames()
-                .stream().filter((propertyName) -> propertyName.startsWith(CAPABILITIES_PREFIX))
+                .stream()
+                .filter((propertyName) -> propertyName.startsWith(CAPABILITIES_PREFIX))
+                .map(capability -> capability.replace(CAPABILITIES_PREFIX, ""))
                 .collect(Collectors.toSet());
 
         for (String capabilityName : capabilitiesNames) {
-            String value = properties.getProperty(capabilityName);
+            String value = properties.getProperty(CAPABILITIES_PREFIX + capabilityName);
 
             if (value.isEmpty()) {
                 // ignore empty capabilities
