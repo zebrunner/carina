@@ -32,7 +32,14 @@ public class AndroidFactory extends IAbstractFactory {
 
         LOGGER.debug("capabilities: {}", capabilities);
 
-        AndroidDriver driver = new AndroidDriver(getCommandExecutor(seleniumHost), uiAutomator2Options);
+        URL hostURL;
+        try {
+            hostURL = new URL(seleniumHost);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("selenium host is invalid", e);
+        }
+
+        AndroidDriver driver = new AndroidDriver(hostURL, uiAutomator2Options);
         registerDevice(driver);
         return driver;
     }
