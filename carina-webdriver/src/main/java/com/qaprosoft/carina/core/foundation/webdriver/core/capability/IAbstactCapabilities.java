@@ -68,7 +68,6 @@ public abstract class IAbstactCapabilities<T extends Capabilities> {
             String value = properties.getProperty(CAPABILITIES_PREFIX + capabilityName);
 
             if (value.isEmpty()) {
-                // ignore empty capabilities
                 continue;
             }
 
