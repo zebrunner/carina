@@ -27,6 +27,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -58,13 +60,13 @@ public interface IDriverPool {
     @SuppressWarnings("static-access")
     static final Set<CarinaDriver> driversPool = driversMap.newKeySet();
     
-    static final ThreadLocal<Device> currentDevice = new ThreadLocal<Device>();
+    static final ThreadLocal<Device> currentDevice = new ThreadLocal<>();
     static final Device nullDevice = new Device();
     
-    static final ThreadLocal<DesiredCapabilities> customCapabilities = new ThreadLocal<>();
+    static final ThreadLocal<Capabilities> customCapabilities = new ThreadLocal<>();
     
     /**
-     * Get default driver. If no default driver discovered it will be created.
+     * Get default driver. If no default driver discovered it will be created
      * 
      * @return default WebDriver
      */
@@ -76,41 +78,40 @@ public interface IDriverPool {
      * Get driver by name. If no driver discovered it will be created using
      * default capabilities.
      * 
-     * @param name
-     *            String driver name
+     * @param name String driver name
      * @return WebDriver
      */
     default public WebDriver getDriver(String name) {
         //customCapabilities.get() return registered custom capabilities or null as earlier
-        return getDriver(name, customCapabilities.get(), null);
+        Capabilities capabilities = customCapabilities.get();
+        if (capabilities == null) {
+
+        }
+        return getDriver(name, customCapabilities.get());
     }
 
+
     /**
-     * Get driver by name and DesiredCapabilities.
+     * Get driver by name and with Capabilities.
      * 
-     * @param name
-     *            String driver name
-     * @param capabilities
-     *            DesiredCapabilities capabilities
+     * @param name String driver name
+     * @param capabilities Capabilities
      * @return WebDriver
      */
-    default public WebDriver getDriver(String name, DesiredCapabilities capabilities) {
-        return getDriver(name, capabilities, null);
+    default public WebDriver getDriver(String name, Capabilities capabilities) {
+        return getDriver(name, capabilities, Configuration.getSeleniumUrl());
     }
 
     /**
      * Get driver by name. If no driver discovered it will be created using
      * custom capabilities and selenium server.
      * 
-     * @param name
-     *            String driver name
-     * @param capabilities
-     *            DesiredCapabilities
-     * @param seleniumHost
-     *            String
+     * @param name String driver name
+     * @param capabilities Capabilities
+     * @param seleniumHost String
      * @return WebDriver
      */
-    default public WebDriver getDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
+    default public WebDriver getDriver(String name, Capabilities capabilities, String seleniumHost) {
         WebDriver drv = null;
 
         ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
@@ -199,7 +200,7 @@ public interface IDriverPool {
     default public WebDriver restartDriver(boolean isSameDevice) {
         WebDriver drv = getDriver(DEFAULT);
         Device device = nullDevice;
-        DesiredCapabilities caps = new DesiredCapabilities();
+        MutableCapabilities caps = new MutableCapabilities();
         
         boolean keepProxy = false;
 
@@ -221,7 +222,7 @@ public interface IDriverPool {
         }
         POOL_LOGGER.debug("after restartDriver: " + driversPool);
 
-        return createDriver(DEFAULT, caps, null);
+        return createDriver(DEFAULT, caps, Configuration.getSeleniumUrl());
     }
 
     /**
@@ -368,15 +369,12 @@ public interface IDriverPool {
     /**
      * Create driver with custom capabilities
      * 
-     * @param name
-     *            String driver name
-     * @param capabilities
-     *            DesiredCapabilities
-     * @param seleniumHost
-     *            String
+     * @param name String driver name
+     * @param capabilities DesiredCapabilities
+     * @param seleniumHost String
      * @return WebDriver
      */
-    private WebDriver createDriver(String name, DesiredCapabilities capabilities, String seleniumHost) {
+    private WebDriver createDriver(String name, Capabilities capabilities, String seleniumHost) {
         int count = 0;
         WebDriver drv = null;
         Device device = nullDevice;

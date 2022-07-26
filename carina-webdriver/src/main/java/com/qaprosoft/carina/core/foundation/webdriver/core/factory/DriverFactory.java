@@ -21,21 +21,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.Browser;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.RemoteWebDriverBuilder;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.DesktopFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.MobileFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.WindowsFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesBuilder;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.OptionsType;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.zebrunner.agent.core.webdriver.RemoteWebDriverFactory;
+
+import io.appium.java_client.remote.AutomationName;
 
 /**
  * DriverFactory produces driver instance with desired capabilities according to
@@ -47,40 +51,29 @@ public class DriverFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-	public static WebDriver create(String testName, DesiredCapabilities capabilities, String seleniumHost) {
+    public static WebDriver create(String testName, Capabilities capabilities, String seleniumHost) {
 		LOGGER.debug("DriverFactory start...");
-		AbstractFactory factory;
+        RemoteWebDriverBuilder webDriverBuilder = RemoteWebDriver.builder();
 
+        // todo it is a magic?
         URL seleniumUrl = RemoteWebDriverFactory.getSeleniumHubUrl();
         if (seleniumUrl != null) {
             // override existing selenium_url in config
             R.CONFIG.put(Parameter.SELENIUM_URL.getKey(), seleniumUrl.toString());
         }
 
-		String driverType = Configuration.getDriverType(capabilities);
-		switch (driverType) {
-		case SpecialKeywords.DESKTOP:
-			factory = new DesktopFactory();
-			break;
+        webDriverBuilder.address(seleniumHost);
 
-		case SpecialKeywords.MOBILE:
-			factory = new MobileFactory();
-			break;
+        CapabilitiesBuilder capabilitiesBuilder = CapabilitiesBuilder.builder();
+        chooseCapabilitiesType(capabilitiesBuilder, testName);
+        capabilitiesBuilder.withCapabilities(capabilities);
+        webDriverBuilder.oneOf(capabilitiesBuilder.build());
 
-        case SpecialKeywords.WINDOWS:
-            factory = new WindowsFactory();
-            break;
-
-		default:
-			throw new RuntimeException("Unsupported driver_type: " + driverType);
-		}
-
-		WebDriver driver = factory.create(testName, capabilities, seleniumHost);
-        driver = factory.registerListeners(driver, getEventListeners());
+        // driver = factory.registerListeners(driver, getEventListeners());
 		
 		LOGGER.debug("DriverFactory finish...");
 
-		return driver;
+        return webDriverBuilder.build();
 	}
 	
 	   /**
@@ -112,6 +105,35 @@ public class DriverFactory {
             LOGGER.error("Unable to register webdriver event listeners!", e);
         }
         return listeners.toArray(new WebDriverEventListener[listeners.size()]);
+    }
+
+    /**
+     * Choose capabilities type depends on configuration
+     * 
+     * @param capabilitiesBuilder
+     */
+    private static void chooseCapabilitiesType(CapabilitiesBuilder capabilitiesBuilder, String testName) {
+        String browser = Configuration.getBrowser();
+        String automationName = Configuration.getAutomationName();
+
+        if (AutomationName.ANDROID_UIAUTOMATOR2.equalsIgnoreCase(automationName)) {
+            capabilitiesBuilder.chooseOptionsType(OptionsType.ANDROID_UIAUTOMATOR2_APPIUM);
+            return;
+        }
+
+        if (!IDriverPool.DEFAULT.equalsIgnoreCase(testName)) {
+            // #1573: remove "default" driver name capability registration
+            capabilitiesBuilder.withTestName(testName);
+        }
+
+        if (Browser.CHROME.browserName().equalsIgnoreCase(browser)) {
+            capabilitiesBuilder.chooseOptionsType(OptionsType.CHROME_SELENIUM);
+            return;
+        }
+        if (Browser.FIREFOX.browserName().equalsIgnoreCase(browser)) {
+            capabilitiesBuilder.chooseOptionsType(OptionsType.FIREFOX_SELENIUM);
+            return;
+        }
     }
 
 }

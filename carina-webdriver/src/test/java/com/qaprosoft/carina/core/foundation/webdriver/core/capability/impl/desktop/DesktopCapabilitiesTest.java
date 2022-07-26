@@ -15,11 +15,13 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Proxy;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.BrowserType;
@@ -30,6 +32,8 @@ import org.testng.annotations.Test;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesBuilder;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.OptionsType;
 
 public class DesktopCapabilitiesTest {
 
@@ -40,41 +44,39 @@ public class DesktopCapabilitiesTest {
     @Test(groups = {"DesktopCapabilitiesTestClass"})
     public static void getChromeCapabilityTest() {
         String testName = "chrome - getChromeCapabilityTest";
-
-        ChromeCapabilities chromeCapabilities = new ChromeCapabilities();
-        DesiredCapabilities capabilities = chromeCapabilities.getCapability(testName);
+        ChromeOptions capabilities = (ChromeOptions) CapabilitiesBuilder.builder()
+                .chooseOptionsType(OptionsType.CHROME_SELENIUM)
+                .withTestName(testName)
+                .build();
 
         Assert.assertEquals(capabilities.getBrowserName(), Browser.CHROME.browserName(), "Returned browser name is not valid!");
-
         Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
 
-        Assert.assertEquals(capabilities.getCapability("chrome.switches"), Arrays.asList("--start-maximized", "--ignore-ssl-errors"),
-                "Returned capability value is not valid!");
-        Assert.assertTrue((Boolean) capabilities.getCapability(CapabilityType.ACCEPT_SSL_CERTS), "Returned capability value is not valid!");
+        Map<String, Object> chromeOptions = (Map<String, Object>) capabilities.getCapability(ChromeOptions.CAPABILITY);
+        List<String> chromeOptionsArgs = (List<String>) chromeOptions.get("args");
 
-        Assert.assertFalse((Boolean) capabilities.getCapability(CapabilityType.TAKES_SCREENSHOT), "Returned capability value is not valid!");
-
-        Assert.assertTrue((Boolean) capabilities.getCapability(CapabilityType.ACCEPT_INSECURE_CERTS), "Returned capability value is not valid!");
+        Assert.assertTrue(chromeOptionsArgs.contains("--start-maximized"), "Options is not contains --start-maximized argument");
+        Assert.assertTrue(chromeOptionsArgs.contains("--ignore-ssl-errors"), "Options is not contains --ignore-ssl-errors argument");
+        Assert.assertTrue(capabilities.is(CapabilityType.ACCEPT_INSECURE_CERTS), "Returned capability value is not valid!");
     }
 
-    @Test(groups = {"DesktopCapabilitiesTestClass"}, enabled = false)
+    @Test(groups = { "DesktopCapabilitiesTestClass" }, enabled = false)
     public static void getFirefoxCapabilityWithDefaultFirefoxProfileTest() {
         String testName = "firefox - getFirefoxDefaultCapabilityTest";
 
-        FirefoxCapabilities firefoxCapabilities = new FirefoxCapabilities();
-        DesiredCapabilities capabilities = firefoxCapabilities.getCapability(testName);
+        FirefoxOptions capabilities = (FirefoxOptions) CapabilitiesBuilder.builder()
+                .chooseOptionsType(OptionsType.FIREFOX_SELENIUM)
+                .withTestName(testName)
+                .build();
 
         Assert.assertEquals(capabilities.getBrowserName(), Browser.FIREFOX.browserName(), "Returned browser name is not valid!");
-
         Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
 
-        Assert.assertFalse((Boolean) capabilities.getCapability(CapabilityType.TAKES_SCREENSHOT), "Returned capability value is not valid!");
-
-        boolean actualMediaEmeEnabled = ((FirefoxProfile) capabilities.getCapability("firefox_profile"))
+        boolean actualMediaEmeEnabled = capabilities.getProfile()
                 .getBooleanPreference("media.eme.enabled", false);
         Assert.assertEquals(actualMediaEmeEnabled, MEDIA_EME_ENABLED, "Returned firefox profile preference is not valid!");
 
-        boolean actualMediaGmpManagerUpdateEnabled = ((FirefoxProfile) capabilities.getCapability("firefox_profile"))
+        boolean actualMediaGmpManagerUpdateEnabled = capabilities.getProfile()
                 .getBooleanPreference("media.gmp-manager.updateEnabled", false);
         Assert.assertEquals(actualMediaGmpManagerUpdateEnabled, MEDIA_GMP_MANAGER_UPDATE_ENABLED, "Returned firefox profile preference is not valid!");
     }
@@ -174,11 +176,12 @@ public class DesktopCapabilitiesTest {
     public static void getChromeCapabilityHeadlessTest() {
         R.CONFIG.put(Configuration.Parameter.HEADLESS.getKey(), "true");
 
-        ChromeCapabilities chromeCapabilities = new ChromeCapabilities();
-        DesiredCapabilities capabilities = chromeCapabilities.getCapability("chrome - getChromeCapabilityHeadlessTest");
+        Capabilities capabilities = CapabilitiesBuilder.builder()
+                .withTestName("chrome - getChromeCapabilityHeadlessTest")
+                .chooseOptionsType(OptionsType.CHROME_SELENIUM)
+                .build();
 
         Assert.assertFalse((Boolean) capabilities.getCapability("enableVNC"), "Returned capability value is not valid!");
-
         Assert.assertFalse((Boolean) capabilities.getCapability("enableVideo"), "Returned capability value is not valid!");
     }
 
@@ -193,8 +196,10 @@ public class DesktopCapabilitiesTest {
         R.CONFIG.put(Configuration.Parameter.PROXY_PROTOCOLS.getKey(), "http,https,ftp,socks", true);
         R.CONFIG.put(Configuration.Parameter.NO_PROXY.getKey(), noProxy, true);
 
-        ChromeCapabilities chromeCapabilities = new ChromeCapabilities();
-        DesiredCapabilities capabilities = chromeCapabilities.getCapability("chrome - getChromeCapabilityProxyTest");
+        Capabilities capabilities = CapabilitiesBuilder.builder()
+                .withTestName("chrome - getChromeCapabilityProxyTest")
+                .chooseOptionsType(OptionsType.CHROME_SELENIUM)
+                .build();
 
         String proxyHostWithPort = proxyHost + ":" + proxyPort;
 
@@ -214,8 +219,10 @@ public class DesktopCapabilitiesTest {
         String browserLanguage = "en_US";
         R.CONFIG.put(Configuration.Parameter.BROWSER_LANGUAGE.getKey(), browserLanguage, true);
 
-        ChromeCapabilities chromeCapabilities = new ChromeCapabilities();
-        DesiredCapabilities capabilities = chromeCapabilities.getCapability("chrome - getChromeCapabilityBrowserLanguageTest");
+        Capabilities capabilities = CapabilitiesBuilder.builder()
+                .withTestName("chrome - getChromeCapabilityBrowserLanguageTest")
+                .chooseOptionsType(OptionsType.CHROME_SELENIUM)
+                .build();
 
         Map<String, Object> chromeOptions = (Map<String, Object>) capabilities.getCapability("goog:chromeOptions");
         List<String> chromeOptionsArgs = (List<String>) chromeOptions.get("args");
@@ -227,8 +234,10 @@ public class DesktopCapabilitiesTest {
     public static void getChromeCapabilityAutoDownloadTest() {
         R.CONFIG.put(Configuration.Parameter.AUTO_DOWNLOAD.getKey(), "true", true);
 
-        ChromeCapabilities chromeCapabilities = new ChromeCapabilities();
-        DesiredCapabilities capabilities = chromeCapabilities.getCapability("chrome - getChromeCapabilityAutoDownloadTest");
+        Capabilities capabilities = CapabilitiesBuilder.builder()
+                .withTestName("chrome - getChromeCapabilityAutoDownloadTest")
+                .chooseOptionsType(OptionsType.CHROME_SELENIUM)
+                .build();
 
         Map<String, Object> chromeOptions = (Map<String, Object>) capabilities.getCapability("goog:chromeOptions");
         Map<String, Object> chromeOptionsPref = (Map<String, Object>) chromeOptions.get("prefs");

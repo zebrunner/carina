@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -334,11 +336,11 @@ public class Configuration {
 
     /**
      * Get platform name from configuration properties or DesiredCapabilities.
-     * @param caps
-     *            DesiredCapabilities
+     * 
+     * @param caps Capabilities
      * @return String platform name
      */
-    public static String getPlatform(DesiredCapabilities caps) {
+    public static String getPlatform(Capabilities caps) {
         // any platform by default
         String platform = "*";
         
@@ -397,8 +399,14 @@ public class Configuration {
         return platformVersion;
     }
 
+    /**
+     * Returns browser name from configuration file (browser or capabilities.browserName(priority)
+     * If not specified, then returns empty
+     * 
+     * @return browser name
+     */
     public static String getBrowser() {
-        String browser = "";
+        String browser = StringUtils.EMPTY;
         if (!Configuration.get(Parameter.BROWSER).isEmpty()) {
             // default "browser=value" should be used to determine current browser
             browser = Configuration.get(Parameter.BROWSER);
@@ -407,6 +415,21 @@ public class Configuration {
         // redefine browser if capabilities.browserName is available
         if (!R.CONFIG.get("capabilities.browserName").isEmpty() && !"null".equalsIgnoreCase(R.CONFIG.get("capabilities.browserName"))) {
             browser = R.CONFIG.get("capabilities.browserName");
+        }
+        return browser;
+    }
+
+    public static Browser getBrowserAsEnum() {
+        String configurationBrowserName = Configuration.getBrowser();
+        Browser browser = null;
+        if (Browser.CHROME.is(configurationBrowserName)) {
+            browser = Browser.CHROME;
+        }
+        if (Browser.FIREFOX.is(configurationBrowserName)) {
+            browser = Browser.FIREFOX;
+        }
+        if (Browser.EDGE.is(configurationBrowserName)) {
+            browser = Browser.EDGE;
         }
         return browser;
     }
@@ -425,10 +448,11 @@ public class Configuration {
     public static String getDriverType() {
 
         String platform = getPlatform();
-        if (platform.equalsIgnoreCase(SpecialKeywords.ANDROID) || platform.equalsIgnoreCase(SpecialKeywords.IOS) || platform.equalsIgnoreCase(SpecialKeywords.TVOS)) {
+        if (platform.equalsIgnoreCase(SpecialKeywords.ANDROID) || platform.equalsIgnoreCase(SpecialKeywords.IOS) ||
+                platform.equalsIgnoreCase(SpecialKeywords.TVOS)) {
             return SpecialKeywords.MOBILE;
         }
-        
+
         if (SpecialKeywords.WINDOWS.equalsIgnoreCase(platform)) {
             return SpecialKeywords.WINDOWS;
         }
@@ -462,6 +486,15 @@ public class Configuration {
         }
 
         return SpecialKeywords.DESKTOP;
+    }
+
+    public static String getAutomationName() {
+        String automationName = StringUtils.EMPTY;
+        String prefix = SpecialKeywords.CAPABILITIES + ".";
+        if (!R.CONFIG.get(prefix + "automationName").isEmpty()) {
+            automationName = R.CONFIG.get(prefix + "automationName");
+        }
+        return automationName;
     }
 
     public static String getMobileApp() {
