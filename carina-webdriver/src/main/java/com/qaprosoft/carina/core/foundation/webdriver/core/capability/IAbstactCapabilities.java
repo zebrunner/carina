@@ -53,7 +53,8 @@ public abstract class IAbstactCapabilities<T extends Capabilities> {
     /**
      * Read all properties which starts from "capabilities.*" prefix and add return them as Capabilities object
      */
-    protected Capabilities getConfigurationCapabilities() {
+    // todo investigate how static will work with capabilities
+    public static Capabilities getConfigurationCapabilities() {
         MutableCapabilities capabilities = new MutableCapabilities();
         Properties properties = R.CONFIG.getProperties();
 
@@ -93,7 +94,7 @@ public abstract class IAbstactCapabilities<T extends Capabilities> {
         return capabilities;
     }
 
-    protected boolean isNumber(String value) {
+    protected static boolean isNumber(String value) {
         if (value == null || value.isEmpty()) {
             return false;
         }
