@@ -121,6 +121,11 @@ public class DriverFactory {
             return;
         }
 
+        if (AutomationName.WINDOWS.equalsIgnoreCase(automationName)) {
+            capabilitiesBuilder.chooseOptionsType(OptionsType.WINDOWS_APPIUM);
+            return;
+        }
+
         if (!IDriverPool.DEFAULT.equalsIgnoreCase(testName)) {
             // #1573: remove "default" driver name capability registration
             capabilitiesBuilder.testName(testName);
