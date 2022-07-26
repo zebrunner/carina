@@ -8,6 +8,7 @@ import org.openqa.selenium.MutableCapabilities;
 
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.ChromeCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.FirefoxCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.SafariCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.UIAutomator2Capabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.WindowsCapabilities;
 
@@ -65,6 +66,11 @@ public class CapabilitiesBuilder {
         case WINDOWS_APPIUM:
             capabilities = new WindowsCapabilities()
                     .getCapabilitiesWithCustom(this.additionalCapabilities);
+            break;
+        case SAFARI_APPIUM:
+            capabilities = new SafariCapabilities()
+                    .getCapabilitiesWithCustom(this.additionalCapabilities);
+            break;
         }
 
         if (capabilities == null) {
