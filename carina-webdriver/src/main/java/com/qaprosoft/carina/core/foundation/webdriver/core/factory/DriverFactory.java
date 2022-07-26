@@ -123,7 +123,7 @@ public class DriverFactory {
 
         if (!IDriverPool.DEFAULT.equalsIgnoreCase(testName)) {
             // #1573: remove "default" driver name capability registration
-            capabilitiesBuilder.withTestName(testName);
+            capabilitiesBuilder.testName(testName);
         }
 
         if (Browser.CHROME.browserName().equalsIgnoreCase(browser)) {

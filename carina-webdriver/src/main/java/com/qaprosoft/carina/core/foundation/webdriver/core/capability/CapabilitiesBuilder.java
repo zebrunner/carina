@@ -23,7 +23,7 @@ public class CapabilitiesBuilder {
         return new CapabilitiesBuilder();
     }
 
-    public CapabilitiesBuilder withTestName(String testName) {
+    public CapabilitiesBuilder testName(String testName) {
         this.testName = testName;
         return this;
     }

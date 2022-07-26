@@ -46,7 +46,7 @@ public class DesktopCapabilitiesTest {
         String testName = "chrome - getChromeCapabilityTest";
         ChromeOptions capabilities = (ChromeOptions) CapabilitiesBuilder.builder()
                 .chooseOptionsType(OptionsType.CHROME_SELENIUM)
-                .withTestName(testName)
+                .testName(testName)
                 .build();
 
         Assert.assertEquals(capabilities.getBrowserName(), Browser.CHROME.browserName(), "Returned browser name is not valid!");
@@ -66,7 +66,7 @@ public class DesktopCapabilitiesTest {
 
         FirefoxOptions capabilities = (FirefoxOptions) CapabilitiesBuilder.builder()
                 .chooseOptionsType(OptionsType.FIREFOX_SELENIUM)
-                .withTestName(testName)
+                .testName(testName)
                 .build();
 
         Assert.assertEquals(capabilities.getBrowserName(), Browser.FIREFOX.browserName(), "Returned browser name is not valid!");
@@ -177,7 +177,7 @@ public class DesktopCapabilitiesTest {
         R.CONFIG.put(Configuration.Parameter.HEADLESS.getKey(), "true");
 
         Capabilities capabilities = CapabilitiesBuilder.builder()
-                .withTestName("chrome - getChromeCapabilityHeadlessTest")
+                .testName("chrome - getChromeCapabilityHeadlessTest")
                 .chooseOptionsType(OptionsType.CHROME_SELENIUM)
                 .build();
 
@@ -197,7 +197,7 @@ public class DesktopCapabilitiesTest {
         R.CONFIG.put(Configuration.Parameter.NO_PROXY.getKey(), noProxy, true);
 
         Capabilities capabilities = CapabilitiesBuilder.builder()
-                .withTestName("chrome - getChromeCapabilityProxyTest")
+                .testName("chrome - getChromeCapabilityProxyTest")
                 .chooseOptionsType(OptionsType.CHROME_SELENIUM)
                 .build();
 
@@ -220,7 +220,7 @@ public class DesktopCapabilitiesTest {
         R.CONFIG.put(Configuration.Parameter.BROWSER_LANGUAGE.getKey(), browserLanguage, true);
 
         Capabilities capabilities = CapabilitiesBuilder.builder()
-                .withTestName("chrome - getChromeCapabilityBrowserLanguageTest")
+                .testName("chrome - getChromeCapabilityBrowserLanguageTest")
                 .chooseOptionsType(OptionsType.CHROME_SELENIUM)
                 .build();
 
@@ -235,7 +235,7 @@ public class DesktopCapabilitiesTest {
         R.CONFIG.put(Configuration.Parameter.AUTO_DOWNLOAD.getKey(), "true", true);
 
         Capabilities capabilities = CapabilitiesBuilder.builder()
-                .withTestName("chrome - getChromeCapabilityAutoDownloadTest")
+                .testName("chrome - getChromeCapabilityAutoDownloadTest")
                 .chooseOptionsType(OptionsType.CHROME_SELENIUM)
                 .build();
 
