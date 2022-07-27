@@ -4,6 +4,7 @@ import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.Browser;
@@ -39,7 +40,8 @@ public class FirefoxFactory extends IAbstractFactory {
             throw new RuntimeException("Malformed selenium URL!", e);
         }
 
-        WebDriver driver = new RemoteWebDriver(hostURL, firefoxOptions);
+        EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(hostURL);
+        WebDriver driver = new RemoteWebDriver(ce, firefoxOptions);
         resizeBrowserWindow(driver, firefoxOptions);
         return driver;
     }

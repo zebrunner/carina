@@ -4,6 +4,7 @@ import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.Browser;
@@ -35,7 +36,8 @@ public class EdgeFactory extends IAbstractFactory {
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed selenium URL!", e);
         }
-        WebDriver driver = new RemoteWebDriver(hostURL, edgeOptions);
+        EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(hostURL);
+        WebDriver driver = new RemoteWebDriver(ce, edgeOptions);
         resizeBrowserWindow(driver, edgeOptions);
         return driver;
     }

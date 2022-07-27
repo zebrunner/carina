@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesBuilder;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.OptionsType;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.IAbstractFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
 
 import io.appium.java_client.remote.options.SupportsAutomationNameOption;
 
@@ -38,8 +39,8 @@ public class ChromeFactory extends IAbstractFactory {
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed selenium URL!", e);
         }
-
-        WebDriver driver = new RemoteWebDriver(hostURL, chromeOptions);
+        EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(hostURL);
+        WebDriver driver = new RemoteWebDriver(ce, chromeOptions);
         resizeBrowserWindow(driver, chromeOptions);
 
         return driver;

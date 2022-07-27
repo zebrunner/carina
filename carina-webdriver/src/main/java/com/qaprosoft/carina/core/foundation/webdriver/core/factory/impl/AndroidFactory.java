@@ -42,7 +42,8 @@ public class AndroidFactory extends IAbstractFactory {
             throw new RuntimeException("Malformed selenium URL!", e);
         }
 
-        AndroidDriver driver = new AndroidDriver(hostURL, uiAutomator2Options);
+        EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(hostURL);
+        AndroidDriver driver = new AndroidDriver(ce, uiAutomator2Options);
         registerDevice(driver);
         return driver;
     }

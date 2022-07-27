@@ -14,6 +14,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesBuilder;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.OptionsType;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.IAbstractFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.remote.AutomationName;
@@ -38,7 +39,8 @@ public class IOSFactory extends IAbstractFactory {
             throw new RuntimeException("Malformed selenium URL!", e);
         }
 
-        IOSDriver driver = new IOSDriver(hostURL, xcuiOptions);
+        EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(hostURL);
+        IOSDriver driver = new IOSDriver(ce, xcuiOptions);
         registerDevice(driver);
         return driver;
     }
