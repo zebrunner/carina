@@ -107,10 +107,6 @@ public class DriverFactory {
             return new AndroidFactory();
         }
 
-        if (SafariFactory.isSuitable(capabilities)) {
-            return new SafariFactory();
-        }
-
         if (IOSFactory.isSuitable(capabilities)) {
             return new IOSFactory();
         }
@@ -137,6 +133,10 @@ public class DriverFactory {
 
         if (EdgeFactory.isSuitable(capabilities)) {
             return new EdgeFactory();
+        }
+
+        if (SafariFactory.isSuitable(capabilities)) {
+            return new SafariFactory();
         }
 
         throw new RuntimeException(
