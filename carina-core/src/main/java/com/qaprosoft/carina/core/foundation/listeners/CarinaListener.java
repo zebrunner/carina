@@ -38,7 +38,7 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -96,7 +96,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.screenshot.AutoScreenshotR
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
 import com.zebrunner.agent.core.registrar.Artifact;
 import com.zebrunner.agent.core.registrar.CurrentTest;
-import com.zebrunner.agent.core.registrar.CurrentTestRun;
 import com.zebrunner.agent.core.registrar.Label;
 import com.zebrunner.agent.core.registrar.TestRail;
 import com.zebrunner.agent.core.registrar.label.CompositeLabelResolver;
@@ -979,8 +978,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 String driverName = entry.getKey();
                 WebDriver drv = entry.getValue().getDriver();
 
-                if (drv instanceof EventFiringWebDriver) {
-                    drv = ((EventFiringWebDriver) drv).getWrappedDriver();
+                if (drv instanceof EventFiringDecorator) {
+                    drv = ((EventFiringDecorator) drv).getDecoratedDriver()
+                            .getOriginal();
                 }
 
                 if (Screenshot.isEnabled()) {

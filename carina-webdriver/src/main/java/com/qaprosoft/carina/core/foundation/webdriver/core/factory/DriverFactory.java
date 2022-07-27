@@ -23,6 +23,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,22 +65,27 @@ public class DriverFactory {
         IAbstractFactory driverFactory = chooseDriverFactory(IAbstactCapabilities.getConfigurationCapabilities());
 
         WebDriver driver = driverFactory.create(testName, additionalCapabilities, seleniumHost);
+
+        DriverListener listener = new DriverListener();
+        WebDriver decorated = new EventFiringDecorator(listener).decorate(driver);
+
         LOGGER.debug("DriverFactory finish...");
-        return driver;
+        return decorated;
     }
 	
 	   /**
-     * Reads 'driver_event_listeners' configuration property and initializes
-     * appropriate array of driver event listeners.
-     * 
-     * @return array of driver listeners
-     */
+        * Reads 'driver_event_listeners' configuration property and initializes
+        * appropriate array of driver event listeners.
+        * todo fix
+        * 
+        * @return array of driver listeners
+        */
     private static WebDriverEventListener[] getEventListeners() {
         List<WebDriverEventListener> listeners = new ArrayList<>();
         try {
             //explicitly add default carina com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener
             DriverListener driverListener = new DriverListener();
-            listeners.add(driverListener);
+            // listeners.add(driverListener); fixme
 
             String listenerClasses = Configuration.get(Parameter.DRIVER_EVENT_LISTENERS);
             if (!StringUtils.isEmpty(listenerClasses)) {

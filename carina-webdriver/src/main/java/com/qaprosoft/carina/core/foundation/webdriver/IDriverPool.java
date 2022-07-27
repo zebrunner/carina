@@ -34,7 +34,7 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -146,9 +146,9 @@ public interface IDriverPool {
     public static WebDriver getDriver(SessionId sessionId) {
         for (CarinaDriver carinaDriver : driversPool) {
             WebDriver drv = carinaDriver.getDriver();
-            if (drv instanceof EventFiringWebDriver) {
-                EventFiringWebDriver eventFirDriver = (EventFiringWebDriver) drv;
-                drv = eventFirDriver.getWrappedDriver();
+            if (drv instanceof EventFiringDecorator) {
+                EventFiringDecorator eventFirDriver = (EventFiringDecorator) drv;
+                drv = eventFirDriver.getDecoratedDriver().getOriginal();
             }
 
             SessionId drvSessionId = ((RemoteWebDriver) drv).getSessionId();
@@ -360,8 +360,8 @@ public interface IDriverPool {
     }
     
     private WebDriver castDriver(WebDriver drv) {
-        if (drv instanceof EventFiringWebDriver) {
-            drv = ((EventFiringWebDriver) drv).getWrappedDriver();
+        if (drv instanceof EventFiringDecorator) {
+            drv = ((EventFiringDecorator) drv).getDecoratedDriver().getOriginal();
         }
         return drv;        
     }    

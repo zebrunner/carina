@@ -73,9 +73,9 @@ public class DeprecatedWindowsFactory extends AbstractFactory {
         return new WindowsCapabilities().getCapability(name);
     }
 
-    @Override
-    public WebDriver registerListeners(WebDriver driver, WebDriverEventListener... listeners) {
-        return super.registerListeners(driver, listeners);
-    }
+//    @Override
+//    public WebDriver registerListeners(WebDriver driver, WebDriverEventListener... listeners) {
+//        return super.registerListeners(driver, listeners);
+//    }
 
 }

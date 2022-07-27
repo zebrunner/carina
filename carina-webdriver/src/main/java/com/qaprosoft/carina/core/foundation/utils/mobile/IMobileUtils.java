@@ -29,7 +29,7 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.interactions.Pause;
 import org.openqa.selenium.interactions.PointerInput;
 import org.openqa.selenium.interactions.Sequence;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -905,8 +905,9 @@ public interface IMobileUtils extends IDriverPool {
      */
     default public WebDriver castDriver() {
         WebDriver drv = getDriver();
-        if (drv instanceof EventFiringWebDriver) {
-            drv = ((EventFiringWebDriver) drv).getWrappedDriver();
+        if (drv instanceof EventFiringDecorator) {
+            drv = ((EventFiringDecorator) drv).getDecoratedDriver()
+                    .getOriginal();
         }
 
         return drv;
