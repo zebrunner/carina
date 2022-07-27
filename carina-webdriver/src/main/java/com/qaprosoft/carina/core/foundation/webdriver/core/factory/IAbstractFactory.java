@@ -3,6 +3,7 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.factory;
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchSessionException;
@@ -11,6 +12,8 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.openqa.selenium.support.events.WebDriverEventListener;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Wait;
 import org.slf4j.Logger;
@@ -33,6 +36,23 @@ public abstract class IAbstractFactory {
      * @return instance of {@link WebDriver}
      */
     abstract public WebDriver create(String testName, Capabilities capabilities, String seleniumHost);
+
+    /**
+     * If any listeners specified, converts RemoteWebDriver to EventFiringWebDriver and registers all listeners.
+     *
+     * @param driver - instance of @link WebDriver}
+     * @param listeners - instances of {@link WebDriverEventListener}
+     * @return driver with registered listeners
+     */
+    public WebDriver registerListeners(WebDriver driver, WebDriverEventListener... listeners) {
+        if (!ArrayUtils.isEmpty(listeners)) {
+            driver = new EventFiringWebDriver(driver);
+            for (WebDriverEventListener listener : listeners) {
+                ((EventFiringWebDriver) driver).register(listener);
+            }
+        }
+        return driver;
+    }
 
     /**
      * Sets browser window according to capabilites.resolution value, otherwise
