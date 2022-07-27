@@ -49,7 +49,7 @@ public class ChromeFactory extends IAbstractFactory {
      * Determines if the driver is suitable for the current capabilities
      */
     public static boolean isSuitable(Capabilities capabilities) {
-        if (!capabilities.getPlatformName().toString().isEmpty()) {
+        if (capabilities.getPlatformName() != null) {
             return false;
         }
 
