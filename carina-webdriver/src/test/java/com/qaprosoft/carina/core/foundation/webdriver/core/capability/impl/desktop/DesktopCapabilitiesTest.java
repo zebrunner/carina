@@ -24,7 +24,6 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.remote.Browser;
-import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
@@ -34,6 +33,8 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesBuilder;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.OptionsType;
+
+import io.appium.java_client.safari.options.SafariOptions;
 
 public class DesktopCapabilitiesTest {
 
@@ -85,30 +86,30 @@ public class DesktopCapabilitiesTest {
     public static void getFirefoxCapabilityWithCustomFirefoxProfileTest() {
         String testName = "firefox - getFirefoxCustomCapabilityTest";
 
-        FirefoxCapabilities firefoxCapabilities = new FirefoxCapabilities();
-
         FirefoxProfile profile = new FirefoxProfile();
         profile.setPreference("media.eme.enabled", !MEDIA_EME_ENABLED);
         profile.setPreference("media.gmp-manager.updateEnabled", !MEDIA_GMP_MANAGER_UPDATE_ENABLED);
 
-        DesiredCapabilities capabilities = firefoxCapabilities.getCapability(testName, profile);
+        FirefoxOptions capabilities = (FirefoxOptions) CapabilitiesBuilder.builder()
+                .chooseOptionsType(OptionsType.FIREFOX_SELENIUM)
+                .testName(testName)
+                .build();
+        capabilities = capabilities.setProfile(profile);
 
         Assert.assertEquals(capabilities.getBrowserName(), Browser.FIREFOX.browserName(), "Returned browser name is not valid!");
 
         Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
 
-        Assert.assertFalse((Boolean) capabilities.getCapability(CapabilityType.TAKES_SCREENSHOT), "Returned capability value is not valid!");
-
-        boolean actualMediaEmeEnabled = ((FirefoxProfile) capabilities.getCapability("firefox_profile"))
+        boolean actualMediaEmeEnabled = capabilities.getProfile()
                 .getBooleanPreference("media.eme.enabled", true);
         Assert.assertEquals(actualMediaEmeEnabled, !MEDIA_EME_ENABLED, "Returned firefox profile preference is not valid!");
 
-        boolean actualMediaGmpManagerUpdateEnabled = ((FirefoxProfile) capabilities.getCapability("firefox_profile"))
+        boolean actualMediaGmpManagerUpdateEnabled = capabilities.getProfile()
                 .getBooleanPreference("media.gmp-manager.updateEnabled", true);
         Assert.assertEquals(actualMediaGmpManagerUpdateEnabled, !MEDIA_GMP_MANAGER_UPDATE_ENABLED, "Returned firefox profile preference is not valid!");
     }
 
-    @Test(groups = {"DesktopCapabilitiesTestClass"})
+    @Test(groups = { "DesktopCapabilitiesTestClass" })
     public static void getOperaCapabilityTest() {
         String testName = "opera - getOperaCapabilityTest";
 
@@ -119,20 +120,20 @@ public class DesktopCapabilitiesTest {
 
         Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
 
-        Assert.assertTrue((Boolean) capabilities.getCapability(CapabilityType.ACCEPT_SSL_CERTS), "Returned capability value is not valid!");
+     Assert.assertTrue((Boolean) capabilities.getCapability(CapabilityType.ACCEPT_SSL_CERTS), "Returned capability value is not valid!");
 
-        Assert.assertFalse((Boolean) capabilities.getCapability(CapabilityType.TAKES_SCREENSHOT), "Returned capability value is not valid!");
-    }
+     Assert.assertFalse((Boolean) capabilities.getCapability(CapabilityType.TAKES_SCREENSHOT), "Returned capability value is not valid!");
+ }
 
-   @Test(groups = {"DesktopCapabilitiesTestClass"}, enabled = false)
+ @Test(groups = { "DesktopCapabilitiesTestClass" }, enabled = false)
     public static void getSafariCapabilityTest() {
         String testName = "safari - getSafariCapabilityTest";
+        SafariOptions capabilities = (SafariOptions) CapabilitiesBuilder.builder()
+                .chooseOptionsType(OptionsType.SAFARI_APPIUM)
+                .testName(testName)
+                .build();
 
-        SafariCapabilities safariCapabilities = new SafariCapabilities();
-        DesiredCapabilities capabilities = safariCapabilities.getCapability(testName);
-
-        Assert.assertEquals(capabilities.getBrowserName(), BrowserType.SAFARI, "Returned browser name is not valid!");
-
+        Assert.assertEquals(capabilities.getBrowserName(), Browser.SAFARI.browserName(), "Returned browser name is not valid!");
         Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
     }
 

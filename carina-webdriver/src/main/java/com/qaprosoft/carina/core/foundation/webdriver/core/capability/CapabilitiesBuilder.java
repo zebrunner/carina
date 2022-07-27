@@ -11,6 +11,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.Firef
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.SafariCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.UIAutomator2Capabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.WindowsCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.XCUITestCapabilities;
 
 public class CapabilitiesBuilder {
 
@@ -61,6 +62,10 @@ public class CapabilitiesBuilder {
             break;
         case ANDROID_UIAUTOMATOR2_APPIUM:
             capabilities = new UIAutomator2Capabilities()
+                    .getCapabilitiesWithCustom(this.additionalCapabilities);
+            break;
+        case IOS_XCUI_TEST_APPIUM:
+            capabilities = new XCUITestCapabilities()
                     .getCapabilitiesWithCustom(this.additionalCapabilities);
             break;
         case WINDOWS_APPIUM:

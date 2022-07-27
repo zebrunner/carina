@@ -32,6 +32,12 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.IAbstactCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.AndroidFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.ChromeFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.CustomAndroidMobileFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.CustomIOSMobileFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.FirefoxFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.IOSFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.SafariFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.zebrunner.agent.core.webdriver.RemoteWebDriverFactory;
 
@@ -92,8 +98,33 @@ public class DriverFactory {
     }
 
     private static IAbstractFactory chooseDriverFactory(Capabilities capabilities) {
+
         if (AndroidFactory.isSuitable(capabilities)) {
             return new AndroidFactory();
+        }
+
+        if (CustomAndroidMobileFactory.isSuitable(capabilities)) {
+            return new CustomAndroidMobileFactory();
+        }
+
+        if (IOSFactory.isSuitable(capabilities)) {
+            return new IOSFactory();
+        }
+
+        if (CustomIOSMobileFactory.isSuitable(capabilities)) {
+            return new CustomIOSMobileFactory();
+        }
+
+        if (SafariFactory.isSuitable(capabilities)) {
+            return new SafariFactory();
+        }
+
+        if (ChromeFactory.isSuitable(capabilities)) {
+            return new ChromeFactory();
+        }
+
+        if (FirefoxFactory.isSuitable(capabilities)) {
+            return new FirefoxFactory();
         }
 
         // fixme add default driver factory instance

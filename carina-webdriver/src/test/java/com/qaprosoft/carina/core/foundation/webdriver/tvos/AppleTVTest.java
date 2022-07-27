@@ -20,6 +20,9 @@ import static com.qaprosoft.carina.core.foundation.commons.SpecialKeywords.MOBIL
 import static com.qaprosoft.carina.core.foundation.commons.SpecialKeywords.MOBILE_DEVICE_PLATFORM;
 import static com.qaprosoft.carina.core.foundation.commons.SpecialKeywords.TVOS;
 
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesBuilder;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.OptionsType;
+import io.appium.java_client.ios.options.XCUITestOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
 import org.testng.annotations.Test;

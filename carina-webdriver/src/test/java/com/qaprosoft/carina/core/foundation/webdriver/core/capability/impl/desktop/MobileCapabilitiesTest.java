@@ -15,13 +15,17 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
 
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileCapabilities;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesBuilder;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.OptionsType;
+
+import io.appium.java_client.android.options.UiAutomator2Options;
+import io.appium.java_client.ios.options.XCUITestOptions;
 
 public class MobileCapabilitiesTest {
 
@@ -40,11 +44,13 @@ public class MobileCapabilitiesTest {
 
         String testName = "mobile - getCapabilityWithLocaleTest";
 
-        MobileCapabilities mobileCapabilities = new MobileCapabilities();
-        DesiredCapabilities capabilities = mobileCapabilities.getCapability(testName);
+        XCUITestOptions capabilities = (XCUITestOptions) CapabilitiesBuilder.builder()
+                .testName(testName)
+                .chooseOptionsType(OptionsType.IOS_XCUI_TEST_APPIUM)
+                .build();
 
-        Assert.assertEquals(capabilities.getCapability(LOCALE_KEY), LOCALE, "Locale capability is not valid");
-        Assert.assertNull(capabilities.getCapability(LANGUAGE_KEY), "Language capability is not empty");
+        Assert.assertEquals(capabilities.getLocale().get(), LOCALE, "Locale capability is not valid");
+        Assert.assertTrue(capabilities.getLanguage().isEmpty(), "Language capability is not empty");
     }
 
     @Test(dependsOnGroups = {"AppleTVTestClass"})
@@ -54,38 +60,44 @@ public class MobileCapabilitiesTest {
 
         String testName = "mobile - getCapabilityWithLocaleAndLanguageSeparatelyTest";
 
-        MobileCapabilities mobileCapabilities = new MobileCapabilities();
-        DesiredCapabilities capabilities = mobileCapabilities.getCapability(testName);
+        XCUITestOptions capabilities = (XCUITestOptions) CapabilitiesBuilder.builder()
+                .testName(testName)
+                .chooseOptionsType(OptionsType.IOS_XCUI_TEST_APPIUM)
+                .build();
 
-        Assert.assertEquals(capabilities.getCapability(LOCALE_KEY), LOCALE, "Locale capability is not valid");
-        Assert.assertEquals(capabilities.getCapability(LANGUAGE_KEY), LANGUAGE, "Language capability is not valid");
+        Assert.assertEquals(capabilities.getLocale().get(), LOCALE, "Locale capability is not valid");
+        Assert.assertEquals(capabilities.getLanguage().get(), LANGUAGE, "Language capability is not valid");
     }
 
-    @Test(dependsOnGroups = {"AppleTVTestClass"})
+    @Test(dependsOnGroups = { "AppleTVTestClass" })
     public void getAndroidCapabilityWithLocaleAndLanguageTogetherTest() {
         R.CONFIG.put(PLATFORM_NAME_KEY, "Android", true);
         R.CONFIG.put(LOCALE_KEY, LOCALE_LANGUAGE, true);
 
         String testName = "mobile - getAndroidCapabilityWithLocaleAndLanguageTogetherTest";
 
-        MobileCapabilities mobileCapabilities = new MobileCapabilities();
-        DesiredCapabilities capabilities = mobileCapabilities.getCapability(testName);
+        UiAutomator2Options capabilities = (UiAutomator2Options) CapabilitiesBuilder.builder()
+                .testName(testName)
+                .chooseOptionsType(OptionsType.ANDROID_UIAUTOMATOR2_APPIUM)
+                .build();
 
-        Assert.assertEquals(capabilities.getCapability(LOCALE_KEY), LOCALE, "Locale capability is not valid");
-        Assert.assertEquals(capabilities.getCapability(LANGUAGE_KEY), LANGUAGE, "Language capability is not valid");
+        Assert.assertEquals(capabilities.getLocale().get(), LOCALE, "Locale capability is not valid");
+        Assert.assertEquals(capabilities.getLanguage().get(), LANGUAGE, "Language capability is not valid");
     }
 
-    @Test(dependsOnGroups = {"AppleTVTestClass"})
+    @Test(dependsOnGroups = { "AppleTVTestClass" })
     public void getIOSCapabilityWithLocaleAndLanguageTogetherTest() {
         R.CONFIG.put(PLATFORM_NAME_KEY, "IOS", true);
         R.CONFIG.put(LOCALE_KEY, LOCALE_LANGUAGE, true);
 
         String testName = "mobile - getIOSCapabilityWithLocaleAndLanguageTogetherTest";
 
-        MobileCapabilities mobileCapabilities = new MobileCapabilities();
-        DesiredCapabilities capabilities = mobileCapabilities.getCapability(testName);
+        XCUITestOptions capabilities = (XCUITestOptions) CapabilitiesBuilder.builder()
+                .testName(testName)
+                .chooseOptionsType(OptionsType.IOS_XCUI_TEST_APPIUM)
+                .build();
 
-        Assert.assertEquals(capabilities.getCapability(LOCALE_KEY), LOCALE_LANGUAGE, "Locale capability is not valid");
-        Assert.assertEquals(capabilities.getCapability(LANGUAGE_KEY), LANGUAGE, "Language capability is not valid");
+        Assert.assertEquals(capabilities.getLocale().get(), LOCALE_LANGUAGE, "Locale capability is not valid");
+        Assert.assertEquals(capabilities.getLanguage().get(), LANGUAGE, "Language capability is not valid");
     }
 }
