@@ -16,11 +16,22 @@ public class WindowsCapabilities extends IAbstactCapabilities<WindowsOptions> {
     }
 
     @Override
-    public WindowsOptions getCapabilitiesWithCustom(Capabilities capabilities) {
+    public WindowsOptions createCapabilitiesFromCustom(Capabilities customCapabilities) {
         WindowsOptions options = new WindowsOptions();
-        if (capabilities != null) {
-            for (String capabilityName : capabilities.getCapabilityNames()) {
-                options.amend(capabilityName, capabilities.getCapability(capabilityName));
+        if (customCapabilities != null) {
+            for (String capabilityName : customCapabilities.getCapabilityNames()) {
+                options.amend(capabilityName, customCapabilities.getCapability(capabilityName));
+            }
+        }
+        return options;
+    }
+
+    @Override
+    public WindowsOptions getCapabilitiesWithCustom(Capabilities customCapabilities) {
+        WindowsOptions options = getCapabilities();
+        if (customCapabilities != null) {
+            for (String capabilityName : customCapabilities.getCapabilityNames()) {
+                options.amend(capabilityName, customCapabilities.getCapability(capabilityName));
             }
         }
         return options;

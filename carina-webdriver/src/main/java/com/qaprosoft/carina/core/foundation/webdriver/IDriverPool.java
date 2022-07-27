@@ -401,7 +401,7 @@ public interface IDriverPool {
                     Assert.fail("Driver '" + name + "' is already registered for thread: " + threadId);
                 }
                 
-                drv = DriverFactory.create(name, capabilities, seleniumHost);
+                drv = DriverFactory.create(name, seleniumHost, capabilities);
                 
                 if (currentDevice.get() != null) {
                     device = currentDevice.get();

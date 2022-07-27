@@ -47,7 +47,7 @@ public class DesktopCapabilitiesTest {
     public static void getChromeCapabilityTest() {
         String testName = "chrome - getChromeCapabilityTest";
         ChromeOptions capabilities = (ChromeOptions) CapabilitiesBuilder.builder()
-                .chooseOptionsType(OptionsType.CHROME_SELENIUM)
+                .chooseOptionsType(OptionsType.CHROME)
                 .testName(testName)
                 .build();
 
@@ -67,7 +67,7 @@ public class DesktopCapabilitiesTest {
         String testName = "firefox - getFirefoxDefaultCapabilityTest";
 
         FirefoxOptions capabilities = (FirefoxOptions) CapabilitiesBuilder.builder()
-                .chooseOptionsType(OptionsType.FIREFOX_SELENIUM)
+                .chooseOptionsType(OptionsType.FIREFOX)
                 .testName(testName)
                 .build();
 
@@ -92,7 +92,7 @@ public class DesktopCapabilitiesTest {
         profile.setPreference("media.gmp-manager.updateEnabled", !MEDIA_GMP_MANAGER_UPDATE_ENABLED);
 
         FirefoxOptions capabilities = (FirefoxOptions) CapabilitiesBuilder.builder()
-                .chooseOptionsType(OptionsType.FIREFOX_SELENIUM)
+                .chooseOptionsType(OptionsType.FIREFOX)
                 .testName(testName)
                 .build();
         capabilities = capabilities.setProfile(profile);
@@ -130,7 +130,7 @@ public class DesktopCapabilitiesTest {
     public static void getSafariCapabilityTest() {
         String testName = "safari - getSafariCapabilityTest";
         SafariOptions capabilities = (SafariOptions) CapabilitiesBuilder.builder()
-                .chooseOptionsType(OptionsType.SAFARI_APPIUM)
+                .chooseOptionsType(OptionsType.SAFARI)
                 .testName(testName)
                 .build();
 
@@ -143,7 +143,7 @@ public class DesktopCapabilitiesTest {
         String testName = "edge - getEdgeCapabilityTest";
 
         ChromiumOptions<?> capabilities = (ChromiumOptions<?>) CapabilitiesBuilder.builder()
-                .chooseOptionsType(OptionsType.EDGE_SELENIUM)
+                .chooseOptionsType(OptionsType.EDGE)
                 .testName(testName)
                 .build();
 
@@ -177,7 +177,7 @@ public class DesktopCapabilitiesTest {
 
         Capabilities capabilities = CapabilitiesBuilder.builder()
                 .testName("chrome - getChromeCapabilityHeadlessTest")
-                .chooseOptionsType(OptionsType.CHROME_SELENIUM)
+                .chooseOptionsType(OptionsType.CHROME)
                 .build();
 
         Assert.assertFalse((Boolean) capabilities.getCapability("enableVNC"), "Returned capability value is not valid!");
@@ -197,7 +197,7 @@ public class DesktopCapabilitiesTest {
 
         Capabilities capabilities = CapabilitiesBuilder.builder()
                 .testName("chrome - getChromeCapabilityProxyTest")
-                .chooseOptionsType(OptionsType.CHROME_SELENIUM)
+                .chooseOptionsType(OptionsType.CHROME)
                 .build();
 
         String proxyHostWithPort = proxyHost + ":" + proxyPort;
@@ -220,7 +220,7 @@ public class DesktopCapabilitiesTest {
 
         Capabilities capabilities = CapabilitiesBuilder.builder()
                 .testName("chrome - getChromeCapabilityBrowserLanguageTest")
-                .chooseOptionsType(OptionsType.CHROME_SELENIUM)
+                .chooseOptionsType(OptionsType.CHROME)
                 .build();
 
         Map<String, Object> chromeOptions = (Map<String, Object>) capabilities.getCapability("goog:chromeOptions");
@@ -235,7 +235,7 @@ public class DesktopCapabilitiesTest {
 
         Capabilities capabilities = CapabilitiesBuilder.builder()
                 .testName("chrome - getChromeCapabilityAutoDownloadTest")
-                .chooseOptionsType(OptionsType.CHROME_SELENIUM)
+                .chooseOptionsType(OptionsType.CHROME)
                 .build();
 
         Map<String, Object> chromeOptions = (Map<String, Object>) capabilities.getCapability("goog:chromeOptions");

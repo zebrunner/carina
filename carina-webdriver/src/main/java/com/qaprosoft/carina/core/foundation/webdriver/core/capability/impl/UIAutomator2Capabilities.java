@@ -26,11 +26,22 @@ public class UIAutomator2Capabilities extends IAbstactCapabilities<UiAutomator2O
     }
 
     @Override
-    public UiAutomator2Options getCapabilitiesWithCustom(Capabilities capabilities) {
+    public UiAutomator2Options createCapabilitiesFromCustom(Capabilities customCapabilities) {
+        UiAutomator2Options options = new UiAutomator2Options();
+        if (customCapabilities != null) {
+            for (String capabilityName : customCapabilities.getCapabilityNames()) {
+                options.amend(capabilityName, customCapabilities.getCapability(capabilityName));
+            }
+        }
+        return options;
+    }
+
+    @Override
+    public UiAutomator2Options getCapabilitiesWithCustom(Capabilities customCapabilities) {
         UiAutomator2Options options = getCapabilities();
-        if (capabilities != null) {
-            for (String capabilityName : capabilities.getCapabilityNames()) {
-                options.amend(capabilityName, capabilities.getCapability(capabilityName));
+        if (customCapabilities != null) {
+            for (String capabilityName : customCapabilities.getCapabilityNames()) {
+                options.amend(capabilityName, customCapabilities.getCapability(capabilityName));
             }
         }
         return options;

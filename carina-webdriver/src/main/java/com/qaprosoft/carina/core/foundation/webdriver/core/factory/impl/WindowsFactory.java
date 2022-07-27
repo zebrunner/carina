@@ -22,11 +22,18 @@ public class WindowsFactory extends IAbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public WebDriver create(String testName, Capabilities capabilities, String seleniumHost) {
-        Capabilities windowsOptions = CapabilitiesBuilder.builder()
-                .withCustomCapabilities(capabilities)
-                .chooseOptionsType(OptionsType.WINDOWS_APPIUM)
-                .build();
+    public WebDriver create(String testName, String seleniumHost) {
+        return this.create(testName, seleniumHost, null);
+    }
+
+    @Override
+    public WebDriver create(String testName, String seleniumHost, Capabilities capabilities) {
+        CapabilitiesBuilder capabilitiesBuilder = CapabilitiesBuilder.builder();
+        if (capabilities != null) {
+            capabilitiesBuilder.fromCustomCapabilities(capabilities);
+        }
+        capabilitiesBuilder.chooseOptionsType(OptionsType.WINDOWS);
+        Capabilities windowsOptions = capabilitiesBuilder.build();
 
         LOGGER.debug("capabilities: {}", windowsOptions);
 

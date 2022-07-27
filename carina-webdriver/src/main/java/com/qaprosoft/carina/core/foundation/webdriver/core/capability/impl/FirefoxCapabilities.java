@@ -39,11 +39,22 @@ public class FirefoxCapabilities extends IAbstactCapabilities<FirefoxOptions> {
     }
 
     @Override
-    public FirefoxOptions getCapabilitiesWithCustom(Capabilities capabilities) {
+    public FirefoxOptions createCapabilitiesFromCustom(Capabilities customCapabilities) {
+        FirefoxOptions options = new FirefoxOptions();
+        if (customCapabilities != null) {
+            for (String capabilityName : customCapabilities.getCapabilityNames()) {
+                options.setCapability(capabilityName, customCapabilities.getCapability(capabilityName));
+            }
+        }
+        return options;
+    }
+
+    @Override
+    public FirefoxOptions getCapabilitiesWithCustom(Capabilities customCapabilities) {
         FirefoxOptions options = getCapabilities();
-        if (capabilities != null) {
-            for (String capabilityName : capabilities.getCapabilityNames()) {
-                options.setCapability(capabilityName, capabilities.getCapability(capabilityName));
+        if (customCapabilities != null) {
+            for (String capabilityName : customCapabilities.getCapabilityNames()) {
+                options.setCapability(capabilityName, customCapabilities.getCapability(capabilityName));
             }
         }
         return options;

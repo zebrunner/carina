@@ -26,11 +26,18 @@ public class SafariFactory extends IAbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public WebDriver create(String testName, Capabilities capabilities, String seleniumHost) {
-        Capabilities safariOptions = CapabilitiesBuilder.builder()
-                .withCustomCapabilities(capabilities)
-                .chooseOptionsType(OptionsType.SAFARI_APPIUM)
-                .build();
+    public WebDriver create(String testName, String seleniumHost) {
+        return this.create(testName, seleniumHost, null);
+    }
+
+    @Override
+    public WebDriver create(String testName, String seleniumHost, Capabilities capabilities) {
+        CapabilitiesBuilder capabilitiesBuilder = CapabilitiesBuilder.builder();
+        if (capabilities != null) {
+            capabilitiesBuilder.fromCustomCapabilities(capabilities);
+        }
+        capabilitiesBuilder.chooseOptionsType(OptionsType.SAFARI);
+        Capabilities safariOptions = capabilitiesBuilder.build();
 
         LOGGER.debug("capabilities: {}", safariOptions);
 

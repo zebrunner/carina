@@ -20,11 +20,22 @@ public class SafariCapabilities extends IAbstactCapabilities<SafariOptions> {
     }
 
     @Override
-    public SafariOptions getCapabilitiesWithCustom(Capabilities capabilities) {
+    public SafariOptions createCapabilitiesFromCustom(Capabilities customCapabilities) {
+        SafariOptions options = new SafariOptions();
+        if (customCapabilities != null) {
+            for (String capabilityName : customCapabilities.getCapabilityNames()) {
+                options.amend(capabilityName, customCapabilities.getCapability(capabilityName));
+            }
+        }
+        return options;
+    }
+
+    @Override
+    public SafariOptions getCapabilitiesWithCustom(Capabilities customCapabilities) {
         SafariOptions options = getCapabilities();
-        if (capabilities != null) {
-            for (String capabilityName : capabilities.getCapabilityNames()) {
-                options.amend(capabilityName, capabilities.getCapability(capabilityName));
+        if (customCapabilities != null) {
+            for (String capabilityName : customCapabilities.getCapabilityNames()) {
+                options.amend(capabilityName, customCapabilities.getCapability(capabilityName));
             }
         }
         return options;

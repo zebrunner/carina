@@ -24,11 +24,18 @@ public class IOSFactory extends IAbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public WebDriver create(String testName, Capabilities capabilities, String seleniumHost) {
-        Capabilities xcuiOptions = CapabilitiesBuilder.builder()
-                .withCustomCapabilities(capabilities)
-                .chooseOptionsType(OptionsType.IOS_XCUI_TEST_APPIUM)
-                .build();
+    public WebDriver create(String testName, String seleniumHost) {
+        return this.create(testName, seleniumHost, null);
+    }
+
+    @Override
+    public WebDriver create(String testName, String seleniumHost, Capabilities capabilities) {
+        CapabilitiesBuilder capabilitiesBuilder = CapabilitiesBuilder.builder();
+        if (capabilities != null) {
+            capabilitiesBuilder.fromCustomCapabilities(capabilities);
+        }
+        capabilitiesBuilder.chooseOptionsType(OptionsType.IOS);
+        Capabilities xcuiOptions = capabilitiesBuilder.build();
 
         LOGGER.debug("capabilities: {}", xcuiOptions);
 

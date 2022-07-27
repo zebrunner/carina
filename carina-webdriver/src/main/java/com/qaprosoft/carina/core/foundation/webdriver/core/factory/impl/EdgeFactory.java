@@ -4,7 +4,6 @@ import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.Browser;
@@ -15,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesBuilder;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.OptionsType;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.IAbstractFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
 
 import io.appium.java_client.remote.options.SupportsAutomationNameOption;
 
@@ -22,11 +22,18 @@ public class EdgeFactory extends IAbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public WebDriver create(String testName, Capabilities capabilities, String seleniumHost) {
-        Capabilities edgeOptions = CapabilitiesBuilder.builder()
-                .withCustomCapabilities(capabilities)
-                .chooseOptionsType(OptionsType.EDGE_SELENIUM)
-                .build();
+    public WebDriver create(String testName, String seleniumHost) {
+        return this.create(testName, seleniumHost, null);
+    }
+
+    @Override
+    public WebDriver create(String testName, String seleniumHost, Capabilities capabilities) {
+        CapabilitiesBuilder capabilitiesBuilder = CapabilitiesBuilder.builder();
+        if (capabilities != null) {
+            capabilitiesBuilder.fromCustomCapabilities(capabilities);
+        }
+        capabilitiesBuilder.chooseOptionsType(OptionsType.EDGE);
+        Capabilities edgeOptions = capabilitiesBuilder.build();
 
         LOGGER.debug("capabilities: {}", edgeOptions);
 

@@ -30,9 +30,22 @@ public abstract class IAbstactCapabilities<T extends Capabilities> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String CAPABILITIES_PREFIX = SpecialKeywords.CAPABILITIES + ".";
 
+    /**
+     * Returns capabilities consist from configuration capabilities plus options
+     * 
+     * @return capabilities
+     */
     public abstract T getCapabilities();
 
-    public abstract T getCapabilitiesWithCustom(Capabilities capabilities);
+    /**
+     * Create capabilities safety from customCapabilities
+     * 
+     * @param customCapabilities capabilities
+     * @return capabilities
+     */
+    public abstract T createCapabilitiesFromCustom(Capabilities customCapabilities);
+
+    public abstract T getCapabilitiesWithCustom(Capabilities customCapabilities);
 
     // todo add description (delete)
     protected Capabilities getBrowserCapabilities(String browser, String testName) {

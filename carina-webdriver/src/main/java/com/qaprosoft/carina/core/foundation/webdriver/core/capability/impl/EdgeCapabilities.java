@@ -36,11 +36,22 @@ public class EdgeCapabilities extends IAbstactCapabilities<ChromiumOptions<?>> {
     }
 
     @Override
-    public ChromiumOptions<?> getCapabilitiesWithCustom(Capabilities capabilities) {
+    public ChromiumOptions<?> createCapabilitiesFromCustom(Capabilities customCapabilities) {
+        ChromiumOptions<?> options = new ChromiumOptions<>(CapabilityType.BROWSER_NAME, EDGE.browserName(), "ms:edgeOptions");
+        if (customCapabilities != null) {
+            for (String capabilityName : customCapabilities.getCapabilityNames()) {
+                options.setCapability(capabilityName, customCapabilities.getCapability(capabilityName));
+            }
+        }
+        return options;
+    }
+
+    @Override
+    public ChromiumOptions<?> getCapabilitiesWithCustom(Capabilities customCapabilities) {
         ChromiumOptions<?> options = getCapabilities();
-        if (capabilities != null) {
-            for (String capabilityName : capabilities.getCapabilityNames()) {
-                options.setCapability(capabilityName, capabilities.getCapability(capabilityName));
+        if (customCapabilities != null) {
+            for (String capabilityName : customCapabilities.getCapabilityNames()) {
+                options.setCapability(capabilityName, customCapabilities.getCapability(capabilityName));
             }
         }
         return options;

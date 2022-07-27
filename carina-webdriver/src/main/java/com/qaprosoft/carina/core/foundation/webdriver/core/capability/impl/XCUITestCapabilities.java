@@ -25,11 +25,22 @@ public class XCUITestCapabilities extends IAbstactCapabilities<XCUITestOptions> 
     }
 
     @Override
-    public XCUITestOptions getCapabilitiesWithCustom(Capabilities capabilities) {
+    public XCUITestOptions createCapabilitiesFromCustom(Capabilities customCapabilities) {
+        XCUITestOptions options = new XCUITestOptions();
+        if (customCapabilities != null) {
+            for (String capabilityName : customCapabilities.getCapabilityNames()) {
+                options.amend(capabilityName, customCapabilities.getCapability(capabilityName));
+            }
+        }
+        return options;
+    }
+
+    @Override
+    public XCUITestOptions getCapabilitiesWithCustom(Capabilities customCapabilities) {
         XCUITestOptions options = getCapabilities();
-        if (capabilities != null) {
-            for (String capabilityName : capabilities.getCapabilityNames()) {
-                options.amend(capabilityName, capabilities.getCapability(capabilityName));
+        if (customCapabilities != null) {
+            for (String capabilityName : customCapabilities.getCapabilityNames()) {
+                options.amend(capabilityName, customCapabilities.getCapability(capabilityName));
             }
         }
         return options;

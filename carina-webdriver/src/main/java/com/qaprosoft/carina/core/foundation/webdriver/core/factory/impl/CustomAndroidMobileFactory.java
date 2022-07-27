@@ -23,11 +23,18 @@ public class CustomAndroidMobileFactory extends IAbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public WebDriver create(String testName, Capabilities capabilities, String seleniumHost) {
-        Capabilities uiAutomator2Options = CapabilitiesBuilder.builder()
-                .withCustomCapabilities(capabilities)
-                .chooseOptionsType(OptionsType.ANDROID_UIAUTOMATOR2_APPIUM)
-                .build();
+    public WebDriver create(String testName, String seleniumHost) {
+        return this.create(testName, seleniumHost, null);
+    }
+
+    @Override
+    public WebDriver create(String testName, String seleniumHost, Capabilities capabilities) {
+        CapabilitiesBuilder capabilitiesBuilder = CapabilitiesBuilder.builder();
+        if (capabilities != null) {
+            capabilitiesBuilder.fromCustomCapabilities(capabilities);
+        }
+        capabilitiesBuilder.chooseOptionsType(OptionsType.ANDROID);
+        Capabilities uiAutomator2Options = capabilitiesBuilder.build();
 
         LOGGER.debug("capabilities: {}", uiAutomator2Options);
 

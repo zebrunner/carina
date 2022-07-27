@@ -46,7 +46,7 @@ public class MobileCapabilitiesTest {
 
         XCUITestOptions capabilities = (XCUITestOptions) CapabilitiesBuilder.builder()
                 .testName(testName)
-                .chooseOptionsType(OptionsType.IOS_XCUI_TEST_APPIUM)
+                .chooseOptionsType(OptionsType.IOS)
                 .build();
 
         Assert.assertEquals(capabilities.getLocale().get(), LOCALE, "Locale capability is not valid");
@@ -62,7 +62,7 @@ public class MobileCapabilitiesTest {
 
         XCUITestOptions capabilities = (XCUITestOptions) CapabilitiesBuilder.builder()
                 .testName(testName)
-                .chooseOptionsType(OptionsType.IOS_XCUI_TEST_APPIUM)
+                .chooseOptionsType(OptionsType.IOS)
                 .build();
 
         Assert.assertEquals(capabilities.getLocale().get(), LOCALE, "Locale capability is not valid");
@@ -78,7 +78,7 @@ public class MobileCapabilitiesTest {
 
         UiAutomator2Options capabilities = (UiAutomator2Options) CapabilitiesBuilder.builder()
                 .testName(testName)
-                .chooseOptionsType(OptionsType.ANDROID_UIAUTOMATOR2_APPIUM)
+                .chooseOptionsType(OptionsType.ANDROID)
                 .build();
 
         Assert.assertEquals(capabilities.getLocale().get(), LOCALE, "Locale capability is not valid");
@@ -94,7 +94,7 @@ public class MobileCapabilitiesTest {
 
         XCUITestOptions capabilities = (XCUITestOptions) CapabilitiesBuilder.builder()
                 .testName(testName)
-                .chooseOptionsType(OptionsType.IOS_XCUI_TEST_APPIUM)
+                .chooseOptionsType(OptionsType.IOS)
                 .build();
 
         Assert.assertEquals(capabilities.getLocale().get(), LOCALE_LANGUAGE, "Locale capability is not valid");

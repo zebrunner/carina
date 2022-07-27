@@ -28,14 +28,19 @@ public abstract class IAbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
+     * Creates new instance of {@link WebDriver} according to configuration capabilities
+     */
+    abstract public WebDriver create(String testName, String seleniumHost);
+
+    /**
      * Creates new instance of {@link WebDriver} according to specified {@link Capabilities}.
      *
      * @param testName - where driver is initiated
-     * @param capabilities - driver desired capabilitues
      * @param seleniumHost - selenium server URL
+     * @param capabilities - driver desired capabilitues
      * @return instance of {@link WebDriver}
      */
-    abstract public WebDriver create(String testName, Capabilities capabilities, String seleniumHost);
+    abstract public WebDriver create(String testName, String seleniumHost, Capabilities capabilities);
 
     /**
      * If any listeners specified, converts RemoteWebDriver to EventFiringWebDriver and registers all listeners.

@@ -50,10 +50,9 @@ import com.zebrunner.agent.core.webdriver.RemoteWebDriverFactory;
  * @author Alexey Khursevich (hursevich@gmail.com)
  */
 public class DriverFactory {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public static WebDriver create(String testName, Capabilities capabilities, String seleniumHost) {
+    public static WebDriver create(String testName, String seleniumHost, Capabilities capabilities) {
 		LOGGER.debug("DriverFactory start...");
         URL seleniumUrl = RemoteWebDriverFactory.getSeleniumHubUrl();
         if (seleniumUrl != null) {
@@ -64,7 +63,7 @@ public class DriverFactory {
         IAbstractFactory driverFactory = chooseDriverFactory(
                 capabilities == null ? IAbstactCapabilities.getConfigurationCapabilities() : capabilities);
 
-        WebDriver driver = driverFactory.create(testName, capabilities, seleniumHost);
+        WebDriver driver = driverFactory.create(testName, seleniumHost, capabilities);
         driver = driverFactory.registerListeners(driver, getEventListeners());
 
         LOGGER.debug("DriverFactory finish...");
