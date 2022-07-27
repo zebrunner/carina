@@ -21,9 +21,10 @@ import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.OldAbstractCapabilities;
 
-public class ChromeCapabilities extends AbstractCapabilities {
+@Deprecated
+public class ChromeCapabilities extends OldAbstractCapabilities {
     
     public DesiredCapabilities getCapability(String testName) {
         DesiredCapabilities capabilities = new DesiredCapabilities();

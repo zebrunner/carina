@@ -16,13 +16,13 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
 
 import org.openqa.selenium.remote.Browser;
-import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.OldAbstractCapabilities;
 
-public class OperaCapabilities extends AbstractCapabilities {
+@Deprecated
+public class OperaCapabilities extends OldAbstractCapabilities {
     public DesiredCapabilities getCapability(String testName) {
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities = initBaseCapabilities(capabilities, Browser.OPERA.browserName(), testName);

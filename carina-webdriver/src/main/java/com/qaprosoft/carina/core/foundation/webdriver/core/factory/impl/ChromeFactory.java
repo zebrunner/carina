@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesBuilder;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.OptionsType;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.IAbstractFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
 
 import io.appium.java_client.remote.options.SupportsAutomationNameOption;
@@ -21,7 +21,7 @@ import io.appium.java_client.remote.options.SupportsAutomationNameOption;
 /**
  * Desktop chrome browser
  */
-public class ChromeFactory extends IAbstractFactory {
+public class ChromeFactory extends AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override

@@ -17,11 +17,11 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.wind
 
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.OldAbstractCapabilities;
 
-public class WindowsCapabilities extends AbstractCapabilities {
+@Deprecated
+public class WindowsCapabilities extends OldAbstractCapabilities {
     
-
     @Override
     public DesiredCapabilities getCapability(String testName) {
         DesiredCapabilities capabilities = new DesiredCapabilities();

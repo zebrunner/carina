@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.IAbstactCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstactCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.AndroidFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.ChromeFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.CustomAndroidMobileFactory;
@@ -60,8 +60,8 @@ public class DriverFactory {
             R.CONFIG.put(Parameter.SELENIUM_URL.getKey(), seleniumUrl.toString());
         }
 
-        IAbstractFactory driverFactory = chooseDriverFactory(
-                capabilities == null ? IAbstactCapabilities.getConfigurationCapabilities() : capabilities);
+        AbstractFactory driverFactory = chooseDriverFactory(
+                capabilities == null ? AbstactCapabilities.getConfigurationCapabilities() : capabilities);
 
         WebDriver driver = driverFactory.create(testName, seleniumHost, capabilities);
         driver = driverFactory.registerListeners(driver, getEventListeners());
@@ -101,7 +101,7 @@ public class DriverFactory {
         return listeners.toArray(new WebDriverEventListener[listeners.size()]);
     }
 
-    private static IAbstractFactory chooseDriverFactory(Capabilities capabilities) {
+    private static AbstractFactory chooseDriverFactory(Capabilities capabilities) {
 
         if (AndroidFactory.isSuitable(capabilities)) {
             return new AndroidFactory();

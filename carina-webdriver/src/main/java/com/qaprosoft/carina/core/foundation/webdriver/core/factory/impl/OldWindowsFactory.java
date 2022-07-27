@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.windows.WindowsCapabilities;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.OldAbstractFactory;
 
 import io.appium.java_client.windows.WindowsDriver;
 
@@ -37,7 +37,8 @@ import io.appium.java_client.windows.WindowsDriver;
  * 
  * @author Sergei Zagriychuk (sergeizagriychuk@gmail.com)
  */
-public class DeprecatedWindowsFactory extends AbstractFactory {
+@Deprecated
+public class OldWindowsFactory extends OldAbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override

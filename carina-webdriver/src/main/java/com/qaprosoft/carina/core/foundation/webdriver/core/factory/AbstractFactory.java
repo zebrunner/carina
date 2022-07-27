@@ -1,54 +1,50 @@
-/*******************************************************************************
- * Copyright 2020-2022 Zebrunner Inc (https://www.zebrunner.com).
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory;
 
 import java.lang.invoke.MethodHandles;
+import java.time.Duration;
 
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.NoSuchSessionException;
+import org.openqa.selenium.Point;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Wait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.utils.R;
+import com.google.common.base.Function;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 
-/**
- * Base implementation of WebDriver factory.
- * 
- * @author Alex Khursevich (alex@qaprosoft.com)
- */
 public abstract class AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     /**
-     * Creates new instance of {@link WebDriver} according to specified {@link DesiredCapabilities}.
-     * 
+     * Creates new instance of {@link WebDriver} according to configuration capabilities
+     */
+    abstract public WebDriver create(String testName, String seleniumHost);
+
+    /**
+     * Creates new instance of {@link WebDriver} according to specified {@link Capabilities}.
+     *
      * @param testName - where driver is initiated
-     * @param capabilities - driver desired capabilitues
      * @param seleniumHost - selenium server URL
+     * @param capabilities - driver desired capabilitues
      * @return instance of {@link WebDriver}
      */
-    abstract public WebDriver create(String testName, DesiredCapabilities capabilities, String seleniumHost);
+    abstract public WebDriver create(String testName, String seleniumHost, Capabilities capabilities);
 
     /**
      * If any listeners specified, converts RemoteWebDriver to EventFiringWebDriver and registers all listeners.
-     * 
+     *
      * @param driver - instance of @link WebDriver}
      * @param listeners - instances of {@link WebDriverEventListener}
      * @return driver with registered listeners
@@ -64,17 +60,71 @@ public abstract class AbstractFactory {
     }
 
     /**
-     * Checks driver capabilities for being not empty.
-     * 
+     * Sets browser window according to capabilites.resolution value, otherwise
+     * maximizes window.
+     * todo refactor method
+     *
+     * @param driver - instance of desktop @WebDriver
      * @param capabilities - driver capabilities
-     * @return if capabilities empty or null
      */
-    protected boolean isCapabilitiesEmpty(Capabilities capabilities) {
-        return capabilities == null || MapUtils.isEmpty(capabilities.asMap());
+    protected void resizeBrowserWindow(WebDriver driver, Capabilities capabilities) {
+        try {
+            Wait<WebDriver> wait = new FluentWait<>(driver)
+                    .pollingEvery(Duration.ofMillis(Configuration.getInt(Configuration.Parameter.RETRY_INTERVAL)))
+                    .withTimeout(Duration.ofSeconds(Configuration.getInt(Configuration.Parameter.EXPLICIT_TIMEOUT)))
+                    .ignoring(WebDriverException.class)
+                    .ignoring(NoSuchSessionException.class)
+                    .ignoring(TimeoutException.class);
+            if (capabilities.getCapability("resolution") != null) {
+                String resolution = (String) capabilities.getCapability("resolution");
+                int expectedWidth = Integer.parseInt(resolution.split("x")[0]);
+                int expectedHeight = Integer.parseInt(resolution.split("x")[1]);
+                wait.until(new Function<WebDriver, Boolean>() {
+                    public Boolean apply(WebDriver driver) {
+                        driver.manage().window().setPosition(new Point(0, 0));
+                        driver.manage().window().setSize(new Dimension(expectedWidth, expectedHeight));
+                        Dimension actualSize = driver.manage().window().getSize();
+                        if (actualSize.getWidth() == expectedWidth && actualSize.getHeight() == expectedHeight) {
+                            LOGGER.debug(String.format("Browser window size set to %dx%d", actualSize.getWidth(), actualSize.getHeight()));
+                        } else {
+                            LOGGER.warn(String.format("Expected browser window %dx%d, but actual %dx%d",
+                                    expectedWidth, expectedHeight, actualSize.getWidth(), actualSize.getHeight()));
+                        }
+                        return true;
+                    }
+                });
+            } else {
+                wait.until(new Function<WebDriver, Boolean>() {
+                    public Boolean apply(WebDriver driver) {
+                        driver.manage().window().maximize();
+                        LOGGER.debug("Browser window size was maximized!");
+                        return true;
+                    }
+                });
+            }
+        } catch (Exception e) {
+            LOGGER.error("Unable to resize browser window", e);
+        }
     }
 
-    protected boolean isEnabled(String capability) {
-        return R.CONFIG.getBoolean(capability);
-    }
+    protected void registerDevice(RemoteWebDriver driver) {
+        try {
+            Device device = new Device(driver.getCapabilities());
+            IDriverPool.registerDevice(device);
+            // will be performed just in case uninstall_related_apps flag marked as true
+            device.uninstallRelatedApps();
+        } catch (Exception e) {
+            // use-case when something wrong happen during initialization and registration device information.
+            // the most common problem might be due to the adb connection problem
 
+            // make sure to initiate driver quit
+            LOGGER.error("Unable to register device!", e);
+            // TODO: try to handle use-case if quit in this place can hangs for minutes!
+            LOGGER.error("starting driver quit...");
+            driver.quit();
+            LOGGER.error("finished driver quit...");
+            throw e;
+        }
+
+    }
 }

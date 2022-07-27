@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesBuilder;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.OptionsType;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.IAbstractFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 
 import io.appium.java_client.android.AndroidDriver;
@@ -23,7 +23,7 @@ import io.appium.java_client.remote.options.SupportsAutomationNameOption;
 /**
  * For native android testing and testing browser on android
  */
-public class AndroidFactory extends IAbstractFactory {
+public class AndroidFactory extends AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override

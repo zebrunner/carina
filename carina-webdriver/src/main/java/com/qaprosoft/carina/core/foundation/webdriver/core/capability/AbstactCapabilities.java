@@ -25,7 +25,7 @@ import com.qaprosoft.carina.proxy.SystemProxy;
 
 import io.appium.java_client.remote.options.SupportsBrowserNameOption;
 
-public abstract class IAbstactCapabilities<T extends Capabilities> {
+public abstract class AbstactCapabilities<T extends Capabilities> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String CAPABILITIES_PREFIX = SpecialKeywords.CAPABILITIES + ".";

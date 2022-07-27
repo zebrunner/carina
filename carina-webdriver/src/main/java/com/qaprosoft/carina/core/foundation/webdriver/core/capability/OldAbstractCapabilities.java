@@ -43,7 +43,11 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.proxy.SystemProxy;
 
-public abstract class AbstractCapabilities {
+/**
+ * In past named as AbstractCapabilities
+ */
+@Deprecated
+public abstract class OldAbstractCapabilities {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static ArrayList<Integer> firefoxPorts = new ArrayList<Integer>();
 

@@ -17,9 +17,10 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desk
 
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.OldAbstractCapabilities;
 
-public class HTMLUnitCapabilities extends AbstractCapabilities {
+@Deprecated
+public class HTMLUnitCapabilities extends OldAbstractCapabilities {
 
     public DesiredCapabilities getCapability(String testName) {
         DesiredCapabilities capabilities = new DesiredCapabilities();
