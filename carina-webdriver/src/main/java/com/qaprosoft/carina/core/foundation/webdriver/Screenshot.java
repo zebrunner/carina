@@ -37,14 +37,13 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 import org.imgscalr.Scalr;
-import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.support.events.EventFiringDecorator;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -484,12 +483,7 @@ public class Screenshot {
                 } else if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
                     ru.yandex.qatools.ashot.Screenshot screenshot;
                     if (Configuration.getPlatform().equals("ANDROID")) {
-                        String pixelRatio;
-                        if (driver instanceof HasCapabilities) {
-                            pixelRatio = String.valueOf(((HasCapabilities) augmentedDriver).getCapabilities().getCapability("pixelRatio"));
-                        } else {
-                            throw new UnsupportedOperationException("Underlying driver does not implement getting capabilities yet.");
-                        }
+                        String pixelRatio = String.valueOf(((EventFiringWebDriver) augmentedDriver).getCapabilities().getCapability("pixelRatio"));
                         if (!pixelRatio.equals("null")) {
                             float dpr = Float.parseFloat(pixelRatio);
                             screenshot = (new AShot()).shootingStrategy(ShootingStrategies
@@ -507,10 +501,8 @@ public class Screenshot {
                     } else {
                         int deviceWidth = augmentedDriver.manage().window().getSize().getWidth();
                         String deviceName = "";
-                        if (augmentedDriver instanceof EventFiringDecorator) {
-                            if (augmentedDriver instanceof HasCapabilities) {
-                                deviceName = String.valueOf(((HasCapabilities) augmentedDriver).getCapabilities().getCapability("deviceName"));
-                            }
+                        if (augmentedDriver instanceof EventFiringWebDriver) {
+                            deviceName = String.valueOf(((EventFiringWebDriver) augmentedDriver).getCapabilities().getCapability("deviceName"));
                         } else if (augmentedDriver instanceof RemoteWebDriver) {
                             deviceName = String.valueOf(((RemoteWebDriver) augmentedDriver).getCapabilities().getCapability("deviceName"));
                         }
@@ -789,8 +781,8 @@ public class Screenshot {
      * @return WebDriver
      */
     private static WebDriver castDriver(WebDriver drv) {
-        if (drv instanceof EventFiringDecorator) {
-            drv = ((EventFiringDecorator) drv).getDecoratedDriver().getOriginal();
+        if (drv instanceof EventFiringWebDriver) {
+            drv = ((EventFiringWebDriver) drv).getWrappedDriver();
         }
         return drv;
     }

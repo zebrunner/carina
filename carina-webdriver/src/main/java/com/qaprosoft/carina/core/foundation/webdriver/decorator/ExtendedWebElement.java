@@ -54,7 +54,7 @@ import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.SessionId;
-import org.openqa.selenium.support.events.EventFiringDecorator;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
@@ -165,7 +165,7 @@ public class ExtendedWebElement implements IWebElement {
 			Field locatorField, searchContextField, byContextField, caseInsensitiveContextField = null;
 			SearchContext tempSearchContext = null;
 
-			if (element.getClass().toString().contains("EventFiringDecorator$EventFiringWebElement")) {
+			if (element.getClass().toString().contains("EventFiringWebDriver$EventFiringWebElement")) {
 				// reuse reflection to get internal fields
 				locatorField = element.getClass().getDeclaredField("underlyingElement");
 				locatorField.setAccessible(true);
@@ -229,14 +229,14 @@ public class ExtendedWebElement implements IWebElement {
 				}
 			}
 
-            if (tempSearchContext instanceof EventFiringDecorator) {
-                EventFiringDecorator eventFirDriver = (EventFiringDecorator) tempSearchContext;
-                this.driver = eventFirDriver.getDecoratedDriver().getOriginal();
+			if (tempSearchContext instanceof EventFiringWebDriver) {
+				EventFiringWebDriver eventFirDriver = (EventFiringWebDriver) tempSearchContext;
+				this.driver = eventFirDriver.getWrappedDriver();
 				//TODO: [VD] it seems like method more and more complex. Let's analyze and avoid return from this line
 				return;
 			}
 
-            if (tempSearchContext != null && tempSearchContext.getClass().toString().contains("EventFiringDecorator$EventFiringWebElement")) {
+			if (tempSearchContext != null && tempSearchContext.getClass().toString().contains("EventFiringWebDriver$EventFiringWebElement")) {
 				// reuse reflection to get internal fields
 				locatorField = tempSearchContext.getClass().getDeclaredField("underlyingElement");
 				locatorField.setAccessible(true);
@@ -1699,9 +1699,8 @@ public class ExtendedWebElement implements IWebElement {
     }
     
     private WebDriver castDriver(WebDriver drv) {
-        if (drv instanceof EventFiringDecorator) {
-            drv = ((EventFiringDecorator) drv).getDecoratedDriver()
-                    .getOriginal();
+        if (drv instanceof EventFiringWebDriver) {
+            drv = ((EventFiringWebDriver) drv).getWrappedDriver();
         }
         return drv;
     }

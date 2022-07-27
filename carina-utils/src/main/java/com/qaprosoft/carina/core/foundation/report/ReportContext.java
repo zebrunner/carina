@@ -31,6 +31,7 @@ import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -47,6 +48,7 @@ import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
+import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -55,14 +57,13 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.imgscalr.Scalr;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.support.events.EventFiringDecorator;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.FileManager;
@@ -372,10 +373,10 @@ public class ReportContext {
      */
     private static String getUrl(WebDriver driver, String name) {
         String seleniumHost = Configuration.getSeleniumUrl().replace("wd/hub", "download/");
-        WebDriver drv = (driver instanceof EventFiringDecorator) ? ((EventFiringDecorator) driver).getDecoratedDriver().getOriginal() : driver;
+        WebDriver drv = (driver instanceof EventFiringWebDriver) ? ((EventFiringWebDriver) driver).getWrappedDriver() : driver;
         String sessionId = ((RemoteWebDriver) drv).getSessionId().toString();
         String url = seleniumHost + sessionId + "/" + name;
-        LOGGER.debug("url: {}", url);
+        LOGGER.debug("url: " + url);
         return url;
     }
 

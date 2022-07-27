@@ -22,9 +22,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.support.events.EventFiringDecorator;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
-import org.openqa.selenium.support.events.WebDriverListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,17 +48,16 @@ public abstract class AbstractFactory {
 
     /**
      * If any listeners specified, converts RemoteWebDriver to EventFiringWebDriver and registers all listeners.
-     * todo investigate is it correctly refactored
      * 
      * @param driver - instance of @link WebDriver}
      * @param listeners - instances of {@link WebDriverEventListener}
      * @return driver with registered listeners
      */
-    public WebDriver registerListeners(WebDriver driver, WebDriverListener... listeners) {
+    public WebDriver registerListeners(WebDriver driver, WebDriverEventListener... listeners) {
         if (!ArrayUtils.isEmpty(listeners)) {
-            driver = new EventFiringDecorator().decorate(driver);
-            for (WebDriverListener listener : listeners) {
-                driver = new EventFiringDecorator(listener).decorate(driver);
+            driver = new EventFiringWebDriver(driver);
+            for (WebDriverEventListener listener : listeners) {
+                ((EventFiringWebDriver) driver).register(listener);
             }
         }
         return driver;
