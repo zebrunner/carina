@@ -5,8 +5,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.Browser;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,21 +15,19 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.Capabiliti
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.OptionsType;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.IAbstractFactory;
 
-import io.appium.java_client.remote.AutomationName;
 import io.appium.java_client.remote.options.SupportsAutomationNameOption;
-import io.appium.java_client.windows.WindowsDriver;
 
-public class WindowsFactory extends IAbstractFactory {
+public class EdgeFactory extends IAbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public WebDriver create(String testName, Capabilities capabilities, String seleniumHost) {
-        Capabilities windowsOptions = CapabilitiesBuilder.builder()
+        Capabilities edgeOptions = CapabilitiesBuilder.builder()
                 .withCapabilities(capabilities)
-                .chooseOptionsType(OptionsType.WINDOWS_APPIUM)
+                .chooseOptionsType(OptionsType.EDGE_SELENIUM)
                 .build();
 
-        LOGGER.debug("capabilities: {}", windowsOptions);
+        LOGGER.debug("capabilities: {}", edgeOptions);
 
         URL hostURL;
         try {
@@ -36,8 +35,8 @@ public class WindowsFactory extends IAbstractFactory {
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed selenium URL!", e);
         }
-
-        WebDriver driver = new WindowsDriver(hostURL, windowsOptions);
+        WebDriver driver = new RemoteWebDriver(hostURL, edgeOptions);
+        resizeBrowserWindow(driver, edgeOptions);
         return driver;
     }
 
@@ -45,16 +44,19 @@ public class WindowsFactory extends IAbstractFactory {
      * Determines if the driver is suitable for the current capabilities
      */
     public static boolean isSuitable(Capabilities capabilities) {
-        if (Platform.WINDOWS.is(capabilities.getPlatformName())) {
+        if (capabilities.getPlatformName() != null) {
+            return false;
+        }
+
+        if (capabilities.getCapability(SupportsAutomationNameOption.AUTOMATION_NAME_OPTION) != null) {
+            return false;
+        }
+
+        if (capabilities.getBrowserName().equalsIgnoreCase(Browser.EDGE.browserName())) {
             return true;
         }
 
-        if (capabilities.getCapability(SupportsAutomationNameOption.AUTOMATION_NAME_OPTION) != null &&
-                capabilities.getCapability(SupportsAutomationNameOption.AUTOMATION_NAME_OPTION)
-                        .toString()
-                        .equalsIgnoreCase(AutomationName.WINDOWS)) {
-            return true;
-        }
         return false;
+
     }
 }

@@ -7,6 +7,7 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.ChromeCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.EdgeCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.FirefoxCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.SafariCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.UIAutomator2Capabilities;
@@ -54,6 +55,10 @@ public class CapabilitiesBuilder {
         switch (optionsType) {
         case CHROME_SELENIUM:
             capabilities = new ChromeCapabilities()
+                    .getCapabilitiesWithCustom(this.additionalCapabilities);
+            break;
+        case EDGE_SELENIUM:
+            capabilities = new EdgeCapabilities()
                     .getCapabilitiesWithCustom(this.additionalCapabilities);
             break;
         case FIREFOX_SELENIUM:

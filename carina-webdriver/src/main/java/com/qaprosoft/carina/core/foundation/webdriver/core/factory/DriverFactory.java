@@ -35,9 +35,11 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.AndroidF
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.ChromeFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.CustomAndroidMobileFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.CustomIOSMobileFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.EdgeFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.FirefoxFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.IOSFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.SafariFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.WindowsFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.zebrunner.agent.core.webdriver.RemoteWebDriverFactory;
 
@@ -103,10 +105,6 @@ public class DriverFactory {
             return new AndroidFactory();
         }
 
-        if (CustomAndroidMobileFactory.isSuitable(capabilities)) {
-            return new CustomAndroidMobileFactory();
-        }
-
         if (IOSFactory.isSuitable(capabilities)) {
             return new IOSFactory();
         }
@@ -115,8 +113,16 @@ public class DriverFactory {
             return new CustomIOSMobileFactory();
         }
 
+        if (CustomAndroidMobileFactory.isSuitable(capabilities)) {
+            return new CustomAndroidMobileFactory();
+        }
+
         if (SafariFactory.isSuitable(capabilities)) {
             return new SafariFactory();
+        }
+
+        if (WindowsFactory.isSuitable(capabilities)) {
+            return new WindowsFactory();
         }
 
         if (ChromeFactory.isSuitable(capabilities)) {
@@ -127,9 +133,12 @@ public class DriverFactory {
             return new FirefoxFactory();
         }
 
-        // fixme add default driver factory instance
-        return null;
+        if (EdgeFactory.isSuitable(capabilities)) {
+            return new EdgeFactory();
+        }
 
+        throw new RuntimeException("Factory is not found");
+        // fixme add default driver factory instance
     }
 
 }

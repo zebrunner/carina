@@ -21,6 +21,7 @@ import java.util.Map;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.chromium.ChromiumOptions;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.remote.Browser;
@@ -141,16 +142,13 @@ public class DesktopCapabilitiesTest {
     public static void getEdgeCapabilityTest() {
         String testName = "edge - getEdgeCapabilityTest";
 
-        EdgeCapabilities edgeCapabilities = new EdgeCapabilities();
-        DesiredCapabilities capabilities = edgeCapabilities.getCapability(testName);
+        ChromiumOptions<?> capabilities = (ChromiumOptions<?>) CapabilitiesBuilder.builder()
+                .chooseOptionsType(OptionsType.EDGE_SELENIUM)
+                .testName(testName)
+                .build();
 
         Assert.assertEquals(capabilities.getBrowserName(), Browser.EDGE.browserName(), "Returned browser name is not valid!");
-
         Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
-
-        Assert.assertTrue((Boolean) capabilities.getCapability(CapabilityType.ACCEPT_SSL_CERTS), "Returned capability value is not valid!");
-
-        Assert.assertFalse((Boolean) capabilities.getCapability(CapabilityType.TAKES_SCREENSHOT), "Returned capability value is not valid!");
     }
 
     @Test(groups = {"DesktopCapabilitiesTestClass"})
