@@ -24,7 +24,7 @@ public class EdgeFactory extends IAbstractFactory {
     @Override
     public WebDriver create(String testName, Capabilities capabilities, String seleniumHost) {
         Capabilities edgeOptions = CapabilitiesBuilder.builder()
-                .withCapabilities(capabilities)
+                .withCustomCapabilities(capabilities)
                 .chooseOptionsType(OptionsType.EDGE_SELENIUM)
                 .build();
 

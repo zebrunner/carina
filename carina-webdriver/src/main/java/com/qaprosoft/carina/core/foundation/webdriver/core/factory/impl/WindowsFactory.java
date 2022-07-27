@@ -24,7 +24,7 @@ public class WindowsFactory extends IAbstractFactory {
     @Override
     public WebDriver create(String testName, Capabilities capabilities, String seleniumHost) {
         Capabilities windowsOptions = CapabilitiesBuilder.builder()
-                .withCapabilities(capabilities)
+                .withCustomCapabilities(capabilities)
                 .chooseOptionsType(OptionsType.WINDOWS_APPIUM)
                 .build();
 

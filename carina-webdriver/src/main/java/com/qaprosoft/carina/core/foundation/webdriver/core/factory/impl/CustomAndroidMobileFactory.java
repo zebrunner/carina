@@ -25,7 +25,7 @@ public class CustomAndroidMobileFactory extends IAbstractFactory {
     @Override
     public WebDriver create(String testName, Capabilities capabilities, String seleniumHost) {
         Capabilities uiAutomator2Options = CapabilitiesBuilder.builder()
-                .withCapabilities(capabilities)
+                .withCustomCapabilities(capabilities)
                 .chooseOptionsType(OptionsType.ANDROID_UIAUTOMATOR2_APPIUM)
                 .build();
 

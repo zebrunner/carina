@@ -25,7 +25,7 @@ public class CustomIOSMobileFactory extends IAbstractFactory {
     @Override
     public WebDriver create(String testName, Capabilities capabilities, String seleniumHost) {
         Capabilities xcuiOptions = CapabilitiesBuilder.builder()
-                .withCapabilities(capabilities)
+                .withCustomCapabilities(capabilities)
                 .chooseOptionsType(OptionsType.IOS_XCUI_TEST_APPIUM)
                 .build();
 

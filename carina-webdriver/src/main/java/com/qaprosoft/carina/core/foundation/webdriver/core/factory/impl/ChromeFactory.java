@@ -27,7 +27,7 @@ public class ChromeFactory extends IAbstractFactory {
     @Override
     public WebDriver create(String testName, Capabilities capabilities, String seleniumHost) {
         Capabilities chromeOptions = CapabilitiesBuilder.builder()
-                .withCapabilities(capabilities)
+                .withCustomCapabilities(capabilities)
                 .chooseOptionsType(OptionsType.CHROME_SELENIUM)
                 .build();
 

@@ -41,7 +41,7 @@ public class ChromeCapabilities extends IAbstactCapabilities<ChromeOptions> {
 
     @Override
     public ChromeOptions getCapabilitiesWithCustom(Capabilities capabilities) {
-        ChromeOptions options = getCapabilities();
+        ChromeOptions options = new ChromeOptions();
         if (capabilities != null) {
             for (String capabilityName : capabilities.getCapabilityNames()) {
                 options.setCapability(capabilityName, capabilities.getCapability(capabilityName));

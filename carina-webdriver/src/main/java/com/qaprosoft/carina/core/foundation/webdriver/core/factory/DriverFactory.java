@@ -53,7 +53,7 @@ public class DriverFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public static WebDriver create(String testName, Capabilities additionalCapabilities, String seleniumHost) {
+    public static WebDriver create(String testName, Capabilities capabilities, String seleniumHost) {
 		LOGGER.debug("DriverFactory start...");
         URL seleniumUrl = RemoteWebDriverFactory.getSeleniumHubUrl();
         if (seleniumUrl != null) {
@@ -61,9 +61,10 @@ public class DriverFactory {
             R.CONFIG.put(Parameter.SELENIUM_URL.getKey(), seleniumUrl.toString());
         }
 
-        IAbstractFactory driverFactory = chooseDriverFactory(IAbstactCapabilities.getConfigurationCapabilities());
+        IAbstractFactory driverFactory = chooseDriverFactory(
+                capabilities == null ? IAbstactCapabilities.getConfigurationCapabilities() : capabilities);
 
-        WebDriver driver = driverFactory.create(testName, additionalCapabilities, seleniumHost);
+        WebDriver driver = driverFactory.create(testName, capabilities, seleniumHost);
         driver = driverFactory.registerListeners(driver, getEventListeners());
 
         LOGGER.debug("DriverFactory finish...");
@@ -139,7 +140,9 @@ public class DriverFactory {
             return new EdgeFactory();
         }
 
-        throw new RuntimeException("Factory is not found");
+        throw new RuntimeException(
+                "Factory cannot be chosen. Please, provide valid capabilities. Check is your capabilities contains "
+                        + "browserName, platformName, automationName (all or one of them)");
         // fixme add default driver factory instance
     }
 

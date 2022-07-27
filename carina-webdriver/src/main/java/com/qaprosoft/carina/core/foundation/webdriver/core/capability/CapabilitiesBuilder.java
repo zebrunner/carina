@@ -16,7 +16,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.XCUIT
 
 public class CapabilitiesBuilder {
 
-    private MutableCapabilities additionalCapabilities = new MutableCapabilities();
+    private MutableCapabilities customCapabilities = null;
     private String testName = StringUtils.EMPTY;
     private OptionsType optionsType;
 
@@ -32,8 +32,8 @@ public class CapabilitiesBuilder {
         return this;
     }
 
-    public CapabilitiesBuilder withCapabilities(Capabilities capabilities) {
-        this.additionalCapabilities = this.additionalCapabilities.merge(capabilities);
+    public CapabilitiesBuilder withCustomCapabilities(Capabilities capabilities) {
+        this.customCapabilities = this.customCapabilities.merge(capabilities);
         return this;
     }
 
@@ -45,41 +45,48 @@ public class CapabilitiesBuilder {
     public Capabilities build() {
         Capabilities capabilities = null;
         if (!Objects.equals(this.testName, StringUtils.EMPTY)) {
-            this.additionalCapabilities.setCapability("name", testName);
+            this.customCapabilities.setCapability("name", testName);
         }
 
         if (this.optionsType == null) {
-            throw new RuntimeException("Options type should be choosen");
+            throw new RuntimeException("Options type should be chosen");
         }
 
         switch (optionsType) {
         case CHROME_SELENIUM:
-            capabilities = new ChromeCapabilities()
-                    .getCapabilitiesWithCustom(this.additionalCapabilities);
+            ChromeCapabilities chromeCapabilities = new ChromeCapabilities();
+            capabilities = this.customCapabilities == null ? chromeCapabilities.getCapabilities()
+                    : chromeCapabilities.getCapabilitiesWithCustom(this.customCapabilities);
             break;
         case EDGE_SELENIUM:
-            capabilities = new EdgeCapabilities()
-                    .getCapabilitiesWithCustom(this.additionalCapabilities);
+            EdgeCapabilities edgeCapabilities = new EdgeCapabilities();
+            capabilities = this.customCapabilities == null ? edgeCapabilities.getCapabilities()
+                    : edgeCapabilities.getCapabilitiesWithCustom(this.customCapabilities);
             break;
         case FIREFOX_SELENIUM:
-            capabilities = new FirefoxCapabilities()
-                    .getCapabilitiesWithCustom(this.additionalCapabilities);
+            FirefoxCapabilities firefoxCapabilities = new FirefoxCapabilities();
+            capabilities = this.customCapabilities == null ? firefoxCapabilities.getCapabilities()
+                    : firefoxCapabilities.getCapabilitiesWithCustom(this.customCapabilities);
             break;
         case ANDROID_UIAUTOMATOR2_APPIUM:
-            capabilities = new UIAutomator2Capabilities()
-                    .getCapabilitiesWithCustom(this.additionalCapabilities);
+            UIAutomator2Capabilities uiAutomator2Capabilities = new UIAutomator2Capabilities();
+            capabilities = this.customCapabilities == null ? uiAutomator2Capabilities.getCapabilities()
+                    : uiAutomator2Capabilities.getCapabilitiesWithCustom(this.customCapabilities);
             break;
         case IOS_XCUI_TEST_APPIUM:
-            capabilities = new XCUITestCapabilities()
-                    .getCapabilitiesWithCustom(this.additionalCapabilities);
+            XCUITestCapabilities xcuiTestCapabilities = new XCUITestCapabilities();
+            capabilities = this.customCapabilities == null ? xcuiTestCapabilities.getCapabilities()
+                    : xcuiTestCapabilities.getCapabilitiesWithCustom(this.customCapabilities);
             break;
         case WINDOWS_APPIUM:
-            capabilities = new WindowsCapabilities()
-                    .getCapabilitiesWithCustom(this.additionalCapabilities);
+            WindowsCapabilities windowsCapabilities = new WindowsCapabilities();
+            capabilities = this.customCapabilities == null ? windowsCapabilities.getCapabilities()
+                    : windowsCapabilities.getCapabilitiesWithCustom(this.customCapabilities);
             break;
         case SAFARI_APPIUM:
-            capabilities = new SafariCapabilities()
-                    .getCapabilitiesWithCustom(this.additionalCapabilities);
+            SafariCapabilities safariCapabilities = new SafariCapabilities();
+            capabilities = this.customCapabilities == null ? safariCapabilities.getCapabilities()
+                    : safariCapabilities.getCapabilitiesWithCustom(this.customCapabilities);
             break;
         }
 
