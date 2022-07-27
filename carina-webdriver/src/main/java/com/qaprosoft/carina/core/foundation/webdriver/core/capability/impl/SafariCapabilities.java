@@ -14,6 +14,8 @@ public class SafariCapabilities extends IAbstactCapabilities<SafariOptions> {
     public SafariOptions getCapabilities() {
         SafariOptions options = new SafariOptions();
         options = options.amend(SupportsBrowserNameOption.BROWSER_NAME_OPTION, Browser.SAFARI.browserName());
+        setCapabilitiesSafe(options, getConfigurationCapabilities());
+        options.acceptInsecureCerts();
         return options;
     }
 
@@ -26,5 +28,11 @@ public class SafariCapabilities extends IAbstactCapabilities<SafariOptions> {
             }
         }
         return options;
+    }
+
+    private void setCapabilitiesSafe(SafariOptions options, Capabilities capabilities) {
+        for (String capabilityName : capabilities.getCapabilityNames()) {
+            options.amend(capabilityName, capabilities.getCapability(capabilityName));
+        }
     }
 }
