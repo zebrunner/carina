@@ -28,6 +28,7 @@ public class FirefoxCapabilities extends IAbstactCapabilities<FirefoxOptions> {
         }
         setCapabilitiesSafe(options, getConfigurationCapabilities());
         addFirefoxOptions(options);
+        options.setAcceptInsecureCerts(true);
 
         if (Configuration.getBoolean(Configuration.Parameter.HEADLESS)) {
             options.setHeadless(true);
