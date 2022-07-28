@@ -14,6 +14,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesBuilder;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.OptionsType;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.remote.AutomationName;
@@ -45,12 +46,8 @@ public class IOSFactory extends AbstractFactory {
             throw new RuntimeException("Malformed selenium URL!", e);
         }
 
-        // fixme do not work with EventFiringAppiumCommandExecutor
-        // error: org.openqa.selenium.SessionNotCreatedException: Could not start a new session. Possible causes are invalid address of the remote
-        // server or browser start-up failure.
-        // EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(hostURL);
-        // IOSDriver driver = new IOSDriver(ce, xcuiOptions);
-        IOSDriver driver = new IOSDriver(hostURL, xcuiOptions);
+        EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(hostURL);
+        IOSDriver driver = new IOSDriver(ce, xcuiOptions);
 
         registerDevice(driver);
         return driver;

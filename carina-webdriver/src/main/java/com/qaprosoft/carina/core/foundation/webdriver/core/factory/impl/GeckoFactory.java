@@ -43,7 +43,7 @@ public class GeckoFactory extends AbstractFactory {
             throw new RuntimeException("Malformed selenium URL!", e);
         }
 
-        // fixme investigate creating driver with EventFiringAppiumCommandExecutor
+        // todo investigate creating driver with EventFiringAppiumCommandExecutor
         // EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(hostURL);
         // return new GeckoDriver(ce, geckoOptions);
 

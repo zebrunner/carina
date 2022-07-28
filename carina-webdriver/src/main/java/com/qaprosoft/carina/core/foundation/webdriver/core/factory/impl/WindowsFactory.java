@@ -44,8 +44,7 @@ public class WindowsFactory extends AbstractFactory {
             throw new RuntimeException("Malformed selenium URL!", e);
         }
 
-        WebDriver driver = new WindowsDriver(hostURL, windowsOptions);
-        return driver;
+        return new WindowsDriver(hostURL, windowsOptions);
     }
 
     /**

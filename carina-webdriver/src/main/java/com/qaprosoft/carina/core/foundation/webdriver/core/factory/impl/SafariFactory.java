@@ -46,7 +46,7 @@ public class SafariFactory extends AbstractFactory {
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed selenium URL!", e);
         }
-        // fixme investigate creating driver with EventFiringAppiumCommandExecutor
+        // todo investigate creating driver with EventFiringAppiumCommandExecutor
         // EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(hostURL);
         // WebDriver driver = new SafariDriver(ce, safariOptions);
         WebDriver driver = new SafariDriver(hostURL, safariOptions);
