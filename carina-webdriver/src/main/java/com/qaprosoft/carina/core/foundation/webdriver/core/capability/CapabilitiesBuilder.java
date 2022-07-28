@@ -9,6 +9,7 @@ import org.openqa.selenium.MutableCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.ChromeCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.EdgeCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.FirefoxCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.GeckoCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.SafariCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.UIAutomator2Capabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.WindowsCapabilities;
@@ -59,6 +60,11 @@ public class CapabilitiesBuilder {
             EdgeCapabilities edgeCapabilities = new EdgeCapabilities();
             capabilities = this.customCapabilities == null ? edgeCapabilities.getCapabilities()
                     : edgeCapabilities.createCapabilitiesFromCustom(this.customCapabilities);
+            break;
+        case GECKO:
+            GeckoCapabilities geckoCapabilities = new GeckoCapabilities();
+            capabilities = this.customCapabilities == null ? geckoCapabilities.getCapabilities()
+                    : geckoCapabilities.createCapabilitiesFromCustom(this.customCapabilities);
             break;
         case FIREFOX:
             FirefoxCapabilities firefoxCapabilities = new FirefoxCapabilities();
