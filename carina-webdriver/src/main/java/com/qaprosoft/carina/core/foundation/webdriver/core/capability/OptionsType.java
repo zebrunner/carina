@@ -10,5 +10,7 @@ public enum OptionsType {
     WINDOWS,
     CHROME,
     EDGE,
-    FIREFOX;
+    FIREFOX,
+    STF_ANDROID,
+    STF_IOS;
 }

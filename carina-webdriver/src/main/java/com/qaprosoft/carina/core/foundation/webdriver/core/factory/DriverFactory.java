@@ -38,6 +38,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.CustomIO
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.EdgeFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.FirefoxFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.IOSFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.STFAndroidFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.STFIOSFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.SafariFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.WindowsFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
@@ -102,6 +104,14 @@ public class DriverFactory {
     }
 
     private static AbstractFactory chooseDriverFactory(Capabilities capabilities) {
+
+        if (STFAndroidFactory.isSuitable(capabilities)) {
+            return new STFAndroidFactory();
+        }
+
+        if (STFIOSFactory.isSuitable(capabilities)) {
+            return new STFIOSFactory();
+        }
 
         if (AndroidFactory.isSuitable(capabilities)) {
             return new AndroidFactory();
