@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesBuilder;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.OptionsType;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
 
 import io.appium.java_client.remote.options.SupportsAutomationNameOption;
 
@@ -47,8 +46,11 @@ public class FirefoxFactory extends AbstractFactory {
             throw new RuntimeException("Malformed selenium URL!", e);
         }
 
-        EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(hostURL);
-        WebDriver driver = new RemoteWebDriver(ce, firefoxOptions);
+        // fixme investigate creating driver with EventFiringSeleniumCommandExecutor
+        // EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(hostURL);
+        // WebDriver driver = new RemoteWebDriver(ce, firefoxOptions);
+        WebDriver driver = new RemoteWebDriver(hostURL, firefoxOptions);
+
         resizeBrowserWindow(driver, firefoxOptions);
         return driver;
     }

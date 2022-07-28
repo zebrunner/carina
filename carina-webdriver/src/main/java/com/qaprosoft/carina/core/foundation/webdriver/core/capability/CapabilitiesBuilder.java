@@ -10,6 +10,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.Chrom
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.EdgeCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.FirefoxCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.GeckoCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.Mac2Capabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.SafariCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.UIAutomator2Capabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.WindowsCapabilities;
@@ -90,6 +91,11 @@ public class CapabilitiesBuilder {
             SafariCapabilities safariCapabilities = new SafariCapabilities();
             capabilities = this.customCapabilities == null ? safariCapabilities.getCapabilities()
                     : safariCapabilities.createCapabilitiesFromCustom(this.customCapabilities);
+            break;
+        case MAC:
+            Mac2Capabilities mac2Capabilities = new Mac2Capabilities();
+            capabilities = this.customCapabilities == null ? mac2Capabilities.getCapabilities()
+                    : mac2Capabilities.createCapabilitiesFromCustom(this.customCapabilities);
             break;
         }
 

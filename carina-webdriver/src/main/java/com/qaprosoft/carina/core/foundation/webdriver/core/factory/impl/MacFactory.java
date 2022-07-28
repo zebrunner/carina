@@ -6,7 +6,6 @@ import java.net.URL;
 
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.Browser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,14 +13,11 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.Capabiliti
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.OptionsType;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 
+import io.appium.java_client.mac.Mac2Driver;
 import io.appium.java_client.remote.AutomationName;
 import io.appium.java_client.remote.options.SupportsAutomationNameOption;
-import io.appium.java_client.safari.SafariDriver;
 
-/**
- * Desktop safari browser
- */
-public class SafariFactory extends AbstractFactory {
+public class MacFactory extends AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
@@ -35,10 +31,10 @@ public class SafariFactory extends AbstractFactory {
         if (capabilities != null) {
             capabilitiesBuilder.fromCustomCapabilities(capabilities);
         }
-        capabilitiesBuilder.chooseOptionsType(OptionsType.SAFARI);
-        Capabilities safariOptions = capabilitiesBuilder.build();
+        capabilitiesBuilder.chooseOptionsType(OptionsType.MAC);
+        Capabilities macOptions = capabilitiesBuilder.build();
 
-        LOGGER.debug("capabilities: {}", safariOptions);
+        LOGGER.debug("capabilities: {}", macOptions);
 
         URL hostURL;
         try {
@@ -46,29 +42,21 @@ public class SafariFactory extends AbstractFactory {
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed selenium URL!", e);
         }
-        // fixme investigate creating driver with EventFiringAppiumCommandExecutor
-        // EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(hostURL);
-        // WebDriver driver = new SafariDriver(ce, safariOptions);
-        WebDriver driver = new SafariDriver(hostURL, safariOptions);
 
-        resizeBrowserWindow(driver, safariOptions);
-        return driver;
+        return new Mac2Driver(hostURL, macOptions);
     }
 
     /**
      * Determines if the driver is suitable for the current capabilities
      */
     public static boolean isSuitable(Capabilities capabilities) {
-        if (capabilities.getBrowserName().equalsIgnoreCase(Browser.SAFARI.browserName())) {
-            return true;
-        }
 
         if (capabilities.getCapability(SupportsAutomationNameOption.AUTOMATION_NAME_OPTION) != null &&
-                capabilities.getCapability(SupportsAutomationNameOption.AUTOMATION_NAME_OPTION).toString()
-                        .equalsIgnoreCase(AutomationName.SAFARI)) {
+                capabilities.getCapability(SupportsAutomationNameOption.AUTOMATION_NAME_OPTION)
+                        .toString()
+                        .equalsIgnoreCase(AutomationName.MAC2)) {
             return true;
         }
-
         return false;
     }
 }

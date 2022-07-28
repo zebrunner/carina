@@ -52,8 +52,13 @@ public class AndroidFactory extends AbstractFactory {
             throw new RuntimeException("Malformed selenium URL!", e);
         }
 
-        EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(hostURL);
-        AndroidDriver driver = new AndroidDriver(ce, uiAutomator2Options);
+        // fixme do not work with EventFiringAppiumCommandExecutor
+        // error: org.openqa.selenium.SessionNotCreatedException: Could not start a new session. Possible causes are invalid address of the remote
+        // server or browser start-up failure.
+        // EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(hostURL);
+        // AndroidDriver driver = new AndroidDriver(ce, uiAutomator2Options);
+        AndroidDriver driver = new AndroidDriver(hostURL, uiAutomator2Options);
+
         registerDevice(driver);
         return driver;
     }

@@ -39,6 +39,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.EdgeFact
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.FirefoxFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.GeckoFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.IOSFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.MacFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.SafariFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.WindowsFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
@@ -118,6 +119,10 @@ public class DriverFactory {
 
         if (CustomAndroidMobileFactory.isSuitable(capabilities)) {
             return new CustomAndroidMobileFactory();
+        }
+
+        if (MacFactory.isSuitable(capabilities)) {
+            return new MacFactory();
         }
 
         if (WindowsFactory.isSuitable(capabilities)) {

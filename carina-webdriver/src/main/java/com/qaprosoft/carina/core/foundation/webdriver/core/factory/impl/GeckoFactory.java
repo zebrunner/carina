@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesBuilder;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.OptionsType;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 
 import io.appium.java_client.gecko.GeckoDriver;
 import io.appium.java_client.remote.AutomationName;
@@ -44,8 +43,11 @@ public class GeckoFactory extends AbstractFactory {
             throw new RuntimeException("Malformed selenium URL!", e);
         }
 
-        EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(hostURL);
-        return new GeckoDriver(ce, geckoOptions);
+        // fixme investigate creating driver with EventFiringAppiumCommandExecutor
+        // EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(hostURL);
+        // return new GeckoDriver(ce, geckoOptions);
+
+        return new GeckoDriver(hostURL, geckoOptions);
     }
 
     /**
