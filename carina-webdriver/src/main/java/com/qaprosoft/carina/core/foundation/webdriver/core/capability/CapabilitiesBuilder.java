@@ -18,7 +18,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.XCUIT
 
 public class CapabilitiesBuilder {
 
-    private MutableCapabilities customCapabilities = null;
+    private Capabilities customCapabilities = null;
     private String testName = StringUtils.EMPTY;
     private OptionsType optionsType;
 
@@ -35,7 +35,7 @@ public class CapabilitiesBuilder {
     }
 
     public CapabilitiesBuilder fromCustomCapabilities(Capabilities capabilities) {
-        this.customCapabilities = this.customCapabilities.merge(capabilities);
+        this.customCapabilities = capabilities;
         return this;
     }
 
