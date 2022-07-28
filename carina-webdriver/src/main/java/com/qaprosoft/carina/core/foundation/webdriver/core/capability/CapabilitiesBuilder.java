@@ -9,6 +9,8 @@ import org.openqa.selenium.MutableCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.ChromeCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.EdgeCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.FirefoxCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.STFAndroidCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.STFIOSCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.SafariCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.UIAutomator2Capabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.WindowsCapabilities;
@@ -69,6 +71,16 @@ public class CapabilitiesBuilder {
             UIAutomator2Capabilities uiAutomator2Capabilities = new UIAutomator2Capabilities();
             capabilities = this.customCapabilities == null ? uiAutomator2Capabilities.getCapabilities()
                     : uiAutomator2Capabilities.createCapabilitiesFromCustom(this.customCapabilities);
+            break;
+        case STF_ANDROID:
+            STFAndroidCapabilities stfAndroidCapabilities = new STFAndroidCapabilities();
+            capabilities = this.customCapabilities == null ? stfAndroidCapabilities.getCapabilities()
+                    : stfAndroidCapabilities.createCapabilitiesFromCustom(this.customCapabilities);
+            break;
+        case STF_IOS:
+            STFIOSCapabilities stfiosCapabilities = new STFIOSCapabilities();
+            capabilities = this.customCapabilities == null ? stfiosCapabilities.getCapabilities()
+                    : stfiosCapabilities.createCapabilitiesFromCustom(this.customCapabilities);
             break;
         case IOS:
             XCUITestCapabilities xcuiTestCapabilities = new XCUITestCapabilities();

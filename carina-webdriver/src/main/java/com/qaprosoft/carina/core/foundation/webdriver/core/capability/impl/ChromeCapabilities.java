@@ -14,6 +14,9 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstactCapabilities;
 
+/**
+ * For desktop chrome
+ */
 public class ChromeCapabilities extends AbstactCapabilities<ChromeOptions> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
