@@ -33,7 +33,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 
 /**
- * EventFiringSeleniumCommandExecutor triggers event listener before/after execution of the command.
+ * Triggers event listener before/after execution of the command
  */
 public class EventFiringSeleniumCommandExecutor extends HttpCommandExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -45,34 +45,37 @@ public class EventFiringSeleniumCommandExecutor extends HttpCommandExecutor {
     @Override
     public Response execute(Command command) throws IOException {
         Response response = null;
-        int retry = 2; // extra retries to execute command
+
+        // extra retries to execute command
+        int retry = 2;
         Number pause = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / retry;
         while (retry >= 0) {
             response = super.execute(command);
-            if (response.getValue() instanceof WebDriverException) {
-                LOGGER.debug("CarinaCommandExecutor catched: " + response.getValue().toString());
-                
-                if (DriverCommand.QUIT.equals(command.getName())) {
-                    // do not retry on quit command (grid will close it forcibly anyway)
-                    break;
-                }
 
-                String msg = response.getValue().toString();
-                if (msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED)
-                        || msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED2)) {
-                    LOGGER.warn("Enabled command executor retries: " + msg);
-                    CommonUtils.pause(pause);
-                } else {
-                    // do not retry for non "driver connection refused" errors!
-                    break;
-                }
-            } else {
-                // do nothing as response already contains all the information we need
+            // do nothing as response already contains all the information we need
+            if (response.getValue() instanceof WebDriverException) {
                 break;
             }
-            retry--;
-        }
 
+            LOGGER.debug("CarinaCommandExecutor caught: {}", response.getValue());
+
+            // do not retry on quit command (grid will close it forcibly anyway)
+            if (DriverCommand.QUIT.equals(command.getName())) {
+                break;
+            }
+
+            String msg = response.getValue().toString();
+
+            if (!(msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED) ||
+                    msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED2))) {
+                // do not retry for non "driver connection refused" errors!
+                break;
+            }
+
+            LOGGER.warn("Enabled command executor retries: {}", msg);
+            CommonUtils.pause(pause);
+            retry--;
+            }
         return response;
     }
 
