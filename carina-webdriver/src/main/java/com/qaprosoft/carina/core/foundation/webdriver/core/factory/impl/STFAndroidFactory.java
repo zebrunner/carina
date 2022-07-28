@@ -69,7 +69,7 @@ public class STFAndroidFactory extends AbstractFactory {
             return false;
         }
 
-        if (capabilities.is("STF_TOKEN")) {
+        if (capabilities.getCapability("STF_TOKEN") != null) {
             if (Platform.ANDROID.is(capabilities.getPlatformName())) {
                 return true;
             }
