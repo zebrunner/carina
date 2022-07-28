@@ -13,9 +13,6 @@ import org.slf4j.LoggerFactory;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstactCapabilities;
 
-/**
- * For desktop edge
- */
 public class EdgeCapabilities extends AbstactCapabilities<ChromiumOptions<?>> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
