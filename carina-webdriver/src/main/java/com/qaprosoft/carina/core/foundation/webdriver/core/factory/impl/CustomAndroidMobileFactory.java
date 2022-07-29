@@ -69,6 +69,11 @@ public class CustomAndroidMobileFactory extends AbstractFactory {
                             customCapabilities.toLowerCase().contains("saucelabs"))) {
                 return true;
             }
+
+            if (Configuration.getSeleniumUrl().contains("hub.browserstack.com")) {
+                // #1786 mobile drivers on browserstack should be started via CUSTOM - RemoteWebDriver driver
+                return true;
+            }
         }
 
         return false;
