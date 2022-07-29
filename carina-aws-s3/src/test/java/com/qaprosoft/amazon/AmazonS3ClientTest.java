@@ -107,7 +107,7 @@ public class AmazonS3ClientTest {
         }
     }
 
-    @Test(enabled = false)
+    @Test()
     public void testgeneratePreSignURL() {
         URL url = AmazonS3Manager.getInstance().generatePreSignUrl("carina.qaprosoft.com", "test.txt", 1000 * 60 * 10);
         System.out.println(url.toString());
