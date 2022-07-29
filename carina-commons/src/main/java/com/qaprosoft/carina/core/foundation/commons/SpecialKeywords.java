@@ -43,8 +43,9 @@ public class SpecialKeywords {
     public static final String EXCEL_DS_FLAG = "{excel_ds_flag}";
     public static final String EXCEL_DS_FILE = "{excel_ds_file}";
     public static final String EXCEL_DS_SHEET = "{excel_ds_sheet}";
-
+    @Deprecated
     public static final String EXCEL_DS_CUSTOM_PROVIDER = "{excel_ds_custom_provider}";
+    @Deprecated
     public static final String DS_CUSTOM_PROVIDER = "{ds_custom_provider}";
     public static final String DS_ARGS = "{ds_args}";
     public static final String DS_UID = "{ds_uid}";
@@ -113,6 +114,7 @@ public class SpecialKeywords {
     
     public final static String DRIVER_CONNECTION_REFUSED = "Driver connection refused";
     public final static String DRIVER_CONNECTION_REFUSED2 = "Expected to read a START_MAP but instead have: END. Last 0 characters read";
+    public final static String DRIVER_TARGET_FRAME_DETACHED = "target frame detached";
     public final static String DRIVER_NO_SUCH_WINDOW = "no such window: window was already closed";
 
     

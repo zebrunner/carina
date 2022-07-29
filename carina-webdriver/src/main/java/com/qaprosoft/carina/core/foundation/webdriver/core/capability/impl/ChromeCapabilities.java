@@ -4,6 +4,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.CapabilityType;
@@ -86,10 +87,12 @@ public class ChromeCapabilities extends AbstactCapabilities<ChromeOptions> {
 
         if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD)) {
             chromePrefs.put("download.prompt_for_download", false);
-            chromePrefs.put("download.default_directory", getAutoDownloadFolderPath());
+            chromePrefs.put("download.default_directory", ReportContext.getArtifactsFolder().getAbsolutePath());
             chromePrefs.put("plugins.always_open_pdf_externally", true);
             needsPrefs = true;
         }
+
+
 
         // [VD] no need to set proxy via options anymore!
         // moreover if below code is uncommented then we have double proxy start and mess in host:port values

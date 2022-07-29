@@ -125,6 +125,9 @@ public class ExtendedFieldDecorator implements FieldDecorator {
         InvocationHandler handler = new LocatingElementHandler(locator);
         WebElement proxy = (WebElement) Proxy.newProxyInstance(loader, new Class[] { WebElement.class, WrapsElement.class, Locatable.class },
                 handler);
+        /**
+         * Questionable place - called ExtendedWebElement constructor with no initializing searchContext
+         */
         return new ExtendedWebElement(proxy, field.getName(),
                 field.isAnnotationPresent(FindBy.class) || field.isAnnotationPresent(ExtendedFindBy.class)? new LocalizedAnnotations(field).buildBy() : null);
     }

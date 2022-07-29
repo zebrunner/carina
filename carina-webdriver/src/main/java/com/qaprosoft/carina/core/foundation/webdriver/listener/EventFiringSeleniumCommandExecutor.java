@@ -59,7 +59,8 @@ public class EventFiringSeleniumCommandExecutor extends HttpCommandExecutor {
 
                 String msg = response.getValue().toString();
                 if (msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED)
-                        || msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED2)) {
+                        || msg.contains(SpecialKeywords.DRIVER_CONNECTION_REFUSED2)
+                        || msg.contains(SpecialKeywords.DRIVER_TARGET_FRAME_DETACHED)) {
                     LOGGER.warn("Enabled command executor retries: " + msg);
                     CommonUtils.pause(pause);
                 } else {

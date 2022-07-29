@@ -31,6 +31,8 @@ import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.FileManager;
+import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 import com.zebrunner.agent.core.registrar.Artifact;
@@ -164,6 +166,7 @@ public class DriverListener implements WebDriverEventListener, IDriverPool {
                 || thr.getMessage().contains("Method is not implemented")
                 || thr.getMessage().contains("An element could not be located on the page using the given search parameters")
                 || thr.getMessage().contains("no such element: Unable to locate element")
+                || thr.getMessage().contains("Failed to execute command screen image")
                 // carina has a lot of extra verifications to solve all stale reference issue and finally perform an action so ignore such exception in listener!
                 || thr.getMessage().contains("StaleElementReferenceException")
                 || thr.getMessage().contains("stale_element_reference.html")) {
@@ -281,20 +284,20 @@ public class DriverListener implements WebDriverEventListener, IDriverPool {
         try {
             if (errorMessage) {
                 LOGGER.error(comment);
-                if (Screenshot.isEnabled()) {
-                    String screenName = Screenshot.capture(driver, comment, true); // in case of failure
-                    // do not generate UI dump if no screenshot
-                    if (!screenName.isEmpty()) {
-                        generateDump(driver, screenName);
-                    }
+                R.CONFIG.put(Parameter.ERROR_SCREENSHOT.getKey(), "true", true);
+                String screenName = Screenshot.captureByRule(driver, "", true); // in case of failure try full size if allowed
+                // do not generate UI dump if no screenshot
+                if (!screenName.isEmpty()) {
+                    generateDump(driver, screenName);
                 }
             } else {
                 LOGGER.info(comment);
-                Screenshot.captureByRule(driver, comment);
+                Screenshot.captureByRule(driver, "");
             }
         } catch (Exception e) {
             LOGGER.debug("Unrecognized failure detected in DriverListener->captureScreenshot!", e);
         } finally {
+            R.CONFIG.put(Parameter.ERROR_SCREENSHOT.getKey(), "false", true);
             resetMessages();
         }
     }

@@ -23,5 +23,10 @@ public class DebugLevelScreenshotRule implements IScreenshotRule {
     public boolean isTakeScreenshot() {
         return Configuration.get(Parameter.CORE_LOG_LEVEL).equalsIgnoreCase("debug");
     }
+    
+    @Override
+    public boolean isAllowFullSize() {
+        return Configuration.get(Parameter.CORE_LOG_LEVEL).equalsIgnoreCase("debug");
+    }
 
 }

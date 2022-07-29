@@ -17,12 +17,14 @@ package com.qaprosoft.carina.core.foundation.report;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
 import java.net.Authenticator;
@@ -30,8 +32,6 @@ import java.net.HttpURLConnection;
 import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -40,15 +40,16 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
-import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -58,12 +59,12 @@ import org.imgscalr.Scalr;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.FileManager;
@@ -78,8 +79,8 @@ import com.zebrunner.agent.core.registrar.Artifact;
 
 public class ReportContext {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
-    public static final String ARTIFACTS_FOLDER = "artifacts";
+    public static final String ARTIFACTS_FOLDER = "downloads"; // renamed to downloads to avoid automatic upload on our old Zebrunner ci-pipeline
+                                                               // versions
 
     private static final String GALLERY_ZIP = "gallery-lib.zip";
     private static final String REPORT_NAME = "/report.html";
@@ -92,10 +93,6 @@ public class ReportContext {
 
     private static File tempDirectory;
 
-    private static File artifactsDirectory;
-
-    private static File metaDataDirectory;
-
     private static long rootID;
 
     private static final ThreadLocal<File> testDirectory = new InheritableThreadLocal<>();
@@ -106,15 +103,10 @@ public class ReportContext {
     // Collects screenshot comments. Screenshot comments are associated using screenshot file name.
     private static Map<String, String> screenSteps = Collections.synchronizedMap(new HashMap<String, String>());
 
-    public static long getRootID() {
-        return rootID;
-    }
-
     /**
-     * Crates new screenshot directory at first call otherwise returns created directory. Directory is specific for any
-     * new test suite launch.
+     * Creates base directory for tests execution to save screenshots, logs etc
      * 
-     * @return root screenshot folder for test launch.
+     * @return base root folder for run.
      */
     public static File getBaseDir() {
         try {
@@ -147,10 +139,11 @@ public class ReportContext {
         return baseDirectory;
     }
 
-    public static boolean isBaseDirCreated() {
-        return baseDirectory != null;
-    }
-
+    /**
+     * Creates temp directory for tests execution
+     * 
+     * @return temp folder for run.
+     */
     public static synchronized File getTempDir() {
         if (tempDirectory == null) {
             tempDirectory = new File(String.format("%s/%s", getBaseDir().getAbsolutePath(), TEMP_FOLDER));
@@ -162,162 +155,219 @@ public class ReportContext {
         return tempDirectory;
     }
 
-    public static synchronized void removeTempDir() {
-        if (tempDirectory != null) {
-            try {
-                FileUtils.deleteDirectory(tempDirectory);
-            } catch (IOException e) {
-                LOGGER.debug("Unable to remove artifacts temp directory!", e);
+    /**
+     * Creates unique test directory for test
+     * 
+     * @return test log/screenshot folder.
+     */
+    public static File getTestDir() {
+        return getTestDir(StringUtils.EMPTY);
+    }
+
+    /**
+     * Creates unique test directory for test
+     * 
+     * @param dirName String
+     * @return test log/screenshot folder.
+     */
+    private static File getTestDir(String dirName) {
+        File testDir = testDirectory.get();
+        if (testDir == null) {
+            testDir = createTestDir(dirName);
+        }
+        return testDir;
+    }
+
+    /**
+     * Rename test directory to custom name.
+     * 
+     * @param dirName String
+     * @return test report dir
+     */
+    public synchronized static File setCustomTestDirName(String dirName) {
+        isCustomTestDirName.set(Boolean.FALSE);
+        File testDir = testDirectory.get();
+        if (testDir == null) {
+            LOGGER.debug("Test dir will be created.");
+            testDir = getTestDir(dirName);
+        } else {
+            LOGGER.debug("Test dir will be renamed to custom name.");
+            renameTestDir(dirName);
+        }
+        isCustomTestDirName.set(Boolean.TRUE);
+        return testDir;
+    }
+
+    public static void emptyTestDirData() {
+        testDirectory.remove();
+        isCustomTestDirName.set(Boolean.FALSE);
+        stopThreadLogAppender();
+    }
+
+    public static synchronized File createTestDir() {
+        return createTestDir(UUID.randomUUID().toString());
+    }
+
+    private static synchronized File createTestDir(String dirName) {
+        File testDir;
+        String directory = String.format("%s/%s", getBaseDir(), dirName);
+
+        testDir = new File(directory);
+        if (!testDir.exists()) {
+            testDir.mkdirs();
+            if (!testDir.exists()) {
+                throw new RuntimeException("Test Folder(s) not created: " + testDir.getAbsolutePath());
             }
         }
+
+        testDirectory.set(testDir);
+        return testDir;
     }
 
     public static synchronized File getArtifactsFolder() {
-        if (artifactsDirectory == null) {
-            String absolutePath = getBaseDir().getAbsolutePath();
-
-            try {
-                if (Configuration.get(Parameter.CUSTOM_ARTIFACTS_FOLDER).isEmpty()) {
-                    artifactsDirectory = new File(String.format("%s/%s", URLDecoder.decode(absolutePath, "utf-8"), ARTIFACTS_FOLDER));
-                } else {
-                    artifactsDirectory = new File(Configuration.get(Parameter.CUSTOM_ARTIFACTS_FOLDER));
-                }
-            } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException("Artifacts folder not created in base dir: " + absolutePath);
-            }
-
-            boolean isCreated = artifactsDirectory.exists() && artifactsDirectory.isDirectory();
-            if (!isCreated) {
-                isCreated = artifactsDirectory.mkdir();
-            } else {
-                LOGGER.info("Artifacts folder already exists: " + artifactsDirectory.getAbsolutePath());
-            }
-
-            if (!isCreated) {
-                throw new RuntimeException("Artifacts folder not created: " + artifactsDirectory.getAbsolutePath());
-            } else {
-                LOGGER.debug(("Artifacts folder created: " + artifactsDirectory.getAbsolutePath()));
-            }
-        }
-        return artifactsDirectory;
-    }
-
-    public static synchronized File getMetadataFolder() {
-        if (metaDataDirectory == null) {
-            String absolutePath = getBaseDir().getAbsolutePath();
-            try {
-                metaDataDirectory = new File(String.format("%s/%s/metadata", URLDecoder.decode(absolutePath, "utf-8"), ARTIFACTS_FOLDER));
-            } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException("Artifacts metadata folder is not created in base dir: " + absolutePath);
-            }
-            boolean isCreated = metaDataDirectory.mkdir();
-            if (!isCreated) {
-                throw new RuntimeException("Artifacts metadata folder is not created in base dir: " + absolutePath);
-            }
-        }
-        return metaDataDirectory;
-    }
-
-    /**
-     * Check that Artifacts Folder exists.
-     * 
-     * @return boolean
-     */
-    public static boolean isArtifactsFolderExists() {
+        File dir = null;
         try {
-            File f = new File(String.format("%s/%s", getBaseDir().getAbsolutePath(), ARTIFACTS_FOLDER));
-            if (f.exists() && f.isDirectory()) {
-                return true;
+            // artifacts directory should use canonical path otherwise auto download feature is broken in browsers
+            if (!Configuration.get(Parameter.CUSTOM_ARTIFACTS_FOLDER).isEmpty()) {
+                dir = new File(Configuration.get(Parameter.CUSTOM_ARTIFACTS_FOLDER)).getCanonicalFile();
+            } else {
+                dir = new File(getTestDir().getCanonicalPath() + File.separator + ARTIFACTS_FOLDER);
             }
-        } catch (Exception e) {
-            LOGGER.debug("Error happen during checking that Artifactory Folder exists or not. Error: " + e.getMessage());
-        }
-        return false;
-    }
 
-    public static List<File> getAllArtifacts() {
-        return Arrays.asList(getArtifactsFolder().listFiles());
+            if (!dir.exists()) {
+                if (!dir.mkdir()) {
+                    throw new RuntimeException("Artifacts folder not created: " + dir.getAbsolutePath());
+                } else {
+                    LOGGER.debug(("Artifacts folder created: " + dir.getAbsolutePath()));
+                }
+            } else {
+                LOGGER.debug("Artifacts folder already exists: " + dir.getAbsolutePath());
+            }
+
+            if (!dir.isDirectory()) {
+                throw new RuntimeException("Artifacts folder is not a folder: " + dir.getAbsolutePath());
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException("Artifacts folder not created!");
+        }
+        return dir;
     }
 
     /**
-     * download artifact from selenoid to local java machine
+     * Returns consolidated list of auto downloaded filenames from local artifacts folder or from remote Selenium session
      * 
      * @param driver WebDriver
-     * @param name String
-     * @param timeout long
-     * @return artifact File
+     * @return list of file and directories names
      */
-    public static File downloadArtifact(WebDriver driver, String name, long timeout) {
-        return downloadArtifact(driver, name, timeout, true);
-    }
+    public static List<String> listArtifacts(WebDriver driver) {
+        List<String> artifactNames = Arrays.stream(Objects.requireNonNull(getArtifactsFolder().listFiles()))
+                .map(File::getName)
+                .collect(Collectors.toList());
 
-    public static File downloadArtifact(WebDriver driver, String name, long timeout, boolean artifact) {
-        File file = getArtifact(name);
-        if (file == null) {
-            // attempt to verify and download file from selenoid
+        String hostUrl = getUrl(driver, "");
+        String username = getField(hostUrl, 1);
+        String password = getField(hostUrl, 2);
 
-            String url = getUrl(driver, name);
-            String username = getField(url, 1);
-            String password = getField(url, 2);
-
-            if (!artifactExists(driver, name, timeout)) {
-                Assert.fail("Unable to find artifact: " + name);
-            }
-
-            file = new File(getArtifactsFolder() + File.separator + name);
-            String path = file.getAbsolutePath();
-            LOGGER.debug("artifact file to download: " + path);
+        try {
+            HttpURLConnection con = (HttpURLConnection) new URL(hostUrl).openConnection();
+            con.setInstanceFollowRedirects(true); // explicitly define as true because default value doesn't work and return 301 status
+            con.setRequestMethod("GET");
 
             if (!username.isEmpty() && !password.isEmpty()) {
-                Authenticator.setDefault(new CustomAuthenticator(username, password));
+                String usernameColonPassword = username + ":" + password;
+                String basicAuthPayload = "Basic " + Base64.getEncoder().encodeToString(usernameColonPassword.getBytes());
+                con.addRequestProperty("Authorization", basicAuthPayload);
             }
 
-            try {
-                FileUtils.copyURLToFile(new URL(url), file);
-                LOGGER.debug("Successfully downloaded artifact: " + name);
-                if (artifact) {
-                    Artifact.attachToTest(name, file); // publish as test artifact to Zebrunner Reporting
+            int responseCode = con.getResponseCode();
+            String responseBody = readStream(con.getInputStream());
+            if (responseCode == HttpURLConnection.HTTP_NOT_FOUND &&
+                    responseBody.contains("\"error\":\"invalid session id\",\"message\":\"unknown session")) {
+                throw new RuntimeException("Invalid session id. Something wrong with driver");
+            }
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                String hrefAttributePattern = "href=([\"'])((?:(?!\\1)[^\\\\]|(?:\\\\\\\\)*\\\\[^\\\\])*)\\1";
+                Pattern pattern = Pattern.compile(hrefAttributePattern);
+                Matcher matcher = pattern.matcher(responseBody);
+                while (matcher.find()) {
+                    if (!artifactNames.contains(matcher.group(2))) {
+                        artifactNames.add(matcher.group(2));
+                    }
                 }
-            } catch (IOException e) {
-                LOGGER.error("Artifact: " + url + " wasn't downloaded to " + path, e);
             }
-        }
-        return file;
-    }
 
-    public static class CustomAuthenticator extends Authenticator {
-
-        String username;
-        String password;
-
-        public CustomAuthenticator(String username, String password) {
-            this.username = username;
-            this.password = password;
+        } catch (IOException e) {
+            LOGGER.debug("Something went wrong when try to get artifacts from remote", e);
         }
 
-        protected PasswordAuthentication getPasswordAuthentication() {
-            return new PasswordAuthentication(username, password.toCharArray());
-        }
+        return artifactNames;
     }
 
     /**
-     * check if artifact exists
+     * Get artifacts from auto download folder of local or remove driver session by pattern
      * 
      * @param driver WebDriver
-     * @param name String
-     * @param timeout long
-     * @return boolean
+     * @param pattern String - regex for artifacts
+     * @return list of artifact files
      */
-    public static boolean artifactExists(WebDriver driver, String name, long timeout) {
+    public static List<File> getArtifacts(WebDriver driver, String pattern) {
+        List<String> filteredFilesNames = listArtifacts(driver)
+                .stream()
+                // ignore directories
+                .filter(fileName -> !fileName.endsWith("/"))
+                .filter(fileName -> fileName.matches(pattern))
+                .collect(Collectors.toList());
+
+        List<File> artifacts = new ArrayList<>();
+
+        for (String fileName : filteredFilesNames) {
+            artifacts
+                    .add(getArtifact(driver, fileName));
+        }
+        return artifacts;
+    }
+
+    /**
+     * Get artifact from auto download folder of local or remove driver session by name
+     * 
+     * @param driver WebDriver
+     * @param name String - filename with extension
+     * @return artifact File
+     */
+    public static File getArtifact(WebDriver driver, String name) {
+        File file = new File(getArtifactsFolder() + File.separator + name);
+        if (file.exists()) {
+            return file;
+        }
+
+        String path = file.getAbsolutePath();
+        LOGGER.debug("artifact file to download: " + path);
+
         String url = getUrl(driver, name);
         String username = getField(url, 1);
         String password = getField(url, 2);
-        try {
-            return new WebDriverWait(driver, Duration.ofSeconds(timeout)).until((k) -> checkArtifactUsingHttp(url, username, password));
-        } catch (Exception e) {
-            LOGGER.debug("", e);
-            return false;
+
+        if (!username.isEmpty() && !password.isEmpty()) {
+            Authenticator.setDefault(new CustomAuthenticator(username, password));
         }
+
+        if (checkArtifactUsingHttp(url, username, password)) {
+            try {
+                FileUtils.copyURLToFile(new URL(url), file);
+                LOGGER.debug("Successfully downloaded artifact: {}", name);
+            } catch (IOException e) {
+                LOGGER.error("Artifact: " + url + " wasn't downloaded to " + path, e);
+            }
+        } else {
+            Assert.fail("Unable to find artifact: " + name);
+        }
+
+        // publish as test artifact to Zebrunner Reporting
+        Artifact.attachToTest(name, file);
+
+        return file;
     }
 
     /**
@@ -365,6 +415,34 @@ public class ReportContext {
     }
 
     /**
+     * Generate file in artifacts location and register in Zebrunner Reporting
+     * 
+     * @param name String
+     * @param source InputStream
+     */
+    public static void saveArtifact(String name, InputStream source) throws IOException {
+        File artifact = new File(String.format("%s/%s", getArtifactsFolder(), name));
+        artifact.createNewFile();
+        FileUtils.writeByteArrayToFile(artifact, IOUtils.toByteArray(source));
+        
+        Artifact.attachToTest(name, IOUtils.toByteArray(source));
+    }
+
+    /**
+     * Copy file into artifacts location and register in Zebrunner Reporting
+     * 
+     * @param source File
+     */
+
+    public static void saveArtifact(File source) throws IOException {
+        File artifact = new File(String.format("%s/%s", getArtifactsFolder(), source.getName()));
+        artifact.createNewFile();
+        FileUtils.copyFile(source, artifact);
+        
+        Artifact.attachToTest(source.getName(), artifact);
+    }
+
+    /**
      * generate url for artifact by name
      * 
      * @param driver WebDriver
@@ -378,113 +456,6 @@ public class ReportContext {
         String url = seleniumHost + sessionId + "/" + name;
         LOGGER.debug("url: " + url);
         return url;
-    }
-
-    public static File getArtifact(String name) {
-        File artifact = null;
-        for (File file : getAllArtifacts()) {
-            if (file.getName().equals(name)) {
-                artifact = file;
-                break;
-            }
-        }
-        return artifact;
-    }
-
-    public static void deleteAllArtifacts() {
-        for (File file : getAllArtifacts()) {
-            file.delete();
-        }
-    }
-
-    public static void deleteArtifact(String name) {
-        for (File file : getAllArtifacts()) {
-            if (file.getName().equals(name)) {
-                file.delete();
-                break;
-            }
-        }
-    }
-
-    public static void saveArtifact(String name, InputStream source) throws IOException {
-        File artifact = new File(String.format("%s/%s", getArtifactsFolder(), name));
-        artifact.createNewFile();
-        FileUtils.writeByteArrayToFile(artifact, IOUtils.toByteArray(source));
-        
-        Artifact.attachToTest(name, IOUtils.toByteArray(source));
-    }
-
-    public static void saveArtifact(File source) throws IOException {
-        File artifact = new File(String.format("%s/%s", getArtifactsFolder(), source.getName()));
-        artifact.createNewFile();
-        FileUtils.copyFile(source, artifact);
-        
-        Artifact.attachToTest(source.getName(), artifact);
-    }
-
-    /**
-     * Creates new test directory at first call otherwise returns created directory. Directory is specific for any new
-     * test launch.
-     * 
-     * @return test log/screenshot folder.
-     */
-    public static File getTestDir() {
-        return getTestDir(StringUtils.EMPTY);
-    }
-
-    public static File getTestDir(String dirName) {
-        File testDir = testDirectory.get();
-        if (testDir == null) {
-            testDir = createTestDir(dirName);
-        }
-        return testDir;
-    }
-
-    /**
-     * Rename test directory from unique number to custom name.
-     * 
-     * @param dirName String
-     * 
-     * @return test report dir
-     */
-    public synchronized static File setCustomTestDirName(String dirName) {
-        isCustomTestDirName.set(Boolean.FALSE);
-        File testDir = testDirectory.get();
-        if (testDir == null) {
-            LOGGER.debug("Test dir will be created.");
-            testDir = getTestDir(dirName);
-        } else {
-            LOGGER.debug("Test dir will be renamed to custom name.");
-            renameTestDir(dirName);
-        }
-        isCustomTestDirName.set(Boolean.TRUE);
-        return testDir;
-    }
-
-    public static void emptyTestDirData() {
-        testDirectory.remove();
-        isCustomTestDirName.set(Boolean.FALSE);
-        stopThreadLogAppender();
-    }
-
-    public static synchronized File createTestDir() {
-        return createTestDir(UUID.randomUUID().toString());
-    }
-
-    public static synchronized File createTestDir(String dirName) {
-        File testDir;
-        String directory = String.format("%s/%s", getBaseDir(), dirName);
-
-        testDir = new File(directory);
-        if (!testDir.exists()) {
-            testDir.mkdirs();
-            if (!testDir.exists()) {
-                throw new RuntimeException("Test Folder(s) not created: " + testDir.getAbsolutePath());
-            }
-        }
-        
-        testDirectory.set(testDir);
-        return testDir;
     }
 
     private static void stopThreadLogAppender() {
@@ -856,6 +827,45 @@ public class ReportContext {
             return baseDirectory.getAbsolutePath();
         }
         return null;
+    }
+
+    // Converting InputStream to String
+    private static String readStream(InputStream in) {
+        BufferedReader reader = null;
+        StringBuffer response = new StringBuffer();
+        try {
+            reader = new BufferedReader(new InputStreamReader(in));
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
+            }
+        } catch (IOException e) {
+            // do noting
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    // do nothing
+                }
+            }
+        }
+        return response.toString();
+    }
+
+    public static class CustomAuthenticator extends Authenticator {
+
+        String username;
+        String password;
+
+        public CustomAuthenticator(String username, String password) {
+            this.username = username;
+            this.password = password;
+        }
+
+        protected PasswordAuthentication getPasswordAuthentication() {
+            return new PasswordAuthentication(username, password.toCharArray());
+        }
     }
 
 }

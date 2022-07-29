@@ -42,7 +42,7 @@ public class FilterTestsListener implements ISuiteListener {
 
         // rules are absent
         if (rules.isEmpty()) {
-            LOGGER.info("There are no any rules and limitations");
+            LOGGER.debug("There are no any rules and limitations");
             return;
         }
 

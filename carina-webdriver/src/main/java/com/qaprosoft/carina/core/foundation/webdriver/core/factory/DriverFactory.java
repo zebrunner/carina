@@ -65,9 +65,11 @@ public class DriverFactory {
         AbstractFactory driverFactory = chooseDriverFactory(
                 capabilities == null ? AbstactCapabilities.getConfigurationCapabilities() : capabilities);
 
+        LOGGER.info("Starting driver session...");
         WebDriver driver = driverFactory.create(testName, seleniumHost, capabilities);
         driver = driverFactory.registerListeners(driver, getEventListeners());
-
+        LOGGER.info("Driver session started.");
+        LOGGER.debug("DriverFactory finish...");
         LOGGER.debug("DriverFactory finish...");
         return driver;
     }

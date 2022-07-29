@@ -27,10 +27,11 @@ import org.slf4j.LoggerFactory;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.HttpMethod;
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
-import com.amazonaws.auth.SystemPropertiesCredentialsProvider;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.GetObjectRequest;
@@ -40,7 +41,7 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.amazonaws.services.s3.transfer.Download;
-import com.amazonaws.services.s3.transfer.TransferManager;
+import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -55,19 +56,29 @@ public class AmazonS3Manager {
     private AmazonS3Manager() {
     }
 
-    public synchronized static AmazonS3Manager getInstance() {
+    public static synchronized AmazonS3Manager getInstance() {
         if (instance == null) {
             instance = new AmazonS3Manager();
+            
             CryptoTool cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
             Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
-                    
+
+            AmazonS3ClientBuilder builder = AmazonS3ClientBuilder.standard();
+            
+            String s3region = Configuration.get(Parameter.S3_REGION);
+            if (!s3region.isEmpty()) {
+                builder.withRegion(Regions.fromName(s3region));
+            }
+            
             String accessKey = cryptoTool.decryptByPattern(Configuration.get(Parameter.ACCESS_KEY_ID), CRYPTO_PATTERN);
             String secretKey = cryptoTool.decryptByPattern(Configuration.get(Parameter.SECRET_KEY), CRYPTO_PATTERN);
-
-            System.setProperty("aws.accessKeyId", accessKey);
-            System.setProperty("aws.secretKey", secretKey);
-
-            s3client = new AmazonS3Client(new SystemPropertiesCredentialsProvider());
+            if (!accessKey.isEmpty() && !secretKey.isEmpty()) {
+                BasicAWSCredentials creds = new BasicAWSCredentials(accessKey, secretKey);
+                builder.withCredentials(new AWSStaticCredentialsProvider(creds)).build();
+            }
+            
+            s3client = builder.build();
+            
         }
         return instance;
     }
@@ -295,6 +306,7 @@ public class AmazonS3Manager {
 
         int i = 0;
         int limit = 100;
+        boolean isTruncated = false;
         // by default S3 return only 1000 objects summary so need while cycle here
         do {
             LOGGER.info("looking for s3 artifact using iteration #" + i);
@@ -312,8 +324,9 @@ public class AmazonS3Manager {
                     }
                 }
             }
+            isTruncated = objBuilds.isTruncated();
             objBuilds = s3client.listNextBatchOfObjects(objBuilds);
-        } while (objBuilds.isTruncated() && ++i < limit);
+        } while (isTruncated && ++i < limit);
 
         if (latestBuild == null) {
             LOGGER.error("Unable to find S3 build artifact by pattern: " + pattern);
@@ -344,26 +357,25 @@ public class AmazonS3Manager {
      */
     public void download(final String bucketName, final String key, final File file, long pollingInterval) {
         LOGGER.info("App will be downloaded from s3.");
-        LOGGER.info(String.format("[Bucket name: %s] [Key: %s] [File: %s]", bucketName, key, file.getAbsolutePath()));
-        DefaultAWSCredentialsProviderChain credentialProviderChain = new DefaultAWSCredentialsProviderChain();
-        TransferManager tx = new TransferManager(
-                credentialProviderChain.getCredentials());
-        Download appDownload = tx.download(bucketName, key, file);
+        LOGGER.info("[Bucket name: {}] [Key: {}] [File: {}]", bucketName, key, file.getAbsolutePath());
+
+        Download appDownload = TransferManagerBuilder.standard()
+                .withS3Client(s3client)
+                .build()
+                .download(bucketName, key, file);
         try {
-            LOGGER.info("Transfer: " + appDownload.getDescription());
-            LOGGER.info("	State: " + appDownload.getState());
-            LOGGER.info("	Progress: ");
+            LOGGER.info("Transfer: {}", appDownload.getDescription());
+            LOGGER.info("\t State: {}", appDownload.getState());
+            LOGGER.info("\t Progress: ");
             // You can poll your transfer's status to check its progress
             while (!appDownload.isDone()) {
-                LOGGER.info("		transferred: " + (int) (appDownload.getProgress().getPercentTransferred() + 0.5) + "%");
+                LOGGER.info("\t\t transferred: {}%", (int) (appDownload.getProgress().getPercentTransferred() + 0.5));
                 CommonUtils.pause(pollingInterval);
             }
-            LOGGER.info("	State: " + appDownload.getState());
-            // appDownload.waitForCompletion();
+            LOGGER.info("\t State: {}", appDownload.getState());
         } catch (AmazonClientException e) {
             throw new RuntimeException("File wasn't downloaded from s3. See log: ".concat(e.getMessage()));
         }
-        // tx.shutdownNow();
     }
 
     /**

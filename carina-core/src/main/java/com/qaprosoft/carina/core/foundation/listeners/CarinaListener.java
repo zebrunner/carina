@@ -18,7 +18,6 @@ package com.qaprosoft.carina.core.foundation.listeners;
 import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +40,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.Assert;
 import org.testng.IClassListener;
 import org.testng.ISuite;
 import org.testng.ISuiteListener;
@@ -50,12 +48,7 @@ import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.SkipException;
-import org.testng.TestListenerAdapter;
-import org.testng.TestNG;
-import org.testng.xml.XmlClass;
-import org.testng.xml.XmlInclude;
 import org.testng.xml.XmlSuite;
-import org.testng.xml.XmlTest;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -120,6 +113,13 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     protected static boolean automaticDriversCleanup = true;
     
     protected boolean isRunLabelsRegistered = false;
+    
+    
+    private static final Pattern S3_BUCKET_PATTERN = Pattern.compile("s3:\\/\\/([a-zA-Z-0-9][^\\/]*)\\/(.*)");
+    private static final Pattern AZURE_CONTAINER_PATTERN = Pattern.compile("\\/\\/([a-z0-9]{3,24})\\.blob.core.windows.net\\/(?:(\\$root|(?:[a-z0-9](?!.*--)[a-z0-9-]{1,61}[a-z0-9]))\\/)?(.{1,1024})");
+    // appcenter://appName/platformName/buildType/version
+    private static final Pattern APPCENTER_PATTERN = Pattern.compile(
+            "appcenter:\\/\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)");
 
     public CarinaListener() {
         // Add shutdown hook
@@ -159,8 +159,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         IScreenshotRule autoScreenshotsRule = (IScreenshotRule) new AutoScreenshotRule();
         Screenshot.addScreenshotRule(autoScreenshotsRule);
 
-        updateAppPath();
-
         TestNameResolverRegistry.set(new ZebrunnerNameResolver());
         CompositeLabelResolver.addResolver(new TagManager());
         CompositeLabelResolver.addResolver(new PriorityManager());
@@ -182,8 +180,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             logger.setLevel(Level.getLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
         }
 
+        updateAppPath();
+        
         setThreadCount(suite);
-        onHealthCheck(suite);
         
         if (Configuration.getPlatform().equalsIgnoreCase(SpecialKeywords.API)) {
         //TODO: investigate this possible problem.
@@ -294,8 +293,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     @Override
     public void onTestFailure(ITestResult result) {
         LOGGER.debug("CarinaListener->onTestFailure");
-        String errorMessage = getFailureReason(result);
-        takeScreenshot("TEST FAILED - " + errorMessage);
+        takeScreenshot();
         onTestFinish(result);
         super.onTestFailure(result);
     }
@@ -303,8 +301,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     @Override
     public void onTestSkipped(ITestResult result) {
         LOGGER.debug("CarinaListener->onTestSkipped");
-        String errorMessage = getFailureReason(result);
-        takeScreenshot("TEST SKIPPED - " + errorMessage, false);
+        takeScreenshot();
         onTestFinish(result);
         super.onTestSkipped(result);
     }
@@ -375,10 +372,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     public void onFinish(ISuite suite) {
         LOGGER.debug("CarinaListener->onFinish(ISuite suite)");
         try {
-            // TODO: quitAllDivers forcibly
-            ReportContext.removeTempDir(); // clean temp artifacts directory
-            // HtmlReportGenerator.generate(ReportContext.getBaseDir().getAbsolutePath());
-
             String browser = getBrowser();
             // String suiteName = getSuiteName(context);
             String title = getTitle(suite.getXmlSuite());
@@ -415,18 +408,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
             printExecutionSummary(EmailReportItemCollector.getTestResults());
 
-            TestResultType suiteResult = EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
-            switch (suiteResult) {
-            case SKIP_ALL:
-                Assert.fail("All tests were skipped! Analyze logs to determine possible configuration issues.");
-                break;
-            case SKIP_ALL_ALREADY_PASSED:
-                LOGGER.info(
-                        "Nothing was executed in rerun mode because all tests already passed and registered in Zafira Repoting Service!");
-                break;
-            default:
-                // do nothing
-            }
             LOGGER.debug("Finish email report generation.");
 
         } catch (Exception e) {
@@ -520,52 +501,62 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         }
     }
 
+    @Deprecated
     protected void putS3Artifact(String key, String path) {
         AmazonS3Manager.getInstance().put(Configuration.get(Parameter.S3_BUCKET_NAME), key, path);
     }
 
+    @Deprecated
     protected S3Object getS3Artifact(String bucket, String key) {
         return AmazonS3Manager.getInstance().get(Configuration.get(Parameter.S3_BUCKET_NAME), key);
     }
 
+    @Deprecated
     protected S3Object getS3Artifact(String key) {
         return getS3Artifact(Configuration.get(Parameter.S3_BUCKET_NAME), key);
     }
 
+    @Deprecated
     protected void putAzureArtifact(String remotePath, String localPath) {
         AzureManager.getInstance().put(Configuration.get(Parameter.AZURE_CONTAINER_NAME), remotePath, localPath);
     }
 
+    @Deprecated
     protected void getAzureArtifact(String bucket, String remotePath, File localPath) {
         AzureManager.getInstance().download(bucket, remotePath, localPath);
     }
 
     private static void updateAppPath() {
-        if (!Configuration.get(Parameter.AZURE_ACCESS_KEY_TOKEN).isEmpty()) {
-            updateAzureAppPath();
+        
+        String mobileAppPath = Configuration.getMobileApp();
+        Matcher matcher = S3_BUCKET_PATTERN.matcher(mobileAppPath);
+        LOGGER.debug("Analyzing if mobile app is located on S3...");
+        if (matcher.find()) {
+            mobileAppPath = updateS3AppPath(mobileAppPath);
         }
 
-        if (!Configuration.get(Parameter.APPCENTER_TOKEN).isEmpty()) {
-            updateAppCenterAppPath();
+        matcher = AZURE_CONTAINER_PATTERN.matcher(mobileAppPath);
+        LOGGER.debug("Analyzing if mobile app is located on Azure...");
+        if (matcher.find()) {
+            mobileAppPath = updateAzureAppPath(mobileAppPath);
         }
-
-        // AWS S3 is preferable and has higher priority
-        if (!Configuration.get(Parameter.ACCESS_KEY_ID).isEmpty()) {
-            updateS3AppPath();
+        
+        matcher = APPCENTER_PATTERN.matcher(mobileAppPath);
+        LOGGER.debug("Analyzing if mobile_app is located on AppCenter...");
+        if (matcher.find()) {
+            mobileAppPath = updateAppCenterAppPath(mobileAppPath);
+        }
+        
+        if (!mobileAppPath.isEmpty()) {
+            Configuration.setMobileApp(mobileAppPath);
         }
     }
 
     /**
      * Method to update MOBILE_APP path in case if apk is located in Hockey App.
      */
-    private static void updateAppCenterAppPath() {
-        // appcenter://appName/platformName/buildType/version
-        Pattern APPCENTER_PATTERN = Pattern.compile(
-                "appcenter:\\/\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)");
-        String mobileAppPath = Configuration.getMobileApp();
+    private static String updateAppCenterAppPath(String mobileAppPath) {
         Matcher matcher = APPCENTER_PATTERN.matcher(mobileAppPath);
-
-        LOGGER.info("Analyzing if mobile_app is located on AppCenter...");
         if (matcher.find()) {
             LOGGER.info("app artifact is located on AppCenter...");
             String appName = matcher.group(1);
@@ -574,25 +565,22 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             String version = matcher.group(4);
 
             //TODO: test if generated appcenter download url is valid
-            String presignedAppUrl = AppCenterManager.getInstance().getDownloadUrl(appName, platformName, buildType,
+            mobileAppPath = AppCenterManager.getInstance().getDownloadUrl(appName, platformName, buildType,
                     version);
 
-            Configuration.setMobileApp(presignedAppUrl);
-
+        } else {
+            LOGGER.error("Unable to parse '{}' path using AppCenter pattern", mobileAppPath);
         }
+        return mobileAppPath;
     }
 
     /**
      * Method to update MOBILE_APP path in case if apk is located in s3 bucket.
      */
-    private static void updateS3AppPath() {
-        Pattern S3_BUCKET_PATTERN = Pattern.compile("s3:\\/\\/([a-zA-Z-0-9][^\\/]*)\\/(.*)");
+    private static String updateS3AppPath(String mobileAppPath) {
         // get app path to be sure that we need(do not need) to download app
         // from s3 bucket
-        String mobileAppPath = Configuration.getMobileApp();
         Matcher matcher = S3_BUCKET_PATTERN.matcher(mobileAppPath);
-
-        LOGGER.info("Analyzing if mobile app is located on S3...");
         if (matcher.find()) {
             LOGGER.info("app artifact is located on s3...");
             String bucketName = matcher.group(1);
@@ -619,22 +607,19 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
             // generate presign url explicitly to register link as run artifact
             long hours = 72L*1000*60*60; // generate presigned url for nearest 3 days
-            String presignedAppUrl = AmazonS3Manager.getInstance().generatePreSignUrl(bucketName, key, hours).toString();
-            Configuration.setMobileApp(presignedAppUrl);
+            mobileAppPath = AmazonS3Manager.getInstance().generatePreSignUrl(bucketName, key, hours).toString();
+        } else {
+            LOGGER.error("Unable to parse '{}' path using S3 pattern", mobileAppPath);
         }
+        
+        return mobileAppPath;
     }
 
     /**
      * Method to update MOBILE_APP path in case if apk is located in Azure storage.
      */
-    private static void updateAzureAppPath() {
-        Pattern AZURE_CONTAINER_PATTERN = Pattern.compile("\\/\\/([a-z0-9]{3,24})\\.blob.core.windows.net\\/(?:(\\$root|(?:[a-z0-9](?!.*--)[a-z0-9-]{1,61}[a-z0-9]))\\/)?(.{1,1024})");
-
-        String mobileAppPath = Configuration.getMobileApp();
+    private static String updateAzureAppPath(String mobileAppPath) {
         Matcher matcher = AZURE_CONTAINER_PATTERN.matcher(mobileAppPath);
-
-        LOGGER.info("Analyzing if mobile app is located on Azure...");
-
         if (matcher.find()) {
             LOGGER.info("app artifact is located on Azure...");
             String accountName = matcher.group(1);
@@ -671,108 +656,23 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 LOGGER.error("Azure app path update exception detected!", exception);
             }
 
-            Configuration.setMobileApp(file.getAbsolutePath());
+            mobileAppPath = file.getAbsolutePath();
 
             // try to redefine app_version if it's value is latest or empty
             String appVersion = Configuration.get(Parameter.APP_VERSION);
             if (appVersion.equals("latest") || appVersion.isEmpty()) {
                 Configuration.setBuild(file.getName());
             }
+        } else {
+            LOGGER.error("Unable to parse '{}' path using Azure pattern", mobileAppPath);
         }
+        
+        return mobileAppPath;
     }
 
     protected void skipExecution(String message) {
         CurrentTest.revertRegistration();
         throw new SkipException(message);
-    }
-
-    protected void onHealthCheck(ISuite suite) {
-        String healthCheckClass = Configuration.get(Parameter.HEALTH_CHECK_CLASS);
-        if (suite.getParameter(Parameter.HEALTH_CHECK_CLASS.getKey()) != null) {
-            // redefine by suite arguments as they have higher priority
-            healthCheckClass = suite.getParameter(Parameter.HEALTH_CHECK_CLASS.getKey());
-        }
-
-        String healthCheckMethods = Configuration.get(Parameter.HEALTH_CHECK_METHODS);
-        if (suite.getParameter(Parameter.HEALTH_CHECK_METHODS.getKey()) != null) {
-            // redefine by suite arguments as they have higher priority
-            healthCheckMethods = suite.getParameter(Parameter.HEALTH_CHECK_METHODS.getKey());
-        }
-
-        String[] healthCheckMethodsArray = null;
-        if (!healthCheckMethods.isEmpty()) {
-            healthCheckMethodsArray = healthCheckMethods.split(",");
-        }
-        checkHealth(suite, healthCheckClass, healthCheckMethodsArray);
-    }
-
-    private void checkHealth(ISuite suite, String className, String[] methods) {
-
-        if (className.isEmpty()) {
-            return;
-        }
-
-        // create runtime XML suite for health check
-        XmlSuite xmlSuite = new XmlSuite();
-        xmlSuite.setName("HealthCheck XmlSuite - " + className);
-
-        XmlTest xmlTest = new XmlTest(xmlSuite);
-        xmlTest.setName("HealthCheck TestCase");
-        XmlClass xmlHealthCheckClass = new XmlClass();
-        xmlHealthCheckClass.setName(className);
-
-        // TestNG do not execute missed methods so we have to calulate expected
-        // methods count to handle potential mistakes in methods naming
-        int expectedMethodsCount = -1;
-        if (methods != null) {
-            // declare particular methods if they are provided
-            List<XmlInclude> methodsToRun = constructIncludes(methods);
-            expectedMethodsCount = methodsToRun.size();
-            xmlHealthCheckClass.setIncludedMethods(methodsToRun);
-        }
-
-        xmlTest.setXmlClasses(Arrays.asList(new XmlClass[] { xmlHealthCheckClass }));
-        xmlSuite.setTests(Arrays.asList(new XmlTest[] { xmlTest }));
-
-        LOGGER.info("HealthCheck '" + className + "' is started.");
-        LOGGER.debug("HealthCheck suite content:" + xmlSuite.toXml());
-
-        // Second TestNG process to run HealthCheck
-        TestNG testng = new TestNG();
-        testng.setXmlSuites(Arrays.asList(xmlSuite));
-
-        TestListenerAdapter tla = new TestListenerAdapter();
-        testng.addListener(tla);
-
-        testng.run();
-        synchronized (this) {
-            boolean passed = false;
-            if (expectedMethodsCount == -1) {
-                if (tla.getPassedTests().size() > 0 && tla.getFailedTests().size() == 0
-                        && tla.getSkippedTests().size() == 0) {
-                    passed = true;
-                }
-            } else {
-                LOGGER.info("Expected passed tests count: " + expectedMethodsCount);
-                if (tla.getPassedTests().size() == expectedMethodsCount && tla.getFailedTests().size() == 0
-                        && tla.getSkippedTests().size() == 0) {
-                    passed = true;
-                }
-            }
-            if (passed) {
-                LOGGER.info("HealthCheck suite '" + className + "' is finished successfully.");
-            } else {
-                throw new SkipException("Skip test(s) due to health check failures for '" + className + "'");
-            }
-        }
-    }
-
-    private List<XmlInclude> constructIncludes(String... methodNames) {
-        List<XmlInclude> includes = new ArrayList<XmlInclude>();
-        for (String eachMethod : methodNames) {
-            includes.add(new XmlInclude(eachMethod));
-        }
-        return includes;
     }
 
     /*
@@ -842,11 +742,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
          * To make possible to parse correctly we had to reuse external parser and private getAttributeValue
         */
         
-        if (SpecialKeywords.CUSTOM.equalsIgnoreCase(R.CONFIG.get(Parameter.THREAD_COUNT.getKey()))) {
-            LOGGER.info("Custom thread count manipulation is enabled. Carina will skip any updates with thread count...");
-            return;
-        }
-
         if (Configuration.getThreadCount()>= 1) {
             // use thread-count from config.properties
             suite.getXmlSuite().setThreadCount(Configuration.getThreadCount());
@@ -913,7 +808,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         // register testrail cases...
         Set<String> trCases = getTestRailCasesUuid(result);
         for (String trCase : trCases) {
-            TestRail.setCaseId(trCase);
+            TestRail.setTestCaseId(trCase);
         }
 
         // register qtest cases...
@@ -965,32 +860,32 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         }
     }
     
-    private String takeScreenshot(String msg) {
-        return takeScreenshot(msg, true);
-    }
-    
-    private String takeScreenshot(String msg, boolean isFullSize) {
-        String screenId = "";
-
+    /*
+     * Capture screenshots for all available drivers after test fail/skip.
+     * Request full size error screenshots if allowed by IScreenshotRules (allow_fullsize_screenshot property)
+     * 
+     * @param msg String comment
+     *  
+     */
+    private void takeScreenshot() {
         ConcurrentHashMap<String, CarinaDriver> drivers = getDrivers();
 
         try {
             for (Map.Entry<String, CarinaDriver> entry : drivers.entrySet()) {
-                String driverName = entry.getKey();
                 WebDriver drv = entry.getValue().getDriver();
 
                 if (drv instanceof EventFiringWebDriver) {
                     drv = ((EventFiringWebDriver) drv).getWrappedDriver();
                 }
 
-                if (Screenshot.isEnabled()) {
-                    screenId = Screenshot.capture(drv, driverName + ": " + msg, isFullSize); // in case of failure
-                }
+                R.CONFIG.put(Parameter.ERROR_SCREENSHOT.getKey(), "true", true);
+                Screenshot.captureByRule(drv, "", true);
             }
         } catch (Throwable thr) {
             LOGGER.error("Failure detected on screenshot generation after failure: ", thr);
+        } finally {
+            R.CONFIG.put(Parameter.ERROR_SCREENSHOT.getKey(), "false", true);
         }
-        return screenId;
     }    
 
     public static class ShutdownHook extends Thread {

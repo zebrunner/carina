@@ -14,7 +14,7 @@ for (WebElement zipCode : zipCodes) {
 WebElement city = driver.findElement(By.id("city"));
 assertEquals("MyCityName", city.getText());
 ```
-Some of the typical problems for this type of Selenium test are:
+Some of the typical problems for this type of Selenium tests are:
 
 * Test cases are difficult to read
 * Changes in the UI break multiple tests, often in several places
@@ -71,7 +71,7 @@ public class ModelInfoPage extends AbstractPage {
 
 * Page should extend **com.qaprosoft.carina.core.gui.AbstractPage**
 * Use **com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement** instead of Selenium WebElement
-* Locate Page Object classes in src/main/java
+* Locate Page Object classes in `src/main/java`
 
 
 ### Implementation of UI Components
@@ -134,10 +134,44 @@ public class HomePage extends AbstractPage {
 
 * UI Object should extend **com.qaprosoft.carina.core.gui.AbstractUIObject**
 * You should call the super constructor **super(driver, searchContext)** where searchContext is an instance of **org.openqa.selenium.SearchContext**
-* Locate UI Object classes in src/main/java source folder
+* Locate UI Object classes in `src/main/java` source folder
+
+### Work with iframe
+Before working with an iframe, you need to understand that an iframe is a separate page. Therefore, if we need to work with the internal structure of an iframe, we need to create a separate class for it inherited from AbstractPage, in which we already paint its internal structure, for example:
+
+```
+public class Frame extends AbstractPage {
+
+    @FindBy(xpath = "//div[@class='tag-of-element']")
+    private ExtendedWebElement component;
+
+    public Frame(WebDriver driver) {
+        super(driver);
+    }
+
+    public void click() {
+        component.click();
+    }
+}
+```
+
+Let's suppose the iframe is a page component or another component. Then we have to designate it as ExtendedWebElement, for example:
+```
+ @FindBy(xpath = ".//iframe")
+ private ExtendedWebElement iframe;
+```
+
+If we need to perform actions on iframe components, we can do:
+
+```
+Frame frame = new Frame(driver);
+driver.switchTo().frame(iframe.getElement());
+frame.click();
+getDriver().switchTo().defaultContent();
+```
 
 ### Implementation of tests
-Carina framework uses TestNG for test organization. In general, test represents a manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:
+Carina framework uses TestNG for test organization. In general, a test represents a manipulation with Page Objects and additional validations of UI events. Here is a sample test implementation:
 ```
 public class WebSampleTest implements IAbstractTest {
     @Test()
@@ -167,14 +201,16 @@ It is good practice to implement all elements search logic of Page Object/UI Obj
 
 * Test class should implement **com.qaprosoft.carina.core.foundation.IAbstractTest**
 * Test method should start with **org.testng.annotations.Test** annotation
-* Use **getDriver()** method to get driver instance in the test
-* Locate tests in src/test/java source folder
+* Use **getDriver()** method to get driver instance in the test. 
+  > 1st call of this method will start a driver based on default capabilities.
+* Locate tests in `src/test/java` source folder
 
 ### Test configuration
 There are a few critical properties in a _config.properties file which are required for web test execution:
-
-* url=http://www.gsmarena.com
-* capabilities.browserName=chrome
+```
+url=http://www.gsmarena.com
+capabilities.browserName=chrome
+```
 
 The implemented test cases should be placed in a TestNG xml file according to the test group the test belongs to. You can find more details about TestNG configuration in the [official documentation](http://testng.org/doc/documentation-main.html).
 ```xml
@@ -193,13 +229,13 @@ The implemented test cases should be placed in a TestNG xml file according to th
 
 ### Page opening strategy
 
-Determines how carina detects whether expected page is opened:
+Determines how Carina detects whether the expected page is opened:
 
-* By Url. (by default)
+* By URL (by default)
 * By Element presence on the page
 * By URL and Element
 
-To check if page was opened is used: 
+To check if a page was opened, you can use the following: 
 ```
 page.isPageOpened();
 //or
@@ -208,180 +244,115 @@ page.assertPageOpened();  // equals Assert.assertTrue(page.isPageOpened(),"PageN
 
 Page opening strategy configuration can be set in several places:
 
-1) in [_config.properties](http://zebrunner.github.io/carina/configuration/). This determines whole project page open strategy.
+1) in [_config.properties](http://zebrunner.github.io/carina/configuration/). This determines the whole project page open strategy.
 
-2) In page.class. This overrides global page opening strategy for a specific page.
-
-	```
-	public class Page extends AbstractPage {
-
-	    public Page(WebDriver driver){
+2) In page class. This overrides global page opening strategy for a specific page.
+```
+public class Page extends AbstractPage {
+	public Page(WebDriver driver){
 		super(driver);
 		setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
-	    }
 	}
-	```
+}
+```
 	
-3) In test.class. This also overrides global page opening strategy for a specific page.
-
-	```
-	@Test
-	public void test(){
-		HomePage homePage=new HomePage(getDriver());
-		homePage.open();
-		homePage.setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
-	}
-	```
+3) In test class. This also overrides global page opening strategy for a specific page.
+```
+@Test
+public void test(){
+	HomePage homePage=new HomePage(getDriver());
+	homePage.open();
+	homePage.setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
+}
+```
 
 Strategy usage examples:
 
 By URL
 	
-	```
-	//This is a default value. To use it you need to set a real page urls into your page classes.
-	
-	private final String specificPageUrl = "https://www.gsmarena.com/specific/url";
+```
+//This is a default value. To use it, you need to set a real page URLs into your page classes.
+private final String specificPageUrl = "https://www.gsmarena.com/specific/url";
 
-	public Page(WebDriver driver) {
-	    super(driver);
-	    setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
+public Page(WebDriver driver) {
+	super(driver);
+	setPageOpeningStrategy(PageOpeningStrategy.BY_URL);
 
-	    setPageAbsoluteURL(specificPageUrl);    //set's full url
-	    //or
-	    setPageURL("/specific/url");            //add's String to url from _config_properties
-	}
-	```
+	setPageAbsoluteURL(specificPageUrl); //set's full url
+	//or
+	setPageURL("/specific/url"); //add's String to url from _config_properties
+}
+```
 
 By Element
-
-	```
-	//To use this strategy, you need to specify ui load marker.
+```
+//To use this strategy, you need to specify ui load marker.
 	
-	@FindBy(id = "id")
-	private ExtendedWebElement element;
+@FindBy(id = "id")
+private ExtendedWebElement element;
 
-	public Page(WebDriver driver) {
-	    super(driver);
+public Page(WebDriver driver) {
+	super(driver);
 
-	    setPageOpeningStrategy(PageOpeningStrategy.BY_ELEMENT);
-	    setUiLoadedMarker(element);
-	}
-	```
+	setPageOpeningStrategy(PageOpeningStrategy.BY_ELEMENT);
+	setUiLoadedMarker(element);
+}
+```
 
 By URL and Element
+```
+private final String specificPageUrl = "https://www.gsmarena.com/specific/url";
 
-	```
-	private final String specificPageUrl = "https://www.gsmarena.com/specific/url";
+@FindBy(id = "id")
+private ExtendedWebElement element;
 
-	@FindBy(id = "id")
-	private ExtendedWebElement element;
+public Page(WebDriver driver) {
+	super(driver);
 
-	public Page(WebDriver driver) {
-	    super(driver);
-
-	    setPageOpeningStrategy(PageOpeningStrategy.BY_URL_AND_ELEMENT);
-	    setUiLoadedMarker(element);
-	    setPageAbsoluteURL(specificPageUrl);
-	}
-	```
+	setPageOpeningStrategy(PageOpeningStrategy.BY_URL_AND_ELEMENT);
+	setUiLoadedMarker(element);
+	setPageAbsoluteURL(specificPageUrl);
+}
+```
 
 ### Element loading strategy
 
-Determines how carina detects appearing of web elements on page
+Determines how carina detects appearing of web elements on page:
 
 * By presence. Carina waits for appearance of web elements in page DOM model.
-* By visibility. Carina waits until web elements would be visible in page.
+* By visibility. Carina waits until web elements are visible in page.
 * By presence or visibility (default).
 
-> It is recommended to use _element_loading_strategy=BY_VISIBILITY_ because in some cases condition with presence happens faster but elements are still not accessible due to invisibility at this short period of time.
+> It is recommended to use _element_loading_strategy=BY_VISIBILITY_ because in some cases, condition with presence happens faster but elements are still not accessible due to invisibility at this short period of time.
 
-Element loading strategy could be set at the same places as **Page opening strategy**.
+Element loading strategy can be set at the same places as **Page opening strategy**.
 
-To check if element presence:
+To check if the element is present:
 ```
 Component component = Page.getComponent();
-component.assertUIObjectPresent();      // equals to Assert.assertTrue(component.isUIObjectPresent(),"UI object componentName does not present!");
 
-component.assertUIObjectNotPresent();   // equals to Assert.assertTrue(!component.isUIObjectPresent(),"UI object componentName presents!");
+// equals to Assert.assertTrue(component.isUIObjectPresent(),"UI object componentName does not present!");
+component.assertUIObjectPresent();
+
+// equals to Assert.assertTrue(!component.isUIObjectPresent(),"UI object componentName presents!");
+component.assertUIObjectNotPresent(); 
 ```
->Dynamic elements loading. 
+> Dynamic elements loading. 
 **waitForJSToLoad()** method was introduced in AbstractPage class. It uses JS under the hood and helps to wait till all the dynamic web elements on the page are loaded.
 
-###Tricks
-####Independent tests is the best way for the automation!
-A correct example:
-```
-//The right way to write tests:
-public class WebSampleTest implements IAbstractTest {
-    @Test()
-    public void testCompareModels() {
-	// Open GSM Arena home page and verify page is opened
-	HomePage homePage = new HomePage(getDriver());
-	homePage.open();
-	Assert.assertTrue(homePage.isPageOpened(), "Home page is not opened");
-	// Open model compare page
-	FooterMenu footerMenu = homePage.getFooterMenu();
-	Assert.assertTrue(footerMenu.isUIObjectPresent(2), "Footer menu wasn't found!");
-	CompareModelsPage comparePage = footerMenu.openComparePage();
-	// Compare 3 models
-	List<ModelSpecs> specs = comparePage.compareModels("Samsung Galaxy J3", "Samsung Galaxy J5", "Samsung Galaxy J7 Pro");
-	// Verify model announced dates
-	SoftAssert softAssert = new SoftAssert();
-	softAssert.assertEquals(specs.get(0).readSpec(SpecType.ANNOUNCED), "2016, March 31");
-	softAssert.assertEquals(specs.get(1).readSpec(SpecType.ANNOUNCED), "2015, June 19");
-	softAssert.assertEquals(specs.get(2).readSpec(SpecType.ANNOUNCED), "2017, June");
-	softAssert.assertAll();
-    }
-}
-```
-Use dependsOnMethods only if it is really required by test login:
-```
-public class WebSampleSingleDriver implements IAbstractTest {
-    HomePage homePage = null;
-    CompareModelsPage comparePage = null;
-    List<ModelSpecs> specs = new ArrayList<>();
+###FAQ
+**What are the benefits of the AbstractUIObject?**
 
-    @BeforeSuite
-    public void startDriver() {
-        // Open GSM Arena home page and verify page is opened
-        homePage = new HomePage(getDriver());
-    }
-    
-    @Test
-    public void testOpenPage() {
-        homePage.open();
-        Assert.assertTrue(homePage.isPageOpened(), "Home page is not opened");
-    }
-    
-    @Test(dependsOnMethods="testOpenPage") //for dependent tests Carina keeps driver sessions by default
-    public void testOpenCompare() {
-        // Open GSM Arena home page and verify page is opened
-        // Open model compare page
-        FooterMenu footerMenu = homePage.getFooterMenu();
-        Assert.assertTrue(footerMenu.isUIObjectPresent(2), "Footer menu wasn't found!");
-        comparePage = footerMenu.openComparePage();
+The biggest advantage of AbstractUIObject(s) is that you have a single place of truth to declare elements and later change the updated locator in one place.
+It also allows to considerably speed up all kinds of refactoring, especially after significant changes by developers:)
+ 
+**Is it possible to automate WebApp written on React, Angular, Vue, Flutter, Google Web Toolkit and other popular and not frameworks?**
 
-    }
-    
-    @Test(dependsOnMethods="testOpenCompare") //for dependent tests Carina keeps driver sessions by default
-    public void testReadSpecs() {
-        // Compare 3 models
-        specs = comparePage.compareModels("Samsung Galaxy J3", "Samsung Galaxy J5", "Samsung Galaxy J7 Pro");
-    }
-    
-    @Test(dependsOnMethods="testReadSpecs") //for dependent tests Carina keeps driver sessions by default
-    public void testCompareModels() {
-        // Verify model announced dates
-        SoftAssert() softAssert = new SoftAssert();
-        softAssert.assertEquals(specs.get(0).readSpec(SpecType.ANNOUNCED), "2016, March 31");
-        softAssert.assertEquals(specs.get(1).readSpec(SpecType.ANNOUNCED), "2015, June 19");
-        softAssert.assertEquals(specs.get(2).readSpec(SpecType.ANNOUNCED), "2017, June");
-        softAssert.assertAll();
-    }
-}
-```
-#### Operate with web elements in page classes only!
-The correct way:
+Carina is a Selenium-based framework so no limitations at this point. Moreover, playing with the page opening and element loading strategies, you can tune this test automation framework to any tool set.
+
+**Can I operate with Page elements on test classes layer?**
+
+In general, it is not prohibited, but **not recommended!** Isolating page elements by `private` access modificator allows you to control the implementation in the single Page Object class. 
 ```
 //In the page class:
 @FindBy(id = "js-lang-list-button")
@@ -417,33 +388,42 @@ public void someTest() {
    WikipediaLocalePage wikipediaLocalePage = wikipediaHomePage.goToWikipediaLocalePage(getDriver());
 }
 ```
-An unwanted approach:
+**How to declare and use an ExtendedWebElement with dynamic xpath?**
+
+In previous versions of Carina, it was possible to search for an element using a dynamic xpath using such code:
 ```
-//In the page class:
-@FindBy(id = "js-lang-list-button")
-public ExtendedWebElement langListBtn;
+   ExtendedWebElement spec = findExtendedWebElement(By.xpath(
+                        String.format("//td[@class='nfo'][%d]//a[text()='%s']", "My link", 1)));
+```
+
+However, this element search format is now deprecated and not recommended to use. There is more convenient way to search:
+
+1) Declare an element using the `@FindBy` annotation and specify a locator based on the convention used by the [Formatter](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Formatter.html):
+```
+@FindBy(xpath = "//a[text()='%s']")
+private ExtendedWebElement link;
     
-@FindBy(xpath = "//div[@id='js-lang-lists']//a")
-private List<ExtendedWebElement> langList;
+@FindBy(xpath = "//td[@class='nfo'][%d]")
+private ExtendedWebElement cell;
 
-public List<ExtendedWebElement> getLangList(){
-   return langList;
-}
+@FindBy(xpath = "//td[@class='nfo'][%d]//a[text()='%s']")
+private ExtendedWebElement cellLink
+```
 
+2) In code where these elements will be used, use the `format` method to format the locator and create an ExtendedWebElement based on it for later use:
+```
+// a link that have the text "My link"
+link.format("My link")
 
-//In the test class:
-public void someTest() {
-   WikipediaHomePage wikipediaHomePage = new WikipediaHomePage(getDriver());
-   wikipediaHomePage.open();
-   wikipediaHomePage.langListBtn.clickIfPresent();
-   WikipediaLocalePage wikipediaLocalePage = null;
-    for (ExtendedWebElement languageBtn : wikipediaHomePage.getLangList()) {
-         String localeStr = Configuration.get(Configuration.Parameter.LOCALE);
-         Locale locale = parseLocale(localeStr);
-         if (languageBtn.getAttribute("lang").equals(locale.getLanguage())) {
-           languageBtn.click();
-           wikipediaLocalePage = new WikipediaLocalePage(driver);
-         }
-    }
-}
+// td tag with class 'nfo' by index 2
+cell.format(2)
+
+// a link that have the text "My link" that  is in the td tag with class 'nfo' by index 2
+cellLink.format(2, "My link");
+```
+
+3) As a result of calling this method, we get a specific ExtendedWebElement, which we can use in the future, for example:
+```
+//getting text of element
+cell.format("My link").getText();
 ```

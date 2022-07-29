@@ -16,7 +16,7 @@ carina-demo
 
 ![src/test/java](img/002-Project-structure.png)
 
-* **src/test/resources** - contains TestNG xml files, API templates and XLS/CSV data providers etc
+* **src/test/resources** - contains TestNG xml files, API templates and XLS/CSV data providers, etc.
 
 ![src/test/resources](img/003-Project-structure.png)
 

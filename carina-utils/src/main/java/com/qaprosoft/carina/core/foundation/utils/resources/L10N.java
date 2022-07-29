@@ -55,12 +55,16 @@ public class L10N {
     private static ArrayList<ResourceBundle> resBoundles = new ArrayList<ResourceBundle>();
     private static Properties missedResources = new Properties();
     
-    private static SoftAssert mistakes = new SoftAssert();
+    private static SoftAssert mistakes;
+
 
     /**
-     * Load L10N resource bundle.
+     * Load L10N resource bundle corresponding to a specific locale.
+     * If called setLocale function in the test, must be called to reload resources
      */    
     public static void load() {
+        // #1679: L10N: made assertion threads dependent
+        mistakes = new SoftAssert();
         List<String> loadedResources = new ArrayList<String>();
         try {
 
@@ -143,6 +147,8 @@ public class L10N {
      *
      */    
     public static void load(ArrayList<ResourceBundle> resources) {
+        // #1679: L10N: made assertion threads dependent
+        mistakes = new SoftAssert();
         resBoundles = resources;
     }
     
@@ -172,7 +178,9 @@ public class L10N {
     
     /**
      * Verify that ExtendedWebElement text is correctly localized.
-     *
+     * Called automatically when an action is performed on an element
+     * marked with the Localized annotation (getText, hover, etc.)
+     * 
      * @param element IWebElement
      * @return boolean
      */
@@ -209,7 +217,7 @@ public class L10N {
      */       
     public static void assertAll() {
         mistakes.assertAll();
-    }    
+    }
     
     /**
      * Override default locale.

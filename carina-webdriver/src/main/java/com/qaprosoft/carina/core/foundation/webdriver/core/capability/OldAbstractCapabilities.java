@@ -15,7 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability;
 
-import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -115,6 +114,8 @@ public abstract class OldAbstractCapabilities {
             capabilities = addFirefoxOptions(capabilities);
         } else if (BrowserType.CHROME.equalsIgnoreCase(browser)) {
             capabilities = addChromeOptions(capabilities);
+        } else if (BrowserType.EDGE.equalsIgnoreCase(browser)) {
+            capabilities = addEdgeOptions(capabilities);
         }
 
         if (Configuration.getBoolean(Parameter.HEADLESS)) {
@@ -180,7 +181,30 @@ public abstract class OldAbstractCapabilities {
 
         return null;
     }
-    
+
+    private DesiredCapabilities addEdgeOptions(DesiredCapabilities caps) {
+        Map<String, Object> prefs = new HashMap<>();
+        Map<String, Object> edgeOptions = new HashMap<>();
+
+        boolean needsPrefs = false;
+
+        if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD)) {
+            prefs.put("download.prompt_for_download", false);
+            if (!"zebrunner".equalsIgnoreCase(R.CONFIG.get("capabilities.provider"))) {
+                prefs.put("download.default_directory",
+                        ReportContext.getArtifactsFolder().getAbsolutePath());
+            }
+            needsPrefs = true;
+        }
+
+        if (needsPrefs) {
+            edgeOptions.put("prefs", prefs);
+        }
+        caps.setCapability("ms:edgeChrominum", true);
+        caps.setCapability("ms:edgeOptions", edgeOptions);
+
+        return caps;
+    }
 
     private DesiredCapabilities addChromeOptions(DesiredCapabilities caps) {
         // add default carina options and arguments
@@ -202,7 +226,10 @@ public abstract class OldAbstractCapabilities {
 
         if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD)) {
             chromePrefs.put("download.prompt_for_download", false);
-            chromePrefs.put("download.default_directory", getAutoDownloadFolderPath());
+            if (!"zebrunner".equalsIgnoreCase(R.CONFIG.get("capabilities.provider"))) {
+                // don't override auto download dir for Zebrunner Selenium Grid (Selenoid)
+                chromePrefs.put("download.default_directory", ReportContext.getArtifactsFolder().getAbsolutePath());
+            }
             chromePrefs.put("plugins.always_open_pdf_externally", true);
             needsPrefs = true;
         }
@@ -372,7 +399,10 @@ public abstract class OldAbstractCapabilities {
         if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD) && !(Configuration.isNull(Configuration.Parameter.AUTO_DOWNLOAD_APPS)
                 || "".equals(Configuration.get(Configuration.Parameter.AUTO_DOWNLOAD_APPS)))) {
             profile.setPreference("browser.download.folderList", 2);
-            profile.setPreference("browser.download.dir", getAutoDownloadFolderPath());
+            if (!"zebrunner".equalsIgnoreCase(R.CONFIG.get("capabilities.provider"))) {
+                // don't override auto download dir for Zebrunner Selenium Grid (Selenoid)
+                profile.setPreference("browser.download.dir", ReportContext.getArtifactsFolder().getAbsolutePath());
+            }
             profile.setPreference("browser.helperApps.neverAsk.saveToDisk", Configuration.get(Configuration.Parameter.AUTO_DOWNLOAD_APPS));
             profile.setPreference("browser.download.manager.showWhenStarting", false);
             profile.setPreference("browser.download.saveLinkAsFilenameTimeout", 1);
@@ -392,25 +422,4 @@ public abstract class OldAbstractCapabilities {
         return profile;
     }
     
-    
-    private String getAutoDownloadFolderPath() {
-        // use custom folder for auto download
-        String autoDownloadFolder = Configuration.get(Parameter.AUTO_DOWNLOAD_FOLDER);
-        File autoDownloadPath;
-
-        if (!autoDownloadFolder.isEmpty()) {
-            autoDownloadPath = new File(autoDownloadFolder);
-            boolean isCreated = autoDownloadPath.exists() && autoDownloadPath.isDirectory();
-            if (!isCreated) {
-                isCreated = autoDownloadPath.mkdir();
-            } else {
-                LOGGER.info("Folder for auto download already exists: " + autoDownloadPath.getAbsolutePath());
-            }
-        } else {
-            // if no AUTO_DOWNLOAD_FOLDER defined use artifacts folder
-            autoDownloadPath = ReportContext.getArtifactsFolder();
-        }
-
-        return autoDownloadPath.getAbsolutePath();
-    }
 }

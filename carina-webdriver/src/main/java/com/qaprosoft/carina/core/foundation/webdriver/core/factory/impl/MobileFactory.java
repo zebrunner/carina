@@ -65,6 +65,11 @@ public class MobileFactory extends OldAbstractFactory {
                 && (customCapabilities.toLowerCase().contains("localhost") || customCapabilities.toLowerCase().contains("browserstack") || customCapabilities.toLowerCase().contains("saucelabs"))) {
             mobilePlatformName = SpecialKeywords.CUSTOM;
         }
+        
+        if (seleniumHost.contains("hub.browserstack.com")) {
+            //#1786 mobile drivers on browserstack should be started via CUSTOM - RemoteWebDriver driver
+            mobilePlatformName = SpecialKeywords.CUSTOM;
+        }
 
         LOGGER.debug("selenium: " + seleniumHost);
 
