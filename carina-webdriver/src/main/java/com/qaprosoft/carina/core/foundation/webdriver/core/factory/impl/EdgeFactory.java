@@ -18,12 +18,15 @@ import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleni
 
 import io.appium.java_client.remote.options.SupportsAutomationNameOption;
 
+/**
+ * EdgeFactory creates instance {@link RemoteWebDriver} for Edge desktop testing
+ */
 public class EdgeFactory extends AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public WebDriver create(String testName, String seleniumHost) {
-        return this.create(testName, seleniumHost, null);
+    public WebDriver create(String testName, String hostURL) {
+        return this.create(testName, hostURL, null);
     }
 
     @Override
@@ -66,6 +69,5 @@ public class EdgeFactory extends AbstractFactory {
         }
 
         return false;
-
     }
 }

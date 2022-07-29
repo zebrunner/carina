@@ -12,13 +12,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstactCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
-public class FirefoxCapabilities extends AbstactCapabilities<FirefoxOptions> {
-
+public class FirefoxCapabilities extends AbstractCapabilities<FirefoxOptions> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static ArrayList<Integer> firefoxPorts = new ArrayList<Integer>();
+    private static ArrayList<Integer> firefoxPorts = new ArrayList<>();
 
     @Override
     public FirefoxOptions getCapabilities() {

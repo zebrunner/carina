@@ -8,11 +8,11 @@ import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstactCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
 import io.appium.java_client.ios.options.XCUITestOptions;
 
-public class XCUITestCapabilities extends AbstactCapabilities<XCUITestOptions> {
+public class XCUITestCapabilities extends AbstractCapabilities<XCUITestOptions> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
@@ -54,7 +54,7 @@ public class XCUITestCapabilities extends AbstactCapabilities<XCUITestOptions> {
     private void setLocaleAndLanguage(XCUITestOptions options) {
         // parse locale param as it has language and country by default like en_US
         String localeValue = Configuration.get(Configuration.Parameter.LOCALE);
-        LOGGER.debug("Default locale value is : " + localeValue);
+        LOGGER.debug("Default locale value is : {}", localeValue);
         String[] values = localeValue.split("_");
         if (values.length == 1) {
             // only locale is present!
@@ -62,7 +62,7 @@ public class XCUITestCapabilities extends AbstactCapabilities<XCUITestOptions> {
 
             String langValue = R.CONFIG.get("language");
             if (!langValue.isEmpty()) {
-                LOGGER.debug("Default language value is : " + langValue);
+                LOGGER.debug("Default language value is : {}", langValue);
                 // provide extra capability language only if it exists among config parameters...
                 options.setLanguage(langValue);
             }

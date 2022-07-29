@@ -19,12 +19,15 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFacto
 import io.appium.java_client.remote.AutomationName;
 import io.appium.java_client.remote.options.SupportsAutomationNameOption;
 
+/**
+ * CustomAndroidMobileFactory creates instance {@link RemoteWebDriver} for Android testing on browserstack and saucelabs
+ */
 public class CustomAndroidMobileFactory extends AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public WebDriver create(String testName, String seleniumHost) {
-        return this.create(testName, seleniumHost, null);
+    public WebDriver create(String testName, String hostURL) {
+        return this.create(testName, hostURL, null);
     }
 
     @Override
@@ -45,6 +48,7 @@ public class CustomAndroidMobileFactory extends AbstractFactory {
             throw new RuntimeException("Malformed selenium URL!", e);
         }
 
+        // for localhost, browserstack, saucelabs we do not create android driver
         RemoteWebDriver driver = new RemoteWebDriver(hostURL, uiAutomator2Options);
         registerDevice(driver);
         return driver;
@@ -54,8 +58,9 @@ public class CustomAndroidMobileFactory extends AbstractFactory {
      * Determines if the driver is suitable for the current capabilities
      */
     public static boolean isSuitable(Capabilities capabilities) {
-        // for localhost, browserstack, saucelabs we do not create android driver
         String customCapabilities = Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES);
+
+        // todo add rule for browser, if this type of driver is not used for browser testing
 
         if (Platform.ANDROID.is(capabilities.getPlatformName()) ||
                 (capabilities.getCapability(SupportsAutomationNameOption.AUTOMATION_NAME_OPTION) != null &&

@@ -21,14 +21,14 @@ import io.appium.java_client.remote.AutomationName;
 import io.appium.java_client.remote.options.SupportsAutomationNameOption;
 
 /**
- * For native android testing and testing browser on android
+ * AndroidFactory creates instance {@link AndroidDriver} for Android application testing (applications and web)
  */
 public class AndroidFactory extends AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public WebDriver create(String testName, String seleniumHost) {
-        return this.create(testName, seleniumHost, null);
+    public WebDriver create(String testName, String hostURL) {
+        return this.create(testName, hostURL, null);
     }
 
     @Override
