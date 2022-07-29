@@ -18,15 +18,12 @@ import io.appium.java_client.remote.AutomationName;
 import io.appium.java_client.remote.options.SupportsAutomationNameOption;
 import io.appium.java_client.windows.WindowsDriver;
 
-/**
- * WindowsFactory creates instance {@link WebDriver} for Windows native application testing
- */
 public class WindowsFactory extends AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public WebDriver create(String testName, String hostURL) {
-        return this.create(testName, hostURL, null);
+    public WebDriver create(String testName, String seleniumHost) {
+        return this.create(testName, seleniumHost, null);
     }
 
     @Override
@@ -51,7 +48,7 @@ public class WindowsFactory extends AbstractFactory {
     }
 
     /**
-     * Determines if the windows driver is suitable for the current capabilities
+     * Determines if the driver is suitable for the current capabilities
      */
     public static boolean isSuitable(Capabilities capabilities) {
         if (Platform.WINDOWS.is(capabilities.getPlatformName())) {

@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstactCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.AndroidFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.ChromeFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.CustomAndroidMobileFactory;
@@ -46,22 +46,15 @@ import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.zebrunner.agent.core.webdriver.RemoteWebDriverFactory;
 
 /**
- * DriverFactory produces driver instance with capabilities according to
- * configuration
+ * DriverFactory produces driver instance with desired capabilities according to
+ * configuration.
  *
  * @author Alexey Khursevich (hursevich@gmail.com)
  */
 public class DriverFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    /**
-     * Creates new instance of {@link WebDriver} according to configuration capabilities
-     *
-     * @param testName todo add desctiption
-     * @param hostURL selenium/appium server URL
-     * @return instance of {@link WebDriver}
-     */
-    public static WebDriver create(String testName, String hostURL, Capabilities capabilities) {
+    public static WebDriver create(String testName, String seleniumHost, Capabilities capabilities) {
 		LOGGER.debug("DriverFactory start...");
         URL seleniumUrl = RemoteWebDriverFactory.getSeleniumHubUrl();
         if (seleniumUrl != null) {
@@ -70,9 +63,9 @@ public class DriverFactory {
         }
 
         AbstractFactory driverFactory = chooseDriverFactory(
-                capabilities == null ? AbstractCapabilities.getConfigurationCapabilities() : capabilities);
+                capabilities == null ? AbstactCapabilities.getConfigurationCapabilities() : capabilities);
 
-        WebDriver driver = driverFactory.create(testName, hostURL, capabilities);
+        WebDriver driver = driverFactory.create(testName, seleniumHost, capabilities);
         driver = driverFactory.registerListeners(driver, getEventListeners());
 
         LOGGER.debug("DriverFactory finish...");

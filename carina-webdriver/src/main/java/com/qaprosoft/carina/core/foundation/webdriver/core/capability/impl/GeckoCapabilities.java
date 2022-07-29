@@ -2,11 +2,11 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl;
 
 import org.openqa.selenium.Capabilities;
 
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstactCapabilities;
 
 import io.appium.java_client.gecko.options.GeckoOptions;
 
-public class GeckoCapabilities extends AbstractCapabilities<GeckoOptions> {
+public class GeckoCapabilities extends AbstactCapabilities<GeckoOptions> {
 
     @Override
     public GeckoOptions getCapabilities() {

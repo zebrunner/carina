@@ -19,14 +19,14 @@ import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleni
 import io.appium.java_client.remote.options.SupportsAutomationNameOption;
 
 /**
- * ChromeFactory creates instance {@link RemoteWebDriver} for Chrome desktop testing
+ * Desktop chrome browser
  */
 public class ChromeFactory extends AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public WebDriver create(String testName, String hostURL) {
-        return this.create(testName, hostURL, null);
+    public WebDriver create(String testName, String seleniumHost) {
+        return this.create(testName, seleniumHost, null);
     }
 
     @Override

@@ -100,8 +100,7 @@ public class CapabilitiesBuilder {
         }
 
         if (capabilities == null) {
-            throw new RuntimeException(
-                    "Cannot understand what type of driver should be chosen. Please, provide browser name or automation name or platform name");
+            throw new RuntimeException("Cannot understand what type of driver should be chosen. Please, provide browser name or automation name");
         }
 
         if (!Objects.equals(this.testName, StringUtils.EMPTY)) {
@@ -110,4 +109,5 @@ public class CapabilitiesBuilder {
 
         return capabilities;
     }
+
 }

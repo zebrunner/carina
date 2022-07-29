@@ -17,13 +17,12 @@ import io.appium.java_client.gecko.GeckoDriver;
 import io.appium.java_client.remote.AutomationName;
 import io.appium.java_client.remote.options.SupportsAutomationNameOption;
 
-// todo check is it work
 public class GeckoFactory extends AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public WebDriver create(String testName, String hostURL) {
-        return this.create(testName, hostURL, null);
+    public WebDriver create(String testName, String seleniumHost) {
+        return this.create(testName, seleniumHost, null);
     }
 
     @Override

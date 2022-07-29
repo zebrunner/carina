@@ -19,14 +19,14 @@ import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleni
 import io.appium.java_client.remote.options.SupportsAutomationNameOption;
 
 /**
- * FirefoxFactory creates instance {@link RemoteWebDriver} for Firefox desktop testing
+ * Desktop firefox browser
  */
 public class FirefoxFactory extends AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public WebDriver create(String testName, String hostURL) {
-        return this.create(testName, hostURL, null);
+    public WebDriver create(String testName, String seleniumHost) {
+        return this.create(testName, seleniumHost, null);
     }
 
     @Override

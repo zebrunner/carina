@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Proxy;
+import org.openqa.selenium.remote.CapabilityType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,30 +20,53 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.proxy.SystemProxy;
 
-public abstract class AbstractCapabilities<T extends Capabilities> {
+import io.appium.java_client.remote.options.SupportsBrowserNameOption;
+
+public abstract class AbstactCapabilities<T extends Capabilities> {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String CAPABILITIES_PREFIX = SpecialKeywords.CAPABILITIES + ".";
 
     /**
-     * Returns capabilities based on configuration capabilities plus default capabilities
+     * Returns capabilities consist from configuration capabilities plus options
+     * 
+     * @return capabilities
      */
     public abstract T getCapabilities();
 
     /**
      * Create capabilities safety from customCapabilities
+     * 
+     * @param customCapabilities capabilities
+     * @return capabilities
      */
     public abstract T createCapabilitiesFromCustom(Capabilities customCapabilities);
 
-    /**
-     * Returns capabilities based on configuration capabilities plus default capabilities and customCapabilities
-     */
     public abstract T getCapabilitiesWithCustom(Capabilities customCapabilities);
+
+    // todo add description (delete)
+    protected Capabilities getBrowserCapabilities(String browser, String testName) {
+        MutableCapabilities capabilities = new MutableCapabilities();
+        capabilities.setCapability(SupportsBrowserNameOption.BROWSER_NAME_OPTION, browser);
+
+        if (!IDriverPool.DEFAULT.equalsIgnoreCase(testName)) {
+            // #1573: remove "default" driver name capability registration
+            capabilities.setCapability("name", testName);
+        }
+
+        if (isProxyConfigurationAvailable()) {
+            capabilities.setCapability(CapabilityType.PROXY, setupProxy());
+        }
+        return capabilities;
+    }
 
     /**
      * Read all properties which starts from "capabilities.*" prefix and add return them as Capabilities object
      */
+    // todo investigate how static will work with capabilities
     public static Capabilities getConfigurationCapabilities() {
         MutableCapabilities capabilities = new MutableCapabilities();
         Properties properties = R.CONFIG.getProperties();
@@ -79,6 +103,7 @@ public abstract class AbstractCapabilities<T extends Capabilities> {
 
             capabilities.setCapability(capabilityName, value);
         }
+
         return capabilities;
     }
 
@@ -127,22 +152,22 @@ public abstract class AbstractCapabilities<T extends Capabilities> {
             String proxyAddress = String.format("%s:%s", proxyHost, proxyPort);
 
             if (protocols.contains("http")) {
-                LOGGER.info("Http proxy will be set: {}:{}", proxyHost, proxyPort);
+                LOGGER.info(String.format("Http proxy will be set: %s:%s", proxyHost, proxyPort));
                 proxy.setHttpProxy(proxyAddress);
             }
 
             if (protocols.contains("https")) {
-                LOGGER.info("Https proxy will be set: {}:{}", proxyHost, proxyPort);
+                LOGGER.info(String.format("Https proxy will be set: %s:%s", proxyHost, proxyPort));
                 proxy.setSslProxy(proxyAddress);
             }
 
             if (protocols.contains("ftp")) {
-                LOGGER.info("FTP proxy will be set: {}:{}", proxyHost, proxyPort);
+                LOGGER.info(String.format("FTP proxy will be set: %s:%s", proxyHost, proxyPort));
                 proxy.setFtpProxy(proxyAddress);
             }
 
             if (protocols.contains("socks")) {
-                LOGGER.info("Socks proxy will be set: {}:{}", proxyHost, proxyPort);
+                LOGGER.info(String.format("Socks proxy will be set: %s:%s", proxyHost, proxyPort));
                 proxy.setSocksProxy(proxyAddress);
             }
 
@@ -152,6 +177,7 @@ public abstract class AbstractCapabilities<T extends Capabilities> {
 
             return proxy;
         }
+
         return null;
     }
 
@@ -166,12 +192,14 @@ public abstract class AbstractCapabilities<T extends Capabilities> {
             if (!isCreated) {
                 isCreated = autoDownloadPath.mkdir();
             } else {
-                LOGGER.info("Folder for auto download already exists: {}", autoDownloadPath.getAbsolutePath());
+                LOGGER.info("Folder for auto download already exists: " + autoDownloadPath.getAbsolutePath());
             }
         } else {
             // if no AUTO_DOWNLOAD_FOLDER defined use artifacts folder
             autoDownloadPath = ReportContext.getArtifactsFolder();
         }
+
         return autoDownloadPath.getAbsolutePath();
     }
+
 }
