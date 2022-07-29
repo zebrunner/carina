@@ -109,9 +109,14 @@ public class DriverFactory {
             return new AndroidFactory();
         }
 
+        if (SafariFactory.isSuitable(capabilities)) {
+            return new SafariFactory();
+        }
+
         if (IOSFactory.isSuitable(capabilities)) {
             return new IOSFactory();
         }
+
 
         if (CustomIOSMobileFactory.isSuitable(capabilities)) {
             return new CustomIOSMobileFactory();
@@ -145,9 +150,6 @@ public class DriverFactory {
             return new EdgeFactory();
         }
 
-        if (SafariFactory.isSuitable(capabilities)) {
-            return new SafariFactory();
-        }
 
         throw new RuntimeException(
                 "Factory cannot be chosen. Please, provide valid capabilities. Check is your capabilities contains "

@@ -7,6 +7,7 @@ import java.net.URL;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.Browser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +64,11 @@ public class IOSFactory extends AbstractFactory {
                 && (customCapabilities.toLowerCase().contains("localhost") ||
                         customCapabilities.toLowerCase().contains("browserstack") ||
                         customCapabilities.toLowerCase().contains("saucelabs"))) {
+            return false;
+        }
+
+        // use safari factory for testing
+        if (Browser.SAFARI.browserName().equalsIgnoreCase(capabilities.getBrowserName())) {
             return false;
         }
 
