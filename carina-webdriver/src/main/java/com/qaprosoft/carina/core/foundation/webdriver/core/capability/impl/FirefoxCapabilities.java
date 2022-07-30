@@ -31,11 +31,6 @@ public class FirefoxCapabilities extends AbstractCapabilities<FirefoxOptions> {
             return options;
         }
 
-        if (!IDriverPool.DEFAULT.equalsIgnoreCase(testName)) {
-            // #1573: remove "default" driver name capability registration
-            options.setCapability("name", testName);
-        }
-
         setCapabilities(options, getBrowserConfigurationCapabilities(testName));
         addFirefoxOptions(options);
 
