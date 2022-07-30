@@ -44,6 +44,7 @@ public class WindowsFactory extends AbstractFactory {
      * Determines if the driver is suitable for the current capabilities
      */
     public static boolean isSuitable(Capabilities capabilities) {
+        // questionable, todo check
         if (Platform.WINDOWS.is(capabilities.getPlatformName())) {
             return true;
         }

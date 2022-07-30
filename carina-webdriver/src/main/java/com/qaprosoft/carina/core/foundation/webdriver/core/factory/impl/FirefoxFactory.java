@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -51,7 +52,8 @@ public class FirefoxFactory extends AbstractFactory {
      * Determines if the driver is suitable for the current capabilities
      */
     public static boolean isSuitable(Capabilities capabilities) {
-        if (capabilities.getPlatformName() != null) {
+        if (capabilities.getPlatformName() != null && (capabilities.getPlatformName().is(Platform.IOS) ||
+                capabilities.getPlatformName().is(Platform.ANDROID))) {
             return false;
         }
 

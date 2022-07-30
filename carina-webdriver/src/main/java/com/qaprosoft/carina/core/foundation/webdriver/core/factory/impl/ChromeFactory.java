@@ -3,6 +3,7 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -41,7 +42,8 @@ public class ChromeFactory extends AbstractFactory {
      * Determines if the driver is suitable for the current capabilities
      */
     public static boolean isSuitable(Capabilities capabilities) {
-        if (capabilities.getPlatformName() != null) {
+        if (capabilities.getPlatformName() != null && (capabilities.getPlatformName().is(Platform.IOS) ||
+                capabilities.getPlatformName().is(Platform.ANDROID))) {
             return false;
         }
 

@@ -41,7 +41,7 @@ public class AndroidFactory extends AbstractFactory {
     }
 
     /**
-     * Determines if the driver is suitable for the current capabilities
+     * Determines if the driver is suitable for the current capabilities and selenium url
      */
     public static boolean isSuitable(Capabilities capabilities) {
         // for localhost, browserstack, saucelabs we do not create android driver
@@ -52,6 +52,7 @@ public class AndroidFactory extends AbstractFactory {
                         customCapabilities.toLowerCase().contains("saucelabs"))) {
             return false;
         }
+
         if (Configuration.getSeleniumUrl().contains("hub.browserstack.com")) {
             // #1786 mobile drivers on browserstack should be started via CUSTOM - RemoteWebDriver driver
             return false;
