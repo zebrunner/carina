@@ -1,6 +1,8 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory;
 
 import java.lang.invoke.MethodHandles;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.Duration;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -125,6 +127,13 @@ public abstract class AbstractFactory {
             LOGGER.error("finished driver quit...");
             throw e;
         }
+    }
 
+    protected URL getURL(String hostUrl) {
+        try {
+            return new URL(hostUrl);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Malformed selenium URL!", e);
+        }
     }
 }

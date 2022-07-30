@@ -11,8 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesBuilder;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.OptionsType;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.UIAutomator2Capabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 
@@ -33,28 +32,10 @@ public class AndroidFactory extends AbstractFactory {
 
     @Override
     public WebDriver create(String testName, String seleniumHost, Capabilities capabilities) {
-
-        CapabilitiesBuilder capabilitiesBuilder = CapabilitiesBuilder.builder();
-
-        if (capabilities != null) {
-            capabilitiesBuilder.fromCustomCapabilities(capabilities);
-        }
-
-        capabilitiesBuilder.chooseOptionsType(OptionsType.ANDROID);
-        Capabilities uiAutomator2Options = capabilitiesBuilder.build();
-
-        LOGGER.debug("capabilities: {}", uiAutomator2Options);
-
-        URL hostURL;
-        try {
-            hostURL = new URL(seleniumHost);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Malformed selenium URL!", e);
-        }
-
-        EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(hostURL);
-        AndroidDriver driver = new AndroidDriver(ce, uiAutomator2Options);
-
+        Capabilities options = new UIAutomator2Capabilities().getCapabilities(testName, capabilities);
+        LOGGER.debug("Android capabilities: {}", options);
+        EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(getURL(seleniumHost));
+        AndroidDriver driver = new AndroidDriver(ce, options);
         registerDevice(driver);
         return driver;
     }

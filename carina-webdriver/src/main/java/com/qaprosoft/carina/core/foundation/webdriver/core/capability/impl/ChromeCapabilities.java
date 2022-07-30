@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.CapabilityType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,17 +16,17 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstactCapabilities;
 
 public class ChromeCapabilities extends AbstactCapabilities<ChromeOptions> {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public ChromeOptions getCapabilities() {
+    public ChromeOptions getCapabilities(String testName, Capabilities customCapabilities) {
         ChromeOptions options = new ChromeOptions();
 
-        if (isProxyConfigurationAvailable()) {
-            options.setCapability(CapabilityType.PROXY, setupProxy());
+        if (customCapabilities != null) {
+            setCapabilities(options, customCapabilities);
+            return options;
         }
-        setCapabilitiesSafe(options, getConfigurationCapabilities());
+        setCapabilities(options, getBrowserConfigurationCapabilities(testName));
         addChromeOptions(options);
 
         if (Configuration.getBoolean(Configuration.Parameter.HEADLESS)) {
@@ -39,34 +38,6 @@ public class ChromeCapabilities extends AbstactCapabilities<ChromeOptions> {
         options.addArguments("--start-maximized", "--ignore-ssl-errors");
         options.setAcceptInsecureCerts(true);
         return options;
-    }
-
-    @Override
-    public ChromeOptions createCapabilitiesFromCustom(Capabilities customCapabilities) {
-        ChromeOptions options = new ChromeOptions();
-        if (customCapabilities != null) {
-            for (String capabilityName : customCapabilities.getCapabilityNames()) {
-                options.setCapability(capabilityName, customCapabilities.getCapability(capabilityName));
-            }
-        }
-        return options;
-    }
-
-    @Override
-    public ChromeOptions getCapabilitiesWithCustom(Capabilities customCapabilities) {
-        ChromeOptions options = getCapabilities();
-        if (customCapabilities != null) {
-            for (String capabilityName : customCapabilities.getCapabilityNames()) {
-                options.setCapability(capabilityName, customCapabilities.getCapability(capabilityName));
-            }
-        }
-        return options;
-    }
-
-    private void setCapabilitiesSafe(ChromeOptions options, Capabilities capabilities) {
-        for (String capabilityName : capabilities.getCapabilityNames()) {
-            options.setCapability(capabilityName, capabilities.getCapability(capabilityName));
-        }
     }
 
     private void addChromeOptions(ChromeOptions options) {

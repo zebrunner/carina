@@ -83,10 +83,6 @@ public interface IDriverPool {
      */
     default public WebDriver getDriver(String name) {
         //customCapabilities.get() return registered custom capabilities or null as earlier
-        Capabilities capabilities = customCapabilities.get();
-        if (capabilities == null) {
-
-        }
         return getDriver(name, customCapabilities.get());
     }
 

@@ -4,6 +4,7 @@ import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.EdgeCapabilities;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.Browser;
@@ -11,8 +12,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesBuilder;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.OptionsType;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.ChromeCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
 
@@ -28,14 +28,8 @@ public class EdgeFactory extends AbstractFactory {
 
     @Override
     public WebDriver create(String testName, String seleniumHost, Capabilities capabilities) {
-        CapabilitiesBuilder capabilitiesBuilder = CapabilitiesBuilder.builder();
-        if (capabilities != null) {
-            capabilitiesBuilder.fromCustomCapabilities(capabilities);
-        }
-        capabilitiesBuilder.chooseOptionsType(OptionsType.EDGE);
-        Capabilities edgeOptions = capabilitiesBuilder.build();
-
-        LOGGER.debug("capabilities: {}", edgeOptions);
+        Capabilities options = new EdgeCapabilities().getCapabilities(testName, capabilities);
+        LOGGER.debug("capabilities: {}", options);
 
         URL hostURL;
         try {
@@ -44,8 +38,8 @@ public class EdgeFactory extends AbstractFactory {
             throw new RuntimeException("Malformed selenium URL!", e);
         }
         EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(hostURL);
-        WebDriver driver = new RemoteWebDriver(ce, edgeOptions);
-        resizeBrowserWindow(driver, edgeOptions);
+        WebDriver driver = new RemoteWebDriver(ce, options);
+        resizeBrowserWindow(driver, options);
         return driver;
     }
 

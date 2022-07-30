@@ -10,8 +10,7 @@ import org.openqa.selenium.remote.Browser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesBuilder;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.OptionsType;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.SafariCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 
 import io.appium.java_client.remote.AutomationName;
@@ -31,14 +30,8 @@ public class SafariFactory extends AbstractFactory {
 
     @Override
     public WebDriver create(String testName, String seleniumHost, Capabilities capabilities) {
-        CapabilitiesBuilder capabilitiesBuilder = CapabilitiesBuilder.builder();
-        if (capabilities != null) {
-            capabilitiesBuilder.fromCustomCapabilities(capabilities);
-        }
-        capabilitiesBuilder.chooseOptionsType(OptionsType.SAFARI);
-        Capabilities safariOptions = capabilitiesBuilder.build();
-
-        LOGGER.debug("capabilities: {}", safariOptions);
+        Capabilities options = new SafariCapabilities().getCapabilities(testName, capabilities);
+        LOGGER.debug("capabilities: {}", options);
 
         URL hostURL;
         try {
@@ -49,9 +42,9 @@ public class SafariFactory extends AbstractFactory {
         // todo investigate creating driver with EventFiringAppiumCommandExecutor
         // EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(hostURL);
         // WebDriver driver = new SafariDriver(ce, safariOptions);
-        WebDriver driver = new SafariDriver(hostURL, safariOptions);
+        WebDriver driver = new SafariDriver(hostURL, options);
 
-        resizeBrowserWindow(driver, safariOptions);
+        resizeBrowserWindow(driver, options);
         return driver;
     }
 

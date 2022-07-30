@@ -21,8 +21,8 @@ import org.testng.annotations.Test;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesBuilder;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.OptionsType;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.UIAutomator2Capabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.XCUITestCapabilities;
 
 import io.appium.java_client.android.options.UiAutomator2Options;
 import io.appium.java_client.ios.options.XCUITestOptions;
@@ -43,11 +43,7 @@ public class MobileCapabilitiesTest {
         R.CONFIG.put(LANGUAGE_KEY, "", true);
 
         String testName = "mobile - getCapabilityWithLocaleTest";
-
-        XCUITestOptions capabilities = (XCUITestOptions) CapabilitiesBuilder.builder()
-                .testName(testName)
-                .chooseOptionsType(OptionsType.IOS)
-                .build();
+        XCUITestOptions capabilities = new XCUITestCapabilities().getCapabilities(testName);
 
         Assert.assertEquals(capabilities.getLocale().get(), LOCALE, "Locale capability is not valid");
         Assert.assertTrue(capabilities.getLanguage().isEmpty(), "Language capability is not empty");
@@ -59,11 +55,7 @@ public class MobileCapabilitiesTest {
         R.CONFIG.put(LANGUAGE_KEY, LANGUAGE, true);
 
         String testName = "mobile - getCapabilityWithLocaleAndLanguageSeparatelyTest";
-
-        XCUITestOptions capabilities = (XCUITestOptions) CapabilitiesBuilder.builder()
-                .testName(testName)
-                .chooseOptionsType(OptionsType.IOS)
-                .build();
+        XCUITestOptions capabilities = new XCUITestCapabilities().getCapabilities(testName);
 
         Assert.assertEquals(capabilities.getLocale().get(), LOCALE, "Locale capability is not valid");
         Assert.assertEquals(capabilities.getLanguage().get(), LANGUAGE, "Language capability is not valid");
@@ -75,11 +67,7 @@ public class MobileCapabilitiesTest {
         R.CONFIG.put(LOCALE_KEY, LOCALE_LANGUAGE, true);
 
         String testName = "mobile - getAndroidCapabilityWithLocaleAndLanguageTogetherTest";
-
-        UiAutomator2Options capabilities = (UiAutomator2Options) CapabilitiesBuilder.builder()
-                .testName(testName)
-                .chooseOptionsType(OptionsType.ANDROID)
-                .build();
+        UiAutomator2Options capabilities = new UIAutomator2Capabilities().getCapabilities(testName);
 
         Assert.assertEquals(capabilities.getLocale().get(), LOCALE, "Locale capability is not valid");
         Assert.assertEquals(capabilities.getLanguage().get(), LANGUAGE, "Language capability is not valid");
@@ -91,11 +79,7 @@ public class MobileCapabilitiesTest {
         R.CONFIG.put(LOCALE_KEY, LOCALE_LANGUAGE, true);
 
         String testName = "mobile - getIOSCapabilityWithLocaleAndLanguageTogetherTest";
-
-        XCUITestOptions capabilities = (XCUITestOptions) CapabilitiesBuilder.builder()
-                .testName(testName)
-                .chooseOptionsType(OptionsType.IOS)
-                .build();
+        XCUITestOptions capabilities = new XCUITestCapabilities().getCapabilities(testName);
 
         Assert.assertEquals(capabilities.getLocale().get(), LOCALE_LANGUAGE, "Locale capability is not valid");
         Assert.assertEquals(capabilities.getLanguage().get(), LANGUAGE, "Language capability is not valid");

@@ -12,8 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesBuilder;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.OptionsType;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.XCUITestCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 
@@ -31,14 +30,8 @@ public class IOSFactory extends AbstractFactory {
 
     @Override
     public WebDriver create(String testName, String seleniumHost, Capabilities capabilities) {
-        CapabilitiesBuilder capabilitiesBuilder = CapabilitiesBuilder.builder();
-        if (capabilities != null) {
-            capabilitiesBuilder.fromCustomCapabilities(capabilities);
-        }
-        capabilitiesBuilder.chooseOptionsType(OptionsType.IOS);
-        Capabilities xcuiOptions = capabilitiesBuilder.build();
-
-        LOGGER.debug("capabilities: {}", xcuiOptions);
+        Capabilities options = new XCUITestCapabilities().getCapabilities(testName, capabilities);
+        LOGGER.debug("capabilities: {}", options);
 
         URL hostURL;
         try {
@@ -48,7 +41,7 @@ public class IOSFactory extends AbstractFactory {
         }
 
         EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(hostURL);
-        IOSDriver driver = new IOSDriver(ce, xcuiOptions);
+        IOSDriver driver = new IOSDriver(ce, options);
 
         registerDevice(driver);
         return driver;

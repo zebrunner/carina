@@ -12,8 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesBuilder;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.OptionsType;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.UIAutomator2Capabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 
 import io.appium.java_client.remote.AutomationName;
@@ -29,14 +28,8 @@ public class CustomAndroidMobileFactory extends AbstractFactory {
 
     @Override
     public WebDriver create(String testName, String seleniumHost, Capabilities capabilities) {
-        CapabilitiesBuilder capabilitiesBuilder = CapabilitiesBuilder.builder();
-        if (capabilities != null) {
-            capabilitiesBuilder.fromCustomCapabilities(capabilities);
-        }
-        capabilitiesBuilder.chooseOptionsType(OptionsType.ANDROID);
-        Capabilities uiAutomator2Options = capabilitiesBuilder.build();
-
-        LOGGER.debug("capabilities: {}", uiAutomator2Options);
+        Capabilities options = new UIAutomator2Capabilities().getCapabilities(testName, capabilities);
+        LOGGER.debug("capabilities: {}", options);
 
         URL hostURL;
         try {
@@ -45,7 +38,7 @@ public class CustomAndroidMobileFactory extends AbstractFactory {
             throw new RuntimeException("Malformed selenium URL!", e);
         }
 
-        RemoteWebDriver driver = new RemoteWebDriver(hostURL, uiAutomator2Options);
+        RemoteWebDriver driver = new RemoteWebDriver(hostURL, options);
         registerDevice(driver);
         return driver;
     }

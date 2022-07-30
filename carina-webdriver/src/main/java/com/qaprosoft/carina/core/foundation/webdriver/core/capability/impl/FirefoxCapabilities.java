@@ -7,13 +7,13 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.net.PortProber;
-import org.openqa.selenium.remote.CapabilityType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstactCapabilities;
 
 public class FirefoxCapabilities extends AbstactCapabilities<FirefoxOptions> {
@@ -23,14 +23,21 @@ public class FirefoxCapabilities extends AbstactCapabilities<FirefoxOptions> {
     private static ArrayList<Integer> firefoxPorts = new ArrayList<Integer>();
 
     @Override
-    public FirefoxOptions getCapabilities() {
+    public FirefoxOptions getCapabilities(String testName, Capabilities customCapabilities) {
         FirefoxOptions options = new FirefoxOptions();
-        if (isProxyConfigurationAvailable()) {
-            options.setCapability(CapabilityType.PROXY, setupProxy());
+
+        if (customCapabilities != null) {
+            setCapabilities(options, customCapabilities);
+            return options;
         }
-        setCapabilitiesSafe(options, getConfigurationCapabilities());
+
+        if (!IDriverPool.DEFAULT.equalsIgnoreCase(testName)) {
+            // #1573: remove "default" driver name capability registration
+            options.setCapability("name", testName);
+        }
+
+        setCapabilities(options, getBrowserConfigurationCapabilities(testName));
         addFirefoxOptions(options);
-        options.setAcceptInsecureCerts(true);
 
         if (Configuration.getBoolean(Configuration.Parameter.HEADLESS)) {
             options.setHeadless(true);
@@ -38,35 +45,8 @@ public class FirefoxCapabilities extends AbstactCapabilities<FirefoxOptions> {
             options.setCapability("enableVNC", false);
             options.setCapability("enableVideo", false);
         }
+        options.setAcceptInsecureCerts(true);
         return options;
-    }
-
-    @Override
-    public FirefoxOptions createCapabilitiesFromCustom(Capabilities customCapabilities) {
-        FirefoxOptions options = new FirefoxOptions();
-        if (customCapabilities != null) {
-            for (String capabilityName : customCapabilities.getCapabilityNames()) {
-                options.setCapability(capabilityName, customCapabilities.getCapability(capabilityName));
-            }
-        }
-        return options;
-    }
-
-    @Override
-    public FirefoxOptions getCapabilitiesWithCustom(Capabilities customCapabilities) {
-        FirefoxOptions options = getCapabilities();
-        if (customCapabilities != null) {
-            for (String capabilityName : customCapabilities.getCapabilityNames()) {
-                options.setCapability(capabilityName, customCapabilities.getCapability(capabilityName));
-            }
-        }
-        return options;
-    }
-
-    private void setCapabilitiesSafe(FirefoxOptions options, Capabilities capabilities) {
-        for (String capabilityName : capabilities.getCapabilityNames()) {
-            options.setCapability(capabilityName, capabilities.getCapability(capabilityName));
-        }
     }
 
     private void addFirefoxOptions(FirefoxOptions options) {

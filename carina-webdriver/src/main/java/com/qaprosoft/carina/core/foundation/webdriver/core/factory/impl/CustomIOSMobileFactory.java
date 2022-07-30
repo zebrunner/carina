@@ -4,6 +4,7 @@ import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.XCUITestCapabilities;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
@@ -12,8 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesBuilder;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.OptionsType;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.ChromeCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 
 import io.appium.java_client.remote.AutomationName;
@@ -29,14 +29,8 @@ public class CustomIOSMobileFactory extends AbstractFactory {
 
     @Override
     public WebDriver create(String testName, String seleniumHost, Capabilities capabilities) {
-        CapabilitiesBuilder capabilitiesBuilder = CapabilitiesBuilder.builder();
-        if (capabilities != null) {
-            capabilitiesBuilder.fromCustomCapabilities(capabilities);
-        }
-        capabilitiesBuilder.chooseOptionsType(OptionsType.IOS);
-        Capabilities xcuiOptions = capabilitiesBuilder.build();
-
-        LOGGER.debug("capabilities: {}", xcuiOptions);
+        Capabilities options = new XCUITestCapabilities().getCapabilities(testName, capabilities);
+        LOGGER.debug("capabilities: {}", options);
 
         URL hostURL;
         try {
@@ -45,7 +39,7 @@ public class CustomIOSMobileFactory extends AbstractFactory {
             throw new RuntimeException("Malformed selenium URL!", e);
         }
 
-        RemoteWebDriver driver = new RemoteWebDriver(hostURL, xcuiOptions);
+        RemoteWebDriver driver = new RemoteWebDriver(hostURL, options);
         registerDevice(driver);
         return driver;
     }

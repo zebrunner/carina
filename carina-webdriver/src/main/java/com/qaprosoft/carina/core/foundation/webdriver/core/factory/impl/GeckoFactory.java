@@ -9,8 +9,7 @@ import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesBuilder;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.OptionsType;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.GeckoCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 
 import io.appium.java_client.gecko.GeckoDriver;
@@ -27,14 +26,8 @@ public class GeckoFactory extends AbstractFactory {
 
     @Override
     public WebDriver create(String testName, String seleniumHost, Capabilities capabilities) {
-        CapabilitiesBuilder capabilitiesBuilder = CapabilitiesBuilder.builder();
-        if (capabilities != null) {
-            capabilitiesBuilder.fromCustomCapabilities(capabilities);
-        }
-        capabilitiesBuilder.chooseOptionsType(OptionsType.GECKO);
-        Capabilities geckoOptions = capabilitiesBuilder.build();
-
-        LOGGER.debug("capabilities: {}", geckoOptions);
+        Capabilities options = new GeckoCapabilities().getCapabilities(testName, capabilities);
+        LOGGER.debug("capabilities: {}", options);
 
         URL hostURL;
         try {
@@ -47,7 +40,7 @@ public class GeckoFactory extends AbstractFactory {
         // EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(hostURL);
         // return new GeckoDriver(ce, geckoOptions);
 
-        return new GeckoDriver(hostURL, geckoOptions);
+        return new GeckoDriver(hostURL, options);
     }
 
     /**

@@ -11,8 +11,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesBuilder;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.OptionsType;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.FirefoxCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
 
@@ -31,14 +30,8 @@ public class FirefoxFactory extends AbstractFactory {
 
     @Override
     public WebDriver create(String testName, String seleniumHost, Capabilities capabilities) {
-        CapabilitiesBuilder capabilitiesBuilder = CapabilitiesBuilder.builder();
-        if (capabilities != null) {
-            capabilitiesBuilder.fromCustomCapabilities(capabilities);
-        }
-        capabilitiesBuilder.chooseOptionsType(OptionsType.FIREFOX);
-        Capabilities firefoxOptions = capabilitiesBuilder.build();
-
-        LOGGER.debug("capabilities: {}", firefoxOptions);
+        Capabilities options = new FirefoxCapabilities().getCapabilities(testName, capabilities);
+        LOGGER.debug("capabilities: {}", options);
 
         URL hostURL;
         try {
@@ -48,9 +41,9 @@ public class FirefoxFactory extends AbstractFactory {
         }
 
         EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(hostURL);
-        WebDriver driver = new RemoteWebDriver(ce, firefoxOptions);
+        WebDriver driver = new RemoteWebDriver(ce, options);
 
-        resizeBrowserWindow(driver, firefoxOptions);
+        resizeBrowserWindow(driver, options);
         return driver;
     }
 

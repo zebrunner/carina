@@ -9,37 +9,16 @@ import io.appium.java_client.gecko.options.GeckoOptions;
 public class GeckoCapabilities extends AbstactCapabilities<GeckoOptions> {
 
     @Override
-    public GeckoOptions getCapabilities() {
+    public GeckoOptions getCapabilities(String testName, Capabilities customCapabilities) {
         GeckoOptions options = new GeckoOptions();
-        setCapabilitiesSafe(options, getConfigurationCapabilities());
-        return options;
-    }
 
-    @Override
-    public GeckoOptions createCapabilitiesFromCustom(Capabilities customCapabilities) {
-        GeckoOptions options = new GeckoOptions();
         if (customCapabilities != null) {
-            for (String capabilityName : customCapabilities.getCapabilityNames()) {
-                options.amend(capabilityName, customCapabilities.getCapability(capabilityName));
-            }
+            setCapabilities(options, customCapabilities);
+            return options;
         }
+
+        setCapabilities(options, getConfigurationCapabilities());
         return options;
     }
 
-    @Override
-    public GeckoOptions getCapabilitiesWithCustom(Capabilities customCapabilities) {
-        GeckoOptions options = getCapabilities();
-        if (customCapabilities != null) {
-            for (String capabilityName : customCapabilities.getCapabilityNames()) {
-                options.amend(capabilityName, customCapabilities.getCapability(capabilityName));
-            }
-        }
-        return options;
-    }
-
-    private void setCapabilitiesSafe(GeckoOptions options, Capabilities capabilities) {
-        for (String capabilityName : capabilities.getCapabilityNames()) {
-            options.amend(capabilityName, capabilities.getCapability(capabilityName));
-        }
-    }
 }

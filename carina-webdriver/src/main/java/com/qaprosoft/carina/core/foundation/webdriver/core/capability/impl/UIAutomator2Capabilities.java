@@ -17,33 +17,16 @@ public class UIAutomator2Capabilities extends AbstactCapabilities<UiAutomator2Op
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public UiAutomator2Options getCapabilities() {
+    public UiAutomator2Options getCapabilities(String testName, Capabilities customCapabilities) {
         UiAutomator2Options options = new UiAutomator2Options();
+        if (customCapabilities != null) {
+            setCapabilities(options, customCapabilities);
+            return options;
+        }
+
         // this step should be executed before getConfigurationCapabilities() to be able to override this capabilities by default appium approach.
         setLocaleAndLanguage(options);
-        setCapabilitiesSafe(options, getConfigurationCapabilities());
-        return options;
-    }
-
-    @Override
-    public UiAutomator2Options createCapabilitiesFromCustom(Capabilities customCapabilities) {
-        UiAutomator2Options options = new UiAutomator2Options();
-        if (customCapabilities != null) {
-            for (String capabilityName : customCapabilities.getCapabilityNames()) {
-                options.amend(capabilityName, customCapabilities.getCapability(capabilityName));
-            }
-        }
-        return options;
-    }
-
-    @Override
-    public UiAutomator2Options getCapabilitiesWithCustom(Capabilities customCapabilities) {
-        UiAutomator2Options options = getCapabilities();
-        if (customCapabilities != null) {
-            for (String capabilityName : customCapabilities.getCapabilityNames()) {
-                options.amend(capabilityName, customCapabilities.getCapability(capabilityName));
-            }
-        }
+        setCapabilities(options, getConfigurationCapabilities());
         return options;
     }
 
@@ -74,12 +57,6 @@ public class UIAutomator2Capabilities extends AbstactCapabilities<UiAutomator2Op
                 options.setLocale(values[1]);
         } else {
             LOGGER.error("Undefined locale provided (ignoring for mobile capabilitites): {}", localeValue);
-        }
-    }
-
-    private void setCapabilitiesSafe(UiAutomator2Options options, Capabilities capabilities) {
-        for (String capabilityName : capabilities.getCapabilityNames()) {
-            options.amend(capabilityName, capabilities.getCapability(capabilityName));
         }
     }
 }

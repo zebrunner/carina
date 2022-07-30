@@ -21,34 +21,33 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.proxy.SystemProxy;
 
-import io.appium.java_client.remote.options.SupportsBrowserNameOption;
-
-public abstract class AbstactCapabilities<T extends Capabilities> {
+public abstract class AbstactCapabilities<T extends MutableCapabilities> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String CAPABILITIES_PREFIX = SpecialKeywords.CAPABILITIES + ".";
+
+    public T getCapabilities(String testName) {
+        return this.getCapabilities(testName, null);
+    }
 
     /**
      * Returns capabilities consist from configuration capabilities plus options
      * 
      * @return capabilities
+     * @param testName
+     * @param customCapabilities if provided return only customCapabilities
      */
-    public abstract T getCapabilities();
+    public abstract T getCapabilities(String testName, Capabilities customCapabilities);
 
-    /**
-     * Create capabilities safety from customCapabilities
-     * 
-     * @param customCapabilities capabilities
-     * @return capabilities
-     */
-    public abstract T createCapabilitiesFromCustom(Capabilities customCapabilities);
 
-    public abstract T getCapabilitiesWithCustom(Capabilities customCapabilities);
+    protected void setCapabilities(T options, Capabilities capabilities) {
+        for (String capabilityName : capabilities.getCapabilityNames()) {
+            options.setCapability(capabilityName, capabilities.getCapability(capabilityName));
+        }
+    }
 
-    // todo add description (delete)
-    protected Capabilities getBrowserCapabilities(String browser, String testName) {
-        MutableCapabilities capabilities = new MutableCapabilities();
-        capabilities.setCapability(SupportsBrowserNameOption.BROWSER_NAME_OPTION, browser);
+    protected Capabilities getBrowserConfigurationCapabilities(String testName) {
+        MutableCapabilities capabilities = new MutableCapabilities(getConfigurationCapabilities());
 
         if (!IDriverPool.DEFAULT.equalsIgnoreCase(testName)) {
             // #1573: remove "default" driver name capability registration
@@ -64,7 +63,6 @@ public abstract class AbstactCapabilities<T extends Capabilities> {
     /**
      * Read all properties which starts from "capabilities.*" prefix and add return them as Capabilities object
      */
-    // todo investigate how static will work with capabilities
     public static Capabilities getConfigurationCapabilities() {
         MutableCapabilities capabilities = new MutableCapabilities();
         Properties properties = R.CONFIG.getProperties();

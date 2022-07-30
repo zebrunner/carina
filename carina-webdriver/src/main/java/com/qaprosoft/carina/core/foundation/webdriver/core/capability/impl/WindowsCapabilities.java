@@ -9,37 +9,14 @@ import io.appium.java_client.windows.options.WindowsOptions;
 public class WindowsCapabilities extends AbstactCapabilities<WindowsOptions> {
 
     @Override
-    public WindowsOptions getCapabilities() {
-        WindowsOptions options = new WindowsOptions();
-        setCapabilitiesSafe(options, getConfigurationCapabilities());
-        return options;
-    }
-
-    @Override
-    public WindowsOptions createCapabilitiesFromCustom(Capabilities customCapabilities) {
+    public WindowsOptions getCapabilities(String testName, Capabilities customCapabilities) {
         WindowsOptions options = new WindowsOptions();
         if (customCapabilities != null) {
-            for (String capabilityName : customCapabilities.getCapabilityNames()) {
-                options.amend(capabilityName, customCapabilities.getCapability(capabilityName));
-            }
+            setCapabilities(options, customCapabilities);
+            return options;
         }
-        return options;
-    }
 
-    @Override
-    public WindowsOptions getCapabilitiesWithCustom(Capabilities customCapabilities) {
-        WindowsOptions options = getCapabilities();
-        if (customCapabilities != null) {
-            for (String capabilityName : customCapabilities.getCapabilityNames()) {
-                options.amend(capabilityName, customCapabilities.getCapability(capabilityName));
-            }
-        }
+        setCapabilities(options, getConfigurationCapabilities());
         return options;
-    }
-
-    private void setCapabilitiesSafe(WindowsOptions options, Capabilities capabilities) {
-        for (String capabilityName : capabilities.getCapabilityNames()) {
-            options.amend(capabilityName, capabilities.getCapability(capabilityName));
-        }
     }
 }

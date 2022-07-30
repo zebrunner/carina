@@ -70,7 +70,6 @@ public class DriverFactory {
         driver = driverFactory.registerListeners(driver, getEventListeners());
         LOGGER.info("Driver session started.");
         LOGGER.debug("DriverFactory finish...");
-        LOGGER.debug("DriverFactory finish...");
         return driver;
     }
 	

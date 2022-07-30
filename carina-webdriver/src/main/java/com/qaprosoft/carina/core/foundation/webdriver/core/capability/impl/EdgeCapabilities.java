@@ -17,12 +17,15 @@ public class EdgeCapabilities extends AbstactCapabilities<ChromiumOptions<?>> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public ChromiumOptions<?> getCapabilities() {
+    public ChromiumOptions<?> getCapabilities(String testName, Capabilities customCapabilities) {
         ChromiumOptions<?> options = new ChromiumOptions<>(CapabilityType.BROWSER_NAME, EDGE.browserName(), "ms:edgeOptions");
-        if (isProxyConfigurationAvailable()) {
-            options.setCapability(CapabilityType.PROXY, setupProxy());
+
+        if (customCapabilities != null) {
+            setCapabilities(options, customCapabilities);
+            return options;
         }
-        setCapabilitiesSafe(options, getConfigurationCapabilities());
+
+        setCapabilities(options, getBrowserConfigurationCapabilities(testName));
 
         if (Configuration.getBoolean(Configuration.Parameter.HEADLESS)) {
             options.setHeadless(true);
@@ -33,33 +36,5 @@ public class EdgeCapabilities extends AbstactCapabilities<ChromiumOptions<?>> {
         options.addArguments("--start-maximized", "--ignore-ssl-errors");
         options.setAcceptInsecureCerts(true);
         return options;
-    }
-
-    @Override
-    public ChromiumOptions<?> createCapabilitiesFromCustom(Capabilities customCapabilities) {
-        ChromiumOptions<?> options = new ChromiumOptions<>(CapabilityType.BROWSER_NAME, EDGE.browserName(), "ms:edgeOptions");
-        if (customCapabilities != null) {
-            for (String capabilityName : customCapabilities.getCapabilityNames()) {
-                options.setCapability(capabilityName, customCapabilities.getCapability(capabilityName));
-            }
-        }
-        return options;
-    }
-
-    @Override
-    public ChromiumOptions<?> getCapabilitiesWithCustom(Capabilities customCapabilities) {
-        ChromiumOptions<?> options = getCapabilities();
-        if (customCapabilities != null) {
-            for (String capabilityName : customCapabilities.getCapabilityNames()) {
-                options.setCapability(capabilityName, customCapabilities.getCapability(capabilityName));
-            }
-        }
-        return options;
-    }
-
-    private void setCapabilitiesSafe(ChromiumOptions<?> options, Capabilities capabilities) {
-        for (String capabilityName : capabilities.getCapabilityNames()) {
-            options.setCapability(capabilityName, capabilities.getCapability(capabilityName));
-        }
     }
 }

@@ -16,33 +16,16 @@ public class XCUITestCapabilities extends AbstactCapabilities<XCUITestOptions> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public XCUITestOptions getCapabilities() {
+    public XCUITestOptions getCapabilities(String testName, Capabilities customCapabilities) {
         XCUITestOptions options = new XCUITestOptions();
+        if (customCapabilities != null) {
+            setCapabilities(options, customCapabilities);
+            return options;
+        }
+
         // this step should be executed before getConfigurationCapabilities() to be able to override this capabilities by default appium approach.
         setLocaleAndLanguage(options);
-        setCapabilitiesSafe(options, getConfigurationCapabilities());
-        return options;
-    }
-
-    @Override
-    public XCUITestOptions createCapabilitiesFromCustom(Capabilities customCapabilities) {
-        XCUITestOptions options = new XCUITestOptions();
-        if (customCapabilities != null) {
-            for (String capabilityName : customCapabilities.getCapabilityNames()) {
-                options.amend(capabilityName, customCapabilities.getCapability(capabilityName));
-            }
-        }
-        return options;
-    }
-
-    @Override
-    public XCUITestOptions getCapabilitiesWithCustom(Capabilities customCapabilities) {
-        XCUITestOptions options = getCapabilities();
-        if (customCapabilities != null) {
-            for (String capabilityName : customCapabilities.getCapabilityNames()) {
-                options.amend(capabilityName, customCapabilities.getCapability(capabilityName));
-            }
-        }
+        setCapabilities(options, getConfigurationCapabilities());
         return options;
     }
 
@@ -74,12 +57,6 @@ public class XCUITestCapabilities extends AbstactCapabilities<XCUITestOptions> {
 
         } else {
             LOGGER.error("Undefined locale provided (ignoring for mobile capabilitites): {}", localeValue);
-        }
-    }
-
-    private void setCapabilitiesSafe(XCUITestOptions options, Capabilities capabilities) {
-        for (String capabilityName : capabilities.getCapabilityNames()) {
-            options.amend(capabilityName, capabilities.getCapability(capabilityName));
         }
     }
 }
