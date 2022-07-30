@@ -25,7 +25,7 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String CAPABILITIES_PREFIX = SpecialKeywords.CAPABILITIES + ".";
-
+    private static final List<String> numericCaps = Arrays.asList("idleTimeout", "waitForIdleTimeout");
     /**
      * Returns capabilities from configuration file
      */
@@ -81,7 +81,7 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
                 continue;
             }
 
-            if (isNumber(value)) {
+            if (numericCaps.contains(capabilityName) && isNumber(value)) {
                 LOGGER.debug("Adding {} to capabilities as integer", capabilityName);
                 capabilities.setCapability(capabilityName, Integer.parseInt(value));
                 continue;
