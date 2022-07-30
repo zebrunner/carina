@@ -60,6 +60,7 @@ public class DriverFactory {
         if (seleniumUrl != null) {
             // override existing selenium_url in config
             R.CONFIG.put(Parameter.SELENIUM_URL.getKey(), seleniumUrl.toString());
+            seleniumHost = seleniumUrl.toString();
         }
 
         AbstractFactory driverFactory = chooseDriverFactory(
