@@ -21,21 +21,21 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.proxy.SystemProxy;
 
-public abstract class AbstactCapabilities<T extends MutableCapabilities> {
+public abstract class AbstractCapabilities<T extends MutableCapabilities> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String CAPABILITIES_PREFIX = SpecialKeywords.CAPABILITIES + ".";
 
+    /**
+     * Returns capabilities from configuration file
+     */
     public T getCapabilities(String testName) {
         return this.getCapabilities(testName, null);
     }
 
     /**
-     * Returns capabilities consist from configuration capabilities plus options
-     * 
-     * @return capabilities
-     * @param testName
-     * @param customCapabilities if provided return only customCapabilities
+     * if customCapabilities equals null, return capabilities from configuration file, otherwise returns
+     * customCapabilities
      */
     public abstract T getCapabilities(String testName, Capabilities customCapabilities);
 
@@ -117,8 +117,7 @@ public abstract class AbstactCapabilities<T extends MutableCapabilities> {
         return true;
     }
 
-    // todo move to proxy utils
-    protected static boolean isProxyConfigurationAvailable() {
+    private static boolean isProxyConfigurationAvailable() {
         String proxyHost = Configuration.get(Configuration.Parameter.PROXY_HOST);
         String proxyPort = Configuration.get(Configuration.Parameter.PROXY_PORT);
         if (Configuration.get(Configuration.Parameter.BROWSERMOB_PROXY).equals("true")) {
@@ -127,8 +126,7 @@ public abstract class AbstactCapabilities<T extends MutableCapabilities> {
         return proxyHost != null && !proxyHost.isEmpty() && proxyPort != null && !proxyPort.isEmpty();
     }
 
-    // todo move to proxy utils
-    protected static Proxy setupProxy() {
+    private static Proxy setupProxy() {
         ProxyPool.setupBrowserMobProxy();
         SystemProxy.setupProxy();
 
@@ -176,5 +174,4 @@ public abstract class AbstactCapabilities<T extends MutableCapabilities> {
 
         return null;
     }
-
 }

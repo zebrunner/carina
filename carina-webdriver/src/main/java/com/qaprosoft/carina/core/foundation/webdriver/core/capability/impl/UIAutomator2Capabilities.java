@@ -8,11 +8,11 @@ import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstactCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
 import io.appium.java_client.android.options.UiAutomator2Options;
 
-public class UIAutomator2Capabilities extends AbstactCapabilities<UiAutomator2Options> {
+public class UIAutomator2Capabilities extends AbstractCapabilities<UiAutomator2Options> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 

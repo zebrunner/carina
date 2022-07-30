@@ -32,17 +32,17 @@ public abstract class AbstractFactory {
     /**
      * Creates new instance of {@link WebDriver} according to configuration capabilities
      */
-    abstract public WebDriver create(String testName, String seleniumHost);
+    public abstract WebDriver create(String testName, String seleniumHost);
 
     /**
      * Creates new instance of {@link WebDriver} according to specified {@link Capabilities}.
      *
      * @param testName - where driver is initiated
      * @param seleniumHost - selenium server URL
-     * @param capabilities - driver desired capabilitues
+     * @param capabilities - driver capabilities
      * @return instance of {@link WebDriver}
      */
-    abstract public WebDriver create(String testName, String seleniumHost, Capabilities capabilities);
+    public abstract WebDriver create(String testName, String seleniumHost, Capabilities capabilities);
 
     /**
      * If any listeners specified, converts RemoteWebDriver to EventFiringWebDriver and registers all listeners.
@@ -62,9 +62,8 @@ public abstract class AbstractFactory {
     }
 
     /**
-     * Sets browser window according to capabilites.resolution value, otherwise
+     * Sets browser window according to capabilities.resolution value, otherwise
      * maximizes window.
-     * todo refactor method
      *
      * @param driver - instance of desktop @WebDriver
      * @param capabilities - driver capabilities

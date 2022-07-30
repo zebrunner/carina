@@ -8,11 +8,11 @@ import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstactCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
 import io.appium.java_client.ios.options.XCUITestOptions;
 
-public class XCUITestCapabilities extends AbstactCapabilities<XCUITestOptions> {
+public class XCUITestCapabilities extends AbstractCapabilities<XCUITestOptions> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override

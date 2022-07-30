@@ -3,13 +3,13 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.remote.Browser;
 
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstactCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
 import io.appium.java_client.remote.AutomationName;
 import io.appium.java_client.remote.options.SupportsBrowserNameOption;
 import io.appium.java_client.safari.options.SafariOptions;
 
-public class SafariCapabilities extends AbstactCapabilities<SafariOptions> {
+public class SafariCapabilities extends AbstractCapabilities<SafariOptions> {
 
     @Override
     public SafariOptions getCapabilities(String testName, Capabilities customCapabilities) {
