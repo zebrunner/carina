@@ -16,6 +16,7 @@
 package com.qaprosoft.carina.core.foundation.api;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.util.ArrayList;
@@ -28,7 +29,9 @@ import com.qaprosoft.apitools.validation.JsonKeywordsComparator;
 import com.qaprosoft.apitools.validation.JsonValidator;
 import com.qaprosoft.apitools.validation.XmlCompareMode;
 import com.qaprosoft.apitools.validation.XmlValidator;
+import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
 import com.qaprosoft.carina.core.foundation.api.log.LoggingOutputStream;
+import com.qaprosoft.carina.core.foundation.api.resolver.ContextResolverChain;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -38,14 +41,11 @@ import org.slf4j.LoggerFactory;
 import com.qaprosoft.apitools.builder.PropertiesProcessorMain;
 import com.qaprosoft.apitools.message.TemplateMessage;
 import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
-import com.qaprosoft.carina.core.foundation.api.annotation.RequestTemplatePath;
-import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePath;
-import com.qaprosoft.carina.core.foundation.api.annotation.SuccessfulHttpStatus;
 
 import io.restassured.response.Response;
 
-
 public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     
     private static final String ACCEPT_ALL_HEADER = "Accept=*/*";
@@ -61,43 +61,31 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
      * and @ResponseTemplatePath if present
      */
     public AbstractApiMethodV2() {
-        super();
-        setHeaders(ACCEPT_ALL_HEADER);
+        this(null, null);
         initPathsFromAnnotation();
-        setProperties(new Properties());
-    }
-
-    public AbstractApiMethodV2(String rqPath, String rsPath, String propertiesPath) {
-        super();
-        setHeaders(ACCEPT_ALL_HEADER);
-        setProperties(propertiesPath);
-        this.rqPath = rqPath;
-        this.rsPath = rsPath;
-    }
-
-    public AbstractApiMethodV2(String rqPath, String rsPath, Properties properties) {
-        super();
-        setHeaders(ACCEPT_ALL_HEADER);
-        if (properties != null) {
-            this.properties = PropertiesProcessorMain.processProperties(properties, ignoredPropertiesProcessorClasses);
-        }
-        this.rqPath = rqPath;
-        this.rsPath = rsPath;
     }
 
     public AbstractApiMethodV2(String rqPath, String rsPath) {
         this(rqPath, rsPath, new Properties());
     }
 
+    public AbstractApiMethodV2(String rqPath, String rsPath, String propertiesPath) {
+        this(rqPath, rsPath, loadProperties(propertiesPath));
+    }
+
+    public AbstractApiMethodV2(String rqPath, String rsPath, Properties properties) {
+        super();
+        setHeaders(ACCEPT_ALL_HEADER);
+        setProperties(properties);
+        this.rqPath = rqPath;
+        this.rsPath = rsPath;
+    }
+
     private void initPathsFromAnnotation() {
-        RequestTemplatePath requestTemplatePath = this.getClass().getAnnotation(RequestTemplatePath.class);
-        if (requestTemplatePath != null) {
-            this.rqPath = requestTemplatePath.path();
-        }
-        ResponseTemplatePath responseTemplatePath = this.getClass().getAnnotation(ResponseTemplatePath.class);
-        if (responseTemplatePath != null) {
-            this.rsPath = responseTemplatePath.path();
-        }
+        ContextResolverChain.resolveRequestTemplatePath(this.getClass())
+                .ifPresent(path -> this.rqPath = path);
+        ContextResolverChain.resolveResponseTemplatePath(this.getClass())
+                .ifPresent(path -> this.rsPath = path);
     }
 
     /**
@@ -156,18 +144,15 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
                 .doAfterExecute(response -> actualRsBody = response.asString());
     }
 
-
     /**
      * Calls API expecting http status in response taken from @SuccessfulHttpStatus value
      * 
      * @return restassured Response object
      */
     public Response callAPIExpectSuccess() {
-        SuccessfulHttpStatus successfulHttpStatus = this.getClass().getAnnotation(SuccessfulHttpStatus.class);
-        if (successfulHttpStatus == null) {
-            throw new RuntimeException("To use this method please declare @SuccessfulHttpStatus for your AbstractApiMethod class");
-        }
-        expectResponseStatus(successfulHttpStatus.status());
+        HttpResponseStatusType statusType = ContextResolverChain.resolveSuccessfulHttpStatus(this.getClass())
+                .orElseThrow(() -> new RuntimeException("To use this method please declare @SuccessfulHttpStatus for your AbstractApiMethod class"));
+        expectResponseStatus(statusType);
         return callAPI();
     }
 
@@ -177,19 +162,30 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
      * @param propertiesPath String path to properties file
      */
     public void setProperties(String propertiesPath) {
-        URL baseResource = ClassLoader.getSystemResource(propertiesPath);
-        if (baseResource != null) {
+        Properties properties = loadProperties(propertiesPath);
+        setProperties(properties);
+    }
+
+    private static Properties loadProperties(String propertiesPath) {
+        Properties properties;
+
+        if (propertiesPath == null) {
             properties = new Properties();
-            try {
-                properties.load(baseResource.openStream());
-            } catch (IOException e) {
-                throw new RuntimeException("Properties can't be loaded by path: " + propertiesPath, e);
-            }
-            LOGGER.info("Base properties loaded: " + propertiesPath);
         } else {
-            throw new RuntimeException("Properties can't be found by path: " + propertiesPath);
+            URL baseResource = ClassLoader.getSystemResource(propertiesPath);
+            if (baseResource != null) {
+                properties = new Properties();
+                try (InputStream propertiesStream = baseResource.openStream()) {
+                    properties.load(propertiesStream);
+                } catch (IOException e) {
+                    throw new RuntimeException("Properties can't be loaded by path: " + propertiesPath, e);
+                }
+                LOGGER.info("Base properties loaded: " + propertiesPath);
+            } else {
+                throw new RuntimeException("Properties can't be found by path: " + propertiesPath);
+            }
         }
-        properties = PropertiesProcessorMain.processProperties(properties, ignoredPropertiesProcessorClasses);
+        return properties;
     }
 
     public void ignorePropertiesProcessor(Class<? extends PropertiesProcessor> ignoredPropertiesProcessorClass) {
@@ -205,7 +201,9 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
      * @param properties Properties object with predefined properties for declared API method
      */
     public void setProperties(Properties properties) {
-        this.properties = PropertiesProcessorMain.processProperties(properties, ignoredPropertiesProcessorClasses);
+        if (properties != null) {
+            this.properties = PropertiesProcessorMain.processProperties(properties, ignoredPropertiesProcessorClasses);
+        }
     }
 
     public void addProperty(String key, Object value) {

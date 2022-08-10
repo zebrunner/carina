@@ -24,13 +24,15 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 
+import com.qaprosoft.carina.core.foundation.api.resolver.ContextResolverChain;
+import com.qaprosoft.carina.core.foundation.api.resolver.RequestStartLine;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.conn.ssl.SSLSocketFactory;
@@ -41,11 +43,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
-import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
-import com.qaprosoft.carina.core.foundation.api.annotation.Endpoint;
-import com.qaprosoft.carina.core.foundation.api.annotation.HideRequestBodyPartsInLogs;
-import com.qaprosoft.carina.core.foundation.api.annotation.HideRequestHeadersInLogs;
-import com.qaprosoft.carina.core.foundation.api.annotation.HideResponseBodyPartsInLogs;
 import com.qaprosoft.carina.core.foundation.api.http.ContentTypeEnum;
 import com.qaprosoft.carina.core.foundation.api.http.HttpClient;
 import com.qaprosoft.carina.core.foundation.api.http.HttpMethodType;
@@ -70,10 +67,12 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
 public abstract class AbstractApiMethod extends HttpClient {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private StringBuilder bodyContent = null;
-    protected String methodPath = null;
-    protected HttpMethodType methodType = null;
+
+    private StringBuilder bodyContent;
+    protected String methodPath;
+    protected HttpMethodType methodType;
     protected Object response;
     public RequestSpecification request;
     protected ContentTypeEnum contentTypeEnum;
@@ -91,42 +90,18 @@ public abstract class AbstractApiMethod extends HttpClient {
 
     @SuppressWarnings({ "rawtypes" })
     private void init(Class clazz) {
-        Endpoint e = this.getClass().getAnnotation(Endpoint.class);
-        if (e != null) {
-            methodType = e.methodType();
-            methodPath = e.url();
-            return;
-        }
-
-        String typePath = R.API.get(clazz.getSimpleName());
-        if (typePath == null) {
-            throw new RuntimeException("Method type and path are not specified for: " + clazz.getSimpleName());
-        }
-        if (typePath.contains(":")) {
-            methodType = HttpMethodType.valueOf(typePath.split(":")[0]);
-            methodPath = StringUtils.substringAfter(typePath, methodType + ":");
-        } else {
-            methodType = HttpMethodType.valueOf(typePath);
-        }
-
+        RequestStartLine startLine = ContextResolverChain.resolveUrl(clazz);
+        this.methodPath = startLine.getUrl();
+        this.methodType = startLine.getMethodType();
     }
 
     private void initContentTypeFromAnnotation() {
-        ContentType contentTypeA = this.getClass().getAnnotation(ContentType.class);
-        if (contentTypeA == null) {
-            contentTypeEnum = ContentTypeEnum.JSON;
-            this.request.contentType(ContentTypeEnum.JSON.getStringValues()[0]);
-            return;
-        }
-
-        if (ArrayUtils.contains(ContentTypeEnum.JSON.getStringValues(), contentTypeA.type())) {
-            contentTypeEnum = ContentTypeEnum.JSON;
-        } else if (ArrayUtils.contains(ContentTypeEnum.XML.getStringValues(), contentTypeA.type())) {
-            contentTypeEnum = ContentTypeEnum.XML;
-        } else {
-            contentTypeEnum = ContentTypeEnum.NA;
-        }
-        this.request.contentType(contentTypeA.type());
+        String contentType = ContextResolverChain.resolveContentType(this.getClass());
+        this.request.contentType(contentType);
+        this.contentTypeEnum = Arrays.stream(ContentTypeEnum.values())
+                .filter(type -> ArrayUtils.contains(type.getStringValues(), contentType))
+                .findFirst()
+                .orElse(ContentTypeEnum.NA);
     }
 
     private void replaceUrlPlaceholders() {
@@ -239,26 +214,19 @@ public abstract class AbstractApiMethod extends HttpClient {
     }
 
     private void initLogging(PrintStream ps) {
-
         if (logRequest) {
-            HideRequestHeadersInLogs hideHeaders = this.getClass().getAnnotation(HideRequestHeadersInLogs.class);
-            RequestLoggingFilter fHeaders = new RequestLoggingFilter(LogDetail.HEADERS, true, ps, true,
-                    hideHeaders == null ? Collections.emptySet() : new HashSet<String>(Arrays.asList(hideHeaders.headers())));
+            Set<String> headers = ContextResolverChain.resolveHiddenRequestHeadersInLogs(this.getClass())
+                    .orElse(Collections.emptySet());
+            RequestLoggingFilter fHeaders = new RequestLoggingFilter(LogDetail.HEADERS, true, ps, true, headers);
 
             RequestLoggingFilter fCookies = new RequestLoggingFilter(LogDetail.COOKIES, ps);
             RequestLoggingFilter fParams = new RequestLoggingFilter(LogDetail.PARAMS, ps);
             RequestLoggingFilter fMethod = new RequestLoggingFilter(LogDetail.METHOD, ps);
             RequestLoggingFilter fUri = new RequestLoggingFilter(LogDetail.URI, ps);
 
-            RequestLoggingFilter fBody;
-            HideRequestBodyPartsInLogs hideRqBody = this.getClass().getAnnotation(HideRequestBodyPartsInLogs.class);
-
-            if (hideRqBody != null) {
-                fBody = new CarinaRequestBodyLoggingFilter(true, ps, new HashSet<String>(Arrays.asList(hideRqBody.paths())), contentTypeEnum);
-            } else {
-                fBody = new RequestLoggingFilter(LogDetail.BODY, ps);
-            }
-
+            RequestLoggingFilter fBody = ContextResolverChain.resolveHiddenRequestBodyPartsInLogs(this.getClass())
+                    .<RequestLoggingFilter>map(paths -> new CarinaRequestBodyLoggingFilter(true, ps, paths, contentTypeEnum))
+                    .orElseGet(() -> new RequestLoggingFilter(LogDetail.BODY, ps));
             request.filters(fMethod, fUri, fParams, fCookies, fHeaders, fBody);
         }
 
@@ -267,15 +235,9 @@ public abstract class AbstractApiMethod extends HttpClient {
             ResponseLoggingFilter fHeaders = new ResponseLoggingFilter(LogDetail.HEADERS, ps);
             ResponseLoggingFilter fCookies = new ResponseLoggingFilter(LogDetail.COOKIES, ps);
 
-            ResponseLoggingFilter fBody;
-            HideResponseBodyPartsInLogs a = this.getClass().getAnnotation(HideResponseBodyPartsInLogs.class);
-            if (a != null) {
-                fBody = new CarinaResponseBodyLoggingFilter(true, ps, Matchers.any(Integer.class), new HashSet<String>(Arrays.asList(a.paths())),
-                        contentTypeEnum);
-            } else {
-                fBody = new ResponseLoggingFilter(LogDetail.BODY, ps);
-            }
-
+            ResponseLoggingFilter fBody = ContextResolverChain.resolveHiddenResponseBodyPartsInLogs(this.getClass())
+                    .<ResponseLoggingFilter>map(paths -> new CarinaResponseBodyLoggingFilter(true, ps, Matchers.any(Integer.class), paths, contentTypeEnum))
+                    .orElseGet(() -> new ResponseLoggingFilter(LogDetail.BODY, ps));
             request.filters(fBody, fCookies, fHeaders, fStatus);
         }
     }
@@ -285,15 +247,13 @@ public abstract class AbstractApiMethod extends HttpClient {
     }
 
     Response callAPI(LoggingOutputStream outputStream) {
-
         if (ignoreSSL) {
             ignoreSSLCerts();
         }
 
-        if (bodyContent.length() != 0)
+        if (bodyContent.length() != 0) {
             request.body(bodyContent.toString());
-
-        Response rs = null;
+        }
 
         PrintStream ps = null;
         if (logRequest || logResponse) {
@@ -301,6 +261,7 @@ public abstract class AbstractApiMethod extends HttpClient {
             initLogging(ps);
         }
 
+        Response rs;
         try {
             rs = HttpClient.send(request, methodPath, methodType);
         } finally {
