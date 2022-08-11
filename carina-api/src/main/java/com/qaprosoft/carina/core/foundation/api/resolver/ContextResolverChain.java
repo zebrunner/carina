@@ -1,6 +1,5 @@
 package com.qaprosoft.carina.core.foundation.api.resolver;
 
-import com.qaprosoft.carina.core.foundation.api.http.ContentTypeEnum;
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
 
 import java.util.List;
@@ -15,14 +14,12 @@ public class ContextResolverChain {
             new PropertiesContextResolver()
     );
 
-    public static RequestStartLine resolveUrl(Class<?> clazz) {
-        return getResolverValue(resolver -> resolver.resolveUrl(clazz))
-                .orElseThrow(() -> new RuntimeException("Method type and path are not specified for: " + clazz.getSimpleName()));
+    public static Optional<RequestStartLine> resolveUrl(Class<?> clazz) {
+        return getResolverValue(resolver -> resolver.resolveUrl(clazz));
     }
 
-    public static String resolveContentType(Class<?> clazz) {
-        return getResolverValue(resolver -> resolver.resolveContentType(clazz))
-                .orElse(ContentTypeEnum.JSON.getMainStringValue());
+    public static Optional<String> resolveContentType(Class<?> clazz) {
+        return getResolverValue(resolver -> resolver.resolveContentType(clazz));
     }
 
     public static Optional<Set<String>> resolveHiddenRequestBodyPartsInLogs(Class<?> clazz) {

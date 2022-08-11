@@ -90,13 +90,15 @@ public abstract class AbstractApiMethod extends HttpClient {
 
     @SuppressWarnings({ "rawtypes" })
     private void init(Class clazz) {
-        RequestStartLine startLine = ContextResolverChain.resolveUrl(clazz);
+        RequestStartLine startLine = ContextResolverChain.resolveUrl(clazz)
+                .orElseThrow(() -> new RuntimeException("Method type and path are not specified for: " + clazz.getSimpleName()));
         this.methodPath = startLine.getUrl();
         this.methodType = startLine.getMethodType();
     }
 
     private void initContentTypeFromAnnotation() {
-        String contentType = ContextResolverChain.resolveContentType(this.getClass());
+        String contentType = ContextResolverChain.resolveContentType(this.getClass())
+                .orElse(ContentTypeEnum.JSON.getMainStringValue());
         this.request.contentType(contentType);
         this.contentTypeEnum = Arrays.stream(ContentTypeEnum.values())
                 .filter(type -> ArrayUtils.contains(type.getStringValues(), contentType))
