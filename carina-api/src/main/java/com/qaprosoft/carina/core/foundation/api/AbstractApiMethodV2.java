@@ -62,7 +62,6 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
      */
     public AbstractApiMethodV2() {
         this(null, null);
-        initPathsFromAnnotation();
     }
 
     public AbstractApiMethodV2(String rqPath, String rsPath) {
@@ -77,15 +76,16 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         super();
         setHeaders(ACCEPT_ALL_HEADER);
         setProperties(properties);
-        this.rqPath = rqPath;
-        this.rsPath = rsPath;
+        initPaths(rqPath, rsPath);
     }
 
-    private void initPathsFromAnnotation() {
-        ContextResolverChain.resolveRequestTemplatePath(this.getClass())
-                .ifPresent(path -> this.rqPath = path);
-        ContextResolverChain.resolveResponseTemplatePath(this.getClass())
-                .ifPresent(path -> this.rsPath = path);
+    private void initPaths(String rqPath, String rsPath) {
+        this.rqPath = rqPath != null
+                ? rqPath
+                : ContextResolverChain.resolveRequestTemplatePath(this.getClass()).orElse(null);
+        this.rsPath = rsPath != null
+                ? rsPath
+                : ContextResolverChain.resolveResponseTemplatePath(this.getClass()).orElse(null);
     }
 
     /**
