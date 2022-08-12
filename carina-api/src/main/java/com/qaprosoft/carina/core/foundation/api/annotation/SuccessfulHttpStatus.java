@@ -25,5 +25,7 @@ import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
 @Target(value = ElementType.TYPE)
 @Retention(value = RetentionPolicy.RUNTIME)
 public @interface SuccessfulHttpStatus {
+
     HttpResponseStatusType status();
+
 }

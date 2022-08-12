@@ -25,7 +25,9 @@ import com.qaprosoft.carina.core.foundation.api.http.HttpMethodType;
 @Target(value = ElementType.TYPE)
 @Retention(value = RetentionPolicy.RUNTIME)
 public @interface Endpoint {
+
     String url();
 
     HttpMethodType methodType();
+
 }
