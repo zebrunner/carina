@@ -3,15 +3,17 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Objects;
 
 import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.EdgeCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
@@ -47,8 +49,8 @@ public class EdgeFactory extends AbstractFactory {
      * Determines if the driver is suitable for the current capabilities
      */
     public static boolean isSuitable(Capabilities capabilities) {
-        if (capabilities.getPlatformName() != null && (capabilities.getPlatformName().is(Platform.IOS) ||
-                capabilities.getPlatformName().is(Platform.ANDROID))) {
+
+        if (!Objects.equals(Configuration.getDriverType(capabilities), SpecialKeywords.DESKTOP)) {
             return false;
         }
 

@@ -455,10 +455,14 @@ public class Configuration {
             return SpecialKeywords.WINDOWS;
         }
 
+        if (SpecialKeywords.MAC.equalsIgnoreCase(platform)) {
+            return SpecialKeywords.MAC;
+        }
+
         return SpecialKeywords.DESKTOP;
     }
 
-    public static String getDriverType(DesiredCapabilities capabilities) {
+    public static String getDriverType(Capabilities capabilities) {
         if (capabilities == null) {
             // calculate driver type based on config.properties arguments
             return getDriverType();
@@ -475,6 +479,10 @@ public class Configuration {
         
         if (SpecialKeywords.WINDOWS.equalsIgnoreCase(platform)) {
             return SpecialKeywords.WINDOWS;
+        }
+
+        if (SpecialKeywords.MAC.equalsIgnoreCase(platform)) {
+            return SpecialKeywords.MAC;
         }
 
         // handle use-case when we provide only uuid object among desired capabilities

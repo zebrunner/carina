@@ -3,8 +3,8 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Objects;
 
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.XCUITestCapabilities;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
@@ -12,8 +12,9 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.ChromeCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.XCUITestCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 
 import io.appium.java_client.remote.AutomationName;
@@ -48,6 +49,11 @@ public class CustomIOSMobileFactory extends AbstractFactory {
      * Determines if the driver is suitable for the current capabilities
      */
     public static boolean isSuitable(Capabilities capabilities) {
+
+        if (!Objects.equals(Configuration.getDriverType(capabilities), SpecialKeywords.MOBILE)) {
+            return false;
+        }
+
         // for localhost, browserstack, saucelabs we do not create android driver
         String customCapabilities = Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES);
 

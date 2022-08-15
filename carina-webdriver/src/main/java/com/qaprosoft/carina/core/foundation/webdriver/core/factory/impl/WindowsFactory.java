@@ -3,13 +3,15 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Objects;
 
 import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.WindowsCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 
@@ -44,8 +46,7 @@ public class WindowsFactory extends AbstractFactory {
      * Determines if the driver is suitable for the current capabilities
      */
     public static boolean isSuitable(Capabilities capabilities) {
-        // questionable, todo check
-        if (Platform.WINDOWS.is(capabilities.getPlatformName())) {
+        if (Objects.equals(Configuration.getDriverType(capabilities), SpecialKeywords.WINDOWS)) {
             return true;
         }
 

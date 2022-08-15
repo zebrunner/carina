@@ -3,12 +3,15 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Objects;
 
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.Mac2Capabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 
@@ -43,6 +46,10 @@ public class MacFactory extends AbstractFactory {
      * Determines if the driver is suitable for the current capabilities
      */
     public static boolean isSuitable(Capabilities capabilities) {
+
+        if (Objects.equals(Configuration.getDriverType(capabilities), SpecialKeywords.MAC)) {
+            return true;
+        }
 
         if (capabilities.getCapability(SupportsAutomationNameOption.AUTOMATION_NAME_OPTION) != null &&
                 capabilities.getCapability(SupportsAutomationNameOption.AUTOMATION_NAME_OPTION)

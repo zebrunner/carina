@@ -3,6 +3,7 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Objects;
 
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Platform;
@@ -10,6 +11,7 @@ import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.UIAutomator2Capabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
@@ -44,6 +46,11 @@ public class AndroidFactory extends AbstractFactory {
      * Determines if the driver is suitable for the current capabilities and selenium url
      */
     public static boolean isSuitable(Capabilities capabilities) {
+
+        if (!Objects.equals(Configuration.getDriverType(capabilities), SpecialKeywords.MOBILE)) {
+            return false;
+        }
+
         // for localhost, browserstack, saucelabs we do not create android driver
         String customCapabilities = Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES);
         if (!customCapabilities.isEmpty()
