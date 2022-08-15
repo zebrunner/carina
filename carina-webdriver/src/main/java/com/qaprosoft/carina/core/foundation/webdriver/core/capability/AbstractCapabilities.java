@@ -3,10 +3,12 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.capability;
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Proxy;
@@ -20,6 +22,8 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.proxy.SystemProxy;
+
+import io.appium.java_client.remote.options.SupportsBrowserNameOption;
 
 public abstract class AbstractCapabilities<T extends MutableCapabilities> {
 
@@ -100,6 +104,11 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
             capabilities.setCapability(capabilityName, value);
         }
 
+        // browser can be provided not only as capability, but also as configuration parameter
+        String browserName = Configuration.getBrowser();
+        if (!Objects.equals(browserName, StringUtils.EMPTY)) {
+            capabilities.setCapability(SupportsBrowserNameOption.BROWSER_NAME_OPTION, Configuration.getBrowser());
+        }
         return capabilities;
     }
 
