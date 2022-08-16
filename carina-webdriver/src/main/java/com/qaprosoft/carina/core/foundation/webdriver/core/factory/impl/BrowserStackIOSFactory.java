@@ -56,7 +56,7 @@ public class BrowserStackIOSFactory extends AbstractFactory {
         String customCapabilities = Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES);
 
         if (capabilities.getCapability("os") != null &&
-                capabilities.getCapability("os") == MobilePlatform.IOS) {
+                MobilePlatform.IOS.equalsIgnoreCase(capabilities.getCapability("os").toString())) {
 
             if (!customCapabilities.isEmpty() && customCapabilities.toLowerCase().contains("browserstack")) {
                 return true;
