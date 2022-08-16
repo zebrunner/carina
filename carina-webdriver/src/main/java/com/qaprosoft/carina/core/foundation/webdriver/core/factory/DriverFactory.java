@@ -36,6 +36,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.BrowserS
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.ChromeFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.CustomAndroidMobileFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.CustomIOSMobileFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.DefaultFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.EdgeFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.FirefoxFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.GeckoFactory;
@@ -156,11 +157,7 @@ public class DriverFactory {
             return new EdgeFactory();
         }
 
-
-        throw new RuntimeException(
-                "Factory cannot be chosen. Please, provide valid capabilities. Check is your capabilities contains "
-                        + "browserName, platformName, automationName (all or one of them)");
-        // fixme add default driver factory instance
+        LOGGER.warn("Cannot understand what type of driver factory should be choosen. Choosed default driver");
+        return new DefaultFactory();
     }
-
 }
