@@ -1313,10 +1313,12 @@ public class DriverHelper {
 
     private static void setPageLoadTimeout(WebDriver drv, long timeout) {
         try {
-            drv.manage().timeouts().pageLoadTimeout(timeout, TimeUnit.SECONDS);
+            drv.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(timeout));
         } catch (UnsupportedCommandException e) {
             // TODO: review upcoming appium 2.0 changes
             LOGGER.debug("Appium: Not implemented yet for pageLoad timeout!");
+        } catch (WebDriverException e) {
+            LOGGER.debug(e.getMessage());
         }
 
     }
