@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.Objects;
 
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
@@ -13,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.BrowserStackIOSCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.XCUITestCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 
 import io.appium.java_client.remote.MobilePlatform;
@@ -28,7 +29,8 @@ public class BrowserStackIOSFactory extends AbstractFactory {
 
     @Override
     public WebDriver create(String testName, String seleniumHost, Capabilities capabilities) {
-        Capabilities options = new BrowserStackIOSCapabilities().getCapabilities(testName, capabilities);
+        MutableCapabilities options = new XCUITestCapabilities().getCapabilities(testName, capabilities);
+        options.setCapability("platformName", "ANY");
         LOGGER.debug("capabilities: {}", options);
 
         URL hostURL;

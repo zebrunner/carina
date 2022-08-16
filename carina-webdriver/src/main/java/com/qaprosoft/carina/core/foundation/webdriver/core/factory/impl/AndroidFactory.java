@@ -18,8 +18,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFacto
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.remote.AutomationName;
-import io.appium.java_client.remote.options.SupportsAutomationNameOption;
 
 /**
  * For native android testing and testing browser on android
@@ -66,13 +64,6 @@ public class AndroidFactory extends AbstractFactory {
         }
 
         if (Platform.ANDROID.is(capabilities.getPlatformName())) {
-            return true;
-        }
-
-        if (capabilities.getCapability(SupportsAutomationNameOption.AUTOMATION_NAME_OPTION) != null &&
-                capabilities.getCapability(SupportsAutomationNameOption.AUTOMATION_NAME_OPTION)
-                        .toString()
-                        .equalsIgnoreCase(AutomationName.ANDROID_UIAUTOMATOR2)) {
             return true;
         }
 

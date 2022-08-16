@@ -10,11 +10,10 @@ import org.openqa.selenium.remote.Browser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.SafariCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 
-import io.appium.java_client.remote.AutomationName;
-import io.appium.java_client.remote.options.SupportsAutomationNameOption;
 import io.appium.java_client.safari.SafariDriver;
 
 /**
@@ -52,16 +51,20 @@ public class SafariFactory extends AbstractFactory {
      * Determines if the driver is suitable for the current capabilities
      */
     public static boolean isSuitable(Capabilities capabilities) {
+
+        // for browserstack we do not create safari driver
+        String customCapabilities = Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES);
+        if (!customCapabilities.isEmpty() && customCapabilities.toLowerCase().contains("browserstack")) {
+            return false;
+        }
+
+        if (Configuration.getSeleniumUrl().contains("hub.browserstack.com")) {
+            return false;
+        }
+
         if (capabilities.getBrowserName().equalsIgnoreCase(Browser.SAFARI.browserName())) {
             return true;
         }
-
-        if (capabilities.getCapability(SupportsAutomationNameOption.AUTOMATION_NAME_OPTION) != null &&
-                capabilities.getCapability(SupportsAutomationNameOption.AUTOMATION_NAME_OPTION).toString()
-                        .equalsIgnoreCase(AutomationName.SAFARI)) {
-            return true;
-        }
-
         return false;
     }
 }
