@@ -20,6 +20,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppium
 
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.remote.AutomationName;
+import io.appium.java_client.remote.MobilePlatform;
 import io.appium.java_client.remote.options.SupportsAutomationNameOption;
 
 public class IOSFactory extends AbstractFactory {
@@ -77,6 +78,11 @@ public class IOSFactory extends AbstractFactory {
         }
 
         if (Platform.IOS.is(capabilities.getPlatformName())) {
+            return true;
+        }
+
+        if (capabilities.getCapability("platformName") != null &&
+                MobilePlatform.TVOS.equalsIgnoreCase(capabilities.getCapability("platformName").toString())) {
             return true;
         }
 
