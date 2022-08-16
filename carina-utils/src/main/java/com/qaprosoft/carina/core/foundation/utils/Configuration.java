@@ -469,8 +469,8 @@ public class Configuration {
         }
 
         String platform = "";
-        if (capabilities.getCapability("platformName") != null) {
-            platform = capabilities.getCapability("platformName").toString();
+        if (capabilities.getPlatformName() != null) {
+            platform = capabilities.getPlatformName().toString();
         }
 
         if (SpecialKeywords.ANDROID.equalsIgnoreCase(platform) || SpecialKeywords.IOS.equalsIgnoreCase(platform) || SpecialKeywords.TVOS.equalsIgnoreCase(platform)) {
