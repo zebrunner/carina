@@ -22,6 +22,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
@@ -341,7 +342,7 @@ public class Configuration {
      */
     public static String getPlatform(Capabilities caps) {
         // any platform by default
-        String platform = "*";
+        String platform = Platform.ANY.toString();
         
         LOGGER.debug("platform1: " + platform);
         // redefine platform if os caps is available
@@ -469,7 +470,7 @@ public class Configuration {
             return getDriverType();
         }
 
-        String platform = "";
+        String platform = getPlatform(capabilities);
         if (capabilities.getCapability("platformName") != null) {
             platform = capabilities.getCapability("platformName").toString();
         }
