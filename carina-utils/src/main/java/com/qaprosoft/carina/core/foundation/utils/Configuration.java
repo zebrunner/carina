@@ -21,6 +21,8 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
@@ -329,7 +331,7 @@ public class Configuration {
      * @return String platform name
      */
     public static String getPlatform() {
-        return getPlatform(new DesiredCapabilities());
+        return getPlatform(new MutableCapabilities());
     }
 
     /**
