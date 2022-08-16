@@ -53,15 +53,15 @@ public class AndroidFactory extends AbstractFactory {
         String customCapabilities = Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES);
         if (!customCapabilities.isEmpty()
                 && (customCapabilities.toLowerCase().contains("localhost") ||
-                        customCapabilities.toLowerCase().contains("browserstack") ||
+                    //    customCapabilities.toLowerCase().contains("browserstack") ||
                         customCapabilities.toLowerCase().contains("saucelabs"))) {
             return false;
         }
 
-        if (Configuration.getSeleniumUrl().contains("hub.browserstack.com")) {
-            // #1786 mobile drivers on browserstack should be started via CUSTOM - RemoteWebDriver driver
-            return false;
-        }
+//        if (Configuration.getSeleniumUrl().contains("hub.browserstack.com")) {
+//            // #1786 mobile drivers on browserstack should be started via CUSTOM - RemoteWebDriver driver
+//            return false;
+//        }
 
         if (Platform.ANDROID.is(capabilities.getPlatformName())) {
             return true;

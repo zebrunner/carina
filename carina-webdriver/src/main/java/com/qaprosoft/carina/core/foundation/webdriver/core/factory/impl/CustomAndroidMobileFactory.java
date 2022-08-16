@@ -65,15 +65,15 @@ public class CustomAndroidMobileFactory extends AbstractFactory {
 
             if (!customCapabilities.isEmpty() &&
                     (customCapabilities.toLowerCase().contains("localhost") ||
-                            customCapabilities.toLowerCase().contains("browserstack") ||
+                      //      customCapabilities.toLowerCase().contains("browserstack") ||
                             customCapabilities.toLowerCase().contains("saucelabs"))) {
                 return true;
             }
 
-            if (Configuration.getSeleniumUrl().contains("hub.browserstack.com")) {
-                // #1786 mobile drivers on browserstack should be started via CUSTOM - RemoteWebDriver driver
-                return true;
-            }
+//            if (Configuration.getSeleniumUrl().contains("hub.browserstack.com")) {
+//                // #1786 mobile drivers on browserstack should be started via CUSTOM - RemoteWebDriver driver
+//                return true;
+//            }
         }
 
         return false;
