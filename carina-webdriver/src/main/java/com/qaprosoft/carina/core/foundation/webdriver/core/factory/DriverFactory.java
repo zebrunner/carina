@@ -32,6 +32,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.AndroidFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.BrowserStackAndroidFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.BrowserStackIOSFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.ChromeFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.CustomAndroidMobileFactory;
@@ -123,6 +124,10 @@ public class DriverFactory {
 
         if (BrowserStackIOSFactory.isSuitable(capabilities)) {
             return new BrowserStackIOSFactory();
+        }
+
+        if (BrowserStackAndroidFactory.isSuitable(capabilities)) {
+            return new BrowserStackAndroidFactory();
         }
 
         if (CustomIOSMobileFactory.isSuitable(capabilities)) {
