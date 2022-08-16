@@ -22,7 +22,6 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.Platform;
 import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
@@ -471,8 +470,8 @@ public class Configuration {
         }
 
         String platform = "";
-        if (capabilities.getPlatformName() != null) {
-            platform = capabilities.getPlatformName().toString();
+        if (capabilities.getCapability("platformName") != null) {
+            platform = capabilities.getCapability("platformName").toString();
         }
 
         if (SpecialKeywords.ANDROID.equalsIgnoreCase(platform) || SpecialKeywords.IOS.equalsIgnoreCase(platform) || SpecialKeywords.TVOS.equalsIgnoreCase(platform)) {
