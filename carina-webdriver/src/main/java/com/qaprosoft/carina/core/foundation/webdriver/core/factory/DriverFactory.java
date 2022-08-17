@@ -30,14 +30,13 @@ import org.slf4j.LoggerFactory;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.AndroidMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.ChromeMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.DriverMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.EdgeMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.FirefoxMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.IOSMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.MacMiddleware;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.DriverMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.SafariMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.WindowsMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.AndroidFactory;
@@ -88,8 +87,7 @@ public class DriverFactory {
                 new MacMiddleware());
 
         LOGGER.info("Starting driver session...");
-        WebDriver driver = middleware.getDriver(testName, seleniumHost,
-                capabilities == null ? AbstractCapabilities.getConfigurationCapabilities() : capabilities);
+        WebDriver driver = middleware.getDriver(testName, seleniumHost, capabilities);
         driver = middleware.registerListeners(driver, getEventListeners());
         LOGGER.info("Driver session started.");
         LOGGER.debug("DriverFactory finish...");

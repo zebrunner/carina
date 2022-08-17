@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Function;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.BrowserstackMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.CapabilitiesMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
@@ -53,7 +54,7 @@ public abstract class DriverMiddleware {
     protected abstract WebDriver getDriverByRule(String testName, String seleniumHost, Capabilities capabilities);
 
     public WebDriver getDriver(String testName, String seleniumHost, Capabilities capabilities) {
-        if (!isSuitable(capabilities)) {
+        if (!isSuitable(capabilities == null ? AbstractCapabilities.getConfigurationCapabilities() : capabilities)) {
             if (next == null) {
                 throw new RuntimeException("Cannot choose driver");
             }
