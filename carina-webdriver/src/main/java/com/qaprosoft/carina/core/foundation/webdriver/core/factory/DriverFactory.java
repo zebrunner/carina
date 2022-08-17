@@ -31,6 +31,13 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.AndroidMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.ChromeMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.EdgeMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.FirefoxMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.IOSMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.Middleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.SafariMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.AndroidFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.BrowserStackAndroidFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.BrowserStackIOSFactory;
@@ -66,12 +73,17 @@ public class DriverFactory {
             seleniumHost = seleniumUrl.toString();
         }
 
-        AbstractFactory driverFactory = chooseDriverFactory(
-                capabilities == null ? AbstractCapabilities.getConfigurationCapabilities() : capabilities);
+        Middleware middleware = Middleware.link(new ChromeMiddleware(),
+                new EdgeMiddleware(),
+                new FirefoxMiddleware(),
+                new AndroidMiddleware(),
+                new IOSMiddleware(),
+                new SafariMiddleware());
 
         LOGGER.info("Starting driver session...");
-        WebDriver driver = driverFactory.create(testName, seleniumHost, capabilities);
-        driver = driverFactory.registerListeners(driver, getEventListeners());
+        WebDriver driver = middleware.getDriver(testName, seleniumHost,
+                capabilities == null ? AbstractCapabilities.getConfigurationCapabilities() : capabilities);
+        driver = middleware.registerListeners(driver, getEventListeners());
         LOGGER.info("Driver session started.");
         LOGGER.debug("DriverFactory finish...");
         return driver;
