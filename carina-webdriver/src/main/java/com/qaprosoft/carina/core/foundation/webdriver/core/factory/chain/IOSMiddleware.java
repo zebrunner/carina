@@ -84,6 +84,8 @@ public class IOSMiddleware extends Middleware {
                 Configuration.getSeleniumUrl().contains("hub-cloud.browserstack.com")) {
 
             LOGGER.info("Browserstack was detected! RemoteWebDriver will be used instead of IOSDriver");
+
+            options.setPlatformName("ANY"); // Browserstack is not understand platform name IOS
             driver = new RemoteWebDriver(hostURL, options);
 
         } else {

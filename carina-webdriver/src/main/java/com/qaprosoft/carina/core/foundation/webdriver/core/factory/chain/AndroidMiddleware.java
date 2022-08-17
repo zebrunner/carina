@@ -71,8 +71,6 @@ public class AndroidMiddleware extends Middleware {
                 Configuration.getSeleniumUrl().contains("hub.browserstack.com") ||
                 Configuration.getSeleniumUrl().contains("hub-cloud.browserstack.com")) {
             LOGGER.info("Browserstack was detected! RemoteWebDriver will be used instead of AndroidDriver");
-
-            options.setPlatformName("ANY"); // Browserstack is not understand platform name IOS
             driver = new RemoteWebDriver(hostURL, options);
 
         } else {
