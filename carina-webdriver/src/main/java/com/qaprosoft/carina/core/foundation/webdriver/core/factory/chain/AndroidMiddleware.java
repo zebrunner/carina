@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.UIAutomator2Capabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.DriverUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 
 import io.appium.java_client.android.AndroidDriver;
@@ -64,14 +65,8 @@ public class AndroidMiddleware extends DriverMiddleware {
         RemoteWebDriver driver = null;
         URL hostURL = getURL(seleniumHost);
 
-        String customCapabilities = Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES);
-        if ((!customCapabilities.isEmpty() &&
-                customCapabilities.toLowerCase().contains("browserstack")) ||
-                Configuration.getSeleniumUrl().contains("hub.browserstack.com") ||
-                Configuration.getSeleniumUrl().contains("hub-cloud.browserstack.com")) {
-            LOGGER.info("Browserstack was detected! RemoteWebDriver will be used instead of AndroidDriver");
+        if (DriverUtils.isCustomDriver()) {
             driver = new RemoteWebDriver(hostURL, options);
-
         } else {
             EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(hostURL);
             driver = new AndroidDriver(ce, options);
