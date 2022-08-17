@@ -16,13 +16,12 @@ import io.appium.java_client.remote.MobilePlatform;
 public class BrowserstackMiddleware extends CapabilitiesMiddleware {
 
     // todo add more and refactor
-    List<String> browserstackSpecificCapabilities = Arrays.asList("userName", "accessKey", "os", "osVersion", "projectName", "buildName",
-            "sessionName", "local", "localIdentifier", "debug", "consoleLogs", "networkLogs", "appiumLogs",
-            "video", "seleniumLogs", "telemetryLogs", "geoLocation", "timezone", "resolution",
-            "seleniumVersion", "browserstack.maskCommands", "idleTimeout", "maskBasicAuth",
-            "autoWait", "hosts", "bfcache", "wsLocalSupport", "disableCorsRestrictions",
-            "buildTag", "deviceName", "realMobile", "appiumVersion", "deviceOrientation",
-            "customNetwork", "networkProfile");
+    List<String> browserstackSpecificCapabilities = Arrays.asList("userName", "accessKey", "appiumVersion", "projectName", "buildName",
+            "sessionName", "appVersion", "acceptInsecureCerts", "local", "midSessionInstallApps", "localIdentifier",
+            "debug", "deviceLogs", "networkLogs", "networkLogsExcludeHosts", "networkLogsIncludeHosts",
+            "appiumLogs", "video", "appStoreConfiguration", "gpsLocation", "geoLocation", "networkProfile",
+            "customNetwork", "resignApp", "timezone", "disableAnimations", "enablePasscode", "deviceOrientation",
+            "idleTimeout", "maskCommands", "uploadMedia");
 
     @Override
     protected boolean isDetected(Capabilities capabilities) {
