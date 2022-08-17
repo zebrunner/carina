@@ -42,7 +42,7 @@ public class BrowserstackMiddleware extends CapabilitiesMiddleware {
         DesiredCapabilities allCapabilities = new DesiredCapabilities();
         for (String capabilityName : capabilities.asMap().keySet()) {
             String cleanCapabilityName = StringUtils.removeStart(capabilityName, CapabilityHelpers.APPIUM_PREFIX);
-            if (browserstackSpecificCapabilities.contains(capabilityName)) {
+            if (browserstackSpecificCapabilities.contains(cleanCapabilityName)) {
                 browserstackOptions.put(cleanCapabilityName, capabilities.getCapability(capabilityName));
             } else {
                 allCapabilities.setCapability(cleanCapabilityName, capabilities.getCapability(capabilityName));
