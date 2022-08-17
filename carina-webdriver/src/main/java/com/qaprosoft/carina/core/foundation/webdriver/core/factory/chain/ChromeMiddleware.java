@@ -34,7 +34,7 @@ public class ChromeMiddleware extends Middleware {
 
     @Override
     protected WebDriver getDriverByRule(String testName, String seleniumHost, Capabilities capabilities) {
-        ChromeOptions options = new ChromeCapabilities().getCapabilities(testName, capabilities);
+        Capabilities options = capabilitiesMiddleware.analyze(new ChromeCapabilities().getCapabilities(testName, capabilities));
         LOGGER.debug("Chrome capabilities: {}", options);
         EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(getURL(seleniumHost));
         WebDriver driver = new RemoteWebDriver(ce, options);

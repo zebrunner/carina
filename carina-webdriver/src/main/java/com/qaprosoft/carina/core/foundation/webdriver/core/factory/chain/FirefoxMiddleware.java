@@ -5,7 +5,6 @@ import java.util.Objects;
 
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
@@ -34,7 +33,7 @@ public class FirefoxMiddleware extends Middleware {
 
     @Override
     protected WebDriver getDriverByRule(String testName, String seleniumHost, Capabilities capabilities) {
-        FirefoxOptions options = new FirefoxCapabilities().getCapabilities(testName, capabilities);
+        Capabilities options = capabilitiesMiddleware.analyze(new FirefoxCapabilities().getCapabilities(testName, capabilities));
         LOGGER.debug("Firefox capabilities: {}", options);
         EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(getURL(seleniumHost));
         WebDriver driver = new RemoteWebDriver(ce, options);

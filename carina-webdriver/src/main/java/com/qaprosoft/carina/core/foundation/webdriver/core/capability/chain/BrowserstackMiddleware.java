@@ -43,6 +43,7 @@ public class BrowserstackMiddleware extends CapabilitiesMiddleware {
                 allCapabilities.setCapability(capabilityName, capabilities.getCapability(capabilityName));
             }
         }
+
         allCapabilities.setCapability("bstack:options", browserstackOptions);
         return allCapabilities;
     }

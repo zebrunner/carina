@@ -18,7 +18,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.XCUIT
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 
 import io.appium.java_client.ios.IOSDriver;
-import io.appium.java_client.ios.options.XCUITestOptions;
 import io.appium.java_client.remote.MobilePlatform;
 
 public class IOSMiddleware extends Middleware {
@@ -71,7 +70,7 @@ public class IOSMiddleware extends Middleware {
 
     @Override
     protected WebDriver getDriverByRule(String testName, String seleniumHost, Capabilities capabilities) {
-        XCUITestOptions options = new XCUITestCapabilities().getCapabilities(testName, capabilities);
+        Capabilities options = capabilitiesMiddleware.analyze(new XCUITestCapabilities().getCapabilities(testName, capabilities));
         LOGGER.debug("IOS capabilities: {}", options);
 
         RemoteWebDriver driver = null;
@@ -85,7 +84,7 @@ public class IOSMiddleware extends Middleware {
 
             LOGGER.info("Browserstack was detected! RemoteWebDriver will be used instead of IOSDriver");
 
-            options.setPlatformName("ANY"); // Browserstack is not understand platform name IOS
+            // options.setPlatformName("ANY"); // Browserstack is not understand platform name IOS
             driver = new RemoteWebDriver(hostURL, options);
 
         } else {

@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.Mac2Capabilities;
 
 import io.appium.java_client.mac.Mac2Driver;
-import io.appium.java_client.mac.options.Mac2Options;
 import io.appium.java_client.remote.AutomationName;
 import io.appium.java_client.remote.options.SupportsAutomationNameOption;
 
@@ -36,7 +35,7 @@ public class MacMiddleware extends Middleware {
 
     @Override
     protected WebDriver getDriverByRule(String testName, String seleniumHost, Capabilities capabilities) {
-        Mac2Options options = new Mac2Capabilities().getCapabilities(testName, capabilities);
+        Capabilities options = capabilitiesMiddleware.analyze(new Mac2Capabilities().getCapabilities(testName, capabilities));
         LOGGER.debug("Mac2 capabilities: {}", options);
         return new Mac2Driver(getURL(seleniumHost), options);
     }

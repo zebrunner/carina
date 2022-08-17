@@ -17,7 +17,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.UIAut
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.options.UiAutomator2Options;
 import io.appium.java_client.remote.MobilePlatform;
 
 public class AndroidMiddleware extends Middleware {
@@ -59,7 +58,7 @@ public class AndroidMiddleware extends Middleware {
 
     @Override
     protected WebDriver getDriverByRule(String testName, String seleniumHost, Capabilities capabilities) {
-        UiAutomator2Options options = new UIAutomator2Capabilities().getCapabilities(testName, capabilities);
+        Capabilities options = capabilitiesMiddleware.analyze(new UIAutomator2Capabilities().getCapabilities(testName, capabilities));
         LOGGER.debug("Android capabilities: {}", options);
 
         RemoteWebDriver driver = null;

@@ -24,13 +24,19 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Function;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.BrowserstackMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.CapabilitiesMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 
 public abstract class Middleware {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
+    protected CapabilitiesMiddleware capabilitiesMiddleware;
     private Middleware next;
+
+    public Middleware() {
+        this.capabilitiesMiddleware = CapabilitiesMiddleware.link(new BrowserstackMiddleware());
+    }
 
     public static Middleware link(Middleware first, Middleware... chain) {
 

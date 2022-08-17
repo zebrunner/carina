@@ -5,7 +5,6 @@ import java.util.Objects;
 
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chromium.ChromiumOptions;
 import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
@@ -34,7 +33,7 @@ public class EdgeMiddleware extends Middleware {
 
     @Override
     protected WebDriver getDriverByRule(String testName, String seleniumHost, Capabilities capabilities) {
-        ChromiumOptions<?> options = new EdgeCapabilities().getCapabilities(testName, capabilities);
+        Capabilities options = capabilitiesMiddleware.analyze(new EdgeCapabilities().getCapabilities(testName, capabilities));
         LOGGER.debug("Edge  capabilities: {}", options);
         EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(getURL(seleniumHost));
         WebDriver driver = new RemoteWebDriver(ce, options);

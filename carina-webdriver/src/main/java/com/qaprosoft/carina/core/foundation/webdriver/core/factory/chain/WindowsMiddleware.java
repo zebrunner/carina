@@ -12,7 +12,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.Windo
 import io.appium.java_client.remote.AutomationName;
 import io.appium.java_client.remote.options.SupportsAutomationNameOption;
 import io.appium.java_client.windows.WindowsDriver;
-import io.appium.java_client.windows.options.WindowsOptions;
 
 public class WindowsMiddleware extends Middleware {
 
@@ -36,7 +35,7 @@ public class WindowsMiddleware extends Middleware {
 
     @Override
     protected WebDriver getDriverByRule(String testName, String seleniumHost, Capabilities capabilities) {
-        WindowsOptions options = new WindowsCapabilities().getCapabilities(testName, capabilities);
+        Capabilities options = capabilitiesMiddleware.analyze(new WindowsCapabilities().getCapabilities(testName, capabilities));
         LOGGER.debug("Windows capabilities: {}", options);
         return new WindowsDriver(getURL(seleniumHost), options);
     }

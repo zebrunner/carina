@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.SafariCapabilities;
 
 import io.appium.java_client.safari.SafariDriver;
-import io.appium.java_client.safari.options.SafariOptions;
 
 public class SafariMiddleware extends Middleware {
 
@@ -38,7 +37,7 @@ public class SafariMiddleware extends Middleware {
 
     @Override
     protected WebDriver getDriverByRule(String testName, String seleniumHost, Capabilities capabilities) {
-        SafariOptions options = new SafariCapabilities().getCapabilities(testName, capabilities);
+        Capabilities options = capabilitiesMiddleware.analyze(new SafariCapabilities().getCapabilities(testName, capabilities));
         LOGGER.debug("Safari capabilities: {}", options);
         WebDriver driver = new SafariDriver(getURL(seleniumHost), options);
         resizeBrowserWindow(driver, options);
