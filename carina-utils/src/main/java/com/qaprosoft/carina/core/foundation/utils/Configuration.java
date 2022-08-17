@@ -453,6 +453,11 @@ public class Configuration {
             return SpecialKeywords.MOBILE;
         }
 
+        if (!Configuration.getBrowser().isEmpty()) {
+            return SpecialKeywords.DESKTOP;
+
+        }
+
         if (SpecialKeywords.WINDOWS.equalsIgnoreCase(platform)) {
             return SpecialKeywords.WINDOWS;
         }
@@ -461,7 +466,7 @@ public class Configuration {
             return SpecialKeywords.MAC;
         }
 
-        return SpecialKeywords.DESKTOP;
+        throw new RuntimeException("Cannot understand what type of driver");
     }
 
     public static String getDriverType(Capabilities capabilities) {
@@ -478,6 +483,10 @@ public class Configuration {
         if (SpecialKeywords.ANDROID.equalsIgnoreCase(platform) || SpecialKeywords.IOS.equalsIgnoreCase(platform) || SpecialKeywords.TVOS.equalsIgnoreCase(platform)) {
             return SpecialKeywords.MOBILE;
         }
+
+        if (capabilities.getBrowserName() != null) {
+            return SpecialKeywords.DESKTOP;
+        }
         
         if (SpecialKeywords.WINDOWS.equalsIgnoreCase(platform)) {
             return SpecialKeywords.WINDOWS;
@@ -492,8 +501,8 @@ public class Configuration {
             LOGGER.debug("Detected MOBILE driver_type by uuid inside capabilities");
             return SpecialKeywords.MOBILE;
         }
+        throw new RuntimeException("Cannot understand what type of driver");
 
-        return SpecialKeywords.DESKTOP;
     }
 
     public static String getAutomationName() {
