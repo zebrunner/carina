@@ -44,7 +44,7 @@ public class BrowserstackMiddleware extends CapabilitiesMiddleware {
             if (browserstackSpecificCapabilities.contains(cleanCapabilityName)) {
                 browserstackOptions.put(cleanCapabilityName, capabilities.getCapability(capabilityName));
             } else {
-                allCapabilities.setCapability(cleanCapabilityName, capabilities.getCapability(capabilityName));
+                allCapabilities.setCapability(capabilityName, capabilities.getCapability(capabilityName));
             }
         }
 
