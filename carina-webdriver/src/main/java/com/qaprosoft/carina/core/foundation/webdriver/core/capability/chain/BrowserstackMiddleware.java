@@ -21,7 +21,7 @@ public class BrowserstackMiddleware extends CapabilitiesMiddleware {
             "debug", "deviceLogs", "networkLogs", "networkLogsExcludeHosts", "networkLogsIncludeHosts",
             "appiumLogs", "video", "appStoreConfiguration", "gpsLocation", "geoLocation", "networkProfile",
             "customNetwork", "resignApp", "timezone", "disableAnimations", "enablePasscode", "deviceOrientation",
-            "idleTimeout", "maskCommands", "uploadMedia", "os", "osVersion");
+            "idleTimeout", "maskCommands", "uploadMedia", "os", "osVersion", "seleniumVersion");
 
     @Override
     protected boolean isDetected(Capabilities capabilities) {
