@@ -13,7 +13,7 @@ import io.appium.java_client.mac.Mac2Driver;
 import io.appium.java_client.remote.AutomationName;
 import io.appium.java_client.remote.options.SupportsAutomationNameOption;
 
-public class MacMiddleware extends Middleware {
+public class MacMiddleware extends DriverMiddleware {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 

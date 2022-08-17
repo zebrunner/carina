@@ -13,7 +13,7 @@ import io.appium.java_client.remote.AutomationName;
 import io.appium.java_client.remote.options.SupportsAutomationNameOption;
 import io.appium.java_client.windows.WindowsDriver;
 
-public class WindowsMiddleware extends Middleware {
+public class WindowsMiddleware extends DriverMiddleware {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 

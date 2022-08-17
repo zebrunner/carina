@@ -15,7 +15,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.EdgeCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
 
-public class EdgeMiddleware extends Middleware {
+public class EdgeMiddleware extends DriverMiddleware {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 

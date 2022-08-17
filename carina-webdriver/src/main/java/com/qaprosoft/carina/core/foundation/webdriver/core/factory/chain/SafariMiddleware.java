@@ -12,7 +12,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.Safar
 
 import io.appium.java_client.safari.SafariDriver;
 
-public class SafariMiddleware extends Middleware {
+public class SafariMiddleware extends DriverMiddleware {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 

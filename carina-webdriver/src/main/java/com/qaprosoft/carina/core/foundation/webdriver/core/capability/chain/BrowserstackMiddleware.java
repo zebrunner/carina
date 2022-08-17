@@ -4,10 +4,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+
+import io.appium.java_client.internal.CapabilityHelpers;
 
 public class BrowserstackMiddleware extends CapabilitiesMiddleware {
 
@@ -37,10 +40,11 @@ public class BrowserstackMiddleware extends CapabilitiesMiddleware {
         HashMap<String, Object> browserstackOptions = new HashMap<>();
         DesiredCapabilities allCapabilities = new DesiredCapabilities();
         for (String capabilityName : capabilities.asMap().keySet()) {
+            String cleanCapabilityName = StringUtils.removeStart(capabilityName, CapabilityHelpers.APPIUM_PREFIX);
             if (browserstackSpecificCapabilities.contains(capabilityName)) {
-                browserstackOptions.put(capabilityName, capabilities.getCapability(capabilityName));
+                browserstackOptions.put(cleanCapabilityName, capabilities.getCapability(capabilityName));
             } else {
-                allCapabilities.setCapability(capabilityName, capabilities.getCapability(capabilityName));
+                allCapabilities.setCapability(cleanCapabilityName, capabilities.getCapability(capabilityName));
             }
         }
 

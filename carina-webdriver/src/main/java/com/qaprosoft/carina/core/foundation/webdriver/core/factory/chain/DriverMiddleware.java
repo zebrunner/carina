@@ -28,20 +28,20 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.Brow
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.CapabilitiesMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 
-public abstract class Middleware {
+public abstract class DriverMiddleware {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     protected CapabilitiesMiddleware capabilitiesMiddleware;
-    private Middleware next;
+    private DriverMiddleware next;
 
-    public Middleware() {
+    public DriverMiddleware() {
         this.capabilitiesMiddleware = CapabilitiesMiddleware.link(new BrowserstackMiddleware());
     }
 
-    public static Middleware link(Middleware first, Middleware... chain) {
+    public static DriverMiddleware link(DriverMiddleware first, DriverMiddleware... chain) {
 
-        Middleware head = first;
-        for (Middleware nextInChain : chain) {
+        DriverMiddleware head = first;
+        for (DriverMiddleware nextInChain : chain) {
             head.next = nextInChain;
             head = nextInChain;
         }

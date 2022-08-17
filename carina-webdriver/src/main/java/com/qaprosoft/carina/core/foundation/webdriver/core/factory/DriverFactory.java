@@ -37,7 +37,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.EdgeMid
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.FirefoxMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.IOSMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.MacMiddleware;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.Middleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.DriverMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.SafariMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.WindowsMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.AndroidFactory;
@@ -78,7 +78,7 @@ public class DriverFactory {
         // CapabilitiesMiddleware capabilitiesMiddleware = CapabilitiesMiddleware.link(new BrowserstackMiddleware());
         // capabilities = capabilitiesMiddleware.analyze(capabilities == null ? AbstractCapabilities.getConfigurationCapabilities() : capabilities);
 
-        Middleware middleware = Middleware.link(new ChromeMiddleware(),
+        DriverMiddleware middleware = DriverMiddleware.link(new ChromeMiddleware(),
                 new EdgeMiddleware(),
                 new FirefoxMiddleware(),
                 new AndroidMiddleware(),
