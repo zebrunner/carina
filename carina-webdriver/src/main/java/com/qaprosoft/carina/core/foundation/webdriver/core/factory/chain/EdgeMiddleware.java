@@ -28,6 +28,12 @@ public class EdgeMiddleware extends DriverMiddleware {
         if (capabilities.getBrowserName().equalsIgnoreCase(Browser.EDGE.browserName())) {
             return true;
         }
+
+        // browserstack-specific
+        if ("Edge".equalsIgnoreCase(capabilities.getBrowserName())) {
+            return true;
+        }
+
         return false;
     }
 
