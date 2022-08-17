@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 
@@ -35,7 +35,7 @@ public class BrowserstackMiddleware extends CapabilitiesMiddleware {
     @Override
     protected Capabilities upgradeCapabilities(Capabilities capabilities) {
         HashMap<String, Object> browserstackOptions = new HashMap<>();
-        MutableCapabilities allCapabilities = new MutableCapabilities();
+        DesiredCapabilities allCapabilities = new DesiredCapabilities();
         for (String capabilityName : capabilities.asMap().keySet()) {
             if (browserstackSpecificCapabilities.contains(capabilityName)) {
                 browserstackOptions.put(capabilityName, capabilities.getCapability(capabilityName));
