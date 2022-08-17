@@ -7,6 +7,7 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.Browser;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +72,16 @@ public class IOSMiddleware extends Middleware {
     protected WebDriver getDriverByRule(String testName, String seleniumHost, Capabilities capabilities) {
         XCUITestOptions options = new XCUITestCapabilities().getCapabilities(testName, capabilities);
         LOGGER.debug("IOS capabilities: {}", options);
+
+        String customCapabilities = Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES);
+        if ((!customCapabilities.isEmpty() &&
+                customCapabilities.toLowerCase().contains("browserstack")) ||
+                Configuration.getSeleniumUrl().contains("hub.browserstack.com") ||
+                Configuration.getSeleniumUrl().contains("hub-cloud.browserstack.com")) {
+            LOGGER.info("Browserstack was detected! RemoteWebDriver will be used instead of IOSDriver");
+            return new RemoteWebDriver(getURL(seleniumHost), options);
+        }
+
         EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(getURL(seleniumHost));
         IOSDriver driver = new IOSDriver(ce, options);
         registerDevice(driver);

@@ -6,6 +6,7 @@ import java.util.Objects;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +60,18 @@ public class AndroidMiddleware extends Middleware {
     protected WebDriver getDriverByRule(String testName, String seleniumHost, Capabilities capabilities) {
         UiAutomator2Options options = new UIAutomator2Capabilities().getCapabilities(testName, capabilities);
         LOGGER.debug("Android capabilities: {}", options);
+
+        String customCapabilities = Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES);
+        if ((!customCapabilities.isEmpty() &&
+                customCapabilities.toLowerCase().contains("browserstack")) ||
+                Configuration.getSeleniumUrl().contains("hub.browserstack.com") ||
+                Configuration.getSeleniumUrl().contains("hub-cloud.browserstack.com")) {
+            LOGGER.info("Browserstack was detected! RemoteWebDriver will be used instead of AndroidDriver");
+
+            options.setPlatformName("ANY"); // Browserstack is not understand platform name IOS
+            return new RemoteWebDriver(getURL(seleniumHost), options);
+        }
+
         EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(getURL(seleniumHost));
         AndroidDriver driver = new AndroidDriver(ce, options);
         registerDevice(driver);
