@@ -44,7 +44,8 @@ public class BrowserstackMiddleware extends CapabilitiesMiddleware {
             if (browserstackSpecificCapabilities.contains(cleanCapabilityName)) {
                 browserstackOptions.put(cleanCapabilityName, capabilities.getCapability(capabilityName));
             } else {
-                allCapabilities.setCapability(capabilityName, capabilities.getCapability(capabilityName));
+                // browserstack is not understand capabilities with appium prefix
+                allCapabilities.setCapability(cleanCapabilityName, capabilities.getCapability(capabilityName));
             }
         }
 
