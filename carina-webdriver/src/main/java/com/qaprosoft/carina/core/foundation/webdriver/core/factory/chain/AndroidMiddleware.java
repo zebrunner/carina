@@ -1,6 +1,7 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain;
 
 import java.lang.invoke.MethodHandles;
+import java.net.URL;
 import java.util.Objects;
 
 import org.openqa.selenium.Capabilities;
@@ -61,6 +62,9 @@ public class AndroidMiddleware extends Middleware {
         UiAutomator2Options options = new UIAutomator2Capabilities().getCapabilities(testName, capabilities);
         LOGGER.debug("Android capabilities: {}", options);
 
+        RemoteWebDriver driver = null;
+        URL hostURL = getURL(seleniumHost);
+
         String customCapabilities = Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES);
         if ((!customCapabilities.isEmpty() &&
                 customCapabilities.toLowerCase().contains("browserstack")) ||
@@ -69,11 +73,12 @@ public class AndroidMiddleware extends Middleware {
             LOGGER.info("Browserstack was detected! RemoteWebDriver will be used instead of AndroidDriver");
 
             options.setPlatformName("ANY"); // Browserstack is not understand platform name IOS
-            return new RemoteWebDriver(getURL(seleniumHost), options);
-        }
+            driver = new RemoteWebDriver(hostURL, options);
 
-        EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(getURL(seleniumHost));
-        AndroidDriver driver = new AndroidDriver(ce, options);
+        } else {
+            EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(hostURL);
+            driver = new AndroidDriver(ce, options);
+        }
         registerDevice(driver);
         return driver;
     }

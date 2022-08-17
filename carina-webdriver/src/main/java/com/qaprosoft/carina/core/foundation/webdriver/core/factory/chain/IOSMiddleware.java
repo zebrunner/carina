@@ -1,6 +1,7 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain;
 
 import java.lang.invoke.MethodHandles;
+import java.net.URL;
 import java.util.Objects;
 
 import org.openqa.selenium.Capabilities;
@@ -73,17 +74,23 @@ public class IOSMiddleware extends Middleware {
         XCUITestOptions options = new XCUITestCapabilities().getCapabilities(testName, capabilities);
         LOGGER.debug("IOS capabilities: {}", options);
 
+        RemoteWebDriver driver = null;
+        URL hostURL = getURL(seleniumHost);
+
         String customCapabilities = Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES);
         if ((!customCapabilities.isEmpty() &&
                 customCapabilities.toLowerCase().contains("browserstack")) ||
                 Configuration.getSeleniumUrl().contains("hub.browserstack.com") ||
                 Configuration.getSeleniumUrl().contains("hub-cloud.browserstack.com")) {
-            LOGGER.info("Browserstack was detected! RemoteWebDriver will be used instead of IOSDriver");
-            return new RemoteWebDriver(getURL(seleniumHost), options);
-        }
 
-        EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(getURL(seleniumHost));
-        IOSDriver driver = new IOSDriver(ce, options);
+            LOGGER.info("Browserstack was detected! RemoteWebDriver will be used instead of IOSDriver");
+            driver = new RemoteWebDriver(hostURL, options);
+
+        } else {
+            EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(hostURL);
+            driver = new IOSDriver(ce, options);
+
+        }
         registerDevice(driver);
         return driver;
     }
