@@ -11,6 +11,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 
 import io.appium.java_client.internal.CapabilityHelpers;
+import io.appium.java_client.remote.MobilePlatform;
 
 public class BrowserstackMiddleware extends CapabilitiesMiddleware {
 
@@ -46,6 +47,12 @@ public class BrowserstackMiddleware extends CapabilitiesMiddleware {
             } else {
                 allCapabilities.setCapability(cleanCapabilityName, capabilities.getCapability(capabilityName));
             }
+        }
+
+        // browserstack is not understand ios platfromName
+        if (allCapabilities.getCapability("platformName") != null
+                && MobilePlatform.IOS.equalsIgnoreCase(allCapabilities.getCapability("platformName").toString())) {
+            allCapabilities.setCapability("platformName", "ANY");
         }
 
         allCapabilities.setCapability("bstack:options", browserstackOptions);
