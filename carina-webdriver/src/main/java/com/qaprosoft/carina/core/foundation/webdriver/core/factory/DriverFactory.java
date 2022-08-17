@@ -36,8 +36,10 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.ChromeM
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.EdgeMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.FirefoxMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.IOSMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.MacMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.Middleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.SafariMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.WindowsMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.AndroidFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.BrowserStackAndroidFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.BrowserStackIOSFactory;
@@ -78,7 +80,9 @@ public class DriverFactory {
                 new FirefoxMiddleware(),
                 new AndroidMiddleware(),
                 new IOSMiddleware(),
-                new SafariMiddleware());
+                new SafariMiddleware(),
+                new WindowsMiddleware(),
+                new MacMiddleware());
 
         LOGGER.info("Starting driver session...");
         WebDriver driver = middleware.getDriver(testName, seleniumHost,
