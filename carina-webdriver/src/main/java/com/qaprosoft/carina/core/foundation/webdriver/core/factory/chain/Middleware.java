@@ -13,7 +13,6 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
@@ -32,11 +31,7 @@ public abstract class Middleware {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private Middleware next;
-    private HttpCommandExecutor ce;
 
-    /**
-     * Помогает строить цепь из объектов-проверок.
-     */
     public static Middleware link(Middleware first, Middleware... chain) {
 
         Middleware head = first;
@@ -49,15 +44,8 @@ public abstract class Middleware {
 
     protected abstract boolean isSuitable(Capabilities capabilities);
 
-    /**
-     * Подклассы реализуют в этом методе конкретные проверки.
-     */
     protected abstract WebDriver getDriverByRule(String testName, String seleniumHost, Capabilities capabilities);
 
-    /**
-     * Запускает проверку в следующем объекте или завершает проверку, если мы в
-     * последнем элементе цепи.
-     */
     public WebDriver getDriver(String testName, String seleniumHost, Capabilities capabilities) {
         if (!isSuitable(capabilities)) {
             if (next == null) {

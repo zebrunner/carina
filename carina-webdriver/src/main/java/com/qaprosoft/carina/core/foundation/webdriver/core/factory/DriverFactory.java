@@ -31,6 +31,8 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.BrowserstackMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.CapabilitiesMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.AndroidMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.ChromeMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.EdgeMiddleware;
@@ -75,6 +77,9 @@ public class DriverFactory {
             seleniumHost = seleniumUrl.toString();
         }
 
+        CapabilitiesMiddleware capabilitiesMiddleware = CapabilitiesMiddleware.link(new BrowserstackMiddleware());
+        capabilities = capabilitiesMiddleware.analyze(capabilities == null ? AbstractCapabilities.getConfigurationCapabilities() : capabilities);
+
         Middleware middleware = Middleware.link(new ChromeMiddleware(),
                 new EdgeMiddleware(),
                 new FirefoxMiddleware(),
@@ -85,8 +90,7 @@ public class DriverFactory {
                 new MacMiddleware());
 
         LOGGER.info("Starting driver session...");
-        WebDriver driver = middleware.getDriver(testName, seleniumHost,
-                capabilities == null ? AbstractCapabilities.getConfigurationCapabilities() : capabilities);
+        WebDriver driver = middleware.getDriver(testName, seleniumHost, capabilities);
         driver = middleware.registerListeners(driver, getEventListeners());
         LOGGER.info("Driver session started.");
         LOGGER.debug("DriverFactory finish...");
