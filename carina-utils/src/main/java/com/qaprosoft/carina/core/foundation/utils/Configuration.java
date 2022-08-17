@@ -466,7 +466,7 @@ public class Configuration {
             return SpecialKeywords.MAC;
         }
 
-        throw new RuntimeException("Cannot understand what type of driver");
+        return SpecialKeywords.DESKTOP;
     }
 
     public static String getDriverType(Capabilities capabilities) {
@@ -501,7 +501,7 @@ public class Configuration {
             LOGGER.debug("Detected MOBILE driver_type by uuid inside capabilities");
             return SpecialKeywords.MOBILE;
         }
-        throw new RuntimeException("Cannot understand what type of driver");
+        return SpecialKeywords.DESKTOP;
 
     }
 
