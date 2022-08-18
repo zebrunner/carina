@@ -14,7 +14,7 @@ import io.appium.java_client.internal.CapabilityHelpers;
 import io.appium.java_client.remote.MobilePlatform;
 
 public class BrowserstackMiddleware extends CapabilitiesMiddleware {
-
+    // todo add special capabilites for chrome, firefox - browserstack custom
     // todo add more and refactor
     List<String> browserstackSpecificCapabilities = Arrays.asList("userName", "accessKey", "appiumVersion", "projectName", "buildName",
             "sessionName", "appVersion", "acceptInsecureCerts", "local", "midSessionInstallApps", "localIdentifier",

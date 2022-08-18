@@ -28,6 +28,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCa
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.BrowserstackMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.CapabilitiesMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.MCloudMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.SauceLabsMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 
 public abstract class DriverMiddleware {
@@ -38,7 +39,8 @@ public abstract class DriverMiddleware {
 
     public DriverMiddleware() {
         this.capabilitiesMiddleware = CapabilitiesMiddleware.link(new BrowserstackMiddleware(),
-                new MCloudMiddleware());
+                new MCloudMiddleware(),
+                new SauceLabsMiddleware());
     }
 
     public static DriverMiddleware link(DriverMiddleware first, DriverMiddleware... chain) {
