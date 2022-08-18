@@ -1,5 +1,6 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -7,12 +8,17 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 
 import io.appium.java_client.internal.CapabilityHelpers;
 
 public class SauceLabsMiddleware extends CapabilitiesMiddleware {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     // todo add special capabilites for chrome, firefox - browserstack custom
     // todo add more and refactor
     List<String> saucelabsSpecificCapabilities = Arrays.asList("build", "name", "username", "accessKey",
@@ -31,6 +37,8 @@ public class SauceLabsMiddleware extends CapabilitiesMiddleware {
 
     @Override
     protected Capabilities upgradeCapabilities(Capabilities capabilities) {
+        LOGGER.debug("Capabilities will be refactored by saucelabs rules");
+
         HashMap<String, Object> saucelabsOptions = new HashMap<>();
         MutableCapabilities allCapabilities = new MutableCapabilities();
         for (String capabilityName : capabilities.asMap().keySet()) {

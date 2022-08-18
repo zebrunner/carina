@@ -1,5 +1,6 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -7,6 +8,8 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 
@@ -14,6 +17,9 @@ import io.appium.java_client.internal.CapabilityHelpers;
 import io.appium.java_client.remote.MobilePlatform;
 
 public class BrowserstackMiddleware extends CapabilitiesMiddleware {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     // todo add special capabilites for chrome, firefox - browserstack custom
     // todo add more and refactor
     List<String> browserstackSpecificCapabilities = Arrays.asList("userName", "accessKey", "appiumVersion", "projectName", "buildName",
@@ -37,6 +43,8 @@ public class BrowserstackMiddleware extends CapabilitiesMiddleware {
 
     @Override
     protected Capabilities upgradeCapabilities(Capabilities capabilities) {
+        LOGGER.debug("Capabilities will be refactored by browserstack rules");
+
         HashMap<String, Object> browserstackOptions = new HashMap<>();
         DesiredCapabilities allCapabilities = new DesiredCapabilities();
         for (String capabilityName : capabilities.asMap().keySet()) {
