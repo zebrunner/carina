@@ -21,8 +21,6 @@ public class BrowserstackMiddleware extends CapabilitiesMiddleware {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    // todo add special capabilites for chrome, firefox - browserstack custom
-    // todo add more and refactor
     private static final List<String> browserstackSpecificCapabilities = Arrays.asList("userName", "accessKey", "appiumVersion", "projectName",
             "buildName",
             "sessionName", "appVersion", "acceptInsecureCerts", "local", "midSessionInstallApps", "localIdentifier",

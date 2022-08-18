@@ -27,6 +27,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.BrowserstackMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.CapabilitiesMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.LambdatestMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.MCloudMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.SauceLabsMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
@@ -34,13 +35,17 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 public abstract class DriverMiddleware {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final ThreadLocal<Capabilities> configurationCapabilities = new ThreadLocal<>();
+
     protected CapabilitiesMiddleware capabilitiesMiddleware;
     private DriverMiddleware next;
 
     public DriverMiddleware() {
-        this.capabilitiesMiddleware = CapabilitiesMiddleware.link(new BrowserstackMiddleware(),
+        this.capabilitiesMiddleware = CapabilitiesMiddleware.link(
+                new BrowserstackMiddleware(),
                 new MCloudMiddleware(),
-                new SauceLabsMiddleware());
+                new SauceLabsMiddleware(),
+                new LambdatestMiddleware());
     }
 
     public static DriverMiddleware link(DriverMiddleware first, DriverMiddleware... chain) {
@@ -50,6 +55,7 @@ public abstract class DriverMiddleware {
             head.next = nextInChain;
             head = nextInChain;
         }
+        configurationCapabilities.set(AbstractCapabilities.getConfigurationCapabilities());
         return first;
     }
 
@@ -58,7 +64,7 @@ public abstract class DriverMiddleware {
     protected abstract WebDriver getDriverByRule(String testName, String seleniumHost, Capabilities capabilities);
 
     public WebDriver getDriver(String testName, String seleniumHost, Capabilities capabilities) {
-        if (!isSuitable(capabilities == null ? AbstractCapabilities.getConfigurationCapabilities() : capabilities)) {
+        if (!isSuitable(capabilities == null ? configurationCapabilities.get() : capabilities)) {
             if (next == null) {
                 throw new RuntimeException("Cannot choose driver");
             }

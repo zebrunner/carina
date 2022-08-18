@@ -31,20 +31,6 @@ public class AndroidMiddleware extends DriverMiddleware {
             return false;
         }
 
-        // // for localhost, browserstack, saucelabs we do not create android driver
-        // String customCapabilities = Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES);
-        // if (!customCapabilities.isEmpty()
-        // && (customCapabilities.toLowerCase().contains("localhost") ||
-        // // customCapabilities.toLowerCase().contains("browserstack") ||
-        // customCapabilities.toLowerCase().contains("saucelabs"))) {
-        // return false;
-        // }
-
-        // if (Configuration.getSeleniumUrl().contains("hub.browserstack.com")) {
-        // // #1786 mobile drivers on browserstack should be started via CUSTOM - RemoteWebDriver driver
-        // return false;
-        // }
-
         if (capabilities.getCapability("os") != null &&
                 MobilePlatform.ANDROID.equalsIgnoreCase(capabilities.getCapability("os").toString())) {
             return true;
