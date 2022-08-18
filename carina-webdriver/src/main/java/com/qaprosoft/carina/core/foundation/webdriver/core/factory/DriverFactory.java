@@ -35,24 +35,11 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.ChromeM
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.DriverMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.EdgeMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.FirefoxMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.GeckoMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.IOSMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.MacMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.SafariMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.WindowsMiddleware;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.AndroidFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.BrowserStackAndroidFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.BrowserStackIOSFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.ChromeFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.CustomAndroidMobileFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.CustomIOSMobileFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.DefaultFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.EdgeFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.FirefoxFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.GeckoFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.IOSFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.MacFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.SafariFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.WindowsFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.zebrunner.agent.core.webdriver.RemoteWebDriverFactory;
 
@@ -84,7 +71,8 @@ public class DriverFactory {
                 new IOSMiddleware(),
                 new SafariMiddleware(),
                 new WindowsMiddleware(),
-                new MacMiddleware());
+                new MacMiddleware(),
+                new GeckoMiddleware());
 
         LOGGER.info("Starting driver session...");
         WebDriver driver = middleware.getDriver(testName, seleniumHost, capabilities);
@@ -123,63 +111,5 @@ public class DriverFactory {
             LOGGER.error("Unable to register webdriver event listeners!", e);
         }
         return listeners.toArray(new WebDriverEventListener[listeners.size()]);
-    }
-
-    private static AbstractFactory chooseDriverFactory(Capabilities capabilities) {
-
-        if (AndroidFactory.isSuitable(capabilities)) {
-            return new AndroidFactory();
-        }
-
-        if (SafariFactory.isSuitable(capabilities)) {
-            return new SafariFactory();
-        }
-
-        if (IOSFactory.isSuitable(capabilities)) {
-            return new IOSFactory();
-        }
-
-        if (BrowserStackIOSFactory.isSuitable(capabilities)) {
-            return new BrowserStackIOSFactory();
-        }
-
-        if (BrowserStackAndroidFactory.isSuitable(capabilities)) {
-            return new BrowserStackAndroidFactory();
-        }
-
-        if (CustomIOSMobileFactory.isSuitable(capabilities)) {
-            return new CustomIOSMobileFactory();
-        }
-
-        if (CustomAndroidMobileFactory.isSuitable(capabilities)) {
-            return new CustomAndroidMobileFactory();
-        }
-
-        if (MacFactory.isSuitable(capabilities)) {
-            return new MacFactory();
-        }
-
-        if (WindowsFactory.isSuitable(capabilities)) {
-            return new WindowsFactory();
-        }
-
-        if (GeckoFactory.isSuitable(capabilities)) {
-            return new GeckoFactory();
-        }
-
-        if (ChromeFactory.isSuitable(capabilities)) {
-            return new ChromeFactory();
-        }
-
-        if (FirefoxFactory.isSuitable(capabilities)) {
-            return new FirefoxFactory();
-        }
-
-        if (EdgeFactory.isSuitable(capabilities)) {
-            return new EdgeFactory();
-        }
-
-        LOGGER.warn("Cannot understand what type of driver factory should be choosen. Choosed default driver");
-        return new DefaultFactory();
     }
 }

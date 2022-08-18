@@ -12,13 +12,27 @@ public class DriverUtils {
 
     public static boolean isCustomDriver() {
         String customCapabilities = Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES);
-        if ((!customCapabilities.isEmpty() &&
-                customCapabilities.toLowerCase().contains("browserstack")) ||
-                Configuration.getSeleniumUrl().contains("hub.browserstack.com") ||
-                Configuration.getSeleniumUrl().contains("hub-cloud.browserstack.com")) {
-            LOGGER.info("Browserstack was detected! RemoteWebDriver will be used instead of AndroidDriver");
-            return true;
+        if (!customCapabilities.isEmpty()) {
+
+            if (customCapabilities.toLowerCase().contains("browserstack") ||
+                    Configuration.getSeleniumUrl().contains("hub.browserstack.com") ||
+                    Configuration.getSeleniumUrl().contains("hub-cloud.browserstack.com")) {
+                LOGGER.info("Browserstack was detected in custom_capability path! RemoteWebDriver will be used");
+                return true;
+            }
+
+            if (customCapabilities.toLowerCase().contains("saucelabs")) {
+                LOGGER.info("Saucelabs was detected in custom_capability path! RemoteWebDriver will be used");
+                return true;
+            }
+
+            // todo investigate usage
+            if (customCapabilities.toLowerCase().contains("localhost")) {
+                LOGGER.info("localhost name was detected in custom_capability path! RemoteWebDriver will be used");
+
+            }
         }
+
         return false;
     }
 }
