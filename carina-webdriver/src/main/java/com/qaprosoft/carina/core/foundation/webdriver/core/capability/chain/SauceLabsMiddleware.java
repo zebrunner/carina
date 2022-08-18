@@ -15,7 +15,8 @@ import io.appium.java_client.internal.CapabilityHelpers;
 public class SauceLabsMiddleware extends CapabilitiesMiddleware {
     // todo add special capabilites for chrome, firefox - browserstack custom
     // todo add more and refactor
-    List<String> saucelabsSpecificCapabilities = Arrays.asList("build", "name");
+    List<String> saucelabsSpecificCapabilities = Arrays.asList("build", "name", "username", "accessKey",
+            "seleniumVersion");
 
     @Override
     protected boolean isDetected(Capabilities capabilities) {
