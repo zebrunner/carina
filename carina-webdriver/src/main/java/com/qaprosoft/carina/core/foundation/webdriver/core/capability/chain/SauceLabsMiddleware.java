@@ -21,8 +21,20 @@ public class SauceLabsMiddleware extends CapabilitiesMiddleware {
 
     // todo add special capabilites for chrome, firefox - browserstack custom
     // todo add more and refactor
-    List<String> saucelabsSpecificCapabilities = Arrays.asList("build", "name", "username", "accessKey",
-            "seleniumVersion");
+    List<String> saucelabsSpecificCapabilities = Arrays.asList("build", "name", "tags", "username", "accessKey",
+            "custom-data", "public", "tunnelName", "tunnelIdentifier", "tunnelOwner", "parentTunnel",
+            "recordVideo", "videoUploadOnPass", "recordScreenshots", "recordLogs", "maxDuration",
+            "commandTimeout", "idleTimeout", "priority", "timeZone",
+            "seleniumVersion", "chromedriverVersion", "edgedriverVersion", "geckodriverVersion",
+            "iedriverVersion", "avoidProxy", "extendedDebugging", "capturePerformance",
+            "screenResolution", "appiumVersion", "deviceType", "deviceOrientation", "orientation",
+            "setupDeviceLock", "otherApps", "tabletOnly", "phoneOnly", "privateDevicesOnly", "publicDevicesOnly",
+            "carrierConnectivityOnly", "cacheId", "sessionCreationRetry", "sessionCreationTimeout",
+            "newCommandTimeout", "noReset", "crosswalkApplication", "autoGrantPermissions",
+            "enableAnimations", "resigningEnabled", "sauceLabsImageInjectionEnabled",
+            "sauceLabsBypassScreenshotRestriction", "allowTouchIdEnroll",
+            "groupFolderRedirectEnabled", "sauceLabsNetworkCaptureEnabled",
+            "audioCapture", "systemAlertsDelayEnabled");
 
     @Override
     protected boolean isDetected(Capabilities capabilities) {
