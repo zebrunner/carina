@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 
 import io.appium.java_client.internal.CapabilityHelpers;
-import io.appium.java_client.remote.MobilePlatform;
 
 public class BrowserstackMiddleware extends CapabilitiesMiddleware {
 
@@ -95,9 +94,8 @@ public class BrowserstackMiddleware extends CapabilitiesMiddleware {
             }
         }
 
-        // browserstack is not understand ios platfromName
-        if (allCapabilities.getCapability("platformName") != null
-                && MobilePlatform.IOS.equalsIgnoreCase(allCapabilities.getCapability("platformName").toString())) {
+        // browserstack is not understand platfromName when tests browsers
+        if (allCapabilities.getCapability("browserName") != null) {
             allCapabilities.setCapability("platformName", "ANY");
         }
 
