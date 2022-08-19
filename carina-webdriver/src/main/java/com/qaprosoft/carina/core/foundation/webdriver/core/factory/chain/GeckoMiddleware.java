@@ -32,7 +32,7 @@ public class GeckoMiddleware extends DriverMiddleware {
     }
 
     @Override
-    protected WebDriver getDriverByRule(String testName, String seleniumHost, Capabilities capabilities) {
+    public WebDriver getDriver(String testName, String seleniumHost, Capabilities capabilities) {
         Capabilities options = new GeckoCapabilities().getCapabilities(testName, capabilities);
         LOGGER.debug("Gecko capabilities: {}", options);
 

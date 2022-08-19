@@ -38,7 +38,7 @@ public class EdgeMiddleware extends DriverMiddleware {
     }
 
     @Override
-    protected WebDriver getDriverByRule(String testName, String seleniumHost, Capabilities capabilities) {
+    public WebDriver getDriver(String testName, String seleniumHost, Capabilities capabilities) {
         Capabilities options = capabilitiesMiddleware.analyze(new EdgeCapabilities().getCapabilities(testName, capabilities));
         LOGGER.debug("Edge  capabilities: {}", options);
         EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(getURL(seleniumHost));

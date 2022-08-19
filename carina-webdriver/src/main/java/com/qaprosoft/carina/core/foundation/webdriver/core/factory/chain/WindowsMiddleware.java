@@ -34,7 +34,7 @@ public class WindowsMiddleware extends DriverMiddleware {
     }
 
     @Override
-    protected WebDriver getDriverByRule(String testName, String seleniumHost, Capabilities capabilities) {
+    public WebDriver getDriver(String testName, String seleniumHost, Capabilities capabilities) {
         Capabilities options = capabilitiesMiddleware.analyze(new WindowsCapabilities().getCapabilities(testName, capabilities));
         LOGGER.debug("Windows capabilities: {}", options);
         return new WindowsDriver(getURL(seleniumHost), options);

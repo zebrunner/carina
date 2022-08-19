@@ -36,7 +36,7 @@ public class SafariMiddleware extends DriverMiddleware {
     }
 
     @Override
-    protected WebDriver getDriverByRule(String testName, String seleniumHost, Capabilities capabilities) {
+    public WebDriver getDriver(String testName, String seleniumHost, Capabilities capabilities) {
         Capabilities options = capabilitiesMiddleware.analyze(new SafariCapabilities().getCapabilities(testName, capabilities));
         LOGGER.debug("Safari capabilities: {}", options);
         WebDriver driver = new SafariDriver(getURL(seleniumHost), options);

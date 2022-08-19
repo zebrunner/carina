@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Function;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.BrowserstackMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.CapabilitiesMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.LambdatestMiddleware;
@@ -33,9 +32,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.Sauc
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 
 public abstract class DriverMiddleware {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final ThreadLocal<Capabilities> configurationCapabilities = new ThreadLocal<>();
 
     protected CapabilitiesMiddleware capabilitiesMiddleware;
     private DriverMiddleware next;
@@ -55,23 +52,37 @@ public abstract class DriverMiddleware {
             head.next = nextInChain;
             head = nextInChain;
         }
-        configurationCapabilities.set(AbstractCapabilities.getConfigurationCapabilities());
         return first;
     }
 
     protected abstract boolean isSuitable(Capabilities capabilities);
 
-    protected abstract WebDriver getDriverByRule(String testName, String seleniumHost, Capabilities capabilities);
+    /**
+     * Creates new instance of {@link WebDriver} according to configuration capabilities
+     */
+    public DriverMiddleware getDriverMiddleware() {
+        return this.getDriverMiddleware(null);
+    }
 
-    public WebDriver getDriver(String testName, String seleniumHost, Capabilities capabilities) {
-        if (!isSuitable(capabilities == null ? configurationCapabilities.get() : capabilities)) {
+    public DriverMiddleware getDriverMiddleware(Capabilities capabilities) {
+        if (!isSuitable(capabilities)) {
             if (next == null) {
                 throw new RuntimeException("Cannot choose driver");
             }
-            return next.getDriver(testName, seleniumHost, capabilities);
+            return next.getDriverMiddleware(capabilities);
         }
-        return getDriverByRule(testName, seleniumHost, capabilities);
+        return this;
     }
+
+    /**
+     * Creates new instance of {@link WebDriver} according to specified {@link Capabilities}.
+     *
+     * @param testName - where driver is initiated
+     * @param seleniumHost - selenium server URL
+     * @param capabilities - driver capabilities
+     * @return instance of {@link WebDriver}
+     */
+    public abstract WebDriver getDriver(String testName, String seleniumHost, Capabilities capabilities);
 
     protected final URL getURL(String hostUrl) {
         try {

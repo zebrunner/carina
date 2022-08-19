@@ -32,7 +32,7 @@ public class FirefoxMiddleware extends DriverMiddleware {
     }
 
     @Override
-    protected WebDriver getDriverByRule(String testName, String seleniumHost, Capabilities capabilities) {
+    public WebDriver getDriver(String testName, String seleniumHost, Capabilities capabilities) {
         Capabilities options = capabilitiesMiddleware.analyze(new FirefoxCapabilities().getCapabilities(testName, capabilities));
         LOGGER.debug("Firefox capabilities: {}", options);
         EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(getURL(seleniumHost));

@@ -34,7 +34,7 @@ public class MacMiddleware extends DriverMiddleware {
     }
 
     @Override
-    protected WebDriver getDriverByRule(String testName, String seleniumHost, Capabilities capabilities) {
+    public WebDriver getDriver(String testName, String seleniumHost, Capabilities capabilities) {
         Capabilities options = capabilitiesMiddleware.analyze(new Mac2Capabilities().getCapabilities(testName, capabilities));
         LOGGER.debug("Mac2 capabilities: {}", options);
         return new Mac2Driver(getURL(seleniumHost), options);

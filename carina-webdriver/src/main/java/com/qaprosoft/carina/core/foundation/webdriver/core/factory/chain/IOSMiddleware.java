@@ -69,7 +69,7 @@ public class IOSMiddleware extends DriverMiddleware {
     }
 
     @Override
-    protected WebDriver getDriverByRule(String testName, String seleniumHost, Capabilities capabilities) {
+    public WebDriver getDriver(String testName, String seleniumHost, Capabilities capabilities) {
         Capabilities options = capabilitiesMiddleware.analyze(new XCUITestCapabilities().getCapabilities(testName, capabilities));
         LOGGER.debug("IOS capabilities: {}", options);
 
