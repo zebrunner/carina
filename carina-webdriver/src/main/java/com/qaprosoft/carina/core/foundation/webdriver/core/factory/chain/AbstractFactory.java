@@ -31,13 +31,13 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.MClo
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.SauceLabsMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 
-public abstract class DriverMiddleware {
+public abstract class AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     protected CapabilitiesMiddleware capabilitiesMiddleware;
-    private DriverMiddleware next;
+    private AbstractFactory next;
 
-    public DriverMiddleware() {
+    public AbstractFactory() {
         this.capabilitiesMiddleware = CapabilitiesMiddleware.link(
                 new BrowserstackMiddleware(),
                 new MCloudMiddleware(),
@@ -45,10 +45,10 @@ public abstract class DriverMiddleware {
                 new LambdatestMiddleware());
     }
 
-    public static DriverMiddleware link(DriverMiddleware first, DriverMiddleware... chain) {
+    public static AbstractFactory link(AbstractFactory first, AbstractFactory... chain) {
 
-        DriverMiddleware head = first;
-        for (DriverMiddleware nextInChain : chain) {
+        AbstractFactory head = first;
+        for (AbstractFactory nextInChain : chain) {
             head.next = nextInChain;
             head = nextInChain;
         }
@@ -60,16 +60,16 @@ public abstract class DriverMiddleware {
     /**
      * Creates new instance of {@link WebDriver} according to configuration capabilities
      */
-    public DriverMiddleware getDriverMiddleware() {
-        return this.getDriverMiddleware(null);
+    public AbstractFactory getSuitableDriverFactory() {
+        return this.getSuitableDriverFactory(null);
     }
 
-    public DriverMiddleware getDriverMiddleware(Capabilities capabilities) {
+    public AbstractFactory getSuitableDriverFactory(Capabilities capabilities) {
         if (!isSuitable(capabilities)) {
             if (next == null) {
                 throw new RuntimeException("Cannot choose driver");
             }
-            return next.getDriverMiddleware(capabilities);
+            return next.getSuitableDriverFactory(capabilities);
         }
         return this;
     }

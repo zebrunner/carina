@@ -15,7 +15,7 @@ import io.appium.java_client.remote.AutomationName;
 import io.appium.java_client.remote.options.SupportsAutomationNameOption;
 
 @Beta
-public class GeckoMiddleware extends DriverMiddleware {
+public class GeckoFactory extends AbstractFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 

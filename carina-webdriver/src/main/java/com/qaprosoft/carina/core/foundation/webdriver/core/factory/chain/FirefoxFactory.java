@@ -12,10 +12,10 @@ import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.ChromeCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.FirefoxCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
 
-public class ChromeMiddleware extends DriverMiddleware {
+public class FirefoxFactory extends AbstractFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -25,7 +25,7 @@ public class ChromeMiddleware extends DriverMiddleware {
             return false;
         }
 
-        if (capabilities.getBrowserName().equalsIgnoreCase(Browser.CHROME.browserName())) {
+        if (capabilities.getBrowserName().equalsIgnoreCase(Browser.FIREFOX.browserName())) {
             return true;
         }
         return false;
@@ -33,8 +33,8 @@ public class ChromeMiddleware extends DriverMiddleware {
 
     @Override
     public WebDriver getDriver(String testName, String seleniumHost, Capabilities capabilities) {
-        Capabilities options = capabilitiesMiddleware.analyze(new ChromeCapabilities().getCapabilities(testName, capabilities));
-        LOGGER.debug("Chrome capabilities: {}", options);
+        Capabilities options = capabilitiesMiddleware.analyze(new FirefoxCapabilities().getCapabilities(testName, capabilities));
+        LOGGER.debug("Firefox capabilities: {}", options);
         EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(getURL(seleniumHost));
         WebDriver driver = new RemoteWebDriver(ce, options);
         resizeBrowserWindow(driver, options);

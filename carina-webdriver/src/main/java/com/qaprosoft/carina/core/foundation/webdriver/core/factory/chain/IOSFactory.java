@@ -20,7 +20,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppium
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.remote.MobilePlatform;
 
-public class IOSMiddleware extends DriverMiddleware {
+public class IOSFactory extends AbstractFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 

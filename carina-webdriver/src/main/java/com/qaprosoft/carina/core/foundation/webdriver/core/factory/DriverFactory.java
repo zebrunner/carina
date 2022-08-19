@@ -31,16 +31,16 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.AndroidMiddleware;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.ChromeMiddleware;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.DriverMiddleware;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.EdgeMiddleware;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.FirefoxMiddleware;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.GeckoMiddleware;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.IOSMiddleware;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.MacMiddleware;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.SafariMiddleware;
-import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.WindowsMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.AbstractFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.AndroidFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.ChromeFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.EdgeFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.FirefoxFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.GeckoFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.IOSFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.MacFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.SafariFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.WindowsFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.zebrunner.agent.core.webdriver.RemoteWebDriverFactory;
 
@@ -63,24 +63,24 @@ public class DriverFactory {
             seleniumHost = seleniumUrl.toString();
         }
 
-        DriverMiddleware driverMiddleware = DriverMiddleware.link(
-                new ChromeMiddleware(),
-                new EdgeMiddleware(),
-                new FirefoxMiddleware(),
-                new AndroidMiddleware(),
-                new IOSMiddleware(),
-                new SafariMiddleware(),
-                new WindowsMiddleware(),
-                new MacMiddleware(),
-                new GeckoMiddleware());
+        AbstractFactory driverFactory = AbstractFactory.link(
+                new ChromeFactory(),
+                new EdgeFactory(),
+                new FirefoxFactory(),
+                new AndroidFactory(),
+                new IOSFactory(),
+                new SafariFactory(),
+                new WindowsFactory(),
+                new MacFactory(),
+                new GeckoFactory());
 
-        DriverMiddleware suitableDriverMiddleware = driverMiddleware
-                .getDriverMiddleware(capabilities == null ? AbstractCapabilities.getConfigurationCapabilities() : capabilities);
+        AbstractFactory suitableFactory = driverFactory
+                .getSuitableDriverFactory(capabilities == null ? AbstractCapabilities.getConfigurationCapabilities() : capabilities);
 
         LOGGER.info("Starting driver session...");
 
-        WebDriver driver = suitableDriverMiddleware.getDriver(testName, seleniumHost, capabilities);
-        driver = suitableDriverMiddleware.registerListeners(driver, getEventListeners());
+        WebDriver driver = suitableFactory.getDriver(testName, seleniumHost, capabilities);
+        driver = suitableFactory.registerListeners(driver, getEventListeners());
         LOGGER.info("Driver session started.");
         LOGGER.debug("DriverFactory finish...");
         return driver;
