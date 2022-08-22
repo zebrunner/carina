@@ -1,43 +1,31 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Objects;
 
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.ChromeCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
 
-public class ChromeFactory extends AbstractFactory {
+import io.appium.java_client.android.options.UiAutomator2Options;
 
+public class ChromeFactory extends AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     protected boolean isSuitable(Capabilities capabilities) {
-        if (!Objects.equals(Configuration.getDriverType(capabilities), SpecialKeywords.DESKTOP)) {
-            return false;
-        }
-
-        if (capabilities.getBrowserName().equalsIgnoreCase(Browser.CHROME.browserName())) {
-            return true;
-        }
-        return false;
+        return capabilities instanceof UiAutomator2Options;
     }
 
     @Override
-    public WebDriver getDriver(String testName, String seleniumHost, Capabilities capabilities) {
-        Capabilities options = capabilitiesMiddleware.analyze(new ChromeCapabilities().getCapabilities(testName, capabilities));
-        LOGGER.debug("Chrome capabilities: {}", options);
+    public WebDriver getDriver(String seleniumHost, Capabilities capabilities) {
+        LOGGER.debug("Chrome capabilities: {}", capabilities);
         EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(getURL(seleniumHost));
-        WebDriver driver = new RemoteWebDriver(ce, options);
-        resizeBrowserWindow(driver, options);
+        WebDriver driver = new RemoteWebDriver(ce, capabilities);
+        resizeBrowserWindow(driver, capabilities);
         return driver;
     }
 }

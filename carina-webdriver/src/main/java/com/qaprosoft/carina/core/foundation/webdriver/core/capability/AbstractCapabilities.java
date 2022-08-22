@@ -20,7 +20,6 @@ import com.qaprosoft.carina.browsermobproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.proxy.SystemProxy;
 
 import io.appium.java_client.remote.options.SupportsBrowserNameOption;
@@ -30,33 +29,25 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String CAPABILITIES_PREFIX = SpecialKeywords.CAPABILITIES + ".";
     private static final List<String> numericCaps = Arrays.asList("idleTimeout", "waitForIdleTimeout");
-    /**
-     * Returns capabilities from configuration file
-     */
-    public T getCapabilities(String testName) {
-        return this.getCapabilities(testName, null);
-    }
 
     /**
      * if customCapabilities equals null, return capabilities from configuration file, otherwise returns
      * customCapabilities
      */
-    public abstract T getCapabilities(String testName, Capabilities customCapabilities);
+    public abstract T getCapabilities(Capabilities customCapabilities);
 
 
     protected void setCapabilities(T options, Capabilities capabilities) {
+        if (capabilities == null) {
+            return;
+        }
         for (String capabilityName : capabilities.getCapabilityNames()) {
             options.setCapability(capabilityName, capabilities.getCapability(capabilityName));
         }
     }
 
-    protected Capabilities getBrowserConfigurationCapabilities(String testName) {
-        MutableCapabilities capabilities = new MutableCapabilities(getConfigurationCapabilities());
-
-        if (!IDriverPool.DEFAULT.equalsIgnoreCase(testName)) {
-            // #1573: remove "default" driver name capability registration
-            capabilities.setCapability("name", testName);
-        }
+    protected Capabilities getBrowserConfigurationCapabilities() {
+        MutableCapabilities capabilities = new MutableCapabilities();
 
         if (isProxyConfigurationAvailable()) {
             capabilities.setCapability(CapabilityType.PROXY, setupProxy());
@@ -67,7 +58,7 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
     /**
      * Read all properties which starts from "capabilities.*" prefix and add return them as Capabilities object
      */
-    public static Capabilities getConfigurationCapabilities() {
+    public static MutableCapabilities getConfigurationCapabilities() {
         MutableCapabilities capabilities = new MutableCapabilities();
         Properties properties = R.CONFIG.getProperties();
 

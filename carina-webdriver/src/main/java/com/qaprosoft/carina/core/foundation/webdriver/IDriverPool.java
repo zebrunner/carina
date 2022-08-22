@@ -27,7 +27,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -63,7 +62,7 @@ public interface IDriverPool {
     static final ThreadLocal<Device> currentDevice = new ThreadLocal<>();
     static final Device nullDevice = new Device();
     
-    static final ThreadLocal<Capabilities> customCapabilities = new ThreadLocal<>();
+    static final ThreadLocal<MutableCapabilities> customCapabilities = new ThreadLocal<>();
     
     /**
      * Get default driver. If no default driver discovered it will be created
@@ -94,7 +93,7 @@ public interface IDriverPool {
      * @param capabilities Capabilities
      * @return WebDriver
      */
-    default public WebDriver getDriver(String name, Capabilities capabilities) {
+    default public WebDriver getDriver(String name, MutableCapabilities capabilities) {
         return getDriver(name, capabilities, Configuration.getSeleniumUrl());
     }
 
@@ -107,7 +106,7 @@ public interface IDriverPool {
      * @param seleniumHost String
      * @return WebDriver
      */
-    default public WebDriver getDriver(String name, Capabilities capabilities, String seleniumHost) {
+    default public WebDriver getDriver(String name, MutableCapabilities capabilities, String seleniumHost) {
         WebDriver drv = null;
 
         ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
@@ -370,7 +369,7 @@ public interface IDriverPool {
      * @param seleniumHost String
      * @return WebDriver
      */
-    private WebDriver createDriver(String name, Capabilities capabilities, String seleniumHost) {
+    private WebDriver createDriver(String name, MutableCapabilities capabilities, String seleniumHost) {
         int count = 0;
         WebDriver drv = null;
         Device device = nullDevice;

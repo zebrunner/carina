@@ -2,6 +2,7 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.factory;
 
 import java.lang.invoke.MethodHandles;
 
+import org.openqa.selenium.Capabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +11,8 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 public class DriverUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public static boolean isCustomDriver() {
+    public static boolean isCustomDriver(Capabilities capabilities) {
+
         String customCapabilities = Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES);
         if (!customCapabilities.isEmpty()) {
 
@@ -29,7 +31,6 @@ public class DriverUtils {
             // todo investigate usage
             if (customCapabilities.toLowerCase().contains("localhost")) {
                 LOGGER.info("localhost name was detected in custom_capability path! RemoteWebDriver will be used");
-
             }
         }
 

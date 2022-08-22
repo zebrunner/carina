@@ -1,4 +1,4 @@
-package com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain;
+package com.qaprosoft.carina.core.foundation.webdriver.core.capability.capabilchain;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
@@ -7,17 +7,15 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-
 import io.appium.java_client.internal.CapabilityHelpers;
 
-public class BrowserstackMiddleware extends CapabilitiesExternalMiddleware {
-
+public class BrowserstackPreMiddleware extends CapabilitiesMiddleware {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final List<String> browserstackSpecificCapabilities = Arrays.asList("userName", "accessKey", "appiumVersion", "projectName",
@@ -36,19 +34,17 @@ public class BrowserstackMiddleware extends CapabilitiesExternalMiddleware {
 
     @Override
     protected boolean isDetected(Capabilities capabilities) {
-        String customCapabilities = Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES);
-        if ((!customCapabilities.isEmpty() &&
-                customCapabilities.toLowerCase().contains("browserstack")) ||
-                Configuration.getSeleniumUrl().contains("hub.browserstack.com") ||
-                Configuration.getSeleniumUrl().contains("hub-cloud.browserstack.com")) {
-            return true;
+        // If we already have bstack:options, it is not necessary to pre-upgrade options
+        if (CapabilitiesUtils.isBrowserStackSpecificCapabilitiesDetected(capabilities)) {
+            return false;
         }
-        return false;
+
+        return CapabilitiesUtils.isBrowserStackDetected();
     }
 
     @Override
-    protected Capabilities upgradeCapabilities(Capabilities capabilities) {
-        LOGGER.debug("Capabilities will be refactored by browserstack rules");
+    protected MutableCapabilities upgradeCapabilities(MutableCapabilities capabilities) {
+        LOGGER.debug("Capabilities will be upgrade by browserstack rules");
 
         HashMap<String, Object> browserstackOptions = new HashMap<>();
         HashMap<String, Object> chromeSpecificOptions = new HashMap<>();
@@ -116,7 +112,7 @@ public class BrowserstackMiddleware extends CapabilitiesExternalMiddleware {
         }
 
         if (!browserstackOptions.isEmpty()) {
-            allCapabilities.setCapability("bstack:options", browserstackOptions);
+            allCapabilities.setCapability(CapabilitiesUtils.BROWSERSTACK_SPECIFIC_CAPABILITIES, browserstackOptions);
         }
 
         return allCapabilities;

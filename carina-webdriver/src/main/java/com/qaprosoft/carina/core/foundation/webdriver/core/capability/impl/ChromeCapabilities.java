@@ -19,14 +19,11 @@ public class ChromeCapabilities extends AbstractCapabilities<ChromeOptions> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public ChromeOptions getCapabilities(String testName, Capabilities customCapabilities) {
+    public ChromeOptions getCapabilities(Capabilities customCapabilities) {
         ChromeOptions options = new ChromeOptions();
 
-        if (customCapabilities != null) {
-            setCapabilities(options, customCapabilities);
-            return options;
-        }
-        setCapabilities(options, getBrowserConfigurationCapabilities(testName));
+        setCapabilities(options, customCapabilities);
+        setCapabilities(options, getBrowserConfigurationCapabilities());
         addChromeOptions(options);
 
         if (Configuration.getBoolean(Configuration.Parameter.HEADLESS)) {

@@ -15,7 +15,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 
 import io.appium.java_client.internal.CapabilityHelpers;
 
-public class LambdatestMiddleware extends CapabilitiesMiddleware {
+public class LambdatestMiddleware extends CapabilitiesExternalMiddleware {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 

@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 import org.slf4j.Logger;
@@ -31,6 +31,19 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.capabilchain.BrowserstackPostMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.capabilchain.BrowserstackPreMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.capabilchain.CapabilitiesMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.capabilchain.ChromeCapabilitiesMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.capabilchain.EdgeCapabilitiesMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.capabilchain.FirefoxCapabilitiesMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.capabilchain.GeckoCapabilitiesMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.capabilchain.Mac2CapabilitiesMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.capabilchain.SafariCapabilitiesMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.capabilchain.SauceLabsPreMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.capabilchain.UIAutomaror2CapabilitiesMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.capabilchain.XCUITestCapabilitiesMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.capabilchain.ZebrunnerPreMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.AndroidFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.ChromeFactory;
@@ -53,7 +66,7 @@ import com.zebrunner.agent.core.webdriver.RemoteWebDriverFactory;
 public class DriverFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public static WebDriver create(String testName, String seleniumHost, Capabilities capabilities) {
+    public static WebDriver create(String testName, String seleniumHost, MutableCapabilities capabilities) {
 		LOGGER.debug("DriverFactory start...");
 
         URL seleniumUrl = RemoteWebDriverFactory.getSeleniumHubUrl();
@@ -62,6 +75,20 @@ public class DriverFactory {
             R.CONFIG.put(Parameter.SELENIUM_URL.getKey(), seleniumUrl.toString());
             seleniumHost = seleniumUrl.toString();
         }
+
+        CapabilitiesMiddleware capabilitiesMiddleware = CapabilitiesMiddleware.link(
+                new BrowserstackPreMiddleware(),
+                new SauceLabsPreMiddleware(),
+                new ZebrunnerPreMiddleware(testName),
+                new ChromeCapabilitiesMiddleware(),
+                new FirefoxCapabilitiesMiddleware(),
+                new EdgeCapabilitiesMiddleware(),
+                new UIAutomaror2CapabilitiesMiddleware(),
+                new XCUITestCapabilitiesMiddleware(),
+                new GeckoCapabilitiesMiddleware(),
+                new Mac2CapabilitiesMiddleware(),
+                new SafariCapabilitiesMiddleware(),
+                new BrowserstackPostMiddleware());
 
         AbstractFactory driverFactory = AbstractFactory.link(
                 new ChromeFactory(),
@@ -74,12 +101,14 @@ public class DriverFactory {
                 new MacFactory(),
                 new GeckoFactory());
 
+        capabilities = capabilitiesMiddleware.analyze(capabilities == null ? AbstractCapabilities.getConfigurationCapabilities() : capabilities);
+
         AbstractFactory suitableFactory = driverFactory
-                .getSuitableDriverFactory(capabilities == null ? AbstractCapabilities.getConfigurationCapabilities() : capabilities);
+                .getSuitableDriverFactory(capabilities);
 
         LOGGER.info("Starting driver session...");
 
-        WebDriver driver = suitableFactory.getDriver(testName, seleniumHost, capabilities);
+        WebDriver driver = suitableFactory.getDriver(seleniumHost, capabilities);
         driver = suitableFactory.registerListeners(driver, getEventListeners());
         LOGGER.info("Driver session started.");
         LOGGER.debug("DriverFactory finish...");

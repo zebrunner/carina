@@ -17,15 +17,11 @@ public class EdgeCapabilities extends AbstractCapabilities<ChromiumOptions<?>> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public ChromiumOptions<?> getCapabilities(String testName, Capabilities customCapabilities) {
+    public ChromiumOptions<?> getCapabilities(Capabilities capabilities) {
         ChromiumOptions<?> options = new ChromiumOptions<>(CapabilityType.BROWSER_NAME, EDGE.browserName(), "ms:edgeOptions");
 
-        if (customCapabilities != null) {
-            setCapabilities(options, customCapabilities);
-            return options;
-        }
-
-        setCapabilities(options, getBrowserConfigurationCapabilities(testName));
+        setCapabilities(options, capabilities);
+        setCapabilities(options, getBrowserConfigurationCapabilities());
 
         if (Configuration.getBoolean(Configuration.Parameter.HEADLESS)) {
             options.setHeadless(true);

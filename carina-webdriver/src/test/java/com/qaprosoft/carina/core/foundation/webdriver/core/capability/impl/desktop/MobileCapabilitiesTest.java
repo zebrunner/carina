@@ -42,8 +42,8 @@ public class MobileCapabilitiesTest {
         R.CONFIG.put(LOCALE_KEY, LOCALE, true);
         R.CONFIG.put(LANGUAGE_KEY, "", true);
 
-        String testName = "mobile - getCapabilityWithLocaleTest";
-        XCUITestOptions capabilities = new XCUITestCapabilities().getCapabilities(testName);
+        // String testName = "mobile - getCapabilityWithLocaleTest";
+        XCUITestOptions capabilities = new XCUITestCapabilities().getCapabilities(null);
 
         Assert.assertEquals(capabilities.getLocale().get(), LOCALE, "Locale capability is not valid");
         Assert.assertTrue(capabilities.getLanguage().isEmpty(), "Language capability is not empty");
@@ -54,8 +54,8 @@ public class MobileCapabilitiesTest {
         R.CONFIG.put(LOCALE_KEY, LOCALE, true);
         R.CONFIG.put(LANGUAGE_KEY, LANGUAGE, true);
 
-        String testName = "mobile - getCapabilityWithLocaleAndLanguageSeparatelyTest";
-        XCUITestOptions capabilities = new XCUITestCapabilities().getCapabilities(testName);
+        // String testName = "mobile - getCapabilityWithLocaleAndLanguageSeparatelyTest";
+        XCUITestOptions capabilities = new XCUITestCapabilities().getCapabilities(null);
 
         Assert.assertEquals(capabilities.getLocale().get(), LOCALE, "Locale capability is not valid");
         Assert.assertEquals(capabilities.getLanguage().get(), LANGUAGE, "Language capability is not valid");
@@ -66,8 +66,8 @@ public class MobileCapabilitiesTest {
         R.CONFIG.put(PLATFORM_NAME_KEY, "Android", true);
         R.CONFIG.put(LOCALE_KEY, LOCALE_LANGUAGE, true);
 
-        String testName = "mobile - getAndroidCapabilityWithLocaleAndLanguageTogetherTest";
-        UiAutomator2Options capabilities = new UIAutomator2Capabilities().getCapabilities(testName);
+        // String testName = "mobile - getAndroidCapabilityWithLocaleAndLanguageTogetherTest";
+        UiAutomator2Options capabilities = new UIAutomator2Capabilities().getCapabilities(null);
 
         Assert.assertEquals(capabilities.getLocale().get(), LOCALE, "Locale capability is not valid");
         Assert.assertEquals(capabilities.getLanguage().get(), LANGUAGE, "Language capability is not valid");
@@ -78,8 +78,8 @@ public class MobileCapabilitiesTest {
         R.CONFIG.put(PLATFORM_NAME_KEY, "IOS", true);
         R.CONFIG.put(LOCALE_KEY, LOCALE_LANGUAGE, true);
 
-        String testName = "mobile - getIOSCapabilityWithLocaleAndLanguageTogetherTest";
-        XCUITestOptions capabilities = new XCUITestCapabilities().getCapabilities(testName);
+        // String testName = "mobile - getIOSCapabilityWithLocaleAndLanguageTogetherTest";
+        XCUITestOptions capabilities = new XCUITestCapabilities().getCapabilities(null);
 
         Assert.assertEquals(capabilities.getLocale().get(), LOCALE_LANGUAGE, "Locale capability is not valid");
         Assert.assertEquals(capabilities.getLanguage().get(), LANGUAGE, "Language capability is not valid");

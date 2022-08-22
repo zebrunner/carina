@@ -12,12 +12,10 @@ import io.appium.java_client.safari.options.SafariOptions;
 public class SafariCapabilities extends AbstractCapabilities<SafariOptions> {
 
     @Override
-    public SafariOptions getCapabilities(String testName, Capabilities customCapabilities) {
+    public SafariOptions getCapabilities(Capabilities capabilities) {
         SafariOptions options = new SafariOptions();
-        if (customCapabilities != null) {
-            setCapabilities(options, customCapabilities);
-            return options;
-        }
+        setCapabilities(options, capabilities);
+        // todo check is it correct
         options = options.amend(SupportsBrowserNameOption.BROWSER_NAME_OPTION, Browser.SAFARI.browserName());
         options.setAutomationName(AutomationName.IOS_XCUI_TEST);
         setCapabilities(options, getConfigurationCapabilities());

@@ -44,10 +44,11 @@ public class DesktopCapabilitiesTest {
 
     @Test(groups = {"DesktopCapabilitiesTestClass"})
     public static void getChromeCapabilityTest() {
-        String testName = "chrome - getChromeCapabilityTest";
-        ChromeOptions capabilities = new ChromeCapabilities().getCapabilities(testName);
+        // String testName = "chrome - getChromeCapabilityTest";
+
+        ChromeOptions capabilities = new ChromeCapabilities().getCapabilities(null);
         Assert.assertEquals(capabilities.getBrowserName(), Browser.CHROME.browserName(), "Returned browser name is not valid!");
-        Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
+        // Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
 
         Map<String, Object> chromeOptions = (Map<String, Object>) capabilities.getCapability(ChromeOptions.CAPABILITY);
         List<String> chromeOptionsArgs = (List<String>) chromeOptions.get("args");
@@ -59,12 +60,12 @@ public class DesktopCapabilitiesTest {
 
     @Test(groups = { "DesktopCapabilitiesTestClass" }, enabled = false)
     public static void getFirefoxCapabilityWithDefaultFirefoxProfileTest() {
-        String testName = "firefox - getFirefoxDefaultCapabilityTest";
+        // String testName = "firefox - getFirefoxDefaultCapabilityTest";
 
-        FirefoxOptions capabilities = new FirefoxCapabilities().getCapabilities(testName);
+        FirefoxOptions capabilities = new FirefoxCapabilities().getCapabilities(null);
 
         Assert.assertEquals(capabilities.getBrowserName(), Browser.FIREFOX.browserName(), "Returned browser name is not valid!");
-        Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
+        // Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
 
         boolean actualMediaEmeEnabled = capabilities.getProfile()
                 .getBooleanPreference("media.eme.enabled", false);
@@ -72,22 +73,23 @@ public class DesktopCapabilitiesTest {
 
         boolean actualMediaGmpManagerUpdateEnabled = capabilities.getProfile()
                 .getBooleanPreference("media.gmp-manager.updateEnabled", false);
-        Assert.assertEquals(actualMediaGmpManagerUpdateEnabled, MEDIA_GMP_MANAGER_UPDATE_ENABLED, "Returned firefox profile preference is not valid!");
+        Assert.assertEquals(actualMediaGmpManagerUpdateEnabled, MEDIA_GMP_MANAGER_UPDATE_ENABLED,
+                "Returned firefox profile preference is not valid!");
     }
 
-    @Test(groups = {"DesktopCapabilitiesTestClass"}, enabled = false)
+    @Test(groups = { "DesktopCapabilitiesTestClass" }, enabled = false)
     public static void getFirefoxCapabilityWithCustomFirefoxProfileTest() {
-        String testName = "firefox - getFirefoxCustomCapabilityTest";
+        // String testName = "firefox - getFirefoxCustomCapabilityTest";
 
         FirefoxProfile profile = new FirefoxProfile();
         profile.setPreference("media.eme.enabled", !MEDIA_EME_ENABLED);
         profile.setPreference("media.gmp-manager.updateEnabled", !MEDIA_GMP_MANAGER_UPDATE_ENABLED);
 
-        FirefoxOptions capabilities = new FirefoxCapabilities().getCapabilities(testName);
+        FirefoxOptions capabilities = new FirefoxCapabilities().getCapabilities(null);
         capabilities = capabilities.setProfile(profile);
 
         Assert.assertEquals(capabilities.getBrowserName(), Browser.FIREFOX.browserName(), "Returned browser name is not valid!");
-        Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
+        // Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
 
         boolean actualMediaEmeEnabled = capabilities.getProfile()
                 .getBooleanPreference("media.eme.enabled", true);
@@ -95,84 +97,90 @@ public class DesktopCapabilitiesTest {
 
         boolean actualMediaGmpManagerUpdateEnabled = capabilities.getProfile()
                 .getBooleanPreference("media.gmp-manager.updateEnabled", true);
-        Assert.assertEquals(actualMediaGmpManagerUpdateEnabled, !MEDIA_GMP_MANAGER_UPDATE_ENABLED, "Returned firefox profile preference is not valid!");
+        Assert.assertEquals(actualMediaGmpManagerUpdateEnabled, !MEDIA_GMP_MANAGER_UPDATE_ENABLED,
+                "Returned firefox profile preference is not valid!");
     }
 
  @Test(groups = { "DesktopCapabilitiesTestClass" }, enabled = false)
-    public static void getSafariCapabilityTest() {
-        String testName = "safari - getSafariCapabilityTest";
-        SafariOptions capabilities = new SafariCapabilities().getCapabilities(testName);
-        Assert.assertEquals(capabilities.getBrowserName(), Browser.SAFARI.browserName(), "Returned browser name is not valid!");
-        Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
-    }
+ public static void getSafariCapabilityTest() {
+     // String testName = "safari - getSafariCapabilityTest";
+     SafariOptions capabilities = new SafariCapabilities().getCapabilities(null);
+     Assert.assertEquals(capabilities.getBrowserName(), Browser.SAFARI.browserName(), "Returned browser name is not valid!");
+     // Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
+ }
 
-    @Test(groups = {"DesktopCapabilitiesTestClass"})
-    public static void getEdgeCapabilityTest() {
-        String testName = "edge - getEdgeCapabilityTest";
-        ChromiumOptions<?> capabilities = new EdgeCapabilities().getCapabilities(testName);
-        Assert.assertEquals(capabilities.getBrowserName(), Browser.EDGE.browserName(), "Returned browser name is not valid!");
-        Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
-    }
+ @Test(groups = { "DesktopCapabilitiesTestClass" })
+ public static void getEdgeCapabilityTest() {
+     // String testName = "edge - getEdgeCapabilityTest";
+     ChromiumOptions<?> capabilities = new EdgeCapabilities().getCapabilities(null);
+     Assert.assertEquals(capabilities.getBrowserName(), Browser.EDGE.browserName(), "Returned browser name is not valid!");
+     // Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
+ }
 
-    @Test(groups = {"DesktopCapabilitiesTestClass"})
-    public static void getChromeCapabilityHeadlessTest() {
-        R.CONFIG.put(Configuration.Parameter.HEADLESS.getKey(), "true");
+ @Test(groups = { "DesktopCapabilitiesTestClass" })
+ public static void getChromeCapabilityHeadlessTest() {
+     R.CONFIG.put(Configuration.Parameter.HEADLESS.getKey(), "true");
+     String testName = "chrome - getChromeCapabilityHeadlessTest";
 
-        ChromeOptions capabilities = new ChromeCapabilities().getCapabilities("chrome - getChromeCapabilityHeadlessTest");
+     ChromeOptions capabilities = new ChromeCapabilities().getCapabilities(null);
 
-        Assert.assertFalse((Boolean) capabilities.getCapability("enableVNC"), "Returned capability value is not valid!");
-        Assert.assertFalse((Boolean) capabilities.getCapability("enableVideo"), "Returned capability value is not valid!");
-    }
+     Assert.assertFalse((Boolean) capabilities.getCapability("enableVNC"), "Returned capability value is not valid!");
+     Assert.assertFalse((Boolean) capabilities.getCapability("enableVideo"), "Returned capability value is not valid!");
+ }
 
-    @Test(groups = {"DesktopCapabilitiesTestClass"})
-    public static void getChromeCapabilityProxyTest() {
-        String proxyHost = "host.example.com";
-        String proxyPort = "80";
-        String noProxy = "localhost.example.com";
+ @Test(groups = { "DesktopCapabilitiesTestClass" })
+ public static void getChromeCapabilityProxyTest() {
+     String proxyHost = "host.example.com";
+     String proxyPort = "80";
+     String noProxy = "localhost.example.com";
 
-        R.CONFIG.put(Configuration.Parameter.PROXY_HOST.getKey(), proxyHost, true);
-        R.CONFIG.put(Configuration.Parameter.PROXY_PORT.getKey(), proxyPort, true);
-        R.CONFIG.put(Configuration.Parameter.PROXY_PROTOCOLS.getKey(), "http,https,ftp,socks", true);
-        R.CONFIG.put(Configuration.Parameter.NO_PROXY.getKey(), noProxy, true);
+     R.CONFIG.put(Configuration.Parameter.PROXY_HOST.getKey(), proxyHost, true);
+     R.CONFIG.put(Configuration.Parameter.PROXY_PORT.getKey(), proxyPort, true);
+     R.CONFIG.put(Configuration.Parameter.PROXY_PROTOCOLS.getKey(), "http,https,ftp,socks", true);
+     R.CONFIG.put(Configuration.Parameter.NO_PROXY.getKey(), noProxy, true);
+     String testName = "chrome - getChromeCapabilityProxyTest";
 
-        ChromeOptions capabilities = new ChromeCapabilities().getCapabilities("chrome - getChromeCapabilityProxyTest");
+     ChromeOptions capabilities = new ChromeCapabilities().getCapabilities(null);
 
-        String proxyHostWithPort = proxyHost + ":" + proxyPort;
+     String proxyHostWithPort = proxyHost + ":" + proxyPort;
 
-        Assert.assertEquals(((Proxy) capabilities.getCapability(CapabilityType.PROXY)).getHttpProxy(), proxyHostWithPort, "Http proxy host is not valid!");
-        Assert.assertEquals(((Proxy) capabilities.getCapability(CapabilityType.PROXY)).getSslProxy(), proxyHostWithPort, "Ssl proxy host is not valid!");
-        Assert.assertEquals(((Proxy) capabilities.getCapability(CapabilityType.PROXY)).getFtpProxy(), proxyHostWithPort, "Ftp proxy host is not valid!");
-        Assert.assertEquals(((Proxy) capabilities.getCapability(CapabilityType.PROXY)).getSocksProxy(), proxyHostWithPort, "Socks proxy host is not valid!");
-        Assert.assertEquals(((Proxy) capabilities.getCapability(CapabilityType.PROXY)).getNoProxy(), noProxy, "No proxy is not valid!");
-    }
+    Assert.assertEquals(((Proxy) capabilities.getCapability(CapabilityType.PROXY)).getHttpProxy(), proxyHostWithPort,
+            "Http proxy host is not valid!");
+    Assert.assertEquals(((Proxy) capabilities.getCapability(CapabilityType.PROXY)).getSslProxy(), proxyHostWithPort, "Ssl proxy host is not valid!");
+    Assert.assertEquals(((Proxy) capabilities.getCapability(CapabilityType.PROXY)).getFtpProxy(), proxyHostWithPort, "Ftp proxy host is not valid!");
+    Assert.assertEquals(((Proxy) capabilities.getCapability(CapabilityType.PROXY)).getSocksProxy(), proxyHostWithPort,
+            "Socks proxy host is not valid!");
+    Assert.assertEquals(((Proxy) capabilities.getCapability(CapabilityType.PROXY)).getNoProxy(), noProxy, "No proxy is not valid!");
+}
 
-    @Test(groups = {"DesktopCapabilitiesTestClass"})
-    public static void getChromeCapabilityBrowserLanguageTest() {
-        String browserLanguage = "en_US";
-        R.CONFIG.put(Configuration.Parameter.BROWSER_LANGUAGE.getKey(), browserLanguage, true);
-        ChromeOptions capabilities = new ChromeCapabilities().getCapabilities("chrome - getChromeCapabilityBrowserLanguageTest");
+@Test(groups = { "DesktopCapabilitiesTestClass" })
+public static void getChromeCapabilityBrowserLanguageTest() {
+    String browserLanguage = "en_US";
+    R.CONFIG.put(Configuration.Parameter.BROWSER_LANGUAGE.getKey(), browserLanguage, true);
+    String testName = "chrome - getChromeCapabilityBrowserLanguageTest";
+    ChromeOptions capabilities = new ChromeCapabilities().getCapabilities(null);
 
-        Map<String, Object> chromeOptions = (Map<String, Object>) capabilities.getCapability("goog:chromeOptions");
-        List<String> chromeOptionsArgs = (List<String>) chromeOptions.get("args");
+     Map<String, Object> chromeOptions = (Map<String, Object>) capabilities.getCapability("goog:chromeOptions");
+     List<String> chromeOptionsArgs = (List<String>) chromeOptions.get("args");
 
-        Assert.assertTrue(chromeOptionsArgs.contains("--lang=" + browserLanguage), "Browser language wasn't set!");
-    }
+     Assert.assertTrue(chromeOptionsArgs.contains("--lang=" + browserLanguage), "Browser language wasn't set!");
+ }
 
-    @Test(groups = {"DesktopCapabilitiesTestClass"})
-    public static void getChromeCapabilityAutoDownloadTest() {
-        R.CONFIG.put(Configuration.Parameter.AUTO_DOWNLOAD.getKey(), "true", true);
+ @Test(groups = { "DesktopCapabilitiesTestClass" })
+ public static void getChromeCapabilityAutoDownloadTest() {
+     R.CONFIG.put(Configuration.Parameter.AUTO_DOWNLOAD.getKey(), "true", true);
+     String testName = "chrome - getChromeCapabilityAutoDownloadTest";
+     ChromeOptions capabilities = new ChromeCapabilities().getCapabilities(null);
 
-        ChromeOptions capabilities = new ChromeCapabilities().getCapabilities("chrome - getChromeCapabilityAutoDownloadTest");
+         Map<String, Object> chromeOptions = (Map<String, Object>) capabilities.getCapability("goog:chromeOptions");
+         Map<String, Object> chromeOptionsPref = (Map<String, Object>) chromeOptions.get("prefs");
 
-        Map<String, Object> chromeOptions = (Map<String, Object>) capabilities.getCapability("goog:chromeOptions");
-        Map<String, Object> chromeOptionsPref = (Map<String, Object>) chromeOptions.get("prefs");
-
-        Assert.assertFalse((Boolean) chromeOptionsPref.get("download.prompt_for_download"),
-                "chromeOptionsPref download.prompt_for_download wasn't set!");
-        Assert.assertNotNull(chromeOptionsPref.get("download.default_directory"),
-                "chromeOptionsPref download.default_directory wasn't set!");
-        Assert.assertTrue((Boolean) chromeOptionsPref.get("plugins.always_open_pdf_externally"),
-                "chromeOptionsPref lugins.always_open_pdf_externally wasn't set!");
-    }
+         Assert.assertFalse((Boolean) chromeOptionsPref.get("download.prompt_for_download"),
+                 "chromeOptionsPref download.prompt_for_download wasn't set!");
+         Assert.assertNotNull(chromeOptionsPref.get("download.default_directory"),
+                 "chromeOptionsPref download.default_directory wasn't set!");
+         Assert.assertTrue((Boolean) chromeOptionsPref.get("plugins.always_open_pdf_externally"),
+                 "chromeOptionsPref lugins.always_open_pdf_externally wasn't set!");
+     }
 
 }

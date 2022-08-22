@@ -9,15 +9,9 @@ import io.appium.java_client.gecko.options.GeckoOptions;
 public class GeckoCapabilities extends AbstractCapabilities<GeckoOptions> {
 
     @Override
-    public GeckoOptions getCapabilities(String testName, Capabilities customCapabilities) {
+    public GeckoOptions getCapabilities(Capabilities capabilities) {
         GeckoOptions options = new GeckoOptions();
-
-        if (customCapabilities != null) {
-            setCapabilities(options, customCapabilities);
-            return options;
-        }
-
-        setCapabilities(options, getConfigurationCapabilities());
+        setCapabilities(options, capabilities);
         return options;
     }
 

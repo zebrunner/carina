@@ -17,16 +17,11 @@ public class UIAutomator2Capabilities extends AbstractCapabilities<UiAutomator2O
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public UiAutomator2Options getCapabilities(String testName, Capabilities customCapabilities) {
+    public UiAutomator2Options getCapabilities(Capabilities capabilities) {
         UiAutomator2Options options = new UiAutomator2Options();
-        if (customCapabilities != null) {
-            setCapabilities(options, customCapabilities);
-            return options;
-        }
-
         // this step should be executed before getConfigurationCapabilities() to be able to override this capabilities by default appium approach.
         setLocaleAndLanguage(options);
-        setCapabilities(options, getConfigurationCapabilities());
+        setCapabilities(options, capabilities);
         return options;
     }
 

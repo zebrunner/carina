@@ -8,11 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.Beta;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.GeckoCapabilities;
 
 import io.appium.java_client.gecko.GeckoDriver;
-import io.appium.java_client.remote.AutomationName;
-import io.appium.java_client.remote.options.SupportsAutomationNameOption;
+import io.appium.java_client.gecko.options.GeckoOptions;
 
 @Beta
 public class GeckoFactory extends AbstractFactory {
@@ -21,22 +19,14 @@ public class GeckoFactory extends AbstractFactory {
 
     @Override
     protected boolean isSuitable(Capabilities capabilities) {
-        if (capabilities.getCapability(SupportsAutomationNameOption.AUTOMATION_NAME_OPTION) != null &&
-                capabilities.getCapability(SupportsAutomationNameOption.AUTOMATION_NAME_OPTION)
-                        .toString()
-                        .equalsIgnoreCase(AutomationName.GECKO)) {
-            return true;
-        }
-
-        return false;
+        return capabilities instanceof GeckoOptions;
     }
 
     @Override
-    public WebDriver getDriver(String testName, String seleniumHost, Capabilities capabilities) {
-        Capabilities options = new GeckoCapabilities().getCapabilities(testName, capabilities);
-        LOGGER.debug("Gecko capabilities: {}", options);
+    public WebDriver getDriver(String seleniumHost, Capabilities capabilities) {
+        LOGGER.debug("Gecko capabilities: {}", capabilities);
 
         // todo investigate creating driver with EventFiringAppiumCommandExecutor
-        return new GeckoDriver(getURL(seleniumHost), options);
+        return new GeckoDriver(getURL(seleniumHost), capabilities);
     }
 }

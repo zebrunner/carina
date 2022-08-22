@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
 public class FirefoxCapabilities extends AbstractCapabilities<FirefoxOptions> {
@@ -23,15 +22,11 @@ public class FirefoxCapabilities extends AbstractCapabilities<FirefoxOptions> {
     private static ArrayList<Integer> firefoxPorts = new ArrayList<Integer>();
 
     @Override
-    public FirefoxOptions getCapabilities(String testName, Capabilities customCapabilities) {
+    public FirefoxOptions getCapabilities(Capabilities capabilities) {
         FirefoxOptions options = new FirefoxOptions();
 
-        if (customCapabilities != null) {
-            setCapabilities(options, customCapabilities);
-            return options;
-        }
-
-        setCapabilities(options, getBrowserConfigurationCapabilities(testName));
+        setCapabilities(options, capabilities);
+        setCapabilities(options, getBrowserConfigurationCapabilities());
         addFirefoxOptions(options);
 
         if (Configuration.getBoolean(Configuration.Parameter.HEADLESS)) {

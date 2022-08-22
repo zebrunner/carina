@@ -4,13 +4,11 @@ import java.lang.invoke.MethodHandles;
 
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.Browser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.SafariCapabilities;
-
 import io.appium.java_client.safari.SafariDriver;
+import io.appium.java_client.safari.options.SafariOptions;
 
 public class SafariFactory extends AbstractFactory {
 
@@ -18,29 +16,14 @@ public class SafariFactory extends AbstractFactory {
 
     @Override
     protected boolean isSuitable(Capabilities capabilities) {
-
-        // // for browserstack we do not create safari driver
-        // String customCapabilities = Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES);
-        // if (!customCapabilities.isEmpty() && customCapabilities.toLowerCase().contains("browserstack")) {
-        // return false;
-        // }
-
-        // if (Configuration.getSeleniumUrl().contains("hub.browserstack.com")) {
-        // return false;
-        // }
-
-        if (capabilities.getBrowserName().equalsIgnoreCase(Browser.SAFARI.browserName())) {
-            return true;
-        }
-        return false;
+        return capabilities instanceof SafariOptions;
     }
 
     @Override
-    public WebDriver getDriver(String testName, String seleniumHost, Capabilities capabilities) {
-        Capabilities options = capabilitiesMiddleware.analyze(new SafariCapabilities().getCapabilities(testName, capabilities));
-        LOGGER.debug("Safari capabilities: {}", options);
-        WebDriver driver = new SafariDriver(getURL(seleniumHost), options);
-        resizeBrowserWindow(driver, options);
+    public WebDriver getDriver(String seleniumHost, Capabilities capabilities) {
+        LOGGER.debug("Safari capabilities: {}", capabilities);
+        WebDriver driver = new SafariDriver(getURL(seleniumHost), capabilities);
+        resizeBrowserWindow(driver, capabilities);
         return driver;
     }
 }

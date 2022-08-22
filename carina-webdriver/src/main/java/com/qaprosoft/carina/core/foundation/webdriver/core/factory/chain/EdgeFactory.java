@@ -1,18 +1,14 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Objects;
 
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.Browser;
+import org.openqa.selenium.chromium.ChromiumOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.EdgeCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
 
 public class EdgeFactory extends AbstractFactory {
@@ -21,29 +17,16 @@ public class EdgeFactory extends AbstractFactory {
 
     @Override
     protected boolean isSuitable(Capabilities capabilities) {
-        if (!Objects.equals(Configuration.getDriverType(capabilities), SpecialKeywords.DESKTOP)) {
-            return false;
-        }
-
-        if (capabilities.getBrowserName().equalsIgnoreCase(Browser.EDGE.browserName())) {
-            return true;
-        }
-
-        // browserstack-specific
-        if ("Edge".equalsIgnoreCase(capabilities.getBrowserName())) {
-            return true;
-        }
-
-        return false;
+        return capabilities instanceof ChromiumOptions<?> &&
+                capabilities.getCapability("ms:edgeOptions") != null;
     }
 
     @Override
-    public WebDriver getDriver(String testName, String seleniumHost, Capabilities capabilities) {
-        Capabilities options = capabilitiesMiddleware.analyze(new EdgeCapabilities().getCapabilities(testName, capabilities));
-        LOGGER.debug("Edge  capabilities: {}", options);
+    public WebDriver getDriver(String seleniumHost, Capabilities capabilities) {
+        LOGGER.debug("Edge  capabilities: {}", capabilities);
         EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(getURL(seleniumHost));
-        WebDriver driver = new RemoteWebDriver(ce, options);
-        resizeBrowserWindow(driver, options);
+        WebDriver driver = new RemoteWebDriver(ce, capabilities);
+        resizeBrowserWindow(driver, capabilities);
         return driver;
     }
 }

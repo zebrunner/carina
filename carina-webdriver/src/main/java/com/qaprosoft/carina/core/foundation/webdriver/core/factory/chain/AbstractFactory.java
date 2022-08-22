@@ -25,7 +25,7 @@ import com.google.common.base.Function;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.BrowserstackMiddleware;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.CapabilitiesMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.CapabilitiesExternalMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.LambdatestMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.MCloudMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.SauceLabsMiddleware;
@@ -34,11 +34,11 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 public abstract class AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    protected CapabilitiesMiddleware capabilitiesMiddleware;
+    protected CapabilitiesExternalMiddleware capabilitiesMiddleware;
     private AbstractFactory next;
 
     public AbstractFactory() {
-        this.capabilitiesMiddleware = CapabilitiesMiddleware.link(
+        this.capabilitiesMiddleware = CapabilitiesExternalMiddleware.link(
                 new BrowserstackMiddleware(),
                 new MCloudMiddleware(),
                 new SauceLabsMiddleware(),
@@ -77,12 +77,11 @@ public abstract class AbstractFactory {
     /**
      * Creates new instance of {@link WebDriver} according to specified {@link Capabilities}.
      *
-     * @param testName - where driver is initiated
      * @param seleniumHost - selenium server URL
      * @param capabilities - driver capabilities
      * @return instance of {@link WebDriver}
      */
-    public abstract WebDriver getDriver(String testName, String seleniumHost, Capabilities capabilities);
+    public abstract WebDriver getDriver(String seleniumHost, Capabilities capabilities);
 
     protected final URL getURL(String hostUrl) {
         try {

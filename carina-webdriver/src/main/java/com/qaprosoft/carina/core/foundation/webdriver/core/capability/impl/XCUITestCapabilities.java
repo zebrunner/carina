@@ -16,13 +16,8 @@ public class XCUITestCapabilities extends AbstractCapabilities<XCUITestOptions> 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public XCUITestOptions getCapabilities(String testName, Capabilities customCapabilities) {
+    public XCUITestOptions getCapabilities(Capabilities capabilities) {
         XCUITestOptions options = new XCUITestOptions();
-        if (customCapabilities != null) {
-            setCapabilities(options, customCapabilities);
-            return options;
-        }
-
         // this step should be executed before getConfigurationCapabilities() to be able to override this capabilities by default appium approach.
         setLocaleAndLanguage(options);
         setCapabilities(options, getConfigurationCapabilities());
