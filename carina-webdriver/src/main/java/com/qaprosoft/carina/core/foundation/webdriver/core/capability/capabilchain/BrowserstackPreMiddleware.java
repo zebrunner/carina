@@ -111,10 +111,7 @@ public class BrowserstackPreMiddleware extends CapabilitiesMiddleware {
             browserstackOptions.put("firefox", firefoxSpecificOptions);
         }
 
-        if (!browserstackOptions.isEmpty()) {
-            allCapabilities.setCapability(CapabilitiesUtils.BROWSERSTACK_SPECIFIC_CAPABILITIES, browserstackOptions);
-        }
-
+        allCapabilities.setCapability(CapabilitiesUtils.BROWSERSTACK_SPECIFIC_CAPABILITIES, browserstackOptions);
         return allCapabilities;
     }
 }

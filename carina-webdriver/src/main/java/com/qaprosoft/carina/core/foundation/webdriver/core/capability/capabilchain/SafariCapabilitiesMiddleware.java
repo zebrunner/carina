@@ -1,11 +1,10 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.capabilchain;
 
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.SafariCapabilities;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.Browser;
 
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.Mac2Capabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.SafariCapabilities;
 
 import io.appium.java_client.safari.options.SafariOptions;
 
@@ -18,7 +17,7 @@ public class SafariCapabilitiesMiddleware extends CapabilitiesMiddleware {
             return false;
         }
 
-        if (Browser.SAFARI.is(capabilities)) {
+        if (Browser.SAFARI.browserName().equalsIgnoreCase(capabilities.getBrowserName())) {
             return true;
         }
         return false;

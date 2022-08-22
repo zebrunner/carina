@@ -26,7 +26,7 @@ public class EdgeCapabilitiesMiddleware extends CapabilitiesMiddleware {
             return false;
         }
 
-        if (Browser.EDGE.is(capabilities)) {
+        if (Browser.EDGE.browserName().equalsIgnoreCase(capabilities.getBrowserName())) {
             return true;
         }
 

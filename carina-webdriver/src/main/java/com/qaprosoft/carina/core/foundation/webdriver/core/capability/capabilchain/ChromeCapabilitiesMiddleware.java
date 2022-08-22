@@ -25,7 +25,7 @@ public class ChromeCapabilitiesMiddleware extends CapabilitiesMiddleware {
             return false;
         }
 
-        if (Browser.CHROME.is(capabilities)) {
+        if (Browser.CHROME.browserName().equalsIgnoreCase(capabilities.getBrowserName())) {
             return true;
         }
         return false;

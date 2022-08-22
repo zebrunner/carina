@@ -25,7 +25,7 @@ public class FirefoxCapabilitiesMiddleware extends CapabilitiesMiddleware {
             return false;
         }
 
-        if (Browser.FIREFOX.is(capabilities)) {
+        if (Browser.FIREFOX.browserName().equalsIgnoreCase(capabilities.getBrowserName())) {
             return true;
         }
         return false;
