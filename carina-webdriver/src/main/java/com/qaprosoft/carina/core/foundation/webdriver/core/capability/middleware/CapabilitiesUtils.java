@@ -1,4 +1,4 @@
-package com.qaprosoft.carina.core.foundation.webdriver.core.capability.capabilchain;
+package com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware;
 
 import org.openqa.selenium.Capabilities;
 
@@ -35,6 +35,23 @@ public class CapabilitiesUtils {
     // return false;
     // }
 
+    public static boolean isLambdaTestDetected() {
+        String customCapabilities = Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES);
+        if (!customCapabilities.isEmpty() && customCapabilities.toLowerCase().contains("lambdatest")) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isMCloudDetected() {
+        String customCapabilities = Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES);
+        if ((!customCapabilities.isEmpty() &&
+                customCapabilities.toLowerCase().contains("mcloud"))) {
+            return true;
+        }
+        return false;
+    }
+
     public static boolean isSauceLabsDetected() {
         String customCapabilities = Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES);
         if ((!customCapabilities.isEmpty() &&
@@ -62,6 +79,7 @@ public class CapabilitiesUtils {
         }
         return false;
     }
+
 
     public static boolean isBrowserStackSpecificCapabilitiesDetected(Capabilities capabilities) {
         return capabilities.getCapability(BROWSERSTACK_SPECIFIC_CAPABILITIES) != null;

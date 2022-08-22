@@ -1,4 +1,4 @@
-package com.qaprosoft.carina.core.foundation.webdriver.core.capability.capabilchain;
+package com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware;
 
 import java.util.Objects;
 
@@ -9,7 +9,6 @@ import org.openqa.selenium.Platform;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.SafariCapabilities;
 
 import io.appium.java_client.android.options.UiAutomator2Options;
 

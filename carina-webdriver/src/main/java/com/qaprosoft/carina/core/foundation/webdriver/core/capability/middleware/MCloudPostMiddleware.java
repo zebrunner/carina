@@ -1,4 +1,4 @@
-package com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain;
+package com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware;
 
 import java.lang.invoke.MethodHandles;
 
@@ -8,28 +8,18 @@ import org.openqa.selenium.MutableCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-
 import io.appium.java_client.internal.CapabilityHelpers;
 
-public class MCloudMiddleware extends CapabilitiesExternalMiddleware {
-
+public class MCloudPostMiddleware extends CapabilitiesMiddleware {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     protected boolean isDetected(Capabilities capabilities) {
-        String customCapabilities = Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES);
-        if ((!customCapabilities.isEmpty() &&
-                customCapabilities.toLowerCase().contains("mcloud"))) {
-            return true;
-        }
-        return false;
+        return CapabilitiesUtils.isMCloudDetected();
     }
 
     @Override
-    protected Capabilities upgradeCapabilities(Capabilities capabilities) {
-        LOGGER.debug("Capabilities will be refactored by mcloud rules");
-
+    protected MutableCapabilities upgradeCapabilities(MutableCapabilities capabilities) {
         MutableCapabilities mcloudCapabilities = new MutableCapabilities();
         for (String capabilityName : capabilities.asMap().keySet()) {
             String cleanCapabilityName = StringUtils.removeStart(capabilityName, CapabilityHelpers.APPIUM_PREFIX);

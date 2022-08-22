@@ -9,7 +9,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.capabilchain.CapabilitiesUtils;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware.CapabilitiesUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 
 import io.appium.java_client.android.AndroidDriver;

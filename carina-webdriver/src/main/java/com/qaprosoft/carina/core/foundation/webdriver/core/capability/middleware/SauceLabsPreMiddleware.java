@@ -1,4 +1,4 @@
-package com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain;
+package com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
@@ -11,11 +11,9 @@ import org.openqa.selenium.MutableCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-
 import io.appium.java_client.internal.CapabilityHelpers;
 
-public class SauceLabsMiddleware extends CapabilitiesExternalMiddleware {
+public class SauceLabsPreMiddleware extends CapabilitiesMiddleware {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -38,17 +36,16 @@ public class SauceLabsMiddleware extends CapabilitiesExternalMiddleware {
 
     @Override
     protected boolean isDetected(Capabilities capabilities) {
-        String customCapabilities = Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES);
-        if ((!customCapabilities.isEmpty() &&
-                customCapabilities.toLowerCase().contains("saucelabs")) ||
-                Configuration.getSeleniumUrl().contains("saucelabs.com")) {
-            return true;
+        // If we already have sauce:options, it is not necessary to pre-upgrade options
+        if (CapabilitiesUtils.isSauceLabsSpecificCapabilitiesDetected(capabilities)) {
+            return false;
         }
-        return false;
+
+        return CapabilitiesUtils.isSauceLabsDetected();
     }
 
     @Override
-    protected Capabilities upgradeCapabilities(Capabilities capabilities) {
+    protected MutableCapabilities upgradeCapabilities(MutableCapabilities capabilities) {
         LOGGER.debug("Capabilities will be refactored by saucelabs rules");
 
         HashMap<String, Object> saucelabsOptions = new HashMap<>();
@@ -63,7 +60,7 @@ public class SauceLabsMiddleware extends CapabilitiesExternalMiddleware {
             }
         }
 
-        allCapabilities.setCapability("sauce:options", saucelabsOptions);
+        allCapabilities.setCapability(CapabilitiesUtils.SAUCELABS_SPECIFIC_CAPABILITIES, saucelabsOptions);
         return allCapabilities;
     }
 }

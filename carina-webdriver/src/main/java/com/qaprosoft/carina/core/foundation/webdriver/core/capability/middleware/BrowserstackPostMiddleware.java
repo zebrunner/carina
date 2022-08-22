@@ -1,4 +1,4 @@
-package com.qaprosoft.carina.core.foundation.webdriver.core.capability.capabilchain;
+package com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware;
 
 import java.lang.invoke.MethodHandles;
 

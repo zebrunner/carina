@@ -1,4 +1,4 @@
-package com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain;
+package com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
@@ -11,12 +11,9 @@ import org.openqa.selenium.MutableCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-
 import io.appium.java_client.internal.CapabilityHelpers;
 
-public class LambdatestMiddleware extends CapabilitiesExternalMiddleware {
-
+public class LambdaTestPreMiddleware extends CapabilitiesMiddleware {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     // todo add more
@@ -25,15 +22,11 @@ public class LambdatestMiddleware extends CapabilitiesExternalMiddleware {
 
     @Override
     protected boolean isDetected(Capabilities capabilities) {
-        String customCapabilities = Configuration.get(Configuration.Parameter.CUSTOM_CAPABILITIES);
-        if (!customCapabilities.isEmpty() && customCapabilities.toLowerCase().contains("lambdatest")) {
-            return true;
-        }
-        return false;
+        return CapabilitiesUtils.isLambdaTestDetected();
     }
 
     @Override
-    protected Capabilities upgradeCapabilities(Capabilities capabilities) {
+    protected MutableCapabilities upgradeCapabilities(MutableCapabilities capabilities) {
         LOGGER.debug("Capabilities will be refactored by lambdatest rules");
 
         HashMap<String, Object> lambdatestOptions = new HashMap<>();

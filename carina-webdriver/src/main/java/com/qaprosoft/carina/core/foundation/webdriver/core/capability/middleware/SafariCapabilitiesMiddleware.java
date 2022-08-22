@@ -1,4 +1,4 @@
-package com.qaprosoft.carina.core.foundation.webdriver.core.capability.capabilchain;
+package com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware;
 
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
