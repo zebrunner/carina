@@ -76,10 +76,12 @@ public class DriverFactory {
             seleniumHost = seleniumUrl.toString();
         }
 
-        CapabilitiesMiddleware capabilitiesMiddleware = CapabilitiesMiddleware.link(
+        CapabilitiesMiddleware preCapabilitiesMiddleware = CapabilitiesMiddleware.link(
                 new BrowserstackPreMiddleware(),
                 new SauceLabsPreMiddleware(),
-                new ZebrunnerPreMiddleware(testName),
+                new ZebrunnerPreMiddleware(testName));
+
+        CapabilitiesMiddleware capabilitiesMiddleware = CapabilitiesMiddleware.link(
                 new ChromeCapabilitiesMiddleware(),
                 new FirefoxCapabilitiesMiddleware(),
                 new EdgeCapabilitiesMiddleware(),
@@ -87,7 +89,9 @@ public class DriverFactory {
                 new XCUITestCapabilitiesMiddleware(),
                 new GeckoCapabilitiesMiddleware(),
                 new Mac2CapabilitiesMiddleware(),
-                new SafariCapabilitiesMiddleware(),
+                new SafariCapabilitiesMiddleware());
+
+        CapabilitiesMiddleware postCapabilitiesMiddleware = CapabilitiesMiddleware.link(
                 new BrowserstackPostMiddleware());
 
         AbstractFactory driverFactory = AbstractFactory.link(
@@ -101,7 +105,10 @@ public class DriverFactory {
                 new MacFactory(),
                 new GeckoFactory());
 
-        capabilities = capabilitiesMiddleware.analyze(capabilities == null ? AbstractCapabilities.getConfigurationCapabilities() : capabilities);
+        capabilities = capabilities == null ? AbstractCapabilities.getConfigurationCapabilities() : capabilities;
+        capabilities = preCapabilitiesMiddleware.analyze(capabilities);
+        capabilities = capabilitiesMiddleware.analyze(capabilities);
+        capabilities = postCapabilitiesMiddleware.analyze(capabilities);
 
         AbstractFactory suitableFactory = driverFactory
                 .getSuitableDriverFactory(capabilities);

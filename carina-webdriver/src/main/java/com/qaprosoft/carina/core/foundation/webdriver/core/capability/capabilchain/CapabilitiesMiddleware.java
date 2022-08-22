@@ -27,13 +27,14 @@ public abstract class CapabilitiesMiddleware {
     protected abstract MutableCapabilities upgradeCapabilities(MutableCapabilities capabilities);
 
     public MutableCapabilities analyze(MutableCapabilities capabilities) {
-        if (next == null) {
-            return capabilities;
+
+        if (!isDetected(capabilities)) {
+            if (next == null) {
+                return capabilities;
+            }
+            return next.analyze(capabilities);
         }
 
-        if (isDetected(capabilities)) {
-            return next.analyze(upgradeCapabilities(capabilities));
-        }
-        return next.analyze(capabilities);
+        return upgradeCapabilities(capabilities);
     }
 }
