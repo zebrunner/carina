@@ -23,16 +23,16 @@ public class BrowserstackPostMiddleware extends CapabilitiesMiddleware {
     @Override
     protected MutableCapabilities upgradeCapabilities(MutableCapabilities capabilities) {
         // todo it seems that browserstack is not understand capabilities with appium prefix, investigate
-//        DesiredCapabilities allCapabilities = new DesiredCapabilities();
-//        for (String capabilityName : capabilities.asMap().keySet()) {
-//            String cleanCapabilityName = StringUtils.removeStart(capabilityName, CapabilityHelpers.APPIUM_PREFIX);
-//            allCapabilities.setCapability(cleanCapabilityName, capabilities.getCapability(capabilityName));
-//        }
+        DesiredCapabilities allCapabilities = new DesiredCapabilities();
+        for (String capabilityName : capabilities.asMap().keySet()) {
+            String cleanCapabilityName = StringUtils.removeStart(capabilityName, CapabilityHelpers.APPIUM_PREFIX);
+            allCapabilities.setCapability(cleanCapabilityName, capabilities.getCapability(capabilityName));
+        }
 
         // browserstack is not understand platfromName when tests browsers
-        if (capabilities.getCapability("browserName") != null) {
-            capabilities.setCapability("platformName", "ANY");
+        if (allCapabilities.getCapability("browserName") != null) {
+            allCapabilities.setCapability("platformName", "ANY");
         }
-        return capabilities;
+        return allCapabilities;
     }
 }
