@@ -4,6 +4,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +18,7 @@ public class ChromeFactory extends AbstractFactory {
 
     @Override
     protected boolean isSuitable(Capabilities capabilities) {
-        return capabilities instanceof UiAutomator2Options;
+        return capabilities instanceof ChromeOptions;
     }
 
     @Override
