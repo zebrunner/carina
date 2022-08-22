@@ -108,12 +108,13 @@ public class DriverFactory {
         capabilities = capabilities == null ? AbstractCapabilities.getConfigurationCapabilities() : capabilities;
         capabilities = preCapabilitiesMiddleware.analyze(capabilities);
         capabilities = capabilitiesMiddleware.analyze(capabilities);
-        capabilities = postCapabilitiesMiddleware.analyze(capabilities);
 
         AbstractFactory suitableFactory = driverFactory
                 .getSuitableDriverFactory(capabilities);
 
         LOGGER.info("Starting driver session...");
+
+        capabilities = postCapabilitiesMiddleware.analyze(capabilities);
 
         WebDriver driver = suitableFactory.getDriver(seleniumHost, capabilities);
         driver = suitableFactory.registerListeners(driver, getEventListeners());
