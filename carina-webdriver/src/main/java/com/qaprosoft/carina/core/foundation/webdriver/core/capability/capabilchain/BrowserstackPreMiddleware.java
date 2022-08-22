@@ -90,10 +90,10 @@ public class BrowserstackPreMiddleware extends CapabilitiesMiddleware {
             }
         }
 
-        // browserstack is not understand platfromName when tests browsers
-        if (allCapabilities.getCapability("browserName") != null) {
-            allCapabilities.setCapability("platformName", "ANY");
-        }
+//        // browserstack is not understand platfromName when tests browsers
+//        if (allCapabilities.getCapability("browserName") != null) {
+//            allCapabilities.setCapability("platformName", "ANY");
+//        }
 
         if (!chromeSpecificOptions.isEmpty()) {
             browserstackOptions.put("chrome", chromeSpecificOptions);

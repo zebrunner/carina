@@ -28,6 +28,11 @@ public class BrowserstackPostMiddleware extends CapabilitiesMiddleware {
             String cleanCapabilityName = StringUtils.removeStart(capabilityName, CapabilityHelpers.APPIUM_PREFIX);
             allCapabilities.setCapability(cleanCapabilityName, capabilities.getCapability(capabilityName));
         }
+
+        // browserstack is not understand platfromName when tests browsers
+        if (allCapabilities.getCapability("browserName") != null) {
+            allCapabilities.setCapability("platformName", "ANY");
+        }
         return allCapabilities;
     }
 }
