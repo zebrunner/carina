@@ -84,10 +84,9 @@ public class BrowserstackPreMiddleware extends CapabilitiesMiddleware {
                 continue;
             }
 
-            else {
                 // browserstack is not understand capabilities with appium prefix
                 allCapabilities.setCapability(cleanCapabilityName, capabilities.getCapability(capabilityName));
-            }
+
         }
 
 //        // browserstack is not understand platfromName when tests browsers
