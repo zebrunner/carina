@@ -9,11 +9,11 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 
-public class ZebrunnerPreMiddleware extends CapabilitiesMiddleware {
+public class ZebrunnerPreCapabilitiesMiddleware extends CapabilitiesMiddleware {
 
     private String testName;
 
-    public ZebrunnerPreMiddleware(String testName) {
+    public ZebrunnerPreCapabilitiesMiddleware(String testName) {
         this.testName = testName;
     }
 

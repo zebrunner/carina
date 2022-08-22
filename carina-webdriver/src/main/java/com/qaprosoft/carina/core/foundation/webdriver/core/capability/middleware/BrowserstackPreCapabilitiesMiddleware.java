@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import io.appium.java_client.internal.CapabilityHelpers;
 
-public class BrowserstackPreMiddleware extends CapabilitiesMiddleware {
+public class BrowserstackPreCapabilitiesMiddleware extends CapabilitiesMiddleware {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final List<String> browserstackSpecificCapabilities = Arrays.asList("userName", "accessKey", "appiumVersion", "projectName",

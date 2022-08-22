@@ -24,26 +24,12 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Function;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.BrowserstackMiddleware;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.CapabilitiesExternalMiddleware;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.LambdatestMiddleware;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.MCloudMiddleware;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.chain.SauceLabsMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 
 public abstract class AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    protected CapabilitiesExternalMiddleware capabilitiesMiddleware;
     private AbstractFactory next;
-
-    public AbstractFactory() {
-        this.capabilitiesMiddleware = CapabilitiesExternalMiddleware.link(
-                new BrowserstackMiddleware(),
-                new MCloudMiddleware(),
-                new SauceLabsMiddleware(),
-                new LambdatestMiddleware());
-    }
 
     public static AbstractFactory link(AbstractFactory first, AbstractFactory... chain) {
 

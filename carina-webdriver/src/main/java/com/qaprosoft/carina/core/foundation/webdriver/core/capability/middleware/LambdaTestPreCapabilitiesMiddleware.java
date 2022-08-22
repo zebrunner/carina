@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import io.appium.java_client.internal.CapabilityHelpers;
 
-public class LambdaTestPreMiddleware extends CapabilitiesMiddleware {
+public class LambdaTestPreCapabilitiesMiddleware extends CapabilitiesMiddleware {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     // todo add more

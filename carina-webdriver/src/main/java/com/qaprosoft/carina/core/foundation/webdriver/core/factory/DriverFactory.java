@@ -31,22 +31,22 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware.BrowserstackPostMiddleware;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware.BrowserstackPreMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware.BrowserstackPostCapabilitiesMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware.BrowserstackPreCapabilitiesMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware.CapabilitiesMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware.ChromeCapabilitiesMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware.EdgeCapabilitiesMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware.FirefoxCapabilitiesMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware.GeckoCapabilitiesMiddleware;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware.LambdaTestPreMiddleware;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware.MCloudPostMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware.LambdaTestPreCapabilitiesMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware.MCloudPostCapabilitiesMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware.Mac2CapabilitiesMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware.SafariCapabilitiesMiddleware;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware.SauceLabsPreMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware.SauceLabsPreCapabilitiesMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware.UIAutomaror2CapabilitiesMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware.WindowsCapabilitiesMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware.XCUITestCapabilitiesMiddleware;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware.ZebrunnerPreMiddleware;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.middleware.ZebrunnerPreCapabilitiesMiddleware;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.AndroidFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.chain.ChromeFactory;
@@ -80,10 +80,10 @@ public class DriverFactory {
         }
 
         CapabilitiesMiddleware preCapabilitiesMiddleware = CapabilitiesMiddleware.link(
-                new BrowserstackPreMiddleware(),
-                new SauceLabsPreMiddleware(),
-                new ZebrunnerPreMiddleware(testName),
-                new LambdaTestPreMiddleware());
+                new BrowserstackPreCapabilitiesMiddleware(),
+                new SauceLabsPreCapabilitiesMiddleware(),
+                new ZebrunnerPreCapabilitiesMiddleware(testName),
+                new LambdaTestPreCapabilitiesMiddleware());
 
         CapabilitiesMiddleware capabilitiesMiddleware = CapabilitiesMiddleware.link(
                 new ChromeCapabilitiesMiddleware(),
@@ -97,8 +97,8 @@ public class DriverFactory {
                 new WindowsCapabilitiesMiddleware());
 
         CapabilitiesMiddleware postCapabilitiesMiddleware = CapabilitiesMiddleware.link(
-                new BrowserstackPostMiddleware(),
-                new MCloudPostMiddleware());
+                new BrowserstackPostCapabilitiesMiddleware(),
+                new MCloudPostCapabilitiesMiddleware());
 
         AbstractFactory driverFactory = AbstractFactory.link(
                 new ChromeFactory(),
