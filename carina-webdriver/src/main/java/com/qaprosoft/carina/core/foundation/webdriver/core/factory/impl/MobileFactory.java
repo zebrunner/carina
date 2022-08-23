@@ -22,7 +22,6 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -32,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.AndroidCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.IOSCapabilities;
@@ -41,7 +39,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.internal.CapabilityHelpers;
 import io.appium.java_client.ios.IOSDriver;
 
 /**
@@ -70,7 +67,8 @@ public class MobileFactory extends AbstractFactory {
             mobilePlatformName = SpecialKeywords.CUSTOM;
         }
         
-        if (seleniumHost.contains("hub.browserstack.com")) {
+        if (seleniumHost.contains("hub.browserstack.com") ||
+                seleniumHost.contains("hub-cloud.browserstack.com")) {
             //#1786 mobile drivers on browserstack should be started via CUSTOM - RemoteWebDriver driver
             mobilePlatformName = SpecialKeywords.CUSTOM;
         }
@@ -90,6 +88,14 @@ public class MobileFactory extends AbstractFactory {
 
         if (Objects.equals(Configuration.get(Parameter.W3C), "false")) {
             capabilities = removeAppiumPrefix(capabilities);
+        }
+
+        if (capabilities.getBrowserName() != null &&
+                mobilePlatformName.equalsIgnoreCase(SpecialKeywords.ANDROID) &&
+                (seleniumHost.contains("hub.browserstack.com") ||
+                        seleniumHost.contains("hub-cloud.browserstack.com"))) {
+            // when browser tests browserstack is not understand android platformName
+            capabilities.setCapability("platformName", "ANY");
         }
 
         LOGGER.debug("capabilities: " + capabilities);
