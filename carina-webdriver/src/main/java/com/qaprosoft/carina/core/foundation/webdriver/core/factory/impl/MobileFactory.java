@@ -212,14 +212,5 @@ public class MobileFactory extends AbstractFactory {
 
         return paramValue;
     }
-
-    private MutableCapabilities removeAppiumPrefix(MutableCapabilities capabilities) {
-        MutableCapabilities allCapabilities = new MutableCapabilities();
-        for (String capabilityName : capabilities.asMap().keySet()) {
-            String cleanCapabilityName = StringUtils.removeStart(capabilityName, CapabilityHelpers.APPIUM_PREFIX);
-            allCapabilities.setCapability(cleanCapabilityName, capabilities.getCapability(capabilityName));
-        }
-        return allCapabilities;
-    }
     
 }

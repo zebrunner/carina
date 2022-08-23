@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Objects;
 
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
@@ -56,6 +57,10 @@ public class MacFactory extends AbstractFactory {
         Mac2Driver driver = null;
         if (isCapabilitiesEmpty(capabilities)) {
             capabilities = getCapabilities(name);
+        }
+
+        if (Objects.equals(Configuration.get(Configuration.Parameter.W3C), "false")) {
+            capabilities = removeAppiumPrefix(capabilities);
         }
 
         LOGGER.debug("capabilities: " + capabilities);
