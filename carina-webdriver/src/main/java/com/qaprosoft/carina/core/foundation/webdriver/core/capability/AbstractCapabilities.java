@@ -134,7 +134,7 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
                 continue;
             }
 
-            String cap = entry.getKey().replaceAll(provider, "");
+            String cap = entry.getKey().replaceAll(provider + ".capabilities.", "");
             specialCapabilities.put(cap, value);
         }
         capabilities.setCapability(provider + ":options", specialCapabilities);
