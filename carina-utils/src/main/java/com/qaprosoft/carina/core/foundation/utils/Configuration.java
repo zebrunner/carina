@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -436,7 +437,7 @@ public class Configuration {
         return SpecialKeywords.DESKTOP;
     }
 
-    public static String getDriverType(DesiredCapabilities capabilities) {
+    public static String getDriverType(MutableCapabilities capabilities) {
         if (capabilities == null) {
             // calculate driver type based on config.properties arguments
             return getDriverType();

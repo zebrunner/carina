@@ -21,8 +21,8 @@ import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,8 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.AndroidCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.IOSCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
@@ -48,13 +49,13 @@ public class MobileFactory extends AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public WebDriver create(String name, DesiredCapabilities capabilities, String seleniumHost) {
+    public WebDriver create(String name, MutableCapabilities capabilities, String seleniumHost) {
 
         if (seleniumHost == null) {
             seleniumHost = Configuration.getSeleniumUrl();
         }
 
-        String mobilePlatformName = Configuration.getPlatform(capabilities);
+        String mobilePlatformName = Configuration.getPlatform();
 
         // TODO: refactor to be able to remove SpecialKeywords.CUSTOM property completely
 
@@ -135,8 +136,17 @@ public class MobileFactory extends AbstractFactory {
         return driver;
     }
 
-    private DesiredCapabilities getCapabilities(String name) {
-        return new MobileCapabilities().getCapability(name);
+    private MutableCapabilities getCapabilities(String name) {
+        String platform = Configuration.getPlatform();
+
+        if (platform.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+            return new AndroidCapabilities().getCapability(name);
+
+        } else if (platform.equalsIgnoreCase(SpecialKeywords.IOS)
+                || platform.equalsIgnoreCase(SpecialKeywords.TVOS)) {
+            return new IOSCapabilities().getCapability(name);
+        }
+        throw new RuntimeException("Unsupported platform: " + platform);
     }
 
     /**

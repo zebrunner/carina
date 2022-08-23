@@ -15,16 +15,17 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
 
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
-import org.openqa.selenium.remote.BrowserType;
+import org.openqa.selenium.chromium.ChromiumOptions;
+import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
-public class EdgeCapabilities extends AbstractCapabilities {
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
-    public DesiredCapabilities getCapability(String testName) {
-        DesiredCapabilities capabilities = new DesiredCapabilities();
-        capabilities = initBaseCapabilities(capabilities, BrowserType.EDGE, testName);
+public class EdgeCapabilities extends AbstractCapabilities<ChromiumOptions<?>> {
+
+    public ChromiumOptions<?> getCapability(String testName) {
+        ChromiumOptions<?> capabilities = new ChromiumOptions<>(CapabilityType.BROWSER_NAME, Browser.EDGE.browserName(), "ms:edgeOptions");
+        initBaseCapabilities(capabilities, testName);
         capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
         capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
 

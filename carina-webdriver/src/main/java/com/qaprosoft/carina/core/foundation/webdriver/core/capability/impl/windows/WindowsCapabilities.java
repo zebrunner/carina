@@ -15,17 +15,16 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.windows;
 
-import org.openqa.selenium.remote.DesiredCapabilities;
-
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
-public class WindowsCapabilities extends AbstractCapabilities {
-    
+import io.appium.java_client.windows.options.WindowsOptions;
+
+public class WindowsCapabilities extends AbstractCapabilities<WindowsOptions> {
 
     @Override
-    public DesiredCapabilities getCapability(String testName) {
-        DesiredCapabilities capabilities = new DesiredCapabilities();
-        capabilities = initCapabilities(capabilities);
+    public WindowsOptions getCapability(String testName) {
+        WindowsOptions capabilities = new WindowsOptions();
+        initCapabilities(capabilities);
         return capabilities;
     }    
 }

@@ -21,13 +21,12 @@ import java.net.URL;
 import java.time.Duration;
 
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
-//import org.openqa.selenium.remote.Browser;
-import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -54,7 +53,7 @@ public class DesktopFactory extends AbstractFactory {
     private static DesiredCapabilities staticCapabilities;
 
     @Override
-    public WebDriver create(String name, DesiredCapabilities capabilities, String seleniumHost) {
+    public WebDriver create(String name, MutableCapabilities capabilities, String seleniumHost) {
         RemoteWebDriver driver = null;
         if (seleniumHost == null) {
             seleniumHost = Configuration.getSeleniumUrl();
@@ -83,7 +82,7 @@ public class DesktopFactory extends AbstractFactory {
     }
 
     @SuppressWarnings("deprecation")
-    public DesiredCapabilities getCapabilities(String name) {
+    public MutableCapabilities getCapabilities(String name) {
         String browser = Configuration.getBrowser();
         
         if (BrowserType.FIREFOX.equalsIgnoreCase(browser)) {
@@ -117,7 +116,7 @@ public class DesktopFactory extends AbstractFactory {
      * @param driver - instance of desktop @WebDriver
      * @param capabilities - driver capabilities
      */
-    private void resizeBrowserWindow(WebDriver driver, DesiredCapabilities capabilities) {
+    private void resizeBrowserWindow(WebDriver driver, MutableCapabilities capabilities) {
         try {
             Wait<WebDriver> wait = new FluentWait<WebDriver>(driver)
                     .pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)))

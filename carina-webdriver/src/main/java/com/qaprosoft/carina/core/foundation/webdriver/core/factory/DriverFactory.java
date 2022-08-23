@@ -32,6 +32,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.DesktopFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.MacFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.MobileFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.WindowsFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
@@ -69,6 +70,10 @@ public class DriverFactory {
 
         case SpecialKeywords.WINDOWS:
             factory = new WindowsFactory();
+            break;
+
+        case SpecialKeywords.MAC:
+            factory = new MacFactory();
             break;
 
 		default:

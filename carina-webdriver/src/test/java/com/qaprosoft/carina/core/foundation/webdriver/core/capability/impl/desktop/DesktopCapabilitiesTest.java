@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.openqa.selenium.Proxy;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.chromium.ChromiumOptions;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.BrowserType;
@@ -30,6 +33,8 @@ import org.testng.annotations.Test;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.R;
+
+import io.appium.java_client.safari.options.SafariOptions;
 
 public class DesktopCapabilitiesTest {
 
@@ -42,7 +47,7 @@ public class DesktopCapabilitiesTest {
         String testName = "chrome - getChromeCapabilityTest";
 
         ChromeCapabilities chromeCapabilities = new ChromeCapabilities();
-        DesiredCapabilities capabilities = chromeCapabilities.getCapability(testName);
+        ChromeOptions capabilities = chromeCapabilities.getCapability(testName);
 
         Assert.assertEquals(capabilities.getBrowserName(), Browser.CHROME.browserName(), "Returned browser name is not valid!");
 
@@ -62,7 +67,7 @@ public class DesktopCapabilitiesTest {
         String testName = "firefox - getFirefoxDefaultCapabilityTest";
 
         FirefoxCapabilities firefoxCapabilities = new FirefoxCapabilities();
-        DesiredCapabilities capabilities = firefoxCapabilities.getCapability(testName);
+        FirefoxOptions capabilities = firefoxCapabilities.getCapability(testName);
 
         Assert.assertEquals(capabilities.getBrowserName(), Browser.FIREFOX.browserName(), "Returned browser name is not valid!");
 
@@ -89,7 +94,7 @@ public class DesktopCapabilitiesTest {
         profile.setPreference("media.eme.enabled", !MEDIA_EME_ENABLED);
         profile.setPreference("media.gmp-manager.updateEnabled", !MEDIA_GMP_MANAGER_UPDATE_ENABLED);
 
-        DesiredCapabilities capabilities = firefoxCapabilities.getCapability(testName, profile);
+        FirefoxOptions capabilities = firefoxCapabilities.getCapability(testName, profile);
 
         Assert.assertEquals(capabilities.getBrowserName(), Browser.FIREFOX.browserName(), "Returned browser name is not valid!");
 
@@ -127,7 +132,7 @@ public class DesktopCapabilitiesTest {
         String testName = "safari - getSafariCapabilityTest";
 
         SafariCapabilities safariCapabilities = new SafariCapabilities();
-        DesiredCapabilities capabilities = safariCapabilities.getCapability(testName);
+        SafariOptions capabilities = safariCapabilities.getCapability(testName);
 
         Assert.assertEquals(capabilities.getBrowserName(), BrowserType.SAFARI, "Returned browser name is not valid!");
 
@@ -139,7 +144,7 @@ public class DesktopCapabilitiesTest {
         String testName = "edge - getEdgeCapabilityTest";
 
         EdgeCapabilities edgeCapabilities = new EdgeCapabilities();
-        DesiredCapabilities capabilities = edgeCapabilities.getCapability(testName);
+        ChromiumOptions<?> capabilities = edgeCapabilities.getCapability(testName);
 
         Assert.assertEquals(capabilities.getBrowserName(), Browser.EDGE.browserName(), "Returned browser name is not valid!");
 
@@ -175,10 +180,9 @@ public class DesktopCapabilitiesTest {
         R.CONFIG.put(Configuration.Parameter.HEADLESS.getKey(), "true");
 
         ChromeCapabilities chromeCapabilities = new ChromeCapabilities();
-        DesiredCapabilities capabilities = chromeCapabilities.getCapability("chrome - getChromeCapabilityHeadlessTest");
+        ChromeOptions capabilities = chromeCapabilities.getCapability("chrome - getChromeCapabilityHeadlessTest");
 
         Assert.assertFalse((Boolean) capabilities.getCapability("enableVNC"), "Returned capability value is not valid!");
-
         Assert.assertFalse((Boolean) capabilities.getCapability("enableVideo"), "Returned capability value is not valid!");
     }
 
@@ -194,7 +198,7 @@ public class DesktopCapabilitiesTest {
         R.CONFIG.put(Configuration.Parameter.NO_PROXY.getKey(), noProxy, true);
 
         ChromeCapabilities chromeCapabilities = new ChromeCapabilities();
-        DesiredCapabilities capabilities = chromeCapabilities.getCapability("chrome - getChromeCapabilityProxyTest");
+        ChromeOptions capabilities = chromeCapabilities.getCapability("chrome - getChromeCapabilityProxyTest");
 
         String proxyHostWithPort = proxyHost + ":" + proxyPort;
 
@@ -215,7 +219,7 @@ public class DesktopCapabilitiesTest {
         R.CONFIG.put(Configuration.Parameter.BROWSER_LANGUAGE.getKey(), browserLanguage, true);
 
         ChromeCapabilities chromeCapabilities = new ChromeCapabilities();
-        DesiredCapabilities capabilities = chromeCapabilities.getCapability("chrome - getChromeCapabilityBrowserLanguageTest");
+        ChromeOptions capabilities = chromeCapabilities.getCapability("chrome - getChromeCapabilityBrowserLanguageTest");
 
         Map<String, Object> chromeOptions = (Map<String, Object>) capabilities.getCapability("goog:chromeOptions");
         List<String> chromeOptionsArgs = (List<String>) chromeOptions.get("args");
@@ -228,7 +232,7 @@ public class DesktopCapabilitiesTest {
         R.CONFIG.put(Configuration.Parameter.AUTO_DOWNLOAD.getKey(), "true", true);
 
         ChromeCapabilities chromeCapabilities = new ChromeCapabilities();
-        DesiredCapabilities capabilities = chromeCapabilities.getCapability("chrome - getChromeCapabilityAutoDownloadTest");
+        ChromeOptions capabilities = chromeCapabilities.getCapability("chrome - getChromeCapabilityAutoDownloadTest");
 
         Map<String, Object> chromeOptions = (Map<String, Object>) capabilities.getCapability("goog:chromeOptions");
         Map<String, Object> chromeOptionsPref = (Map<String, Object>) chromeOptions.get("prefs");

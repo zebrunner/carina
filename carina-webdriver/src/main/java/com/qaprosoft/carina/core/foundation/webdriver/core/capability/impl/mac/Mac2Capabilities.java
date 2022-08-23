@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
-
-import org.openqa.selenium.remote.DesiredCapabilities;
+package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mac;
 
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
-public class HTMLUnitCapabilities extends AbstractCapabilities<DesiredCapabilities> {
+import io.appium.java_client.mac.options.Mac2Options;
 
-    public DesiredCapabilities getCapability(String testName) {
-        DesiredCapabilities capabilities = new DesiredCapabilities();
-        capabilities.setJavascriptEnabled(true);
+public class Mac2Capabilities extends AbstractCapabilities<Mac2Options> {
+
+    @Override
+    public Mac2Options getCapability(String testName) {
+        Mac2Options capabilities = new Mac2Options();
+        initCapabilities(capabilities);
         return capabilities;
     }
 }
