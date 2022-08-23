@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.CapabilityType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,8 +39,6 @@ public class ChromeCapabilities extends AbstractCapabilities<ChromeOptions> {
         addChromeOptions(capabilities);
         capabilities.setCapability("chrome.switches", Arrays.asList("--start-maximized", "--ignore-ssl-errors"));
         capabilities.setAcceptInsecureCerts(true);
-        capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
-        capabilities.setCapability(CapabilityType.ACCEPT_INSECURE_CERTS, true);
         return capabilities;
     }
 

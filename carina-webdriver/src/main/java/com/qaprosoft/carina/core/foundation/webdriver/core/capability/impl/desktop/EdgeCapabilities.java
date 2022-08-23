@@ -33,8 +33,6 @@ public class EdgeCapabilities extends AbstractCapabilities<ChromiumOptions<?>> {
         ChromiumOptions<?> capabilities = new ChromiumOptions<>(CapabilityType.BROWSER_NAME, Browser.EDGE.browserName(), "ms:edgeOptions");
         initBaseCapabilities(capabilities, testName);
         addEdgeOptions(capabilities);
-        capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
-        capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
 
         return capabilities;
     }

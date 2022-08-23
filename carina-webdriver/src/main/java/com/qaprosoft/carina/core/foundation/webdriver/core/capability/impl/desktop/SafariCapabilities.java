@@ -25,10 +25,6 @@ public class SafariCapabilities extends AbstractCapabilities<SafariOptions> {
 
     public SafariOptions getCapability(String testName) {
         SafariOptions safariOptions = new SafariOptions();
-        /*DesiredCapabilities capabilities = DesiredCapabilities.safari();
-        capabilities = initBaseCapabilities(capabilities, BrowserType.SAFARI, testName);
-        return capabilities;
-        */
         safariOptions.setCapability("browserName", Browser.SAFARI.browserName());
         return safariOptions;
     }

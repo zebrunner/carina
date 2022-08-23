@@ -30,8 +30,6 @@ public class IECapabilities extends AbstractCapabilities<DesiredCapabilities> {
 
         // todo investigate necessity of this capability
         // capabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
-        capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
-        capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
 
         return capabilities;
     }

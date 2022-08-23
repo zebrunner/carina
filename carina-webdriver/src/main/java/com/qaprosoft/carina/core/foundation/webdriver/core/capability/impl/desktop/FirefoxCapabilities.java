@@ -46,7 +46,6 @@ public class FirefoxCapabilities extends AbstractCapabilities<FirefoxOptions> {
     public FirefoxOptions getCapability(String testName) {
         FirefoxOptions capabilities = new FirefoxOptions();
         initBaseCapabilities(capabilities, testName);
-        capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
 
         FirefoxProfile profile = new FirefoxProfile();
         profile.setPreference("media.eme.enabled", true);

@@ -26,9 +26,7 @@ public class OperaCapabilities extends AbstractCapabilities<DesiredCapabilities>
         DesiredCapabilities capabilities = new DesiredCapabilities();
         initBaseCapabilities(capabilities, testName);
         capabilities.setBrowserName(Browser.OPERA.browserName());
-        capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
-        capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
-        
+
         //TODO: add support for AUTO_DOWNLOAD and PROXY
         return capabilities;
     }
