@@ -59,6 +59,8 @@ public class WindowsFactory extends AbstractFactory {
             capabilities = getCapabilities(name);
         }
 
+        LOGGER.debug("capabilities: " + capabilities);
+
         URL url;
         try {
             url = new URL(seleniumHost);

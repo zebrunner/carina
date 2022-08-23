@@ -58,6 +58,8 @@ public class MacFactory extends AbstractFactory {
             capabilities = getCapabilities(name);
         }
 
+        LOGGER.debug("capabilities: " + capabilities);
+
         URL url;
         try {
             url = new URL(seleniumHost);
