@@ -208,7 +208,11 @@ public class Configuration {
         ASSIGNEE("assignee"),
         
         // sha1
-        GIT_HASH("git_hash");
+        GIT_HASH("git_hash"),
+
+        W3C("w3c"),
+
+        PROVIDER("provider");
         
         private final String key;
 

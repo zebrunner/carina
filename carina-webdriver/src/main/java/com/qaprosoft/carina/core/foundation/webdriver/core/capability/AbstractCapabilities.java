@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.remote.BrowserType;
@@ -113,10 +114,10 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
     }
 
     protected void initSpecialCapabilities(T capabilities) {
-        if (!Objects.equals(R.CONFIG.get("isW3C"), "true")) {
+        if (!Objects.equals(Configuration.get(Parameter.W3C), "true")) {
             return;
         }
-        String provider = R.CONFIG.get("provider");
+        String provider = Configuration.get(Parameter.PROVIDER);
         if (Objects.equals(provider, StringUtils.EMPTY)) {
             return;
         }

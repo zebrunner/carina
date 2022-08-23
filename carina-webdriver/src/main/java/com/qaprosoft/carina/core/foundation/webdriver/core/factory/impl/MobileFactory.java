@@ -88,7 +88,7 @@ public class MobileFactory extends AbstractFactory {
             LOGGER.debug("Appended udid to cpabilities: " + capabilities);
         }
 
-        if (Objects.equals(R.CONFIG.get("isW3C"), "false")) {
+        if (Objects.equals(Configuration.get(Parameter.W3C), "false")) {
             capabilities = removeAppiumPrefix(capabilities);
         }
 
