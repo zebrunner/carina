@@ -18,9 +18,11 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -30,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.AndroidCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.IOSCapabilities;
@@ -38,6 +41,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 
 import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.internal.CapabilityHelpers;
 import io.appium.java_client.ios.IOSDriver;
 
 /**
@@ -82,6 +86,10 @@ public class MobileFactory extends AbstractFactory {
             capabilities = getCapabilities(name);
             capabilities.setCapability("udid", udid);
             LOGGER.debug("Appended udid to cpabilities: " + capabilities);
+        }
+
+        if (Objects.equals(R.CONFIG.get("isW3C"), "false")) {
+            capabilities = removeAppiumPrefix(capabilities);
         }
 
         LOGGER.debug("capabilities: " + capabilities);
@@ -203,6 +211,15 @@ public class MobileFactory extends AbstractFactory {
         }
 
         return paramValue;
+    }
+
+    private MutableCapabilities removeAppiumPrefix(MutableCapabilities capabilities) {
+        MutableCapabilities allCapabilities = new MutableCapabilities();
+        for (String capabilityName : capabilities.asMap().keySet()) {
+            String cleanCapabilityName = StringUtils.removeStart(capabilityName, CapabilityHelpers.APPIUM_PREFIX);
+            allCapabilities.setCapability(cleanCapabilityName, capabilities.getCapability(capabilityName));
+        }
+        return allCapabilities;
     }
     
 }
