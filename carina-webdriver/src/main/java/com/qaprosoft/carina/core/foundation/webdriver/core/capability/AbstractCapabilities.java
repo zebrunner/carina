@@ -21,7 +21,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.remote.BrowserType;
@@ -107,6 +109,35 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
                 LOGGER.error(String.format("Headless mode isn't supported by %s browser / platform.", browser));
             }
         }
+        initSpecialCapabilities(capabilities);
+    }
+
+    protected void initSpecialCapabilities(T capabilities) {
+        if (!Objects.equals(R.CONFIG.get("isW3C"), "true")) {
+            return;
+        }
+        String provider = R.CONFIG.get("provider");
+        if (Objects.equals(provider, StringUtils.EMPTY)) {
+            return;
+        }
+
+        Map<String, String> capabilitiesMap = new HashMap(R.CONFIG.getProperties());
+        HashMap<String, String> specialCapabilities = new HashMap<>();
+
+        for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
+            if (!entry.getKey().toLowerCase().startsWith(provider)) {
+                continue;
+            }
+
+            String value = R.CONFIG.get(entry.getKey());
+            if (value.isEmpty()) {
+                continue;
+            }
+
+            String cap = entry.getKey().replaceAll(provider, "");
+            specialCapabilities.put(cap, value);
+        }
+        capabilities.setCapability(provider + ":options", specialCapabilities);
     }
 
     protected Proxy setupProxy() {
