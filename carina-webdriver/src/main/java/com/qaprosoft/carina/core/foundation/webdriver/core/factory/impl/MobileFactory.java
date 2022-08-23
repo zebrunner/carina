@@ -91,7 +91,8 @@ public class MobileFactory extends AbstractFactory {
         }
 
         if (capabilities.getBrowserName() != null &&
-                mobilePlatformName.equalsIgnoreCase(SpecialKeywords.ANDROID) &&
+                (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.ANDROID) ||
+                        mobilePlatformName.equalsIgnoreCase(SpecialKeywords.IOS)) &&
                 (seleniumHost.contains("hub.browserstack.com") ||
                         seleniumHost.contains("hub-cloud.browserstack.com"))) {
             // when browser tests browserstack is not understand android platformName
