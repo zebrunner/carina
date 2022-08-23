@@ -55,9 +55,6 @@ public class DesktopCapabilitiesTest {
 
         Assert.assertEquals(capabilities.getCapability("chrome.switches"), Arrays.asList("--start-maximized", "--ignore-ssl-errors"),
                 "Returned capability value is not valid!");
-        Assert.assertTrue((Boolean) capabilities.getCapability(CapabilityType.ACCEPT_SSL_CERTS), "Returned capability value is not valid!");
-
-        Assert.assertFalse((Boolean) capabilities.getCapability(CapabilityType.TAKES_SCREENSHOT), "Returned capability value is not valid!");
 
         Assert.assertTrue((Boolean) capabilities.getCapability(CapabilityType.ACCEPT_INSECURE_CERTS), "Returned capability value is not valid!");
     }
@@ -73,7 +70,6 @@ public class DesktopCapabilitiesTest {
 
         Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
 
-        Assert.assertFalse((Boolean) capabilities.getCapability(CapabilityType.TAKES_SCREENSHOT), "Returned capability value is not valid!");
 
         boolean actualMediaEmeEnabled = ((FirefoxProfile) capabilities.getCapability("firefox_profile"))
                 .getBooleanPreference("media.eme.enabled", false);
@@ -100,7 +96,6 @@ public class DesktopCapabilitiesTest {
 
         Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
 
-        Assert.assertFalse((Boolean) capabilities.getCapability(CapabilityType.TAKES_SCREENSHOT), "Returned capability value is not valid!");
 
         boolean actualMediaEmeEnabled = ((FirefoxProfile) capabilities.getCapability("firefox_profile"))
                 .getBooleanPreference("media.eme.enabled", true);
@@ -121,10 +116,6 @@ public class DesktopCapabilitiesTest {
         Assert.assertEquals(capabilities.getBrowserName(), Browser.OPERA.browserName(), "Returned browser name is not valid!");
 
         Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
-
-        Assert.assertTrue((Boolean) capabilities.getCapability(CapabilityType.ACCEPT_SSL_CERTS), "Returned capability value is not valid!");
-
-        Assert.assertFalse((Boolean) capabilities.getCapability(CapabilityType.TAKES_SCREENSHOT), "Returned capability value is not valid!");
     }
 
    @Test(groups = {"DesktopCapabilitiesTestClass"}, enabled = false)
@@ -149,10 +140,6 @@ public class DesktopCapabilitiesTest {
         Assert.assertEquals(capabilities.getBrowserName(), Browser.EDGE.browserName(), "Returned browser name is not valid!");
 
         Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
-
-        Assert.assertTrue((Boolean) capabilities.getCapability(CapabilityType.ACCEPT_SSL_CERTS), "Returned capability value is not valid!");
-
-        Assert.assertFalse((Boolean) capabilities.getCapability(CapabilityType.TAKES_SCREENSHOT), "Returned capability value is not valid!");
     }
 
     @Test(groups = {"DesktopCapabilitiesTestClass"})
@@ -170,9 +157,6 @@ public class DesktopCapabilitiesTest {
         // Assert.assertTrue((Boolean) capabilities.getCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS),
         // "Returned capability value is not valid!");
 
-        Assert.assertTrue((Boolean) capabilities.getCapability(CapabilityType.ACCEPT_SSL_CERTS), "Returned capability value is not valid!");
-
-        Assert.assertFalse((Boolean) capabilities.getCapability(CapabilityType.TAKES_SCREENSHOT), "Returned capability value is not valid!");
     }
 
     @Test(groups = {"DesktopCapabilitiesTestClass"})
