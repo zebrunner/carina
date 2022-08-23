@@ -15,7 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability;
 
-import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,7 +31,6 @@ import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.browsermobproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
@@ -173,26 +171,5 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
         }
 
         return true;
-    }
-
-    protected String getAutoDownloadFolderPath() {
-        // use custom folder for auto download
-        String autoDownloadFolder = Configuration.get(Parameter.AUTO_DOWNLOAD_FOLDER);
-        File autoDownloadPath;
-
-        if (!autoDownloadFolder.isEmpty()) {
-            autoDownloadPath = new File(autoDownloadFolder);
-            boolean isCreated = autoDownloadPath.exists() && autoDownloadPath.isDirectory();
-            if (!isCreated) {
-                isCreated = autoDownloadPath.mkdir();
-            } else {
-                LOGGER.info("Folder for auto download already exists: " + autoDownloadPath.getAbsolutePath());
-            }
-        } else {
-            // if no AUTO_DOWNLOAD_FOLDER defined use artifacts folder
-            autoDownloadPath = ReportContext.getArtifactsFolder();
-        }
-
-        return autoDownloadPath.getAbsolutePath();
     }
 }

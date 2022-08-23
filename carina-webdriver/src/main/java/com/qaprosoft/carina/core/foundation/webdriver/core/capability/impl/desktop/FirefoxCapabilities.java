@@ -26,7 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
 public class FirefoxCapabilities extends AbstractCapabilities<FirefoxOptions> {
@@ -72,9 +74,10 @@ public class FirefoxCapabilities extends AbstractCapabilities<FirefoxOptions> {
         return capabilities;
     }
 
-    private void addFirefoxOptions(FirefoxOptions options) {
+    private void addFirefoxOptions(FirefoxOptions caps) {
         FirefoxProfile profile = getDefaultFirefoxProfile();
-        options.setProfile(profile);
+        FirefoxOptions options = new FirefoxOptions().setProfile(profile);
+        caps.setCapability(FirefoxOptions.FIREFOX_OPTIONS, options);
 
         // add all custom firefox args
         for (String arg : Configuration.get(Configuration.Parameter.FIREFOX_ARGS).split(",")) {
@@ -105,7 +108,9 @@ public class FirefoxCapabilities extends AbstractCapabilities<FirefoxOptions> {
                 && driverType.equals(SpecialKeywords.DESKTOP)) {
             options.setHeadless(Configuration.getBoolean(Configuration.Parameter.HEADLESS));
         }
+
     }
+
 
     /**
      * Generate default default Carina FirefoxProfile.
@@ -146,7 +151,10 @@ public class FirefoxCapabilities extends AbstractCapabilities<FirefoxOptions> {
         if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD) && !(Configuration.isNull(Configuration.Parameter.AUTO_DOWNLOAD_APPS)
                 || "".equals(Configuration.get(Configuration.Parameter.AUTO_DOWNLOAD_APPS)))) {
             profile.setPreference("browser.download.folderList", 2);
-            profile.setPreference("browser.download.dir", getAutoDownloadFolderPath());
+            if (!"zebrunner".equalsIgnoreCase(R.CONFIG.get("capabilities.provider"))) {
+                // don't override auto download dir for Zebrunner Selenium Grid (Selenoid)
+                profile.setPreference("browser.download.dir", ReportContext.getArtifactsFolder().getAbsolutePath());
+            }
             profile.setPreference("browser.helperApps.neverAsk.saveToDisk", Configuration.get(Configuration.Parameter.AUTO_DOWNLOAD_APPS));
             profile.setPreference("browser.download.manager.showWhenStarting", false);
             profile.setPreference("browser.download.saveLinkAsFilenameTimeout", 1);
@@ -165,5 +173,4 @@ public class FirefoxCapabilities extends AbstractCapabilities<FirefoxOptions> {
         // TODO: implement support of custom args if any
         return profile;
     }
-
 }

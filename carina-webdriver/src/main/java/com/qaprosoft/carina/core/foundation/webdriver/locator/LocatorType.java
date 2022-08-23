@@ -4,7 +4,8 @@ public enum LocatorType {
     XPATH("By.xpath: "),
     NAME("By.name: "),
     ID("By.id: "),
-    LINKTEXT("By.linkText: ");
+    LINKTEXT("By.linkText: "),
+    CLASSNAME("By.className: ");
 
     private LocatorType(String startsWith) {
         this.startsWith = startsWith;

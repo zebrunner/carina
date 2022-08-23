@@ -376,7 +376,8 @@ public interface IAndroidUtils extends IMobileUtils {
                 WebElement ele = drv.findElement(scrollBy);
                 if (ele.isDisplayed()) {
                     UTILS_LOGGER.info("Element found!!!");
-                    extendedWebElement = new ExtendedWebElement(scrollBy, scrollToEle, drv);
+                    // initializing with driver context because scrollBy consists from container and element selectors
+                    extendedWebElement = new ExtendedWebElement(scrollBy, scrollToEle, drv, drv);
                     break;
                 }
             } catch (NoSuchElementException noSuchElement) {
@@ -448,7 +449,8 @@ public interface IAndroidUtils extends IMobileUtils {
                 WebElement ele = drv.findElement(scrollBy);
                 if (ele.isDisplayed()) {
                     UTILS_LOGGER.info("Element found!!!");
-                    extendedWebElement = new ExtendedWebElement(scrollBy, scrollToEle, drv);
+                    // initializing with driver context because scrollBy consists from container and element selectors
+                    extendedWebElement = new ExtendedWebElement(scrollBy, scrollToEle, drv, drv);
                     break;
                 }
             } catch (NoSuchElementException noSuchElement) {
@@ -514,7 +516,8 @@ public interface IAndroidUtils extends IMobileUtils {
                 WebElement ele = drv.findElement(scrollBy);
                 if (ele.isDisplayed()) {
                     UTILS_LOGGER.info("Element found!!!");
-                    extendedWebElement = new ExtendedWebElement(scrollBy, scrollToEle, drv);
+                    // initializing with driver context because scrollBy consists from container and element selectors
+                    extendedWebElement = new ExtendedWebElement(scrollBy, scrollToEle, drv, drv);
                     break;
                 }
             } catch (NoSuchElementException noSuchElement) {
@@ -982,8 +985,9 @@ public interface IAndroidUtils extends IMobileUtils {
         AndroidService androidService = AndroidService.getInstance();
         androidService.executeAdbCommand("shell am start -a android.settings.APPLICATION_SETTINGS");
 
+        // initializing appItem with ExtendedWebElement constructor that initialize search context
         ExtendedWebElement appItem = new ExtendedWebElement(By.xpath(String.format("//*[contains(@text, '%s')]", appName)), "notifications",
-                getDriver());
+                getDriver(), getDriver());
         swipe(appItem);
 
         appItem.click();
@@ -999,12 +1003,14 @@ public interface IAndroidUtils extends IMobileUtils {
         openAppMenuFromDeviceSettings(appName);
 
         WebDriver driver = getDriver();
+        // initializing with driver context
         ExtendedWebElement element = new ExtendedWebElement(By.xpath("//*[contains(@text, 'Notifications') or contains(@text, 'notifications')]"),
-                "notifications", driver);
+                "notifications", driver, driver);
         element.click();
 
+        // initializing with driver context
         element = new ExtendedWebElement(By.xpath("//*[@resource-id='com.android.settings:id/switch_text']/following-sibling::android.widget.Switch"),
-                "toggle", driver);
+                "toggle", driver, driver);
         if (Boolean.valueOf(element.getAttribute("checked")) != setValue) {
             element.click();
         }

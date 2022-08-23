@@ -1,44 +1,42 @@
-Under the hood Carina uses TestNG framework, so the first class to initialize is RemoteTestNGStarter.class. Program life cycle logic could be observed at [TestNG.class](https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestNG.java) run() method.
+Under the hood, Carina uses TestNG framework, so the first class to initialize is `RemoteTestNGStarter` class. Program lifecycle logic can be observed at `TestNG` [run()](https://github.com/cbeust/testng/blob/c394d371224b7d1aa3872c34c1f7818e2b9335f9/testng-core/src/main/java/org/testng/TestNG.java#L1058) method.
 
-The initializing turn comes to Carina when [CarinaListenerChain.class](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListenerChain.java) object created.
-It extends [ListenerChain.class](http://javadox.com/com.nordstrom.tools/testng-foundation/1.10.0/com/nordstrom/automation/testng/package-summary.html)
-which will create, sort and attach [AbstractTest.class](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/AbstractTest.java) listeners. This whole sequence is described in [TestRunner.class](https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/TestRunner.java) init() method.
+The initializing turn comes to Carina when [CarinaListenerChain](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListenerChain.java) object is created.
+It extends [ListenerChain](http://javadox.com/com.nordstrom.tools/testng-foundation/1.10.0/com/nordstrom/automation/testng/package-summary.html)
+which will create, sort and attach [IAbstractTest](https://github.com/zebrunner/carina/blob/60bea823c0921cb808e4c68eb6c056710a72b847/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/IAbstractTest.java#L49) listeners `CarinaListener.class, TestRunListener.class, FilterTestsListener.class`. This whole sequence is described in `TestRunner` [init()](https://github.com/cbeust/testng/blob/c394d371224b7d1aa3872c34c1f7818e2b9335f9/testng-core/src/main/java/org/testng/TestRunner.java#L229) method.
 
-[AbstractTest.class](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/AbstractTest.java) listeners are:
+These listeners are being attached and created when transform(IListenersAnnotation annotation, Class testClass) method is called.
 
-```
-@LinkedListeners({ CarinaListener.class, TestRunListener.class, DataProviderInterceptor.class })
-```
+* [FilterTestsListener](https://github.com/zebrunner/carina/blob/1202f5f7a660e53ab463548dd111682b310be261/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/FilterTestsListener.java#L33) which is resposible for tets execution [rules]( https://zebrunner.github.io/carina/configuration/#tests-execution-filter-configuration)
 
-Theese listeners being attached and created when transform(IListenersAnnotation annotation, Class testClass) method is called.
+* `TestRunListener` which is implemented in the Zebrunner agent. 
 
-* `TestRunListener.class` and `DataProviderInterceptor.class` are implemented in zebrunner. 
+* [CarinaListener](https://github.com/zebrunner/carina/blob/1202f5f7a660e53ab463548dd111682b310be261/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListener.java#L105) which is the main Carina TestNG listener.
 
-* [CarinaListener.class](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListener.java)
-as it comes from the name is a Carina's listener.
+Because CarinaListener object is created, the class static field is initialized in it. There are several important steps inside:
 
-Because CarinaListener object created, the class static field is initialized in it. There are several important steps inside:
+* R.reinit(). This method loads default values for all parameters from [carina-core](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/resources), then overrides them with user's configurations (_api.properties, _config.properties, _testdata.properties, _email.properties, _report.properties, _database.properties).
+* Configure log4j2x properties 
+* Initialize L10N feature.
 
-* R.reinit(). This method load's default values for all parameters from [carina-core](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/resources)
-   , then override's them with users configuration (api.properties, config.properties, testdata.properties, email.properties, report.properties, database.properties).
-* Configure log4j properties 
-* Initializing L10N feature.
-
-Then listeners attached to different Lists according to their implementations in TestNG:
+Then standard listeners according to their implementations in TestNG:
 
 ![Report link](../img/debug_entry_point1.png)
 
-After that methods are called in appropriate order in the [ListenerChain.class](http://javadox.com/com.nordstrom.tools/testng-foundation/1.10.0/com/nordstrom/automation/testng/package-summary.html):
+Then overridden TestNG methods
 
-* onStart(ISuite suite). There is called every ISuiteListener's onStart() method that where mentioned in AbstractTest.class (CarinaListener and TestRunListener). CarinaListener.class onStart(ISuite suite) method will configure logging level and thread count.
+* `FilterTestsListener->onStart(ISuite suite)`
 
-* now your test class is considered initialized and onStart(ITestContext testContext) method is called. Udid is generated there.
+* `TestRunListener->onStart(ISuite suite)`
 
-* onBeforeClass(ITestClass testClass). Complete steps described in @BeforeClass annotation from your test.
+* `CarinaListener->onStart(ISuite suite)`
 
-* onTestStart(ITestResult result) provide described data to test.
+* Now your test class is considered initialized and `onStart(ITestContext testContext)` method is called.
 
-Next TestRunner.class runs code described in your test.class. The following route depends on what you are doing in your test:
+* `onBeforeClass(ITestClass testClass)`. Complete the steps described in `@BeforeClass` annotation from your test.
+
+* `onTestStart(ITestResult result)` provides described data to test.
+
+Next, `TestRunner.class` runs code described in your test class. The following route depends on what you are doing in your test:
 
 **UI (web, mobile)**
 
@@ -89,3 +87,55 @@ public void createUser() {
 ```  
 
 These are user's classes, samples at carina-demo: [UserMapper](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/mappers/UserMapper.java), [ConnectionFactory](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/ConnectionFactory.java), [User](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/models/User.java).
+
+### FAQ
+
+**Dependent vs. independent tests. Which approach is better?**
+
+Try to develop fully independent tests to reuse all the benefits of the multi-threading execution. For example, [Zebrunner Selenium Grid](https://zebrunner.com/) provides **1000 threads** as default limitation and allows to execute your full regression scenarios in minutes!
+Use dependent methods via `dependsOnMethods` Test Annotation only if it is really required by Test logic. Carina will preserve all drivers for dependent methods so you can start a driver in one method and proceed with the page in another.
+```
+public class WebSampleSingleDriver implements IAbstractTest {
+    HomePage homePage = null;
+    CompareModelsPage comparePage = null;
+    List<ModelSpecs> specs = new ArrayList<>();
+
+    @BeforeSuite
+    public void startDriver() {
+        // Open GSM Arena home page and verify page is opened
+        homePage = new HomePage(getDriver());
+    }
+    
+    @Test
+    public void testOpenPage() {
+        homePage.open();
+        Assert.assertTrue(homePage.isPageOpened(), "Home page is not opened");
+    }
+    
+    @Test(dependsOnMethods="testOpenPage") //for dependent tests Carina keeps driver sessions by default
+    public void testOpenCompare() {
+        // Open GSM Arena home page and verify page is opened
+        // Open model compare page
+        FooterMenu footerMenu = homePage.getFooterMenu();
+        Assert.assertTrue(footerMenu.isUIObjectPresent(2), "Footer menu wasn't found!");
+        comparePage = footerMenu.openComparePage();
+
+    }
+    
+    @Test(dependsOnMethods="testOpenCompare") //for dependent tests Carina keeps driver sessions by default
+    public void testReadSpecs() {
+        // Compare 3 models
+        specs = comparePage.compareModels("Samsung Galaxy J3", "Samsung Galaxy J5", "Samsung Galaxy J7 Pro");
+    }
+    
+    @Test(dependsOnMethods="testReadSpecs") //for dependent tests Carina keeps driver sessions by default
+    public void testCompareModels() {
+        // Verify model announced dates
+        SoftAssert() softAssert = new SoftAssert();
+        softAssert.assertEquals(specs.get(0).readSpec(SpecType.ANNOUNCED), "2016, March 31");
+        softAssert.assertEquals(specs.get(1).readSpec(SpecType.ANNOUNCED), "2015, June 19");
+        softAssert.assertEquals(specs.get(2).readSpec(SpecType.ANNOUNCED), "2017, June");
+        softAssert.assertAll();
+    }
+}
+```

@@ -48,6 +48,7 @@ nav:
       - Localization: advanced/localization.md
       - Program flow: advanced/program_flow.md
       - Proxy: advanced/proxy.md
+      - Screenshot: advanced/screenshot.md
       - Security: advanced/security.md
     - Integration:
       - Zebrunner: integration/zebrunner.md

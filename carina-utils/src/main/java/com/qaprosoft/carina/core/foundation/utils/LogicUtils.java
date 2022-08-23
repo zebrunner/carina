@@ -58,14 +58,14 @@ public class LogicUtils {
     }
 
     private static boolean compareWithIgnore(String[] urlAr1, String[] urlAr2) {
-        int count = Math.max(urlAr1.length, urlAr2.length);
+        int count = Math.min(urlAr1.length, urlAr2.length);
         if (urlAr1 != null && urlAr2 != null) {
             for (int i = 0; i < count; i++) {
                 // 2 use-cases when different levels are compared using $ignore field
-                if (urlAr1.length <= i && SpecialKeywords.IGNORE.equals(urlAr2[i])) {
+                if ((urlAr1.length - 1) <= i && SpecialKeywords.IGNORE.equals(urlAr2[i])) {
                     //use-case when url1 is finished but url2 contains only $ignore sub-domain
                     continue;
-                } else if (urlAr2.length <= i && SpecialKeywords.IGNORE.equals(urlAr1[i])) {
+                } else if ((urlAr2.length - 1) <= i && SpecialKeywords.IGNORE.equals(urlAr1[i])) {
                     //use-case when url2 is finished but url1 contains only $ignore sub-domain
                     continue;
                 } else if (SpecialKeywords.IGNORE.equals(urlAr1[i]) || SpecialKeywords.IGNORE.equals(urlAr2[i])) {

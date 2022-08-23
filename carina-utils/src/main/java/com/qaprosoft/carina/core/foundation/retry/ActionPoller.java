@@ -1,6 +1,4 @@
-package com.qaprosoft.carina.core.foundation.api;
-
-import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
+package com.qaprosoft.carina.core.foundation.retry;
 
 import java.time.Duration;
 import java.time.temporal.TemporalUnit;
@@ -13,6 +11,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+
+import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 
 public class ActionPoller<T> {
 
@@ -146,7 +146,7 @@ public class ActionPoller<T> {
         }
     }
 
-    Predicate<T> getSuccessCondition() {
+    public Predicate<T> getSuccessCondition() {
         return successCondition;
     }
 }

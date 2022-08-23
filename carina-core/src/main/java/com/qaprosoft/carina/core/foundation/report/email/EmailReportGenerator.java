@@ -76,9 +76,6 @@ public class EmailReportGenerator {
     // Cucumber section
     private static final String CUCUMBER_RESULTS_PLACEHOLDER = "${cucumber_results}";
 
-    // Artifacts section
-    private static final String ARTIFACTS_RESULTS_PLACEHOLDER = "${artifacts}";
-
     private static boolean INCLUDE_PASS = R.EMAIL.getBoolean("include_pass");
     private static boolean INCLUDE_FAIL = R.EMAIL.getBoolean("include_fail");
     private static boolean INCLUDE_SKIP = R.EMAIL.getBoolean("include_skip");
@@ -107,8 +104,6 @@ public class EmailReportGenerator {
         // Cucumber section
         emailBody = emailBody.replace(CUCUMBER_RESULTS_PLACEHOLDER, getCucumberResultsHTML());
 
-        // Artifacts section
-        emailBody = emailBody.replace(ARTIFACTS_RESULTS_PLACEHOLDER, getArtifactsLinkHTML());
     }
 
     public String getEmailBody() {
@@ -225,7 +220,6 @@ public class EmailReportGenerator {
         int failed = 0;
         int failedKnownIssue = 0;
         int skipped = 0;
-        int skipped_already_passed = 0;
 
         for (TestResultItem ri : ris) {
             if (ri.isConfig()) {
@@ -242,23 +236,16 @@ public class EmailReportGenerator {
             case SKIP:
                 skipped++;
                 break;
-            case SKIP_ALL:
-                // do nothing
-                break;
             default:
                 // do nothing
                 break;
             }
         }
         TestResultType result;
-        if (passed == 0 && failed == 0 && skipped == 0 && skipped_already_passed > 0) {
-            result = TestResultType.SKIP_ALL_ALREADY_PASSED; // it was re-run of the suite where all tests passed during previous run
-        } else if (passed > 0 && failedKnownIssue == 0 && failed == 0 && skipped == 0) {
+        if (passed > 0 && failedKnownIssue == 0 && failed == 0 && skipped == 0) {
             result = TestResultType.PASS;
         } else if (passed >= 0 && failedKnownIssue > 0 && failed == 0 && skipped == 0) {
             result = TestResultType.PASS_WITH_KNOWN_ISSUES;
-        } else if (passed == 0 && failed == 0 && skipped > 0) {
-            result = TestResultType.SKIP_ALL;
         } else if (passed >= 0 && failed == 0 && skipped > 0) {
             result = TestResultType.SKIP;
         } else {
@@ -289,27 +276,6 @@ public class EmailReportGenerator {
             reasonText = reasonText.replace("\n", "<br/>");
         }
         return reasonText;
-    }
-
-    /**
-     * Get HTML block for link to artifacts folder in local file system
-     * 
-     * @return generated HTML block
-     */
-    private String getArtifactsLinkHTML() {
-        String result = "";
-
-        if (!ReportContext.getAllArtifacts().isEmpty()) {
-
-            String link = ReportContext.getTestArtifactsLink();
-            LOGGER.debug("Artifacts gallery link: " + link);
-            result = String.format(
-                    "<br/><b><a href='%s' style='color: black;' target='_blank' style='display: block'> Open Artifacts gallery in a new tab</a></b><br/>",
-                    link);
-            LOGGER.debug("Artifacts gallery: " + result);
-        }
-
-        return result;
     }
 
     private String getCucumberResultsHTML() {

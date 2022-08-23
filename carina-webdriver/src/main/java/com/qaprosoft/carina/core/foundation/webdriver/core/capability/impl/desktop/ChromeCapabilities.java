@@ -26,7 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
 public class ChromeCapabilities extends AbstractCapabilities<ChromeOptions> {
@@ -62,10 +64,14 @@ public class ChromeCapabilities extends AbstractCapabilities<ChromeOptions> {
 
         if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD)) {
             chromePrefs.put("download.prompt_for_download", false);
-            chromePrefs.put("download.default_directory", getAutoDownloadFolderPath());
+            if (!"zebrunner".equalsIgnoreCase(R.CONFIG.get("capabilities.provider"))) {
+                // don't override auto download dir for Zebrunner Selenium Grid (Selenoid)
+                chromePrefs.put("download.default_directory", ReportContext.getArtifactsFolder().getAbsolutePath());
+            }
             chromePrefs.put("plugins.always_open_pdf_externally", true);
             needsPrefs = true;
         }
+
 
         // [VD] no need to set proxy via options anymore!
         // moreover if below code is uncommented then we have double proxy start and mess in host:port values
@@ -135,5 +141,4 @@ public class ChromeCapabilities extends AbstractCapabilities<ChromeOptions> {
             options.setHeadless(Configuration.getBoolean(Configuration.Parameter.HEADLESS));
         }
     }
-
 }

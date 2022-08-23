@@ -15,10 +15,16 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.openqa.selenium.chromium.ChromiumOptions;
 import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.CapabilityType;
 
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
 public class EdgeCapabilities extends AbstractCapabilities<ChromiumOptions<?>> {
@@ -26,10 +32,32 @@ public class EdgeCapabilities extends AbstractCapabilities<ChromiumOptions<?>> {
     public ChromiumOptions<?> getCapability(String testName) {
         ChromiumOptions<?> capabilities = new ChromiumOptions<>(CapabilityType.BROWSER_NAME, Browser.EDGE.browserName(), "ms:edgeOptions");
         initBaseCapabilities(capabilities, testName);
+        addEdgeOptions(capabilities);
         capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
         capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
 
         return capabilities;
+    }
+
+    private void addEdgeOptions(ChromiumOptions<?> caps) {
+        Map<String, Object> prefs = new HashMap<>();
+        Map<String, Object> edgeOptions = new HashMap<>();
+
+        boolean needsPrefs = false;
+
+        if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD)) {
+            prefs.put("download.prompt_for_download", false);
+            if (!"zebrunner".equalsIgnoreCase(R.CONFIG.get("capabilities.provider"))) {
+                prefs.put("download.default_directory",
+                        ReportContext.getArtifactsFolder().getAbsolutePath());
+            }
+            needsPrefs = true;
+        }
+
+        if (needsPrefs) {
+            edgeOptions.put("prefs", prefs);
+        }
+        caps.setCapability("ms:edgeChrominum", true);
     }
 
 }

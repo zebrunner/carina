@@ -15,8 +15,11 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -64,6 +67,7 @@ public enum R {
     // temporary thread/test properties which is cleaned on afterTest phase for current thread. It can override any value from below R enum maps
     private static ThreadLocal<Properties> testProperties = new ThreadLocal<>();
 
+    private static Map<String, Properties> defaultPropertiesHolder = new HashMap<>();
     // permanent global configuration map 
     private static Map<String, Properties> propertiesHolder = new HashMap<>();
     
@@ -77,21 +81,28 @@ public enum R {
             try {
                 Properties properties = new Properties();
 
-                URL baseResource = ClassLoader.getSystemResource(resource.resourceFile);
-                if (baseResource != null) {
-                    properties.load(baseResource.openStream());
-                    LOGGER.debug("Base properties loaded: " + resource.resourceFile);
+                if (isResourceExists(resource.resourceFile)) {
+                    Properties collectedProperties = collect(resource.resourceFile);
+                    properties.putAll(collectedProperties);
+                    defaultPropertiesHolder.put(resource.resourceFile, collectedProperties);
                 }
 
                 URL overrideResource;
                 String resourceName = OVERRIDE_SIGN + resource.resourceFile;
                 while ((overrideResource = ClassLoader.getSystemResource(resourceName)) != null) {
                     properties.load(overrideResource.openStream());
-                    LOGGER.debug("Override properties loaded: " + resourceName);
                     resourceName = OVERRIDE_SIGN + resourceName;
                 }
 
-                // Overrides properties by systems values
+                // Overrides properties by env variables
+                for (Object key : properties.keySet()) {
+                    String systemValue = System.getenv((String) key);
+                    if (!StringUtils.isEmpty(systemValue)) {
+                        properties.put(key, systemValue);
+                    }
+                }
+                
+                // Overrides properties by systems properties (java arguments)
                 for (Object key : properties.keySet()) {
                     String systemValue = System.getProperty((String) key);
                     if (!StringUtils.isEmpty(systemValue)) {
@@ -112,6 +123,7 @@ public enum R {
                 if (resource.resourceFile.contains("config.properties")) {
                     // no need to read env variables using System.getenv()
                     final String prefix = SpecialKeywords.CAPABILITIES + ".";
+                    
                     // read all java arguments and redefine capabilities.* items
                     @SuppressWarnings({ "unchecked", "rawtypes" })
                     Map<String, String> javaProperties = new HashMap(System.getProperties());
@@ -142,6 +154,38 @@ public enum R {
         }
     }
 
+    /**
+     * Checks for the presence of at least one resource in the classpath
+     * 
+     * @param resourceName the name of the resource being searched for
+     * @return true if at least one resource found, false otherwise
+     */
+    private static boolean isResourceExists(String resourceName) {
+        return ClassLoader.getSystemResource(resourceName) != null;
+    }
+
+    /**
+     * Collect all properties with the same name into a single Properties object
+     * 
+     * @param resourceName resource name, for example config.properties
+     * @return collected properties
+     */
+    private static Properties collect(String resourceName) throws IOException {
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        Properties assembledProperties = new Properties();
+            Enumeration<URL> resourceURLs = classLoader.getResources(resourceName);
+            while (resourceURLs.hasMoreElements()) {
+                Properties tempProperties = new Properties();
+                URL url = resourceURLs.nextElement();
+
+                try (InputStream stream = url.openStream()) {
+                    tempProperties.load(stream);
+                    assembledProperties.putAll(tempProperties);
+                }
+            }
+        return assembledProperties;
+    }
+
     private boolean isInit(Parameter parameter, Properties properties){
         String value = (String) properties.get(parameter.getKey());
         return !(value == null || value.length() == 0 || value.equals("NULL"));
@@ -149,6 +193,22 @@ public enum R {
 
     R(String resourceKey) {
         this.resourceFile = resourceKey;
+    }
+
+    /**
+     * Compares the current value of property with the default value
+     * 
+     * @param key name of property
+     * @return true if current value equals default value, otherwise false
+     */
+    public boolean isOverwritten(String key) {
+        String currentValue = get(key);
+        String defaultValue = defaultPropertiesHolder.get(resourceFile).getProperty(key);
+        if (defaultValue == null) {
+            defaultValue = StringUtils.EMPTY;
+        }
+
+        return !currentValue.equals(defaultValue);
     }
 
     /**
@@ -170,8 +230,11 @@ public enum R {
      */
     public void put(String key, String value, boolean currentTestOnly) {
         if (currentTestOnly) {
+            // do not warn user about this system property update
+            if (!Parameter.ERROR_SCREENSHOT.getKey().equals(key)) {
+                LOGGER.warn("Override property for current test '" + key + "=" + value + "'!");
+            }
             //declare temporary property key
-            LOGGER.warn("Override property for current test '" + key + "=" + value + "'!");
             getTestProperties().put(key, value);
         } else {
             // override globally configuration map property 
@@ -200,7 +263,10 @@ public enum R {
     public String get(String key) {
         String value = getTestProperties().getProperty(key);
         if (value != null) {
-            System.out.println("Overridden '" + key + "=" + value + "' property will be used for current test!");
+            // do not warn user about this system property update
+            if (!Parameter.ERROR_SCREENSHOT.getKey().equals(key)) {
+                System.out.println("Overridden '" + key + "=" + value + "' property will be used for current test!");
+            }
             return value;
         }
         

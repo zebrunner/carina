@@ -28,11 +28,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -44,9 +39,9 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Locatable;
@@ -120,30 +115,35 @@ public class ExtendedWebElement implements IWebElement {
     private String formatValues = "";
 
     private LocatorConverter caseInsensitiveConverter;
+    
+    public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext) {
+        if (by == null) {
+            throw new RuntimeException("By couldn't be null!");
+        }
+        if (driver == null) {
+            throw new RuntimeException("driver couldn't be null!");
+        }
+
+        if (searchContext == null) {
+            throw new RuntimeException("review stacktrace to analyze why searchContext is null");
+        }
+
+        this.by = by;
+        this.name = name;
+        this.driver = driver;
+        this.searchContext = searchContext;
+    }
+
+    public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext, Object[] formatValues) {
+        this(by, name, driver, searchContext);
+        this.formatValues = Arrays.toString(formatValues);
+    }
 
     public ExtendedWebElement(WebElement element, String name, By by) {
         this(element, name);
         this.by = by;
     }
 
-    public ExtendedWebElement(By by, String name) {
-    	this.by = by;
-    	this.name = name;
-    }
-    
-    public ExtendedWebElement(By by, String name, WebDriver driver) {
-    	this.by = by;
-    	this.name = name;
-    	this.driver = driver;
-    }
-    
-    public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext) {
-        this.by = by;
-        this.name = name;
-        this.driver = driver;
-        this.searchContext = searchContext;
-    }
-    
     public ExtendedWebElement(WebElement element, String name) {
     	this.name = name;
         this.element = element;
@@ -210,7 +210,9 @@ public class ExtendedWebElement implements IWebElement {
 					locatorField.setAccessible(true);
 
 					locator = (ExtendedElementLocator) locatorField.get(innerProxy);
-					this.isLocalized = locator.isLocalized();
+                    // #1691 fix L10N Localized annotation does not work when elements are nested and the
+                    // parent element does not have an annotation.
+                    // this.isLocalized = locator.isLocalized();
 
 					searchContextField = locator.getClass().getDeclaredField("searchContext");
 					searchContextField.setAccessible(true);
@@ -275,23 +277,14 @@ public class ExtendedWebElement implements IWebElement {
 		} catch (Throwable thr) {
 			thr.printStackTrace();
 			LOGGER.error("Unable to get Driver, searchContext and By via reflection!", thr);
-		}
-		
-    	if (this.searchContext == null) {
-			try {
-				throw new RuntimeException("review stacktrace to analyze why searchContext is not populated correctly via reflection!");
-			} catch (Throwable thr) {
-			    LOGGER.warn("this.searchContext is null!", thr);
-			}
-    	}
+        } finally {
+            if (this.searchContext == null) {
+                throw new RuntimeException("review stacktrace to analyze why searchContext is not populated correctly via reflection!");
+            }
+        }
+
     }
 
-    
-
-    public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext, Object[] formatValues) {
-        this(by, name, driver, searchContext);
-        this.formatValues = Arrays.toString(formatValues);
-    }
 
     public WebElement getElement() {
         if (this.element == null) {
@@ -299,6 +292,16 @@ public class ExtendedWebElement implements IWebElement {
         }
         
         return this.element;
+    }
+
+    /**
+     * Reinitializes the element
+     *
+     * @throws NoSuchElementException if the element is not found
+     */
+    public void refresh() {
+        // try to override element
+        element = this.findElement();
     }
     
     /**
@@ -330,7 +333,14 @@ public class ExtendedWebElement implements IWebElement {
 	 * @return element existence status.
 	 */
 	public boolean isPresent(By by, long timeout) {
-		return waitUntil(getDefaultCondition(by), timeout);
+        boolean res = false;
+        try {
+            res = waitUntil(getDefaultCondition(by), timeout);
+        } catch (StaleElementReferenceException e) {
+            // there is no sense to continue as StaleElementReferenceException captured
+            LOGGER.debug("waitUntil: StaleElementReferenceException", e);
+        }
+        return res;
 	}
 	
 	
@@ -342,17 +352,17 @@ public class ExtendedWebElement implements IWebElement {
      * @return true if condition happen.
      */
     private boolean waitUntil(ExpectedCondition<?> condition, long timeout) {
-        if (timeout <= 0) {
-            LOGGER.error("Fluent wait with 0 and less timeout might hangs! Updating to 1 sec.");
+        if (timeout < 1) {
+            LOGGER.warn("Fluent wait less than 1sec timeout might hangs! Updating to 1 sec.");
             timeout = 1;
         }
-        boolean result = false;
 
-//      Wait<WebDriver> wait = new WebDriverWait(getDriver(), timeout, RETRY_TIME)
-        //try to use better tickMillis clock 
-        Wait<WebDriver> wait = new WebDriverWait(getDriver(), Duration.ofSeconds(timeout), Duration.ofSeconds(RETRY_TIME),  java.time.Clock.tickMillis(java.time.ZoneId.systemDefault()), Sleeper.SYSTEM_SLEEPER)
-                .ignoring(WebDriverException.class)
-                .ignoring(NoSuchElementException.class);
+        long retryInterval = getRetryInterval(timeout);
+
+        // try to use better tickMillis clock
+        Wait<WebDriver> wait = new WebDriverWait(getDriver(), Duration.ofSeconds(timeout), Duration.ofMillis(retryInterval),
+                java.time.Clock.tickMillis(java.time.ZoneId.systemDefault()), Sleeper.SYSTEM_SLEEPER)
+                        .withTimeout(Duration.ofSeconds(timeout));
 
         // [VD] Notes:
         // do not ignore TimeoutException or NoSuchSessionException otherwise you can wait for minutes instead of timeout!
@@ -362,58 +372,35 @@ public class ExtendedWebElement implements IWebElement {
         // 7.3.17-SNAPSHOT. Removed NoSuchSessionException (Mar-11-2022)
         //.ignoring(NoSuchSessionException.class) // why do we ignore noSuchSession? Just to minimize errors?
 
+        // 7.3.20.1686-SNAPSHOT. Removed ignoring WebDriverException (Jun-03-2022).
+        // Goal to test if inside timeout happens first and remove interruption and future call
+        // removed ".ignoring(NoSuchElementException.class);" as NotFoundException ignored by waiter itself
+        // added explicit .withTimeout(Duration.ofSeconds(timeout));
+
         LOGGER.debug("waitUntil: starting... timeout: " + timeout);
-        
-        Future<?> future = Executors.newSingleThreadExecutor().submit(new Callable<Boolean>() {
-            public Boolean call() throws Exception {
-                boolean res = false;
-                try {
-                    wait.until(condition);
-                    res = true;
-                } catch (TimeoutException e) {
-                    LOGGER.debug("waitUntil: org.openqa.selenium.TimeoutException", e);
-                }
-                return res;
-            }
-        });
-        
-     // make future process timeout 10s longer
-        long processTimeout = timeout + 10;
+        boolean res = false;
         try {
-            result = (boolean) future.get(processTimeout, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        } catch (java.util.concurrent.TimeoutException e) {
-            LOGGER.error("waitUntil: java.util.concurrent.TimeoutException: " + processTimeout + "s", e);
-        } catch (ExecutionException e) {
-            LOGGER.error(e.getMessage(), e);
+            wait.until(condition);
+            res = true;
+        } catch (TimeoutException e) {
+            LOGGER.debug("waitUntil: org.openqa.selenium.TimeoutException", e);
+        } finally {
+            LOGGER.debug("waiter is finished. conditions: " + condition);
         }
+        return res;
         
-        return result;
     }
 
     private WebElement findElement() {
-        // as we still provide several ways to init ExtendedWebElement without searchContext we have to use "if" operator and getDriver()
-        // to use only searchContext we must remove all findExtendedWebElement(s) methods in DriverHelper which is not so simple
-        if (searchContext != null) {
-            //element = searchContext.findElement(by);
-            List<WebElement> elements = searchContext.findElements(by);
-
-            if (elements.isEmpty()) {
-                throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
-            }
-            this.element = elements.get(0);
-        } else {
-            // No way to remove this else piece as several projects play with this part of finder
-            //LOGGER.warn("Please, inform Carina team about this warn providing logs...");
-            List<WebElement> elements = getDriver().findElements(by);
-
-            if (elements.isEmpty()) {
-                throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
-            }
-
-            this.element = elements.get(0);
+        List<WebElement> elements = searchContext.findElements(this.by);
+        if (elements.isEmpty()) {
+            throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + this.by.toString());
         }
+        if (elements.size() > 1) {
+            // TODO: think about moving into the debug or info level
+            LOGGER.warn(String.format("returned first but found %d elements by xpath: %s", elements.size(), getBy()));
+        }
+        this.element = elements.get(0);
 
         return element;
     }
@@ -867,7 +854,8 @@ public class ExtendedWebElement implements IWebElement {
      * @return true if item selected, otherwise false.
      */
     public boolean selectByPartialText(final String partialSelectText) {
-        return (boolean) doAction(ACTION_NAME.SELECT_BY_PARTIAL_TEXT, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), partialSelectText);
+        return (boolean) doAction(ACTION_NAME.SELECT_BY_PARTIAL_TEXT, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()),
+                partialSelectText);
     }
 
     /**
@@ -983,7 +971,15 @@ public class ExtendedWebElement implements IWebElement {
             waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
         }
 
-        return waitUntil(waitCondition, timeout);
+        boolean res = false;
+        try {
+            res = waitUntil(waitCondition, timeout);
+        } catch (StaleElementReferenceException e) {
+            // there is no sense to continue as StaleElementReferenceException captured
+            LOGGER.debug("waitUntil: StaleElementReferenceException", e);
+        }
+
+        return res;
     }
 
 	
@@ -1039,8 +1035,6 @@ public class ExtendedWebElement implements IWebElement {
 		}
     }
 
-
-
     /**
      * Find Extended Web Element on page using By starting search from this
      * object.
@@ -1087,7 +1081,7 @@ public class ExtendedWebElement implements IWebElement {
      */
     public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
         if (isPresent(by, timeout)) {
-            return new ExtendedWebElement(by, name, this.driver, this.searchContext);
+            return new ExtendedWebElement(by, name, this.driver, getElement());
         } else {
         	throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
         }
@@ -1118,37 +1112,54 @@ public class ExtendedWebElement implements IWebElement {
             }
 
             // we can't initiate ExtendedWebElement using by as it belongs to the list of elements
-            extendedWebElements.add(new ExtendedWebElement(generateByForList(by, i), name, this.driver, this.searchContext));
+            extendedWebElements.add(new ExtendedWebElement(generateByForList(by, i), name, this.driver, getElement()));
             i++;
         }
         return extendedWebElements;
     }
 
+    /**
+     * Wait until element disappear
+     *
+     * @param timeout long
+     * @return boolean true if element disappeared and false if still visible
+     */
     public boolean waitUntilElementDisappear(final long timeout) {
-    	try {
-        	//TODO: investigate maybe searchContext better to use here!
-    		//do direct selenium/appium search without any extra validations
-            if (searchContext != null) {
-                //TODO: use-case when format method is used. Need investigate howto init context in this case as well
-                element = searchContext.findElement(by);
-            } else {
-                LOGGER.debug("waitUntilElementDisappear: searchContext is null for " + getNameWithLocator());
-                element = getDriver().findElement(by);  
+        boolean res = false;
+        try {
+            if (this.element == null) {
+                // if element not found it will cause NoSuchElementException
+                findElement();
             }
-    	} catch (NoSuchElementException e) {
-    		//element not present so means disappear
-    		return true;
-    	} catch (Exception e) {
-    		//element not present so means disappear
-    		LOGGER.error("Investigate use-case with disappeared element later!", e);
-    		return true;
-    	}
 
-        return waitUntil(ExpectedConditions.or(ExpectedConditions.invisibilityOfElementLocated(getBy()),
-                ExpectedConditions.stalenessOf(element),
-                ExpectedConditions.invisibilityOf(element)), timeout);
+            // if element is stale, it will cause StaleElementReferenceException
+            if (this.element.isDisplayed()) {
+                LOGGER.info("Element {} detected. Waiting until disappear...", this.element.getTagName());
+            } else {
+                LOGGER.info("Element {} is not detected, i.e. disappeared", this.element.getTagName());
+                // no sense to continue as element is not displayed so return asap
+                return true;
+            }
+
+            res = waitUntil(ExpectedConditions.or(ExpectedConditions.stalenessOf(this.element),
+                    ExpectedConditions.invisibilityOf(this.element)),
+                    timeout);
+
+        } catch (NoSuchElementException | StaleElementReferenceException e) {
+            // element not present so means disappear
+            LOGGER.debug("Element disappeared as exception catched: {}", e.getMessage());
+            res = true;
+        }
+
+        return res;
+
     }
 
+    /**
+     * Used to format locator
+     * 
+     * @return ExtendedWebElement
+     */
     public ExtendedWebElement format(Object... objects) {
         String locator = by.toString();
         By by = null;
@@ -1412,8 +1423,22 @@ public class ExtendedWebElement implements IWebElement {
             L10N.verify(this);
         }
 
-        this.element = getElement();
-        return overrideAction(actionName, inputArgs);
+        Object output = null;
+
+        try {
+            this.element = getElement();
+            output = overrideAction(actionName, inputArgs);
+        } catch (StaleElementReferenceException e) {
+            // TODO: analyze mobile testing for staled elements. Potentially it should be fixed by appium java client already
+            // sometime Appium instead printing valid StaleElementException generate java.lang.ClassCastException:
+            // com.google.common.collect.Maps$TransformedEntriesMap cannot be cast to java.lang.String
+            LOGGER.debug("catched StaleElementReferenceException: ", e);
+            // try to find again using driver context and do action
+            element = this.findElement();
+            output = overrideAction(actionName, inputArgs);
+        }
+
+        return output;
 	}
 
 	// single place for all supported UI actions in carina core
@@ -1725,6 +1750,10 @@ public class ExtendedWebElement implements IWebElement {
         	resBy = By.linkText(StringUtils.remove(locator, LocatorType.LINKTEXT.getStartsWith()) + "[" + index + "]");
         }
 
+        if (locator.startsWith(LocatorType.CLASSNAME.getStartsWith())) {
+            resBy = By.className(StringUtils.remove(locator, LocatorType.CLASSNAME.getStartsWith()) + "[" + index + "]");
+        }
+
         if (locator.startsWith("partialLinkText: ")) {
         	resBy = By.partialLinkText(StringUtils.remove(locator, "partialLinkText: ") + "[" + index + "]");
         }
@@ -1757,45 +1786,92 @@ public class ExtendedWebElement implements IWebElement {
         }
         return resBy;
     }
-    
-/*	private ExpectedCondition<?> getDefaultCondition(By myBy) {
-        // generate the most popular wiatCondition to check if element visible or present
-        return ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
-                ExpectedConditions.visibilityOfElementLocated(myBy));
-    }*/
 
-    // old functionality to remove completely after successfull testing
-    private ExpectedCondition<?> getDefaultCondition(By myBy) {
+    /**
+     * Get element waiting condition depends on element loading strategy
+     */
+    private ExpectedCondition<?> getDefaultCondition(By by) {
         // generate the most popular waitCondition to check if element visible or present
         ExpectedCondition<?> waitCondition = null;
+        // need to get root element from with we will try to find element by By
         switch (loadingStrategy) {
         case BY_PRESENCE: {
             if (element != null) {
-                waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy), ExpectedConditions.visibilityOf(element));
+                if (searchContext instanceof RemoteWebElement) {
+                    WebElement contextElement = searchContext.findElement(By.xpath("."));
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by),
+                            ExpectedConditions.visibilityOf(element));
+                } else {
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
+                            ExpectedConditions.visibilityOf(element));
+                }
             } else {
-                waitCondition = ExpectedConditions.presenceOfElementLocated(myBy);
+                if (searchContext instanceof RemoteWebElement) {
+                    WebElement contextElement = searchContext.findElement(By.xpath("."));
+                    waitCondition = ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by);
+                } else {
+                    waitCondition = ExpectedConditions.presenceOfElementLocated(by);
+
+                }
             }
             break;
         }
         case BY_VISIBILITY: {
             if (element != null) {
-                waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(myBy), ExpectedConditions.visibilityOf(element));
+                if (searchContext instanceof RemoteWebElement) {
+                    WebElement contextElement = searchContext.findElement(By.xpath("."));
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by),
+                            ExpectedConditions.visibilityOf(element));
+                } else {
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(by),
+                            ExpectedConditions.visibilityOf(element));
+                }
             } else {
-                waitCondition = ExpectedConditions.visibilityOfElementLocated(myBy);
+                if (searchContext instanceof RemoteWebElement) {
+                    WebElement contextElement = searchContext.findElement(By.xpath("."));
+                    waitCondition = ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by);
+                } else {
+                    waitCondition = ExpectedConditions.visibilityOfElementLocated(by);
+                }
             }
             break;
         }
         case BY_PRESENCE_OR_VISIBILITY:
             if (element != null) {
-                waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
-                        ExpectedConditions.visibilityOfElementLocated(myBy),
-                        ExpectedConditions.visibilityOf(element));
+                if (searchContext instanceof RemoteWebElement) {
+                    WebElement contextElement = searchContext.findElement(By.xpath("."));
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by),
+                            ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by),
+                            ExpectedConditions.visibilityOf(element));
+                } else {
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
+                            ExpectedConditions.visibilityOfElementLocated(by),
+                            ExpectedConditions.visibilityOf(element));
+                }
             } else {
-                waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(myBy),
-                        ExpectedConditions.visibilityOfElementLocated(myBy));
+                if (searchContext instanceof RemoteWebElement) {
+                    WebElement contextElement = searchContext.findElement(By.xpath("."));
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by),
+                            ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by));
+                } else {
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
+                            ExpectedConditions.visibilityOfElementLocated(by));
+                }
             }
             break;
         }
         return waitCondition;
     }
+
+    private long getRetryInterval(long timeout) {
+        long retryInterval = RETRY_TIME;
+        if (timeout >= 3 && timeout <= 10) {
+            retryInterval = 500;
+        }
+        if (timeout > 10) {
+            retryInterval = 1000;
+        }
+        return retryInterval;
+    }
+
 }
