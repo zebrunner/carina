@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.remote.BrowserType;
@@ -114,9 +113,6 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
     }
 
     protected void initSpecialCapabilities(T capabilities) {
-        if (!Objects.equals(Configuration.get(Parameter.W3C), "true")) {
-            return;
-        }
         String provider = Configuration.get(Parameter.PROVIDER);
         if (Objects.equals(provider, StringUtils.EMPTY)) {
             return;
@@ -138,7 +134,13 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
             String cap = entry.getKey().replaceAll(provider + ".capabilities.", "");
             specialCapabilities.put(cap, value);
         }
-        capabilities.setCapability(provider + ":options", specialCapabilities);
+        if (Objects.equals(Configuration.get(Parameter.W3C), "true")) {
+            capabilities.setCapability(provider + ":options", specialCapabilities);
+        } else {
+            for (String capName : specialCapabilities.keySet()) {
+                capabilities.setCapability(capName, specialCapabilities.get(capName));
+            }
+        }
     }
 
     protected Proxy setupProxy() {
