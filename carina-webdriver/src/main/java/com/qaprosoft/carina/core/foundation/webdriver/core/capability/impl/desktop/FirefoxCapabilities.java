@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.net.PortProber;
-import org.openqa.selenium.remote.CapabilityType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,20 +32,18 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCa
 
 public class FirefoxCapabilities extends AbstractCapabilities<FirefoxOptions> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
-    private static ArrayList<Integer> firefoxPorts = new ArrayList<Integer>();
+    private static final ArrayList<Integer> firefoxPorts = new ArrayList<>();
 
     /**
-     * Generate DesiredCapabilities for Firefox with default Carina FirefoxProfile.
-     *
-     * @param testName
-     *            - String.
-     * @return Firefox desired capabilities.
+     * Generate FirefoxOptions for Firefox with default Carina FirefoxProfile.
+     * 
+     * @return Firefox capabilities.
      */
+    @Override
     public FirefoxOptions getCapability(String testName) {
         FirefoxOptions capabilities = new FirefoxOptions();
         initBaseCapabilities(capabilities, testName);
-
+        addFirefoxOptions(capabilities);
         FirefoxProfile profile = new FirefoxProfile();
         profile.setPreference("media.eme.enabled", true);
         profile.setPreference("media.gmp-manager.updateEnabled", true);
@@ -56,19 +53,16 @@ public class FirefoxCapabilities extends AbstractCapabilities<FirefoxOptions> {
     }
 
     /**
-     * Generate DesiredCapabilities for Firefox with custom FirefoxProfile.
+     * Generate FirefoxOptions for Firefox with custom FirefoxProfile.
      *
-     * @param testName
-     *            - String.
-     * @param profile
-     *            - FirefoxProfile.
-     * @return Firefox desired capabilities.
+     * @param testName - String.
+     * @param profile - FirefoxProfile.
+     * @return FirefoxOptions
      */
     public FirefoxOptions getCapability(String testName, FirefoxProfile profile) {
         FirefoxOptions capabilities = new FirefoxOptions();
         initBaseCapabilities(capabilities, testName);
-        capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
-
+        addFirefoxOptions(capabilities);
         capabilities.setProfile(profile);
         return capabilities;
     }

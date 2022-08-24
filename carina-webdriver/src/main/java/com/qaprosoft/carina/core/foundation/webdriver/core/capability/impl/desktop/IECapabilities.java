@@ -15,15 +15,16 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
 
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.Browser;
-import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
-public class IECapabilities extends AbstractCapabilities<DesiredCapabilities> {
+public class IECapabilities extends AbstractCapabilities<MutableCapabilities> {
 
-    public DesiredCapabilities getCapability(String testName) {
+    @Override
+    public MutableCapabilities getCapability(String testName) {
         DesiredCapabilities capabilities = new DesiredCapabilities();
         initBaseCapabilities(capabilities, testName);
         capabilities.setBrowserName(Browser.IE.browserName());

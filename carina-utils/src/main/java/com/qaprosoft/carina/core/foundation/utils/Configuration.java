@@ -436,6 +436,10 @@ public class Configuration {
             return SpecialKeywords.WINDOWS;
         }
 
+        if (SpecialKeywords.MAC.equalsIgnoreCase(platform)) {
+            return SpecialKeywords.MAC;
+        }
+
         return SpecialKeywords.DESKTOP;
     }
 
@@ -456,6 +460,10 @@ public class Configuration {
         
         if (SpecialKeywords.WINDOWS.equalsIgnoreCase(platform)) {
             return SpecialKeywords.WINDOWS;
+        }
+
+        if (SpecialKeywords.MAC.equalsIgnoreCase(platform)) {
+            return SpecialKeywords.MAC;
         }
 
         // handle use-case when we provide only uuid object among desired capabilities

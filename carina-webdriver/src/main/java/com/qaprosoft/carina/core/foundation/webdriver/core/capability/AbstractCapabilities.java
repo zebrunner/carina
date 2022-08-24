@@ -26,7 +26,7 @@ import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Proxy;
-import org.openqa.selenium.remote.BrowserType;
+import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.CapabilityType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,9 +42,13 @@ import com.qaprosoft.carina.proxy.SystemProxy;
 public abstract class AbstractCapabilities<T extends MutableCapabilities> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    /**
+     * Generate Capabilities according to configuration file
+     */
     public abstract T getCapability(String testName);
 
     protected void initBaseCapabilities(T capabilities, String testName) {
+
         if (!IDriverPool.DEFAULT.equalsIgnoreCase(testName)) {
             // #1573: remove "default" driver name capability registration
             capabilities.setCapability("name", testName);
@@ -60,31 +64,38 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
     }
 
     protected void initCapabilities(T capabilities) {
-        ArrayList<String> numericCaps = new ArrayList<String>(
-                Arrays.asList("idleTimeout", "waitForIdleTimeout"));
+        ArrayList<String> numericCaps = new ArrayList<>(Arrays.asList("idleTimeout", "waitForIdleTimeout"));
         
         // read all properties which starts from "capabilities.*" prefix and add them into desired capabilities.
         final String prefix = SpecialKeywords.CAPABILITIES + ".";
+
         @SuppressWarnings({ "unchecked", "rawtypes" })
         Map<String, String> capabilitiesMap = new HashMap(R.CONFIG.getProperties());
+
         for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
-            if (entry.getKey().toLowerCase().startsWith(prefix)) {
-                String value = R.CONFIG.get(entry.getKey());                
-                if (!value.isEmpty()) {
-                    String cap = entry.getKey().replaceAll(prefix, "");
-                    if (numericCaps.contains(cap) && isNumber(value)) {
-                        LOGGER.debug("Adding " + cap + " to capabilities as integer");
-                        capabilities.setCapability(cap, Integer.parseInt(value));
-                    } else if ("false".equalsIgnoreCase(value)) {
-                        capabilities.setCapability(cap, false);
-                    } else if ("true".equalsIgnoreCase(value)) {
-                        capabilities.setCapability(cap, true);
-                    } else {
-                        capabilities.setCapability(cap, value);
-                    }
+            if (!entry.getKey().toLowerCase().startsWith(prefix)) {
+                continue;
+            }
+
+            String value = R.CONFIG.get(entry.getKey());
+            if (value.isEmpty()) {
+                continue;
+            }
+
+            String capability = entry.getKey().replaceAll(prefix, "");
+
+            if (numericCaps.contains(capability) && isNumber(value)) {
+                LOGGER.debug("Adding {} to capabilities as integer", capability);
+                capabilities.setCapability(capability, Integer.parseInt(value));
+            } else if ("false".equalsIgnoreCase(value)) {
+                capabilities.setCapability(capability, false);
+            } else if ("true".equalsIgnoreCase(value)) {
+                capabilities.setCapability(capability, true);
+            } else {
+                capabilities.setCapability(capability, value);
                 }
             }
-        }
+
 
         //TODO: [VD] reorganize in the same way Firefox profiles args/options if any and review other browsers
         // support customization for Chrome args and options
@@ -99,46 +110,46 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
         }
 
         if (Configuration.getBoolean(Parameter.HEADLESS)) {
-            if (BrowserType.FIREFOX.equalsIgnoreCase(browser)
-                    || BrowserType.CHROME.equalsIgnoreCase(browser)
+            if (Browser.FIREFOX.browserName().equalsIgnoreCase(browser)
+                    || Browser.CHROME.browserName().equalsIgnoreCase(browser)
                     && Configuration.getDriverType().equalsIgnoreCase(SpecialKeywords.DESKTOP)) {
                 LOGGER.info("Browser will be started in headless mode. VNC and Video will be disabled.");
                 capabilities.setCapability("enableVNC", false);
                 capabilities.setCapability("enableVideo", false);
             } else {
-                LOGGER.error(String.format("Headless mode isn't supported by %s browser / platform.", browser));
+                LOGGER.error("Headless mode isn't supported by {} browser / platform.", browser);
             }
         }
-        initSpecialCapabilities(capabilities);
+        initCustomCapabilities(capabilities);
     }
 
-    protected void initSpecialCapabilities(T capabilities) {
+    private void initCustomCapabilities(T capabilities) {
         String provider = Configuration.get(Parameter.PROVIDER);
+
         if (Objects.equals(provider, StringUtils.EMPTY)) {
             return;
         }
 
-        Map<String, String> capabilitiesMap = new HashMap(R.CONFIG.getProperties());
-        HashMap<String, String> specialCapabilities = new HashMap<>();
+        Map<String, String> propertiesMap = new HashMap(R.CONFIG.getProperties());
+        Map<String, Object> customCapabilities = new HashMap<>();
 
-        for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
-            if (!entry.getKey().toLowerCase().startsWith(provider)) {
-                continue;
+        for (Map.Entry<String, String> entry : propertiesMap.entrySet()) {
+
+            if (entry.getKey().toLowerCase().startsWith(provider + ".capabilities")) {
+                String cap = entry.getKey().replaceFirst(provider + ".capabilities.", "");
+                String value = R.CONFIG.get(entry.getKey());
+                if (value.isEmpty()) {
+                    continue;
+                }
+                customCapabilities.put(cap, value);
             }
-
-            String value = R.CONFIG.get(entry.getKey());
-            if (value.isEmpty()) {
-                continue;
-            }
-
-            String cap = entry.getKey().replaceAll(provider + ".capabilities.", "");
-            specialCapabilities.put(cap, value);
         }
-        if (Objects.equals(Configuration.get(Parameter.W3C), "true")) {
-            capabilities.setCapability(provider + ":options", specialCapabilities);
+
+        if ("true".equalsIgnoreCase(Configuration.get(Parameter.W3C))) {
+            capabilities.setCapability(provider + ":options", customCapabilities);
         } else {
-            for (String capName : specialCapabilities.keySet()) {
-                capabilities.setCapability(capName, specialCapabilities.get(capName));
+            for (String capabilityName : customCapabilities.keySet()) {
+                capabilities.setCapability(capabilityName, customCapabilities.get(capabilityName));
             }
         }
     }

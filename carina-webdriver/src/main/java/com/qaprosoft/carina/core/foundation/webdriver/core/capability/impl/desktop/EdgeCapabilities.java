@@ -29,18 +29,16 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCa
 
 public class EdgeCapabilities extends AbstractCapabilities<ChromiumOptions<?>> {
 
+    @Override
     public ChromiumOptions<?> getCapability(String testName) {
         ChromiumOptions<?> capabilities = new ChromiumOptions<>(CapabilityType.BROWSER_NAME, Browser.EDGE.browserName(), "ms:edgeOptions");
         initBaseCapabilities(capabilities, testName);
         addEdgeOptions(capabilities);
-
         return capabilities;
     }
 
     private void addEdgeOptions(ChromiumOptions<?> caps) {
         Map<String, Object> prefs = new HashMap<>();
-        Map<String, Object> edgeOptions = new HashMap<>();
-
         boolean needsPrefs = false;
 
         if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD)) {
@@ -53,9 +51,8 @@ public class EdgeCapabilities extends AbstractCapabilities<ChromiumOptions<?>> {
         }
 
         if (needsPrefs) {
-            edgeOptions.put("prefs", prefs);
+            caps.setCapability("prefs", prefs);
         }
         caps.setCapability("ms:edgeChrominum", true);
     }
-
 }

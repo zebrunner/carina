@@ -23,6 +23,7 @@ import io.appium.java_client.safari.options.SafariOptions;
 
 public class SafariCapabilities extends AbstractCapabilities<SafariOptions> {
 
+    @Override
     public SafariOptions getCapability(String testName) {
         SafariOptions safariOptions = new SafariOptions();
         safariOptions.setCapability("browserName", Browser.SAFARI.browserName());

@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,16 +39,14 @@ import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.zebrunner.agent.core.webdriver.RemoteWebDriverFactory;
 
 /**
- * DriverFactory produces driver instance with desired capabilities according to
- * configuration.
+ * DriverFactory produces driver instance with capabilities according to configuration.
  *
  * @author Alexey Khursevich (hursevich@gmail.com)
  */
 public class DriverFactory {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-	public static WebDriver create(String testName, DesiredCapabilities capabilities, String seleniumHost) {
+    public static WebDriver create(String testName, MutableCapabilities capabilities, String seleniumHost) {
 		LOGGER.debug("DriverFactory start...");
 		AbstractFactory factory;
 

@@ -15,13 +15,15 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
 
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
-public class HTMLUnitCapabilities extends AbstractCapabilities<DesiredCapabilities> {
+public class HTMLUnitCapabilities extends AbstractCapabilities<MutableCapabilities> {
 
-    public DesiredCapabilities getCapability(String testName) {
+    @Override
+    public MutableCapabilities getCapability(String testName) {
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setJavascriptEnabled(true);
         return capabilities;

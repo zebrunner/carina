@@ -44,7 +44,7 @@ public abstract class AbstractFactory {
      * Creates new instance of {@link WebDriver} according to specified {@link MutableCapabilities}.
      * 
      * @param testName - where driver is initiated
-     * @param capabilities - driver desired capabilitues
+     * @param capabilities - driver capabilities
      * @param seleniumHost - selenium server URL
      * @return instance of {@link WebDriver}
      */

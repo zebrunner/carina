@@ -16,7 +16,6 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,27 +32,30 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCa
 public class ChromeCapabilities extends AbstractCapabilities<ChromeOptions> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    /**
+     * Generate ChromeOptions from configuration file
+     */
+    @Override
     public ChromeOptions getCapability(String testName) {
-        ChromeOptions capabilities = new ChromeOptions();
-        initBaseCapabilities(capabilities, testName);
-        addChromeOptions(capabilities);
-        capabilities.setCapability("chrome.switches", Arrays.asList("--start-maximized", "--ignore-ssl-errors"));
-        capabilities.setAcceptInsecureCerts(true);
-        return capabilities;
+        ChromeOptions options = new ChromeOptions();
+        initBaseCapabilities(options, testName);
+        addChromeOptions(options);
+        options.addArguments("--start-maximized", "--ignore-ssl-errors");
+        options.setAcceptInsecureCerts(true);
+        return options;
     }
 
     private void addChromeOptions(ChromeOptions options) {
         // add default carina options and arguments
-        options.addArguments("test-type");
-
+        options.addArguments("--test-type");
         // prefs
-        HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
+        HashMap<String, Object> chromePrefs = new HashMap<>();
         boolean needsPrefs = false;
 
         // update browser language
         String browserLang = Configuration.get(Configuration.Parameter.BROWSER_LANGUAGE);
         if (!browserLang.isEmpty()) {
-            LOGGER.info("Set Chrome language to: " + browserLang);
+            LOGGER.info("Set Chrome language to: {}", browserLang);
             options.addArguments("--lang=" + browserLang);
             chromePrefs.put("intl.accept_languages", browserLang);
             needsPrefs = true;
