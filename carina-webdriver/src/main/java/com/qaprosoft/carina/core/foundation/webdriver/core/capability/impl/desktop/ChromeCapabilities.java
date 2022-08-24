@@ -34,7 +34,7 @@ public class ChromeCapabilities extends AbstractCapabilities<ChromeOptions> {
 
     /**
      * Generate ChromeOptions depends on capabilities defines in configuration file
-     * Also adds chrome-specific
+     * Also adds chrome-specific arguments, prefs and so on
      */
     @Override
     public ChromeOptions getCapability(String testName) {
@@ -46,6 +46,11 @@ public class ChromeCapabilities extends AbstractCapabilities<ChromeOptions> {
         return options;
     }
 
+    /**
+     * Add chrome-specific arguments, prefs and so on
+     * 
+     * @param options ChromeOptions to which will be added
+     */
     private void addChromeOptions(ChromeOptions options) {
         // add default carina options and arguments
         options.addArguments("--test-type");

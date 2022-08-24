@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
 
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.remote.Browser;
 
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
@@ -26,6 +27,8 @@ public class SafariCapabilities extends AbstractCapabilities<SafariOptions> {
     @Override
     public SafariOptions getCapability(String testName) {
         SafariOptions safariOptions = new SafariOptions();
+        // we want to test safari not only on IOS, but on mac
+        safariOptions.setPlatformName(Platform.ANY.toString());
         safariOptions.setCapability("browserName", Browser.SAFARI.browserName());
         return safariOptions;
     }
