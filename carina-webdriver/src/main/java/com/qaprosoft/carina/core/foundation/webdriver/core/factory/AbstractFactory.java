@@ -38,7 +38,6 @@ import io.appium.java_client.internal.CapabilityHelpers;
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
 public abstract class AbstractFactory {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
      * Creates new instance of {@link WebDriver} according to specified {@link MutableCapabilities}.
@@ -48,7 +47,7 @@ public abstract class AbstractFactory {
      * @param seleniumHost - selenium server URL
      * @return instance of {@link WebDriver}
      */
-    abstract public WebDriver create(String testName, MutableCapabilities capabilities, String seleniumHost);
+    public abstract WebDriver create(String testName, MutableCapabilities capabilities, String seleniumHost);
 
     /**
      * If any listeners specified, converts RemoteWebDriver to EventFiringWebDriver and registers all listeners.

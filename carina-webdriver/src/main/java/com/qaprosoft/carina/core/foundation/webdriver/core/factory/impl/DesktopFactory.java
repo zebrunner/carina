@@ -125,8 +125,8 @@ public class DesktopFactory extends AbstractFactory {
                     .ignoring(TimeoutException.class);
             if (capabilities.getCapability("resolution") != null) {
                 String resolution = (String) capabilities.getCapability("resolution");
-                int expectedWidth = Integer.valueOf(resolution.split("x")[0]);
-                int expectedHeight = Integer.valueOf(resolution.split("x")[1]);
+                int expectedWidth = Integer.parseInt(resolution.split("x")[0]);
+                int expectedHeight = Integer.parseInt(resolution.split("x")[1]);
                 wait.until(new Function<WebDriver, Boolean>(){
                     public Boolean apply(WebDriver driver ) {
                         driver.manage().window().setPosition(new Point(0, 0));

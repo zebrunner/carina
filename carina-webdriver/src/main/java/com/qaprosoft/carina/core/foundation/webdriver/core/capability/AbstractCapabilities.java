@@ -39,6 +39,9 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.proxy.SystemProxy;
 
+import io.appium.java_client.remote.options.SupportsLanguageOption;
+import io.appium.java_client.remote.options.SupportsLocaleOption;
+
 public abstract class AbstractCapabilities<T extends MutableCapabilities> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -47,7 +50,7 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
      */
     public abstract T getCapability(String testName);
 
-    protected void initBaseCapabilities(T capabilities, String testName) {
+    protected T initBaseCapabilities(T capabilities, String testName) {
 
         if (!IDriverPool.DEFAULT.equalsIgnoreCase(testName)) {
             // #1573: remove "default" driver name capability registration
@@ -60,10 +63,10 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
         }
 
         // add capabilities based on dynamic _config.properties variables
-        initCapabilities(capabilities);
+        return initCapabilities(capabilities);
     }
 
-    protected void initCapabilities(T capabilities) {
+    protected T initCapabilities(T capabilities) {
         ArrayList<String> numericCaps = new ArrayList<>(Arrays.asList("idleTimeout", "waitForIdleTimeout"));
         
         // read all properties which starts from "capabilities.*" prefix and add them into desired capabilities.
@@ -120,14 +123,14 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
                 LOGGER.error("Headless mode isn't supported by {} browser / platform.", browser);
             }
         }
-        initCustomCapabilities(capabilities);
+        return initCustomCapabilities(capabilities);
     }
 
-    private void initCustomCapabilities(T capabilities) {
+    private T initCustomCapabilities(T capabilities) {
         String provider = Configuration.get(Parameter.PROVIDER);
 
         if (Objects.equals(provider, StringUtils.EMPTY)) {
-            return;
+            return capabilities;
         }
 
         Map<String, String> propertiesMap = new HashMap(R.CONFIG.getProperties());
@@ -152,6 +155,7 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
                 capabilities.setCapability(capabilityName, customCapabilities.get(capabilityName));
             }
         }
+        return capabilities;
     }
 
     protected Proxy setupProxy() {
@@ -174,22 +178,22 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
             String proxyAddress = String.format("%s:%s", proxyHost, proxyPort);
 
             if (protocols.contains("http")) {
-                LOGGER.info(String.format("Http proxy will be set: %s:%s", proxyHost, proxyPort));
+                LOGGER.info("Http proxy will be set: {}:{}", proxyHost, proxyPort);
                 proxy.setHttpProxy(proxyAddress);
             }
 
             if (protocols.contains("https")) {
-                LOGGER.info(String.format("Https proxy will be set: %s:%s", proxyHost, proxyPort));
+                LOGGER.info("Https proxy will be set: {}:{}", proxyHost, proxyPort);
                 proxy.setSslProxy(proxyAddress);
             }
 
             if (protocols.contains("ftp")) {
-                LOGGER.info(String.format("FTP proxy will be set: %s:%s", proxyHost, proxyPort));
+                LOGGER.info("FTP proxy will be set: {}:{}", proxyHost, proxyPort);
                 proxy.setFtpProxy(proxyAddress);
             }
 
             if (protocols.contains("socks")) {
-                LOGGER.info(String.format("Socks proxy will be set: %s:%s", proxyHost, proxyPort));
+                LOGGER.info("Socks proxy will be set: {}:{}", proxyHost, proxyPort);
                 proxy.setSocksProxy(proxyAddress);
             }
             
@@ -216,5 +220,43 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
         }
 
         return true;
+    }
+
+    protected T setLocaleAndLanguage(T caps) {
+        /*
+         * http://appium.io/docs/en/writing-running-appium/caps/ locale and language
+         * Locale to set for iOS (XCUITest driver only) and Android.
+         * fr_CA format for iOS. CA format (country name abbreviation) for Android
+         */
+
+        // parse locale param as it has language and country by default like en_US
+        String localeValue = Configuration.get(Parameter.LOCALE);
+        LOGGER.debug("Default locale value is : {}", localeValue);
+        String[] values = localeValue.split("_");
+        if (values.length == 1) {
+            // only locale is present!
+            caps.setCapability(SupportsLocaleOption.LOCALE_OPTION, localeValue);
+
+            String langValue = Configuration.get(Parameter.LANGUAGE);
+            if (!langValue.isEmpty()) {
+                LOGGER.debug("Default language value is : {}", langValue);
+                // provide extra capability language only if it exists among config parameters...
+                caps.setCapability(SupportsLanguageOption.LANGUAGE_OPTION, langValue);
+            }
+
+        } else if (values.length == 2) {
+            if (Configuration.getPlatform(caps).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+                LOGGER.debug("Put language and locale to android capabilities. language: {}; locale: {}", values[0], values[1]);
+                caps.setCapability(SupportsLanguageOption.LANGUAGE_OPTION, values[0]);
+                caps.setCapability(SupportsLocaleOption.LOCALE_OPTION, values[1]);
+            } else if (Configuration.getPlatform().equalsIgnoreCase(SpecialKeywords.IOS)) {
+                LOGGER.debug("Put language and locale to iOS capabilities. language: {}; locale: {}", values[0], localeValue);
+                caps.setCapability(SupportsLanguageOption.LANGUAGE_OPTION, values[0]);
+                caps.setCapability(SupportsLocaleOption.LOCALE_OPTION, localeValue);
+            }
+        } else {
+            LOGGER.error("Undefined locale provided (ignoring for mobile capabilitites): {}", localeValue);
+        }
+        return caps;
     }
 }

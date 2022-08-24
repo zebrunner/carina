@@ -56,9 +56,6 @@ import io.appium.java_client.remote.AppiumCommandExecutor;
 import io.appium.java_client.remote.AppiumProtocolHandshake;
 import io.appium.java_client.remote.AppiumW3CHttpCommandCodec;
 
-//import io.appium.java_client.remote.NewAppiumSessionPayload;
-
-
 /**
  * EventFiringAppiumCommandExecutor triggers event listener before/after execution of the command.
  * Please track {@link AppiumCommandExecutor} for latest changes.
@@ -67,7 +64,6 @@ import io.appium.java_client.remote.AppiumW3CHttpCommandCodec;
  */
 @SuppressWarnings({ "unchecked" })
 public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
-    //private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String IDEMPOTENCY_KEY_HEADER = "X-Idempotency-Key";
     private static final Duration DEFAULT_READ_TIMEOUT = Duration.ofMinutes(10);
 
@@ -96,7 +92,6 @@ public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
         this(additionalCommands, null, checkNotNull(addressOfRemoteServer), httpClientFactory);
     }
 
-    //TODO import latest java-appium client
     public EventFiringAppiumCommandExecutor(Map<String, CommandInfo> additionalCommands,
             URL addressOfRemoteServer) {
         this(additionalCommands, addressOfRemoteServer, HttpClient.Factory.createDefault());
@@ -109,7 +104,6 @@ public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
 
     public EventFiringAppiumCommandExecutor(URL addressOfRemoteServer) {
     	this(MobileCommand.commandRepository, addressOfRemoteServer, HttpClient.Factory.createDefault());
-        //this(MobileCommand.commandRepository, addressOfRemoteServer, new HttpClientFactoryCustom());
     }
 
     @SuppressWarnings("SameParameterValue")

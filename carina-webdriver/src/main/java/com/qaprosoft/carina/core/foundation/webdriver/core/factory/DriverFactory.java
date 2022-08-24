@@ -107,7 +107,7 @@ public class DriverFactory {
                     if (WebDriverEventListener.class.isAssignableFrom(clazz)) {
                         WebDriverEventListener listener = (WebDriverEventListener) clazz.newInstance();
                         listeners.add(listener);
-                        LOGGER.debug("Webdriver event listener registered: " + clazz.getName());
+                        LOGGER.debug("Webdriver event listener registered: {}", clazz.getName());
                     }
                 }
             }

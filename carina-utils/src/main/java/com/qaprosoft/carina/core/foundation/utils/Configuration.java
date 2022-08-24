@@ -210,6 +210,8 @@ public class Configuration {
         // sha1
         GIT_HASH("git_hash"),
 
+        LANGUAGE("language"),
+
         W3C("w3c"),
 
         PROVIDER("provider");
@@ -341,7 +343,7 @@ public class Configuration {
      *            DesiredCapabilities
      * @return String platform name
      */
-    public static String getPlatform(DesiredCapabilities caps) {
+    public static String getPlatform(MutableCapabilities caps) {
         // any platform by default
         String platform = "*";
         

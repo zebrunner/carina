@@ -16,9 +16,8 @@
 package com.qaprosoft.carina.core.foundation.utils.android;
 
 import java.lang.invoke.MethodHandles;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.time.Duration;
+import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;

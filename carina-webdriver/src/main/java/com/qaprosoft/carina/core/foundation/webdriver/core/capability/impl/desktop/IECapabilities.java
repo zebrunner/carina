@@ -17,21 +17,18 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desk
 
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.Browser;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
+
+import io.appium.java_client.remote.options.SupportsBrowserNameOption;
 
 public class IECapabilities extends AbstractCapabilities<MutableCapabilities> {
 
     @Override
     public MutableCapabilities getCapability(String testName) {
-        DesiredCapabilities capabilities = new DesiredCapabilities();
+        MutableCapabilities capabilities = new MutableCapabilities();
         initBaseCapabilities(capabilities, testName);
-        capabilities.setBrowserName(Browser.IE.browserName());
-
-        // todo investigate necessity of this capability
-        // capabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
-
+        capabilities.setCapability(SupportsBrowserNameOption.BROWSER_NAME_OPTION, Browser.IE.browserName());
         return capabilities;
     }
 

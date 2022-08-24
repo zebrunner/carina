@@ -116,7 +116,7 @@ public class FirefoxCapabilities extends AbstractCapabilities<FirefoxOptions> {
         // update browser language
         String browserLang = Configuration.get(Configuration.Parameter.BROWSER_LANGUAGE);
         if (!browserLang.isEmpty()) {
-            LOGGER.info("Set Firefox lanaguage to: " + browserLang);
+            LOGGER.info("Set Firefox lanaguage to: {}, ", browserLang);
             profile.setPreference("intl.accept_languages", browserLang);
         }
 
@@ -135,7 +135,7 @@ public class FirefoxCapabilities extends AbstractCapabilities<FirefoxOptions> {
         }
 
         profile.setPreference("webdriver_firefox_port", newPort);
-        LOGGER.debug("FireFox profile will use '" + newPort + "' port number.");
+        LOGGER.debug("FireFox profile will use '{}' port number.", newPort);
 
         profile.setPreference("dom.max_chrome_script_run_time", 0);
         profile.setPreference("dom.max_script_run_time", 0);
@@ -156,7 +156,7 @@ public class FirefoxCapabilities extends AbstractCapabilities<FirefoxOptions> {
         } else if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD) && Configuration.isNull(Configuration.Parameter.AUTO_DOWNLOAD_APPS)
                 || "".equals(Configuration.get(Configuration.Parameter.AUTO_DOWNLOAD_APPS))) {
             LOGGER.warn(
-                    "If you want to enable auto-download for FF please specify '" + Configuration.Parameter.AUTO_DOWNLOAD_APPS.getKey() + "' param");
+                    "If you want to enable auto-download for FF please specify '{}' param", Configuration.Parameter.AUTO_DOWNLOAD_APPS.getKey());
         }
 
         profile.setAcceptUntrustedCertificates(true);
