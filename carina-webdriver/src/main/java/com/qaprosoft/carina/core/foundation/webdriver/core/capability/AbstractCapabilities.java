@@ -148,7 +148,7 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
             }
         }
 
-        if ("true".equalsIgnoreCase(Configuration.get(Parameter.W3C))) {
+        if ("true".equalsIgnoreCase(Configuration.get(Parameter.W3C)) && !customCapabilities.isEmpty()) {
             capabilities.setCapability(provider + ":options", customCapabilities);
         } else {
             for (String capabilityName : customCapabilities.keySet()) {
