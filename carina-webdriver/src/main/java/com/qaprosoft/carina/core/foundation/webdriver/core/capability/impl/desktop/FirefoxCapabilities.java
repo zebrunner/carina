@@ -67,10 +67,9 @@ public class FirefoxCapabilities extends AbstractCapabilities<FirefoxOptions> {
         return capabilities;
     }
 
-    private void addFirefoxOptions(FirefoxOptions caps) {
+    private void addFirefoxOptions(FirefoxOptions options) {
         FirefoxProfile profile = getDefaultFirefoxProfile();
-        FirefoxOptions options = new FirefoxOptions().setProfile(profile);
-        caps.setCapability(FirefoxOptions.FIREFOX_OPTIONS, options);
+        options.setProfile(profile);
 
         // add all custom firefox args
         for (String arg : Configuration.get(Configuration.Parameter.FIREFOX_ARGS).split(",")) {
@@ -110,7 +109,7 @@ public class FirefoxCapabilities extends AbstractCapabilities<FirefoxOptions> {
      *
      * @return Firefox profile.
      */
-    // keep it public to be bale to get default and override on client layerI
+    // keep it public to be able to get default and override on client layerI
     public FirefoxProfile getDefaultFirefoxProfile() {
         FirefoxProfile profile = new FirefoxProfile();
 

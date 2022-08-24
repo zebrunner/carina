@@ -31,15 +31,19 @@ import org.slf4j.LoggerFactory;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.AndroidCapabilities;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.IOSCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.EspressoCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.UiAutomator2Capabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.XCUITestCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
+import io.appium.java_client.remote.AutomationName;
+import io.appium.java_client.remote.options.SupportsAutomationNameOption;
 
 /**
  * MobileFactory creates instance {@link WebDriver} for mobile testing.
@@ -158,13 +162,18 @@ public class MobileFactory extends AbstractFactory {
 
     private MutableCapabilities getCapabilities(String name) {
         String platform = Configuration.getPlatform();
+        String automationName = R.CONFIG.get("capabilities." + SupportsAutomationNameOption.AUTOMATION_NAME_OPTION);
+
+        if (AutomationName.ESPRESSO.equalsIgnoreCase(automationName)) {
+            return new EspressoCapabilities().getCapability(name);
+        }
 
         if (platform.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
-            return new AndroidCapabilities().getCapability(name);
+            return new UiAutomator2Capabilities().getCapability(name);
 
         } else if (platform.equalsIgnoreCase(SpecialKeywords.IOS)
                 || platform.equalsIgnoreCase(SpecialKeywords.TVOS)) {
-            return new IOSCapabilities().getCapability(name);
+            return new XCUITestCapabilities().getCapability(name);
         }
         throw new RuntimeException("Unsupported platform: " + platform);
     }

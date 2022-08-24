@@ -27,14 +27,13 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCa
 
 import io.appium.java_client.android.options.UiAutomator2Options;
 
-public class AndroidCapabilities extends AbstractCapabilities<UiAutomator2Options> {
+public class UiAutomator2Capabilities extends AbstractCapabilities<UiAutomator2Options> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public UiAutomator2Options getCapability(String testName) {
         UiAutomator2Options capabilities = new UiAutomator2Options();
-
         // this step should be executed before initCapabilities() to be able to override this capabilities by default appium approach.
         setLocaleAndLanguage(capabilities);
         // add capabilities based on dynamic _config.properties variables
@@ -51,12 +50,13 @@ public class AndroidCapabilities extends AbstractCapabilities<UiAutomator2Option
 
         // parse locale param as it has language and country by default like en_US
         String localeValue = Configuration.get(Parameter.LOCALE);
-        LOGGER.debug("Default locale value is : " + localeValue);
+        LOGGER.debug("Default locale value is : {}", localeValue);
         String[] values = localeValue.split("_");
         if (values.length == 1) {
             // only locale is present!
-            caps.setCapability("locale", localeValue);
+            caps.setLocale(localeValue);
 
+            // todo add language in the Configuration.Parameters
             String langValue = R.CONFIG.get("language");
             if (!langValue.isEmpty()) {
                 LOGGER.debug("Default language value is : " + langValue);

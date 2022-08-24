@@ -27,14 +27,13 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCa
 
 import io.appium.java_client.ios.options.XCUITestOptions;
 
-public class IOSCapabilities extends AbstractCapabilities<XCUITestOptions> {
+public class XCUITestCapabilities extends AbstractCapabilities<XCUITestOptions> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public XCUITestOptions getCapability(String testName) {
         XCUITestOptions capabilities = new XCUITestOptions();
-
         // this step should be executed before initCapabilities() to be able to override this capabilities by default appium approach.
         setLocaleAndLanguage(capabilities);
         // add capabilities based on dynamic _config.properties variables

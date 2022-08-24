@@ -21,7 +21,7 @@ import org.testng.annotations.Test;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.IOSCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.XCUITestCapabilities;
 
 import io.appium.java_client.ios.options.XCUITestOptions;
 
@@ -41,7 +41,7 @@ public class IOSCapabilitiesTest {
         R.CONFIG.put(LANGUAGE_KEY, "", true);
 
         String testName = "mobile - getCapabilityWithLocaleTest";
-        XCUITestOptions capabilities = new IOSCapabilities().getCapability(testName);
+        XCUITestOptions capabilities = new XCUITestCapabilities().getCapability(testName);
 
         Assert.assertEquals(capabilities.getCapability(LOCALE_KEY), LOCALE, "Locale capability is not valid");
         Assert.assertNull(capabilities.getCapability(LANGUAGE_KEY), "Language capability is not empty");
@@ -54,7 +54,7 @@ public class IOSCapabilitiesTest {
 
         String testName = "mobile - getCapabilityWithLocaleAndLanguageSeparatelyTest";
 
-        XCUITestOptions capabilities = new IOSCapabilities().getCapability(testName);
+        XCUITestOptions capabilities = new XCUITestCapabilities().getCapability(testName);
 
         Assert.assertEquals(capabilities.getCapability(LOCALE_KEY), LOCALE, "Locale capability is not valid");
         Assert.assertEquals(capabilities.getCapability(LANGUAGE_KEY), LANGUAGE, "Language capability is not valid");
@@ -67,7 +67,7 @@ public class IOSCapabilitiesTest {
 
         String testName = "mobile - getIOSCapabilityWithLocaleAndLanguageTogetherTest";
 
-        XCUITestOptions capabilities = new IOSCapabilities().getCapability(testName);
+        XCUITestOptions capabilities = new XCUITestCapabilities().getCapability(testName);
 
         Assert.assertEquals(capabilities.getCapability(LOCALE_KEY), LOCALE_LANGUAGE, "Locale capability is not valid");
         Assert.assertEquals(capabilities.getCapability(LANGUAGE_KEY), LANGUAGE, "Language capability is not valid");
