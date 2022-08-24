@@ -33,6 +33,7 @@ public class SafariCapabilities extends AbstractCapabilities<SafariOptions> {
         // it is strange that safari options is not contains browser
         safariOptions.setCapability(SupportsBrowserNameOption.BROWSER_NAME_OPTION, Browser.SAFARI.browserName());
         safariOptions.setCapability("browserName", Browser.SAFARI.browserName());
+        initBaseCapabilities(safariOptions, testName);
         return safariOptions;
     }
     
