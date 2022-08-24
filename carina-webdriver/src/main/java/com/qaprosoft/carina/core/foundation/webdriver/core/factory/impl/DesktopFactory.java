@@ -19,6 +19,7 @@ import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
+import java.util.Objects;
 
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.MutableCapabilities;
@@ -65,6 +66,11 @@ public class DesktopFactory extends AbstractFactory {
         if (staticCapabilities != null) {
             LOGGER.info("Static MutableCapabilities will be merged to basic driver capabilities");
             capabilities.merge(staticCapabilities);
+        }
+
+        if (Browser.SAFARI.browserName().equalsIgnoreCase(capabilities.getBrowserName()) &&
+                Objects.equals(Configuration.get(Parameter.W3C), "false")) {
+            capabilities = removeAppiumPrefix(capabilities);
         }
 
         LOGGER.debug("capabilities: {}", capabilities);
