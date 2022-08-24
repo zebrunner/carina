@@ -21,9 +21,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.remote.Browser;
@@ -41,9 +39,11 @@ import com.qaprosoft.carina.proxy.SystemProxy;
 
 import io.appium.java_client.remote.options.SupportsLanguageOption;
 import io.appium.java_client.remote.options.SupportsLocaleOption;
+import io.appium.java_client.remote.options.W3CCapabilityKeys;
 
 public abstract class AbstractCapabilities<T extends MutableCapabilities> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final ArrayList<String> numericCaps = new ArrayList<>(Arrays.asList("idleTimeout", "waitForIdleTimeout"));
 
     /**
      * Generate Capabilities according to configuration file
@@ -66,89 +66,122 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
         return initCapabilities(capabilities);
     }
 
+    /**
+     * Add capability by w3c rules
+     * 
+     * @param capabilities capabilities to upgrade
+     * @param name capability name
+     * @param value capability value
+     * @return upgraded capabilities
+     */
+    protected T addCapabilityW3CSafe(T capabilities, String name, Object value) {
+        boolean isW3C = Configuration.getBoolean(Parameter.W3C);
+        String provider = Configuration.getCapability("provider").toString();
+
+        if (isW3C && provider.isEmpty() && !W3CCapabilityKeys.INSTANCE.test(name)) {
+            throw new RuntimeException("W3C enabled, but provider is empty. Trying to add w3c-incompatible capability");
+        }
+
+        if (isW3C) {
+            if (W3CCapabilityKeys.INSTANCE.test(name)) {
+                capabilities.setCapability(name, value);
+            } else {
+                Map<String, Object> options = (Map<String, Object>) capabilities.getCapability(provider + ":options");
+                if (options == null) {
+                    options = new HashMap<>();
+                }
+
+                options.put(name, value);
+                capabilities.setCapability(provider + ":options", options);
+            }
+        } else {
+            capabilities.setCapability(name, value);
+        }
+
+        return capabilities;
+    }
+
     protected T initCapabilities(T capabilities) {
-        ArrayList<String> numericCaps = new ArrayList<>(Arrays.asList("idleTimeout", "waitForIdleTimeout"));
-        
         // read all properties which starts from "capabilities.*" prefix and add them into desired capabilities.
         final String prefix = SpecialKeywords.CAPABILITIES + ".";
+        boolean isW3C = Configuration.getBoolean(Parameter.W3C);
+        String provider = Configuration.getCapability("provider").toString();
 
         @SuppressWarnings({ "unchecked", "rawtypes" })
         Map<String, String> capabilitiesMap = new HashMap(R.CONFIG.getProperties());
+        Map<String, Object> customCapabilities = new HashMap<>();
 
-        for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
-            if (!entry.getKey().toLowerCase().startsWith(prefix)) {
+        for (String name : new ArrayList<>(capabilitiesMap.keySet())) {
+            // cleanup capabilitiesMap from non-capabilities or empty capabilities
+            if (!name.toLowerCase().startsWith(prefix)) {
+                capabilitiesMap.remove(name);
                 continue;
             }
 
-            String value = R.CONFIG.get(entry.getKey());
+            // provider is not w3c-compatible capability, so we ignore it
+            if ((prefix + "provider").equalsIgnoreCase(name)) {
+                capabilitiesMap.remove(name);
+            }
+
+            String value = R.CONFIG.get(name);
             if (value.isEmpty()) {
-                continue;
+                capabilitiesMap.remove(name);
             }
+        }
 
-            String capability = entry.getKey().replaceAll(prefix, "");
-
-            if (numericCaps.contains(capability) && isNumber(value)) {
-                LOGGER.debug("Adding {} to capabilities as integer", capability);
-                capabilities.setCapability(capability, Integer.parseInt(value));
-            } else if ("false".equalsIgnoreCase(value)) {
-                capabilities.setCapability(capability, false);
-            } else if ("true".equalsIgnoreCase(value)) {
-                capabilities.setCapability(capability, true);
-            } else {
-                capabilities.setCapability(capability, value);
+        // check for w3c-incompatible capabilities
+        if (provider.isEmpty() && isW3C) {
+            for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
+                if (!W3CCapabilityKeys.INSTANCE.test(entry.getKey())) {
+                    throw new RuntimeException("W3C enabled, but provider is empty. Detected w3c-incompatible capability");
                 }
             }
+        }
 
+        for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
+            String capabilityName = entry.getKey().replaceAll(prefix, "");
+            Object value = entry.getValue();
+            if (numericCaps.contains(capabilityName) && isNumber(entry.getValue())) {
+                LOGGER.debug("Adding {} to capabilities as integer", entry.getValue());
+                value = Integer.parseInt(entry.getValue());
+            } else if ("false".equalsIgnoreCase(entry.getValue())) {
+                value = false;
+            } else if ("true".equalsIgnoreCase(entry.getValue())) {
+                value = true;
+            }
+
+            if (isW3C) {
+                if (W3CCapabilityKeys.INSTANCE.test(capabilityName)) {
+                    capabilities.setCapability(capabilityName, value);
+                } else {
+                    customCapabilities.put(capabilityName, value);
+                }
+            } else {
+                capabilities.setCapability(capabilityName, value);
+            }
+        }
 
         //TODO: [VD] reorganize in the same way Firefox profiles args/options if any and review other browsers
         // support customization for Chrome args and options
 
         // for pc we may set browserName through Desired capabilities in our Test with a help of a method initBaseCapabilities,
         // so we don't want to override with value from config
-        String browser;
-        if (capabilities.getBrowserName() != null && capabilities.getBrowserName().length() > 0) {
-            browser = capabilities.getBrowserName();
-        } else {
-            browser = Configuration.getBrowser();
-        }
+        String browser = capabilities.getBrowserName() != null && capabilities.getBrowserName().length() > 0 ? capabilities.getBrowserName()
+                : Configuration.getBrowser();
 
         if (Configuration.getBoolean(Parameter.HEADLESS)) {
             if (Browser.FIREFOX.browserName().equalsIgnoreCase(browser)
                     || Browser.CHROME.browserName().equalsIgnoreCase(browser)
                     && Configuration.getDriverType().equalsIgnoreCase(SpecialKeywords.DESKTOP)) {
                 LOGGER.info("Browser will be started in headless mode. VNC and Video will be disabled.");
-                capabilities.setCapability("enableVNC", false);
-                capabilities.setCapability("enableVideo", false);
+                customCapabilities.put("enableVNC", false);
+                customCapabilities.put("enableVideo", false);
             } else {
                 LOGGER.error("Headless mode isn't supported by {} browser / platform.", browser);
             }
         }
-        return initCustomCapabilities(capabilities);
-    }
 
-    private T initCustomCapabilities(T capabilities) {
-        String provider = Configuration.get(Parameter.PROVIDER);
-
-        if (Objects.equals(provider, StringUtils.EMPTY)) {
-            return capabilities;
-        }
-
-        Map<String, String> propertiesMap = new HashMap(R.CONFIG.getProperties());
-        Map<String, Object> customCapabilities = new HashMap<>();
-
-        for (Map.Entry<String, String> entry : propertiesMap.entrySet()) {
-
-            if (entry.getKey().toLowerCase().startsWith(provider + ".capabilities")) {
-                String cap = entry.getKey().replaceFirst(provider + ".capabilities.", "");
-                String value = R.CONFIG.get(entry.getKey());
-                if (value.isEmpty()) {
-                    continue;
-                }
-                customCapabilities.put(cap, value);
-            }
-        }
-
-        if ("true".equalsIgnoreCase(Configuration.get(Parameter.W3C)) && !customCapabilities.isEmpty()) {
+        if (isW3C && !customCapabilities.isEmpty()) {
             capabilities.setCapability(provider + ":options", customCapabilities);
         } else {
             for (String capabilityName : customCapabilities.keySet()) {

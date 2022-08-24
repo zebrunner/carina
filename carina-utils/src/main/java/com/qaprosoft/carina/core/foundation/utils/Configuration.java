@@ -212,10 +212,8 @@ public class Configuration {
 
         LANGUAGE("language"),
 
-        W3C("w3c"),
+        W3C("w3c");
 
-        PROVIDER("provider");
-        
         private final String key;
 
         Parameter(String key) {
