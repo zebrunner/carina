@@ -33,7 +33,8 @@ public class ChromeCapabilities extends AbstractCapabilities<ChromeOptions> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
-     * Generate ChromeOptions from configuration file
+     * Generate ChromeOptions depends on capabilities defines in configuration file
+     * Also adds chrome-specific
      */
     @Override
     public ChromeOptions getCapability(String testName) {

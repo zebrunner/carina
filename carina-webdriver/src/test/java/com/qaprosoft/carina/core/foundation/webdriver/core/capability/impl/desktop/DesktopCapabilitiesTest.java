@@ -15,10 +15,10 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.chromium.ChromiumOptions;
@@ -27,7 +27,6 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -52,10 +51,12 @@ public class DesktopCapabilitiesTest {
         Assert.assertEquals(capabilities.getBrowserName(), Browser.CHROME.browserName(), "Returned browser name is not valid!");
 
         Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
-
-        Assert.assertEquals(capabilities.getCapability("chrome.switches"), Arrays.asList("--start-maximized", "--ignore-ssl-errors"),
+        Map<String, Object> chromeOptions = (Map<String, Object>) capabilities.getCapability(ChromeOptions.CAPABILITY);
+        List<String> chromeOptionsArgs = (List<String>) chromeOptions.get("args");
+        Assert.assertTrue(chromeOptionsArgs.contains("--start-maximized"),
                 "Returned capability value is not valid!");
-
+        Assert.assertTrue(chromeOptionsArgs.contains("--ignore-ssl-errors"),
+                "Returned capability value is not valid!");
         Assert.assertTrue((Boolean) capabilities.getCapability(CapabilityType.ACCEPT_INSECURE_CERTS), "Returned capability value is not valid!");
     }
 
@@ -111,7 +112,7 @@ public class DesktopCapabilitiesTest {
         String testName = "opera - getOperaCapabilityTest";
 
         OperaCapabilities operaCapabilities = new OperaCapabilities();
-        DesiredCapabilities capabilities = operaCapabilities.getCapability(testName);
+        MutableCapabilities capabilities = operaCapabilities.getCapability(testName);
 
         Assert.assertEquals(capabilities.getBrowserName(), Browser.OPERA.browserName(), "Returned browser name is not valid!");
 
@@ -147,7 +148,7 @@ public class DesktopCapabilitiesTest {
         String testName = "ie - getIECapabilityTest";
 
         IECapabilities ieCapabilities = new IECapabilities();
-        DesiredCapabilities capabilities = ieCapabilities.getCapability(testName);
+        MutableCapabilities capabilities = ieCapabilities.getCapability(testName);
 
         Assert.assertEquals(capabilities.getBrowserName(), Browser.IE.browserName(), "Returned browser name is not valid!");
 

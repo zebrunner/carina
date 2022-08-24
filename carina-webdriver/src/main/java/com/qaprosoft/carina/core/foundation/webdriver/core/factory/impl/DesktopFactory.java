@@ -27,8 +27,7 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.remote.BrowserType;
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Wait;
@@ -85,17 +84,17 @@ public class DesktopFactory extends AbstractFactory {
     public MutableCapabilities getCapabilities(String name) {
         String browser = Configuration.getBrowser();
         
-        if (BrowserType.FIREFOX.equalsIgnoreCase(browser)) {
+        if (Browser.FIREFOX.browserName().equalsIgnoreCase(browser)) {
             return new FirefoxCapabilities().getCapability(name);
-        } else if (BrowserType.IE.equalsIgnoreCase(browser) || "ie".equalsIgnoreCase(browser)) {
+        } else if (Browser.IE.browserName().equalsIgnoreCase(browser) || "ie".equalsIgnoreCase(browser)) {
             return new IECapabilities().getCapability(name);
-        } else if (BrowserType.SAFARI.equalsIgnoreCase(browser)) {
+        } else if (Browser.SAFARI.browserName().equalsIgnoreCase(browser)) {
             return new SafariCapabilities().getCapability(name);
-        } else if (BrowserType.CHROME.equalsIgnoreCase(browser)) {
+        } else if (Browser.CHROME.browserName().equalsIgnoreCase(browser)) {
             return new ChromeCapabilities().getCapability(name);
-        } else if (BrowserType.OPERA.equalsIgnoreCase(browser)) {
+        } else if (Browser.OPERA.browserName().equalsIgnoreCase(browser)) {
             return new OperaCapabilities().getCapability(name);
-        } else if (BrowserType.EDGE.equalsIgnoreCase(browser) || "edge".equalsIgnoreCase(browser)) {
+        } else if (Browser.EDGE.browserName().equalsIgnoreCase(browser) || "edge".equalsIgnoreCase(browser)) {
             return new EdgeCapabilities().getCapability(name);
         } else {
             throw new RuntimeException("Unsupported browser: " + browser);
@@ -104,7 +103,7 @@ public class DesktopFactory extends AbstractFactory {
 
     public static void addStaticCapability(String name, Object value) {
         if (staticCapabilities == null) {
-            staticCapabilities = new DesiredCapabilities();
+            staticCapabilities = new MutableCapabilities();
         }
         staticCapabilities.setCapability(name, value);
     }

@@ -400,8 +400,14 @@ public class Configuration {
         return platformVersion;
     }
 
+    /**
+     * Takes browserName from browser configuration parameter - see {{@link Configuration.Parameter}} or
+     * capabilities.browserName (priority)
+     * 
+     * @return browser name
+     */
     public static String getBrowser() {
-        String browser = "";
+        String browser = StringUtils.EMPTY;
         if (!Configuration.get(Parameter.BROWSER).isEmpty()) {
             // default "browser=value" should be used to determine current browser
             browser = Configuration.get(Parameter.BROWSER);
@@ -425,11 +431,24 @@ public class Configuration {
         return browserVersion;
     }
 
+    /**
+     * Returns driver type depends on platform and browser
+     * 
+     * @return driver type
+     */
     public static String getDriverType() {
 
         String platform = getPlatform();
-        if (platform.equalsIgnoreCase(SpecialKeywords.ANDROID) || platform.equalsIgnoreCase(SpecialKeywords.IOS) || platform.equalsIgnoreCase(SpecialKeywords.TVOS)) {
+        String browserName = Configuration.getBrowser();
+
+        if (platform.equalsIgnoreCase(SpecialKeywords.ANDROID) ||
+                platform.equalsIgnoreCase(SpecialKeywords.IOS) ||
+                platform.equalsIgnoreCase(SpecialKeywords.TVOS)) {
             return SpecialKeywords.MOBILE;
+        }
+
+        if (!StringUtils.isEmpty(browserName)) {
+            return SpecialKeywords.DESKTOP;
         }
         
         if (SpecialKeywords.WINDOWS.equalsIgnoreCase(platform)) {
@@ -440,6 +459,7 @@ public class Configuration {
             return SpecialKeywords.MAC;
         }
 
+        // todo this method should not returns default values as desktop
         return SpecialKeywords.DESKTOP;
     }
 
@@ -449,15 +469,22 @@ public class Configuration {
             return getDriverType();
         }
 
-        String platform = "";
+        String platform = StringUtils.EMPTY;
+        String browserName = getBrowser();
         if (capabilities.getCapability("platformName") != null) {
             platform = capabilities.getCapability("platformName").toString();
         }
 
-        if (SpecialKeywords.ANDROID.equalsIgnoreCase(platform) || SpecialKeywords.IOS.equalsIgnoreCase(platform) || SpecialKeywords.TVOS.equalsIgnoreCase(platform)) {
+        if (SpecialKeywords.ANDROID.equalsIgnoreCase(platform) ||
+                SpecialKeywords.IOS.equalsIgnoreCase(platform) ||
+                SpecialKeywords.TVOS.equalsIgnoreCase(platform)) {
             return SpecialKeywords.MOBILE;
         }
-        
+
+        if (!StringUtils.isEmpty(browserName)) {
+            return SpecialKeywords.DESKTOP;
+        }
+
         if (SpecialKeywords.WINDOWS.equalsIgnoreCase(platform)) {
             return SpecialKeywords.WINDOWS;
         }
@@ -472,6 +499,7 @@ public class Configuration {
             return SpecialKeywords.MOBILE;
         }
 
+        // todo this method should not returns default values as desktop
         return SpecialKeywords.DESKTOP;
     }
 
