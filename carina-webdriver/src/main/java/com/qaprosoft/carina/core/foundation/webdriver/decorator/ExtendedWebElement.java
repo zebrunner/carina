@@ -82,7 +82,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinse
 import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.Platform;
 import com.sun.jersey.core.util.Base64;
 
-import io.appium.java_client.MobileBy;
+import io.appium.java_client.AppiumBy;
 
 public class ExtendedWebElement implements IWebElement {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -1212,15 +1212,15 @@ public class ExtendedWebElement implements IWebElement {
          * All ClassChain locators start from **. e.g FindBy(xpath = "**'/XCUIElementTypeStaticText[`name CONTAINS[cd] '%s'`]")
          */
         if (locator.startsWith("By.IosClassChain: **")) {
-            by = MobileBy.iOSClassChain(String.format(StringUtils.remove(locator, "By.IosClassChain: "), objects));
+            by = AppiumBy.iOSClassChain(String.format(StringUtils.remove(locator, "By.IosClassChain: "), objects));
         }
 
         if (locator.startsWith("By.IosNsPredicate: **")) {
-            by = MobileBy.iOSNsPredicateString(String.format(StringUtils.remove(locator, "By.IosNsPredicate: "), objects));
+            by = AppiumBy.iOSNsPredicateString(String.format(StringUtils.remove(locator, "By.IosNsPredicate: "), objects));
         }
 
         if (locator.startsWith("By.AccessibilityId: ")) {
-            by = MobileBy.AccessibilityId(String.format(StringUtils.remove(locator, "By.AccessibilityId: "), objects));
+            by = AppiumBy.accessibilityId(String.format(StringUtils.remove(locator, "By.AccessibilityId: "), objects));
         }
 
         if (locator.startsWith("By.Image: ")) {
@@ -1235,11 +1235,11 @@ public class ExtendedWebElement implements IWebElement {
                         "Error while reading image file after formatting. Formatted locator : " + formattedLocator, e);
             }
             LOGGER.debug("Base64 image representation has benn successfully obtained after formatting.");
-            by = MobileBy.image(base64image);
+            by = AppiumBy.image(base64image);
         }
 
         if (locator.startsWith("By.AndroidUIAutomator: ")) {
-            by = MobileBy.AndroidUIAutomator(String.format(StringUtils.remove(locator, "By.AndroidUIAutomator: "), objects));
+            by = AppiumBy.androidUIAutomator(String.format(StringUtils.remove(locator, "By.AndroidUIAutomator: "), objects));
             LOGGER.debug("Formatted locator is : " + by.toString());
         }
 
@@ -1774,15 +1774,15 @@ public class ExtendedWebElement implements IWebElement {
          * All ClassChain locators start from **. e.g FindBy(xpath = "**'/XCUIElementTypeStaticText[`name CONTAINS[cd] '%s'`]")
          */
         if (locator.startsWith("By.IosClassChain: **")) {
-        	resBy = MobileBy.iOSClassChain(StringUtils.remove(locator, "By.IosClassChain: ") + "[" + index + "]");
+            resBy = AppiumBy.iOSClassChain(StringUtils.remove(locator, "By.IosClassChain: ") + "[" + index + "]");
         }
         
         if (locator.startsWith("By.IosNsPredicate: **")) {
-        	resBy = MobileBy.iOSNsPredicateString(StringUtils.remove(locator, "By.IosNsPredicate: ") + "[" + index + "]");
+            resBy = AppiumBy.iOSNsPredicateString(StringUtils.remove(locator, "By.IosNsPredicate: ") + "[" + index + "]");
         }
 
         if (locator.startsWith("By.AccessibilityId: ")) {
-            resBy = MobileBy.AccessibilityId(StringUtils.remove(locator, "By.AccessibilityId: ") + "[" + index + "]");
+            resBy = AppiumBy.accessibilityId(StringUtils.remove(locator, "By.AccessibilityId: ") + "[" + index + "]");
         }
         return resBy;
     }
