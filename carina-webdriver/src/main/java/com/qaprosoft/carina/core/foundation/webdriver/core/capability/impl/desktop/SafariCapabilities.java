@@ -20,6 +20,7 @@ import org.openqa.selenium.remote.Browser;
 
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
+import io.appium.java_client.remote.options.SupportsBrowserNameOption;
 import io.appium.java_client.safari.options.SafariOptions;
 
 public class SafariCapabilities extends AbstractCapabilities<SafariOptions> {
@@ -29,6 +30,8 @@ public class SafariCapabilities extends AbstractCapabilities<SafariOptions> {
         SafariOptions safariOptions = new SafariOptions();
         // we want to test safari not only on IOS, but on mac
         safariOptions.setPlatformName(Platform.ANY.toString());
+        // it is strange that safari options is not contains browser
+        safariOptions.setCapability(SupportsBrowserNameOption.BROWSER_NAME_OPTION, Browser.SAFARI.browserName());
         safariOptions.setCapability("browserName", Browser.SAFARI.browserName());
         return safariOptions;
     }
