@@ -35,7 +35,6 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.W3CCapabilityCommonKeys;
 import com.qaprosoft.carina.proxy.SystemProxy;
 
 import io.appium.java_client.remote.options.SupportsLanguageOption;
@@ -122,7 +121,7 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
             }
 
             // provider is not w3c-compatible capability, so we ignore it
-            if ((prefix + "provider").equalsIgnoreCase(name)) {
+            if ((SpecialKeywords.PROVIDER).equalsIgnoreCase(name)) {
                 capabilitiesMap.remove(name);
                 continue;
             }

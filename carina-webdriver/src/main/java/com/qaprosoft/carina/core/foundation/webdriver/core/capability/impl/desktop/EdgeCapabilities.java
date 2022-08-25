@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desk
 import java.util.HashMap;
 import java.util.Map;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import org.openqa.selenium.chromium.ChromiumOptions;
 import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.CapabilityType;
@@ -43,7 +44,7 @@ public class EdgeCapabilities extends AbstractCapabilities<ChromiumOptions<?>> {
 
         if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD)) {
             prefs.put("download.prompt_for_download", false);
-            if (!"zebrunner".equalsIgnoreCase(R.CONFIG.get("capabilities.provider"))) {
+            if (!"zebrunner".equalsIgnoreCase(R.CONFIG.get(SpecialKeywords.PROVIDER))) {
                 prefs.put("download.default_directory",
                         ReportContext.getArtifactsFolder().getAbsolutePath());
             }

@@ -17,11 +17,9 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desk
 
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.Browser;
+import org.openqa.selenium.remote.CapabilityType;
 
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
-
-import io.appium.java_client.remote.options.SupportsBrowserNameOption;
-import org.openqa.selenium.remote.CapabilityType;
 
 public class IECapabilities extends AbstractCapabilities<MutableCapabilities> {
 

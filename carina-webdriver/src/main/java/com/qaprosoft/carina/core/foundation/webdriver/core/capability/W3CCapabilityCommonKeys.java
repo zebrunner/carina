@@ -1,4 +1,4 @@
-package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl;
+package com.qaprosoft.carina.core.foundation.webdriver.core.capability;
 
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
