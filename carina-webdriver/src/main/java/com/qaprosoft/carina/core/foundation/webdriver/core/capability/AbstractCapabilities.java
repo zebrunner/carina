@@ -122,6 +122,7 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
             // provider is not w3c-compatible capability, so we ignore it
             if ((prefix + "provider").equalsIgnoreCase(name)) {
                 capabilitiesMap.remove(name);
+                continue;
             }
 
             String value = R.CONFIG.get(name);
@@ -130,18 +131,10 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
             }
         }
 
-        // check for w3c-incompatible capabilities
-        if (provider.isEmpty() && isW3C) {
-            for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
-                if (!W3CCapabilityCommonKeys.INSTANCE.test(entry.getKey().replaceAll(prefix, ""))) {
-                    throw new RuntimeException("W3C enabled, but provider is empty. Detected w3c-incompatible capability: " + entry.getKey());
-                }
-            }
-        }
-
         for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
             String capabilityName = entry.getKey().replaceAll(prefix, "");
             Object value = entry.getValue();
+
             if (numericCaps.contains(capabilityName) && isNumber(entry.getValue())) {
                 LOGGER.debug("Adding {} to capabilities as integer", entry.getValue());
                 value = Integer.parseInt(entry.getValue());
@@ -155,6 +148,9 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
                 if (W3CCapabilityCommonKeys.INSTANCE.test(capabilityName)) {
                     capabilities.setCapability(capabilityName, value);
                 } else {
+                    if (provider.isEmpty()) {
+                        throw new RuntimeException("W3C enabled, but provider is empty. Detected w3c-incompatible capability: " + capabilityName);
+                    }
                     customCapabilities.put(capabilityName, value);
                 }
             } else {

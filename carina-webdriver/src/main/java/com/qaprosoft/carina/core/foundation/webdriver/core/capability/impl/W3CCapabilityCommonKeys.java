@@ -13,7 +13,26 @@ import io.appium.java_client.remote.options.W3CCapabilityKeys;
 public class W3CCapabilityCommonKeys extends W3CCapabilityKeys {
     public static final W3CCapabilityCommonKeys INSTANCE = new W3CCapabilityCommonKeys();
 
-    private static final Predicate<String> ACCEPTED_W3C_MOBILE_PATTERNS = Stream.of(
+    private W3CCapabilityCommonKeys() {
+    }
+
+    private static final Predicate<String> COMMON_CAPABILITIES_PATTERNS = Stream.of(
+            /**
+             * see {{{@link W3CCapabilityKeys}}}
+             */
+            "^[\\w-]+:.*$",
+            "^acceptInsecureCerts$",
+            "^browserName$",
+            "^browserVersion$",
+            "^platformName$",
+            "^pageLoadStrategy$",
+            "^proxy$",
+            "^setWindowRect$",
+            "^strictFileInteractability$",
+            "^timeouts$",
+            "^unhandledPromptBehavior$",
+            "^webSocketUrl$",
+            // MobileCapabilityType capabilities
             "^" + MobileCapabilityType.AUTOMATION_NAME + "$",
             "^" + MobileCapabilityType.PLATFORM_VERSION + "$",
             "^" + MobileCapabilityType.DEVICE_NAME + "$",
@@ -30,18 +49,10 @@ public class W3CCapabilityCommonKeys extends W3CCapabilityKeys {
             "^" + MobileCapabilityType.EVENT_TIMINGS + "$",
             "^" + MobileCapabilityType.ENABLE_PERFORMANCE_LOGGING + "$",
             "^" + MobileCapabilityType.OTHER_APPS + "$",
-            "^" + MobileCapabilityType.PRINT_PAGE_SOURCE_ON_FIND_FAILURE + "$")
-            .map(Pattern::compile)
-            .map(Pattern::asPredicate)
-            .reduce(identity -> false, Predicate::or);
-
-    private static final Predicate<String> ACCEPTED_W3C_YOUI_ENGINE_PATTERNS = Stream.of(
-            "^" + YouiEngineCapabilityType.APP_ADDRESS + "$")
-            .map(Pattern::compile)
-            .map(Pattern::asPredicate)
-            .reduce(identity -> false, Predicate::or);
-
-    private static final Predicate<String> ACCEPTED_W3C_IOS_PATTERNS = Stream.of(
+            "^" + MobileCapabilityType.PRINT_PAGE_SOURCE_ON_FIND_FAILURE + "$",
+            // YouiEngineCapabilityType
+            "^" + YouiEngineCapabilityType.APP_ADDRESS + "$",
+            // IOSMobileCapabilityType
             "^" + IOSMobileCapabilityType.CALENDAR_FORMAT + "$",
             "^" + IOSMobileCapabilityType.BUNDLE_ID + "$",
             "^" + IOSMobileCapabilityType.LOCATION_SERVICES_ENABLED + "$",
@@ -92,12 +103,8 @@ public class W3CCapabilityCommonKeys extends W3CCapabilityKeys {
             "^" + IOSMobileCapabilityType.USE_CARTHAGE_SSL + "$",
             "^" + IOSMobileCapabilityType.SHOULD_USE_SINGLETON_TESTMANAGER + "$",
             "^" + IOSMobileCapabilityType.START_IWDP + "$",
-            "^" + IOSMobileCapabilityType.ALLOW_TOUCHID_ENROLL + "$")
-            .map(Pattern::compile)
-            .map(Pattern::asPredicate)
-            .reduce(identity -> false, Predicate::or);
-
-    private static final Predicate<String> ACCEPTED_W3C_ANDROID_PATTERNS = Stream.of(
+            "^" + IOSMobileCapabilityType.ALLOW_TOUCHID_ENROLL + "$",
+            // AndroidMobileCapabilityType
             "^" + AndroidMobileCapabilityType.APP_ACTIVITY + "$",
             "^" + AndroidMobileCapabilityType.APP_PACKAGE + "$",
             "^" + AndroidMobileCapabilityType.APP_WAIT_ACTIVITY + "$",
@@ -167,16 +174,14 @@ public class W3CCapabilityCommonKeys extends W3CCapabilityKeys {
             "^" + AndroidMobileCapabilityType.ENSURE_WEBVIEWS_HAVE_PAGES + "$",
             "^" + AndroidMobileCapabilityType.WEBVIEW_DEVTOOLS_PORT + "$",
             "^" + AndroidMobileCapabilityType.REMOTE_APPS_CACHE_LIMIT + "$")
+
             .map(Pattern::compile)
             .map(Pattern::asPredicate)
             .reduce(identity -> false, Predicate::or);
 
     @Override
     public boolean test(String capabilityName) {
-        return super.test(capabilityName) &&
-                ACCEPTED_W3C_MOBILE_PATTERNS.test(capabilityName) &&
-                ACCEPTED_W3C_YOUI_ENGINE_PATTERNS.test(capabilityName) &&
-                ACCEPTED_W3C_IOS_PATTERNS.test(capabilityName) &&
-                ACCEPTED_W3C_ANDROID_PATTERNS.test(capabilityName);
+        return COMMON_CAPABILITIES_PATTERNS.test(capabilityName);
+
     }
 }
