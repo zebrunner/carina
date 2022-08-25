@@ -39,7 +39,6 @@ import com.qaprosoft.carina.proxy.SystemProxy;
 
 import io.appium.java_client.remote.options.SupportsLanguageOption;
 import io.appium.java_client.remote.options.SupportsLocaleOption;
-import io.appium.java_client.remote.options.W3CCapabilityKeys;
 
 public abstract class AbstractCapabilities<T extends MutableCapabilities> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -69,40 +68,11 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
     }
 
     /**
-     * Add capability by w3c rules
+     * Add capabilities from configuration file to capabilities param
      * 
-     * @param capabilities capabilities to upgrade
-     * @param name capability name
-     * @param value capability value
+     * @param capabilities capabilities to which will be added the capabilities from the configuration file
      * @return upgraded capabilities
      */
-    protected T addCapabilityW3CSafe(T capabilities, String name, Object value) {
-        boolean isW3C = Configuration.getBoolean(Parameter.W3C);
-        String provider = R.CONFIG.get(SpecialKeywords.PROVIDER);
-
-        if (isW3C && provider.isEmpty() && !W3CCapabilityKeys.INSTANCE.test(name)) {
-            throw new RuntimeException("W3C enabled, but provider is empty. Trying to add w3c-incompatible capability");
-        }
-
-        if (isW3C) {
-            if (W3CCapabilityCommonKeys.INSTANCE.test(name)) {
-                capabilities.setCapability(name, value);
-            } else {
-                Map<String, Object> options = (Map<String, Object>) capabilities.getCapability(provider + ":options");
-                if (options == null) {
-                    options = new HashMap<>();
-                }
-
-                options.put(name, value);
-                capabilities.setCapability(provider + ":options", options);
-            }
-        } else {
-            capabilities.setCapability(name, value);
-        }
-
-        return capabilities;
-    }
-
     protected T initCapabilities(T capabilities) {
         // read all properties which starts from "capabilities.*" prefix and add them into desired capabilities.
         final String prefix = SpecialKeywords.CAPABILITIES + ".";
@@ -114,7 +84,7 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
         Map<String, Object> customCapabilities = new HashMap<>();
 
         for (String name : new ArrayList<>(capabilitiesMap.keySet())) {
-            // cleanup capabilitiesMap from non-capabilities or empty capabilities
+            // cleanup capabilitiesMap from non-capabilities
             if (!name.toLowerCase().startsWith(prefix)) {
                 capabilitiesMap.remove(name);
                 continue;
@@ -126,6 +96,7 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
                 continue;
             }
 
+            // cleanup capabilitiesMap from empty capabilities
             String value = R.CONFIG.get(name);
             if (value.isEmpty()) {
                 capabilitiesMap.remove(name);
@@ -150,7 +121,9 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
                     capabilities.setCapability(capabilityName, value);
                 } else {
                     if (provider.isEmpty()) {
-                        throw new RuntimeException("W3C enabled, but provider is empty. Detected w3c-incompatible capability: " + capabilityName);
+                        throw new RuntimeException(
+                                "W3C enabled, but provider capability is empty. Please, provide 'provider' capability. Detected w3c-incompatible capability: "
+                                        + capabilityName);
                     }
                     customCapabilities.put(capabilityName, value);
                 }
@@ -252,6 +225,9 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
         return true;
     }
 
+    /**
+     * Add locale and language capabilities to caps param
+     */
     protected T setLocaleAndLanguage(T caps) {
         /*
          * http://appium.io/docs/en/writing-running-appium/caps/ locale and language

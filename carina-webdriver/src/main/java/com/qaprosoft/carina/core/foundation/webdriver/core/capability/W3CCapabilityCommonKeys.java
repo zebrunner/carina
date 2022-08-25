@@ -179,6 +179,12 @@ public class W3CCapabilityCommonKeys extends W3CCapabilityKeys {
             .map(Pattern::asPredicate)
             .reduce(identity -> false, Predicate::or);
 
+    /**
+     * Checks capability for compliance with w3c (whether it is contained in standard capabilities or meets certain rules)
+     * 
+     * @param capabilityName name of capability (ps. without any prefix, as appium:)
+     * @return is capability w3c-compliance
+     */
     @Override
     public boolean test(String capabilityName) {
         return COMMON_CAPABILITIES_PATTERNS.test(capabilityName);
