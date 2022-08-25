@@ -77,7 +77,8 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
         // read all properties which starts from "capabilities.*" prefix and add them into desired capabilities.
         final String prefix = SpecialKeywords.CAPABILITIES + ".";
         boolean isW3C = Configuration.getBoolean(Parameter.W3C);
-        String provider = Configuration.getCapability("provider").toString();
+        String provider = R.CONFIG.get(SpecialKeywords.PROVIDER);
+        String providerType = R.CONFIG.get(SpecialKeywords.PROVIDER_TYPE);
 
         @SuppressWarnings({ "unchecked", "rawtypes" })
         Map<String, String> capabilitiesMap = new HashMap(R.CONFIG.getProperties());
@@ -90,8 +91,9 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
                 continue;
             }
 
-            // provider is not w3c-compatible capability, so we ignore it
-            if ((SpecialKeywords.PROVIDER).equalsIgnoreCase(name)) {
+            // provider and providerType is not w3c-compatible capability, so we ignore it
+            if (SpecialKeywords.PROVIDER.equalsIgnoreCase(name) ||
+                    SpecialKeywords.PROVIDER_TYPE.equalsIgnoreCase(name)) {
                 capabilitiesMap.remove(name);
                 continue;
             }
@@ -153,7 +155,7 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
         }
 
         if (isW3C && !customCapabilities.isEmpty()) {
-            capabilities.setCapability(provider + ":options", customCapabilities);
+            capabilities.setCapability(provider + ":" + providerType, customCapabilities);
         } else {
             for (String capabilityName : customCapabilities.keySet()) {
                 capabilities.setCapability(capabilityName, customCapabilities.get(capabilityName));
