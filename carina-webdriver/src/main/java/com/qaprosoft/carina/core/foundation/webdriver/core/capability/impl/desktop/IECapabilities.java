@@ -21,6 +21,7 @@ import org.openqa.selenium.remote.Browser;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
 import io.appium.java_client.remote.options.SupportsBrowserNameOption;
+import org.openqa.selenium.remote.CapabilityType;
 
 public class IECapabilities extends AbstractCapabilities<MutableCapabilities> {
 
@@ -28,7 +29,7 @@ public class IECapabilities extends AbstractCapabilities<MutableCapabilities> {
     public MutableCapabilities getCapability(String testName) {
         MutableCapabilities capabilities = new MutableCapabilities();
         initBaseCapabilities(capabilities, testName);
-        capabilities.setCapability(SupportsBrowserNameOption.BROWSER_NAME_OPTION, Browser.IE.browserName());
+        capabilities.setCapability(CapabilityType.BROWSER_NAME, Browser.IE.browserName());
         return capabilities;
     }
 

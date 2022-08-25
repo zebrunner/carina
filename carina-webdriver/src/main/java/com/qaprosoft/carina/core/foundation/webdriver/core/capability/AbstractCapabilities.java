@@ -35,6 +35,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.W3CCapabilityCommonKeys;
 import com.qaprosoft.carina.proxy.SystemProxy;
 
 import io.appium.java_client.remote.options.SupportsLanguageOption;
@@ -151,7 +152,7 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
             }
 
             if (isW3C) {
-                if (W3CCapabilityKeys.INSTANCE.test(capabilityName)) {
+                if (W3CCapabilityCommonKeys.INSTANCE.test(capabilityName)) {
                     capabilities.setCapability(capabilityName, value);
                 } else {
                     customCapabilities.put(capabilityName, value);
