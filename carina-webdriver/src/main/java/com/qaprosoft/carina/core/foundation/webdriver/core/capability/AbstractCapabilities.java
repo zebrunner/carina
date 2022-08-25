@@ -205,8 +205,7 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
         }
         List<String> protocols = Arrays.asList(Configuration.get(Parameter.PROXY_PROTOCOLS).split("[\\s,]+"));
 
-        //TODO: test removal comparing with null
-        if (proxyHost != null && !proxyHost.isEmpty() && proxyPort != null && !proxyPort.isEmpty()) {
+        if (!proxyHost.isEmpty() && !proxyPort.isEmpty()) {
 
             org.openqa.selenium.Proxy proxy = new org.openqa.selenium.Proxy();
             String proxyAddress = String.format("%s:%s", proxyHost, proxyPort);

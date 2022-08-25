@@ -228,10 +228,9 @@ public class Configuration {
     /**
      * Returns configuration value from startup properties or from configuration
      * file if not found in startup args.
-     * 
-     * @param param
-     *            - parameter key.
-     * @return parameter value if it is found by key or default value if not.
+     *
+     * @param param parameter key.
+     * @return The parameter value if it is found by key, or "" if not
      */
     public static String get(Parameter param) {
         String value = R.CONFIG.get(param.getKey());
