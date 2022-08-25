@@ -134,6 +134,7 @@ public class SpecialKeywords {
     public static final String PLATFORM_VERSION = "capabilities.platformVersion";
     public static final String BROWSERSTACK_PLATFORM_NAME = "capabilities.os";
     public static final String BROWSERSTACK_PLATFORM_VERSION = "capabilities.os_version";
+    public static final String PROVIDER = "capabilities.provider";
 
     public static final String ADB_EXEC_TIMEOUT = "capabilities.adbExecTimeout";
     public static final String MOBILE_DEVICE_UDID = "capabilities.udid";

@@ -19,7 +19,6 @@ import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
-import java.util.Objects;
 
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.MutableCapabilities;
@@ -50,7 +49,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleni
 public class DesktopFactory extends AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static MutableCapabilities staticCapabilities;
+    private static MutableCapabilities staticCapabilities = null;
 
     @Override
     public WebDriver create(String name, MutableCapabilities capabilities, String seleniumHost) {
@@ -69,7 +68,7 @@ public class DesktopFactory extends AbstractFactory {
         }
 
         if (Browser.SAFARI.browserName().equalsIgnoreCase(capabilities.getBrowserName()) &&
-                Objects.equals(Configuration.get(Parameter.W3C), "false")) {
+                "false".equalsIgnoreCase(Configuration.get(Parameter.W3C))) {
             capabilities = removeAppiumPrefix(capabilities);
         }
 

@@ -46,9 +46,13 @@ import com.zebrunner.agent.core.webdriver.RemoteWebDriverFactory;
 public class DriverFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    // class have only static methods, so constructor should be hidden
+    private DriverFactory() {
+    }
+
     public static WebDriver create(String testName, MutableCapabilities capabilities, String seleniumHost) {
 		LOGGER.debug("DriverFactory start...");
-		AbstractFactory factory;
+        AbstractFactory factory = null;
 
         URL seleniumUrl = RemoteWebDriverFactory.getSeleniumHubUrl();
         if (seleniumUrl != null) {

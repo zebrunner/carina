@@ -22,7 +22,6 @@ import java.util.Objects;
 
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.events.WebDriverEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +47,7 @@ public class WindowsFactory extends AbstractFactory {
         if (seleniumHost == null) {
             seleniumHost = Configuration.getSeleniumUrl();
         }
-        LOGGER.debug("selenium: " + seleniumHost);
+        LOGGER.debug("selenium: {}", seleniumHost);
 
         String driverType = Configuration.getDriverType(capabilities);
         if (!SpecialKeywords.WINDOWS.equals(driverType)) {
@@ -64,7 +63,7 @@ public class WindowsFactory extends AbstractFactory {
             capabilities = removeAppiumPrefix(capabilities);
         }
 
-        LOGGER.debug("capabilities: " + capabilities);
+        LOGGER.debug("capabilities: {}", capabilities);
 
         URL url;
         try {
@@ -80,10 +79,4 @@ public class WindowsFactory extends AbstractFactory {
     private WindowsOptions getCapabilities(String name) {
         return new WindowsCapabilities().getCapability(name);
     }
-
-    @Override
-    public WebDriver registerListeners(WebDriver driver, WebDriverEventListener... listeners) {
-        return super.registerListeners(driver, listeners);
-    }
-
 }

@@ -77,7 +77,7 @@ public class MobileFactory extends AbstractFactory {
             mobilePlatformName = SpecialKeywords.CUSTOM;
         }
 
-        LOGGER.debug("selenium: " + seleniumHost);
+        LOGGER.debug("selenium: {}", seleniumHost);
 
         RemoteWebDriver driver = null;
         // if inside capabilities only singly "udid" capability then generate default one and append udid
@@ -87,7 +87,7 @@ public class MobileFactory extends AbstractFactory {
             String udid = capabilities.getCapability("udid").toString();
             capabilities = getCapabilities(name);
             capabilities.setCapability("udid", udid);
-            LOGGER.debug("Appended udid to cpabilities: " + capabilities);
+            LOGGER.debug("Appended udid to capabilities: {}", capabilities);
         }
 
         if (Objects.equals(Configuration.get(Parameter.W3C), "false")) {
@@ -103,7 +103,7 @@ public class MobileFactory extends AbstractFactory {
             capabilities.setCapability("platformName", "ANY");
         }
 
-        LOGGER.debug("capabilities: " + capabilities);
+        LOGGER.debug("capabilities: {}", capabilities);
 
         try {
             EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
@@ -192,9 +192,9 @@ public class MobileFactory extends AbstractFactory {
         String debugInfo = "";
         if (m.find()) {
             debugInfo = m.group(1);
-            LOGGER.debug("Extracted debug info: ".concat(debugInfo));
+            LOGGER.debug("Extracted debug info: {}", debugInfo);
         } else {
-            LOGGER.debug("Debug info hasn'been found");
+            LOGGER.debug("Debug info hasn't been found");
         }
         return debugInfo;
     }
@@ -221,9 +221,9 @@ public class MobileFactory extends AbstractFactory {
         String paramValue = "";
         if (m.find()) {
             paramValue = m.group(1);
-            LOGGER.debug(String.format("Found parameter: %s -> ", paramName).concat(paramValue));
+            LOGGER.debug("Found parameter: {} -> {}", paramName, paramValue);
         } else {
-            LOGGER.debug(String.format("Param '%s' hasn't been found in debug info: [%s]", paramName, debugInfo));
+            LOGGER.debug("Param '{}' hasn't been found in debug info: [{}]", paramName, debugInfo);
         }
 
         return paramValue;

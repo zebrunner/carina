@@ -15,18 +15,11 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile;
 
-import java.lang.invoke.MethodHandles;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
 import io.appium.java_client.ios.options.XCUITestOptions;
 
 public class XCUITestCapabilities extends AbstractCapabilities<XCUITestOptions> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public XCUITestOptions getCapability(String testName) {

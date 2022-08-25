@@ -77,14 +77,14 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
      */
     protected T addCapabilityW3CSafe(T capabilities, String name, Object value) {
         boolean isW3C = Configuration.getBoolean(Parameter.W3C);
-        String provider = Configuration.getCapability("provider").toString();
+        String provider = R.CONFIG.get(SpecialKeywords.PROVIDER);
 
         if (isW3C && provider.isEmpty() && !W3CCapabilityKeys.INSTANCE.test(name)) {
             throw new RuntimeException("W3C enabled, but provider is empty. Trying to add w3c-incompatible capability");
         }
 
         if (isW3C) {
-            if (W3CCapabilityKeys.INSTANCE.test(name)) {
+            if (W3CCapabilityCommonKeys.INSTANCE.test(name)) {
                 capabilities.setCapability(name, value);
             } else {
                 Map<String, Object> options = (Map<String, Object>) capabilities.getCapability(provider + ":options");
@@ -133,8 +133,8 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
         // check for w3c-incompatible capabilities
         if (provider.isEmpty() && isW3C) {
             for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
-                if (!W3CCapabilityKeys.INSTANCE.test(entry.getKey())) {
-                    throw new RuntimeException("W3C enabled, but provider is empty. Detected w3c-incompatible capability");
+                if (!W3CCapabilityCommonKeys.INSTANCE.test(entry.getKey().replaceAll(prefix, ""))) {
+                    throw new RuntimeException("W3C enabled, but provider is empty. Detected w3c-incompatible capability: " + entry.getKey());
                 }
             }
         }

@@ -22,7 +22,6 @@ import java.util.Objects;
 
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.events.WebDriverEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +46,7 @@ public class MacFactory extends AbstractFactory {
         if (seleniumHost == null) {
             seleniumHost = Configuration.getSeleniumUrl();
         }
-        LOGGER.debug("selenium: " + seleniumHost);
+        LOGGER.debug("selenium: {}", seleniumHost);
 
         String driverType = Configuration.getDriverType(capabilities);
         if (!SpecialKeywords.MAC.equals(driverType)) {
@@ -63,7 +62,7 @@ public class MacFactory extends AbstractFactory {
             capabilities = removeAppiumPrefix(capabilities);
         }
 
-        LOGGER.debug("capabilities: " + capabilities);
+        LOGGER.debug("capabilities: {}", capabilities);
 
         URL url;
         try {
@@ -79,10 +78,4 @@ public class MacFactory extends AbstractFactory {
     private MutableCapabilities getCapabilities(String name) {
         return new Mac2Capabilities().getCapability(name);
     }
-
-    @Override
-    public WebDriver registerListeners(WebDriver driver, WebDriverEventListener... listeners) {
-        return super.registerListeners(driver, listeners);
-    }
-
 }

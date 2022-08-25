@@ -15,18 +15,11 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile;
 
-import java.lang.invoke.MethodHandles;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
 import io.appium.java_client.android.options.UiAutomator2Options;
 
 public class UiAutomator2Capabilities extends AbstractCapabilities<UiAutomator2Options> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public UiAutomator2Options getCapability(String testName) {
