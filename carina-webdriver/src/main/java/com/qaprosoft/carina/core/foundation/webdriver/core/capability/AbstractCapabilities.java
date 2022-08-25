@@ -55,7 +55,9 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
 
         if (!IDriverPool.DEFAULT.equalsIgnoreCase(testName)) {
             // #1573: remove "default" driver name capability registration
-            capabilities.setCapability("name", testName);
+            // capabilities.setCapability("name", testName);
+            // todo investigate is in work, if not, think about another path
+            R.CONFIG.put(SpecialKeywords.CAPABILITIES + ".name", testName, true);
         }
 
         Proxy proxy = setupProxy();
