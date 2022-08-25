@@ -77,10 +77,6 @@ public class MobileFactory extends AbstractFactory {
             mobilePlatformName = SpecialKeywords.CUSTOM;
         }
 
-        if (seleniumHost.contains("hub.lambdatest.com")) {
-            mobilePlatformName = SpecialKeywords.CUSTOM;
-        }
-
         LOGGER.debug("selenium: {}", seleniumHost);
 
         RemoteWebDriver driver = null;
