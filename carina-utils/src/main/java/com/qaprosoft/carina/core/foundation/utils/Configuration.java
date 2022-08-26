@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -331,13 +330,13 @@ public class Configuration {
      * @return String platform name
      */
     public static String getPlatform() {
-        return getPlatform(new DesiredCapabilities());
+        return getPlatform(new MutableCapabilities());
     }
 
     /**
-     * Get platform name from configuration properties or DesiredCapabilities.
-     * @param caps
-     *            DesiredCapabilities
+     * Get platform name from configuration properties or MutableCapabilities.
+     * 
+     * @param caps MutableCapabilities
      * @return String platform name
      */
     public static String getPlatform(MutableCapabilities caps) {
@@ -371,10 +370,10 @@ public class Configuration {
     }
     
     public static String getPlatformVersion() {
-        return getPlatformVersion(new DesiredCapabilities());
+        return getPlatformVersion(new MutableCapabilities());
     }
     
-    public static String getPlatformVersion(DesiredCapabilities caps) {
+    public static String getPlatformVersion(MutableCapabilities caps) {
         // default "os_version=value" should be used to determine current platform
         String platformVersion = "";
 

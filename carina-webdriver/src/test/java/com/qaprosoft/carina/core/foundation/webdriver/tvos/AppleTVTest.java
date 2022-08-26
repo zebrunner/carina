@@ -20,7 +20,8 @@ import static com.qaprosoft.carina.core.foundation.commons.SpecialKeywords.MOBIL
 import static com.qaprosoft.carina.core.foundation.commons.SpecialKeywords.MOBILE_DEVICE_PLATFORM;
 import static com.qaprosoft.carina.core.foundation.commons.SpecialKeywords.TVOS;
 
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.remote.CapabilityType;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -32,8 +33,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 
 public class AppleTVTest {
 
-	private static final String PLATFORM_NAME = "platformName";
-
 	@Test(groups = {"AppleTVTestClass"}, dependsOnGroups = {"DesktopCapabilitiesTestClass"})
 	public void getTvOSCapabilityTest() {
 		R.CONFIG.put(MOBILE_DEVICE_PLATFORM, TVOS);
@@ -42,15 +41,15 @@ public class AppleTVTest {
 
 	@Test(groups = {"AppleTVTestClass"}, dependsOnGroups = {"DesktopCapabilitiesTestClass"})
 	public void getTvOSDriverTypeTest() {
-		DesiredCapabilities capability = new DesiredCapabilities();
-		capability.setCapability(PLATFORM_NAME, TVOS);
+        MutableCapabilities capability = new MutableCapabilities();
+        capability.setCapability(CapabilityType.PLATFORM_NAME, TVOS);
 		Assert.assertEquals(Configuration.getDriverType(capability), MOBILE);
 	}
 
 	@Test(groups = {"AppleTVTestClass"}, dependsOnGroups = {"DesktopCapabilitiesTestClass"})
 	public void negativeTvOSDriverTypeTest() {
-		DesiredCapabilities capability = new DesiredCapabilities();
-		capability.setCapability(PLATFORM_NAME, TVOS);
+        MutableCapabilities capability = new MutableCapabilities();
+        capability.setCapability(CapabilityType.PLATFORM_NAME, TVOS);
 		Assert.assertNotEquals(Configuration.getDriverType(capability), DESKTOP);
 	}
 
@@ -68,19 +67,19 @@ public class AppleTVTest {
 
 	@Test(groups = {"AppleTVTestClass"}, dependsOnGroups = {"DesktopCapabilitiesTestClass"})
 	public void isTvOSTvTest() {
-		DesiredCapabilities capability = new DesiredCapabilities();
+        MutableCapabilities capability = new MutableCapabilities();
+        // deviceType is not standard capability
 		capability.setCapability("deviceType", TVOS);
 		Assert.assertTrue(new Device(capability).isTv());
 	}
 
 	@Test(groups = {"AppleTVTestClass"}, dependsOnGroups = {"DesktopCapabilitiesTestClass"})
 	public void getDeviceTypeTest() {
-		DesiredCapabilities capability = new DesiredCapabilities();
+        MutableCapabilities capability = new MutableCapabilities();
 		capability.setCapability("deviceType", TVOS);
 		Device device = new Device(capability);
 		device.setName(TVOS);
 		device.setOs(TVOS);
 		Assert.assertEquals(device.getDeviceType(), Type.APPLE_TV);
 	}
-
 }

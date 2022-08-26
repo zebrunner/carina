@@ -17,7 +17,7 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desk
 
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.Browser;
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.CapabilityType;
 
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
@@ -25,9 +25,9 @@ public class OperaCapabilities extends AbstractCapabilities<MutableCapabilities>
 
     @Override
     public MutableCapabilities getCapability(String testName) {
-        DesiredCapabilities capabilities = new DesiredCapabilities();
+        MutableCapabilities capabilities = new MutableCapabilities();
         initBaseCapabilities(capabilities, testName);
-        capabilities.setBrowserName(Browser.OPERA.browserName());
+        capabilities.setCapability(CapabilityType.BROWSER_NAME, Browser.OPERA.browserName());
 
         //TODO: add support for AUTO_DOWNLOAD and PROXY
         return capabilities;

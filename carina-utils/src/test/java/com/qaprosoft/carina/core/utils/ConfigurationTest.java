@@ -15,13 +15,11 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.utils;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
@@ -101,16 +99,16 @@ public class ConfigurationTest {
         Assert.assertEquals(Configuration.getDriverType(), "mobile", "Can't find out device type");
     }
 
-    /*
-    @Test
-    public void testDesktopDeviceTypeWithDesiredCapabilities() {
-        DesiredCapabilities capabilities = DesiredCapabilities.safari();
-        capabilities.setBrowserName("safari");
-        capabilities.setCapability(CapabilityType.PLATFORM_NAME, SpecialKeywords.MAC);
-
-        Assert.assertEquals(Configuration.getDriverType(capabilities), "desktop", "Can't find out device type");
-    }
-*/
+    
+    // @Test
+    // public void testDesktopDeviceTypeWithMutableCapabilities() {
+    // MutableCapabilities capabilities = new MutableCapabilities();
+    // capabilities.setCapability(CapabilityType.BROWSER_NAME, "safari");
+    // capabilities.setCapability(CapabilityType.PLATFORM_NAME, SpecialKeywords.MAC);
+    //
+    // Assert.assertEquals(Configuration.getDriverType(capabilities), "desktop", "Can't find out device type");
+    // }
+     
     @Test
     public void testMobileApp() {
         String mobileApp = "https://qaprosoft.s3-us-west-2.amazonaws.com/carinademoexample.apk";
