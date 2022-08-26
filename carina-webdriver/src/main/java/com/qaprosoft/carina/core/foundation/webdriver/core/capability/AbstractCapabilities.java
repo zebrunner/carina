@@ -84,30 +84,26 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
         Map<String, String> capabilitiesMap = new HashMap(R.CONFIG.getProperties());
         Map<String, Object> customCapabilities = new HashMap<>();
 
-        for (String name : new ArrayList<>(capabilitiesMap.keySet())) {
-            // cleanup capabilitiesMap from non-capabilities
-            if (!name.toLowerCase().startsWith(prefix)) {
-                capabilitiesMap.remove(name);
+        for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
+
+            // ignore non-capabilities
+            if (!entry.getKey().toLowerCase().startsWith(prefix)) {
                 continue;
             }
 
             // provider and providerType is not w3c-compatible capability, so we ignore it
-            if (SpecialKeywords.PROVIDER.equalsIgnoreCase(name) ||
-                    SpecialKeywords.PROVIDER_OPTIONS.equalsIgnoreCase(name)) {
-                capabilitiesMap.remove(name);
+            if (SpecialKeywords.PROVIDER.equalsIgnoreCase(entry.getKey()) ||
+                    SpecialKeywords.PROVIDER_OPTIONS.equalsIgnoreCase(entry.getKey())) {
                 continue;
             }
 
-            // cleanup capabilitiesMap from empty capabilities
-            String value = R.CONFIG.get(name);
-            if (value.isEmpty()) {
-                capabilitiesMap.remove(name);
+            // ignore empty capabilities
+            if (R.CONFIG.get(entry.getKey()).isEmpty()) {
+                continue;
             }
-        }
 
-        for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
             String capabilityName = entry.getKey().replaceAll(prefix, "");
-            Object value = entry.getValue();
+            Object value = R.CONFIG.get(entry.getKey());
 
             if (numericCaps.contains(capabilityName) && isNumber(entry.getValue())) {
                 LOGGER.debug("Adding {} to capabilities as integer", entry.getValue());
