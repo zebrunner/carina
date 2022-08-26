@@ -15,20 +15,45 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
 
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
-import org.openqa.selenium.remote.BrowserType;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import org.openqa.selenium.chromium.ChromiumOptions;
+import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
-public class EdgeCapabilities extends AbstractCapabilities {
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
-    public DesiredCapabilities getCapability(String testName) {
-        DesiredCapabilities capabilities = new DesiredCapabilities();
-        capabilities = initBaseCapabilities(capabilities, BrowserType.EDGE, testName);
-        capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
-        capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
+public class EdgeCapabilities extends AbstractCapabilities<ChromiumOptions<?>> {
 
+    @Override
+    public ChromiumOptions<?> getCapability(String testName) {
+        ChromiumOptions<?> capabilities = new ChromiumOptions<>(CapabilityType.BROWSER_NAME, Browser.EDGE.browserName(), "ms:edgeOptions");
+        initBaseCapabilities(capabilities, testName);
+        addEdgeOptions(capabilities);
         return capabilities;
     }
 
+    private void addEdgeOptions(ChromiumOptions<?> caps) {
+        Map<String, Object> prefs = new HashMap<>();
+        boolean needsPrefs = false;
+
+        if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD)) {
+            prefs.put("download.prompt_for_download", false);
+            if (!"zebrunner".equalsIgnoreCase(R.CONFIG.get(SpecialKeywords.PROVIDER))) {
+                prefs.put("download.default_directory",
+                        ReportContext.getArtifactsFolder().getAbsolutePath());
+            }
+            needsPrefs = true;
+        }
+
+        if (needsPrefs) {
+            caps.setCapability("prefs", prefs);
+        }
+        caps.setCapability("ms:edgeChrominum", true);
+    }
 }

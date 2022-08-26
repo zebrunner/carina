@@ -21,13 +21,13 @@ import java.net.URL;
 import java.time.Duration;
 
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.remote.BrowserType;
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Wait;
@@ -49,10 +49,10 @@ import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleni
 public class DesktopFactory extends AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static DesiredCapabilities staticCapabilities;
+    private static MutableCapabilities staticCapabilities = null;
 
     @Override
-    public WebDriver create(String name, DesiredCapabilities capabilities, String seleniumHost) {
+    public WebDriver create(String name, MutableCapabilities capabilities, String seleniumHost) {
         RemoteWebDriver driver = null;
         if (seleniumHost == null) {
             seleniumHost = Configuration.getSeleniumUrl();
@@ -63,11 +63,16 @@ public class DesktopFactory extends AbstractFactory {
         }
 
         if (staticCapabilities != null) {
-            LOGGER.info("Static DesiredCapabilities will be merged to basic driver capabilities");
+            LOGGER.info("Static MutableCapabilities will be merged to basic driver capabilities");
             capabilities.merge(staticCapabilities);
         }
-        
-        LOGGER.debug("capabilities: " + capabilities);
+
+        if (Browser.SAFARI.browserName().equalsIgnoreCase(capabilities.getBrowserName()) &&
+                "false".equalsIgnoreCase(Configuration.get(Parameter.W3C))) {
+            capabilities = removeAppiumPrefix(capabilities);
+        }
+
+        LOGGER.debug("capabilities: {}", capabilities);
 
         try {
             EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(new URL(seleniumHost));
@@ -81,20 +86,20 @@ public class DesktopFactory extends AbstractFactory {
     }
 
     @SuppressWarnings("deprecation")
-    public DesiredCapabilities getCapabilities(String name) {
+    public MutableCapabilities getCapabilities(String name) {
         String browser = Configuration.getBrowser();
         
-        if (BrowserType.FIREFOX.equalsIgnoreCase(browser)) {
+        if (Browser.FIREFOX.browserName().equalsIgnoreCase(browser)) {
             return new FirefoxCapabilities().getCapability(name);
-        } else if (BrowserType.IEXPLORE.equalsIgnoreCase(browser) || BrowserType.IE.equalsIgnoreCase(browser) || "ie".equalsIgnoreCase(browser)) {
+        } else if (Browser.IE.browserName().equalsIgnoreCase(browser) || "ie".equalsIgnoreCase(browser)) {
             return new IECapabilities().getCapability(name);
-        } else if (BrowserType.SAFARI.equalsIgnoreCase(browser)) {
+        } else if (Browser.SAFARI.browserName().equalsIgnoreCase(browser)) {
             return new SafariCapabilities().getCapability(name);
-        } else if (BrowserType.CHROME.equalsIgnoreCase(browser)) {
+        } else if (Browser.CHROME.browserName().equalsIgnoreCase(browser)) {
             return new ChromeCapabilities().getCapability(name);
-        } else if (BrowserType.OPERA_BLINK.equalsIgnoreCase(browser) || BrowserType.OPERA.equalsIgnoreCase(browser)) {
+        } else if (Browser.OPERA.browserName().equalsIgnoreCase(browser)) {
             return new OperaCapabilities().getCapability(name);
-        } else if (BrowserType.EDGE.equalsIgnoreCase(browser) || "edge".equalsIgnoreCase(browser)) {
+        } else if (Browser.EDGE.browserName().equalsIgnoreCase(browser) || "edge".equalsIgnoreCase(browser)) {
             return new EdgeCapabilities().getCapability(name);
         } else {
             throw new RuntimeException("Unsupported browser: " + browser);
@@ -103,7 +108,7 @@ public class DesktopFactory extends AbstractFactory {
 
     public static void addStaticCapability(String name, Object value) {
         if (staticCapabilities == null) {
-            staticCapabilities = new DesiredCapabilities();
+            staticCapabilities = new MutableCapabilities();
         }
         staticCapabilities.setCapability(name, value);
     }
@@ -115,7 +120,7 @@ public class DesktopFactory extends AbstractFactory {
      * @param driver - instance of desktop @WebDriver
      * @param capabilities - driver capabilities
      */
-    private void resizeBrowserWindow(WebDriver driver, DesiredCapabilities capabilities) {
+    private void resizeBrowserWindow(WebDriver driver, MutableCapabilities capabilities) {
         try {
             Wait<WebDriver> wait = new FluentWait<WebDriver>(driver)
                     .pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)))
@@ -125,8 +130,8 @@ public class DesktopFactory extends AbstractFactory {
                     .ignoring(TimeoutException.class);
             if (capabilities.getCapability("resolution") != null) {
                 String resolution = (String) capabilities.getCapability("resolution");
-                int expectedWidth = Integer.valueOf(resolution.split("x")[0]);
-                int expectedHeight = Integer.valueOf(resolution.split("x")[1]);
+                int expectedWidth = Integer.parseInt(resolution.split("x")[0]);
+                int expectedHeight = Integer.parseInt(resolution.split("x")[1]);
                 wait.until(new Function<WebDriver, Boolean>(){
                     public Boolean apply(WebDriver driver ) {
                         driver.manage().window().setPosition(new Point(0, 0));

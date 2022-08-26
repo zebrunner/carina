@@ -82,7 +82,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinse
 import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.Platform;
 import com.sun.jersey.core.util.Base64;
 
-import io.appium.java_client.MobileBy;
+import io.appium.java_client.AppiumBy;
 
 public class ExtendedWebElement implements IWebElement {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -212,7 +212,7 @@ public class ExtendedWebElement implements IWebElement {
 					locator = (ExtendedElementLocator) locatorField.get(innerProxy);
                     // #1691 fix L10N Localized annotation does not work when elements are nested and the
                     // parent element does not have an annotation.
-					//this.isLocalized = locator.isLocalized();
+                    // this.isLocalized = locator.isLocalized();
 
 					searchContextField = locator.getClass().getDeclaredField("searchContext");
 					searchContextField.setAccessible(true);
@@ -333,14 +333,14 @@ public class ExtendedWebElement implements IWebElement {
 	 * @return element existence status.
 	 */
 	public boolean isPresent(By by, long timeout) {
-	    boolean res = false;
-	    try {
-	        res = waitUntil(getDefaultCondition(by), timeout);
+        boolean res = false;
+        try {
+            res = waitUntil(getDefaultCondition(by), timeout);
         } catch (StaleElementReferenceException e) {
             // there is no sense to continue as StaleElementReferenceException captured
             LOGGER.debug("waitUntil: StaleElementReferenceException", e);
         }
-	    return res;
+        return res;
 	}
 	
 	
@@ -356,16 +356,13 @@ public class ExtendedWebElement implements IWebElement {
             LOGGER.warn("Fluent wait less than 1sec timeout might hangs! Updating to 1 sec.");
             timeout = 1;
         }
-        
+
         long retryInterval = getRetryInterval(timeout);
-        
-        //try to use better tickMillis clock
-        Wait<WebDriver> wait = new WebDriverWait(getDriver(), 
-                java.time.Clock.tickMillis(java.time.ZoneId.systemDefault()), 
-                Sleeper.SYSTEM_SLEEPER, 
-                timeout, 
-                retryInterval)
-                .withTimeout(Duration.ofSeconds(timeout));
+
+        // try to use better tickMillis clock
+        Wait<WebDriver> wait = new WebDriverWait(getDriver(), Duration.ofSeconds(timeout), Duration.ofMillis(retryInterval),
+                java.time.Clock.tickMillis(java.time.ZoneId.systemDefault()), Sleeper.SYSTEM_SLEEPER)
+                        .withTimeout(Duration.ofSeconds(timeout));
 
         // [VD] Notes:
         // do not ignore TimeoutException or NoSuchSessionException otherwise you can wait for minutes instead of timeout!
@@ -374,11 +371,11 @@ public class ExtendedWebElement implements IWebElement {
         
         // 7.3.17-SNAPSHOT. Removed NoSuchSessionException (Mar-11-2022)
         //.ignoring(NoSuchSessionException.class) // why do we ignore noSuchSession? Just to minimize errors?
-        
+
         // 7.3.20.1686-SNAPSHOT. Removed ignoring WebDriverException (Jun-03-2022).
         // Goal to test if inside timeout happens first and remove interruption and future call
         // removed ".ignoring(NoSuchElementException.class);" as NotFoundException ignored by waiter itself
-        // added explicit .withTimeout(Duration.ofSeconds(timeout));        
+        // added explicit .withTimeout(Duration.ofSeconds(timeout));
 
         LOGGER.debug("waitUntil: starting... timeout: " + timeout);
         boolean res = false;
@@ -400,7 +397,7 @@ public class ExtendedWebElement implements IWebElement {
             throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + this.by.toString());
         }
         if (elements.size() > 1) {
-            //TODO: think about moving into the debug or info level
+            // TODO: think about moving into the debug or info level
             LOGGER.warn(String.format("returned first but found %d elements by xpath: %s", elements.size(), getBy()));
         }
         this.element = elements.get(0);
@@ -981,7 +978,7 @@ public class ExtendedWebElement implements IWebElement {
             // there is no sense to continue as StaleElementReferenceException captured
             LOGGER.debug("waitUntil: StaleElementReferenceException", e);
         }
-        
+
         return res;
     }
 
@@ -1134,7 +1131,7 @@ public class ExtendedWebElement implements IWebElement {
                 // if element not found it will cause NoSuchElementException
                 findElement();
             }
-            
+
             // if element is stale, it will cause StaleElementReferenceException
             if (this.element.isDisplayed()) {
                 LOGGER.info("Element {} detected. Waiting until disappear...", this.element.getTagName());
@@ -1143,11 +1140,11 @@ public class ExtendedWebElement implements IWebElement {
                 // no sense to continue as element is not displayed so return asap
                 return true;
             }
-            
+
             res = waitUntil(ExpectedConditions.or(ExpectedConditions.stalenessOf(this.element),
                     ExpectedConditions.invisibilityOf(this.element)),
                     timeout);
-            
+
         } catch (NoSuchElementException | StaleElementReferenceException e) {
             // element not present so means disappear
             LOGGER.debug("Element disappeared as exception catched: {}", e.getMessage());
@@ -1215,15 +1212,15 @@ public class ExtendedWebElement implements IWebElement {
          * All ClassChain locators start from **. e.g FindBy(xpath = "**'/XCUIElementTypeStaticText[`name CONTAINS[cd] '%s'`]")
          */
         if (locator.startsWith("By.IosClassChain: **")) {
-            by = MobileBy.iOSClassChain(String.format(StringUtils.remove(locator, "By.IosClassChain: "), objects));
+            by = AppiumBy.iOSClassChain(String.format(StringUtils.remove(locator, "By.IosClassChain: "), objects));
         }
 
         if (locator.startsWith("By.IosNsPredicate: **")) {
-            by = MobileBy.iOSNsPredicateString(String.format(StringUtils.remove(locator, "By.IosNsPredicate: "), objects));
+            by = AppiumBy.iOSNsPredicateString(String.format(StringUtils.remove(locator, "By.IosNsPredicate: "), objects));
         }
 
         if (locator.startsWith("By.AccessibilityId: ")) {
-            by = MobileBy.AccessibilityId(String.format(StringUtils.remove(locator, "By.AccessibilityId: "), objects));
+            by = AppiumBy.accessibilityId(String.format(StringUtils.remove(locator, "By.AccessibilityId: "), objects));
         }
 
         if (locator.startsWith("By.Image: ")) {
@@ -1238,11 +1235,11 @@ public class ExtendedWebElement implements IWebElement {
                         "Error while reading image file after formatting. Formatted locator : " + formattedLocator, e);
             }
             LOGGER.debug("Base64 image representation has benn successfully obtained after formatting.");
-            by = MobileBy.image(base64image);
+            by = AppiumBy.image(base64image);
         }
 
         if (locator.startsWith("By.AndroidUIAutomator: ")) {
-            by = MobileBy.AndroidUIAutomator(String.format(StringUtils.remove(locator, "By.AndroidUIAutomator: "), objects));
+            by = AppiumBy.androidUIAutomator(String.format(StringUtils.remove(locator, "By.AndroidUIAutomator: "), objects));
             LOGGER.debug("Formatted locator is : " + by.toString());
         }
 
@@ -1432,7 +1429,7 @@ public class ExtendedWebElement implements IWebElement {
             this.element = getElement();
             output = overrideAction(actionName, inputArgs);
         } catch (StaleElementReferenceException e) {
-            //TODO: analyze mobile testing for staled elements. Potentially it should be fixed by appium java client already
+            // TODO: analyze mobile testing for staled elements. Potentially it should be fixed by appium java client already
             // sometime Appium instead printing valid StaleElementException generate java.lang.ClassCastException:
             // com.google.common.collect.Maps$TransformedEntriesMap cannot be cast to java.lang.String
             LOGGER.debug("catched StaleElementReferenceException: ", e);
@@ -1777,15 +1774,15 @@ public class ExtendedWebElement implements IWebElement {
          * All ClassChain locators start from **. e.g FindBy(xpath = "**'/XCUIElementTypeStaticText[`name CONTAINS[cd] '%s'`]")
          */
         if (locator.startsWith("By.IosClassChain: **")) {
-        	resBy = MobileBy.iOSClassChain(StringUtils.remove(locator, "By.IosClassChain: ") + "[" + index + "]");
+            resBy = AppiumBy.iOSClassChain(StringUtils.remove(locator, "By.IosClassChain: ") + "[" + index + "]");
         }
         
         if (locator.startsWith("By.IosNsPredicate: **")) {
-        	resBy = MobileBy.iOSNsPredicateString(StringUtils.remove(locator, "By.IosNsPredicate: ") + "[" + index + "]");
+            resBy = AppiumBy.iOSNsPredicateString(StringUtils.remove(locator, "By.IosNsPredicate: ") + "[" + index + "]");
         }
 
         if (locator.startsWith("By.AccessibilityId: ")) {
-            resBy = MobileBy.AccessibilityId(StringUtils.remove(locator, "By.AccessibilityId: ") + "[" + index + "]");
+            resBy = AppiumBy.accessibilityId(StringUtils.remove(locator, "By.AccessibilityId: ") + "[" + index + "]");
         }
         return resBy;
     }
@@ -1865,7 +1862,7 @@ public class ExtendedWebElement implements IWebElement {
         }
         return waitCondition;
     }
-    
+
     private long getRetryInterval(long timeout) {
         long retryInterval = RETRY_TIME;
         if (timeout >= 3 && timeout <= 10) {

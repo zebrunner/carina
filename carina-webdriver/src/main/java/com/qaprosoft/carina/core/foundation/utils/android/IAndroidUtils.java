@@ -50,8 +50,8 @@ import com.qaprosoft.carina.core.foundation.utils.mobile.IMobileUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 
+import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.nativekey.AndroidKey;
 import io.appium.java_client.android.nativekey.KeyEvent;
@@ -88,12 +88,12 @@ public interface IAndroidUtils extends IMobileUtils {
     static final String SHELL_RECENT_APPS_CMD = "input keyevent KEYCODE_APP_SWITCH";
 
     default public void pressKeyboardKey(AndroidKey key) {
-        ((AndroidDriver<?>) castDriver()).pressKey(new KeyEvent(key).withFlag(KeyEventFlag.SOFT_KEYBOARD)
+        ((AndroidDriver) castDriver()).pressKey(new KeyEvent(key).withFlag(KeyEventFlag.SOFT_KEYBOARD)
                 .withFlag(KeyEventFlag.KEEP_TOUCH_MODE).withFlag(KeyEventFlag.EDITOR_ACTION));
     }
 
     default public void pressBack() {
-        ((AndroidDriver<?>) castDriver()).pressKey(new KeyEvent(AndroidKey.BACK));
+        ((AndroidDriver) castDriver()).pressKey(new KeyEvent(AndroidKey.BACK));
     }
 
     /**
@@ -368,7 +368,7 @@ public interface IAndroidUtils extends IMobileUtils {
         for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
 
             try {
-                By scrollBy = MobileBy.AndroidUIAutomator("new UiScrollable("
+                By scrollBy = AppiumBy.androidUIAutomator("new UiScrollable("
                         + getScrollContainerSelector(scrollableContainer, containerSelectorType) + ".instance("
                         + containerInstance + "))" + ".setMaxSearchSwipes(" + SCROLL_MAX_SEARCH_SWIPES + ")"
                         + ".scrollIntoView(" + getScrollToElementSelector(scrollToEle, eleSelectorType) + ")");
@@ -387,7 +387,7 @@ public interface IAndroidUtils extends IMobileUtils {
 
             for (int j = 0; j < i; j++) {
                 checkTimeout(startTime);
-                MobileBy.AndroidUIAutomator(
+                AppiumBy.androidUIAutomator(
                         "new UiScrollable(" + getScrollContainerSelector(scrollableContainer, containerSelectorType)
                                 + ".instance(" + containerInstance + ")).scrollForward()");
                 UTILS_LOGGER.info("Scroller got stuck on a page, scrolling forward to next page of elements..");
@@ -440,7 +440,7 @@ public interface IAndroidUtils extends IMobileUtils {
         for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
 
             try {
-                By scrollBy = MobileBy.AndroidUIAutomator("new UiScrollable("
+                By scrollBy = AppiumBy.androidUIAutomator("new UiScrollable("
                         + getScrollContainerSelector(scrollableContainer, containerSelectorType) + ".instance("
                         + containerInstance + "))" + ".setMaxSearchSwipes(" + SCROLL_MAX_SEARCH_SWIPES + ")"
                         + ".scrollIntoView(" + getScrollToElementSelector(scrollToEle, eleSelectorType) + ".instance("
@@ -460,7 +460,7 @@ public interface IAndroidUtils extends IMobileUtils {
 
             for (int j = 0; j < i; j++) {
                 checkTimeout(startTime);
-                MobileBy.AndroidUIAutomator(
+                AppiumBy.androidUIAutomator(
                         "new UiScrollable(" + getScrollContainerSelector(scrollableContainer, containerSelectorType)
                                 + ".instance(" + containerInstance + ")).scrollForward()");
                 UTILS_LOGGER.info("Scroller got stuck on a page, scrolling forward to next page of elements..");
@@ -508,7 +508,7 @@ public interface IAndroidUtils extends IMobileUtils {
         for (int i = 0; i < SCROLL_MAX_SEARCH_SWIPES; i++) {
 
             try {
-                By scrollBy = MobileBy.AndroidUIAutomator(
+                By scrollBy = AppiumBy.androidUIAutomator(
                         "new UiScrollable(" + getScrollContainerSelector(scrollableContainer, containerSelectorType)
                                 + ")" + ".setMaxSearchSwipes(" + SCROLL_MAX_SEARCH_SWIPES + ")" + ".scrollIntoView("
                                 + getScrollToElementSelector(scrollToEle, eleSelectorType) + ")");
@@ -527,7 +527,7 @@ public interface IAndroidUtils extends IMobileUtils {
 
             for (int j = 0; j < i; j++) {
                 checkTimeout(startTime);
-                MobileBy.AndroidUIAutomator("new UiScrollable("
+                AppiumBy.androidUIAutomator("new UiScrollable("
                         + getScrollContainerSelector(scrollableContainer, containerSelectorType) + ").scrollForward()");
                 UTILS_LOGGER.info("Scroller got stuck on a page, scrolling forward to next page of elements..");
             }
@@ -735,7 +735,7 @@ public interface IAndroidUtils extends IMobileUtils {
         String commadKeyWord = commands.get(0);
         List<String> args = commands.subList(1, commands.size());
         Map<String, Object> preparedCommand = ImmutableMap.of("command", commadKeyWord, "args", args);
-        String output = (String) ((AppiumDriver<?>) castDriver()).executeScript(SHELL_INIT_CONSOLE, preparedCommand);
+        String output = (String) ((AppiumDriver) castDriver()).executeScript(SHELL_INIT_CONSOLE, preparedCommand);
         if (!StringUtils.isEmpty(output)) {
             UTILS_LOGGER.debug("ADB command output: " + output);
         }
@@ -894,7 +894,7 @@ public interface IAndroidUtils extends IMobileUtils {
     default public void triggerDeeplink(String link, String packageName) {
         Map<String, Object> preparedCommand = ImmutableMap.of("url", link, "package", packageName);
         try {
-            ((AppiumDriver<?>) castDriver()).executeScript(SHELL_INIT_DEEPLINK_CONSOLE, preparedCommand);
+            ((AppiumDriver) castDriver()).executeScript(SHELL_INIT_DEEPLINK_CONSOLE, preparedCommand);
         } catch (WebDriverException wde) {
             // TODO: need to pay attention
             UTILS_LOGGER.warn("org.openqa.selenium.WebDriverException is caught and ignored.", wde);
@@ -911,7 +911,7 @@ public interface IAndroidUtils extends IMobileUtils {
     @SuppressWarnings("unchecked")
     default public ArrayList<String> getAppPermissions(String packageName, PermissionType type) {
         Map<String, Object> preparedCommand = ImmutableMap.of("type", type.getType(), "package", packageName);
-        return (ArrayList<String>) ((AppiumDriver<?>) castDriver()).executeScript(SHELL_INIT_GET_PERMISSION_CONSOLE,
+        return (ArrayList<String>) ((AppiumDriver) castDriver()).executeScript(SHELL_INIT_GET_PERMISSION_CONSOLE,
                 preparedCommand);
     }
 
@@ -927,7 +927,7 @@ public interface IAndroidUtils extends IMobileUtils {
         Arrays.asList(permissions).forEach(p -> permissionsStr.add(p.getPermission()));
         Map<String, Object> preparedCommand = ImmutableMap.of("action", action.getAction(), "appPackage", packageName,
                 "permissions", permissionsStr);
-        ((AppiumDriver<?>) castDriver()).executeScript(SHELL_INIT_CHANGE_PERMISSION_CONSOLE, preparedCommand);
+        ((AppiumDriver) castDriver()).executeScript(SHELL_INIT_CHANGE_PERMISSION_CONSOLE, preparedCommand);
     }
 
     /**
@@ -953,7 +953,7 @@ public interface IAndroidUtils extends IMobileUtils {
     }
 
     default public boolean isWifiEnabled() {
-        boolean enabled = ((AndroidDriver<?>) castDriver()).getConnection().isWiFiEnabled();
+        boolean enabled = ((AndroidDriver) castDriver()).getConnection().isWiFiEnabled();
         UTILS_LOGGER.info("Wi-Fi enabled: " + enabled);
         return enabled;
     }
@@ -961,7 +961,7 @@ public interface IAndroidUtils extends IMobileUtils {
     default public void enableWifi() {
         boolean enabled = isWifiEnabled();
         if (!enabled) {
-            ((AndroidDriver<?>) castDriver()).toggleWifi();
+            ((AndroidDriver) castDriver()).toggleWifi();
             return;
         }
         UTILS_LOGGER.info("Wifi is already anebled. No actions needed");
@@ -970,7 +970,7 @@ public interface IAndroidUtils extends IMobileUtils {
     default public void disableWifi() {
         boolean enabled = isWifiEnabled();
         if (enabled) {
-            ((AndroidDriver<?>) castDriver()).toggleWifi();
+            ((AndroidDriver) castDriver()).toggleWifi();
             return;
         }
         UTILS_LOGGER.info("Wifi is already disabled. No actions needed");

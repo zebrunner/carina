@@ -27,18 +27,17 @@ import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.windows.WindowsCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mac.Mac2Capabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 
-import io.appium.java_client.windows.WindowsDriver;
-import io.appium.java_client.windows.options.WindowsOptions;
+import io.appium.java_client.mac.Mac2Driver;
 
 /**
  * WindowsFactory creates instance {@link WebDriver} for Windows native application testing.
  * 
  * @author Sergei Zagriychuk (sergeizagriychuk@gmail.com)
  */
-public class WindowsFactory extends AbstractFactory {
+public class MacFactory extends AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
@@ -50,11 +49,11 @@ public class WindowsFactory extends AbstractFactory {
         LOGGER.debug("selenium: {}", seleniumHost);
 
         String driverType = Configuration.getDriverType(capabilities);
-        if (!SpecialKeywords.WINDOWS.equals(driverType)) {
+        if (!SpecialKeywords.MAC.equals(driverType)) {
             throw new RuntimeException(String.format("Driver type %s is not applicable for Windows driver", driverType));
         }
 
-        WindowsDriver driver = null;
+        Mac2Driver driver = null;
         if (isCapabilitiesEmpty(capabilities)) {
             capabilities = getCapabilities(name);
         }
@@ -71,12 +70,12 @@ public class WindowsFactory extends AbstractFactory {
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed appium URL!", e);
         }
-        driver = new WindowsDriver(url, capabilities);
+        driver = new Mac2Driver(url, capabilities);
 
         return driver;
     }
 
-    private WindowsOptions getCapabilities(String name) {
-        return new WindowsCapabilities().getCapability(name);
+    private MutableCapabilities getCapabilities(String name) {
+        return new Mac2Capabilities().getCapability(name);
     }
 }

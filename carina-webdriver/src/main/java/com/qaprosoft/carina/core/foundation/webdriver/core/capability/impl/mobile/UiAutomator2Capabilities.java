@@ -13,17 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
-
-import org.openqa.selenium.remote.DesiredCapabilities;
+package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile;
 
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
-public class HTMLUnitCapabilities extends AbstractCapabilities {
+import io.appium.java_client.android.options.UiAutomator2Options;
 
-    public DesiredCapabilities getCapability(String testName) {
-        DesiredCapabilities capabilities = DesiredCapabilities.htmlUnit();
-        capabilities.setJavascriptEnabled(true);
+public class UiAutomator2Capabilities extends AbstractCapabilities<UiAutomator2Options> {
+
+    @Override
+    public UiAutomator2Options getCapability(String testName) {
+        UiAutomator2Options capabilities = new UiAutomator2Options();
+        // this step should be executed before initCapabilities() to be able to override this capabilities by default appium approach.
+        setLocaleAndLanguage(capabilities);
+        // add capabilities based on dynamic _config.properties variables
+        initCapabilities(capabilities);
         return capabilities;
     }
 }

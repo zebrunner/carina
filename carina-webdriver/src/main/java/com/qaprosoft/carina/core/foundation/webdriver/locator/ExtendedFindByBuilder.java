@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sun.jersey.core.util.Base64;
 
-import io.appium.java_client.MobileBy;
+import io.appium.java_client.AppiumBy;
 
 public abstract class ExtendedFindByBuilder extends AbstractFindByBuilder {
     
@@ -40,19 +40,19 @@ public abstract class ExtendedFindByBuilder extends AbstractFindByBuilder {
 
     protected By buildByFromShortFindBy(ExtendedFindBy findByCarina) {
         if (!"".equals(findByCarina.iosPredicate())) {
-          return MobileBy.iOSNsPredicateString(findByCarina.iosPredicate());
+            return AppiumBy.iOSNsPredicateString(findByCarina.iosPredicate());
         }
         
         if (!"".equals(findByCarina.androidUIAutomator())) {
-            return MobileBy.AndroidUIAutomator(findByCarina.androidUIAutomator());
+            return AppiumBy.androidUIAutomator(findByCarina.androidUIAutomator());
           }
 
         if (!"".equals(findByCarina.iosClassChain())) {
-          return MobileBy.iOSClassChain(findByCarina.iosClassChain());
+            return AppiumBy.iOSClassChain(findByCarina.iosClassChain());
         }
         
         if (!"".equals(findByCarina.accessibilityId())) {
-            return MobileBy.AccessibilityId(findByCarina.accessibilityId());
+            return AppiumBy.accessibilityId(findByCarina.accessibilityId());
         }
         
         if (!"".equals(findByCarina.text())) {
@@ -62,7 +62,7 @@ public abstract class ExtendedFindByBuilder extends AbstractFindByBuilder {
         if (!"".equals(findByCarina.image())) {
             if (findByCarina.image().contains("%")) {
                 LOGGER.debug("Special char has been detected in the image locator. Call format method on element before interaction.");
-                return MobileBy.image(ClassLoader.getSystemResource("").getPath() + findByCarina.image());
+                return AppiumBy.image(ClassLoader.getSystemResource("").getPath() + findByCarina.image());
             }
             URL fileUrl = ClassLoader.getSystemResource(findByCarina.image());
             Path path;
@@ -84,7 +84,7 @@ public abstract class ExtendedFindByBuilder extends AbstractFindByBuilder {
             try {
                 base64image = new String(Base64.encode(Files.readAllBytes(path)));
                 LOGGER.debug("Base64 image representation has been successfully obtained.");
-                return MobileBy.image(base64image);
+                return AppiumBy.image(base64image);
             } catch (IOException e) {
                 throw new RuntimeException("Error while reading image file for ExtendedFindBy annotation : " + fileUrl.getPath(), e);
             }

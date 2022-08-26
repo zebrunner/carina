@@ -15,12 +15,20 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.utils.mobile;
 
+import static org.openqa.selenium.interactions.PointerInput.MouseButton.LEFT;
+
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
 
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.interactions.Pause;
+import org.openqa.selenium.interactions.PointerInput;
+import org.openqa.selenium.interactions.Sequence;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,19 +45,14 @@ import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.MobileDriver;
-import io.appium.java_client.MultiTouchAction;
-import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.appmanagement.ApplicationState;
 import io.appium.java_client.ios.IOSDriver;
-import io.appium.java_client.touch.LongPressOptions;
-import io.appium.java_client.touch.WaitOptions;
-import io.appium.java_client.touch.offset.ElementOption;
-import io.appium.java_client.touch.offset.PointOption;
 
 public interface IMobileUtils extends IDriverPool {
+
     static final Logger UTILS_LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
 
     public enum Direction {
         LEFT,
@@ -79,102 +82,114 @@ public interface IMobileUtils extends IDriverPool {
     static DriverHelper helper = new DriverHelper();
 
     /**
-     * Tap with TouchAction by the center of element
+     * Tap the center of element
      *
-     * @param element ExtendedWebElement
+     * @param element Element to touch
      */
     default public void tap(ExtendedWebElement element) {
-        UTILS_LOGGER.info("tap on " + element.getName());
+        UTILS_LOGGER.info("tap on {}", element.getName());
         Point point = element.getLocation();
         Dimension size = element.getSize();
         tap(point.getX() + size.getWidth() / 2, point.getY() + size.getHeight() / 2);
     }
 
     /**
-     * Tap with TouchAction by coordinates with default 1000ms duration
+     * Tap by coordinates with default 1000ms duration
      *
-     * @param startx int
-     * @param starty int
+     * @param startx x coordinate
+     * @param starty y coordinate
      */
     default public void tap(int startx, int starty) {
         tap(startx, starty, DEFAULT_TOUCH_ACTION_DURATION);
     }
 
     /**
-     * tap with TouchActions slowly to imitate log tap on element
+     * Tap slowly to imitate log tap on element
      *
-     * @param elem ExtendedWebElement
-     *            element
+     * @param elem Element to long tap
      */
     default public void longTap(ExtendedWebElement elem) {
-        UTILS_LOGGER.info("longTap on" + elem.getName());
-        Dimension size = elem.getSize();
+        UTILS_LOGGER.info("Long tap on {} element", elem.getName());
 
+        Dimension size = elem.getSize();
         int width = size.getWidth();
         int height = size.getHeight();
 
         Point point = elem.getLocation();
         int x = point.getX() + width / 2;
         int y = point.getY() + height / 2;
+
         try {
             swipe(x, y, x, y, 2500);
-        } catch (Exception e) {
-            UTILS_LOGGER.error("Exception: " + e);
+        } catch (WebDriverException e) {
+            UTILS_LOGGER.error("Exception when call longTap method: ", e);
         }
     }
 
     /**
      * Tap and Hold (LongPress) on element
      *
-     * @param element ExtendedWebElement
-     * @return boolean
+     * @param element Element to long press
+     * @return is long press successful
      */
     default public boolean longPress(ExtendedWebElement element) {
-        UTILS_LOGGER.info("longPress on" + element.getName());
+        boolean isActionSuccessful = false;
+        // todo change this value to optimal or try to found constant
+        final Duration longPressDuration = Duration.ofMillis(1000);
+
+        UTILS_LOGGER.info("longPress on {}", element.getName());
         // TODO: SZ migrate to FluentWaits
+        AppiumDriver driver = (AppiumDriver) castDriver();
+
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+        Point elementLocation = element.getLocation();
+
+        Sequence longPressSequence = new Sequence(finger, 1)
+                .addAction(finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.viewport(), elementLocation.getX(),
+                        elementLocation.getY()))
+                .addAction(finger.createPointerDown(LEFT.asArg()))
+                .addAction(new Pause(finger, longPressDuration))
+                .addAction(finger.createPointerUp(LEFT.asArg()));
+
         try {
-            WebDriver driver = castDriver();
-            @SuppressWarnings("rawtypes")
-            TouchAction<?> action = new TouchAction((MobileDriver<?>) driver);
-            LongPressOptions options = LongPressOptions.longPressOptions().withElement(ElementOption.element(element.getElement()));
-            action.longPress(options).release().perform();
-            return true;
-        } catch (Exception e) {
+            driver.perform(List.of(longPressSequence));
+            isActionSuccessful = true;
+        } catch (WebDriverException e) {
             UTILS_LOGGER.info("Error occurs during longPress: " + e, e);
         }
-        return false;
+        return isActionSuccessful;
     }
 
     /**
-     * Tap with TouchAction by coordinates with custom duration
+     * Tap by coordinates with custom duration
      *
-     * @param startx int
-     * @param starty int
-     * @param duration int
+     * @param startx x coordinate
+     * @param starty y coordinate
+     * @param duration touch hold time
      */
     default public void tap(int startx, int starty, int duration) {
         // TODO: add Screenshot.capture()
-        try {
-            @SuppressWarnings("rawtypes")
-            TouchAction<?> touchAction = new TouchAction((MobileDriver<?>) castDriver());
-            PointOption<?> startPoint = PointOption.point(startx, starty);
-            WaitOptions waitOptions = WaitOptions.waitOptions(Duration.ofMillis(duration));
 
-            if (duration == 0) {
-                // do not perform waiter as using 6.0.0. appium java client we do longpress instead of simple tap even with 0 wait duration
-                touchAction.press(startPoint).release().perform();
-            } else {
-                touchAction.press(startPoint).waitAction(waitOptions).release().perform();
-            }
+            AppiumDriver driver = (AppiumDriver) castDriver();
+            PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+
+            Sequence tapSequence = new Sequence(finger, 1)
+                    .addAction(finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.viewport(), startx, starty))
+                    .addAction(finger.createPointerDown(LEFT.asArg()))
+                    .addAction(new Pause(finger, Duration.ofMillis(duration)))
+                    .addAction(finger.createPointerUp(LEFT.asArg()));
+
+            try {
+                driver.perform(List.of(tapSequence));
             Messager.TAP_EXECUTED.info(String.valueOf(startx), String.valueOf(starty));
-        } catch (Exception e) {
+        } catch (WebDriverException e) {
             Messager.TAP_NOT_EXECUTED.error(String.valueOf(startx), String.valueOf(starty));
             throw e;
         }
     }
 
     /**
-     * swipe till element using TouchActions
+     * swipe till element
      *
      * @param element ExtendedWebElement
      * @return boolean
@@ -184,7 +199,7 @@ public interface IMobileUtils extends IDriverPool {
     }
 
     /**
-     * swipe till element using TouchActions
+     * Swipe till element
      *
      * @param element ExtendedWebElement
      * @param count int
@@ -195,7 +210,7 @@ public interface IMobileUtils extends IDriverPool {
     }
 
     /**
-     * swipe till element using TouchActions
+     * swipe till element
      *
      * @param element ExtendedWebElement
      * @param direction Direction
@@ -206,7 +221,7 @@ public interface IMobileUtils extends IDriverPool {
     }
 
     /**
-     * swipe till element using TouchActions
+     * swipe till element
      *
      * @param element ExtendedWebElement
      * @param count int
@@ -218,7 +233,7 @@ public interface IMobileUtils extends IDriverPool {
     }
 
     /**
-     * swipe till element using TouchActions
+     * swipe till element
      *
      * @param element ExtendedWebElement
      * @param direction Direction
@@ -393,7 +408,7 @@ public interface IMobileUtils extends IDriverPool {
     }
 
     /**
-     * Swipe by coordinates using TouchAction (platform independent)
+     * Swipe by coordinates
      *
      * @param startx int
      * @param starty int
@@ -401,10 +416,9 @@ public interface IMobileUtils extends IDriverPool {
      * @param endy int
      * @param duration int Millis
      */
-    @SuppressWarnings("rawtypes")
     default public void swipe(int startx, int starty, int endx, int endy, int duration) {
         UTILS_LOGGER.debug("Starting swipe...");
-        WebDriver drv = castDriver();
+        AppiumDriver drv = (AppiumDriver) castDriver();
 
         UTILS_LOGGER.debug("Getting driver dimension size...");
         Dimension scrSize = drv.manage().window().getSize();
@@ -424,15 +438,16 @@ public interface IMobileUtils extends IDriverPool {
             endy = Math.max(1, endy);
         }
 
-        UTILS_LOGGER.debug("startx: " + startx + "; starty: " + starty + "; endx: " + endx + "; endy: " + endy
-                + "; duration: " + duration);
+        UTILS_LOGGER.debug("startx: {}; starty: {}; endx: {}; endy: {}; duration: {}", startx, starty, endx, endy, duration);
 
-        PointOption<?> startPoint = PointOption.point(startx, starty);
-        PointOption<?> endPoint = PointOption.point(endx, endy);
-        WaitOptions waitOptions = WaitOptions.waitOptions(Duration.ofMillis(duration));
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
 
-        new TouchAction((MobileDriver<?>) drv).press(startPoint).waitAction(waitOptions).moveTo(endPoint).release()
-                .perform();
+        Sequence swipe = new Sequence(finger, 1)
+                .addAction(finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.viewport(), startx, starty))
+                .addAction(finger.createPointerDown(LEFT.asArg()))
+                .addAction(finger.createPointerMove(Duration.ofMillis(duration), PointerInput.Origin.viewport(), endx, endy))
+                .addAction(finger.createPointerUp(LEFT.asArg()));
+        drv.perform(Arrays.asList(swipe));
 
         UTILS_LOGGER.debug("Finished swipe...");
     }
@@ -711,7 +726,14 @@ public interface IMobileUtils extends IDriverPool {
      */
     default public void hideKeyboard() {
         try {
-            ((MobileDriver<?>) castDriver()).hideKeyboard();
+            WebDriver driver = castDriver();
+            if (driver instanceof IOSDriver) {
+                ((IOSDriver) castDriver()).hideKeyboard();
+            } else if (driver instanceof AndroidDriver) {
+                ((AndroidDriver) castDriver()).hideKeyboard();
+            } else {
+                throw new RuntimeException("Unsupported driver");
+            }
         } catch (Exception e) {
             if (!e.getMessage().contains("Soft keyboard not present, cannot hide keyboard")) {
                 UTILS_LOGGER.error("Exception appears during hideKeyboard: " + e);
@@ -726,64 +748,75 @@ public interface IMobileUtils extends IDriverPool {
      * @return boolean
      */
     default public boolean isKeyboardShown() {
-        MobileDriver<?> driver = (MobileDriver<?>) castDriver();
+        AppiumDriver driver = (AppiumDriver) castDriver();
         if (driver instanceof IOSDriver) {
-            return ((IOSDriver<?>) castDriver()).isKeyboardShown();
+            return ((IOSDriver) castDriver()).isKeyboardShown();
         }
         else if (driver instanceof AndroidDriver) {
-            return ((AndroidDriver<?>) castDriver()).isKeyboardShown();
+            return ((AndroidDriver) castDriver()).isKeyboardShown();
         }
         return false;
     }
 
-    default public void zoom(Zoom type) {
-        UTILS_LOGGER.info("Zoom will be performed :" + type);
-        MobileDriver<?> driver = (MobileDriver<?>) castDriver();
+    default public  void zoom(Zoom type) {
+        UTILS_LOGGER.info("Zoom will be performed :{}", type);
+
+        AppiumDriver driver = (AppiumDriver) castDriver();
+
         Dimension scrSize = driver.manage().window().getSize();
         int height = scrSize.getHeight();
         int width = scrSize.getWidth();
-        UTILS_LOGGER.debug("Screen height : " + height);
-        UTILS_LOGGER.debug("Screen width : " + width);
+
+        UTILS_LOGGER.debug("Screen height : {}", height);
+        UTILS_LOGGER.debug("Screen width : {}", width);
+
         Point point1 = new Point(width / 2, height / 2 - 30);
         Point point2 = new Point(width / 2, height / 10 * 3);
         Point point3 = new Point(width / 2, height / 2 + 30);
         Point point4 = new Point(width / 2, (7 * height) / 10);
-        switch (type) {
-        case OUT:
+
+        if (type == Zoom.OUT) {
             zoom(point1.getX(), point1.getY(), point2.getX(), point2.getY(), point3.getX(), point3.getY(), point4.getX(), point4.getY(),
                     DEFAULT_TOUCH_ACTION_DURATION);
-            break;
-        case IN:
+        } else if (type == Zoom.IN) {
             zoom(point2.getX(), point2.getY(), point1.getX(), point1.getY(), point4.getX(), point4.getY(), point3.getX(), point3.getY(),
                     DEFAULT_TOUCH_ACTION_DURATION);
-            break;
         }
     }
 
     default public void zoom(int startx1, int starty1, int endx1, int endy1, int startx2, int starty2, int endx2, int endy2, int duration) {
-        UTILS_LOGGER.debug(String.format(
-                "Zoom action will be performed with parameters : startX1 : %s ;  startY1: %s ; endX1: %s ; endY1: %s; startX2 : %s ;  startY2: %s ; endX2: %s ; endY2: %s",
-                startx1, starty1, endx1, endy1, startx2, starty2, endx2, endy2));
-        MobileDriver<?> driver = (MobileDriver<?>) castDriver();
+        UTILS_LOGGER.debug(
+                "Zoom action will be performed with parameters : startX1 : {} ;  startY1: {} ; endX1: {} ; endY1: {}; startX2 : {} ;  startY2: {} ; endX2: {} ; endY2: {}",
+                startx1, starty1, endx1, endy1, startx2, starty2, endx2, endy2);
+
+        AppiumDriver driver = (AppiumDriver) castDriver();
+
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+
+        Sequence zoomPartOne = new Sequence(finger, 0);
+        zoomPartOne.addAction(finger.createPointerMove(Duration.ofMillis(0),
+                PointerInput.Origin.viewport(), startx1, starty1));
+        zoomPartOne.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+        zoomPartOne.addAction(new Pause(finger, Duration.ofMillis(duration)));
+        zoomPartOne.addAction(finger.createPointerMove(Duration.ofMillis(600), // todo investigate the best duration
+                PointerInput.Origin.viewport(), endx1, endy1));
+        zoomPartOne.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+
+        PointerInput anotherFinger = new PointerInput(PointerInput.Kind.TOUCH, "another finger");
+
+        Sequence zoomPartTwo = new Sequence(anotherFinger, 0);
+        zoomPartTwo.addAction(anotherFinger.createPointerMove(Duration.ofMillis(0),
+                PointerInput.Origin.viewport(), startx2, starty2));
+        zoomPartTwo.addAction(anotherFinger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+        zoomPartTwo.addAction(new Pause(anotherFinger, Duration.ofMillis(duration)));
+        zoomPartTwo.addAction(anotherFinger.createPointerMove(Duration.ofMillis(600), // todo investigate the best duration
+                PointerInput.Origin.viewport(), endx2, endy2));
+        zoomPartTwo.addAction(anotherFinger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+
         try {
-            MultiTouchAction multiTouch = new MultiTouchAction(driver);
-            @SuppressWarnings("rawtypes")
-            TouchAction<?> tAction0 = new TouchAction(driver);
-            @SuppressWarnings("rawtypes")
-            TouchAction<?> tAction1 = new TouchAction(driver);
-
-            PointOption<?> startPoint1 = PointOption.point(startx1, starty1);
-            PointOption<?> endPoint1 = PointOption.point(endx1, endy1);
-            PointOption<?> startPoint2 = PointOption.point(startx2, starty2);
-            PointOption<?> endPoint2 = PointOption.point(endx2, endy2);
-            WaitOptions waitOptions = WaitOptions.waitOptions(Duration.ofMillis(duration));
-
-            tAction0.press(startPoint1).waitAction(waitOptions).moveTo(endPoint1).release();
-            tAction1.press(startPoint2).waitAction(waitOptions).moveTo(endPoint2).release();
-            multiTouch.add(tAction0).add(tAction1);
-            multiTouch.perform();
+            driver.perform(List.of(zoomPartOne, zoomPartTwo));
             UTILS_LOGGER.info("Zoom has been performed");
-        } catch (Exception e) {
+        } catch (WebDriverException e) {
             UTILS_LOGGER.error("Error during zooming", e);
         }
     }
@@ -798,9 +831,9 @@ public interface IMobileUtils extends IDriverPool {
         String os = getDevice().getOs();
         // get bundleId or appId of the application started by driver
         if (os.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
-            bundleId = ((AppiumDriver<?>) castDriver()).getSessionDetail(SpecialKeywords.APP_PACKAGE).toString();
+            bundleId = ((AndroidDriver) castDriver()).getCapabilities().getCapability(SpecialKeywords.APP_PACKAGE).toString();
         } else if (os.equalsIgnoreCase(SpecialKeywords.IOS) || os.equalsIgnoreCase(SpecialKeywords.MAC) || os.equalsIgnoreCase(SpecialKeywords.TVOS)) {
-            bundleId = ((AppiumDriver<?>) castDriver()).getSessionDetail(SpecialKeywords.BUNDLE_ID).toString();
+            bundleId = ((IOSDriver) castDriver()).getCapabilities().getCapability(SpecialKeywords.BUNDLE_ID).toString();
         }
 
         return isAppRunning(bundleId);
@@ -812,8 +845,18 @@ public interface IMobileUtils extends IDriverPool {
      * @param bundleId the bundle identifier for iOS (or appPackage for Android) of the app to query the state of.
      * @return boolean
      */
-    default public boolean isAppRunning(String bundleId) {
-        ApplicationState actualApplicationState = ((MobileDriver<?>) castDriver()).queryAppState(bundleId);
+    default public  boolean isAppRunning(String bundleId) {
+        AppiumDriver driver = (AppiumDriver) castDriver();
+        ApplicationState actualApplicationState;
+
+        if (driver instanceof IOSDriver) {
+            actualApplicationState = ((IOSDriver) castDriver()).queryAppState(bundleId);
+        } else if (driver instanceof AndroidDriver) {
+            actualApplicationState = ((AndroidDriver) castDriver()).queryAppState(bundleId);
+        } else {
+            throw new RuntimeException("Unsupported driver");
+        }
+
         return ApplicationState.RUNNING_IN_FOREGROUND.equals(actualApplicationState);
     }
 
@@ -826,11 +869,12 @@ public interface IMobileUtils extends IDriverPool {
 
         // get bundleId or appId of the application started by driver
         if (os.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
-            bundleId = ((AppiumDriver<?>) castDriver()).getSessionDetail(SpecialKeywords.APP_PACKAGE).toString();
+            // todo investigate changes is work
+            bundleId = ((AndroidDriver) castDriver()).getCapabilities().getCapability(SpecialKeywords.APP_PACKAGE).toString();
         } else if (os.equalsIgnoreCase(SpecialKeywords.IOS) || os.equalsIgnoreCase(SpecialKeywords.MAC) || os.equalsIgnoreCase(SpecialKeywords.TVOS)) {
-            bundleId = ((AppiumDriver<?>) castDriver()).getSessionDetail(SpecialKeywords.BUNDLE_ID).toString();
+            // todo investigate changes is work
+            bundleId = ((AppiumDriver) castDriver()).getCapabilities().getCapability(SpecialKeywords.BUNDLE_ID).toString();
         }
-
         terminateApp(bundleId);
     }
 
@@ -840,7 +884,7 @@ public interface IMobileUtils extends IDriverPool {
      * @param bundleId the bundle identifier for iOS (or appPackage for Android) of the app to terminate.
      */
     default public void terminateApp(String bundleId) {
-        ((MobileDriver<?>) castDriver()).terminateApp(bundleId);
+        ((AndroidDriver) castDriver()).terminateApp(bundleId);
     }
     
     /**
@@ -850,7 +894,7 @@ public interface IMobileUtils extends IDriverPool {
      */
     default public void closeApp() {
         UTILS_LOGGER.info("Application will be closed to background");
-        ((MobileDriver<?>) castDriver()).closeApp();
+        ((AndroidDriver) castDriver()).closeApp();
     }
 
 
@@ -875,15 +919,26 @@ public interface IMobileUtils extends IDriverPool {
      * Android 8.0.0 standard keyboard. Coefficients of coordinates for other
      * devices and custom keyboards could be different.
      */
-    @SuppressWarnings("rawtypes")
     default public void pressBottomRightKey() {
-        WebDriver driver = castDriver();
+        AppiumDriver driver = (AppiumDriver) castDriver();
         Dimension size = helper.performIgnoreException(() -> driver.manage().window().getSize());
         int height = size.getHeight();
         int width = size.getWidth();
 
-        PointOption<?> option = PointOption.point((int) (width * 0.915), (int) (height * 0.945));
-        new TouchAction((MobileDriver<?>) castDriver()).tap(option).perform();
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+
+        Sequence pressBottomRightKeySequence = new Sequence(finger, 1)
+                .addAction(
+                        finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.viewport(), (int) (width * 0.915), (int) (height * 0.945)))
+                .addAction(finger.createPointerDown(LEFT.asArg()))
+                .addAction(new Pause(finger, Duration.ofMillis(DEFAULT_TOUCH_ACTION_DURATION)))
+                .addAction(finger.createPointerUp(LEFT.asArg()));
+
+        try {
+            driver.perform(List.of(pressBottomRightKeySequence));
+        } catch (WebDriverException e) {
+            UTILS_LOGGER.error("Error when try to press bottom right key", e);
+        }
     }
 
     default public boolean isChecked(final ExtendedWebElement element) {
@@ -896,13 +951,20 @@ public interface IMobileUtils extends IDriverPool {
      * If the application you're interested about is installed - returns "true".
      * Otherwise, returns "false".
      *
-     * @param packageName
-     *            - app's package or bundle id
-     * 
+     * @param packageName app's package or bundle id
      * @return boolean
      */
-    default public boolean isApplicationInstalled(String packageName) {
-        boolean installed = ((MobileDriver<?>) castDriver()).isAppInstalled(packageName);
+    default public  boolean isApplicationInstalled(String packageName) {
+        boolean installed;
+        WebDriver driver = castDriver();
+        if (driver instanceof IOSDriver) {
+            installed = ((IOSDriver) castDriver()).isAppInstalled(packageName);
+        } else if (driver instanceof AndroidDriver) {
+            installed = ((AndroidDriver) castDriver()).isAppInstalled(packageName);
+        } else {
+            throw new RuntimeException("Unsupported driver");
+        }
+
         UTILS_LOGGER.info(String.format("Application by package name (%s) installed: ", packageName) + installed);
         return installed;
     }
@@ -918,8 +980,16 @@ public interface IMobileUtils extends IDriverPool {
      *            - app's package or bundle id
      */
     default public void startApp(String packageName) {
-        UTILS_LOGGER.info("Starting " + packageName);
-        ((MobileDriver<?>) castDriver()).activateApp(packageName);
+        UTILS_LOGGER.info("Starting {}", packageName);
+
+        WebDriver driver = castDriver();
+        if (driver instanceof IOSDriver) {
+            ((IOSDriver) castDriver()).activateApp(packageName);
+        } else if (driver instanceof AndroidDriver) {
+            ((AndroidDriver) castDriver()).activateApp(packageName);
+        } else {
+            throw new RuntimeException("Unsupported driver");
+        }
     }
 
     /**
@@ -928,32 +998,53 @@ public interface IMobileUtils extends IDriverPool {
      * @param apkPath String
      */
     default public void installApp(String apkPath) {
-        UTILS_LOGGER.info("Will install application with apk-file from " + apkPath);
-        ((MobileDriver<?>) castDriver()).installApp(apkPath);
+        UTILS_LOGGER.info("Will install application with apk-file from {}", apkPath);
+
+        WebDriver driver = castDriver();
+        if (driver instanceof IOSDriver) {
+            ((IOSDriver) castDriver()).installApp(apkPath);
+        } else if (driver instanceof AndroidDriver) {
+            ((AndroidDriver) castDriver()).installApp(apkPath);
+        } else {
+            throw new RuntimeException("Unsupported driver");
+        }
     }
 
     /**
      * To remove installed application by provided package name
      *
-     * @param packageName
-     *            - app's package or bundle id
-     *
+     * @param packageName app's package or bundle id
      * @return true if succeed
      */
-    default public boolean removeApp(String packageName) {
-        boolean removed = ((MobileDriver<?>) castDriver()).removeApp(packageName);
-        UTILS_LOGGER.info(String.format("Application (%s) is successfuly removed: ", packageName) + removed);
+    default public  boolean removeApp(String packageName) {
+        boolean removed;
+        WebDriver driver = castDriver();
+        if (driver instanceof IOSDriver) {
+            removed = ((IOSDriver) castDriver()).removeApp(packageName);
+        } else if (driver instanceof AndroidDriver) {
+            removed = ((AndroidDriver) castDriver()).removeApp(packageName);
+        } else {
+            throw new RuntimeException("Unsupported driver");
+        }
+
+        UTILS_LOGGER.info("Application ({}) is successfully removed: {}", packageName, removed);
         return removed;
     }
 
     /**
      * Method to reset test application.
      *
-     * App's settings will be reset. User will be logged out. Application will be
-     * closed to background.
+     * App's settings will be reset. User will be logged out. Application will be closed to background.
      */
     default public void clearAppCache() {
         UTILS_LOGGER.info("Initiation application reset...");
-        ((MobileDriver<?>) castDriver()).resetApp();
+        WebDriver driver = castDriver();
+        if (driver instanceof IOSDriver) {
+            ((IOSDriver) castDriver()).resetApp();
+        } else if (driver instanceof AndroidDriver) {
+            ((AndroidDriver) castDriver()).resetApp();
+        } else {
+            throw new RuntimeException("Unsupported driver");
+        }
     }
 }

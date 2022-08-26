@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.MutableCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -74,15 +74,13 @@ public class CapabilitiesLoader {
     }
     
     /**
-     * Put DesiredCapabilities from Zebrunner Agent.
-     *  
-     * @param caps 
-     *            Capabilities from Zebrunner Agent launcher
-     *            
-     * @return desiredCapabilities
-     *          DesiredCapabilities
+     * Put Capabilities from Zebrunner Agent.
+     * 
+     * @param caps Capabilities from Zebrunner Agent launcher
+     * 
+     * @return capabilities MutableCapabilities
      */
-    public DesiredCapabilities loadCapabilities(Capabilities caps) {
+    public MutableCapabilities loadCapabilities(Capabilities caps) {
         for (Map.Entry<String, Object> cap : caps.asMap().entrySet()) {
             String key = cap.getKey();
             // so far only primitive String, integer and boolean are supported from Zebrunner Launcher
@@ -92,21 +90,19 @@ public class CapabilitiesLoader {
             R.CONFIG.put(SpecialKeywords.CAPABILITIES + "." + key, value);
         }
         
-        return (DesiredCapabilities) caps;
+        return (MutableCapabilities) caps;
     }    
     
     /**
-     * Generate DesiredCapabilities from external file.
+     * Generate MutableCapabilities from external file.
      * Only "capabilities.name=value" will be added to the response.
-     *  
-     * @param fileName
-     *            String path to the properties file with custom capabilities
-     *            
-     * @return desiredCapabilities
-     * 			DesiredCapabilities
+     * 
+     * @param fileName String path to the properties file with custom capabilities
+     * 
+     * @return capabilities MutableCapabilities
      */
-    public DesiredCapabilities getCapabilities(String fileName) {
-        DesiredCapabilities capabilities = new DesiredCapabilities();
+    public MutableCapabilities getCapabilities(String fileName) {
+        MutableCapabilities capabilities = new MutableCapabilities();
         
         LOGGER.info("Generating capabilities from " + fileName);
         Properties props = loadProperties(fileName);

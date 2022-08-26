@@ -13,22 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
-
-import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.remote.Browser;
-import org.openqa.selenium.remote.CapabilityType;
+package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile;
 
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
-public class IECapabilities extends AbstractCapabilities<MutableCapabilities> {
+import io.appium.java_client.android.options.EspressoOptions;
+
+public class EspressoCapabilities extends AbstractCapabilities<EspressoOptions> {
 
     @Override
-    public MutableCapabilities getCapability(String testName) {
-        MutableCapabilities capabilities = new MutableCapabilities();
-        initBaseCapabilities(capabilities, testName);
-        capabilities.setCapability(CapabilityType.BROWSER_NAME, Browser.IE.browserName());
+    public EspressoOptions getCapability(String testName) {
+        EspressoOptions capabilities = new EspressoOptions();
+        // this step should be executed before initCapabilities() to be able to override this capabilities by default appium approach.
+        setLocaleAndLanguage(capabilities);
+        // add capabilities based on dynamic _config.properties variables
+        initCapabilities(capabilities);
         return capabilities;
     }
-
 }
