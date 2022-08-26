@@ -103,3 +103,64 @@ public class DataprovidersSampleTest implements IAbstractTest {
 	}
 }
 ```
+
+## Adding test unique identifier (TUID) to the test name using Java data provider
+TUID sets at the beginning of the test name in a test result report.
+
+### Prerequisites
+For this functionality to work, update your maven-compiler-plugin (add `--parameters` compiler argument)
+
+```
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-compiler-plugin</artifactId>
+	...
+	<configuration>
+		<compilerArgs>
+			    <arg>-parameters</arg>
+			</compilerArgs>
+	</configuration>
+</plugin>
+```
+
+### Implementation
+If you want to add TUID information to the Java data provider, for example
+
+```
+    @DataProvider(name = "dataProvider")
+    public static Object[][] dataprovider() {
+        return new Object[][]{
+                ...
+    }
+```
+you should do the following:
+
+1. Add to the data provider field with test unique identifier (TUID), for example:
+```
+@DataProvider(name = "dataProvider")
+public static Object[][] dataprovider() {
+    return new Object[][]{
+        {"TUID: Data1", "some data", ... },
+        {"TUID: Data2", "some data", ... },
+        {"TUID: Data3", "some data", ... }
+    };
+}
+```
+where `"TUID: Data1"` - is the TUID (`TUID:` prefix is optional, you can write just `Data1`).
+
+2. In the test, that use our provider, for example
+```
+@Test(dataProvider = "dataProvider")
+public void testDataProvider(...) {
+    ...
+}
+```
+
+when you receive data from the data provider, you must name the method parameter 
+that receives a TUID as `TUID`, for example:
+```
+@Test(dataProvider = "dataProvider")
+public void testDataProvider(String TUID, String data, ...) {
+    ...
+}
+```
