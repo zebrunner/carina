@@ -145,14 +145,14 @@ you should do the following:
 @DataProvider(name = "dataProvider")
 public static Object[][] dataprovider() {
     return new Object[][]{
-        {"TUID: Data1", "some data", ... },
-        {"TUID: Data2", "some data", ... },
-        {"TUID: Data3", "some data", ... }
+        {"Data1", "some data", ... },
+        {"Data2", "some data", ... },
+        {"Data3", "some data", ... }
     };
 }
 ```
 
-where `"TUID: Data1"` - is the test unique identifier (`TUID:` prefix is optional, you can write just `Data1`).
+where `"Data1", "Data2", "Data3"` in this example is the tests unique identifiers.
 
 2. In the test, that use our provider, for example
 
