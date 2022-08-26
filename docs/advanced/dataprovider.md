@@ -152,7 +152,7 @@ public static Object[][] dataprovider() {
 }
 ```
 
-where `"Data1", "Data2", "Data3"` in this example is the tests unique identifiers.
+where `"Data1"`, `"Data2"`, `"Data3"` in this example is the tests unique identifiers.
 
 2. In the test, that use our provider, for example
 
