@@ -17,18 +17,18 @@ package com.qaprosoft.carina.core.foundation.webdriver.listener;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.openqa.selenium.By;
-import org.openqa.selenium.OutputType;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
-import org.openqa.selenium.support.events.WebDriverEventListener;
 import org.openqa.selenium.support.events.WebDriverListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,133 +47,85 @@ import com.zebrunner.agent.core.registrar.Artifact;
  * 
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
-public class DriverListener implements WebDriverEventListener, IDriverPool {
+public class DriverListener implements WebDriverListener, IDriverPool {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private WebDriver driver = null;
+    // TODO if alert, element cannot cast to driver, use driver instead
 
-    private final static ThreadLocal<String> currentPositiveMessage = new ThreadLocal<String>();
-    private final static ThreadLocal<String> currentNegativeMessage = new ThreadLocal<String>();
+    private static final ThreadLocal<String> CURRENT_POSITIVE_MESSAGE = new ThreadLocal<>();
+    private static final ThreadLocal<String> CURRENT_NEGATIVE_MESSAGE = new ThreadLocal<>();
 
-    @Override
-    public void afterAlertAccept(WebDriver driver) {
-        onAfterAction("Alert accepted", driver);
+    public DriverListener(WebDriver driver) {
+        this.driver = driver;
     }
 
     @Override
-    public void afterAlertDismiss(WebDriver driver) {
-        onAfterAction("Alert dismissed", driver);
+    public void afterAccept(Alert alert) {
+        onAfterAction("Alert accepted", (WebDriver) alert);
     }
 
     @Override
-    public void afterChangeValueOf(WebElement element, WebDriver driver, CharSequence[] value) {
-        captureScreenshot(String.format("Text '%s' typed", charArrayToString(value)), driver, element, false);
+    public void afterDismiss(Alert alert) {
+        onAfterAction("Alert dismissed", (WebDriver) alert);
+
     }
 
     @Override
-    public void afterClickOn(WebElement element, WebDriver driver) {
+    public void afterSendKeys(WebElement element, CharSequence... keysToSend) {
+        captureScreenshot(String.format("Text '%s' typed", charArrayToString(keysToSend)), (WebDriver) element, element, false);
+    }
+
+    @Override
+    public void afterClick(WebElement element) {
         String comment = "Element clicked";
-        captureScreenshot(comment, driver, element, false);
+        captureScreenshot(comment, (WebDriver) element, element, false);
     }
 
     @Override
-    public void afterFindBy(By by, WebElement element, WebDriver driver) {
-        // Do nothing
+    public void afterBack(WebDriver.Navigation navigation) {
+        onAfterAction("Navigated back", (WebDriver) navigation);
     }
 
     @Override
-    public void afterNavigateBack(WebDriver driver) {
-        onAfterAction("Navigated back", driver);
+    public void afterForward(WebDriver.Navigation navigation) {
+        onAfterAction("Navigated forward", (WebDriver) navigation);
+
     }
 
     @Override
-    public void afterNavigateForward(WebDriver driver) {
-        onAfterAction("Navigated forward", driver);
+    public void afterRefresh(WebDriver.Navigation navigation) {
+        onAfterAction("Page refreshed", (WebDriver) navigation);
     }
 
     @Override
-    public void afterNavigateRefresh(WebDriver driver) {
-        onAfterAction("Page refreshed", driver);
-    }
-
-    @Override
-    public void afterNavigateTo(String url, WebDriver driver) {
+    public void afterTo(WebDriver.Navigation navigation, String url) {
         String comment = String.format("URL '%s' opened", url);
-        onAfterAction(comment, driver);
+        onAfterAction(comment, (WebDriver) navigation);
+
     }
 
+    // TODO investigate this method is too complex, and it contails old logic. Can we simplify it?
     @Override
-    public void afterScript(String script, WebDriver driver) {
-        // Do nothing
-    }
+    public void onError(Object target, Method method, Object[] args, InvocationTargetException e) {
 
-    @Override
-    public void beforeAlertAccept(WebDriver driver) {
-        // Do nothing
-    }
-
-    @Override
-    public void beforeAlertDismiss(WebDriver driver) {
-        // Do nothing
-    }
-
-    @Override
-    public void beforeChangeValueOf(WebElement element, WebDriver driver, CharSequence[] value) {
-        // Do nothing
-    }
-
-    @Override
-    public void beforeClickOn(WebElement element, WebDriver driver) {
-        // Do nothing
-    }
-
-    @Override
-    public void beforeFindBy(By by, WebElement element, WebDriver driver) {
-        // Do nothing
-    }
-
-    @Override
-    public void beforeNavigateBack(WebDriver driver) {
-        // Do nothing
-    }
-
-    @Override
-    public void beforeNavigateForward(WebDriver driver) {
-        // Do nothing
-    }
-
-    @Override
-    public void beforeNavigateRefresh(WebDriver driver) {
-        // Do nothing
-    }
-
-    @Override
-    public void beforeNavigateTo(String script, WebDriver driver) {
-        // Do nothing
-    }
-
-    @Override
-    public void beforeScript(String script, WebDriver driver) {
-        // Do nothing
-    }
-
-    @Override
-    public void onException(Throwable thr, WebDriver driver) {
         // [VD] make below code as much safety as possible otherwise potential recursive failure could occur with driver related issue.
         // most suspicious are capture screenshots, generating dumps etc
-        if (thr == null
-                || thr.getMessage() == null
-                || thr.getMessage().contains("Method has not yet been implemented")                        
-                || thr.getMessage().contains("Expected to read a START_MAP but instead have: END. Last 0 characters read")
-                || thr.getMessage().contains("Unable to determine type from: <. Last 1 characters read")
-                || thr.getMessage().contains("script timeout")
-                || thr.getMessage().contains("javascript error: Cannot read property 'outerHTML' of null")
-                || thr.getMessage().contains("javascript error: Cannot read property 'scrollHeight' of null")
-                || thr.getMessage().contains("Method is not implemented")
-                || thr.getMessage().contains("An element could not be located on the page using the given search parameters")
-                || thr.getMessage().contains("no such element: Unable to locate element")
-                || thr.getMessage().contains("Failed to execute command screen image")
-                // carina has a lot of extra verifications to solve all stale reference issue and finally perform an action so ignore such exception in listener!
-                || thr.getMessage().contains("StaleElementReferenceException")
-                || thr.getMessage().contains("stale_element_reference.html")) {
+        if (e == null
+                || e.getMessage() == null
+                || e.getMessage().contains("Method has not yet been implemented")
+                || e.getMessage().contains("Expected to read a START_MAP but instead have: END. Last 0 characters read")
+                || e.getMessage().contains("Unable to determine type from: <. Last 1 characters read")
+                || e.getMessage().contains("script timeout")
+                || e.getMessage().contains("javascript error: Cannot read property 'outerHTML' of null")
+                || e.getMessage().contains("javascript error: Cannot read property 'scrollHeight' of null")
+                || e.getMessage().contains("Method is not implemented")
+                || e.getMessage().contains("An element could not be located on the page using the given search parameters")
+                || e.getMessage().contains("no such element: Unable to locate element")
+                || e.getMessage().contains("Failed to execute command screen image")
+                // carina has a lot of extra verifications to solve all stale reference issue and finally perform an action so ignore such exception
+                // in listener!
+                || e.getMessage().contains("StaleElementReferenceException")
+                || e.getMessage().contains("stale_element_reference.html")) {
             // do nothing
             return;
         }
@@ -189,21 +141,21 @@ public class DriverListener implements WebDriverEventListener, IDriverPool {
         // stacktrace information)
 
         // TODO: investigate if we run @AfterMethod etc system events after this crash
-        if (thr.getMessage().contains("is not running, possibly crashed")) {
-            throw new RuntimeException(thr);
+        if (e.getMessage().contains("is not running, possibly crashed")) {
+            throw new RuntimeException(e);
         }
 
         // hopefully castDriver below resolve root cause of the recursive onException calls but keep below to ensure
-        if (thr.getStackTrace() != null
-                && (Arrays.toString(thr.getStackTrace())
+        if (e.getStackTrace() != null
+                && (Arrays.toString(e.getStackTrace())
                         .contains("com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener.onException")
-                        || Arrays.toString(thr.getStackTrace()).contains("Unable to capture screenshot due to the WebDriverException"))) {
+                        || Arrays.toString(e.getStackTrace()).contains("Unable to capture screenshot due to the WebDriverException"))) {
             LOGGER.error("Do not generate screenshot for invalid driver!");
             // prevent recursive crash for onException
             return;
         }
 
-        LOGGER.debug("DriverListener->onException starting..." + thr.getMessage());
+        LOGGER.debug("DriverListener->onException starting..." + e.getMessage());
         driver = castDriver(driver);
 
         try {
@@ -213,18 +165,19 @@ public class DriverListener implements WebDriverEventListener, IDriverPool {
             // 3. 99% those root exception means that we should prohibit screenshot generation for such use-case
             // 4. if 3rd one is true just update Screenshot.isCaptured() adding part of the exception to the list
             // handle cases which should't be captured
-            if (Screenshot.isCaptured(thr.getMessage())) {
-                captureScreenshot(thr.getMessage(), driver, null, true);
+            if (Screenshot.isCaptured(e.getMessage())) {
+                captureScreenshot(e.getMessage(), driver, null, true);
             }
-        } catch (Exception e) {
-            if (!e.getMessage().isEmpty()
-                    && (e.getMessage().contains("Method has not yet been implemented") || (e.getMessage().contains("Method is not implemented")))) {
-                LOGGER.debug("Unrecognized exception detected in DriverListener->onException!", e);
+        } catch (Exception err) {
+            if (!err.getMessage().isEmpty()
+                    && (err.getMessage().contains("Method has not yet been implemented")
+                            || (err.getMessage().contains("Method is not implemented")))) {
+                LOGGER.debug("Unrecognized exception detected in DriverListener->onException!", err);
             } else {
-                LOGGER.error("Unrecognized exception detected in DriverListener->onException!", e);
+                LOGGER.error("Unrecognized exception detected in DriverListener->onException!", err);
             }
-        } catch (Throwable e) {
-            LOGGER.error("Take a look to the logs above for current thread and add exception into the exclusion for Screenshot.isCaptured().", e);
+        } catch (Throwable err) {
+            LOGGER.error("Take a look to the logs above for current thread and add exception into the exclusion for Screenshot.isCaptured().", err);
         }
 
         LOGGER.debug("DriverListener->onException finished.");
@@ -246,37 +199,6 @@ public class DriverListener implements WebDriverEventListener, IDriverPool {
             s = sb.toString();
         }
         return s;
-    }
-
-    @Override
-    public void afterSwitchToWindow(String arg0, WebDriver driver) {
-        // do nothing
-
-    }
-
-    @Override
-    public void beforeSwitchToWindow(String arg0, WebDriver driver) {
-        // Do nothing
-    }
-
-    @Override
-    public <X> void afterGetScreenshotAs(OutputType<X> arg0, X arg1) {
-        // do nothing
-    }
-
-    @Override
-    public <X> void beforeGetScreenshotAs(OutputType<X> arg0) {
-        // Do nothing
-    }
-
-    @Override
-    public void afterGetText(WebElement element, WebDriver driver, String arg2) {
-        // do nothing
-    }
-
-    @Override
-    public void beforeGetText(WebElement element, WebDriver driver) {
-        // do nothing
     }
 
     private void captureScreenshot(String comment, WebDriver driver, WebElement element, boolean errorMessage) {
@@ -332,20 +254,20 @@ public class DriverListener implements WebDriverEventListener, IDriverPool {
 
     public static String getMessage(boolean errorMessage) {
         if (errorMessage) {
-            return currentNegativeMessage.get();
+            return CURRENT_NEGATIVE_MESSAGE.get();
         } else {
-            return currentPositiveMessage.get();
+            return CURRENT_POSITIVE_MESSAGE.get();
         }
     }
 
     public static void setMessages(String positiveMessage, String negativeMessage) {
-        currentPositiveMessage.set(positiveMessage);
-        currentNegativeMessage.set(negativeMessage);
+        CURRENT_POSITIVE_MESSAGE.set(positiveMessage);
+        CURRENT_NEGATIVE_MESSAGE.set(negativeMessage);
     }
 
     private void resetMessages() {
-        currentPositiveMessage.remove();
-        currentNegativeMessage.remove();
+        CURRENT_POSITIVE_MESSAGE.remove();
+        CURRENT_NEGATIVE_MESSAGE.remove();
     }
 
     /**
