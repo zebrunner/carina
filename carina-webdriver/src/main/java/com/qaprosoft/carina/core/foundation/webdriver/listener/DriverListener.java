@@ -18,21 +18,25 @@ package com.qaprosoft.carina.core.foundation.webdriver.listener;
 import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
+import org.openqa.selenium.support.events.WebDriverListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
+import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.FileManager;
 import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 import com.zebrunner.agent.core.registrar.Artifact;
@@ -358,4 +362,25 @@ public class DriverListener implements WebDriverEventListener, IDriverPool {
         return drv;
     }
 
+    public static <T extends WebDriver> T castDriver(WebDriver driver, Class<T> clazz) {
+        T castDriver = null;
+        List<WebDriverListener> listeners = null;
+
+        if (driver instanceof EventFiringDecorator) {
+            driver = ((EventFiringDecorator<?>) driver).getDecoratedDriver()
+                    .getOriginal();
+            try {
+                listeners = (List<WebDriverListener>) FieldUtils.readField(driver, "listeners", true);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Cannot get private field 'listeners' from EventFiringDecorator");
+            }
+        }
+
+        castDriver = clazz.cast(driver);
+
+        if (listeners != null) {
+            castDriver = new EventFiringDecorator<T>(listeners.toArray(new WebDriverListener[listeners.size()])).decorate(castDriver);
+        }
+        return castDriver;
+    }
 }
