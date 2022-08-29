@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
@@ -88,12 +89,12 @@ public interface IAndroidUtils extends IMobileUtils {
     static final String SHELL_RECENT_APPS_CMD = "input keyevent KEYCODE_APP_SWITCH";
 
     default public void pressKeyboardKey(AndroidKey key) {
-        ((AndroidDriver) castDriver()).pressKey(new KeyEvent(key).withFlag(KeyEventFlag.SOFT_KEYBOARD)
+        DriverListener.castDriver(getDriver(), AndroidDriver.class).pressKey(new KeyEvent(key).withFlag(KeyEventFlag.SOFT_KEYBOARD)
                 .withFlag(KeyEventFlag.KEEP_TOUCH_MODE).withFlag(KeyEventFlag.EDITOR_ACTION));
     }
 
     default public void pressBack() {
-        ((AndroidDriver) castDriver()).pressKey(new KeyEvent(AndroidKey.BACK));
+        DriverListener.castDriver(getDriver(), AndroidDriver.class).pressKey(new KeyEvent(AndroidKey.BACK));
     }
 
     /**
@@ -355,7 +356,7 @@ public interface IAndroidUtils extends IMobileUtils {
         ExtendedWebElement extendedWebElement = null;
         long startTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
         // TODO: support multi threaded WebDriver's removing DriverPool usage
-        WebDriver drv = castDriver();
+        WebDriver drv = getDriver();
 
         // workaorund for appium issue: https://github.com/appium/appium/issues/10159
         if (scrollToEle.contains(",")) {
@@ -427,7 +428,7 @@ public interface IAndroidUtils extends IMobileUtils {
         ExtendedWebElement extendedWebElement = null;
         long startTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
         // TODO: support multi threaded WebDriver's removing DriverPool usage
-        WebDriver drv = castDriver();
+        WebDriver drv = getDriver();
 
         // workaorund for appium issue: https://github.com/appium/appium/issues/10159
         if (scrollToEle.contains(",")) {
@@ -495,7 +496,7 @@ public interface IAndroidUtils extends IMobileUtils {
         ExtendedWebElement extendedWebElement = null;
         long startTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
         // TODO: support multi threaded WebDriver's removing DriverPool usage
-        WebDriver drv = castDriver();
+        WebDriver drv = getDriver();
 
         // workaorund for appium issue: https://github.com/appium/appium/issues/10159
         if (scrollToEle.contains(",")) {
@@ -735,7 +736,7 @@ public interface IAndroidUtils extends IMobileUtils {
         String commadKeyWord = commands.get(0);
         List<String> args = commands.subList(1, commands.size());
         Map<String, Object> preparedCommand = ImmutableMap.of("command", commadKeyWord, "args", args);
-        String output = (String) ((AppiumDriver) castDriver()).executeScript(SHELL_INIT_CONSOLE, preparedCommand);
+        String output = (String) (DriverListener.castDriver(getDriver(), AppiumDriver.class)).executeScript(SHELL_INIT_CONSOLE, preparedCommand);
         if (!StringUtils.isEmpty(output)) {
             UTILS_LOGGER.debug("ADB command output: " + output);
         }
@@ -894,7 +895,7 @@ public interface IAndroidUtils extends IMobileUtils {
     default public void triggerDeeplink(String link, String packageName) {
         Map<String, Object> preparedCommand = ImmutableMap.of("url", link, "package", packageName);
         try {
-            ((AppiumDriver) castDriver()).executeScript(SHELL_INIT_DEEPLINK_CONSOLE, preparedCommand);
+            DriverListener.castDriver(getDriver(), AppiumDriver.class).executeScript(SHELL_INIT_DEEPLINK_CONSOLE, preparedCommand);
         } catch (WebDriverException wde) {
             // TODO: need to pay attention
             UTILS_LOGGER.warn("org.openqa.selenium.WebDriverException is caught and ignored.", wde);
@@ -911,7 +912,7 @@ public interface IAndroidUtils extends IMobileUtils {
     @SuppressWarnings("unchecked")
     default public ArrayList<String> getAppPermissions(String packageName, PermissionType type) {
         Map<String, Object> preparedCommand = ImmutableMap.of("type", type.getType(), "package", packageName);
-        return (ArrayList<String>) ((AppiumDriver) castDriver()).executeScript(SHELL_INIT_GET_PERMISSION_CONSOLE,
+        return (ArrayList<String>) (DriverListener.castDriver(getDriver(), AppiumDriver.class)).executeScript(SHELL_INIT_GET_PERMISSION_CONSOLE,
                 preparedCommand);
     }
 
@@ -927,7 +928,7 @@ public interface IAndroidUtils extends IMobileUtils {
         Arrays.asList(permissions).forEach(p -> permissionsStr.add(p.getPermission()));
         Map<String, Object> preparedCommand = ImmutableMap.of("action", action.getAction(), "appPackage", packageName,
                 "permissions", permissionsStr);
-        ((AppiumDriver) castDriver()).executeScript(SHELL_INIT_CHANGE_PERMISSION_CONSOLE, preparedCommand);
+        (DriverListener.castDriver(getDriver(), AppiumDriver.class)).executeScript(SHELL_INIT_CHANGE_PERMISSION_CONSOLE, preparedCommand);
     }
 
     /**
@@ -953,7 +954,7 @@ public interface IAndroidUtils extends IMobileUtils {
     }
 
     default public boolean isWifiEnabled() {
-        boolean enabled = ((AndroidDriver) castDriver()).getConnection().isWiFiEnabled();
+        boolean enabled = (DriverListener.castDriver(getDriver(), AndroidDriver.class)).getConnection().isWiFiEnabled();
         UTILS_LOGGER.info("Wi-Fi enabled: " + enabled);
         return enabled;
     }
@@ -961,7 +962,7 @@ public interface IAndroidUtils extends IMobileUtils {
     default public void enableWifi() {
         boolean enabled = isWifiEnabled();
         if (!enabled) {
-            ((AndroidDriver) castDriver()).toggleWifi();
+            (DriverListener.castDriver(getDriver(), AndroidDriver.class)).toggleWifi();
             return;
         }
         UTILS_LOGGER.info("Wifi is already anebled. No actions needed");
@@ -970,7 +971,7 @@ public interface IAndroidUtils extends IMobileUtils {
     default public void disableWifi() {
         boolean enabled = isWifiEnabled();
         if (enabled) {
-            ((AndroidDriver) castDriver()).toggleWifi();
+            (DriverListener.castDriver(getDriver(), AndroidDriver.class)).toggleWifi();
             return;
         }
         UTILS_LOGGER.info("Wifi is already disabled. No actions needed");
@@ -1021,7 +1022,7 @@ public interface IAndroidUtils extends IMobileUtils {
      */
     default boolean isCarrierConnectionAvailable() {
         AndroidService androidService = AndroidService.getInstance();
-        boolean status = ((AndroidDriver) this.castDriver()).getConnection().isDataEnabled();
+        boolean status = (DriverListener.castDriver(getDriver(), AndroidDriver.class)).getConnection().isDataEnabled();
         boolean linkProperties = false;
 
         String linkProp = androidService.executeAdbCommand("shell dumpsys telephony.registry | grep mPreciseDataConnectionState");
@@ -1031,7 +1032,7 @@ public interface IAndroidUtils extends IMobileUtils {
         }
         UTILS_LOGGER.info("STATUS ENABLED: " + status);
         UTILS_LOGGER.info("CARRIER AVAILABLE: " + linkProperties);
-        return ((AndroidDriver) this.castDriver()).getConnection().isDataEnabled() && linkProperties;
+        return (DriverListener.castDriver(getDriver(), AndroidDriver.class)).getConnection().isDataEnabled() && linkProperties;
     }
 
     /**

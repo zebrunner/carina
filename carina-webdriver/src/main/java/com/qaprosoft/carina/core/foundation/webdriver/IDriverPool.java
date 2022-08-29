@@ -32,6 +32,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
+import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -352,8 +353,8 @@ public interface IDriverPool {
     }
     
     private WebDriver castDriver(WebDriver drv) {
-        if (drv instanceof EventFiringWebDriver) {
-            drv = ((EventFiringWebDriver) drv).getWrappedDriver();
+        if (drv instanceof EventFiringDecorator) {
+            drv = ((EventFiringDecorator<WebDriver>) drv).getDecoratedDriver().getOriginal();
         }
         return drv;        
     }    

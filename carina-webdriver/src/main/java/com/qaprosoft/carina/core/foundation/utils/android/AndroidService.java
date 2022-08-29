@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -415,7 +416,7 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
     public boolean findExpectedNotification(String expectedTitle, String expectedText, boolean partially) {
         // open notification
         try {
-            ((AndroidDriver) castDriver()).openNotifications();
+            DriverListener.castDriver(getDriver(), AndroidDriver.class).openNotifications();
             CommonUtils.pause(2); // wait while notifications are playing animation to
             // appear to avoid missed taps
         } catch (Exception e) {

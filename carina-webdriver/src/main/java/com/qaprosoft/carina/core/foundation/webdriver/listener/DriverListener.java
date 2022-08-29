@@ -28,7 +28,6 @@ import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.events.EventFiringDecorator;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -278,8 +277,8 @@ public class DriverListener implements WebDriverListener, IDriverPool {
      * @return WebDriver
      */
     private WebDriver castDriver(WebDriver drv) {
-        if (drv instanceof EventFiringWebDriver) {
-            drv = ((EventFiringWebDriver) drv).getWrappedDriver();
+        if (drv instanceof EventFiringDecorator) {
+            drv = ((EventFiringDecorator<WebDriver>) drv).getDecoratedDriver().getOriginal();
         }
         return drv;
     }
