@@ -49,7 +49,7 @@ import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.SessionId;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
@@ -165,6 +165,7 @@ public class ExtendedWebElement implements IWebElement {
 			Field locatorField, searchContextField, byContextField, caseInsensitiveContextField = null;
 			SearchContext tempSearchContext = null;
 
+            // FIXME REPLACE EventFiringWebDriver$EventFiringWebElement
 			if (element.getClass().toString().contains("EventFiringWebDriver$EventFiringWebElement")) {
 				// reuse reflection to get internal fields
 				locatorField = element.getClass().getDeclaredField("underlyingElement");
@@ -231,9 +232,9 @@ public class ExtendedWebElement implements IWebElement {
 				}
 			}
 
-			if (tempSearchContext instanceof EventFiringWebDriver) {
-				EventFiringWebDriver eventFirDriver = (EventFiringWebDriver) tempSearchContext;
-				this.driver = eventFirDriver.getWrappedDriver();
+			if (tempSearchContext instanceof EventFiringDecorator) {
+                EventFiringDecorator<WebDriver> eventFirDriver = (EventFiringDecorator) tempSearchContext;
+				this.driver = eventFirDriver.getDecoratedDriver().getOriginal();
 				//TODO: [VD] it seems like method more and more complex. Let's analyze and avoid return from this line
 				return;
 			}

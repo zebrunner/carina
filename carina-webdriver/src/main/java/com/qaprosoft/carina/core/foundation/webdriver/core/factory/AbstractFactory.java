@@ -21,12 +21,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 
 import com.qaprosoft.carina.core.foundation.utils.R;
 
 import io.appium.java_client.internal.CapabilityHelpers;
+import org.openqa.selenium.support.events.WebDriverListener;
 
 /**
  * Base implementation of WebDriver factory.
@@ -52,6 +54,7 @@ public abstract class AbstractFactory {
      * @param listeners - instances of {@link WebDriverEventListener}
      * @return driver with registered listeners
      */
+    @Deprecated(forRemoval = true)
     public WebDriver registerListeners(WebDriver driver, WebDriverEventListener... listeners) {
         if (!ArrayUtils.isEmpty(listeners)) {
             driver = new EventFiringWebDriver(driver);

@@ -58,7 +58,7 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.imgscalr.Scalr;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -451,7 +451,7 @@ public class ReportContext {
      */
     private static String getUrl(WebDriver driver, String name) {
         String seleniumHost = Configuration.getSeleniumUrl().replace("wd/hub", "download/");
-        WebDriver drv = (driver instanceof EventFiringWebDriver) ? ((EventFiringWebDriver) driver).getWrappedDriver() : driver;
+        WebDriver drv = (driver instanceof EventFiringDecorator) ? ((EventFiringDecorator<WebDriver>) driver).getDecoratedDriver().getOriginal() : driver;
         String sessionId = ((RemoteWebDriver) drv).getSessionId().toString();
         String url = seleniumHost + sessionId + "/" + name;
         LOGGER.debug("url: " + url);
