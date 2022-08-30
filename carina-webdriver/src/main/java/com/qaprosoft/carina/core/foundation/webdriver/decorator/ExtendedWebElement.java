@@ -49,6 +49,7 @@ import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.SessionId;
+import org.openqa.selenium.support.decorators.Decorated;
 import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -232,9 +233,8 @@ public class ExtendedWebElement implements IWebElement {
 				}
 			}
 
-			if (tempSearchContext instanceof EventFiringDecorator) {
-                EventFiringDecorator<WebDriver> eventFirDriver = (EventFiringDecorator) tempSearchContext;
-				this.driver = eventFirDriver.getDecoratedDriver().getOriginal();
+			if (tempSearchContext instanceof Decorated) {
+				this.driver = ((Decorated<WebDriver>) tempSearchContext).getOriginal();
 				//TODO: [VD] it seems like method more and more complex. Let's analyze and avoid return from this line
 				return;
 			}
