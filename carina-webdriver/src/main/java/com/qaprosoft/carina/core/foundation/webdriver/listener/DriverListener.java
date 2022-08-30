@@ -295,11 +295,11 @@ public class DriverListener implements WebDriverListener, IDriverPool {
 
         if (driver instanceof Decorated) {
             try {
-                listeners = (List<WebDriverListener>)FieldUtils.readDeclaredField(((Decorated)driver).getDecorator(), "listeners", true);
+                listeners = (List<WebDriverListener>)FieldUtils.readDeclaredField(((Decorated<T>)driver).getDecorator(), "listeners", true);
             } catch (IllegalAccessException e) {
                 new RuntimeException(e);
             }
-            driver =  ((Decorated<WebDriver>) driver).getOriginal();
+            driver =  ((Decorated<T>) driver).getOriginal();
 
         }
 
