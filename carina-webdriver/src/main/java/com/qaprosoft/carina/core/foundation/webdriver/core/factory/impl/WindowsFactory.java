@@ -55,7 +55,7 @@ public class WindowsFactory extends AbstractFactory {
             throw new RuntimeException(String.format("Driver type %s is not applicable for Windows driver", driverType));
         }
 
-        WindowsDriver driver = null;
+        WebDriver driver = null;
         if (isCapabilitiesEmpty(capabilities)) {
             capabilities = getCapabilities(name);
         }
@@ -72,8 +72,8 @@ public class WindowsFactory extends AbstractFactory {
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed appium URL!", e);
         }
-        driver = new WindowsDriver(url, capabilities);
-        driver = new EventFiringDecorator<WindowsDriver>(getEventListeners()).decorate(driver);
+        driver = new EventFiringDecorator<WindowsDriver>(getEventListeners())
+                .decorate(new WindowsDriver(url, capabilities));
 
         return driver;
     }

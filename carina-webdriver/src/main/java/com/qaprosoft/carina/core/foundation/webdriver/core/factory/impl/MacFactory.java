@@ -22,7 +22,6 @@ import java.util.Objects;
 
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +54,7 @@ public class MacFactory extends AbstractFactory {
             throw new RuntimeException(String.format("Driver type %s is not applicable for Windows driver", driverType));
         }
 
-        Mac2Driver driver = null;
+        WebDriver driver = null;
         if (isCapabilitiesEmpty(capabilities)) {
             capabilities = getCapabilities(name);
         }
@@ -72,8 +71,8 @@ public class MacFactory extends AbstractFactory {
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed appium URL!", e);
         }
-        driver = new Mac2Driver(url, capabilities);
-        driver  = new EventFiringDecorator<Mac2Driver>(getEventListeners()).decorate(driver);
+        driver = new EventFiringDecorator<Mac2Driver>(getEventListeners())
+                .decorate(new Mac2Driver(url, capabilities));
 
         return driver;
     }

@@ -54,7 +54,7 @@ public class DesktopFactory extends AbstractFactory {
 
     @Override
     public WebDriver create(String name, MutableCapabilities capabilities, String seleniumHost) {
-        RemoteWebDriver driver = null;
+        WebDriver driver = null;
         if (seleniumHost == null) {
             seleniumHost = Configuration.getSeleniumUrl();
         }
@@ -77,8 +77,8 @@ public class DesktopFactory extends AbstractFactory {
 
         try {
             EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(new URL(seleniumHost));
-            driver = new RemoteWebDriver(ce, capabilities);
-            driver  = new EventFiringDecorator<RemoteWebDriver>(getEventListeners()).decorate(driver);
+            driver = new EventFiringDecorator<RemoteWebDriver>(getEventListeners())
+                    .decorate(new RemoteWebDriver(ce, capabilities));
 
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed selenium URL!", e);
