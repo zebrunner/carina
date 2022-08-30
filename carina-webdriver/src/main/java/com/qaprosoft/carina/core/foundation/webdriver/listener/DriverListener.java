@@ -27,6 +27,8 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.decorators.Decorated;
+import org.openqa.selenium.support.decorators.WebDriverDecorator;
 import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.openqa.selenium.support.events.WebDriverListener;
 import org.slf4j.Logger;
@@ -287,20 +289,20 @@ public class DriverListener implements WebDriverListener, IDriverPool {
         T castDriver = null;
         List<WebDriverListener> listeners = null;
 
-        if (driver instanceof EventFiringDecorator) {
-            driver = ((EventFiringDecorator<?>) driver).getDecoratedDriver()
-                    .getOriginal();
+        if (driver instanceof Decorated) {
             try {
-                listeners = (List<WebDriverListener>) FieldUtils.readField(driver, "listeners", true);
+                listeners = (List<WebDriverListener>)FieldUtils.readDeclaredField(((Decorated)driver).getDecorator(), "listeners", true);
             } catch (IllegalAccessException e) {
-                throw new RuntimeException("Cannot get private field 'listeners' from EventFiringDecorator");
+                new RuntimeException(e);
             }
+            driver =  ((Decorated<WebDriver>) driver).getOriginal();
+
         }
 
         castDriver = clazz.cast(driver);
 
         if (listeners != null) {
-            castDriver = new EventFiringDecorator<T>(listeners.toArray(new WebDriverListener[listeners.size()])).decorate(castDriver);
+            castDriver =  new EventFiringDecorator<T>(listeners.toArray(new WebDriverListener[0])).decorate(castDriver);
         }
         return castDriver;
     }
