@@ -22,6 +22,7 @@ import java.util.Objects;
 
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,6 +73,7 @@ public class WindowsFactory extends AbstractFactory {
             throw new RuntimeException("Malformed appium URL!", e);
         }
         driver = new WindowsDriver(url, capabilities);
+        driver = new EventFiringDecorator<WindowsDriver>(getEventListeners()).decorate(driver);
 
         return driver;
     }

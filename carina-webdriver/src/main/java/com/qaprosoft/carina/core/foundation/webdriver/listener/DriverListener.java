@@ -56,7 +56,11 @@ public class DriverListener implements WebDriverListener, IDriverPool {
     private static final ThreadLocal<String> CURRENT_POSITIVE_MESSAGE = new ThreadLocal<>();
     private static final ThreadLocal<String> CURRENT_NEGATIVE_MESSAGE = new ThreadLocal<>();
 
-    public DriverListener(WebDriver driver) {
+    public DriverListener() {
+    }
+
+    @Override
+    public void beforeAnyWebDriverCall(WebDriver driver, Method method, Object[] args)  {
         this.driver = driver;
     }
 

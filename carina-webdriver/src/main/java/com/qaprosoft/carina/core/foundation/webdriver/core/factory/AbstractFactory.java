@@ -15,6 +15,8 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory;
 
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +31,13 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 
 import io.appium.java_client.internal.CapabilityHelpers;
 import org.openqa.selenium.support.events.WebDriverListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Base implementation of WebDriver factory.
@@ -36,6 +45,7 @@ import org.openqa.selenium.support.events.WebDriverListener;
  * @author Alex Khursevich (alex@qaprosoft.com)
  */
 public abstract class AbstractFactory {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
      * Creates new instance of {@link WebDriver} according to specified {@link MutableCapabilities}.
@@ -86,5 +96,39 @@ public abstract class AbstractFactory {
             allCapabilities.setCapability(cleanCapabilityName, capabilities.getCapability(capabilityName));
         }
         return allCapabilities;
+    }
+
+    /**
+     * Reads 'driver_event_listeners' configuration property and initializes appropriate array of driver event listeners.
+     *
+     * @return list of driver listeners (default listener plus custom listeners)
+     */
+    protected static WebDriverListener[] getEventListeners() {
+        List<WebDriverListener> listeners = new ArrayList<>();
+
+        // explicitly add default carina com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener
+        DriverListener driverListener = new DriverListener();
+        listeners.add(driverListener);
+
+        String listenerClasses = Configuration.get(Configuration.Parameter.DRIVER_EVENT_LISTENERS);
+
+        if (!StringUtils.isEmpty(listenerClasses)) {
+            for (String listenerClass : listenerClasses.split(",")) {
+                try {
+                    Class<?> clazz = Class.forName(listenerClass);
+                    if (WebDriverListener.class.isAssignableFrom(clazz)) {
+                        WebDriverListener listener = (WebDriverListener) clazz.getDeclaredConstructor().newInstance();
+                        listeners.add(listener);
+                        LOGGER.debug("Webdriver event listener registered: {}", clazz.getName());
+                    }
+                } catch (ClassNotFoundException e) {
+                    LOGGER.error("Unable to register '{}' webdriver event listener! Class was not found", listenerClass, e);
+
+                } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
+                    LOGGER.error("Unable to register '{}' webdriver event listener! Please, investigate stacktrace!", listenerClass, e);
+                }
+            }
+        }
+        return listeners.toArray(new WebDriverListener[0]);
     }
 }

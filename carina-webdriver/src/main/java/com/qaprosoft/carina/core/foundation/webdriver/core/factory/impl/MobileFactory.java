@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,15 +108,19 @@ public class MobileFactory extends AbstractFactory {
 
         try {
             EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
-            
+
             if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
                 driver = new AndroidDriver(ce, capabilities);
+                driver = new EventFiringDecorator<AndroidDriver>(getEventListeners()).decorate((AndroidDriver) driver);
             } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.IOS)
                     || mobilePlatformName.equalsIgnoreCase(SpecialKeywords.TVOS)) {
                 driver = new IOSDriver(ce, capabilities);
+                driver = new EventFiringDecorator<IOSDriver>(getEventListeners()).decorate((IOSDriver) driver);
             } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.CUSTOM)) {
                 // that's a case for custom mobile capabilities like browserstack or saucelabs
                 driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);
+                driver = new EventFiringDecorator<RemoteWebDriver>(getEventListeners()).decorate(driver);
+
             } else {
                 throw new RuntimeException("Unsupported mobile platform: " + mobilePlatformName);
             }
