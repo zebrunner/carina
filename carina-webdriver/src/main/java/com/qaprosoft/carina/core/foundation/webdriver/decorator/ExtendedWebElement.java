@@ -31,6 +31,7 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -50,7 +51,6 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.decorators.Decorated;
-import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
@@ -146,13 +146,13 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     public ExtendedWebElement(WebElement element, String name) {
-    	this.name = name;
+        this.name = name;
         this.element = element;
-        
-        //read searchContext from not null elements only
-        if (element == null) {
+
+        // read searchContext from not null elements only
+        if (this.element == null) {
             // it seems like we have to specify WebElement or By annotation! Add verification that By is valid in this case!
-            if (getBy() == null) {
+            if (this.by == null) {
                 try {
                     throw new RuntimeException("review stacktrace to analyze why tempBy is not populated correctly via reflection!");
                 } catch (Throwable thr) {
@@ -162,67 +162,56 @@ public class ExtendedWebElement implements IWebElement {
             return;
         }
 
-		try {
-			Field locatorField, searchContextField, byContextField, caseInsensitiveContextField = null;
-			SearchContext tempSearchContext = null;
+        try {
+            Field locatorField, searchContextField, byContextField, caseInsensitiveContextField = null;
+            SearchContext tempSearchContext = null;
 
             // FIXME REPLACE EventFiringWebDriver$EventFiringWebElement
-			if (element.getClass().toString().contains("EventFiringWebDriver$EventFiringWebElement")) {
-				// reuse reflection to get internal fields
-				locatorField = element.getClass().getDeclaredField("underlyingElement");
-				locatorField.setAccessible(true);
-				element = (RemoteWebElement) locatorField.get(element);
-			}
+            if (element.getClass().toString().contains("EventFiringWebDriver$EventFiringWebElement")) {
+                // reuse reflection to get internal fields
+                element = (RemoteWebElement) (FieldUtils.getDeclaredField(element.getClass(), "underlyingElement", true).get(element));
+            }
 
-			if (element instanceof RemoteWebElement) {
-				tempSearchContext = ((RemoteWebElement) element).getWrappedDriver();
-			} else if (element instanceof Proxy) {
-				InvocationHandler innerProxy = Proxy.getInvocationHandler(((Proxy) element));
-
-				locatorField = innerProxy.getClass().getDeclaredField("locator");
-				locatorField.setAccessible(true);
-
-                ExtendedElementLocator locator = (ExtendedElementLocator) locatorField.get(innerProxy);
+            if (element instanceof RemoteWebElement) {
+                tempSearchContext = ((RemoteWebElement) element).getWrappedDriver();
+            } else if (element instanceof Proxy) {
+                InvocationHandler innerProxy = Proxy.getInvocationHandler(element);
+                ExtendedElementLocator locator = (ExtendedElementLocator) (FieldUtils.getDeclaredField(innerProxy.getClass(), "locator", true))
+                        .get(innerProxy);
                 this.isLocalized = locator.isLocalized();
 
                 if (isLocalized) {
                     this.name = locator.getClassName() + "." + name;
                 }
 
-				searchContextField = locator.getClass().getDeclaredField("searchContext");
-				searchContextField.setAccessible(true);
-				this.searchContext = tempSearchContext = (SearchContext) searchContextField.get(locator);
+                this.searchContext = (SearchContext) FieldUtils.getDeclaredField(locator.getClass(), "searchContext", true)
+                        .get(locator);
+                tempSearchContext = this.searchContext;
 
-                caseInsensitiveContextField = locator.getClass().getDeclaredField("caseInsensitive");
-                caseInsensitiveContextField.setAccessible(true);
-                this.caseInsensitive = (Boolean) caseInsensitiveContextField.get(locator);
+                this.caseInsensitive = (Boolean) FieldUtils.getDeclaredField(locator.getClass(), "caseInsensitive", true)
+                        .get(locator);
 
-                byContextField = locator.getClass().getDeclaredField("by");
-                byContextField.setAccessible(true);
-                //TODO: identify if it is a child element and
-                //	1. get rootBy
-                //  2. append current "by" to the rootBy
+                // TODO: identify if it is a child element and
+                // 1. get rootBy
+                // 2. append current "by" to the rootBy
                 // -> it should allow to search via regular driver and fluent waits - getBy()
-                this.by = (By) byContextField.get(locator);
+                this.by = (By) FieldUtils.getDeclaredField(locator.getClass(), "by", true).get(locator);
 
                 while (tempSearchContext instanceof Proxy) {
-                    innerProxy = Proxy.getInvocationHandler(((Proxy) tempSearchContext));
+                    innerProxy = Proxy.getInvocationHandler(tempSearchContext);
 
-					locatorField = innerProxy.getClass().getDeclaredField("locator");
-					locatorField.setAccessible(true);
+                    locator = (ExtendedElementLocator) FieldUtils.getDeclaredField(innerProxy.getClass(), "locator", true)
+                            .get(innerProxy);
 
-					locator = (ExtendedElementLocator) locatorField.get(innerProxy);
                     // #1691 fix L10N Localized annotation does not work when elements are nested and the
                     // parent element does not have an annotation.
                     // this.isLocalized = locator.isLocalized();
 
-					searchContextField = locator.getClass().getDeclaredField("searchContext");
-					searchContextField.setAccessible(true);
-					tempSearchContext = (SearchContext) searchContextField.get(locator);
+                    tempSearchContext = (SearchContext) FieldUtils.getDeclaredField(locator.getClass(), "searchContext", true)
+                            .get(locator);
 
-                    caseInsensitiveContextField = locator.getClass().getDeclaredField("caseInsensitive");
-                    caseInsensitiveContextField.setAccessible(true);
-                    this.caseInsensitive = (Boolean) caseInsensitiveContextField.get(locator);
+                    this.caseInsensitive = (Boolean) FieldUtils.getDeclaredField(locator.getClass(), "caseInsensitive", true)
+                            .get(locator);
 
                     if (this.caseInsensitive) {
                         CaseInsensitiveXPath csx = locator.getCaseInsensitiveXPath();
@@ -230,52 +219,48 @@ public class ExtendedWebElement implements IWebElement {
                         caseInsensitiveConverter = new CaseInsensitiveConverter(
                                 new ParamsToConvert(csx.id(), csx.name(), csx.text(), csx.classAttr()), platform);
                     }
-				}
-			}
+                }
+            }
 
-			if (tempSearchContext instanceof Decorated) {
-				this.driver = ((Decorated<WebDriver>) tempSearchContext).getOriginal();
-				//TODO: [VD] it seems like method more and more complex. Let's analyze and avoid return from this line
-				return;
-			}
+            if (tempSearchContext instanceof Decorated) {
+                this.driver = ((Decorated<WebDriver>) tempSearchContext).getOriginal();
+                // TODO: [VD] it seems like method more and more complex. Let's analyze and avoid return from this line
+                return;
+            }
 
-			if (tempSearchContext != null && tempSearchContext.getClass().toString().contains("EventFiringWebDriver$EventFiringWebElement")) {
-				// reuse reflection to get internal fields
-				locatorField = tempSearchContext.getClass().getDeclaredField("underlyingElement");
-				locatorField.setAccessible(true);
-				this.searchContext = tempSearchContext = (RemoteWebElement) locatorField.get(tempSearchContext);
-			}
+            if (tempSearchContext != null && tempSearchContext.getClass().toString().contains("EventFiringWebDriver$EventFiringWebElement")) {
+                // reuse reflection to get internal fields
+                this.searchContext = (RemoteWebElement) FieldUtils.getDeclaredField(tempSearchContext.getClass(), "underlyingElement", true)
+                        .get(tempSearchContext);
+                tempSearchContext = this.searchContext;
+            }
 
-			if (tempSearchContext instanceof RemoteWebElement) {
-//				this.driver = ((RemoteWebElement) searchContext).getWrappedDriver();
-				tempSearchContext = ((RemoteWebElement) tempSearchContext).getWrappedDriver();
-			}
-			if (tempSearchContext != null && tempSearchContext instanceof RemoteWebDriver) {
-				SessionId sessionId = ((RemoteWebDriver) tempSearchContext).getSessionId();
-				if (this.searchContext == null) {
-					// do not override if it was already initialized as it has
-					// real searchContext which shouldn't be replaced by actual driver
-					this.searchContext = tempSearchContext; 
-				}
-				//this.driver = (WebDriver) tempSearchContext;
-				// that's the only place to use DriverPool to get driver.
+            if (tempSearchContext instanceof RemoteWebElement) {
+                // this.driver = ((RemoteWebElement) searchContext).getWrappedDriver();
+                tempSearchContext = ((RemoteWebElement) tempSearchContext).getWrappedDriver();
+            }
+            if (tempSearchContext != null && tempSearchContext instanceof RemoteWebDriver) {
+                SessionId sessionId = ((RemoteWebDriver) tempSearchContext).getSessionId();
+                if (this.searchContext == null) {
+                    // do not override if it was already initialized as it has
+                    // real searchContext which shouldn't be replaced by actual driver
+                    this.searchContext = tempSearchContext;
+                }
+                // this.driver = (WebDriver) tempSearchContext;
+                // that's the only place to use DriverPool to get driver.
                 try {
-                    //try to search securely in driver pool by sessionId
+                    // try to search securely in driver pool by sessionId
                     this.driver = IDriverPool.getDriver(sessionId);
                 } catch (DriverPoolException ex) {
                     // seems like driver started outside of IDriverPool so try to register it as well
                     this.driver = (WebDriver) tempSearchContext;
                 }
-			} else {
-				LOGGER.error("Undefined error for searchContext: " + tempSearchContext.toString());
-			}
-		} catch (NoSuchFieldException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (ClassCastException e) {
-			e.printStackTrace();
-		} catch (Throwable thr) {
+            } else {
+                LOGGER.error("Undefined error for searchContext: " + tempSearchContext.toString());
+            }
+        } catch (IllegalAccessException | ClassCastException e) {
+            e.printStackTrace();
+        } catch (Throwable thr) {
 			thr.printStackTrace();
 			LOGGER.error("Unable to get Driver, searchContext and By via reflection!", thr);
         } finally {
