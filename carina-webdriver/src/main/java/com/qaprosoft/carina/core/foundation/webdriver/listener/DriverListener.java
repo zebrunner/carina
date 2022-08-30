@@ -60,46 +60,46 @@ public class DriverListener implements WebDriverListener, IDriverPool {
 
     @Override
     public void afterAccept(Alert alert) {
-        onAfterAction("Alert accepted", (WebDriver) alert);
+        onAfterAction("Alert accepted", this.driver);
     }
 
     @Override
     public void afterDismiss(Alert alert) {
-        onAfterAction("Alert dismissed", (WebDriver) alert);
+        onAfterAction("Alert dismissed", this.driver);
 
     }
 
     @Override
     public void afterSendKeys(WebElement element, CharSequence... keysToSend) {
-        captureScreenshot(String.format("Text '%s' typed", charArrayToString(keysToSend)), (WebDriver) element, element, false);
+        captureScreenshot(String.format("Text '%s' typed", charArrayToString(keysToSend)), this.driver, element, false);
     }
 
     @Override
     public void afterClick(WebElement element) {
         String comment = "Element clicked";
-        captureScreenshot(comment, (WebDriver) element, element, false);
+        captureScreenshot(comment, this.driver, element, false);
     }
 
     @Override
     public void afterBack(WebDriver.Navigation navigation) {
-        onAfterAction("Navigated back", (WebDriver) navigation);
+        onAfterAction("Navigated back", this.driver);
     }
 
     @Override
     public void afterForward(WebDriver.Navigation navigation) {
-        onAfterAction("Navigated forward", (WebDriver) navigation);
+        onAfterAction("Navigated forward", this.driver);
 
     }
 
     @Override
     public void afterRefresh(WebDriver.Navigation navigation) {
-        onAfterAction("Page refreshed", (WebDriver) navigation);
+        onAfterAction("Page refreshed", this.driver);
     }
 
     @Override
     public void afterTo(WebDriver.Navigation navigation, String url) {
         String comment = String.format("URL '%s' opened", url);
-        onAfterAction(comment, (WebDriver) navigation);
+        onAfterAction(comment, this.driver);
 
     }
 
@@ -155,7 +155,7 @@ public class DriverListener implements WebDriverListener, IDriverPool {
         }
 
         LOGGER.debug("DriverListener->onException starting..." + e.getMessage());
-        driver = castDriver(driver);
+        //this.driver = castDriver(this.driver);
 
         try {
             // 1. if you see mess with afterTest carina actions and Timer startup failure you should follow steps #2+ to determine root cause.

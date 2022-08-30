@@ -163,7 +163,6 @@ public class ExtendedWebElement implements IWebElement {
         }
 
         try {
-            Field locatorField, searchContextField, byContextField, caseInsensitiveContextField = null;
             SearchContext tempSearchContext = null;
 
             // FIXME REPLACE EventFiringWebDriver$EventFiringWebElement
@@ -195,7 +194,8 @@ public class ExtendedWebElement implements IWebElement {
                 // 1. get rootBy
                 // 2. append current "by" to the rootBy
                 // -> it should allow to search via regular driver and fluent waits - getBy()
-                this.by = (By) FieldUtils.getDeclaredField(locator.getClass(), "by", true).get(locator);
+                this.by = (By) FieldUtils.getDeclaredField(locator.getClass(), "by", true)
+                        .get(locator);
 
                 while (tempSearchContext instanceof Proxy) {
                     innerProxy = Proxy.getInvocationHandler(tempSearchContext);
