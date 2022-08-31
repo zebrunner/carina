@@ -853,11 +853,9 @@ public interface IMobileUtils extends IDriverPool {
 
         // get bundleId or appId of the application started by driver
         if (os.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
-            // todo investigate changes is work
             bundleId = capabilities.getCapability(SpecialKeywords.APP_PACKAGE).toString();
         } else if (os.equalsIgnoreCase(SpecialKeywords.IOS) || os.equalsIgnoreCase(SpecialKeywords.MAC)
                 || os.equalsIgnoreCase(SpecialKeywords.TVOS)) {
-            // todo investigate changes is work
             bundleId = capabilities.getCapability(SpecialKeywords.BUNDLE_ID).toString();
         }
         terminateApp(bundleId);

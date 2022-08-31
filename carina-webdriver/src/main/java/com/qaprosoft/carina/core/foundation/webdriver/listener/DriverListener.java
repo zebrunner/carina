@@ -26,7 +26,6 @@ import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.decorators.Decorated;
-import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.openqa.selenium.support.events.WebDriverListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,15 +46,16 @@ import com.zebrunner.agent.core.registrar.Artifact;
  */
 public class DriverListener implements WebDriverListener, IDriverPool {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private WebDriver driver = null;
-    // TODO if alert, element cannot cast to driver, use driver instead
-
     private static final ThreadLocal<String> CURRENT_POSITIVE_MESSAGE = new ThreadLocal<>();
     private static final ThreadLocal<String> CURRENT_NEGATIVE_MESSAGE = new ThreadLocal<>();
 
+    private WebDriver driver = null;
+
     public DriverListener() {
+        // do nothing
     }
 
+    // FIXME refactor - it is not a good idea to set driver using this method
     @Override
     public void beforeAnyWebDriverCall(WebDriver driver, Method method, Object[] args)  {
         this.driver = driver;

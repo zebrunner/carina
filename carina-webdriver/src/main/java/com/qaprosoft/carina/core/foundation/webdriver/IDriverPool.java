@@ -32,8 +32,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
-import org.openqa.selenium.support.events.EventFiringDecorator;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.openqa.selenium.support.decorators.Decorated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -139,19 +138,20 @@ public interface IDriverPool {
     public static WebDriver getDriver(SessionId sessionId) {
         for (CarinaDriver carinaDriver : driversPool) {
             WebDriver drv = carinaDriver.getDriver();
-            if (drv instanceof EventFiringWebDriver) {
-                EventFiringWebDriver eventFirDriver = (EventFiringWebDriver) drv;
-                drv = eventFirDriver.getWrappedDriver();
+            SessionId drvSessionId = null;
+
+            if (drv instanceof Decorated<?>) {
+                drvSessionId = ((RemoteWebDriver) (((Decorated<?>) drv).getOriginal())).getSessionId();
+
+            } else {
+                drvSessionId = ((RemoteWebDriver) drv).getSessionId();
             }
 
-            SessionId drvSessionId = ((RemoteWebDriver) drv).getSessionId();
-
-            if (drvSessionId != null) {
-                if (sessionId.equals(drvSessionId)) {
-                    return drv;
-                }
+            if (sessionId.equals(drvSessionId)) {
+                return drv;
             }
         }
+        
         throw new DriverPoolException("Unable to find driver using sessionId artifacts. Returning default one!");
     }
     
@@ -351,14 +351,14 @@ public interface IDriverPool {
             }
         }
     }
-    
+
     private WebDriver castDriver(WebDriver drv) {
-        if (drv instanceof EventFiringDecorator) {
-            drv = ((EventFiringDecorator<WebDriver>) drv).getDecoratedDriver().getOriginal();
+        if (drv instanceof Decorated<?>) {
+            drv = (WebDriver) ((Decorated<?>) drv).getOriginal();
         }
-        return drv;        
-    }    
-    
+        return drv;
+    }
+
     /**
      * Create driver with custom capabilities
      * 

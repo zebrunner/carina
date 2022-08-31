@@ -26,7 +26,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -43,12 +42,12 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WrapsDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
-import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.decorators.Decorated;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -62,7 +61,6 @@ import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
-import com.qaprosoft.carina.core.foundation.exception.DriverPoolException;
 import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -71,15 +69,9 @@ import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
-import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
-import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.LocatorConverter;
-import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.CaseInsensitiveConverter;
-import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.ParamsToConvert;
-import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.Platform;
 import com.sun.jersey.core.util.Base64;
 
 import io.appium.java_client.AppiumBy;
@@ -105,8 +97,6 @@ public class ExtendedWebElement implements IWebElement {
     private String name;
     private By by;
 
-    private boolean caseInsensitive;
-
     private ElementLoadingStrategy loadingStrategy = ElementLoadingStrategy.valueOf(Configuration.get(Parameter.ELEMENT_LOADING_STRATEGY));
 
     private boolean isLocalized = false;
@@ -114,8 +104,6 @@ public class ExtendedWebElement implements IWebElement {
     // Converted array of objects to String for dynamic element locators
     private String formatValues = "";
 
-    private LocatorConverter caseInsensitiveConverter;
-    
     public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext) {
         if (by == null) {
             throw new RuntimeException("By couldn't be null!");
@@ -155,7 +143,7 @@ public class ExtendedWebElement implements IWebElement {
                 try {
                     throw new RuntimeException("review stacktrace to analyze why tempBy is not populated correctly via reflection!");
                 } catch (Throwable thr) {
-                    LOGGER.warn("getBy() is null!", thr);
+                    LOGGER.warn("by is null!", thr);
                 }
             }
             return;
@@ -164,84 +152,59 @@ public class ExtendedWebElement implements IWebElement {
         try {
             SearchContext tempSearchContext = null;
 
-            if (element instanceof Proxy) {
+            // if the element is decorated, we take its decorated context
+            if (element instanceof Decorated &&
+                    ((Decorated<?>) element).getOriginal() instanceof RemoteWebElement) {
+                tempSearchContext = (SearchContext) ((Decorated<?>) element).getDecorator().getDecoratedDriver();
+                // if the element is RemoteWebElement, we take its context as is
+            } else if (element instanceof RemoteWebElement) {
+                tempSearchContext = ((RemoteWebElement) element).getWrappedDriver();
+                // we create proxy for {{ExtendedElementLocator}}, so we can get info from it
+            } else if (element instanceof Proxy) {
                 InvocationHandler innerProxy = Proxy.getInvocationHandler(element);
                 ExtendedElementLocator locator = (ExtendedElementLocator) (FieldUtils.getDeclaredField(innerProxy.getClass(), "locator", true))
                         .get(innerProxy);
-                this.isLocalized = locator.isLocalized();
 
+                this.isLocalized = locator.isLocalized();
                 if (isLocalized) {
                     this.name = locator.getClassName() + "." + name;
                 }
 
-                this.searchContext = (SearchContext) FieldUtils.getDeclaredField(locator.getClass(), "searchContext", true)
-                        .get(locator);
+                this.searchContext = locator.getSearchContext();
                 tempSearchContext = this.searchContext;
-
-                this.caseInsensitive = (Boolean) FieldUtils.getDeclaredField(locator.getClass(), "caseInsensitive", true)
-                        .get(locator);
 
                 // TODO: identify if it is a child element and
                 // 1. get rootBy
                 // 2. append current "by" to the rootBy
                 // -> it should allow to search via regular driver and fluent waits - getBy()
-                this.by = (By) FieldUtils.getDeclaredField(locator.getClass(), "by", true)
-                        .get(locator);
+                this.by = locator.getBy();
 
                 while (tempSearchContext instanceof Proxy) {
                     innerProxy = Proxy.getInvocationHandler(tempSearchContext);
-
                     locator = (ExtendedElementLocator) FieldUtils.getDeclaredField(innerProxy.getClass(), "locator", true)
                             .get(innerProxy);
-
-                    // #1691 fix L10N Localized annotation does not work when elements are nested and the
-                    // parent element does not have an annotation.
-                    // this.isLocalized = locator.isLocalized();
-
-                    tempSearchContext = (SearchContext) FieldUtils.getDeclaredField(locator.getClass(), "searchContext", true)
-                            .get(locator);
-
-                    this.caseInsensitive = (Boolean) FieldUtils.getDeclaredField(locator.getClass(), "caseInsensitive", true)
-                            .get(locator);
-
-                    if (this.caseInsensitive) {
-                        CaseInsensitiveXPath csx = locator.getCaseInsensitiveXPath();
-                        Platform platform = Objects.equals(Configuration.getMobileApp(), "") ? Platform.WEB : Platform.MOBILE;
-                        caseInsensitiveConverter = new CaseInsensitiveConverter(
-                                new ParamsToConvert(csx.id(), csx.name(), csx.text(), csx.classAttr()), platform);
-                    }
+                    tempSearchContext = locator.getSearchContext();
                 }
             }
 
-            if (tempSearchContext instanceof Decorated) {
-                this.driver = (WebDriver) ((Decorated<?>) tempSearchContext).getDecorator().getDecoratedDriver().getOriginal();
-                // TODO: [VD] it seems like method more and more complex. Let's analyze and avoid return from this line
-                return;
+            // initialize context if it is not initialized
+            if (this.searchContext == null) {
+                this.searchContext = tempSearchContext;
             }
 
-            if (tempSearchContext instanceof RemoteWebElement) {
-                // this.driver = ((RemoteWebElement) searchContext).getWrappedDriver();
-                tempSearchContext = ((RemoteWebElement) tempSearchContext).getWrappedDriver();
+            // FIXME: DefaultDecorated cannot be cast to (SearchContext, WebElement, WebDriver), so we get original element / driver and
+            // set this.driver as original driver
+            if (tempSearchContext instanceof Decorated<?>) {
+                tempSearchContext = (SearchContext) ((Decorated<?>) tempSearchContext).getOriginal();
             }
-            if (tempSearchContext != null && tempSearchContext instanceof RemoteWebDriver) {
-                SessionId sessionId = ((RemoteWebDriver) tempSearchContext).getSessionId();
-                if (this.searchContext == null) {
-                    // do not override if it was already initialized as it has
-                    // real searchContext which shouldn't be replaced by actual driver
-                    this.searchContext = tempSearchContext;
-                }
-                // this.driver = (WebDriver) tempSearchContext;
-                // that's the only place to use DriverPool to get driver.
-                try {
-                    // try to search securely in driver pool by sessionId
-                    this.driver = IDriverPool.getDriver(sessionId);
-                } catch (DriverPoolException ex) {
-                    // seems like driver started outside of IDriverPool so try to register it as well
-                    this.driver = (WebDriver) tempSearchContext;
-                }
-            } else {
-                LOGGER.error("Undefined error for searchContext: " + tempSearchContext.toString());
+
+            // search driver in hierarchy
+            while (!(tempSearchContext instanceof WebDriver)) {
+                tempSearchContext = ((WrapsDriver) tempSearchContext).getWrappedDriver();
             }
+
+            this.driver = (WebDriver) tempSearchContext;
+
         } catch (IllegalAccessException | ClassCastException e) {
             e.printStackTrace();
         } catch (Throwable thr) {
@@ -252,7 +215,6 @@ public class ExtendedWebElement implements IWebElement {
                 throw new RuntimeException("review stacktrace to analyze why searchContext is not populated correctly via reflection!");
             }
         }
-
     }
 
 
@@ -401,12 +363,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return By by
      */
     public By getBy() {
-        // todo move this code from getter
-        By value = by;
-        if (caseInsensitiveConverter != null) {
-           value = caseInsensitiveConverter.convert(this.by);
-        }
-        return value;
+        return this.by;
     }
 
     public void setBy(By by) {
@@ -1135,35 +1092,20 @@ public class ExtendedWebElement implements IWebElement {
         By by = null;
 
         if (locator.startsWith(LocatorType.ID.getStartsWith())) {
-            if (caseInsensitiveConverter != null) {
-                by = caseInsensitiveConverter.convert(by);
-            } else {
                 by = By.id(String.format(StringUtils.remove(locator, LocatorType.ID.getStartsWith()), objects));
-            }
+
         }
 
         if (locator.startsWith(LocatorType.NAME.getStartsWith())) {
-            if (caseInsensitiveConverter != null) {
-                by = caseInsensitiveConverter.convert(by);
-            } else {
-                by = By.id(String.format(StringUtils.remove(locator, LocatorType.NAME.getStartsWith()), objects));
-            }
+                by = By.name(String.format(StringUtils.remove(locator, LocatorType.NAME.getStartsWith()), objects));
         }
 
         if (locator.startsWith(LocatorType.XPATH.getStartsWith())) {
-            if (caseInsensitiveConverter != null) {
-                by = caseInsensitiveConverter.convert(by);
-            } else {
                 by = By.xpath(String.format(StringUtils.remove(locator, LocatorType.XPATH.getStartsWith()), objects));
-            }
         }
 
         if (locator.startsWith(LocatorType.LINKTEXT.getStartsWith())) {
-            if (caseInsensitiveConverter != null) {
-                by = caseInsensitiveConverter.convert(by);
-            } else {
-                by = By.xpath(String.format(StringUtils.remove(locator, LocatorType.LINKTEXT.getStartsWith()), objects));
-            }
+                by = By.linkText(String.format(StringUtils.remove(locator, LocatorType.LINKTEXT.getStartsWith()), objects));
         }
 
         if (locator.startsWith("partialLinkText: ")) {
