@@ -20,15 +20,12 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.decorators.Decorated;
-import org.openqa.selenium.support.decorators.WebDriverDecorator;
 import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.openqa.selenium.support.events.WebDriverListener;
 import org.slf4j.Logger;
@@ -283,31 +280,21 @@ public class DriverListener implements WebDriverListener, IDriverPool {
      * @return WebDriver
      */
     private WebDriver castDriver(WebDriver drv) {
-        if (drv instanceof EventFiringDecorator) {
-            drv = ((EventFiringDecorator<WebDriver>) drv).getDecoratedDriver().getOriginal();
+        if (drv instanceof Decorated) {
+            drv = ((Decorated<WebDriver>) drv).getOriginal();
         }
         return drv;
     }
 
+    /**
+     * Clean driver from Decorator and cast driver to
+     */
     public static <T extends WebDriver> T castDriver(WebDriver driver, Class<T> clazz) {
         T castDriver = null;
-        List<WebDriverListener> listeners = null;
-
         if (driver instanceof Decorated) {
-            try {
-                listeners = (List<WebDriverListener>)FieldUtils.readDeclaredField(((Decorated<T>)driver).getDecorator(), "listeners", true);
-            } catch (IllegalAccessException e) {
-                new RuntimeException(e);
-            }
-            driver =  ((Decorated<T>) driver).getOriginal();
-
+            driver = ((Decorated<WebDriver>) driver).getOriginal();
         }
-
         castDriver = clazz.cast(driver);
-
-        if (listeners != null) {
-            castDriver =  new EventFiringDecorator<T>(listeners.toArray(new WebDriverListener[0])).decorate(castDriver);
-        }
         return castDriver;
     }
 }
