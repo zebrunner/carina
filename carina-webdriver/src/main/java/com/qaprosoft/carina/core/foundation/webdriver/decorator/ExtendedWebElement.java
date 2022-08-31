@@ -17,7 +17,6 @@ package com.qaprosoft.carina.core.foundation.webdriver.decorator;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.nio.file.Files;
@@ -165,15 +164,7 @@ public class ExtendedWebElement implements IWebElement {
         try {
             SearchContext tempSearchContext = null;
 
-            // FIXME REPLACE EventFiringWebDriver$EventFiringWebElement
-            if (element.getClass().toString().contains("EventFiringWebDriver$EventFiringWebElement")) {
-                // reuse reflection to get internal fields
-                element = (RemoteWebElement) (FieldUtils.getDeclaredField(element.getClass(), "underlyingElement", true).get(element));
-            }
-
-            if (element instanceof RemoteWebElement) {
-                tempSearchContext = ((RemoteWebElement) element).getWrappedDriver();
-            } else if (element instanceof Proxy) {
+            if (element instanceof Proxy) {
                 InvocationHandler innerProxy = Proxy.getInvocationHandler(element);
                 ExtendedElementLocator locator = (ExtendedElementLocator) (FieldUtils.getDeclaredField(innerProxy.getClass(), "locator", true))
                         .get(innerProxy);
@@ -223,16 +214,9 @@ public class ExtendedWebElement implements IWebElement {
             }
 
             if (tempSearchContext instanceof Decorated) {
-                this.driver = ((Decorated<WebDriver>) tempSearchContext).getOriginal();
+                this.driver = (WebDriver) ((Decorated<?>) tempSearchContext).getDecorator().getDecoratedDriver().getOriginal();
                 // TODO: [VD] it seems like method more and more complex. Let's analyze and avoid return from this line
                 return;
-            }
-
-            if (tempSearchContext != null && tempSearchContext.getClass().toString().contains("EventFiringWebDriver$EventFiringWebElement")) {
-                // reuse reflection to get internal fields
-                this.searchContext = (RemoteWebElement) FieldUtils.getDeclaredField(tempSearchContext.getClass(), "underlyingElement", true)
-                        .get(tempSearchContext);
-                tempSearchContext = this.searchContext;
             }
 
             if (tempSearchContext instanceof RemoteWebElement) {
@@ -261,8 +245,8 @@ public class ExtendedWebElement implements IWebElement {
         } catch (IllegalAccessException | ClassCastException e) {
             e.printStackTrace();
         } catch (Throwable thr) {
-			thr.printStackTrace();
-			LOGGER.error("Unable to get Driver, searchContext and By via reflection!", thr);
+            thr.printStackTrace();
+            LOGGER.error("Unable to get Driver, searchContext and By via reflection!", thr);
         } finally {
             if (this.searchContext == null) {
                 throw new RuntimeException("review stacktrace to analyze why searchContext is not populated correctly via reflection!");
