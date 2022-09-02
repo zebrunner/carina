@@ -71,8 +71,7 @@ public class MacFactory extends AbstractFactory {
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed appium URL!", e);
         }
-        driver = new EventFiringDecorator<Mac2Driver>(getEventListeners())
-                .decorate(new Mac2Driver(url, capabilities));
+        driver = new Mac2Driver(url, capabilities);
 
         return driver;
     }

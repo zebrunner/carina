@@ -24,6 +24,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.openqa.selenium.support.events.WebDriverListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,8 +86,8 @@ public class DriverFactory {
 
         LOGGER.info("Starting driver session...");
         WebDriver driver = factory.create(testName, capabilities, seleniumHost);
-        // decorate in every Factory class
-        // driver = new EventFiringDecorator<>(getEventListeners(driver)).decorate(driver);
+        driver = new EventFiringDecorator<WebDriver>(getEventListeners())
+                .decorate(driver);
         LOGGER.info("Driver session started.");
         LOGGER.debug("DriverFactory finish...");
 

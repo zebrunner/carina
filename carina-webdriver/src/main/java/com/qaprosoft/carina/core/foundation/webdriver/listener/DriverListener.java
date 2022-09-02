@@ -204,7 +204,6 @@ public class DriverListener implements WebDriverListener, IDriverPool {
     }
 
     private void captureScreenshot(String comment, WebDriver driver, WebElement element, boolean errorMessage) {
-        driver = castDriver(driver);
         if (getMessage(errorMessage) != null) {
             comment = getMessage(errorMessage);
         }
@@ -279,12 +278,12 @@ public class DriverListener implements WebDriverListener, IDriverPool {
      *
      * @return WebDriver
      */
-    private WebDriver castDriver(WebDriver drv) {
-        if (drv instanceof Decorated) {
-            drv = ((Decorated<WebDriver>) drv).getOriginal();
-        }
-        return drv;
-    }
+//    private WebDriver castDriver(WebDriver drv) {
+//        if (drv instanceof Decorated) {
+//            drv = ((Decorated<WebDriver>) drv).getOriginal();
+//        }
+//        return drv;
+//    }
 
     /**
      * Clean driver from Decorator and cast driver to

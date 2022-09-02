@@ -77,8 +77,7 @@ public class DesktopFactory extends AbstractFactory {
 
         try {
             EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(new URL(seleniumHost));
-            driver = new EventFiringDecorator<RemoteWebDriver>(getEventListeners())
-                    .decorate(new RemoteWebDriver(ce, capabilities));
+            driver = new RemoteWebDriver(ce, capabilities);
 
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed selenium URL!", e);

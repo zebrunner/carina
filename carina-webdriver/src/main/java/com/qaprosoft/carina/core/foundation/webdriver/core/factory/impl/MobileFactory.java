@@ -111,18 +111,15 @@ public class MobileFactory extends AbstractFactory {
             EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
 
             if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
-                driver = new EventFiringDecorator<AndroidDriver>(getEventListeners())
-                        .decorate(new AndroidDriver(ce, capabilities));
+                driver = new AndroidDriver(ce, capabilities);
 
             } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.IOS)
                     || mobilePlatformName.equalsIgnoreCase(SpecialKeywords.TVOS)) {
-                driver = new EventFiringDecorator<IOSDriver>(getEventListeners())
-                        .decorate(new IOSDriver(ce, capabilities));
+                driver = new IOSDriver(ce, capabilities);
 
             } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.CUSTOM)) {
                 // that's a case for custom mobile capabilities like browserstack or saucelabs
-                driver = new EventFiringDecorator<RemoteWebDriver>(getEventListeners())
-                        .decorate(new RemoteWebDriver(new URL(seleniumHost), capabilities));
+                driver =new RemoteWebDriver(new URL(seleniumHost), capabilities);
 
             } else {
                 throw new RuntimeException("Unsupported mobile platform: " + mobilePlatformName);

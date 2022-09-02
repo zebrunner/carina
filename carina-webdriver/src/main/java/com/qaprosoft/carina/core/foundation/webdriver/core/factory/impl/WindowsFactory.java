@@ -72,8 +72,7 @@ public class WindowsFactory extends AbstractFactory {
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed appium URL!", e);
         }
-        driver = new EventFiringDecorator<WindowsDriver>(getEventListeners())
-                .decorate(new WindowsDriver(url, capabilities));
+        driver = new WindowsDriver(url, capabilities);
 
         return driver;
     }
