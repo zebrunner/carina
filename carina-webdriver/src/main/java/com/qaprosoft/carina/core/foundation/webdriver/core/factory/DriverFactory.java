@@ -86,7 +86,7 @@ public class DriverFactory {
 
         LOGGER.info("Starting driver session...");
         WebDriver driver = factory.create(testName, capabilities, seleniumHost);
-        driver = new EventFiringDecorator<WebDriver>(getEventListeners())
+        driver = new EventFiringDecorator<WebDriver>(getEventListeners(driver))
                 .decorate(driver);
         LOGGER.info("Driver session started.");
         LOGGER.debug("DriverFactory finish...");
@@ -99,11 +99,11 @@ public class DriverFactory {
      *
      * @return list of driver listeners (default listener plus custom listeners)
      */
-    private static WebDriverListener[] getEventListeners() {
+    private static WebDriverListener[] getEventListeners(WebDriver driver) {
         List<WebDriverListener> listeners = new ArrayList<>();
 
         // explicitly add default carina com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener
-        DriverListener driverListener = new DriverListener();
+        DriverListener driverListener = new DriverListener(driver);
         listeners.add(driverListener);
 
         String listenerClasses = Configuration.get(Parameter.DRIVER_EVENT_LISTENERS);

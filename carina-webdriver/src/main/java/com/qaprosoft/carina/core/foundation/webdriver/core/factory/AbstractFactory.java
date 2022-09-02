@@ -91,38 +91,4 @@ public abstract class AbstractFactory {
         }
         return allCapabilities;
     }
-
-    /**
-     * Reads 'driver_event_listeners' configuration property and initializes appropriate array of driver event listeners.
-     *
-     * @return list of driver listeners (default listener plus custom listeners)
-     */
-    protected static WebDriverListener[] getEventListeners() {
-        List<WebDriverListener> listeners = new ArrayList<>();
-
-        // explicitly add default carina com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener
-        DriverListener driverListener = new DriverListener();
-        listeners.add(driverListener);
-
-        String listenerClasses = Configuration.get(Configuration.Parameter.DRIVER_EVENT_LISTENERS);
-
-        if (!StringUtils.isEmpty(listenerClasses)) {
-            for (String listenerClass : listenerClasses.split(",")) {
-                try {
-                    Class<?> clazz = Class.forName(listenerClass);
-                    if (WebDriverListener.class.isAssignableFrom(clazz)) {
-                        WebDriverListener listener = (WebDriverListener) clazz.getDeclaredConstructor().newInstance();
-                        listeners.add(listener);
-                        LOGGER.debug("Webdriver event listener registered: {}", clazz.getName());
-                    }
-                } catch (ClassNotFoundException e) {
-                    LOGGER.error("Unable to register '{}' webdriver event listener! Class was not found", listenerClass, e);
-
-                } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
-                    LOGGER.error("Unable to register '{}' webdriver event listener! Please, investigate stacktrace!", listenerClass, e);
-                }
-            }
-        }
-        return listeners.toArray(new WebDriverListener[0]);
-    }
 }

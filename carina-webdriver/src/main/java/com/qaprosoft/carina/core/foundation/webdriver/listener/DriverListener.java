@@ -49,15 +49,10 @@ public class DriverListener implements WebDriverListener, IDriverPool {
     private static final ThreadLocal<String> CURRENT_POSITIVE_MESSAGE = new ThreadLocal<>();
     private static final ThreadLocal<String> CURRENT_NEGATIVE_MESSAGE = new ThreadLocal<>();
 
-    private WebDriver driver = null;
+    private WebDriver driver  = null;
 
-    public DriverListener() {
-        // do nothing
-    }
-
-    // FIXME refactor - it is not a good idea to set driver using this method
-    @Override
-    public void beforeAnyWebDriverCall(WebDriver driver, Method method, Object[] args)  {
+    // FIXME refactor - it is not a good idea to set driver using constructor
+    public DriverListener(WebDriver driver) {
         this.driver = driver;
     }
 
