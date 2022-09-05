@@ -13,16 +13,16 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.browsermobproxy.ProxyPool;
+import com.qaprosoft.carina.browserupproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
 import ${package}.carina.demo.gui.pages.HomePage;
-import ${package}.carina.demo.gui.pages.NewsPage;
+{package}.carina.demo.gui.pages.NewsPage;
 import com.zebrunner.agent.core.registrar.Artifact;
 
-import net.lightbody.bmp.BrowserMobProxy;
-import net.lightbody.bmp.proxy.CaptureType;
+import com.browserup.bup.BrowserUpProxy;
+import com.browserup.bup.proxy.CaptureType;
 
 /**
  * This sample shows how generate har file with proxied Web test content.
@@ -32,12 +32,12 @@ import net.lightbody.bmp.proxy.CaptureType;
 public class ProxySampleTest implements IAbstractTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    BrowserMobProxy proxy;
+    BrowserUpProxy proxy;
 
     @BeforeMethod(alwaysRun = true)
     public void startProxy()
     {
-        R.CONFIG.put("browsermob_proxy", "true");
+        R.CONFIG.put("browserup_proxy", "true");
         getDriver();
         proxy = ProxyPool.getProxy();
         proxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT);
