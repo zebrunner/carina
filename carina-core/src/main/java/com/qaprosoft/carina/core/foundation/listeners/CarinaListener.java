@@ -59,7 +59,7 @@ import com.azure.storage.blob.models.BlobProperties;
 import com.qaprosoft.amazon.AmazonS3Manager;
 import com.qaprosoft.appcenter.AppCenterManager;
 import com.qaprosoft.azure.AzureManager;
-import com.qaprosoft.carina.browsermobproxy.ProxyPool;
+import com.qaprosoft.carina.browserupproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
@@ -89,7 +89,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.screenshot.AutoScreenshotR
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
 import com.zebrunner.agent.core.registrar.Artifact;
 import com.zebrunner.agent.core.registrar.CurrentTest;
-import com.zebrunner.agent.core.registrar.CurrentTestRun;
 import com.zebrunner.agent.core.registrar.Label;
 import com.zebrunner.agent.core.registrar.TestRail;
 import com.zebrunner.agent.core.registrar.label.CompositeLabelResolver;

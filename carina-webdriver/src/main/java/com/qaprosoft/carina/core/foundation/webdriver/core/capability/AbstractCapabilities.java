@@ -29,7 +29,7 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.browsermobproxy.ProxyPool;
+import com.qaprosoft.carina.browserupproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -161,14 +161,14 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
     }
 
     protected Proxy setupProxy() {
-        ProxyPool.setupBrowserMobProxy();
+        ProxyPool.setupBrowserUpProxy();
         SystemProxy.setupProxy();
 
         String proxyHost = Configuration.get(Parameter.PROXY_HOST);
         String proxyPort = Configuration.get(Parameter.PROXY_PORT);
         String noProxy = Configuration.get(Parameter.NO_PROXY);
         
-        if (Configuration.get(Parameter.BROWSERMOB_PROXY).equals("true")) {
+        if (Configuration.get(Parameter.BROWSERUP_PROXY).equals("true")) {
             proxyPort = Integer.toString(ProxyPool.getProxyPortFromThread());
         }
         List<String> protocols = Arrays.asList(Configuration.get(Parameter.PROXY_PROTOCOLS).split("[\\s,]+"));
