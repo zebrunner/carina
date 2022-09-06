@@ -18,7 +18,7 @@ import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
 import ${package}.carina.demo.gui.pages.HomePage;
-{package}.carina.demo.gui.pages.NewsPage;
+import ${package}.carina.demo.gui.pages.NewsPage;
 import com.zebrunner.agent.core.registrar.Artifact;
 
 import com.browserup.bup.BrowserUpProxy;

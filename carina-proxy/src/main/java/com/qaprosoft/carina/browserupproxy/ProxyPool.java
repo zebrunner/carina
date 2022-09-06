@@ -37,23 +37,20 @@ import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 
 public final class ProxyPool {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final ConcurrentHashMap<Long, Integer> PROXY_PORTS_BY_THREAD = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<Long, Integer> proxyPortsByThread = new ConcurrentHashMap<>();
     // map for storing of available ports range and their availability
-    private static final ConcurrentHashMap<Integer, Boolean> PROXY_PORTS_FROM_RANGE = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<Integer, Boolean> proxyPortsFromRange = new ConcurrentHashMap<>();
 
 	static {
         initProxyPortsRange();
-    }
-
-    private ProxyPool() {
     }
 
 	public static void initProxyPortsRange() {
 		if (!Configuration.get(Parameter.BROWSERUP_PORTS_RANGE).isEmpty()) {
 			try {
 				String[] ports = Configuration.get(Parameter.BROWSERUP_PORTS_RANGE).split(":");
-				for (int i = Integer.parseInt(ports[0]); i <= Integer.parseInt(ports[1]); i++) {
-					PROXY_PORTS_FROM_RANGE.put(i, true);
+				for (int i = Integer.valueOf(ports[0]); i <= Integer.valueOf(ports[1]); i++) {
+					proxyPortsFromRange.put(i, true);
 				}
 			} catch (Exception e) {
 				throw new RuntimeException("Please specify BROWSERUP_PORTS_RANGE in format 'port_from:port_to'");
@@ -84,7 +81,7 @@ public final class ProxyPool {
             BrowserUpProxy proxy = startProxy();
 
             Integer port = proxy.getPort();
-            PROXY_PORTS_BY_THREAD.put(threadId, port);
+            proxyPortsByThread.put(threadId, port);
             
             // reuse "proxy_host" to be able to share valid publicly available host. 
             // it is useful when java and web tests are executed absolutely in different containers/networks. 
@@ -94,7 +91,7 @@ public final class ProxyPool {
             }
 
             LOGGER.warn("Set http/https proxy settings only to use with BrowserUpProxy host: {}; port: {}", Configuration.get(Parameter.PROXY_HOST),
-                    +PROXY_PORTS_BY_THREAD.get(threadId));
+                    +proxyPortsByThread.get(threadId));
 
             R.CONFIG.put(Parameter.PROXY_PORT.getKey(), port.toString());
             R.CONFIG.put("proxy_protocols", "http,https");
@@ -140,7 +137,7 @@ public final class ProxyPool {
     
     // ------------------------- BOWSERMOB PROXY ---------------------
     
-    private static final ConcurrentHashMap<Long, BrowserUpProxy> PROXIES = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<Long, BrowserUpProxy> proxies = new ConcurrentHashMap<>();
     
     /**
      * Checking whether BROWSERUP_PORT is declared. then it will be used as port for browserup proxy
@@ -152,7 +149,7 @@ public final class ProxyPool {
 		if (!Configuration.get(Parameter.BROWSERUP_PORT).isEmpty())
 			return Configuration.getInt(Parameter.BROWSERUP_PORT);
 		else if (!Configuration.get(Parameter.BROWSERUP_PORTS_RANGE).isEmpty()) {
-			for (Map.Entry<Integer, Boolean> pair : PROXY_PORTS_FROM_RANGE.entrySet()) {
+			for (Map.Entry<Integer, Boolean> pair : proxyPortsFromRange.entrySet()) {
 				if (pair.getValue()) {
 					LOGGER.info("Making BrowserUp proxy port busy: {}", pair.getKey());
 					pair.setValue(false);
@@ -183,18 +180,18 @@ public final class ProxyPool {
         // integrate browserUp proxy if required here
         BrowserUpProxy proxy = null;
         long threadId = Thread.currentThread().getId();
-        if (PROXIES.containsKey(threadId)) {
-            proxy = PROXIES.get(threadId);
+        if (proxies.containsKey(threadId)) {
+            proxy = proxies.get(threadId);
         }
 
-        if (PROXY_PORTS_BY_THREAD.containsKey(threadId)) {
-            proxyPort = PROXY_PORTS_BY_THREAD.get(threadId);
+        if (proxyPortsByThread.containsKey(threadId)) {
+            proxyPort = proxyPortsByThread.get(threadId);
         }
 
         // case when proxy was already instantiated but port doesn't correspond to current device
         if (null == proxy || proxy.getPort() != proxyPort) {
             proxy = ProxyPool.createProxy();
-            PROXIES.put(Thread.currentThread().getId(), proxy);
+            proxies.put(Thread.currentThread().getId(), proxy);
         }
         
         if (!proxy.isStarted()) {
@@ -210,11 +207,11 @@ public final class ProxyPool {
     }
     
     private static void setProxyPortToAvailable(long threadId) {
-		if (PROXY_PORTS_BY_THREAD.get(threadId) != null) {
-			if (PROXY_PORTS_FROM_RANGE.get(PROXY_PORTS_BY_THREAD.get(threadId)) != null) {
-				LOGGER.info("Setting BrowserUp proxy port {} to available state", PROXY_PORTS_BY_THREAD.get(threadId));
-				PROXY_PORTS_FROM_RANGE.put(PROXY_PORTS_BY_THREAD.get(threadId), true);
-				PROXY_PORTS_BY_THREAD.remove(threadId);
+		if (proxyPortsByThread.get(threadId) != null) {
+			if (proxyPortsFromRange.get(proxyPortsByThread.get(threadId)) != null) {
+				LOGGER.info("Setting BrowserUp proxy port {} to available state", proxyPortsByThread.get(threadId));
+				proxyPortsFromRange.put(proxyPortsByThread.get(threadId), true);
+				proxyPortsByThread.remove(threadId);
 			}
 		}
     }
@@ -235,7 +232,7 @@ public final class ProxyPool {
      * Stop all proxies if possible
      */
     public static void stopAllProxies() {
-        for (Long threadId : Collections.list(PROXIES.keys())) {
+        for (Long threadId : Collections.list(proxies.keys())) {
             stopProxyByThread(threadId);
         }
     }
@@ -245,9 +242,9 @@ public final class ProxyPool {
      * @param threadId long
      */
     private static void stopProxyByThread(long threadId) {
-        if (PROXIES.containsKey(threadId)) {
+        if (proxies.containsKey(threadId)) {
             setProxyPortToAvailable(threadId);
-            BrowserUpProxy proxy = PROXIES.get(threadId);
+            BrowserUpProxy proxy = proxies.get(threadId);
             if (proxy != null) {
                 LOGGER.debug("Found registered proxy by thread: {}", threadId);
 
@@ -264,7 +261,7 @@ public final class ProxyPool {
                     }
                 }
             }
-            PROXIES.remove(threadId);
+            proxies.remove(threadId);
         }
     }
 
@@ -277,8 +274,8 @@ public final class ProxyPool {
     public static BrowserUpProxy getProxy() {
         BrowserUpProxy proxy = null;
         long threadId = Thread.currentThread().getId();
-        if (PROXIES.containsKey(threadId)) {
-            proxy = PROXIES.get(threadId);
+        if (proxies.containsKey(threadId)) {
+            proxy = proxies.get(threadId);
         } else {
             Assert.fail("There is not a registered BrowserUpProxy for thread: " + threadId);
         }
@@ -288,8 +285,8 @@ public final class ProxyPool {
     public static int getProxyPortFromThread() {
         int port = 0;
         long threadId = Thread.currentThread().getId();
-        if (PROXY_PORTS_BY_THREAD.containsKey(threadId)) {
-            port = PROXY_PORTS_BY_THREAD.get(threadId);
+        if (proxyPortsByThread.containsKey(threadId)) {
+            port = proxyPortsByThread.get(threadId);
         } else {
             Assert.fail("This is not a register BrowserUpProxy Port for thread: " + threadId);
         }
@@ -304,7 +301,7 @@ public final class ProxyPool {
      */
     public static boolean isProxyRegistered() {
         long threadId = Thread.currentThread().getId();
-        return PROXIES.containsKey(threadId);
+        return proxies.containsKey(threadId);
     }
 
     /**
@@ -315,18 +312,18 @@ public final class ProxyPool {
      */
     public static void registerProxy(BrowserUpProxy proxy) {
         long threadId = Thread.currentThread().getId();
-        if (PROXIES.containsKey(threadId)) {
+        if (proxies.containsKey(threadId)) {
             LOGGER.warn("Existing proxy is detected and will be overwritten");
             // No sense to stop as it is not supported
-            PROXIES.remove(threadId);
+            proxies.remove(threadId);
         }
-        if (PROXY_PORTS_BY_THREAD.containsKey(threadId)) {
+        if (proxyPortsByThread.containsKey(threadId)) {
             LOGGER.warn("Existing proxyPort is detected and will be overwritten");
-            PROXY_PORTS_BY_THREAD.remove(threadId);
+            proxyPortsByThread.remove(threadId);
         }
         
         LOGGER.info("Register custom proxy with thread: {}", threadId);
-        PROXIES.put(threadId, proxy);
+        proxies.put(threadId, proxy);
     }
     
     /**
