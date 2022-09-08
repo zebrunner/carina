@@ -1205,16 +1205,15 @@ public class DriverHelper {
      */
     @Deprecated(since = "7.4.21", forRemoval = true)
     public List<ExtendedWebElement> findExtendedWebElements(final By by, long timeout) {
-        List<ExtendedWebElement> extendedWebElements = new ArrayList<ExtendedWebElement>();
-        List<WebElement> webElements = new ArrayList<WebElement>();
+        List<ExtendedWebElement> extendedWebElements = new ArrayList<>();
 
         String name = "undefined";
     	if (!waitUntil(ExpectedConditions.presenceOfElementLocated(by), timeout)) {
     		Messager.ELEMENT_NOT_FOUND.info(name);
     		return extendedWebElements;
     	}
-    	
-    	webElements = getDriver().findElements(by);
+
+        List<WebElement> webElements = getDriver().findElements(by);
     	int i = 1;
         for (WebElement element : webElements) {
             try {
