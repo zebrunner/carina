@@ -1248,7 +1248,6 @@ public class ExtendedWebElement implements IWebElement {
         }
 
         if (resultBy == null) {
-            LOGGER.error("Please, inform Carina Support about this problem");
             throw new RuntimeException("Locator formatting failed - no suitable locator type found for formatting");
         }
 
@@ -1790,7 +1789,6 @@ public class ExtendedWebElement implements IWebElement {
         }
 
         if (resBy == null) {
-            LOGGER.error("Please, inform Carina Support about this problem");
             throw new RuntimeException("Locator formatting failed - no suitable locator type found for generating by for element of list");
         }
 
