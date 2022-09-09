@@ -13,7 +13,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<carina-core_version>7.4.24</carina-core_version>
+		<carina-core_version>7.4.25</carina-core_version>
 		<java.version>11</java.version>
 		<zebrunner-agent.version>1.7.2</zebrunner-agent.version>
 		<suite>helloWorld</suite>
