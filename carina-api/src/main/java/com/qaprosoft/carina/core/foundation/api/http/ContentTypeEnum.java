@@ -24,6 +24,10 @@ public enum ContentTypeEnum {
         return stringValues;
     }
 
+    public String getMainStringValue() {
+        return stringValues[0];
+    }
+
     private String[] stringValues;
 
     ContentTypeEnum(String[] stringValues) {
