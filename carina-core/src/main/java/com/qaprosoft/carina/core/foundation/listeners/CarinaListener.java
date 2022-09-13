@@ -59,7 +59,7 @@ import com.azure.storage.blob.models.BlobProperties;
 import com.qaprosoft.amazon.AmazonS3Manager;
 import com.qaprosoft.appcenter.AppCenterManager;
 import com.qaprosoft.azure.AzureManager;
-import com.qaprosoft.carina.browsermobproxy.ProxyPool;
+import com.qaprosoft.carina.browserupproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;

@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.browsermobproxy.rewrite;
+package com.qaprosoft.carina.browserupproxy.rewrite;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.browserup.bup.filters.ResponseFilter;
+import com.browserup.bup.util.HttpMessageContents;
+import com.browserup.bup.util.HttpMessageInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.netty.handler.codec.http.HttpResponse;
-import net.lightbody.bmp.filters.ResponseFilter;
-import net.lightbody.bmp.util.HttpMessageContents;
-import net.lightbody.bmp.util.HttpMessageInfo;
 
 /**
  * Class wrapper for ResponseFilter. Rewrite rules can be configured as separate
@@ -76,7 +76,7 @@ public class CustomRsFilter implements ResponseFilter {
         for (RewriteItem rewriteItem : rewrites) {
             if (reqUrl.matches(rewriteItem.getHost())) {
                 // headers rewrite
-                LOGGER.debug("Rewrite rule will be applied for host: ".concat(reqUrl));
+                LOGGER.debug("Rewrite rule will be applied for host: {}", reqUrl);
                 applyHeaders(response, rewriteItem.getHeaders());
 
                 // body rewrite

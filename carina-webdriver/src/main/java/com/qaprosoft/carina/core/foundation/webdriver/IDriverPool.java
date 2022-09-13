@@ -37,7 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
-import com.qaprosoft.carina.browsermobproxy.ProxyPool;
+import com.qaprosoft.carina.browserupproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.exception.DriverPoolException;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
@@ -405,7 +405,7 @@ public interface IDriverPool {
                 driversPool.add(carinaDriver);
                 POOL_LOGGER.debug("initDriver finish...");
                 
-                if (Configuration.getBoolean(Parameter.BROWSERMOB_PROXY)) {
+                if (Configuration.getBoolean(Parameter.BROWSERUP_PROXY)) {
                     if (!device.isNull()) {
                         int proxyPort;
                         try {

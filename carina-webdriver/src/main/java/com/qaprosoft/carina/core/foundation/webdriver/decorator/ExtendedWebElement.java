@@ -1089,56 +1089,55 @@ public class ExtendedWebElement implements IWebElement {
      */
     public ExtendedWebElement format(Object... objects) {
         String locator = by.toString();
-        By by = null;
+        By resultBy = null;
 
         if (locator.startsWith(LocatorType.ID.getStartsWith())) {
-                by = By.id(String.format(StringUtils.remove(locator, LocatorType.ID.getStartsWith()), objects));
-
+                resultBy = By.id(String.format(StringUtils.remove(locator, LocatorType.ID.getStartsWith()), objects));
         }
 
         if (locator.startsWith(LocatorType.NAME.getStartsWith())) {
-                by = By.name(String.format(StringUtils.remove(locator, LocatorType.NAME.getStartsWith()), objects));
+                resultBy = By.name(String.format(StringUtils.remove(locator, LocatorType.NAME.getStartsWith()), objects));
         }
 
         if (locator.startsWith(LocatorType.XPATH.getStartsWith())) {
-                by = By.xpath(String.format(StringUtils.remove(locator, LocatorType.XPATH.getStartsWith()), objects));
+                resultBy = By.xpath(String.format(StringUtils.remove(locator, LocatorType.XPATH.getStartsWith()), objects));
         }
 
         if (locator.startsWith(LocatorType.LINKTEXT.getStartsWith())) {
-                by = By.linkText(String.format(StringUtils.remove(locator, LocatorType.LINKTEXT.getStartsWith()), objects));
+                resultBy = By.linkText(String.format(StringUtils.remove(locator, LocatorType.LINKTEXT.getStartsWith()), objects));
         }
 
-        if (locator.startsWith("partialLinkText: ")) {
-            by = By.partialLinkText(String.format(StringUtils.remove(locator, "partialLinkText: "), objects));
+        if (locator.startsWith(LocatorType.PARTIAL_LINK_TEXT.getStartsWith())) {
+            resultBy = By.partialLinkText(String.format(StringUtils.remove(locator, LocatorType.PARTIAL_LINK_TEXT.getStartsWith()), objects));
         }
 
-        if (locator.startsWith("css: ")) {
-            by = By.cssSelector(String.format(StringUtils.remove(locator, "css: "), objects));
+        if (locator.startsWith(LocatorType.CSS.getStartsWith())) {
+            resultBy = By.cssSelector(String.format(StringUtils.remove(locator, LocatorType.CSS.getStartsWith()), objects));
         }
 
-        if (locator.startsWith("tagName: ")) {
-            by = By.tagName(String.format(StringUtils.remove(locator, "tagName: "), objects));
+        if (locator.startsWith(LocatorType.TAG_NAME.getStartsWith())) {
+            resultBy = By.tagName(String.format(StringUtils.remove(locator, LocatorType.TAG_NAME.getStartsWith()), objects));
         }
 
         /*
          * All ClassChain locators start from **. e.g FindBy(xpath = "**'/XCUIElementTypeStaticText[`name CONTAINS[cd] '%s'`]")
          */
         if (locator.startsWith("By.IosClassChain: **")) {
-            by = AppiumBy.iOSClassChain(String.format(StringUtils.remove(locator, "By.IosClassChain: "), objects));
+            resultBy = AppiumBy.iOSClassChain(String.format(StringUtils.remove(locator, "By.IosClassChain: "), objects));
         }
 
         if (locator.startsWith("By.IosNsPredicate: **")) {
-            by = AppiumBy.iOSNsPredicateString(String.format(StringUtils.remove(locator, "By.IosNsPredicate: "), objects));
+            resultBy = AppiumBy.iOSNsPredicateString(String.format(StringUtils.remove(locator, "By.IosNsPredicate: "), objects));
         }
 
         if (locator.startsWith("By.AccessibilityId: ")) {
-            by = AppiumBy.accessibilityId(String.format(StringUtils.remove(locator, "By.AccessibilityId: "), objects));
+            resultBy = AppiumBy.accessibilityId(String.format(StringUtils.remove(locator, LocatorType.ACCESSIBILITY_ID.getStartsWith()), objects));
         }
 
-        if (locator.startsWith("By.Image: ")) {
-            String formattedLocator = String.format(StringUtils.remove(locator, "By.Image: "), objects);
+        if (locator.startsWith(LocatorType.IMAGE.getStartsWith())) {
+            String formattedLocator = String.format(StringUtils.remove(locator, LocatorType.IMAGE.getStartsWith()), objects);
             Path path = Paths.get(formattedLocator);
-            LOGGER.debug("Formatted locator is : " + formattedLocator);
+            LOGGER.debug("Formatted locator is : {}", formattedLocator);
             String base64image;
             try {
                 base64image = new String(Base64.encode(Files.readAllBytes(path)));
@@ -1147,17 +1146,21 @@ public class ExtendedWebElement implements IWebElement {
                         "Error while reading image file after formatting. Formatted locator : " + formattedLocator, e);
             }
             LOGGER.debug("Base64 image representation has benn successfully obtained after formatting.");
-            by = AppiumBy.image(base64image);
+            resultBy = AppiumBy.image(base64image);
         }
 
-        if (locator.startsWith("By.AndroidUIAutomator: ")) {
-            by = AppiumBy.androidUIAutomator(String.format(StringUtils.remove(locator, "By.AndroidUIAutomator: "), objects));
-            LOGGER.debug("Formatted locator is : " + by.toString());
+        if (locator.startsWith(LocatorType.ANDROID_UI_AUTOMATOR.getStartsWith())) {
+            resultBy = AppiumBy
+                    .androidUIAutomator(String.format(StringUtils.remove(locator, LocatorType.ANDROID_UI_AUTOMATOR.getStartsWith()), objects));
+            LOGGER.debug("Formatted locator is : " + resultBy);
         }
 
-        return new ExtendedWebElement(by, name, this.driver, this.searchContext, objects);
+        if (resultBy == null) {
+            throw new RuntimeException("Locator formatting failed - no suitable locator type found for formatting");
+        }
+
+        return new ExtendedWebElement(resultBy, name, this.driver, this.searchContext, objects);
     }
-
 
     /**
      * Pause for specified timeout.
@@ -1646,34 +1649,30 @@ public class ExtendedWebElement implements IWebElement {
         }
 
         if (locator.startsWith(LocatorType.NAME.getStartsWith())) {
-        	resBy = By.name(StringUtils.remove(locator, LocatorType.NAME.getStartsWith()) + "[" + index + "]");
+            resBy = By.name(StringUtils.remove(locator, LocatorType.NAME.getStartsWith()) + "[" + index + "]");
         }
 
         if (locator.startsWith(LocatorType.XPATH.getStartsWith())) {
-        	resBy = By.xpath(StringUtils.remove(locator, LocatorType.XPATH.getStartsWith()) + "[" + index + "]");
+            resBy = By.xpath(StringUtils.remove(locator, LocatorType.XPATH.getStartsWith()) + "[" + index + "]");
         }
         if (locator.startsWith(LocatorType.LINKTEXT.getStartsWith())) {
-        	resBy = By.linkText(StringUtils.remove(locator, LocatorType.LINKTEXT.getStartsWith()) + "[" + index + "]");
+            resBy = By.linkText(StringUtils.remove(locator, LocatorType.LINKTEXT.getStartsWith()) + "[" + index + "]");
         }
 
         if (locator.startsWith(LocatorType.CLASSNAME.getStartsWith())) {
             resBy = By.className(StringUtils.remove(locator, LocatorType.CLASSNAME.getStartsWith()) + "[" + index + "]");
         }
 
-        if (locator.startsWith("partialLinkText: ")) {
-        	resBy = By.partialLinkText(StringUtils.remove(locator, "partialLinkText: ") + "[" + index + "]");
+        if (locator.startsWith(LocatorType.PARTIAL_LINK_TEXT.getStartsWith())) {
+            resBy = By.partialLinkText(StringUtils.remove(locator, LocatorType.PARTIAL_LINK_TEXT.getStartsWith()) + "[" + index + "]");
         }
 
-        if (locator.startsWith("css: ")) {
-        	resBy = By.cssSelector(StringUtils.remove(locator, "css: ") + ":nth-child(" + index + ")");
-        }
-        
-        if (locator.startsWith("By.cssSelector: ")) {
-        	resBy = By.cssSelector(StringUtils.remove(locator, "By.cssSelector: ") + ":nth-child(" + index + ")");
+        if (locator.startsWith(LocatorType.CSS.getStartsWith())) {
+            resBy = By.cssSelector(StringUtils.remove(locator, LocatorType.CSS.getStartsWith()) + ":nth-child(" + index + ")");
         }
 
-        if (locator.startsWith("tagName: ")) {
-        	resBy = By.tagName(StringUtils.remove(locator, "tagName: ") + "[" + index + "]");
+        if (locator.startsWith(LocatorType.TAG_NAME.getStartsWith())) {
+            resBy = By.tagName(StringUtils.remove(locator, LocatorType.TAG_NAME.getStartsWith()) + "[" + index + "]");
         }
 
         /*
@@ -1682,14 +1681,19 @@ public class ExtendedWebElement implements IWebElement {
         if (locator.startsWith("By.IosClassChain: **")) {
             resBy = AppiumBy.iOSClassChain(StringUtils.remove(locator, "By.IosClassChain: ") + "[" + index + "]");
         }
-        
+
         if (locator.startsWith("By.IosNsPredicate: **")) {
             resBy = AppiumBy.iOSNsPredicateString(StringUtils.remove(locator, "By.IosNsPredicate: ") + "[" + index + "]");
         }
 
-        if (locator.startsWith("By.AccessibilityId: ")) {
-            resBy = AppiumBy.accessibilityId(StringUtils.remove(locator, "By.AccessibilityId: ") + "[" + index + "]");
+        if (locator.startsWith(LocatorType.ACCESSIBILITY_ID.getStartsWith())) {
+            resBy = AppiumBy.accessibilityId(StringUtils.remove(locator, LocatorType.ACCESSIBILITY_ID.getStartsWith()) + "[" + index + "]");
         }
+
+        if (resBy == null) {
+            throw new RuntimeException("Locator formatting failed - no suitable locator type found for generating by for element of list");
+        }
+
         return resBy;
     }
 
