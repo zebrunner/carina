@@ -37,7 +37,7 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.openqa.selenium.support.decorators.Decorated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.IClassListener;
@@ -873,8 +873,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             for (Map.Entry<String, CarinaDriver> entry : drivers.entrySet()) {
                 WebDriver drv = entry.getValue().getDriver();
 
-                if (drv instanceof EventFiringWebDriver) {
-                    drv = ((EventFiringWebDriver) drv).getWrappedDriver();
+                if (drv instanceof Decorated<?>) {
+                    drv = (WebDriver) ((Decorated<?>) drv).getOriginal();
                 }
 
                 R.CONFIG.put(Parameter.ERROR_SCREENSHOT.getKey(), "true", true);

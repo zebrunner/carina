@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.decorators.Decorated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -415,7 +417,7 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
     public boolean findExpectedNotification(String expectedTitle, String expectedText, boolean partially) {
         // open notification
         try {
-            ((AndroidDriver) castDriver()).openNotifications();
+            castDriver(getDriver(), AndroidDriver.class).openNotifications();
             CommonUtils.pause(2); // wait while notifications are playing animation to
             // appear to avoid missed taps
         } catch (Exception e) {
@@ -1179,4 +1181,16 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
 
     // End of TimeZone private section
 
+    /**
+     * Clean driver from Decorator and cast driver to {{@code clazz}} class
+     * This method is duplicate from DriverListener class
+     */
+    private <T extends WebDriver> T castDriver(WebDriver driver, Class<T> clazz) {
+        T castDriver = null;
+        if (driver instanceof Decorated) {
+            driver = ((Decorated<WebDriver>) driver).getOriginal();
+        }
+        castDriver = clazz.cast(driver);
+        return castDriver;
+    }
 }

@@ -22,9 +22,11 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,7 +81,7 @@ public class MobileFactory extends AbstractFactory {
 
         LOGGER.debug("selenium: {}", seleniumHost);
 
-        RemoteWebDriver driver = null;
+        WebDriver driver = null;
         // if inside capabilities only singly "udid" capability then generate default one and append udid
         if (isCapabilitiesEmpty(capabilities)) {
             capabilities = getCapabilities(name);
@@ -107,15 +109,18 @@ public class MobileFactory extends AbstractFactory {
 
         try {
             EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
-            
+
             if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
                 driver = new AndroidDriver(ce, capabilities);
+
             } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.IOS)
                     || mobilePlatformName.equalsIgnoreCase(SpecialKeywords.TVOS)) {
                 driver = new IOSDriver(ce, capabilities);
+
             } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.CUSTOM)) {
                 // that's a case for custom mobile capabilities like browserstack or saucelabs
-                driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);
+                driver =new RemoteWebDriver(new URL(seleniumHost), capabilities);
+
             } else {
                 throw new RuntimeException("Unsupported mobile platform: " + mobilePlatformName);
             }
@@ -140,7 +145,7 @@ public class MobileFactory extends AbstractFactory {
         }
 
         try {
-            Device device = new Device(driver.getCapabilities());
+            Device device = new Device(((HasCapabilities) driver).getCapabilities());
             IDriverPool.registerDevice(device);
             // will be performed just in case uninstall_related_apps flag marked as true
             device.uninstallRelatedApps();
@@ -156,6 +161,8 @@ public class MobileFactory extends AbstractFactory {
             LOGGER.error("finished driver quit...");
             throw e;
         }
+
+
 
         return driver;
     }

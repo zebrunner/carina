@@ -22,6 +22,7 @@ import java.util.Objects;
 
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +55,7 @@ public class WindowsFactory extends AbstractFactory {
             throw new RuntimeException(String.format("Driver type %s is not applicable for Windows driver", driverType));
         }
 
-        WindowsDriver driver = null;
+        WebDriver driver = null;
         if (isCapabilitiesEmpty(capabilities)) {
             capabilities = getCapabilities(name);
         }

@@ -60,7 +60,7 @@ import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.json.JsonException;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.openqa.selenium.support.decorators.Decorated;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
@@ -678,13 +678,13 @@ public class DriverHelper {
 
     private String getSelenoidClipboardUrl(WebDriver driver) {
         String seleniumHost = Configuration.getSeleniumUrl().replace("wd/hub", "clipboard/");
-        if (seleniumHost.isEmpty()){
+        if (seleniumHost.isEmpty()) {
             seleniumHost = Configuration.getEnvArg(Parameter.URL.getKey()).replace("wd/hub", "clipboard/");
         }
-        WebDriver drv = (driver instanceof EventFiringWebDriver) ? ((EventFiringWebDriver) driver).getWrappedDriver() : driver;
+        WebDriver drv = (driver instanceof Decorated<?>) ? (WebDriver) ((Decorated<?>) driver).getOriginal() : driver;
         String sessionId = ((RemoteWebDriver) drv).getSessionId().toString();
         String url = seleniumHost + sessionId;
-        LOGGER.debug("url: " + url);
+        LOGGER.debug("url: {}", url);
         return url;
     }
 
