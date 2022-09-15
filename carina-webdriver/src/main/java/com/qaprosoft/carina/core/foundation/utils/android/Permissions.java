@@ -30,7 +30,7 @@ public class Permissions {
         ACCESS_LOCATION_EXTRA_COMMANDS(
                 "android.permission.ACCESS_LOCATION_EXTRA_COMMANDS");
 
-        private String permission;
+        private final String permission;
 
         private Permission(String permission) {
             this.permission = permission;

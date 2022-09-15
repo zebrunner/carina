@@ -21,6 +21,8 @@ import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.HasCapabilities;
@@ -50,6 +52,7 @@ import io.appium.java_client.HidesKeyboard;
 import io.appium.java_client.InteractsWithApps;
 import io.appium.java_client.SupportsLegacyAppManagement;
 import io.appium.java_client.appmanagement.ApplicationState;
+import io.appium.java_client.appmanagement.BaseInstallApplicationOptions;
 
 public interface IMobileUtils extends IDriverPool {
 
@@ -907,11 +910,14 @@ public interface IMobileUtils extends IDriverPool {
 
         try {
             ((Interactive) driver).perform(List.of(pressBottomRightKeySequence));
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver does not support pressBottomRightKey method", e);
         } catch (WebDriverException e) {
             UTILS_LOGGER.error("Error when try to press bottom right key", e);
         }
     }
 
+    // todo investigate is it method needed
     default public boolean isChecked(final ExtendedWebElement element) {
         // TODO: SZ migrate to FluentWaits
         return element.isElementPresent(5)
@@ -919,68 +925,106 @@ public interface IMobileUtils extends IDriverPool {
     }
 
     /**
-     * If the application you're interested about is installed - returns "true".
-     * Otherwise, returns "false".
+     * Checks if an app is installed on the device
      *
-     * @param packageName app's package or bundle id
-     * @return boolean
+     * @param packageName bundleId – bundleId of the app
+     * @return true if app is installed
      */
     default public boolean isApplicationInstalled(String packageName) {
-        WebDriver driver = getDriver();
-        boolean installed = ((InteractsWithApps) driver).isAppInstalled(packageName);
+        InteractsWithApps driver = null;
+        try {
+            driver = (InteractsWithApps) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver does not support isApplicationInstalled method", e);
+        }
 
-        UTILS_LOGGER.info(String.format("Application by package name (%s) installed: ", packageName) + installed);
+        boolean installed = driver.isAppInstalled(packageName);
+
+        UTILS_LOGGER.info("Application by package name ({}) installed: {}", packageName, installed);
         return installed;
     }
 
     /**
-     * Method to launch Android application by its package name.
+     * Activates the given app if it installed, but not running or if it is running in the background<br>
      *
-     * Application should be installed to device.
-     *
-     * Application might not be running in background, but will be launched anyway.
-     *
-     * @param packageName
-     *            - app's package or bundle id
+     * @param packageName bundleId – the bundle identifier (or app id) of the app to activate
      */
     default public void startApp(String packageName) {
         UTILS_LOGGER.info("Starting {}", packageName);
-        WebDriver driver = getDriver();
-        ((InteractsWithApps) driver).activateApp(packageName);
+        InteractsWithApps driver = null;
+        try {
+            driver = (InteractsWithApps) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver does not support startApp method", e);
+        }
+        driver.activateApp(packageName);
     }
 
     /**
-     * Will install application if path to apk-file on working machine is set.
+     * Install an app on the mobile device
      *
-     * @param apkPath String
+     * @param apkPath path to app to install
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void installApp(String apkPath) {
-        UTILS_LOGGER.info("Will install application with apk-file from {}", apkPath);
-        WebDriver driver = getDriver();
-        ((InteractsWithApps) driver).installApp(apkPath);
+        installApp(apkPath, null);
     }
 
     /**
-     * To remove installed application by provided package name
+     * Install an app on the mobile device
      *
-     * @param packageName app's package or bundle id
-     * @return true if succeed
+     * @param apkPath path to app to install
+     * @param options Set of the corresponding installation options for the particular platform
+     * @throws UnsupportedOperationException if driver does not support this feature
+     */
+    default public void installApp(String apkPath, @Nullable BaseInstallApplicationOptions<?> options) {
+        UTILS_LOGGER.info("Will install application with apk-file from {}", apkPath);
+        InteractsWithApps driver = null;
+        try {
+            driver = (InteractsWithApps) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver does not support installApp method", e);
+        }
+        driver.installApp(apkPath, options);
+    }
+
+   
+
+    /**
+     * Remove the specified app from the device (uninstall)
+     *
+     * @param packageName bundleId – the bundle identifier (or app id) of the app to remove
+     * @return true if the uninstall was successful
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public boolean removeApp(String packageName) {
-        WebDriver driver = getDriver();
-        boolean removed = ((InteractsWithApps) driver).removeApp(packageName);
-        UTILS_LOGGER.info("Application ({}) is successfully removed: {}", packageName, removed);
-        return removed;
+        InteractsWithApps driver = null;
+        try {
+            driver = (InteractsWithApps) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver does not support removeApp method", e);
+        }
+
+        boolean isRemoved = driver.removeApp(packageName);
+        UTILS_LOGGER.info("Application ({}) was successfully removed: {}", packageName, isRemoved);
+        return isRemoved;
     }
 
     /**
-     * Method to reset test application.
-     *
+     * Method to reset test application.<br>
      * App's settings will be reset. User will be logged out. Application will be closed to background.
+     * 
+     * @deprecated this method will be removed. iOS cannot clean the local state without reinstalling app
      */
+    @Deprecated(forRemoval = true, since = "8.x")
     default public void clearAppCache() {
         UTILS_LOGGER.info("Initiation application reset...");
-        WebDriver driver = getDriver();
-        ((SupportsLegacyAppManagement) driver).resetApp();
+        SupportsLegacyAppManagement driver = null;
+        try {
+            driver = (SupportsLegacyAppManagement) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver does not support deprecated clearAppCache  method", e);
+        }
+        driver.resetApp();
     }
 }

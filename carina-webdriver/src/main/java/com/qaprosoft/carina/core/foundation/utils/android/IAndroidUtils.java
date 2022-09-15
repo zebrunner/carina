@@ -21,11 +21,11 @@ import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -52,6 +52,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 
 import io.appium.java_client.AppiumBy;
+import io.appium.java_client.ExecutesMethod;
 import io.appium.java_client.android.SupportsNetworkStateManagement;
 import io.appium.java_client.android.connection.HasNetworkConnection;
 import io.appium.java_client.android.nativekey.AndroidKey;
@@ -89,106 +90,165 @@ public interface IAndroidUtils extends IMobileUtils {
     static final String SHELL_PRESS_HOME_CMD = "input keyevent 3";
     static final String SHELL_RECENT_APPS_CMD = "input keyevent KEYCODE_APP_SWITCH";
 
+    // seconds
+    static final int DEVICE_REFRESH_TIME = 20;
+
+    /**
+     * Send a key-press event to the keyboard
+     *
+     * @param key keyboard key, see {@link AndroidKey}
+     *
+     * @see <a href="https://android-developers.googleblog.com/2008/12/touch-mode.html">This method send key without leaving the touch-mode</a>
+     */
     default public void pressKeyboardKey(AndroidKey key) {
-        WebDriver driver = getDriver();
-        ((PressesKey) driver).pressKey(new KeyEvent(key).withFlag(KeyEventFlag.SOFT_KEYBOARD)
-                .withFlag(KeyEventFlag.KEEP_TOUCH_MODE).withFlag(KeyEventFlag.EDITOR_ACTION));
+        PressesKey driver = null;
+        try {
+            driver = (PressesKey) getDriver();
+        } catch (ClassCastException e) {
+            throw new RuntimeException("driver is not support pressKeyboardKey method", e);
+        }
+
+        driver.pressKey(new KeyEvent(key)
+                .withFlag(KeyEventFlag.SOFT_KEYBOARD)
+                .withFlag(KeyEventFlag.KEEP_TOUCH_MODE)
+                .withFlag(KeyEventFlag.EDITOR_ACTION));
     }
 
+    /**
+     * Send a key-press event to the keyboard
+     *
+     * @param key keyboard key, see {@link AndroidKey}
+     * @param flags event flags, see {@link KeyEventFlag}
+     */
+    default public void pressKeyboardKey(AndroidKey key, KeyEventFlag... flags) {
+        PressesKey driver = null;
+        try {
+            driver = (PressesKey) getDriver();
+        } catch (ClassCastException e) {
+            throw new RuntimeException("driver is not support pressKeyboardKey method", e);
+        }
+        KeyEvent keyEvent = new KeyEvent(key);
+
+        if (flags.length > 0) {
+            for (KeyEventFlag keyEventFlag : flags) {
+                keyEvent = keyEvent.withFlag(keyEventFlag);
+            }
+        }
+
+        driver.pressKey(keyEvent);
+    }
+
+    /**
+     * Send a key-press events to the keyboard
+     *
+     * @param keys keyboard keys, see {@link AndroidKey}
+     * 
+     * @see <a href="https://android-developers.googleblog.com/2008/12/touch-mode.html">This method send key without leaving the touch-mode</a>
+     */
+    default public void pressKeyboardKeys(List<AndroidKey> keys) {
+        final PressesKey driver;
+        try {
+            driver = (PressesKey) getDriver();
+        } catch (ClassCastException e) {
+            throw new RuntimeException("driver is not support pressKeyboardKey(s) method", e);
+        }
+
+        keys.forEach(key -> driver.pressKey(new KeyEvent(key)
+                .withFlag(KeyEventFlag.SOFT_KEYBOARD)
+                .withFlag(KeyEventFlag.KEEP_TOUCH_MODE)
+                .withFlag(KeyEventFlag.EDITOR_ACTION)));
+    }
+    
+
+    /**
+     * Send a key-press {@link AndroidKey#BACK} event to the keyboard
+     */
     default public void pressBack() {
         WebDriver driver = getDriver();
         ((PressesKey) driver).pressKey(new KeyEvent(AndroidKey.BACK));
     }
 
     /**
-     * Pressing "search" key of Android keyboard by coordinates.
-     * <p>
-     * Tested at Nexus 6P Android 8.0.0 standard keyboard. Coefficients of
-     * coordinates for other devices and custom keyboards could be different.
-     * <p>
-     * Following options are not working: 1.
-     * AndroidDriver.pressKeyCode(AndroidKeyCode.KEYCODE_SEARCH); 2.
-     * searchEditText.sendKeys("textToSearch" + "\n")
+     * Send a key-press {@link AndroidKey#SEARCH} event to the keyboard
      */
     default public void pressSearchKey() {
-        pressBottomRightKey();
+        WebDriver driver = getDriver();
+        ((PressesKey) driver).pressKey(new KeyEvent(AndroidKey.SEARCH));
     }
 
+    /**
+     * Press next key by coordinates
+     * This method does not guarantee that the next button will be clicked,
+     * it clicks the bottom right button by coordinates
+     */
     default public void pressNextKey() {
+        // todo refactor to use pressKey
         pressBottomRightKey();
     }
 
     // Change Device Language section
 
     /**
-     * change Android Device Language
-     * <p>
-     * Url: <a href=
-     * "http://play.google.com/store/apps/details?id=net.sanapeli.adbchangelanguage">
-     * ADBChangeLanguage apk </a> Change locale (language) of your device via ADB
-     * (on Android OS version 6.0, 5.0, 4.4, 4.3, 4.2 and older). No need to root
-     * your device! With ADB (Android Debug Bridge) on your computer, you can fast
-     * switch the device locale to see how your application UI looks on different
-     * languages. Usage: - install this app - setup adb connection to your device
-     * (http://developer.android.com/tools/help/adb.html) - Android OS 4.2 onwards
-     * (tip: you can copy the command here and paste it to your command console):
-     * adb shell pm grant net.sanapeli.adbchangelanguage
-     * android.permission.CHANGE_CONFIGURATION
-     * <p>
-     * English: adb shell am start -n
-     * net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language en Russian: adb
-     * shell am start -n net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e
-     * language ru Spanish: adb shell am start -n
-     * net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language es
+     * change device language using ADBChangeLanguage application via ADB
      *
-     * @param language
-     *            to set. Can be es, en, etc.
-     * @return boolean
+     * <p>
+     * <b>Usage</b>: <br>
+     * - install this app <br>
+     * - setup adb connection to your device <br>
+     * (http://developer.android.com/tools/help/adb.html) - Android OS 4.2 onwards
+     * (tip: you can copy the command here and paste it to your command console): <br>
+     * {@code adb shell pm grant net.sanapeli.adbchangelanguage}
+     * android.permission.CHANGE_CONFIGURATION
+     *
+     * <p>
+     * English: {@code adb shell am start -n net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language en}<br>
+     * Russian: {@code adb shell am start -n net.sanapeli.adbchangelanguage/.AdbChangeLanguage -elanguage ru}<br>
+     * Spanish: {@code adb shell am start -n net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language es}<br>
+     *
+     *
+     * @param language to set, for example {@code es}, {@code en}, etc.
+     * 
+     * @see <a href="http://play.google.com/store/apps/details?id=net.sanapeli.adbchangelanguage">ADBChangeLanguage apk</a>
+     * @return was the language change successful
      */
     default public boolean setDeviceLanguage(String language) {
-        boolean status = setDeviceLanguage(language, 20);
-        return status;
+        return setDeviceLanguage(language, DEVICE_REFRESH_TIME);
     }
 
+
     /**
-     * change Android Device Language
-     * <p>
-     * Url: <a href=
-     * "http://play.google.com/store/apps/details?id=net.sanapeli.adbchangelanguage">
-     * ADBChangeLanguage apk </a> Change locale (language) of your device via ADB
-     * (on Android OS version 6.0, 5.0, 4.4, 4.3, 4.2 and older). No need to root
-     * your device! With ADB (Android Debug Bridge) on your computer, you can fast
-     * switch the device locale to see how your application UI looks on different
-     * languages. Usage: - install this app - setup adb connection to your device
-     * (http://developer.android.com/tools/help/adb.html) - Android OS 4.2 onwards
-     * (tip: you can copy the command here and paste it to your command console):
-     * adb shell pm grant net.sanapeli.adbchangelanguage
-     * android.permission.CHANGE_CONFIGURATION
-     * <p>
-     * English: adb shell am start -n
-     * net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language en Russian: adb
-     * shell am start -n net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e
-     * language ru Spanish: adb shell am start -n
-     * net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language es
+     * change device language using ADBChangeLanguage application via ADB
      *
-     * @param language
-     *            to set. Can be es, en, etc.
-     * @param waitTime
-     *            int wait in seconds before device refresh.
-     * @return boolean
+     * <p>
+     * <b>Usage</b>: <br>
+     * - install this app <br>
+     * - setup adb connection to your device <br>
+     * (http://developer.android.com/tools/help/adb.html) - Android OS 4.2 onwards
+     * (tip: you can copy the command here and paste it to your command console): <br>
+     * {@code adb shell pm grant net.sanapeli.adbchangelanguage android.permission.CHANGE_CONFIGURATION}
+
+     * <p>
+     * English: {@code adb shell am start -n net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language en}<br>
+     * Russian: {@code adb shell am start -n net.sanapeli.adbchangelanguage/.AdbChangeLanguage -elanguage ru}<br>
+     * Spanish: {@code adb shell am start -n net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language es}<br>
+     *
+     * @param language to set, for example {@code es}, {@code en}, etc.
+     * @param waitTime int wait in seconds before device refresh
+     *
+     * @see <a href="http://play.google.com/store/apps/details?id=net.sanapeli.adbchangelanguage">ADBChangeLanguage apk</a>
+     * @return was the language change successful
      */
     default public boolean setDeviceLanguage(String language, int waitTime) {
         boolean status = false;
-
-        UTILS_LOGGER.info("Do not concat language for Android. Keep: " + language);
+        UTILS_LOGGER.info("Do not concat language for Android. Keep: {}", language);
         language = language.replace("_", "-");
-        UTILS_LOGGER.info("Refactor language to : " + language);
+        UTILS_LOGGER.info("Refactor language to : {}", language);
 
         String actualDeviceLanguage = getDeviceLanguage();
 
-        if (language.contains(actualDeviceLanguage.toLowerCase())
-                || actualDeviceLanguage.toLowerCase().contains(language)) {
-            UTILS_LOGGER.info("Device already have expected language: " + actualDeviceLanguage);
+        if (language.contains(actualDeviceLanguage.toLowerCase()) ||
+                actualDeviceLanguage.toLowerCase().contains(language)) {
+            UTILS_LOGGER.info("Device already have expected language: {}", actualDeviceLanguage);
             return true;
         }
 
@@ -197,7 +257,7 @@ public interface IAndroidUtils extends IMobileUtils {
         String setLocalizationCmd = "shell am start -n net.sanapeli.adbchangelanguage/.AdbChangeLanguage -e language "
                 + language;
 
-        UTILS_LOGGER.info("Try set localization change permission with following cmd:" + setLocalizationChangePermissionCmd);
+        UTILS_LOGGER.info("Try set localization change permission with following cmd: {}", setLocalizationChangePermissionCmd);
         String expandOutput = executeAdbCommand(setLocalizationChangePermissionCmd);
 
         String pathToInstalledAppCmd = "shell pm path net.sanapeli.adbchangelanguage";
@@ -209,15 +269,14 @@ public interface IAndroidUtils extends IMobileUtils {
             expandOutput = executeAdbCommand(setLocalizationChangePermissionCmd);
         }
 
-        UTILS_LOGGER.info("Output after set localization change permission using 'ADB Change Language apk': " + expandOutput);
+        UTILS_LOGGER.info("Output after set localization change permission using 'ADB Change Language apk': {}", expandOutput);
 
-        UTILS_LOGGER.info("Try set localization to '" + language + "' with following cmd: " + setLocalizationCmd);
+        UTILS_LOGGER.info("Try set localization to '{}' with following cmd: {}", language, setLocalizationCmd);
         String changeLocaleOutput = executeAdbCommand(setLocalizationCmd);
-        UTILS_LOGGER.info("Output after set localization to '" + language + "' using 'ADB Change Language apk' : "
-                + changeLocaleOutput);
+        UTILS_LOGGER.info("Output after set localization to '{}' using 'ADB Change Language apk' : {}", language, changeLocaleOutput);
 
         if (waitTime > 0) {
-            UTILS_LOGGER.info("Wait for at least '" + waitTime + "' seconds before device refresh.");
+            UTILS_LOGGER.info("Wait for at least '{}' seconds before device refresh.", waitTime);
             CommonUtils.pause(waitTime);
         }
 
@@ -244,9 +303,9 @@ public interface IAndroidUtils extends IMobileUtils {
     }
 
     /**
-     * getDeviceLanguage
+     * Get the current language on the device
      *
-     * @return String
+     * @return language
      */
     default public String getDeviceLanguage() {
         String locale = executeAdbCommand("shell getprop persist.sys.language");
@@ -259,36 +318,31 @@ public interface IAndroidUtils extends IMobileUtils {
     // End Language Change section
 
     /**
-     * install android Apk by path to apk file.
+     * Install android Apk by path to apk file
      *
-     * @param apkPath
-     *            String
+     * @param apkPath todo add description
      */
     default public void installApk(final String apkPath) {
         installApk(apkPath, false);
     }
 
     /**
-     * install android Apk by path to apk or by name in classpath.
+     * Install android Apk by path to apk or by name in classpath
      *
-     * @param apkPath
-     *            String
-     * @param inClasspath
-     *            boolean
+     * @param apkPath todo add description
+     * @param inClasspath boolean
      */
     default public void installApk(final String apkPath, boolean inClasspath) {
-
         String filePath = apkPath;
+
         if (inClasspath) {
             URL baseResource = ClassLoader.getSystemResource(apkPath);
             if (baseResource == null) {
                 throw new RuntimeException("Unable to get resource from classpath: " + apkPath);
-            } else {
-                UTILS_LOGGER.debug("Resource was found: " + baseResource.getPath());
             }
+            UTILS_LOGGER.debug("Resource was found: {}", baseResource.getPath());
 
-            String fileName = FilenameUtils.getBaseName(baseResource.getPath()) + "."
-                    + FilenameUtils.getExtension(baseResource.getPath());
+            String fileName = FilenameUtils.getBaseName(baseResource.getPath()) + "." + FilenameUtils.getExtension(baseResource.getPath());
             // make temporary copy of resource in artifacts folder
             filePath = ReportContext.getArtifactsFolder().getAbsolutePath() + File.separator + fileName;
 
@@ -317,16 +371,16 @@ public interface IAndroidUtils extends IMobileUtils {
     }
 
     /**
-     * Scrolls into view in specified container by text only and return boolean
+     * Scrolls into view in specified container by text only and return found element
      *
-     * @param container
-     *            ExtendedWebElement - defaults to id Selector Type
-     * @param scrollToElement
-     *            String defaults to text Selector Type
-     * @return ExtendedWebElement
-     *         <p>
-     *         example of usage: ExtendedWebElement res =
-     *         AndroidUtils.scroll("News", newsListContainer);
+     * <p>
+     * example of usage: {@code ExtendedWebElement res = AndroidUtils.scroll("News", newsListContainer);}
+     * 
+     * @param scrollToElement text to scroll to
+     * @param container the element in which the text will be searched
+     * 
+     * @return if element was found, return {@link ExtendedWebElement}, otherwise return {@code null}
+     * 
      **/
     default public ExtendedWebElement scroll(String scrollToElement, ExtendedWebElement container) {
         return scroll(scrollToElement, container, SelectorType.ID, SelectorType.TEXT);
@@ -477,25 +531,20 @@ public interface IAndroidUtils extends IMobileUtils {
     /**
      * Scrolls into view in specified container
      * 
-     * @param scrollToEle
-     *            - has to be id, text, contentDesc or className
-     * @param scrollableContainer
-     *            - ExtendedWebElement type
-     * @param containerSelectorType
-     *            - container Selector type: has to be id, text, textContains,
-     *            textStartsWith, Description, DescriptionContains or className
-     * @param eleSelectorType
-     *            - scrollToEle Selector type: has to be id, text, textContains,
-     *            textStartsWith, Description, DescriptionContains or className
+     * @param scrollToEle has to be id, text, contentDesc or className
+     * @param scrollableContainer ExtendedWebElement type
+     * @param containerSelectorType container Selector type: has to be id, text, textContains, textStartsWith, Description, DescriptionContains or
+     *            className
+     * @param eleSelectorType scrollToEle Selector type: has to be id, text, textContains, textStartsWith, Description, DescriptionContains or
+     *            className
+     * 
      * @return ExtendedWebElement
      *         <p>
-     *         example of usage: ExtendedWebElement res =
-     *         AndroidUtils.scroll("News", newsListContainer,
-     *         AndroidUtils.SelectorType.CLASS_NAME,
-     *         AndroidUtils.SelectorType.TEXT);
+     *         example of usage: {@code ExtendedWebElement res = AndroidUtils.scroll("News", newsListContainer, AndroidUtils.SelectorType.CLASS_NAME,
+     *         AndroidUtils.SelectorType.TEXT);}
      **/
-    default public ExtendedWebElement scroll(String scrollToEle, ExtendedWebElement scrollableContainer,
-            SelectorType containerSelectorType, SelectorType eleSelectorType) {
+    default public ExtendedWebElement scroll(String scrollToEle, ExtendedWebElement scrollableContainer, SelectorType containerSelectorType,
+            SelectorType eleSelectorType) {
         ExtendedWebElement extendedWebElement = null;
         long startTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
         // TODO: support multi threaded WebDriver's removing DriverPool usage
@@ -550,8 +599,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * @return scrollViewContainerFinder String
      *
      **/
-    default String getScrollContainerSelector(ExtendedWebElement scrollableContainer,
-            SelectorType containerSelectorType) {
+    default String getScrollContainerSelector(ExtendedWebElement scrollableContainer, SelectorType containerSelectorType) {
         UTILS_LOGGER.debug(scrollableContainer.getBy().toString());
         String scrollableContainerBy;
         String scrollViewContainerFinder = "";
@@ -643,8 +691,7 @@ public interface IAndroidUtils extends IMobileUtils {
     /**
      * Scroll Timeout check
      * 
-     * @param startTime
-     *            - Long initial time for timeout count down
+     * @param startTime Long initial time for timeout count down
      **/
     default public void checkTimeout(long startTime) {
         long elapsed = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) - startTime;
@@ -736,13 +783,22 @@ public interface IAndroidUtils extends IMobileUtils {
      * @return String - response (might be empty)
      */
     default public String executeShell(List<String> commands) {
-        String commadKeyWord = commands.get(0);
+        JavascriptExecutor driver = null;
+        try {
+            driver = (JavascriptExecutor) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver does not support executeShell method", e);
+        }
+
+        String commandKeyWord = commands.get(0);
         List<String> args = commands.subList(1, commands.size());
-        Map<String, Object> preparedCommand = ImmutableMap.of("command", commadKeyWord, "args", args);
-        WebDriver driver = getDriver();
-        String output = (String) ((JavascriptExecutor) driver).executeScript(SHELL_INIT_CONSOLE, preparedCommand);
+        Map<String, Object> preparedCommand = ImmutableMap.of("command", commandKeyWord, "args", args);
+
+        String output = driver.executeScript(SHELL_INIT_CONSOLE, preparedCommand)
+                .toString();
+
         if (!StringUtils.isEmpty(output)) {
-            UTILS_LOGGER.debug("ADB command output: " + output);
+            UTILS_LOGGER.debug("ADB command output: {}}", output);
         }
         return output;
     }
@@ -759,38 +815,37 @@ public interface IAndroidUtils extends IMobileUtils {
     }
 
     /**
-     * Tapping at native 'Home' button will be emulated. All applications will be
-     * closed to background.
+     * Emulate tap at native 'Home' button.<br>
+     * All applications will be closed to background.
      */
     default public void pressHome() {
         executeShell(SHELL_PRESS_HOME_CMD);
     }
 
     /**
-     * Is used to get GPS service status.
+     * Get GPS service status.
      * 
-     * Response reflects which services are used for obtaining location:
-     * 
-     * - "gps" - GPS only (device only);
-     * 
-     * - "gps,network" - GPS + Wi-Fi + Bluetooth or cellular networks (High accuracy
-     * mode);
-     * 
-     * - "network" - Using Wi-Fi, Bluetooth or cellular networks (Battery saving
-     * mode);
-     * 
-     * @return boolean
+     * @return true if GPS enabled
      */
     default public boolean isGPSEnabled() {
         String response = executeShell(SHELL_GPS_STATUS_CMD);
+
+        // Response reflects which services are used for obtaining location:
+        // - "gps" - GPS only (device only);
+        // - "gps,network" - GPS + Wi-Fi + Bluetooth or cellular networks (High accuracy mode);
+        // - "network" - Using Wi-Fi, Bluetooth or cellular networks (Battery saving mode);
         return response.contains("gps");
     }
 
+    /**
+     * Enable GPS
+     */
     default public void enableGPS() {
         executeShell(SHELL_ENABLE_GPS_CMD);
     }
 
     /**
+     * Disable GPS<br>
      * Works if ONLY DEVICE (GPS sensor) is user for obtaining location
      */
     default public void disableGPS() {
@@ -798,109 +853,106 @@ public interface IAndroidUtils extends IMobileUtils {
     }
 
     /**
-     * This command will save screenshot to specified folder on device's OS using
-     * provided path.
+     * Save screenshot to specified folder on device's OS using provided path
      * 
-     * @param filepath
-     *            - path to save screenshot to device's OS (/storage/emulated/0/Download/scr.png).
+     * @param filepath path to save screenshot to device's OS, for example {@code /storage/emulated/0/Download/scr.png}.
      */
     default public void takeScreenShot(String filepath) {
-        UTILS_LOGGER.info("Screenshot will be saved to: " + filepath);
+        UTILS_LOGGER.info("Screenshot will be saved to: {}", filepath);
         String command = String.format(SHELL_TAKE_SCREENSHOT_CMD.concat(" %s"), filepath);
         executeShell(command);
     }
 
     /**
-     * This method provides app's version for the app that is already installed to
-     * devices, based on its package name.
-     * In order to do that we search for "versionCode" parameter in system dump.
-     * 
-     * @param packageName String
-     * 
-     * @return appVersion String
+     * Get app's version for the app that is already installed to devices, based on its package name.<br>
+     *
+     * @param packageName name of the package
+     * @return appVersion version of app (versionCode from system dump), for example {@code 11200050}
      */
     default public String getAppVersion(String packageName) {
         String command = "dumpsys package ".concat(packageName);
         String output = executeShell(command);
+        // we search for "versionCode" parameter in system dump.
         String versionCode = StringUtils.substringBetween(output, "versionCode=", " ");
-        UTILS_LOGGER.info(String.format("Version code for '%s' package name is %s", packageName, versionCode));
+        UTILS_LOGGER.info("Version code for '{}' package name is {}", packageName, versionCode);
         return versionCode;
     }
 
     /**
-     * This method provides app's version name for the app that is already installed to
-     * devices, based on its package name.
-     * In order to do that we search for "versionName" parameter in system dump.
-     * Ex. "versionCode" returns 11200050, "versionName" returns 11.2.0
+     * Get app's version name for the app that is already installed to devices, based on its package name<br>
      * 
-     * @param packageName String
-     * @return appVersion String
+     * @param packageName name of the package
+     * @return version of app(versionName from system dump), for example {@code 11.2.0}
      */
     default public String getAppVersionName(String packageName) {
         String command = "dumpsys package ".concat(packageName);
         String output = this.executeShell(command);
+        // we search for "versionName" parameter in system dump.
         String versionName = StringUtils.substringBetween(output, "versionName=", "\n");
         UTILS_LOGGER.info(String.format("Version name for '%s' package name is %s", packageName, versionName));
         return versionName;
     }
 
     /**
-     * To open Android device native settings
+     * Open Android device native settings
      */
     default public void openDeviceSettings() {
         executeShell(SHELL_OPEN_DEVICE_SETTINGS_CMD);
     }
 
     /**
-     * Method to reset test specific application by package name
+     * Reset test specific application by package name<br>
      * 
-     * App's settings will be reset. User will be logged out. Application will be
-     * closed to background.
+     * App's settings will be reset. User will be logged out. Application will be closed to background.
      * 
-     * @param packageName String
+     * @param packageName name of the package
      */
     default public void clearAppCache(String packageName) {
-        UTILS_LOGGER.info("Will clear data for the following app: " + packageName);
+        UTILS_LOGGER.info("Will clear data for the following app: {}", packageName);
         String command = String.format(SHELL_CLEAR_CACHE_CMD.concat(" %s"), packageName);
         String response = executeShell(command);
-        UTILS_LOGGER.info(
-                String.format("Output after resetting custom application by package (%s): ", packageName) + response);
+        UTILS_LOGGER.info("Output after resetting custom application by package ({}): {}", packageName, response);
         if (!response.contains("Success")) {
             UTILS_LOGGER.warn(String.format("App data was not cleared for %s app", packageName));
         }
     }
 
     /**
-     * With this method user is able to trigger a deeplink (link to specific place
-     * within the application) or event open URL in mobile browser.
+     * Trigger a deeplink (link to specific place within the application) or event open URL in mobile browser<br>
+     * <br>
      * 
-     * NOTE, that to open URL in browser, URL should starts with "https://www.{place
-     * your link here}".
+     * NOTE, that to open URL in browser, URL should start with "https://www.{place your link here}"<br>
+     * NOTE that not all deeplinks require package name
      * 
-     * NOTE that not all deeplinks require package name.
-     * 
-     * @param link
-     *            - URL to trigger
+     * @param link URL to trigger
      */
     default public void openURL(String link) {
         // TODO: #1380 make openURL call from this mobile interface in DriverHelper
-        UTILS_LOGGER.info("Following link will be triggered via ADB: " + link);
+        UTILS_LOGGER.info("Following link will be triggered via ADB: {}", link);
         String command = String.format(SHELL_OPEN_URL_CMD.concat(" %s"), link);
         executeShell(command);
     }
 
     /**
-     * With this method user is able to trigger a deeplink (link to specific place
-     * within the application)
+     * todo add more understandable description
+     * With this method user is able to trigger a deeplink (link to specific place within the application)
      * 
      * @param link String
      * @param packageName String
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void triggerDeeplink(String link, String packageName) {
         Map<String, Object> preparedCommand = ImmutableMap.of("url", link, "package", packageName);
+
+        JavascriptExecutor driver = null;
         try {
-            WebDriver driver = getDriver();
-            ((JavascriptExecutor) driver).executeScript(SHELL_INIT_DEEPLINK_CONSOLE, preparedCommand);
+            driver = (JavascriptExecutor) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver does not support triggerDeeplink method", e);
+        }
+
+        try {
+            driver.executeScript(SHELL_INIT_DEEPLINK_CONSOLE, preparedCommand);
         } catch (WebDriverException wde) {
             // TODO: need to pay attention
             UTILS_LOGGER.warn("org.openqa.selenium.WebDriverException is caught and ignored.", wde);
@@ -909,16 +961,36 @@ public interface IAndroidUtils extends IMobileUtils {
 
     /**
      * To get list of granted/denied/requested permission for specified application
-     * 
+     *
+     * if response is not correct, return null
+     *
      * @param packageName String
      * @param type PermissionType
      * @return ArrayList String
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     @SuppressWarnings("unchecked")
-    default public ArrayList<String> getAppPermissions(String packageName, PermissionType type) {
+    default public List<String> getAppPermissions(String packageName, PermissionType type) {
         Map<String, Object> preparedCommand = ImmutableMap.of("type", type.getType(), "package", packageName);
-        WebDriver driver = getDriver();
-        return (ArrayList<String>) ((JavascriptExecutor) driver).executeScript(SHELL_INIT_GET_PERMISSION_CONSOLE, preparedCommand);
+
+        JavascriptExecutor driver = null;
+        try {
+            driver = (JavascriptExecutor) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver does not support getAppPermissions method", e);
+        }
+
+        Object responseAsObject = driver.executeScript(SHELL_INIT_GET_PERMISSION_CONSOLE, preparedCommand);
+        List<String> responseValue = null;
+        try {
+            responseValue = (List<String>) responseAsObject;
+        } catch (ClassCastException e) {
+            UTILS_LOGGER.error("Cannot cast result of getAppPermissions method to the list. Possible reason that the response is not correct: {}",
+                    responseAsObject);
+            return null;
+        }
+
+        return responseValue;
     }
 
     /**
@@ -927,63 +999,131 @@ public interface IAndroidUtils extends IMobileUtils {
      * @param packageName String
      * @param action PermissionAction
      * @param permissions Permission
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void changePermissions(String packageName, PermissionAction action, Permission... permissions) {
-        ArrayList<String> permissionsStr = new ArrayList<>();
-        Arrays.asList(permissions).forEach(p -> permissionsStr.add(p.getPermission()));
-        Map<String, Object> preparedCommand = ImmutableMap.of("action", action.getAction(), "appPackage", packageName,
+        List<String> permissionsStr = Arrays.stream(permissions)
+                .map(Permission::getPermission)
+                .collect(Collectors.toList());
+
+        JavascriptExecutor driver = null;
+        try {
+            driver = (JavascriptExecutor) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver does not support changePermissions method", e);
+        }
+
+        Map<String, Object> preparedCommand = ImmutableMap.of(
+                "action", action.getAction(),
+                "appPackage", packageName,
                 "permissions", permissionsStr);
-        WebDriver driver = getDriver();
-        ((JavascriptExecutor)driver).executeScript(SHELL_INIT_CHANGE_PERMISSION_CONSOLE, preparedCommand);
+
+        driver.executeScript(SHELL_INIT_CHANGE_PERMISSION_CONSOLE, preparedCommand);
     }
 
     /**
      * Method to enter text to ACTIVATED input field.
      * 
-     * NOTE: that it might be necessary to escape some special characters.
-     * Space-symbol is already escaped.
-     * 
+     * NOTE: that it might be necessary to escape some special characters. Space-symbol is already escaped.
      * NOTE2: input field should be cleared previously.
      * 
-     * @param text String
+     * @param text text to enter in the field
      */
     default public void typeWithADB(String text) {
-        UTILS_LOGGER.info(String.format("Will enter '%s' to an active input field via ADB.", text));
-        // In this method characters are entered one by one because sometimes some
-        // characters might be omitted if to enter whole text at a time.
+        UTILS_LOGGER.info("Will enter '{}' to an active input field via ADB.", text);
+        // In this method characters are entered one by one because sometimes some characters might be omitted if to enter whole text at a time.
         char[] array = text.toCharArray();
         for (char sym : array) {
+            // todo refactor
             String ch = (sym == ' ') ? "%s" : String.valueOf(sym);
             String command = SHELL_INPUT_TXT_CMD + ch;
             executeShell(command);
         }
     }
 
-    default public boolean isWifiEnabled() {
-        WebDriver driver = getDriver();
-        boolean enabled = ((HasNetworkConnection) driver).getConnection().isWiFiEnabled();
-        UTILS_LOGGER.info("Wi-Fi enabled: " + enabled);
+    /**
+     * Is airplane mode enabled or not
+     * 
+     * @return true if airplane mode is enabled
+     * @throws UnsupportedOperationException if driver does not support this feature
+     */
+    default public boolean isAirplaneModeEnabled() {
+        HasNetworkConnection driver = null;
+        try {
+            driver = (HasNetworkConnection) getDriver();
+        } catch (ClassCastException e) {
+            // todo add opportunity check is Airplane mode enabled via adb if we use RemoteWebDriver instead of AndroidDriver if possible
+            throw new UnsupportedOperationException("Driver does not support isAirplaneModeEnabled method", e);
+        }
+        boolean enabled = driver.getConnection()
+                .isAirplaneModeEnabled();
+        UTILS_LOGGER.info("AirplaneMode enabled: {}", enabled);
         return enabled;
     }
 
-    default public void enableWifi() {
-        boolean enabled = isWifiEnabled();
-        if (!enabled) {
-            WebDriver driver = getDriver();
-            ((SupportsNetworkStateManagement)driver).toggleWifi();
-            return;
+    /**
+     * Is Wi-Fi connection enabled or not
+     *
+     * @return true if Wi-Fi connection is enabled
+     * @throws UnsupportedOperationException if driver does not support this feature
+     */
+    default public boolean isWifiEnabled() {
+        HasNetworkConnection driver = null;
+        try {
+            driver = (HasNetworkConnection) getDriver();
+        } catch (ClassCastException e) {
+            // todo add opportunity check is WiFi enabled via adb if we use RemoteWebDriver instead of AndroidDriver if possible
+            throw new UnsupportedOperationException("Driver does not support isWifiEnabled method", e);
         }
-        UTILS_LOGGER.info("Wifi is already anebled. No actions needed");
+        boolean enabled = driver.getConnection().isWiFiEnabled();
+        UTILS_LOGGER.info("Wi-Fi enabled: {}", enabled);
+        return enabled;
     }
 
-    default public void disableWifi() {
+    /**
+     * Turns on Wi-Fi, if it's off
+     * 
+     * @throws UnsupportedOperationException if driver does not support this feature
+     */
+    default public void enableWifi() {
         boolean enabled = isWifiEnabled();
         if (enabled) {
-            WebDriver driver = getDriver();
-            ((SupportsNetworkStateManagement) driver).toggleWifi();
+            UTILS_LOGGER.info("Wifi is already enabled. No actions needed");
             return;
         }
-        UTILS_LOGGER.info("Wifi is already disabled. No actions needed");
+
+        SupportsNetworkStateManagement driver = null;
+        try {
+            driver = (SupportsNetworkStateManagement) getDriver();
+        } catch (ClassCastException e) {
+            // todo add opportunity to turn on wifi via adb if we use RemoteWebDriver instead of AndroidDriver if possible
+            throw new UnsupportedOperationException("Driver does not support enableWifi method", e);
+        }
+
+        driver.toggleWifi();
+    }
+
+    /**
+     * Turns off Wi-Fi, if it's on
+     * 
+     * @throws UnsupportedOperationException if driver does not support this feature
+     */
+    default public void disableWifi() {
+        boolean enabled = isWifiEnabled();
+        if (!enabled) {
+            UTILS_LOGGER.info("Wifi is already disabled. No actions needed");
+            return;
+        }
+
+        SupportsNetworkStateManagement driver = null;
+        try {
+            driver = (SupportsNetworkStateManagement) getDriver();
+        } catch (ClassCastException e) {
+            // todo add opportunity to turn on wifi via adb if we use RemoteWebDriver instead of AndroidDriver if possible
+            throw new UnsupportedOperationException("Driver does not support disableWifi method", e);
+        }
+
+        driver.toggleWifi();
     }
 
     /**
