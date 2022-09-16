@@ -41,8 +41,6 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
-import com.qaprosoft.carina.core.foundation.utils.android.AndroidService;
-import com.qaprosoft.carina.core.foundation.utils.android.DeviceTimeZone;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
@@ -57,7 +55,6 @@ import io.appium.java_client.appmanagement.BaseInstallApplicationOptions;
 public interface IMobileUtils extends IDriverPool {
 
     static final Logger UTILS_LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
 
     public enum Direction {
         LEFT,
@@ -136,6 +133,7 @@ public interface IMobileUtils extends IDriverPool {
      *
      * @param element Element to long press
      * @return is long press successful
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public boolean longPress(ExtendedWebElement element) {
         boolean isActionSuccessful = false;
@@ -155,10 +153,14 @@ public interface IMobileUtils extends IDriverPool {
                 .addAction(new Pause(finger, longPressDuration))
                 .addAction(finger.createPointerUp(LEFT.asArg()));
 
+        Interactive driver = null;
+
         try {
-            WebDriver driver = getDriver();
-            ((Interactive) driver).perform(List.of(longPressSequence));
+            driver = (Interactive) getDriver();
+            driver.perform(List.of(longPressSequence));
             isActionSuccessful = true;
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support longPress method", e);
         } catch (WebDriverException e) {
             UTILS_LOGGER.info("Error occurs during longPress: " + e, e);
         }
@@ -171,25 +173,29 @@ public interface IMobileUtils extends IDriverPool {
      * @param startx x coordinate
      * @param starty y coordinate
      * @param duration touch hold time
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void tap(int startx, int starty, int duration) {
         // TODO: add Screenshot.capture()
 
-            PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
 
-            Sequence tapSequence = new Sequence(finger, 1)
-                    .addAction(finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.viewport(), startx, starty))
-                    .addAction(finger.createPointerDown(LEFT.asArg()))
-                    .addAction(new Pause(finger, Duration.ofMillis(duration)))
-                    .addAction(finger.createPointerUp(LEFT.asArg()));
+        Sequence tapSequence = new Sequence(finger, 1)
+                .addAction(finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.viewport(), startx, starty))
+                .addAction(finger.createPointerDown(LEFT.asArg()))
+                .addAction(new Pause(finger, Duration.ofMillis(duration)))
+                .addAction(finger.createPointerUp(LEFT.asArg()));
 
-            try {
-                WebDriver driver = getDriver();
-                ((Interactive) driver).perform(List.of(tapSequence));
-                Messager.TAP_EXECUTED.info(String.valueOf(startx), String.valueOf(starty));
-            } catch (WebDriverException e) {
-                Messager.TAP_NOT_EXECUTED.error(String.valueOf(startx), String.valueOf(starty));
-                throw e;
+        Interactive driver = null;
+        try {
+            driver = (Interactive) getDriver();
+            driver.perform(List.of(tapSequence));
+            Messager.TAP_EXECUTED.info(String.valueOf(startx), String.valueOf(starty));
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support tap method", e);
+        } catch (WebDriverException e) {
+            Messager.TAP_NOT_EXECUTED.error(String.valueOf(startx), String.valueOf(starty));
+            throw e;
         }
     }
 
@@ -198,6 +204,7 @@ public interface IMobileUtils extends IDriverPool {
      *
      * @param element ExtendedWebElement
      * @return boolean
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public boolean swipe(final ExtendedWebElement element) {
         return swipe(element, null, Direction.UP, DEFAULT_MAX_SWIPE_COUNT, DEFAULT_TOUCH_ACTION_DURATION);
@@ -209,6 +216,7 @@ public interface IMobileUtils extends IDriverPool {
      * @param element ExtendedWebElement
      * @param count int
      * @return boolean
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public boolean swipe(final ExtendedWebElement element, int count) {
         return swipe(element, null, Direction.UP, count, DEFAULT_TOUCH_ACTION_DURATION);
@@ -220,6 +228,7 @@ public interface IMobileUtils extends IDriverPool {
      * @param element ExtendedWebElement
      * @param direction Direction
      * @return boolean
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public boolean swipe(final ExtendedWebElement element, Direction direction) {
         return swipe(element, null, direction, DEFAULT_MAX_SWIPE_COUNT, DEFAULT_TOUCH_ACTION_DURATION);
@@ -232,6 +241,7 @@ public interface IMobileUtils extends IDriverPool {
      * @param count int
      * @param duration int
      * @return boolean
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public boolean swipe(final ExtendedWebElement element, int count, int duration) {
         return swipe(element, null, Direction.UP, count, duration);
@@ -245,6 +255,7 @@ public interface IMobileUtils extends IDriverPool {
      * @param count int
      * @param duration int
      * @return boolean
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public boolean swipe(final ExtendedWebElement element, Direction direction, int count, int duration) {
         return swipe(element, null, direction, count, duration);
@@ -255,13 +266,11 @@ public interface IMobileUtils extends IDriverPool {
      * Number of attempts is limited by count argument
      * <p>
      *
-     * @param element
-     *            ExtendedWebElement
-     * @param container
-     *            ExtendedWebElement
-     * @param count
-     *            int
+     * @param element ExtendedWebElement
+     * @param container ExtendedWebElement
+     * @param count int
      * @return boolean
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public boolean swipe(ExtendedWebElement element, ExtendedWebElement container, int count) {
         return swipe(element, container, Direction.UP, count, DEFAULT_TOUCH_ACTION_DURATION);
@@ -272,11 +281,10 @@ public interface IMobileUtils extends IDriverPool {
      * Number of attempts is limited by 5
      * <p>
      *
-     * @param element
-     *            ExtendedWebElement
-     * @param container
-     *            ExtendedWebElement
+     * @param element ExtendedWebElement
+     * @param container ExtendedWebElement
      * @return boolean
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public boolean swipe(ExtendedWebElement element, ExtendedWebElement container) {
         return swipe(element, container, Direction.UP, DEFAULT_MAX_SWIPE_COUNT, DEFAULT_TOUCH_ACTION_DURATION);
@@ -294,6 +302,7 @@ public interface IMobileUtils extends IDriverPool {
      * @param direction
      *            Direction
      * @return boolean
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public boolean swipe(ExtendedWebElement element, ExtendedWebElement container, Direction direction) {
         return swipe(element, container, direction, DEFAULT_MAX_SWIPE_COUNT, DEFAULT_TOUCH_ACTION_DURATION);
@@ -313,6 +322,7 @@ public interface IMobileUtils extends IDriverPool {
      * @param count
      *            int
      * @return boolean
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public boolean swipe(ExtendedWebElement element, ExtendedWebElement container, Direction direction,
             int count) {
@@ -336,6 +346,7 @@ public interface IMobileUtils extends IDriverPool {
      * @param duration
      *            pulling timeout, ms
      * @return boolean
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public boolean swipe(ExtendedWebElement element, ExtendedWebElement container, Direction direction,
             int count, int duration) {
@@ -420,6 +431,7 @@ public interface IMobileUtils extends IDriverPool {
      * @param endx int
      * @param endy int
      * @param duration int Millis
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void swipe(int startx, int starty, int endx, int endy, int duration) {
         UTILS_LOGGER.debug("Starting swipe...");
@@ -451,8 +463,14 @@ public interface IMobileUtils extends IDriverPool {
                 .addAction(finger.createPointerDown(LEFT.asArg()))
                 .addAction(finger.createPointerMove(Duration.ofMillis(duration), PointerInput.Origin.viewport(), endx, endy))
                 .addAction(finger.createPointerUp(LEFT.asArg()));
-        ((Interactive) drv).perform(List.of(swipe));
+        Interactive driver = null;
+        try {
+            driver = (Interactive) drv;
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support swipe method", e);
+        }
 
+        driver.perform(List.of(swipe));
         UTILS_LOGGER.debug("Finished swipe...");
     }
 
@@ -671,86 +689,41 @@ public interface IMobileUtils extends IDriverPool {
     }
 
     /**
-     * Set Android Device Default TimeZone And Language based on config or to GMT and En
-     * Without restoring actual focused apk.
-     */
-    default public void setDeviceDefaultTimeZoneAndLanguage() {
-        setDeviceDefaultTimeZoneAndLanguage(false);
-    }
-
-    /**
-     * set Android Device Default TimeZone And Language based on config or to GMT and En
-     *
-     * @param returnAppFocus - if true store actual Focused apk and activity, than restore after setting Timezone and Language.
-     */
-    default public void setDeviceDefaultTimeZoneAndLanguage(boolean returnAppFocus) {
-        try {
-            String baseApp = "";
-            String os = IDriverPool.getDefaultDevice().getOs();
-            if (os.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
-
-                AndroidService androidService = AndroidService.getInstance();
-
-                if (returnAppFocus) {
-                    baseApp = androidService.getCurrentFocusedApkDetails();
-                }
-
-                String deviceTimezone = Configuration.get(Parameter.DEFAULT_DEVICE_TIMEZONE);
-                String deviceTimeFormat = Configuration.get(Parameter.DEFAULT_DEVICE_TIME_FORMAT);
-                String deviceLanguage = Configuration.get(Parameter.DEFAULT_DEVICE_LANGUAGE);
-
-                DeviceTimeZone.TimeFormat timeFormat = DeviceTimeZone.TimeFormat.parse(deviceTimeFormat);
-                DeviceTimeZone.TimeZoneFormat timeZone = DeviceTimeZone.TimeZoneFormat.parse(deviceTimezone);
-
-                UTILS_LOGGER.info("Set device timezone to " + timeZone.toString());
-                UTILS_LOGGER.info("Set device time format to " + timeFormat.toString());
-                UTILS_LOGGER.info("Set device language to " + deviceLanguage);
-
-                boolean timeZoneChanged = androidService.setDeviceTimeZone(timeZone.getTimeZone(), timeZone.getSettingsTZ(), timeFormat);
-                boolean languageChanged = androidService.setDeviceLanguage(deviceLanguage);
-
-                UTILS_LOGGER.info(String.format("Device TimeZone was changed to timeZone '%s' : %s. Device Language was changed to language '%s': %s",
-                        deviceTimezone,
-                        timeZoneChanged, deviceLanguage, languageChanged));
-
-                if (returnAppFocus) {
-                    androidService.openApp(baseApp);
-                }
-
-            } else {
-                UTILS_LOGGER.info(String.format("Current OS is %s. But we can set default TimeZone and Language only for Android.", os));
-            }
-        } catch (Exception e) {
-            UTILS_LOGGER.error("Error while setting to device default timezone and language!", e);
-        }
-    }
-
-    /**
-     * Hide keyboard if needed
+     * Hides the keyboard if it is showing
+     * 
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void hideKeyboard() {
+        HidesKeyboard driver = null;
         try {
-            WebDriver driver = getDriver();
-            ((HidesKeyboard) driver).hideKeyboard();
+            driver = (HidesKeyboard) getDriver();
+            driver.hideKeyboard();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support hideKeyboard method", e);
         } catch (Exception e) {
             if (!e.getMessage().contains("Soft keyboard not present, cannot hide keyboard")) {
-                UTILS_LOGGER.error("Exception appears during hideKeyboard: " + e);
+                UTILS_LOGGER.error("Exception appears during hideKeyboard: ", e);
             }
         }
     }
 
     /**
      * Check if keyboard is showing
-     * return false if driver is not ios or android driver
      *
-     * @return boolean
+     * @return true if keyboard is displayed. False otherwise
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public boolean isKeyboardShown() {
-        WebDriver driver = getDriver();
-        return ((HasOnScreenKeyboard) driver).isKeyboardShown();
+        HasOnScreenKeyboard driver = null;
+        try {
+            driver = (HasOnScreenKeyboard) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support isKeyboardShown method", e);
+        }
+        return driver.isKeyboardShown();
     }
 
-    default public  void zoom(Zoom type) {
+    default public void zoom(Zoom type) {
         UTILS_LOGGER.info("Zoom will be performed :{}", type);
         WebDriver driver = getDriver();
         Dimension scrSize = driver.manage().window().getSize();
@@ -774,6 +747,9 @@ public interface IMobileUtils extends IDriverPool {
         }
     }
 
+    /**
+     * @throws UnsupportedOperationException if driver does not support this feature
+     */
     default public void zoom(int startx1, int starty1, int endx1, int endy1, int startx2, int starty2, int endx2, int endy2, int duration) {
         UTILS_LOGGER.debug(
                 "Zoom action will be performed with parameters : startX1 : {} ;  startY1: {} ; endX1: {} ; endY1: {}; startX2 : {} ;  startY2: {} ; endX2: {} ; endY2: {}",
@@ -801,10 +777,13 @@ public interface IMobileUtils extends IDriverPool {
                 PointerInput.Origin.viewport(), endx2, endy2));
         zoomPartTwo.addAction(anotherFinger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
 
+        Interactive driver = null;
         try {
-            WebDriver driver = getDriver();
-            ((Interactive) driver).perform(List.of(zoomPartOne, zoomPartTwo));
+            driver = (Interactive) getDriver();
+            driver.perform(List.of(zoomPartOne, zoomPartTwo));
             UTILS_LOGGER.info("Zoom has been performed");
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support zoom method", e);
         } catch (WebDriverException e) {
             UTILS_LOGGER.error("Error during zooming", e);
         }
@@ -814,13 +793,20 @@ public interface IMobileUtils extends IDriverPool {
      * Check if started driver/application is running in foreground
      *
      * @return boolean
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public boolean isAppRunning() {
         String bundleId = "";
         String os = getDevice().getOs();
 
-        WebDriver driver = getDriver();
-        Capabilities capabilities = ((HasCapabilities) driver).getCapabilities();
+        HasCapabilities driver = null;
+        try {
+            driver = (HasCapabilities) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support isAppRunning method", e);
+        }
+
+        Capabilities capabilities = driver.getCapabilities();
         // get bundleId or appId of the application started by driver
         if (os.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
             bundleId = capabilities.getCapability(SpecialKeywords.APP_PACKAGE).toString();
@@ -837,54 +823,86 @@ public interface IMobileUtils extends IDriverPool {
      *
      * @param bundleId the bundle identifier for iOS (or appPackage for Android) of the app to query the state of.
      * @return boolean
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public boolean isAppRunning(String bundleId) {
-        WebDriver driver = getDriver();
-        ApplicationState actualApplicationState = ((InteractsWithApps) driver).queryAppState(bundleId);
+        InteractsWithApps driver = null;
+        try {
+            driver = (InteractsWithApps) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support isAppRunning method", e);
+        }
+
+        ApplicationState actualApplicationState = driver.queryAppState(bundleId);
         return ApplicationState.RUNNING_IN_FOREGROUND.equals(actualApplicationState);
     }
 
     /**
      * Terminate running driver/application
+     * 
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void terminateApp() {
         String bundleId = "";
         String os = getDevice().getOs();
 
-        WebDriver driver = getDriver();
-        Capabilities capabilities = ((HasCapabilities) driver).getCapabilities();
+        HasCapabilities driver = null;
+        try {
+            driver = (HasCapabilities) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support terminateApp method", e);
+        }
+
+        Capabilities capabilities = driver.getCapabilities();
 
         // get bundleId or appId of the application started by driver
         if (os.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
             bundleId = capabilities.getCapability(SpecialKeywords.APP_PACKAGE).toString();
-        } else if (os.equalsIgnoreCase(SpecialKeywords.IOS) || os.equalsIgnoreCase(SpecialKeywords.MAC)
-                || os.equalsIgnoreCase(SpecialKeywords.TVOS)) {
+        } else if (os.equalsIgnoreCase(SpecialKeywords.IOS) ||
+                os.equalsIgnoreCase(SpecialKeywords.MAC) ||
+                os.equalsIgnoreCase(SpecialKeywords.TVOS)) {
             bundleId = capabilities.getCapability(SpecialKeywords.BUNDLE_ID).toString();
         }
         terminateApp(bundleId);
     }
 
     /**
-     * Terminate running application by bundleId or appId
+     * Terminate the particular application if it is running
      *
-     * @param bundleId the bundle identifier for iOS (or appPackage for Android) of the app to terminate.
+     * @param bundleId the bundle identifier (or app id) of the app to be terminated.
+     * @return true if the app was running before and has been successfully stopped
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
-    default public void terminateApp(String bundleId) {
-        WebDriver driver = getDriver();
-        ((InteractsWithApps) driver).terminateApp(bundleId);
+    default public boolean terminateApp(String bundleId) {
+        InteractsWithApps driver = null;
+        try {
+            driver = (InteractsWithApps) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support terminateApp method", e);
+        }
+        return driver.terminateApp(bundleId);
     }
 
     /**
      * The application that has its package name set to current driver's
      * capabilities will be closed to background IN CASE IT IS CURRENTLY IN
      * FOREGROUND. Will be in recent app's list;
+     * 
+     * @deprecated https://github.com/appium/appium/issues/1580
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
+    @Deprecated(since = "8.x")
     default public void closeApp() {
         UTILS_LOGGER.info("Application will be closed to background");
-        WebDriver driver = getDriver();
-        ((SupportsLegacyAppManagement)driver).closeApp();
-    }
+        SupportsLegacyAppManagement driver = null;
+        try {
+            driver = (SupportsLegacyAppManagement) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support closeApp method", e);
+        }
 
+        driver.closeApp();
+    }
 
     // TODO Update this method using findByImage strategy
     /**
@@ -892,6 +910,8 @@ public interface IMobileUtils extends IDriverPool {
      * "next", etc. - various keys appear at this position. Tested at Nexus 6P
      * Android 8.0.0 standard keyboard. Coefficients of coordinates for other
      * devices and custom keyboards could be different.
+     * 
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void pressBottomRightKey() {
         WebDriver driver = getDriver();
@@ -908,16 +928,17 @@ public interface IMobileUtils extends IDriverPool {
                 .addAction(new Pause(finger, Duration.ofMillis(DEFAULT_TOUCH_ACTION_DURATION)))
                 .addAction(finger.createPointerUp(LEFT.asArg()));
 
+        Interactive drv = null;
         try {
-            ((Interactive) driver).perform(List.of(pressBottomRightKeySequence));
+            drv = (Interactive) driver;
+            drv.perform(List.of(pressBottomRightKeySequence));
         } catch (ClassCastException e) {
-            throw new UnsupportedOperationException("Driver does not support pressBottomRightKey method", e);
+            throw new UnsupportedOperationException("Driver is not support pressBottomRightKey method", e);
         } catch (WebDriverException e) {
             UTILS_LOGGER.error("Error when try to press bottom right key", e);
         }
     }
 
-    // todo investigate is it method needed
     default public boolean isChecked(final ExtendedWebElement element) {
         // TODO: SZ migrate to FluentWaits
         return element.isElementPresent(5)
@@ -929,13 +950,14 @@ public interface IMobileUtils extends IDriverPool {
      *
      * @param packageName bundleId – bundleId of the app
      * @return true if app is installed
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public boolean isApplicationInstalled(String packageName) {
         InteractsWithApps driver = null;
         try {
             driver = (InteractsWithApps) getDriver();
         } catch (ClassCastException e) {
-            throw new UnsupportedOperationException("Driver does not support isApplicationInstalled method", e);
+            throw new UnsupportedOperationException("Driver is not support isApplicationInstalled method", e);
         }
 
         boolean installed = driver.isAppInstalled(packageName);
@@ -948,6 +970,7 @@ public interface IMobileUtils extends IDriverPool {
      * Activates the given app if it installed, but not running or if it is running in the background<br>
      *
      * @param packageName bundleId – the bundle identifier (or app id) of the app to activate
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void startApp(String packageName) {
         UTILS_LOGGER.info("Starting {}", packageName);
@@ -955,7 +978,7 @@ public interface IMobileUtils extends IDriverPool {
         try {
             driver = (InteractsWithApps) getDriver();
         } catch (ClassCastException e) {
-            throw new UnsupportedOperationException("Driver does not support startApp method", e);
+            throw new UnsupportedOperationException("Driver is not support startApp method", e);
         }
         driver.activateApp(packageName);
     }
@@ -983,7 +1006,7 @@ public interface IMobileUtils extends IDriverPool {
         try {
             driver = (InteractsWithApps) getDriver();
         } catch (ClassCastException e) {
-            throw new UnsupportedOperationException("Driver does not support installApp method", e);
+            throw new UnsupportedOperationException("Driver is not support installApp method", e);
         }
         driver.installApp(apkPath, options);
     }
@@ -1002,7 +1025,7 @@ public interface IMobileUtils extends IDriverPool {
         try {
             driver = (InteractsWithApps) getDriver();
         } catch (ClassCastException e) {
-            throw new UnsupportedOperationException("Driver does not support removeApp method", e);
+            throw new UnsupportedOperationException("Driver is not support removeApp method", e);
         }
 
         boolean isRemoved = driver.removeApp(packageName);
@@ -1014,16 +1037,16 @@ public interface IMobileUtils extends IDriverPool {
      * Method to reset test application.<br>
      * App's settings will be reset. User will be logged out. Application will be closed to background.
      * 
-     * @deprecated this method will be removed. iOS cannot clean the local state without reinstalling app
+     * @deprecated https://github.com/appium/appium/issues/15807
      */
-    @Deprecated(forRemoval = true, since = "8.x")
+    @Deprecated(since = "8.x")
     default public void clearAppCache() {
         UTILS_LOGGER.info("Initiation application reset...");
         SupportsLegacyAppManagement driver = null;
         try {
             driver = (SupportsLegacyAppManagement) getDriver();
         } catch (ClassCastException e) {
-            throw new UnsupportedOperationException("Driver does not support deprecated clearAppCache  method", e);
+            throw new UnsupportedOperationException("Driver is not support deprecated clearAppCache  method", e);
         }
         driver.resetApp();
     }

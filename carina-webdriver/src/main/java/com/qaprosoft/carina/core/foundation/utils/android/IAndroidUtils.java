@@ -35,12 +35,15 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.DriverCommand;
+import org.openqa.selenium.remote.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableMap;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.android.Permissions.Permission;
 import com.qaprosoft.carina.core.foundation.utils.android.Permissions.PermissionAction;
 import com.qaprosoft.carina.core.foundation.utils.android.Permissions.PermissionType;
@@ -53,6 +56,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebEleme
 
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.ExecutesMethod;
+import io.appium.java_client.android.StartsActivity;
 import io.appium.java_client.android.SupportsNetworkStateManagement;
 import io.appium.java_client.android.connection.HasNetworkConnection;
 import io.appium.java_client.android.nativekey.AndroidKey;
@@ -62,42 +66,22 @@ import io.appium.java_client.android.nativekey.PressesKey;
 
 public interface IAndroidUtils extends IMobileUtils {
 
-    // TODO: review carefully and remove duplicates and migrate completely to fluent
-    // waits
+    // TODO: review carefully and remove duplicates and migrate completely to fluent waits
     static final Logger UTILS_LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     static final int SCROLL_MAX_SEARCH_SWIPES = 55;
     static final long SCROLL_TIMEOUT = 300;
-    AdbExecutor executor = new AdbExecutor();
-    String[] baseInitCmd = executor.getDefaultCmd();
+    static final AdbExecutor executor = new AdbExecutor();
+    static final String[] baseInitCmd = executor.getDefaultCmd();
     static final String LANGUAGE_CHANGE_APP_PATH = "app/ADB_Change_Language.apk";
-
-    static final String SHELL_INIT_CONSOLE = "mobile: shell";
-    static final String SHELL_INIT_DEEPLINK_CONSOLE = "mobile:deepLink";
-    static final String SHELL_INIT_GET_PERMISSION_CONSOLE = "mobile:getPermissions";
-    static final String SHELL_INIT_CHANGE_PERMISSION_CONSOLE = "mobile:changePermissions";
-
-    static final String SHELL_GPS_STATUS_CMD = "settings get secure location_providers_allowed";
-    static final String SHELL_CLOSE_STATUS_BAR_CMD = "cmd statusbar collapse";
-    static final String SHELL_OPEN_STATUS_BAR_CMD = "cmd statusbar expand-notifications";
-    static final String SHELL_INPUT_TXT_CMD = "input text ";
-    static final String SHELL_OPEN_URL_CMD = "am start -a android.intent.action.VIEW";
-    static final String SHELL_CLEAR_CACHE_CMD = "pm clear";
-    static final String SHELL_OPEN_DEVICE_SETTINGS_CMD = "am start -a android.settings.SETTINGS";
-    static final String SHELL_TAKE_SCREENSHOT_CMD = "screencap -p";
-    static final String SHELL_DISABLE_GPS_CMD = "settings put secure location_providers_allowed -gps";
-    static final String SHELL_ENABLE_GPS_CMD = "settings put secure location_providers_allowed +gps";
-    static final String SHELL_PRESS_HOME_CMD = "input keyevent 3";
-    static final String SHELL_RECENT_APPS_CMD = "input keyevent KEYCODE_APP_SWITCH";
-
-    // seconds
-    static final int DEVICE_REFRESH_TIME = 20;
 
     /**
      * Send a key-press event to the keyboard
      *
      * @param key keyboard key, see {@link AndroidKey}
-     *
+     * 
+     * @throws UnsupportedOperationException if driver does not support this feature
+     * 
      * @see <a href="https://android-developers.googleblog.com/2008/12/touch-mode.html">This method send key without leaving the touch-mode</a>
      */
     default public void pressKeyboardKey(AndroidKey key) {
@@ -105,7 +89,7 @@ public interface IAndroidUtils extends IMobileUtils {
         try {
             driver = (PressesKey) getDriver();
         } catch (ClassCastException e) {
-            throw new RuntimeException("driver is not support pressKeyboardKey method", e);
+            throw new UnsupportedOperationException("Driver is not support pressKeyboardKey method", e);
         }
 
         driver.pressKey(new KeyEvent(key)
@@ -115,21 +99,23 @@ public interface IAndroidUtils extends IMobileUtils {
     }
 
     /**
-     * Send a key-press event to the keyboard
+     * Send a key-press event to the keyboard<br>
      *
      * @param key keyboard key, see {@link AndroidKey}
      * @param flags event flags, see {@link KeyEventFlag}
+     * 
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void pressKeyboardKey(AndroidKey key, KeyEventFlag... flags) {
         PressesKey driver = null;
         try {
             driver = (PressesKey) getDriver();
         } catch (ClassCastException e) {
-            throw new RuntimeException("driver is not support pressKeyboardKey method", e);
+            throw new UnsupportedOperationException("Driver is not support pressKeyboardKey method", e);
         }
         KeyEvent keyEvent = new KeyEvent(key);
 
-        if (flags.length > 0) {
+        if (flags != null && flags.length > 0) {
             for (KeyEventFlag keyEventFlag : flags) {
                 keyEvent = keyEvent.withFlag(keyEventFlag);
             }
@@ -143,46 +129,54 @@ public interface IAndroidUtils extends IMobileUtils {
      *
      * @param keys keyboard keys, see {@link AndroidKey}
      * 
-     * @see <a href="https://android-developers.googleblog.com/2008/12/touch-mode.html">This method send key without leaving the touch-mode</a>
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void pressKeyboardKeys(List<AndroidKey> keys) {
-        final PressesKey driver;
+        PressesKey driver;
         try {
             driver = (PressesKey) getDriver();
         } catch (ClassCastException e) {
-            throw new RuntimeException("driver is not support pressKeyboardKey(s) method", e);
+            throw new UnsupportedOperationException("Driver is not support pressKeyboardKey(s) method", e);
         }
 
-        keys.forEach(key -> driver.pressKey(new KeyEvent(key)
-                .withFlag(KeyEventFlag.SOFT_KEYBOARD)
-                .withFlag(KeyEventFlag.KEEP_TOUCH_MODE)
-                .withFlag(KeyEventFlag.EDITOR_ACTION)));
+        keys.forEach(key -> driver.pressKey(new KeyEvent(key)));
     }
-    
 
     /**
      * Send a key-press {@link AndroidKey#BACK} event to the keyboard
+     * 
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void pressBack() {
-        WebDriver driver = getDriver();
-        ((PressesKey) driver).pressKey(new KeyEvent(AndroidKey.BACK));
+        PressesKey driver;
+        try {
+            driver = (PressesKey) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support pressBack method", e);
+        }
+        driver.pressKey(new KeyEvent(AndroidKey.BACK));
     }
 
     /**
      * Send a key-press {@link AndroidKey#SEARCH} event to the keyboard
+     * 
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void pressSearchKey() {
-        WebDriver driver = getDriver();
-        ((PressesKey) driver).pressKey(new KeyEvent(AndroidKey.SEARCH));
+        PressesKey driver;
+        try {
+            driver = (PressesKey) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support pressSearchKey method", e);
+        }
+        driver.pressKey(new KeyEvent(AndroidKey.SEARCH));
     }
 
     /**
-     * Press next key by coordinates
-     * This method does not guarantee that the next button will be clicked,
-     * it clicks the bottom right button by coordinates
+     * Press next key
      */
     default public void pressNextKey() {
-        // todo refactor to use pressKey
+        // todo investigate to use keyEvent with pressKey instead
         pressBottomRightKey();
     }
 
@@ -212,9 +206,9 @@ public interface IAndroidUtils extends IMobileUtils {
      * @return was the language change successful
      */
     default public boolean setDeviceLanguage(String language) {
-        return setDeviceLanguage(language, DEVICE_REFRESH_TIME);
+        int deviceRefreshTimeSec = 20;
+        return setDeviceLanguage(language, deviceRefreshTimeSec);
     }
-
 
     /**
      * change device language using ADBChangeLanguage application via ADB
@@ -281,7 +275,7 @@ public interface IAndroidUtils extends IMobileUtils {
         }
 
         actualDeviceLanguage = getDeviceLanguage();
-        UTILS_LOGGER.info("Actual Device Language: " + actualDeviceLanguage);
+        UTILS_LOGGER.info("Actual Device Language: {}", actualDeviceLanguage);
         if (language.contains(actualDeviceLanguage.toLowerCase())
                 || actualDeviceLanguage.toLowerCase().contains(language)) {
             status = true;
@@ -290,8 +284,9 @@ public interface IAndroidUtils extends IMobileUtils {
                 UTILS_LOGGER.info("Adb return empty response without errors.");
                 status = true;
             } else {
-                String currentAndroidVersion = IDriverPool.getDefaultDevice().getOsVersion();
-                UTILS_LOGGER.info("currentAndroidVersion=" + currentAndroidVersion);
+                String currentAndroidVersion = IDriverPool.getDefaultDevice()
+                        .getOsVersion();
+                UTILS_LOGGER.info("currentAndroidVersion={}", currentAndroidVersion);
                 if (currentAndroidVersion.contains("7.")) {
                     UTILS_LOGGER.info("Adb return language command do not work on some Android 7+ devices."
                             + " Check that there are no error.");
@@ -305,11 +300,13 @@ public interface IAndroidUtils extends IMobileUtils {
     /**
      * Get the current language on the device
      *
-     * @return language
+     * @return language, for example {@code fr}, or {@code fr-CA}
      */
     default public String getDeviceLanguage() {
+        // get language only, for example 'fr'
         String locale = executeAdbCommand("shell getprop persist.sys.language");
         if (locale.isEmpty()) {
+            // get locale, for example 'fr-CA'
             locale = executeAdbCommand("shell getprop persist.sys.locale");
         }
         return locale;
@@ -319,8 +316,8 @@ public interface IAndroidUtils extends IMobileUtils {
 
     /**
      * Install android Apk by path to apk file
-     *
-     * @param apkPath todo add description
+     * 
+     * @param apkPath path to apk
      */
     default public void installApk(final String apkPath) {
         installApk(apkPath, false);
@@ -329,8 +326,8 @@ public interface IAndroidUtils extends IMobileUtils {
     /**
      * Install android Apk by path to apk or by name in classpath
      *
-     * @param apkPath todo add description
-     * @param inClasspath boolean
+     * @param apkPath path to apk
+     * @param inClasspath whether to search for apk in classpath
      */
     default public void installApk(final String apkPath, boolean inClasspath) {
         String filePath = apkPath;
@@ -375,12 +372,12 @@ public interface IAndroidUtils extends IMobileUtils {
      *
      * <p>
      * example of usage: {@code ExtendedWebElement res = AndroidUtils.scroll("News", newsListContainer);}
-     * 
-     * @param scrollToElement text to scroll to
-     * @param container the element in which the text will be searched
-     * 
+     *
+     * @param scrollToElement text to scroll to. Defaults to text Selector Type
+     * @param container the element in which the text will be searched. Defaults to id Selector Type
+     *
      * @return if element was found, return {@link ExtendedWebElement}, otherwise return {@code null}
-     * 
+     *
      **/
     default public ExtendedWebElement scroll(String scrollToElement, ExtendedWebElement container) {
         return scroll(scrollToElement, container, SelectorType.ID, SelectorType.TEXT);
@@ -389,18 +386,11 @@ public interface IAndroidUtils extends IMobileUtils {
     /**
      * Scrolls into view in a container specified by it's instance (index)
      * 
-     * @param scrollToEle
-     *            - has to be id, text, contentDesc or className
-     * @param scrollableContainer
-     *            - ExtendedWebElement type
-     * @param containerSelectorType
-     *            - has to be id, text, textContains, textStartsWith, Description,
-     *            DescriptionContains or className
-     * @param containerInstance
-     *            - has to an instance number of desired container
-     * @param eleSelectorType
-     *            - has to be id, text, textContains, textStartsWith, Description,
-     *            DescriptionContains or className
+     * @param scrollToEle has to be id, text, contentDesc or className
+     * @param scrollableContainer ExtendedWebElement type
+     * @param containerSelectorType has to be id, text, textContains, textStartsWith, Description, DescriptionContains or className
+     * @param containerInstance has to an instance number of desired container
+     * @param eleSelectorType has to be id, text, textContains, textStartsWith, Description, DescriptionContains or className
      * @return ExtendedWebElement
      *         <p>
      *         example of usage: ExtendedWebElement res =
@@ -458,20 +448,12 @@ public interface IAndroidUtils extends IMobileUtils {
     /**
      * Scrolls into view in specified container
      * 
-     * @param scrollToEle
-     *            - has to be id, text, contentDesc or className
-     * @param scrollableContainer
-     *            - ExtendedWebElement type
-     * @param containerSelectorType
-     *            - has to be id, text, textContains, textStartsWith, Description,
-     *            DescriptionContains or className
-     * @param containerInstance
-     *            - has to an instance number of desired container
-     * @param eleSelectorType
-     *            - has to be id, text, textContains, textStartsWith, Description,
-     *            DescriptionContains or className
-     * @param eleSelectorInstance
-     *            - has to an instance number of desired container
+     * @param scrollToEle has to be id, text, contentDesc or className
+     * @param scrollableContainer ExtendedWebElement type
+     * @param containerSelectorType has to be id, text, textContains, textStartsWith, Description, DescriptionContains or className
+     * @param containerInstance has to an instance number of desired container
+     * @param eleSelectorType has to be id, text, textContains, textStartsWith, Description, DescriptionContains or className
+     * @param eleSelectorInstance has to an instance number of desired container
      * @return ExtendedWebElement
      *         <p>
      *         example of usage: ExtendedWebElement res =
@@ -592,10 +574,8 @@ public interface IAndroidUtils extends IMobileUtils {
     /**
      * Scrolls into view in specified container
      * 
-     * @param scrollableContainer
-     *            - ExtendedWebElement type
-     * @param containerSelectorType
-     *            - Selector type: has to be id, text, contentDesc or className
+     * @param scrollableContainer ExtendedWebElement type
+     * @param containerSelectorType Selector type: has to be id, text, contentDesc or className
      * @return scrollViewContainerFinder String
      *
      **/
@@ -646,10 +626,8 @@ public interface IAndroidUtils extends IMobileUtils {
     /**
      * Scrolls into view in specified container
      * 
-     * @param scrollToEle
-     *            - String type
-     * @param eleSelectorType
-     *            - Selector type: has to be id, text, contentDesc or className
+     * @param scrollToEle String type
+     * @param eleSelectorType Selector type: has to be id, text, contentDesc or className
      * @return String
      **/
     default String getScrollToElementSelector(String scrollToEle, SelectorType eleSelectorType) {
@@ -702,20 +680,37 @@ public interface IAndroidUtils extends IMobileUtils {
     }
 
     /**
-     * getCurrentDeviceFocus - get actual device apk in focus.
-     *
+     * Get current pack in focus
+     * 
+     * @deprecated this method calls adb bypassing the driver, so use {@link #getCurrentPackage(WebDriver)} instead
      * @return String
      */
+    @Deprecated(since = "8.x", forRemoval = true)
     default public String getCurrentDeviceFocus() {
         String result = executeAdbCommand("shell dumpsys window windows | grep -E 'mCurrentFocus|mFocusedApp'");
         return result;
     }
 
     /**
-     * executeAbdCommand
+     * Get current device package
+     * 
+     * @return current package name, for example {@code com.android.settings}
+     * @throws UnsupportedOperationException if driver does not support this feature
+     */
+    default public String getCurrentPackage(WebDriver driver) {
+        StartsActivity startsActivity;
+        try {
+            startsActivity = (StartsActivity) driver;
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getCurrentPackage method", e);
+        }
+        return startsActivity.getCurrentPackage();
+    }
+
+    /**
+     * execute ADB command bypassing the driver
      *
-     * @param command
-     *            String
+     * @param command adb command
      * @return String command output in one line
      */
     default public String executeAdbCommand(String command) {
@@ -728,19 +723,19 @@ public interface IAndroidUtils extends IMobileUtils {
         }
 
         String result = "";
-        UTILS_LOGGER.info("Command: " + command);
+        UTILS_LOGGER.info("Command: {}", command);
         String[] listOfCommands = command.split(" ");
 
         String[] execCmd = CmdLine.insertCommandsAfter(baseInitCmd, listOfCommands);
 
         try {
-            UTILS_LOGGER.info("Try to execute following cmd: " + CmdLine.arrayToString(execCmd));
+            UTILS_LOGGER.info("Try to execute following cmd: {}", CmdLine.arrayToString(execCmd));
             List<String> execOutput = executor.execute(execCmd);
-            UTILS_LOGGER.info("Output after execution ADB command: " + execOutput);
+            UTILS_LOGGER.info("Output after execution ADB command: {}", execOutput);
 
             result = execOutput.toString().replaceAll("\\[|\\]", "").replaceAll(", ", " ").trim();
 
-            UTILS_LOGGER.info("Returning Output: " + result);
+            UTILS_LOGGER.info("Returning Output: {}", result);
         } catch (Exception e) {
             UTILS_LOGGER.error("Error while executing adb command: " + command, e);
         }
@@ -749,38 +744,41 @@ public interface IAndroidUtils extends IMobileUtils {
     }
 
     /**
+     * Execute android-specific commands throw driver using adb
      * 
-     * @param command
-     * 
-     *            - ADB shell command represented as single String where 1st literal
-     *            is a command itself. Everything that follow is treated as
-     *            arguments.
+     * @param command adb-shell command represented as single String where 1st literal is a command itself.
+     *            Everything that follow is treated as arguments.<br>
      *
-     *            NOTE: "adb -s {UDID} shell" - should be omitted.
-     *            Example: "adb -s {UDID} shell list packages" - list packages
+     *            <b>IMPORTANT</b>: "adb -s {UDID} shell" - <b>should be omitted</b> in {@code command} param.<br>
+     *            Example: "adb -s {UDID} shell list packages" - list packages <br>
      * 
-     *            NOTE: shell arguments with space symbols are unsupported!
+     *            <b>IMPORTANT</b>: shell arguments with space symbols are unsupported! Use {@link #executeShell(List)} instead
      * 
-     * @return String - response (might be empty)
+     * @return response (might be empty)
+     * @throws UnsupportedOperationException if driver does not support this feature
+     * 
+     * @see <a href="https://github.com/appium/appium-uiautomator2-driver#platform-specific-extensions">Platform-specific extensions</a>
      */
     default public String executeShell(String command) {
-        UTILS_LOGGER.info("ADB command to be executed: adb shell ".concat(command.trim()));
+        UTILS_LOGGER.info("ADB command to be executed: adb shell {}", command);
         List<String> literals = Arrays.asList(command.split(" "));
         return executeShell(literals);
     }
 
     /**
-     * 
-     * @param commands list of string commands
-     * 
-     *            - ADB shell command represented as single String where 1st literal
-     *            is a command itself. Everything that follow is treated as
-     *            arguments.
+     * Execute android-specific commands throw driver using adb
      *
-     *            NOTE: "adb -s {UDID} shell" - should be omitted.
-     *            Example: "adb -s {UDID} shell list packages" - list packages
+     * @param commands list of commands and arguments<br>
+     *            adb-shell command represented as single String where 1st literal is a command itself.
+     *            Everything that follow is treated as arguments.<br>
      * 
-     * @return String - response (might be empty)
+     *            <b>IMPORTANT</b>: "adb -s {UDID} shell" - <b>should be omitted</b> in {@code command} param.<br>
+     *            Example: "adb -s {UDID} shell list packages" - list packages <br>
+     * 
+     * @return response (might be empty)
+     * @throws UnsupportedOperationException if driver does not support this feature
+     * 
+     * @see <a href="https://github.com/appium/appium-uiautomator2-driver#platform-specific-extensions">Platform-specific extensions</a>
      */
     default public String executeShell(List<String> commands) {
         JavascriptExecutor driver = null;
@@ -790,11 +788,11 @@ public interface IAndroidUtils extends IMobileUtils {
             throw new UnsupportedOperationException("Driver does not support executeShell method", e);
         }
 
-        String commandKeyWord = commands.get(0);
+        String command = commands.get(0);
         List<String> args = commands.subList(1, commands.size());
-        Map<String, Object> preparedCommand = ImmutableMap.of("command", commandKeyWord, "args", args);
+        Map<String, Object> preparedCommand = Map.of("command", command, "args", args);
 
-        String output = driver.executeScript(SHELL_INIT_CONSOLE, preparedCommand)
+        String output = driver.executeScript("mobile: shell", preparedCommand)
                 .toString();
 
         if (!StringUtils.isEmpty(output)) {
@@ -804,14 +802,50 @@ public interface IAndroidUtils extends IMobileUtils {
     }
 
     /**
-     * This method performs an action corresponding to press Android device's native
-     * button to show all recent applications.
+     * <b>For internal use only</b>
+     * Start URI that may take users directly to the specific content in the app
+     *
+     * @param url the URL to start, for example {@code theapp://login/}
+     * @param packageName the name of the package to start the URI with, for example {@code com.mycompany}
+     * @return Response
+     * @see <a href="https://appiumpro.com/editions/84-reliably-opening-deep-links-across-platforms-and-devices">
+     *      Reliably Opening Deep Links Across Platforms and Devices</a>
+     */
+    default Response executeDeepLink(String url, String packageName) {
+        WebDriver driver = getDriver();
+
+        Map<String, Object> preparedCommand = Map.of("url", url, "package", packageName);
+        return executeMobileScript(driver, "mobile: deepLink", preparedCommand);
+    }
+
+    /**
+     * <b>For internal use only</b>
+     *
+     * Execute scripts
      * 
-     * NOTE: method could be used to get a list of running in background
-     * applications with respect to particular device.
+     * @param driver WebDriver instance
+     * @param scriptType name of script type, for example {@code mobile:deepLink}
+     */
+    default Response executeMobileScript(WebDriver driver, String scriptType, Map<String, Object> arguments) {
+        Map<String, ?> command = ImmutableMap.of(
+                "script", scriptType, "args", arguments);
+
+        ExecutesMethod executesMethod = null;
+
+        try {
+            executesMethod = (ExecutesMethod) driver;
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver does not support executeMobileScript method", e);
+        }
+
+        return executesMethod.execute(DriverCommand.EXECUTE_SCRIPT, command);
+    }
+
+    /**
+     * Bring up the application switcher dialog
      */
     default public void displayRecentApps() {
-        executeShell(SHELL_RECENT_APPS_CMD);
+        executeShell("input keyevent KEYCODE_APP_SWITCH");
     }
 
     /**
@@ -819,7 +853,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * All applications will be closed to background.
      */
     default public void pressHome() {
-        executeShell(SHELL_PRESS_HOME_CMD);
+        executeShell("input keyevent 3");
     }
 
     /**
@@ -828,8 +862,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * @return true if GPS enabled
      */
     default public boolean isGPSEnabled() {
-        String response = executeShell(SHELL_GPS_STATUS_CMD);
-
+        String response = executeShell("settings get secure location_providers_allowed");
         // Response reflects which services are used for obtaining location:
         // - "gps" - GPS only (device only);
         // - "gps,network" - GPS + Wi-Fi + Bluetooth or cellular networks (High accuracy mode);
@@ -841,7 +874,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * Enable GPS
      */
     default public void enableGPS() {
-        executeShell(SHELL_ENABLE_GPS_CMD);
+        executeShell("settings put secure location_providers_allowed +gps");
     }
 
     /**
@@ -849,7 +882,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * Works if ONLY DEVICE (GPS sensor) is user for obtaining location
      */
     default public void disableGPS() {
-        executeShell(SHELL_DISABLE_GPS_CMD);
+        executeShell("settings put secure location_providers_allowed -gps");
     }
 
     /**
@@ -859,8 +892,7 @@ public interface IAndroidUtils extends IMobileUtils {
      */
     default public void takeScreenShot(String filepath) {
         UTILS_LOGGER.info("Screenshot will be saved to: {}", filepath);
-        String command = String.format(SHELL_TAKE_SCREENSHOT_CMD.concat(" %s"), filepath);
-        executeShell(command);
+        executeShell(String.format("screencap -p %s", filepath));
     }
 
     /**
@@ -870,8 +902,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * @return appVersion version of app (versionCode from system dump), for example {@code 11200050}
      */
     default public String getAppVersion(String packageName) {
-        String command = "dumpsys package ".concat(packageName);
-        String output = executeShell(command);
+        String output = executeShell("dumpsys package ".concat(packageName));
         // we search for "versionCode" parameter in system dump.
         String versionCode = StringUtils.substringBetween(output, "versionCode=", " ");
         UTILS_LOGGER.info("Version code for '{}' package name is {}", packageName, versionCode);
@@ -889,7 +920,7 @@ public interface IAndroidUtils extends IMobileUtils {
         String output = this.executeShell(command);
         // we search for "versionName" parameter in system dump.
         String versionName = StringUtils.substringBetween(output, "versionName=", "\n");
-        UTILS_LOGGER.info(String.format("Version name for '%s' package name is %s", packageName, versionName));
+        UTILS_LOGGER.info("Version name for '{}' package name is {}", packageName, versionName);
         return versionName;
     }
 
@@ -897,7 +928,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * Open Android device native settings
      */
     default public void openDeviceSettings() {
-        executeShell(SHELL_OPEN_DEVICE_SETTINGS_CMD);
+        executeShell("am start -a android.settings.SETTINGS");
     }
 
     /**
@@ -909,11 +940,10 @@ public interface IAndroidUtils extends IMobileUtils {
      */
     default public void clearAppCache(String packageName) {
         UTILS_LOGGER.info("Will clear data for the following app: {}", packageName);
-        String command = String.format(SHELL_CLEAR_CACHE_CMD.concat(" %s"), packageName);
-        String response = executeShell(command);
+        String response = executeShell(String.format("pm clear %s", packageName));
         UTILS_LOGGER.info("Output after resetting custom application by package ({}): {}", packageName, response);
         if (!response.contains("Success")) {
-            UTILS_LOGGER.warn(String.format("App data was not cleared for %s app", packageName));
+            UTILS_LOGGER.warn("App data was not cleared for {} app", packageName);
         }
     }
 
@@ -929,30 +959,21 @@ public interface IAndroidUtils extends IMobileUtils {
     default public void openURL(String link) {
         // TODO: #1380 make openURL call from this mobile interface in DriverHelper
         UTILS_LOGGER.info("Following link will be triggered via ADB: {}", link);
-        String command = String.format(SHELL_OPEN_URL_CMD.concat(" %s"), link);
-        executeShell(command);
+        executeShell(String.format("am start -a android.intent.action.VIEW %s", link));
     }
 
     /**
-     * todo add more understandable description
-     * With this method user is able to trigger a deeplink (link to specific place within the application)
-     * 
-     * @param link String
-     * @param packageName String
-     * @throws UnsupportedOperationException if driver does not support this feature
+     * Start URI that may take users directly to the specific content in the app
+     *
+     * @param url the URL to start, for example {@code theapp://login/}
+     * @param packageName the name of the package to start the URI with, for example {@code com.mycompany}
+     * @see <a href="https://appiumpro.com/editions/84-reliably-opening-deep-links-across-platforms-and-devices">
+     *      Reliably Opening Deep Links Across Platforms and Devices</a>
      */
-    default public void triggerDeeplink(String link, String packageName) {
-        Map<String, Object> preparedCommand = ImmutableMap.of("url", link, "package", packageName);
-
-        JavascriptExecutor driver = null;
+    default public void triggerDeeplink(String url, String packageName) {
+        WebDriver driver = getDriver();
         try {
-            driver = (JavascriptExecutor) getDriver();
-        } catch (ClassCastException e) {
-            throw new UnsupportedOperationException("Driver does not support triggerDeeplink method", e);
-        }
-
-        try {
-            driver.executeScript(SHELL_INIT_DEEPLINK_CONSOLE, preparedCommand);
+            executeDeepLink(url, packageName);
         } catch (WebDriverException wde) {
             // TODO: need to pay attention
             UTILS_LOGGER.warn("org.openqa.selenium.WebDriverException is caught and ignored.", wde);
@@ -964,41 +985,23 @@ public interface IAndroidUtils extends IMobileUtils {
      *
      * if response is not correct, return null
      *
-     * @param packageName String
-     * @param type PermissionType
+     * @param appPackage the application package to get permissions from, for example {@code }
+     * @param type permission type. See {@link PermissionType}
      * @return ArrayList String
      * @throws UnsupportedOperationException if driver does not support this feature
      */
     @SuppressWarnings("unchecked")
-    default public List<String> getAppPermissions(String packageName, PermissionType type) {
-        Map<String, Object> preparedCommand = ImmutableMap.of("type", type.getType(), "package", packageName);
-
-        JavascriptExecutor driver = null;
-        try {
-            driver = (JavascriptExecutor) getDriver();
-        } catch (ClassCastException e) {
-            throw new UnsupportedOperationException("Driver does not support getAppPermissions method", e);
-        }
-
-        Object responseAsObject = driver.executeScript(SHELL_INIT_GET_PERMISSION_CONSOLE, preparedCommand);
-        List<String> responseValue = null;
-        try {
-            responseValue = (List<String>) responseAsObject;
-        } catch (ClassCastException e) {
-            UTILS_LOGGER.error("Cannot cast result of getAppPermissions method to the list. Possible reason that the response is not correct: {}",
-                    responseAsObject);
-            return null;
-        }
-
-        return responseValue;
+    default public List<String> getAppPermissions(String appPackage, PermissionType type) {
+        Map<String, Object> preparedCommand = ImmutableMap.of("type", type.getType(), "package", appPackage);
+        return (List<String>) executeMobileScript(getDriver(), "mobile: getPermissions", preparedCommand);
     }
 
     /**
-     * To change (grant or revoke) application permissions.
+     * Change package permissions in runtime
      * 
      * @param packageName String
-     * @param action PermissionAction
-     * @param permissions Permission
+     * @param action permission action, see {@link PermissionAction}
+     * @param permissions list of permissions {@link Permission}
      * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void changePermissions(String packageName, PermissionAction action, Permission... permissions) {
@@ -1006,19 +1009,11 @@ public interface IAndroidUtils extends IMobileUtils {
                 .map(Permission::getPermission)
                 .collect(Collectors.toList());
 
-        JavascriptExecutor driver = null;
-        try {
-            driver = (JavascriptExecutor) getDriver();
-        } catch (ClassCastException e) {
-            throw new UnsupportedOperationException("Driver does not support changePermissions method", e);
-        }
-
         Map<String, Object> preparedCommand = ImmutableMap.of(
                 "action", action.getAction(),
                 "appPackage", packageName,
                 "permissions", permissionsStr);
-
-        driver.executeScript(SHELL_INIT_CHANGE_PERMISSION_CONSOLE, preparedCommand);
+        executeMobileScript(getDriver(), "mobile: changePermissions", preparedCommand);
     }
 
     /**
@@ -1036,8 +1031,7 @@ public interface IAndroidUtils extends IMobileUtils {
         for (char sym : array) {
             // todo refactor
             String ch = (sym == ' ') ? "%s" : String.valueOf(sym);
-            String command = SHELL_INPUT_TXT_CMD + ch;
-            executeShell(command);
+            executeShell(String.format("input text %s", ch));
         }
     }
 
@@ -1052,8 +1046,7 @@ public interface IAndroidUtils extends IMobileUtils {
         try {
             driver = (HasNetworkConnection) getDriver();
         } catch (ClassCastException e) {
-            // todo add opportunity check is Airplane mode enabled via adb if we use RemoteWebDriver instead of AndroidDriver if possible
-            throw new UnsupportedOperationException("Driver does not support isAirplaneModeEnabled method", e);
+            throw new UnsupportedOperationException("Driver is not support isAirplaneModeEnabled method", e);
         }
         boolean enabled = driver.getConnection()
                 .isAirplaneModeEnabled();
@@ -1072,8 +1065,7 @@ public interface IAndroidUtils extends IMobileUtils {
         try {
             driver = (HasNetworkConnection) getDriver();
         } catch (ClassCastException e) {
-            // todo add opportunity check is WiFi enabled via adb if we use RemoteWebDriver instead of AndroidDriver if possible
-            throw new UnsupportedOperationException("Driver does not support isWifiEnabled method", e);
+            throw new UnsupportedOperationException("Driver is not support isWifiEnabled method", e);
         }
         boolean enabled = driver.getConnection().isWiFiEnabled();
         UTILS_LOGGER.info("Wi-Fi enabled: {}", enabled);
@@ -1096,8 +1088,7 @@ public interface IAndroidUtils extends IMobileUtils {
         try {
             driver = (SupportsNetworkStateManagement) getDriver();
         } catch (ClassCastException e) {
-            // todo add opportunity to turn on wifi via adb if we use RemoteWebDriver instead of AndroidDriver if possible
-            throw new UnsupportedOperationException("Driver does not support enableWifi method", e);
+            throw new UnsupportedOperationException("Driver is not support enableWifi method", e);
         }
 
         driver.toggleWifi();
@@ -1119,8 +1110,7 @@ public interface IAndroidUtils extends IMobileUtils {
         try {
             driver = (SupportsNetworkStateManagement) getDriver();
         } catch (ClassCastException e) {
-            // todo add opportunity to turn on wifi via adb if we use RemoteWebDriver instead of AndroidDriver if possible
-            throw new UnsupportedOperationException("Driver does not support disableWifi method", e);
+            throw new UnsupportedOperationException("Driver is not support disableWifi method", e);
         }
 
         driver.toggleWifi();
@@ -1132,8 +1122,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * @param appName - Name of the app as it appears in the device's Apps list (Language specific)
      */
     default void openAppMenuFromDeviceSettings(String appName) {
-        AndroidService androidService = AndroidService.getInstance();
-        androidService.executeAdbCommand("shell am start -a android.settings.APPLICATION_SETTINGS");
+        executeAdbCommand("shell am start -a android.settings.APPLICATION_SETTINGS");
 
         // initializing appItem with ExtendedWebElement constructor that initialize search context
         ExtendedWebElement appItem = new ExtendedWebElement(By.xpath(String.format("//*[contains(@text, '%s')]", appName)), "notifications",
@@ -1161,7 +1150,7 @@ public interface IAndroidUtils extends IMobileUtils {
         // initializing with driver context
         element = new ExtendedWebElement(By.xpath("//*[@resource-id='com.android.settings:id/switch_text']/following-sibling::android.widget.Switch"),
                 "toggle", driver, driver);
-        if (Boolean.valueOf(element.getAttribute("checked")) != setValue) {
+        if (Boolean.parseBoolean(element.getAttribute("checked")) != setValue) {
             element.click();
         }
     }
@@ -1170,36 +1159,97 @@ public interface IAndroidUtils extends IMobileUtils {
      * @return - Returns if the device in use has a running LTE connection
      */
     default boolean isCarrierConnectionAvailable() {
-        AndroidService androidService = AndroidService.getInstance();
-        WebDriver driver = getDriver();
+        HasNetworkConnection hasNetworkConnection = null;
 
-        boolean status = ((HasNetworkConnection) driver).getConnection().isDataEnabled();
+        try {
+            hasNetworkConnection = (HasNetworkConnection) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver does not support isCarrierConnectionAvailable method", e);
+        }
+
+        boolean status = hasNetworkConnection.getConnection()
+                .isDataEnabled();
         boolean linkProperties = false;
 
-        String linkProp = androidService.executeAdbCommand("shell dumpsys telephony.registry | grep mPreciseDataConnectionState");
-        UTILS_LOGGER.info("PROP:  " + linkProp);
+        String linkProp = executeAdbCommand("shell dumpsys telephony.registry | grep mPreciseDataConnectionState");
+        UTILS_LOGGER.info("PROP:  {}", linkProp);
         if (!linkProp.isEmpty()) {
             linkProperties = !StringUtils.substringBetween(linkProp, "APN: ", " ").equals("null");
         }
-        UTILS_LOGGER.info("STATUS ENABLED: " + status);
-        UTILS_LOGGER.info("CARRIER AVAILABLE: " + linkProperties);
-        return ((HasNetworkConnection) driver).getConnection().isDataEnabled() && linkProperties;
+        UTILS_LOGGER.info("STATUS ENABLED: {}", status);
+        UTILS_LOGGER.info("CARRIER AVAILABLE: {}", linkProperties);
+        return hasNetworkConnection.getConnection().isDataEnabled() && linkProperties;
     }
 
     /**
-     * @return - Returns the value of the device model in use as a String
+     * Get device model
+     * 
+     * @return device model
      */
-    default String getDeviceModel() {
-        AndroidService androidService = AndroidService.getInstance();
-        return StringUtils.substringAfter(androidService.executeAdbCommand("shell getprop | grep 'ro.product.model'"), "ro.product.model: ");
+    default public String getDeviceModel() {
+        return StringUtils.substringAfter(executeAdbCommand("shell getprop | grep 'ro.product.model'"), "ro.product.model: ");
     }
 
     default public void openStatusBar() {
-        executeShell(SHELL_OPEN_STATUS_BAR_CMD);
+        executeShell("cmd statusbar expand-notifications");
     }
 
     default public void closeStatusBar() {
-        executeShell(SHELL_CLOSE_STATUS_BAR_CMD);
+        executeShell("cmd statusbar collapse");
     }
 
+    /**
+     * Set Android Device Default TimeZone And Language based on config or to GMT and En
+     * Without restoring actual focused apk.
+     */
+    default public void setDeviceDefaultTimeZoneAndLanguage() {
+        setDeviceDefaultTimeZoneAndLanguage(false);
+    }
+
+    /**
+     * Set default TimeZone And Language based on config or to GMT and En
+     *
+     * @param returnAppFocus - if true store actual Focused apk and activity, than restore after setting Timezone and Language.
+     */
+    default public void setDeviceDefaultTimeZoneAndLanguage(boolean returnAppFocus) {
+        try {
+            String baseApp = "";
+            String os = IDriverPool.getDefaultDevice().getOs();
+            if (os.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+
+                AndroidService androidService = AndroidService.getInstance();
+
+                if (returnAppFocus) {
+                    baseApp = androidService.getCurrentFocusedApkDetails();
+                }
+
+                String deviceTimezone = Configuration.get(Configuration.Parameter.DEFAULT_DEVICE_TIMEZONE);
+                String deviceTimeFormat = Configuration.get(Configuration.Parameter.DEFAULT_DEVICE_TIME_FORMAT);
+                String deviceLanguage = Configuration.get(Configuration.Parameter.DEFAULT_DEVICE_LANGUAGE);
+
+                DeviceTimeZone.TimeFormat timeFormat = DeviceTimeZone.TimeFormat.parse(deviceTimeFormat);
+                DeviceTimeZone.TimeZoneFormat timeZone = DeviceTimeZone.TimeZoneFormat.parse(deviceTimezone);
+
+                UTILS_LOGGER.info("Set device timezone to {}", timeZone);
+                UTILS_LOGGER.info("Set device time format to {}", timeFormat);
+                UTILS_LOGGER.info("Set device language to {}", deviceLanguage);
+
+                boolean timeZoneChanged = androidService.setDeviceTimeZone(timeZone.getTimeZone(), timeZone.getSettingsTZ(), timeFormat);
+                boolean languageChanged = androidService.setDeviceLanguage(deviceLanguage);
+
+                UTILS_LOGGER.info("Device TimeZone was changed to timeZone '{}' : {}. Device Language was changed to language '{}': {}",
+                        deviceTimezone,
+                        timeZoneChanged, deviceLanguage, languageChanged);
+
+                if (returnAppFocus) {
+                    androidService.openApp(baseApp);
+                }
+
+            } else {
+                UTILS_LOGGER.info("Current OS is {}. But we can set default TimeZone and Language only for Android.", os);
+            }
+        } catch (Exception e) {
+            UTILS_LOGGER.error("Error while setting to device default timezone and language!", e);
+        }
+    }
 }

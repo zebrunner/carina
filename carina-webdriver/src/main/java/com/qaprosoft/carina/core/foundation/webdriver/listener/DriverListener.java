@@ -282,6 +282,11 @@ public class DriverListener implements WebDriverListener, IDriverPool {
 
     /**
      * Clean driver from Decorator and cast driver to
+     *
+     * @param <T> extends WebDriver
+     * @param driver WebDriver
+     * @param clazz  class to which to cast
+     * @return driver without listeners
      */
     public static <T extends WebDriver> T castDriver(WebDriver driver, Class<T> clazz) {
         T castDriver = null;
