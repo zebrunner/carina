@@ -16,10 +16,9 @@ import io.appium.java_client.ios.PerformsTouchID;
 import io.appium.java_client.ios.ShakesDevice;
 
 /**
- * Contains utility methods for working with ios<br>
- * Applicable only to the {@link io.appium.java_client.ios.IOSDriver}
+ * Contains utility methods for working with ios
  */
-public interface IOSUtils extends IMobileUtils, IDriverPool {
+public interface IOSUtils extends IMobileUtils {
     // todo add methods from HasIOSSettings
     // todo add methods from ListensToSyslogMessages
 

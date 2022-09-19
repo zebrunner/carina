@@ -85,8 +85,7 @@ import io.appium.java_client.battery.HasBattery;
 import io.appium.java_client.clipboard.ClipboardContentType;
 
 /**
- * Contains utility methods for working with android devices<br>
- * Applicable only to the {@link io.appium.java_client.android.AndroidDriver}
+ * Contains utility methods for working with android devices
  */
 public interface IAndroidUtils extends IMobileUtils {
     // todo add HasAndroidSettings methods
@@ -341,11 +340,12 @@ public interface IAndroidUtils extends IMobileUtils {
 
     /**
      * Get the current language on the device
-     *and
+     * and
+     * 
      * @return language, for example {@code fr}, or {@code fr-CA}
-     * @deprecated  this method calls adb bypassing the driver, so use {@link #getSystemDeviceLanguage()} instead
+     * @deprecated this method calls adb bypassing the driver, so use {@link #getSystemDeviceLanguage()} instead
      */
-    @Deprecated
+    @Deprecated(forRemoval = true, since = "8.x")
     default public String getDeviceLanguage() {
         // get language only, for example 'fr'
         String locale = executeAdbCommand("shell getprop persist.sys.language");
@@ -986,10 +986,17 @@ public interface IAndroidUtils extends IMobileUtils {
     }
 
     /**
-     * Open Android device native settings
+     * Open android device native settings
      */
     default public void openDeviceSettings() {
         executeShell("am start -a android.settings.SETTINGS");
+    }
+
+    /**
+     * Open development settings
+     */
+    default public void openDeveloperOptions() {
+        executeShell("am start -n com.android.settings/.DevelopmentSettings");
     }
 
     /**
@@ -1277,30 +1284,28 @@ public interface IAndroidUtils extends IMobileUtils {
     }
 
     /**
-     * Set Android Device Default TimeZone And Language based on config or to GMT and En
-     * Without restoring actual focused apk.
+     * Set android device default timezone and language based on config or to GMT and En
+     * without restoring actual focused apk
      */
-    @SuppressWarnings("deprecation")
-    default public void setDeviceDefaultTimeZoneAndLanguage() {
-        setDeviceDefaultTimeZoneAndLanguage(false);
+    default public void setDeviceDefaultTimeZoneLanguage() {
+        setDeviceDefaultTimeZoneLanguage(false);
     }
 
     /**
-     * Set default TimeZone And Language based on config or to GMT and En
+     * Set default timezone and language based on config or to GMT and En
      *
      * @param returnAppFocus - if true store actual Focused apk and activity, than restore after setting Timezone and Language.
      */
-    @SuppressWarnings("deprecation")
-    default public void setDeviceDefaultTimeZoneAndLanguage(boolean returnAppFocus) {
+    default public void setDeviceDefaultTimeZoneLanguage(boolean returnAppFocus) {
         try {
-            String baseApp = "";
+            Activity activity = null;
             String os = IDriverPool.getDefaultDevice().getOs();
             if (os.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
 
                 AndroidService androidService = AndroidService.getInstance();
 
                 if (returnAppFocus) {
-                    baseApp = androidService.getCurrentFocusedApkDetails();
+                    activity = new Activity(getCurrentPackage(), getCurrentActivity());
                 }
 
                 String deviceTimezone = Configuration.get(Configuration.Parameter.DEFAULT_DEVICE_TIMEZONE);
@@ -1322,7 +1327,7 @@ public interface IAndroidUtils extends IMobileUtils {
                         timeZoneChanged, deviceLanguage, languageChanged);
 
                 if (returnAppFocus) {
-                    androidService.openApp(baseApp);
+                    androidService.startActivity(activity);
                 }
 
             } else {
@@ -1385,14 +1390,29 @@ public interface IAndroidUtils extends IMobileUtils {
      * @return a current activity being run on the mobile device
      * @throws UnsupportedOperationException if driver does not support this feature
      */
-    default public String currentActivity() {
+    default public String getCurrentActivity() {
         StartsActivity driver = null;
         try {
             driver = (StartsActivity) getDriver();
         } catch (ClassCastException e) {
-            throw new UnsupportedOperationException("Driver is not support currentActivity method", e);
+            throw new UnsupportedOperationException("Driver is not support getCurrentActivity method", e);
         }
         return driver.currentActivity();
+    }
+
+    /**
+     * Get the current activity being run on the mobile device with package name (apkPackage/apkActivity)
+     *
+     * @return {@code apkPackage/apkActivity} string
+     */
+    default public String getCurrentPackageActivity() {
+        StartsActivity driver = null;
+        try {
+            driver = (StartsActivity) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getCurrentPackageActivity method", e);
+        }
+        return driver.getCurrentPackage() + "/" + driver.currentActivity();
     }
 
     /**

@@ -76,9 +76,7 @@ import io.appium.java_client.screenrecording.BaseStopScreenRecordingOptions;
 import io.appium.java_client.screenrecording.CanRecordScreen;
 
 /**
- * Contains utility methods for working with android and ios<br>
- * Applicable only to the {@link io.appium.java_client.android.AndroidDriver} and
- * {@link io.appium.java_client.ios.IOSDriver}
+ * Contains utility methods for working with android and ios
  */
 public interface IMobileUtils extends IDriverPool {
 
@@ -110,7 +108,7 @@ public interface IMobileUtils extends IDriverPool {
     /**
      * @deprecated this constant is not used in IMobileUtils
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "8.x")
     static final int MINIMUM_TIMEOUT = 2;
 
     static final int DEFAULT_TOUCH_ACTION_DURATION = 1000;
@@ -729,7 +727,7 @@ public interface IMobileUtils extends IDriverPool {
      * Without restoring actual focused apk.
      * 
      * @deprecated IMobileUtils should contains only methods for Android <b>and</b> IOS, so use
-     *             {@link com.qaprosoft.carina.core.foundation.utils.android.IAndroidUtils#setDeviceDefaultTimeZoneAndLanguage()}
+     *             {@link com.qaprosoft.carina.core.foundation.utils.android.IAndroidUtils#setDeviceDefaultTimeZoneLanguage()}
      */
     @Deprecated(forRemoval = true, since = "8.x")
     default public void setDeviceDefaultTimeZoneAndLanguage() {
@@ -741,7 +739,7 @@ public interface IMobileUtils extends IDriverPool {
      *
      * @param returnAppFocus - if true store actual Focused apk and activity, than restore after setting Timezone and Language.
      * @deprecated IMobileUtils should contains only methods for Android <b>and</b> IOS, so use
-     *             {@link com.qaprosoft.carina.core.foundation.utils.android.IAndroidUtils#setDeviceDefaultTimeZoneAndLanguage(boolean)}
+     *             {@link com.qaprosoft.carina.core.foundation.utils.android.IAndroidUtils#setDeviceDefaultTimeZoneLanguage(boolean)}
      */
     @Deprecated(forRemoval = true, since = "8.x")
     default public void setDeviceDefaultTimeZoneAndLanguage(boolean returnAppFocus) {
