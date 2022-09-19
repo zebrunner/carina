@@ -84,6 +84,10 @@ import io.appium.java_client.android.nativekey.PressesKey;
 import io.appium.java_client.battery.HasBattery;
 import io.appium.java_client.clipboard.ClipboardContentType;
 
+/**
+ * Contains utility methods for working with android devices<br>
+ * Applicable only to the {@link io.appium.java_client.android.AndroidDriver}
+ */
 public interface IAndroidUtils extends IMobileUtils {
     // todo add HasAndroidSettings methods
     // todo add methods from ListensToLogcatMessages
@@ -1214,6 +1218,7 @@ public interface IAndroidUtils extends IMobileUtils {
 
     /**
      * @return - Returns if the device in use has a running LTE connection
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default boolean isCarrierConnectionAvailable() {
         HasNetworkConnection hasNetworkConnection = null;
@@ -1332,6 +1337,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * Retrieves battery info from the device under test
      *
      * @return BatteryInfo instance, containing the battery information
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public AndroidBatteryInfo getBatteryInfo() {
         HasBattery<AndroidBatteryInfo> driver = null;
@@ -1361,6 +1367,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * </pre>
      *
      * @param activity The {@link Activity} object
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void startActivity(Activity activity) {
         StartsActivity driver = null;
@@ -1376,6 +1383,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * Get the current activity being run on the mobile device
      *
      * @return a current activity being run on the mobile device
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public String currentActivity() {
         StartsActivity driver = null;
@@ -1391,6 +1399,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * Retrieve the display density of the Android device
      * 
      * @return The density value in dpi
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public Long getDisplayDensity() {
         HasAndroidDeviceDetails driver = null;
@@ -1406,6 +1415,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * Retrieve visibility and bounds information of the status and navigation bars
      * 
      * @return The map where keys are bar types and values are mappings of bar properties
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public Map<String, Map<String, Object>> getSystemBars() {
         HasAndroidDeviceDetails driver = null;
@@ -1423,7 +1433,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * 
      * @return output - array like below
      *         [cpuinfo, batteryinfo, networkinfo, memoryinfo]
-     *
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public List<String> getSupportedPerformanceDataTypes() {
         HasSupportedPerformanceDataType driver = null;
@@ -1462,6 +1472,7 @@ public interface IAndroidUtils extends IMobileUtils {
      *         [1478095200, null, null, 10079213, 19962, 2487705, 20015, 0, 3600],
      *         [1478098800, null, null, 4444433, 10227, 1430356, 10493, 0, 3600]]
      *         in case of cpu info : [[user, kernel], [0.9, 1.3]]
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default List<List<Object>> getPerformanceData(String packageName, String dataType, int dataReadTimeout) {
         HasSupportedPerformanceDataType driver = null;
@@ -1477,6 +1488,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * Authenticate users by using their finger print scans on supported emulators
      *
      * @param fingerPrintId finger prints stored in Android Keystore system (from 1 to 10)
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void authByFingerPrint(int fingerPrintId) {
         AuthenticatesByFinger driver = null;
@@ -1493,6 +1505,7 @@ public interface IAndroidUtils extends IMobileUtils {
      *
      * @param phoneNumber The phone number of message sender
      * @param message The message content
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void sendSMS(String phoneNumber, String message) {
         SupportsSpecialEmulatorCommands driver = null;
@@ -1509,6 +1522,7 @@ public interface IAndroidUtils extends IMobileUtils {
      *
      * @param phoneNumber The phone number of the caller
      * @param gsmCallActions One of available {@link GsmCallActions} values
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void makeGsmCall(String phoneNumber, GsmCallActions gsmCallActions) {
         SupportsSpecialEmulatorCommands driver = null;
@@ -1524,6 +1538,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * Emulate GSM signal strength change event on the connected emulator
      *
      * @param gsmSignalStrength One of available {@link GsmSignalStrength} values
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void setGsmSignalStrength(GsmSignalStrength gsmSignalStrength) {
         SupportsSpecialEmulatorCommands driver = null;
@@ -1539,6 +1554,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * Emulate GSM voice event on the connected emulator
      *
      * @param gsmVoiceState One of available {@link GsmVoiceState} values
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void setGsmVoice(GsmVoiceState gsmVoiceState) {
         SupportsSpecialEmulatorCommands driver = null;
@@ -1554,6 +1570,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * Emulate network speed change event on the connected emulator
      *
      * @param networkSpeed One of available {@link NetworkSpeed} values
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void setNetworkSpeed(NetworkSpeed networkSpeed) {
         SupportsSpecialEmulatorCommands driver = null;
@@ -1569,6 +1586,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * Emulate power capacity change on the connected emulator
      *
      * @param percent Percentage value in range [0, 100]
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void setPowerCapacity(int percent) {
         SupportsSpecialEmulatorCommands driver = null;
@@ -1584,6 +1602,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * Emulate power state change on the connected emulator
      *
      * @param powerACState One of available {@link PowerACState} values
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void setPowerAC(PowerACState powerACState) {
         SupportsSpecialEmulatorCommands driver = null;
@@ -1601,6 +1620,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * @param label clipboard data label
      * @param contentType one of supported content types
      * @param base64Content base64-encoded content to be set
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void setClipboard(String label, ClipboardContentType contentType, byte[] base64Content) {
         HasAndroidClipboard driver = null;
@@ -1617,6 +1637,7 @@ public interface IAndroidUtils extends IMobileUtils {
      *
      * @param label clipboard data label
      * @param text The actual text to be set
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void setClipboardText(String label, String text) {
         setClipboard(label, ClipboardContentType.PLAINTEXT, Base64
@@ -1629,6 +1650,7 @@ public interface IAndroidUtils extends IMobileUtils {
      *
      * @param element The destination element
      * @param value The value to set
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void replaceElementValue(RemoteWebElement element, String value) {
         CanReplaceElementValue driver = null;
@@ -1644,6 +1666,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * Allows to set geo location with extended parameters available for Android platform
      *
      * @param location the location object to set, see {@link AndroidGeoLocation}
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default void setLocation(AndroidGeoLocation location) {
         SupportsExtendedGeolocationCommands driver = null;

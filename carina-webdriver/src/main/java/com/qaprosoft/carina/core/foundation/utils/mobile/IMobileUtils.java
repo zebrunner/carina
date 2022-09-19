@@ -75,6 +75,11 @@ import io.appium.java_client.screenrecording.BaseStartScreenRecordingOptions;
 import io.appium.java_client.screenrecording.BaseStopScreenRecordingOptions;
 import io.appium.java_client.screenrecording.CanRecordScreen;
 
+/**
+ * Contains utility methods for working with android and ios<br>
+ * Applicable only to the {@link io.appium.java_client.android.AndroidDriver} and
+ * {@link io.appium.java_client.ios.IOSDriver}
+ */
 public interface IMobileUtils extends IDriverPool {
 
     static final Logger UTILS_LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -1427,6 +1432,7 @@ public interface IMobileUtils extends IDriverPool {
      *
      * @param bundleId the bundle identifier (or app id) of the app to get the state of
      * @return state of app, one of {@link ApplicationState} value
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public ApplicationState getAppState(String bundleId) {
         InteractsWithApps driver = null;
@@ -1442,6 +1448,7 @@ public interface IMobileUtils extends IDriverPool {
      * Get all defined Strings from an app for the default language
      *
      * @return a map with localized strings defined in the app
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public Map<String, String> getAppStringMap() {
         HasAppStrings driver = null;
@@ -1458,6 +1465,7 @@ public interface IMobileUtils extends IDriverPool {
      *
      * @param language strings language code
      * @return a map with localized strings defined in the app
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public Map<String, String> getAppStringMap(String language) {
         HasAppStrings driver = null;
@@ -1475,6 +1483,7 @@ public interface IMobileUtils extends IDriverPool {
      * @param language strings language code
      * @param stringFile strings filename
      * @return a map with localized strings defined in the app
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public Map<String, String> getAppStringMap(String language, String stringFile) {
         HasAppStrings driver = null;
@@ -1489,6 +1498,7 @@ public interface IMobileUtils extends IDriverPool {
     /**
      * This method locks a device<br>
      * It will return silently if the device is already locked
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void lockDevice() {
         LocksDevice driver = null;
@@ -1507,6 +1517,7 @@ public interface IMobileUtils extends IDriverPool {
      *
      * @param duration for how long to lock the screen. Minimum time resolution is one second.
      *            A negative/zero value will lock the device and return immediately.
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void lockDevice(Duration duration) {
         LocksDevice driver = null;
@@ -1521,6 +1532,8 @@ public interface IMobileUtils extends IDriverPool {
     /**
      * Unlock the device if it is locked<br>
      * This method will return silently if the device is not locked
+     * 
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void unlockDevice() {
         LocksDevice driver = null;
@@ -1536,6 +1549,7 @@ public interface IMobileUtils extends IDriverPool {
      * Check if the device is locked
      *
      * @return true if the device is locked or false otherwise.
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public boolean isDeviceLocked() {
         LocksDevice driver = null;
@@ -1559,6 +1573,7 @@ public interface IMobileUtils extends IDriverPool {
      *            If the path starts with <em>@applicationId/</em> prefix, then the file
      *            will be pushed to the root of the corresponding application container.
      * @param base64Data Base64 encoded byte array of media file data to write to remote device
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void pushFile(String remotePath, byte[] base64Data) {
         PushesFiles driver = null;
@@ -1576,6 +1591,7 @@ public interface IMobileUtils extends IDriverPool {
      * @param remotePath See the documentation on {@link #pushFile(String, byte[])}
      * @param file Is an existing local file to be written to the remote device
      * @throws IOException when there are problems with a file or current file system
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void pushFile(String remotePath, File file) throws IOException {
         PushesFiles driver = null;
@@ -1588,12 +1604,13 @@ public interface IMobileUtils extends IDriverPool {
     }
 
     /**
-     * Start asynchronous screen recording process.
+     * Start asynchronous screen recording process
      *
      * @param <T> The platform-specific {@link BaseStartScreenRecordingOptions}
      * @param options see the documentation on the {@link BaseStartScreenRecordingOptions}
-     *            descendant for the particular platform.
-     * @return `not used`.
+     *            descendant for the particular platform
+     * @return `not used`
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     @SuppressWarnings("rawtypes")
     default public <T extends BaseStartScreenRecordingOptions> String startRecordingScreen(T options) {
@@ -1609,7 +1626,8 @@ public interface IMobileUtils extends IDriverPool {
     /**
      * Start asynchronous screen recording process with default options
      *
-     * @return `not used`.
+     * @return `not used`
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public String startRecordingScreen() {
         CanRecordScreen driver = null;
@@ -1629,6 +1647,7 @@ public interface IMobileUtils extends IDriverPool {
      *            descendant for the particular platform
      * @return Base-64 encoded content of the recorded media file or an empty string
      *         if the file has been successfully uploaded to a remote location (depends on the actual options)
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     @SuppressWarnings("rawtypes")
     default public <T extends BaseStopScreenRecordingOptions> String stopRecordingScreen(T options) {
@@ -1646,6 +1665,7 @@ public interface IMobileUtils extends IDriverPool {
      * with default options
      *
      * @return Base-64 encoded content of the recorded media file
+     * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public String stopRecordingScreen() {
         CanRecordScreen driver = null;
