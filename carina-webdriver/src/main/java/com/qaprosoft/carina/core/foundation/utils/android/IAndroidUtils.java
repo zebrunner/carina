@@ -299,9 +299,11 @@ public interface IAndroidUtils extends IMobileUtils {
 
     /**
      * Get the current language on the device
-     *
+     *and
      * @return language, for example {@code fr}, or {@code fr-CA}
+     * @deprecated  this method calls adb bypassing the driver, so use {@link #getSystemDeviceLanguage()} instead
      */
+    @Deprecated
     default public String getDeviceLanguage() {
         // get language only, for example 'fr'
         String locale = executeAdbCommand("shell getprop persist.sys.language");
@@ -310,6 +312,22 @@ public interface IAndroidUtils extends IMobileUtils {
             locale = executeAdbCommand("shell getprop persist.sys.locale");
         }
         return locale;
+    }
+
+    /**
+     * Get the current language on the device
+     *
+     * @return language, for example {@code fr}, or {@code fr-CA}
+     */
+    default public String getSystemDeviceLanguage() {
+        // get language only, for example 'fr'
+        String locale = executeShell("getprop persist.sys.language").trim();
+        if (locale.isEmpty()) {
+            // get locale, for example 'fr-CA'
+            locale = executeShell("getprop persist.sys.locale");
+        }
+        // executeShell return value like as 'fr-CA/n', so need to trim
+        return locale.trim();
     }
 
     // End Language Change section
