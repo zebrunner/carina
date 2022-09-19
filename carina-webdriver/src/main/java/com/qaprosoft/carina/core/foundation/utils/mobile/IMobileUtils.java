@@ -1160,6 +1160,25 @@ public interface IMobileUtils extends IDriverPool {
     }
 
     /**
+     * Runs the current app as a background app for the time
+     * requested<br>
+     * This is a synchronous method, it blocks while the
+     * application is in background.
+     *
+     * @param duration The time to run App in background. Minimum time resolution is one millisecond.
+     *            Passing zero or a negative value will switch to Home screen and return immediately.
+     */
+    default void runAppInBackground(Duration duration) {
+        InteractsWithApps driver = null;
+        try {
+            driver = (InteractsWithApps) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support runAppInBackground method", e);
+        }
+        driver.runAppInBackground(duration);
+    }
+
+    /**
      * Method to reset test application.<br>
      * App's settings will be reset. User will be logged out. Application will be closed to background.
      * 

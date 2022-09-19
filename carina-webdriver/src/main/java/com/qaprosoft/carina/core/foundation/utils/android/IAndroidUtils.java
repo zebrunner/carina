@@ -20,8 +20,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -36,6 +38,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DriverCommand;
+import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,18 +59,35 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebEleme
 
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.ExecutesMethod;
+import io.appium.java_client.android.Activity;
 import io.appium.java_client.android.AndroidBatteryInfo;
+import io.appium.java_client.android.AuthenticatesByFinger;
+import io.appium.java_client.android.CanReplaceElementValue;
+import io.appium.java_client.android.GsmCallActions;
+import io.appium.java_client.android.GsmSignalStrength;
+import io.appium.java_client.android.GsmVoiceState;
+import io.appium.java_client.android.HasAndroidClipboard;
+import io.appium.java_client.android.HasAndroidDeviceDetails;
+import io.appium.java_client.android.HasSupportedPerformanceDataType;
+import io.appium.java_client.android.NetworkSpeed;
+import io.appium.java_client.android.PowerACState;
 import io.appium.java_client.android.StartsActivity;
 import io.appium.java_client.android.SupportsNetworkStateManagement;
+import io.appium.java_client.android.SupportsSpecialEmulatorCommands;
 import io.appium.java_client.android.connection.HasNetworkConnection;
+import io.appium.java_client.android.geolocation.AndroidGeoLocation;
+import io.appium.java_client.android.geolocation.SupportsExtendedGeolocationCommands;
 import io.appium.java_client.android.nativekey.AndroidKey;
 import io.appium.java_client.android.nativekey.KeyEvent;
 import io.appium.java_client.android.nativekey.KeyEventFlag;
 import io.appium.java_client.android.nativekey.PressesKey;
 import io.appium.java_client.battery.HasBattery;
+import io.appium.java_client.clipboard.ClipboardContentType;
 
 public interface IAndroidUtils extends IMobileUtils {
-
+    // todo add HasAndroidSettings methods
+    // todo add methods from ListensToLogcatMessages
+    // todo add methods from ExecuteCDPCommand
     // TODO: review carefully and remove duplicates and migrate completely to fluent waits
     static final Logger UTILS_LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -142,6 +162,22 @@ public interface IAndroidUtils extends IMobileUtils {
         }
 
         keys.forEach(key -> driver.pressKey(new KeyEvent(key)));
+    }
+
+    /**
+     * Send a long press key event to the device
+     *
+     * @param keyEvent The generated native key event
+     */
+    default public void longPressKey(KeyEvent keyEvent) {
+        PressesKey driver;
+        try {
+            driver = (PressesKey) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support longPressKey method", e);
+        }
+
+        driver.longPressKey(keyEvent);
     }
 
     /**
@@ -1305,5 +1341,317 @@ public interface IAndroidUtils extends IMobileUtils {
             throw new UnsupportedOperationException("Driver is not support getBatteryInfo method", e);
         }
         return driver.getBatteryInfo();
+    }
+
+    /**
+     * This method should start arbitrary activity during a test. If the activity belongs to
+     * another application, that application is started and the activity is opened.
+     * <p>
+     * Usage:
+     * </p>
+     * 
+     * <pre>
+     * {
+     *     &#64;code
+     *     Activity activity = new Activity("app package goes here", "app activity goes here");
+     *     activity.setWaitAppPackage("app wait package goes here");
+     *     activity.setWaitAppActivity("app wait activity goes here");
+     *     driver.startActivity(activity);
+     * }
+     * </pre>
+     *
+     * @param activity The {@link Activity} object
+     */
+    default public void startActivity(Activity activity) {
+        StartsActivity driver = null;
+        try {
+            driver = (StartsActivity) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support startActivity method", e);
+        }
+        driver.startActivity(activity);
+    }
+
+    /**
+     * Get the current activity being run on the mobile device
+     *
+     * @return a current activity being run on the mobile device
+     */
+    default public String currentActivity() {
+        StartsActivity driver = null;
+        try {
+            driver = (StartsActivity) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support currentActivity method", e);
+        }
+        return driver.currentActivity();
+    }
+
+    /**
+     * Retrieve the display density of the Android device
+     * 
+     * @return The density value in dpi
+     */
+    default public Long getDisplayDensity() {
+        HasAndroidDeviceDetails driver = null;
+        try {
+            driver = (HasAndroidDeviceDetails) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getDisplayDensity method", e);
+        }
+        return driver.getDisplayDensity();
+    }
+
+    /**
+     * Retrieve visibility and bounds information of the status and navigation bars
+     * 
+     * @return The map where keys are bar types and values are mappings of bar properties
+     */
+    default public Map<String, Map<String, Object>> getSystemBars() {
+        HasAndroidDeviceDetails driver = null;
+        try {
+            driver = (HasAndroidDeviceDetails) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getSystemBars method", e);
+        }
+        return driver.getSystemBars();
+    }
+
+    /**
+     * returns the information type of the system state which is supported to read
+     * as like cpu, memory, network traffic, and battery
+     * 
+     * @return output - array like below
+     *         [cpuinfo, batteryinfo, networkinfo, memoryinfo]
+     *
+     */
+    default public List<String> getSupportedPerformanceDataTypes() {
+        HasSupportedPerformanceDataType driver = null;
+        try {
+            driver = (HasSupportedPerformanceDataType) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getSupportedPerformanceDataTypes method", e);
+        }
+        return driver.getSupportedPerformanceDataTypes();
+    }
+
+    /**
+     * returns the resource usage information of the application. the resource is one of the system state
+     * which means cpu, memory, network traffic, and battery
+     *
+     * @param packageName the package name of the application
+     * @param dataType the type of system state which wants to read.
+     *            It should be one of the supported performance data types,
+     *            the return value of the function "getSupportedPerformanceDataTypes"
+     * @param dataReadTimeout the number of attempts to read
+     * @return table of the performance data, The first line of the table represents the type of data.
+     *         The remaining lines represent the values of the data.
+     *         in case of battery info : [[power], [23]]
+     *         in case of memory info :
+     *         [[totalPrivateDirty, nativePrivateDirty, dalvikPrivateDirty, eglPrivateDirty, glPrivateDirty,
+     *         totalPss, nativePss, dalvikPss, eglPss, glPss, nativeHeapAllocatedSize, nativeHeapSize],
+     *         [18360, 8296, 6132, null, null, 42588, 8406, 7024, null, null, 26519, 10344]]
+     *         in case of network info :
+     *         [[bucketStart, activeTime, rxBytes, rxPackets, txBytes, txPackets, operations, bucketDuration,],
+     *         [1478091600000, null, 1099075, 610947, 928, 114362, 769, 0, 3600000],
+     *         [1478095200000, null, 1306300, 405997, 509, 46359, 370, 0, 3600000]]
+     *         in case of network info :
+     *         [[st, activeTime, rb, rp, tb, tp, op, bucketDuration],
+     *         [1478088000, null, null, 32115296, 34291, 2956805, 25705, 0, 3600],
+     *         [1478091600, null, null, 2714683, 11821, 1420564, 12650, 0, 3600],
+     *         [1478095200, null, null, 10079213, 19962, 2487705, 20015, 0, 3600],
+     *         [1478098800, null, null, 4444433, 10227, 1430356, 10493, 0, 3600]]
+     *         in case of cpu info : [[user, kernel], [0.9, 1.3]]
+     */
+    default List<List<Object>> getPerformanceData(String packageName, String dataType, int dataReadTimeout) {
+        HasSupportedPerformanceDataType driver = null;
+        try {
+            driver = (HasSupportedPerformanceDataType) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getPerformanceData method", e);
+        }
+        return driver.getPerformanceData(packageName, dataType, dataReadTimeout);
+    }
+
+    /**
+     * Authenticate users by using their finger print scans on supported emulators
+     *
+     * @param fingerPrintId finger prints stored in Android Keystore system (from 1 to 10)
+     */
+    default public void authByFingerPrint(int fingerPrintId) {
+        AuthenticatesByFinger driver = null;
+        try {
+            driver = (AuthenticatesByFinger) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support authByFingerPrint method", e);
+        }
+        driver.fingerPrint(fingerPrintId);
+    }
+
+    /**
+     * Emulate send SMS event on the connected emulator
+     *
+     * @param phoneNumber The phone number of message sender
+     * @param message The message content
+     */
+    default public void sendSMS(String phoneNumber, String message) {
+        SupportsSpecialEmulatorCommands driver = null;
+        try {
+            driver = (SupportsSpecialEmulatorCommands) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support sendSMS method", e);
+        }
+        driver.sendSMS(phoneNumber, message);
+    }
+
+    /**
+     * Emulate GSM call event on the connected emulator
+     *
+     * @param phoneNumber The phone number of the caller
+     * @param gsmCallActions One of available {@link GsmCallActions} values
+     */
+    default public void makeGsmCall(String phoneNumber, GsmCallActions gsmCallActions) {
+        SupportsSpecialEmulatorCommands driver = null;
+        try {
+            driver = (SupportsSpecialEmulatorCommands) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support makeGsmCall method", e);
+        }
+        driver.makeGsmCall(phoneNumber, gsmCallActions);
+    }
+
+    /**
+     * Emulate GSM signal strength change event on the connected emulator
+     *
+     * @param gsmSignalStrength One of available {@link GsmSignalStrength} values
+     */
+    default public void setGsmSignalStrength(GsmSignalStrength gsmSignalStrength) {
+        SupportsSpecialEmulatorCommands driver = null;
+        try {
+            driver = (SupportsSpecialEmulatorCommands) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support setGsmSignalStrength method", e);
+        }
+        driver.setGsmSignalStrength(gsmSignalStrength);
+    }
+
+    /**
+     * Emulate GSM voice event on the connected emulator
+     *
+     * @param gsmVoiceState One of available {@link GsmVoiceState} values
+     */
+    default public void setGsmVoice(GsmVoiceState gsmVoiceState) {
+        SupportsSpecialEmulatorCommands driver = null;
+        try {
+            driver = (SupportsSpecialEmulatorCommands) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support setGsmVoice method", e);
+        }
+        driver.setGsmVoice(gsmVoiceState);
+    }
+
+    /**
+     * Emulate network speed change event on the connected emulator
+     *
+     * @param networkSpeed One of available {@link NetworkSpeed} values
+     */
+    default public void setNetworkSpeed(NetworkSpeed networkSpeed) {
+        SupportsSpecialEmulatorCommands driver = null;
+        try {
+            driver = (SupportsSpecialEmulatorCommands) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support setNetworkSpeed method", e);
+        }
+        driver.setNetworkSpeed(networkSpeed);
+    }
+
+    /**
+     * Emulate power capacity change on the connected emulator
+     *
+     * @param percent Percentage value in range [0, 100]
+     */
+    default public void setPowerCapacity(int percent) {
+        SupportsSpecialEmulatorCommands driver = null;
+        try {
+            driver = (SupportsSpecialEmulatorCommands) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support setPowerCapacity method", e);
+        }
+        driver.setPowerCapacity(percent);
+    }
+
+    /**
+     * Emulate power state change on the connected emulator
+     *
+     * @param powerACState One of available {@link PowerACState} values
+     */
+    default public void setPowerAC(PowerACState powerACState) {
+        SupportsSpecialEmulatorCommands driver = null;
+        try {
+            driver = (SupportsSpecialEmulatorCommands) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support setPowerAC method", e);
+        }
+        driver.setPowerAC(powerACState);
+    }
+
+    /**
+     * Set the content of device's clipboard
+     *
+     * @param label clipboard data label
+     * @param contentType one of supported content types
+     * @param base64Content base64-encoded content to be set
+     */
+    default public void setClipboard(String label, ClipboardContentType contentType, byte[] base64Content) {
+        HasAndroidClipboard driver = null;
+        try {
+            driver = (HasAndroidClipboard) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support setClipboard method", e);
+        }
+        driver.setClipboard(label, contentType, base64Content);
+    }
+
+    /**
+     * Set the clipboard text
+     *
+     * @param label clipboard data label
+     * @param text The actual text to be set
+     */
+    default public void setClipboardText(String label, String text) {
+        setClipboard(label, ClipboardContentType.PLAINTEXT, Base64
+                .getEncoder()
+                .encode(text.getBytes(StandardCharsets.UTF_8)));
+    }
+
+    /**
+     * Replaces element value with the given one
+     *
+     * @param element The destination element
+     * @param value The value to set
+     */
+    default public void replaceElementValue(RemoteWebElement element, String value) {
+        CanReplaceElementValue driver = null;
+        try {
+            driver = (CanReplaceElementValue) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support replaceElementValue method", e);
+        }
+        driver.replaceElementValue(element, value);
+    }
+
+    /**
+     * Allows to set geo location with extended parameters available for Android platform
+     *
+     * @param location the location object to set, see {@link AndroidGeoLocation}
+     */
+    default void setLocation(AndroidGeoLocation location) {
+        SupportsExtendedGeolocationCommands driver = null;
+        try {
+            driver = (SupportsExtendedGeolocationCommands) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support setLocation method", e);
+        }
+        driver.setLocation(location);
     }
 }
