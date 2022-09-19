@@ -682,7 +682,7 @@ public interface IAndroidUtils extends IMobileUtils {
     /**
      * Get current pack in focus
      * 
-     * @deprecated this method calls adb bypassing the driver, so use {@link #getCurrentPackage(WebDriver)} instead
+     * @deprecated this method calls adb bypassing the driver, so use {@link #getCurrentPackage()} instead
      * @return String
      */
     @Deprecated(since = "8.x", forRemoval = true)
@@ -697,10 +697,10 @@ public interface IAndroidUtils extends IMobileUtils {
      * @return current package name, for example {@code com.android.settings}
      * @throws UnsupportedOperationException if driver does not support this feature
      */
-    default public String getCurrentPackage(WebDriver driver) {
+    default public String getCurrentPackage() {
         StartsActivity startsActivity;
         try {
-            startsActivity = (StartsActivity) driver;
+            startsActivity = (StartsActivity) getDriver();
         } catch (ClassCastException e) {
             throw new UnsupportedOperationException("Driver is not support getCurrentPackage method", e);
         }
