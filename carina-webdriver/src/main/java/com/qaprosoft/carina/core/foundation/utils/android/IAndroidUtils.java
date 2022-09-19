@@ -863,6 +863,7 @@ public interface IAndroidUtils extends IMobileUtils {
      * Bring up the application switcher dialog
      */
     default public void displayRecentApps() {
+        // todo investigate replace by pressKeyboardKey(AndroidKey.APP_SWITCH, null);
         executeShell("input keyevent KEYCODE_APP_SWITCH");
     }
 
@@ -1200,12 +1201,17 @@ public interface IAndroidUtils extends IMobileUtils {
     }
 
     /**
-     * Get device model
+     * Get device model<br>
+     *
+     * <b>Important: </b> before carina 8.x this method calls adb bypassing the driver,
+     * but now it gets device model using driver
      * 
-     * @return device model
+     * @return device model, for example {@code G3112}
      */
     default public String getDeviceModel() {
-        return StringUtils.substringAfter(executeAdbCommand("shell getprop | grep 'ro.product.model'"), "ro.product.model: ");
+        // executeShell returns model with \n, for example G3112\n, so need to trim
+        return executeShell("getprop ro.product.model")
+                .trim();
     }
 
     default public void openStatusBar() {
@@ -1217,9 +1223,21 @@ public interface IAndroidUtils extends IMobileUtils {
     }
 
     /**
+     * Get device timezone
+     * 
+     * @return device timezone, for example {@code Europe/Moscow}
+     */
+    default public String getDeviceTimezone() {
+        // executeShell returns timezone with \n, for example Europe/Moscow\n, so need to trim
+        return executeShell("getprop persist.sys.timezone")
+                .trim();
+    }
+
+    /**
      * Set Android Device Default TimeZone And Language based on config or to GMT and En
      * Without restoring actual focused apk.
      */
+    @SuppressWarnings("deprecation")
     default public void setDeviceDefaultTimeZoneAndLanguage() {
         setDeviceDefaultTimeZoneAndLanguage(false);
     }
@@ -1229,6 +1247,7 @@ public interface IAndroidUtils extends IMobileUtils {
      *
      * @param returnAppFocus - if true store actual Focused apk and activity, than restore after setting Timezone and Language.
      */
+    @SuppressWarnings("deprecation")
     default public void setDeviceDefaultTimeZoneAndLanguage(boolean returnAppFocus) {
         try {
             String baseApp = "";
@@ -1253,7 +1272,7 @@ public interface IAndroidUtils extends IMobileUtils {
                 UTILS_LOGGER.info("Set device language to {}", deviceLanguage);
 
                 boolean timeZoneChanged = androidService.setDeviceTimeZone(timeZone.getTimeZone(), timeZone.getSettingsTZ(), timeFormat);
-                boolean languageChanged = androidService.setDeviceLanguage(deviceLanguage);
+                boolean languageChanged = setDeviceLanguage(deviceLanguage);
 
                 UTILS_LOGGER.info("Device TimeZone was changed to timeZone '{}' : {}. Device Language was changed to language '{}': {}",
                         deviceTimezone,

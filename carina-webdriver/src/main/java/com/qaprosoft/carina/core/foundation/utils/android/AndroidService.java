@@ -98,8 +98,10 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
 
     /**
      * press Home button to open home screen
+     * 
+     * @deprecated duplicate, use {@link IAndroidUtils#pressHome()} instead
      */
-
+    @Deprecated(forRemoval = true, since = "8.x")
     public void gotoAndroidHome() {
         executeAdbCommand("shell input keyevent 3");
     }
@@ -211,6 +213,7 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
     /**
      * Open Development Settings on device
      */
+    // todo investigate
     public void openDeveloperOptions() {
         executeAdbCommand("shell am start -n com.android.settings/.DevelopmentSettings");
     }
@@ -221,14 +224,20 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
 
     /**
      * expandStatusBar
+     * 
+     * @deprecated duplicate, use {@link IAndroidUtils#openStatusBar()} instead
      */
+    @Deprecated(forRemoval = true, since = "8.x")
     public void expandStatusBar() {
         executeAdbCommand("shell service call statusbar 1");
     }
 
     /**
      * collapseStatusBar
+     * 
+     * @deprecated duplicate, use {@link IAndroidUtils#closeStatusBar()} instead
      */
+    @Deprecated(forRemoval = true, since = "8.x")
     public void collapseStatusBar() {
         executeAdbCommand("shell service call statusbar 2");
     }

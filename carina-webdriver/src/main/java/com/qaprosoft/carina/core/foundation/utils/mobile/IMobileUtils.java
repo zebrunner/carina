@@ -41,6 +41,8 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
+import com.qaprosoft.carina.core.foundation.utils.android.AndroidService;
+import com.qaprosoft.carina.core.foundation.utils.android.DeviceTimeZone;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
@@ -73,8 +75,16 @@ public interface IMobileUtils extends IDriverPool {
     }
 
     // TODO: [VD] make private after migration to java 9+
+    /**
+     * @deprecated this constant is not used in IMobileUtils
+     */
+    @Deprecated(forRemoval = true, since = "8.x")
     static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
+    /**
+     * @deprecated this constant is not used in IMobileUtils
+     */
+    @Deprecated(forRemoval = true)
     static final int MINIMUM_TIMEOUT = 2;
 
     static final int DEFAULT_TOUCH_ACTION_DURATION = 1000;
@@ -689,6 +699,68 @@ public interface IMobileUtils extends IDriverPool {
     }
 
     /**
+     * Set Android Device Default TimeZone And Language based on config or to GMT and En
+     * Without restoring actual focused apk.
+     * 
+     * @deprecated IMobileUtils should contains only methods for Android <b>and</b> IOS, so use
+     *             {@link com.qaprosoft.carina.core.foundation.utils.android.IAndroidUtils#setDeviceDefaultTimeZoneAndLanguage()}
+     */
+    @Deprecated(forRemoval = true, since = "8.x")
+    default public void setDeviceDefaultTimeZoneAndLanguage() {
+        setDeviceDefaultTimeZoneAndLanguage(false);
+    }
+
+    /**
+     * Set default TimeZone And Language based on config or to GMT and En
+     *
+     * @param returnAppFocus - if true store actual Focused apk and activity, than restore after setting Timezone and Language.
+     * @deprecated IMobileUtils should contains only methods for Android <b>and</b> IOS, so use
+     *             {@link com.qaprosoft.carina.core.foundation.utils.android.IAndroidUtils#setDeviceDefaultTimeZoneAndLanguage(boolean)}
+     */
+    @Deprecated(forRemoval = true, since = "8.x")
+    default public void setDeviceDefaultTimeZoneAndLanguage(boolean returnAppFocus) {
+        try {
+            String baseApp = "";
+            String os = IDriverPool.getDefaultDevice().getOs();
+            if (os.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+
+                AndroidService androidService = AndroidService.getInstance();
+
+                if (returnAppFocus) {
+                    baseApp = androidService.getCurrentFocusedApkDetails();
+                }
+
+                String deviceTimezone = Configuration.get(Configuration.Parameter.DEFAULT_DEVICE_TIMEZONE);
+                String deviceTimeFormat = Configuration.get(Configuration.Parameter.DEFAULT_DEVICE_TIME_FORMAT);
+                String deviceLanguage = Configuration.get(Configuration.Parameter.DEFAULT_DEVICE_LANGUAGE);
+
+                DeviceTimeZone.TimeFormat timeFormat = DeviceTimeZone.TimeFormat.parse(deviceTimeFormat);
+                DeviceTimeZone.TimeZoneFormat timeZone = DeviceTimeZone.TimeZoneFormat.parse(deviceTimezone);
+
+                UTILS_LOGGER.info("Set device timezone to {}", timeZone);
+                UTILS_LOGGER.info("Set device time format to {}", timeFormat);
+                UTILS_LOGGER.info("Set device language to {}", deviceLanguage);
+
+                boolean timeZoneChanged = androidService.setDeviceTimeZone(timeZone.getTimeZone(), timeZone.getSettingsTZ(), timeFormat);
+                boolean languageChanged = androidService.setDeviceLanguage(deviceLanguage);
+
+                UTILS_LOGGER.info("Device TimeZone was changed to timeZone '{}' : {}. Device Language was changed to language '{}': {}",
+                        deviceTimezone,
+                        timeZoneChanged, deviceLanguage, languageChanged);
+
+                if (returnAppFocus) {
+                    androidService.openApp(baseApp);
+                }
+
+            } else {
+                UTILS_LOGGER.info("Current OS is {}. But we can set default TimeZone and Language only for Android.", os);
+            }
+        } catch (Exception e) {
+            UTILS_LOGGER.error("Error while setting to device default timezone and language!", e);
+        }
+    }
+
+    /**
      * Hides the keyboard if it is showing
      * 
      * @throws UnsupportedOperationException if driver does not support this feature
@@ -822,7 +894,7 @@ public interface IMobileUtils extends IDriverPool {
      * Check running in foreground application by bundleId or appId
      *
      * @param bundleId the bundle identifier for iOS (or appPackage for Android) of the app to query the state of.
-     * @return boolean
+     * @return true, if app's status equals {@link ApplicationState#RUNNING_IN_FOREGROUND}, false otherwise
      * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public boolean isAppRunning(String bundleId) {
@@ -986,7 +1058,7 @@ public interface IMobileUtils extends IDriverPool {
     /**
      * Install an app on the mobile device
      *
-     * @param apkPath path to app to install
+     * @param apkPath path to app to install or a remote URL
      * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void installApp(String apkPath) {
@@ -996,22 +1068,20 @@ public interface IMobileUtils extends IDriverPool {
     /**
      * Install an app on the mobile device
      *
-     * @param apkPath path to app to install
+     * @param appPath  path to app to install or a remote URL
      * @param options Set of the corresponding installation options for the particular platform
      * @throws UnsupportedOperationException if driver does not support this feature
      */
-    default public void installApp(String apkPath, @Nullable BaseInstallApplicationOptions<?> options) {
-        UTILS_LOGGER.info("Will install application with apk-file from {}", apkPath);
+    default public void installApp(String appPath, @Nullable BaseInstallApplicationOptions<?> options) {
+        UTILS_LOGGER.info("Will install application with apk-file from {}", appPath);
         InteractsWithApps driver = null;
         try {
             driver = (InteractsWithApps) getDriver();
         } catch (ClassCastException e) {
             throw new UnsupportedOperationException("Driver is not support installApp method", e);
         }
-        driver.installApp(apkPath, options);
+        driver.installApp(appPath, options);
     }
-
-   
 
     /**
      * Remove the specified app from the device (uninstall)
