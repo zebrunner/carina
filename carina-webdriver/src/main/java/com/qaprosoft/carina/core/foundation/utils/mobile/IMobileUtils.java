@@ -17,18 +17,25 @@ package com.qaprosoft.carina.core.foundation.utils.mobile;
 
 import static org.openqa.selenium.interactions.PointerInput.MouseButton.LEFT;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.DeviceRotation;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.ScreenOrientation;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.html5.Location;
 import org.openqa.selenium.interactions.Interactive;
 import org.openqa.selenium.interactions.Pause;
 import org.openqa.selenium.interactions.PointerInput;
@@ -47,12 +54,26 @@ import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 
+import io.appium.java_client.HasAppStrings;
+import io.appium.java_client.HasDeviceTime;
 import io.appium.java_client.HasOnScreenKeyboard;
 import io.appium.java_client.HidesKeyboard;
 import io.appium.java_client.InteractsWithApps;
+import io.appium.java_client.LocksDevice;
+import io.appium.java_client.PullsFiles;
+import io.appium.java_client.PushesFiles;
 import io.appium.java_client.SupportsLegacyAppManagement;
 import io.appium.java_client.appmanagement.ApplicationState;
+import io.appium.java_client.appmanagement.BaseActivateApplicationOptions;
 import io.appium.java_client.appmanagement.BaseInstallApplicationOptions;
+import io.appium.java_client.appmanagement.BaseRemoveApplicationOptions;
+import io.appium.java_client.appmanagement.BaseTerminateApplicationOptions;
+import io.appium.java_client.remote.SupportsContextSwitching;
+import io.appium.java_client.remote.SupportsLocation;
+import io.appium.java_client.remote.SupportsRotation;
+import io.appium.java_client.screenrecording.BaseStartScreenRecordingOptions;
+import io.appium.java_client.screenrecording.BaseStopScreenRecordingOptions;
+import io.appium.java_client.screenrecording.CanRecordScreen;
 
 public interface IMobileUtils extends IDriverPool {
 
@@ -946,13 +967,25 @@ public interface IMobileUtils extends IDriverPool {
      * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public boolean terminateApp(String bundleId) {
+        return terminateApp(bundleId, null);
+    }
+
+    /**
+     * Terminate the particular application if it is running
+     *
+     * @param bundleId the bundle identifier (or app id) of the app to be terminated.
+     * @param options the set of termination options supported by the particular platform.
+     * @return true if the app was running before and has been successfully stopped
+     * @throws UnsupportedOperationException if driver does not support this feature
+     */
+    default public boolean terminateApp(String bundleId, @Nullable BaseTerminateApplicationOptions<?> options) {
         InteractsWithApps driver = null;
         try {
             driver = (InteractsWithApps) getDriver();
         } catch (ClassCastException e) {
             throw new UnsupportedOperationException("Driver is not support terminateApp method", e);
         }
-        return driver.terminateApp(bundleId);
+        return driver.terminateApp(bundleId, options);
     }
 
     /**
@@ -1045,6 +1078,17 @@ public interface IMobileUtils extends IDriverPool {
      * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public void startApp(String packageName) {
+        startApp(packageName, null);
+    }
+
+    /**
+     * Activates the given app if it installed, but not running or if it is running in the background<br>
+     *
+     * @param packageName bundleId – the bundle identifier (or app id) of the app to activate
+     * @param options the set of activation options supported by the particular platform
+     * @throws UnsupportedOperationException if driver does not support this feature
+     */
+    default public void startApp(String packageName, @Nullable BaseActivateApplicationOptions<?> options) {
         UTILS_LOGGER.info("Starting {}", packageName);
         InteractsWithApps driver = null;
         try {
@@ -1052,7 +1096,7 @@ public interface IMobileUtils extends IDriverPool {
         } catch (ClassCastException e) {
             throw new UnsupportedOperationException("Driver is not support startApp method", e);
         }
-        driver.activateApp(packageName);
+        driver.activateApp(packageName, options);
     }
 
     /**
@@ -1091,6 +1135,18 @@ public interface IMobileUtils extends IDriverPool {
      * @throws UnsupportedOperationException if driver does not support this feature
      */
     default public boolean removeApp(String packageName) {
+        return removeApp(packageName, null);
+    }
+
+    /**
+     * Remove the specified app from the device (uninstall)
+     *
+     * @param packageName bundleId – the bundle identifier (or app id) of the app to remove
+     * @param options the set of uninstall options supported by the particular platform
+     * @return true if the uninstall was successful
+     * @throws UnsupportedOperationException if driver does not support this feature
+     */
+    default public boolean removeApp(String packageName, @Nullable BaseRemoveApplicationOptions<?> options) {
         InteractsWithApps driver = null;
         try {
             driver = (InteractsWithApps) getDriver();
@@ -1098,7 +1154,7 @@ public interface IMobileUtils extends IDriverPool {
             throw new UnsupportedOperationException("Driver is not support removeApp method", e);
         }
 
-        boolean isRemoved = driver.removeApp(packageName);
+        boolean isRemoved = driver.removeApp(packageName, options);
         UTILS_LOGGER.info("Application ({}) was successfully removed: {}", packageName, isRemoved);
         return isRemoved;
     }
@@ -1120,4 +1176,466 @@ public interface IMobileUtils extends IDriverPool {
         }
         driver.resetApp();
     }
+
+    /**
+     * Switches to the given context
+     *
+     * @param name the name of the context to switch to
+     * @throws UnsupportedOperationException if driver does not support this feature
+     */
+    default public void switchContext(String name) {
+        SupportsContextSwitching driver = null;
+        try {
+            driver = (SupportsContextSwitching) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support switchContext  method", e);
+        }
+        driver.context(name);
+    }
+
+    /**
+     * Get the names of available contexts
+     *
+     * @return list of available context names
+     * @throws UnsupportedOperationException if driver does not support this feature
+     */
+    default public Set<String> getAvailableContexts() {
+        SupportsContextSwitching driver = null;
+        try {
+            driver = (SupportsContextSwitching) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getAvailableContexts  method", e);
+        }
+        return driver.getContextHandles();
+    }
+
+    /**
+     * Get the name of the current context
+     *
+     * @return context name or null if it cannot be determined
+     * @throws UnsupportedOperationException if driver does not support this feature
+     */
+    default public String getContext() {
+        SupportsContextSwitching driver = null;
+        try {
+            driver = (SupportsContextSwitching) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getContext  method", e);
+        }
+        return driver.getContext();
+    }
+
+    /**
+     * Get device rotation
+     * 
+     * @return rotation, see {@link DeviceRotation}
+     * @throws UnsupportedOperationException if driver does not support this feature
+     */
+    default public DeviceRotation getRotation() {
+        SupportsRotation driver = null;
+        try {
+            driver = (SupportsRotation) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getContext method", e);
+        }
+        return driver.rotation();
+    }
+
+    /**
+     * Change the rotation of the device
+     * 
+     * @param rotation rotation, see {@link DeviceRotation}
+     * @throws UnsupportedOperationException if driver does not support this feature
+     */
+    default public void rotate(DeviceRotation rotation) {
+        SupportsRotation driver = null;
+        try {
+            driver = (SupportsRotation) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support rotate method", e);
+        }
+        driver.rotate(rotation);
+    }
+
+    /**
+     * Change the orientation of the device
+     *
+     * @param rotation – rotation, see {@link ScreenOrientation}
+     * @throws UnsupportedOperationException if driver does not support this feature
+     */
+    default public void rotate(ScreenOrientation rotation) {
+        SupportsRotation driver = null;
+        try {
+            driver = (SupportsRotation) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support rotate method", e);
+        }
+        driver.rotate(rotation);
+    }
+
+    /**
+     * Get device orientation
+     * 
+     * @return orientation, see {@link ScreenOrientation}
+     * @throws UnsupportedOperationException if driver does not support this feature
+     */
+    default public ScreenOrientation getOrientation() {
+        SupportsRotation driver = null;
+        try {
+            driver = (SupportsRotation) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getOrientation method", e);
+        }
+        return driver.getOrientation();
+    }
+
+    /**
+     * Gets the physical location
+     *
+     * @return a {@link Location} containing the location information. Returns null if the location is
+     *         not available
+     * @throws UnsupportedOperationException if driver does not support this feature
+     */
+    default public Location getLocation() {
+        SupportsLocation driver = null;
+        try {
+            driver = (SupportsLocation) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getLocation method", e);
+        }
+        return driver.location();
+    }
+
+    /**
+     * Set the physical location
+     * 
+     * @param location a {@link Location} containing the location information
+     * @throws UnsupportedOperationException if driver does not support this feature
+     */
+    default public void setLocation(Location location) {
+        SupportsLocation driver = null;
+        try {
+            driver = (SupportsLocation) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support setLocation method", e);
+        }
+        driver.setLocation(location);
+    }
+
+    /**
+     * Gets device date and time for both iOS(host time is returned for simulators) and Android devices<br>
+     * The default format is `YYYY-MM-DDTHH:mm:ssZ`, which complies to ISO-8601.
+     *
+     * @return device time as string
+     * @throws UnsupportedOperationException if driver does not support this feature
+     */
+    default public String getDeviceTime() {
+        HasDeviceTime driver = null;
+        try {
+            driver = (HasDeviceTime) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getDeviceTime method", e);
+        }
+        return driver.getDeviceTime();
+    }
+
+    /**
+     * Gets device date and time for both iOS(host time is returned for simulators) and Android devices<br>
+     *
+     * @param format The set of format specifiers. Read
+     *            https://momentjs.com/docs/ to get the full list of supported
+     *            datetime format specifiers. The default format is
+     *            `YYYY-MM-DDTHH:mm:ssZ`, which complies to ISO-8601
+     * @return device time as string
+     * @throws UnsupportedOperationException if driver does not support this feature
+     */
+    default public String getDeviceTime(String format) {
+        HasDeviceTime driver = null;
+        try {
+            driver = (HasDeviceTime) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getDeviceTime method", e);
+        }
+        return driver.getDeviceTime();
+    }
+
+    /**
+     * Pull a file from the remote system<br>
+     * On Android the application under test should be built with debuggable flag enabled in order to get access to its container
+     * on the internal file system
+     *
+     * @param remotePath If the path starts with <em>@applicationId/</em>/ prefix, then the file
+     *            will be pulled from the root of the corresponding application container.
+     *            Otherwise, the root folder is considered as / on Android and
+     *            on iOS it is a media folder root (real devices only).
+     * @return A byte array of Base64 encoded data
+     * @throws UnsupportedOperationException if driver does not support this feature
+     */
+    default public byte[] pullFile(String remotePath) {
+        PullsFiles driver = null;
+        try {
+            driver = (PullsFiles) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support pullFile method", e);
+        }
+        return driver.pullFile(remotePath);
+    }
+
+    /**
+     * Pull a folder content from the remote system<br>
+     * On Android the application under test should be built with debuggable flag enabled in order to get access to its container
+     * on the internal file system.
+     *
+     * @param remotePath If the path starts with <em>@applicationId/</em> prefix, then the folder
+     *            will be pulled from the root of the corresponding application container.
+     *            Otherwise, the root folder is considered as / on Android and
+     *            on iOS it is a media folder root (real devices only).
+     * @return A byte array of Base64 encoded zip archive data.
+     * @throws UnsupportedOperationException if driver does not support this feature
+     */
+    default public byte[] pullFolder(String remotePath) {
+        PullsFiles driver = null;
+        try {
+            driver = (PullsFiles) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support pullFolder method", e);
+        }
+        return driver.pullFile(remotePath);
+    }
+
+    /**
+     * Get the state of an application
+     *
+     * @param bundleId the bundle identifier (or app id) of the app to get the state of
+     * @return state of app, one of {@link ApplicationState} value
+     */
+    default public ApplicationState getAppState(String bundleId) {
+        InteractsWithApps driver = null;
+        try {
+            driver = (InteractsWithApps) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getAppState method", e);
+        }
+        return driver.queryAppState(bundleId);
+    }
+
+    /**
+     * Get all defined Strings from an app for the default language
+     *
+     * @return a map with localized strings defined in the app
+     */
+    default public Map<String, String> getAppStringMap() {
+        HasAppStrings driver = null;
+        try {
+            driver = (HasAppStrings) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getAppStringMap method", e);
+        }
+        return driver.getAppStringMap();
+    }
+
+    /**
+     * Get all defined Strings from an app for the specified language
+     *
+     * @param language strings language code
+     * @return a map with localized strings defined in the app
+     */
+    default public Map<String, String> getAppStringMap(String language) {
+        HasAppStrings driver = null;
+        try {
+            driver = (HasAppStrings) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getAppStringMap method", e);
+        }
+        return driver.getAppStringMap(language);
+    }
+
+    /**
+     * Get all defined Strings from an app for the specified language and strings filename
+     *
+     * @param language strings language code
+     * @param stringFile strings filename
+     * @return a map with localized strings defined in the app
+     */
+    default public Map<String, String> getAppStringMap(String language, String stringFile) {
+        HasAppStrings driver = null;
+        try {
+            driver = (HasAppStrings) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getAppStringMap method", e);
+        }
+        return driver.getAppStringMap(language, stringFile);
+    }
+
+    /**
+     * This method locks a device<br>
+     * It will return silently if the device is already locked
+     */
+    default public void lockDevice() {
+        LocksDevice driver = null;
+        try {
+            driver = (LocksDevice) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support lockDevice method", e);
+        }
+        driver.lockDevice();
+    }
+
+    /**
+     * Lock the device (bring it to the lock screen) for a given number of
+     * seconds or forever (until the command for unlocking is called)<br>
+     * The call is ignored if the device has been already locked.
+     *
+     * @param duration for how long to lock the screen. Minimum time resolution is one second.
+     *            A negative/zero value will lock the device and return immediately.
+     */
+    default public void lockDevice(Duration duration) {
+        LocksDevice driver = null;
+        try {
+            driver = (LocksDevice) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support lockDevice method", e);
+        }
+        driver.lockDevice(duration);
+    }
+
+    /**
+     * Unlock the device if it is locked<br>
+     * This method will return silently if the device is not locked
+     */
+    default public void unlockDevice() {
+        LocksDevice driver = null;
+        try {
+            driver = (LocksDevice) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support unlockDevice method", e);
+        }
+        driver.unlockDevice();
+    }
+
+    /**
+     * Check if the device is locked
+     *
+     * @return true if the device is locked or false otherwise.
+     */
+    default public boolean isDeviceLocked() {
+        LocksDevice driver = null;
+        try {
+            driver = (LocksDevice) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support isDeviceLocked method", e);
+        }
+        return driver.isDeviceLocked();
+    }
+
+    /**
+     * Saves base64 encoded data as a media file on the remote system.
+     *
+     * @param remotePath Path to file to write data to on remote device
+     *            Only the filename part matters there on Simulator, so the remote end
+     *            can figure out which type of media data it is and save
+     *            it into a proper folder on the target device. Check
+     *            'xcrun simctl addmedia' output to get more details on
+     *            supported media types.
+     *            If the path starts with <em>@applicationId/</em> prefix, then the file
+     *            will be pushed to the root of the corresponding application container.
+     * @param base64Data Base64 encoded byte array of media file data to write to remote device
+     */
+    default public void pushFile(String remotePath, byte[] base64Data) {
+        PushesFiles driver = null;
+        try {
+            driver = (PushesFiles) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support pushFile method", e);
+        }
+        driver.pushFile(remotePath, base64Data);
+    }
+
+    /**
+     * Saves base64 encoded data as a media file on the remote system
+     *
+     * @param remotePath See the documentation on {@link #pushFile(String, byte[])}
+     * @param file Is an existing local file to be written to the remote device
+     * @throws IOException when there are problems with a file or current file system
+     */
+    default public void pushFile(String remotePath, File file) throws IOException {
+        PushesFiles driver = null;
+        try {
+            driver = (PushesFiles) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support pushFile method", e);
+        }
+        driver.pushFile(remotePath, file);
+    }
+
+    /**
+     * Start asynchronous screen recording process.
+     *
+     * @param <T> The platform-specific {@link BaseStartScreenRecordingOptions}
+     * @param options see the documentation on the {@link BaseStartScreenRecordingOptions}
+     *            descendant for the particular platform.
+     * @return `not used`.
+     */
+    @SuppressWarnings("rawtypes")
+    default public <T extends BaseStartScreenRecordingOptions> String startRecordingScreen(T options) {
+        CanRecordScreen driver = null;
+        try {
+            driver = (CanRecordScreen) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support startRecordingScreen method", e);
+        }
+        return driver.startRecordingScreen(options);
+    }
+
+    /**
+     * Start asynchronous screen recording process with default options
+     *
+     * @return `not used`.
+     */
+    default public String startRecordingScreen() {
+        CanRecordScreen driver = null;
+        try {
+            driver = (CanRecordScreen) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support startRecordingScreen method", e);
+        }
+        return driver.startRecordingScreen();
+    }
+
+    /**
+     * Gather the output from the previously started screen recording to a media file
+     *
+     * @param <T> The platform-specific {@link BaseStopScreenRecordingOptions}
+     * @param options see the documentation on the {@link BaseStopScreenRecordingOptions}
+     *            descendant for the particular platform
+     * @return Base-64 encoded content of the recorded media file or an empty string
+     *         if the file has been successfully uploaded to a remote location (depends on the actual options)
+     */
+    @SuppressWarnings("rawtypes")
+    default public <T extends BaseStopScreenRecordingOptions> String stopRecordingScreen(T options) {
+        CanRecordScreen driver = null;
+        try {
+            driver = (CanRecordScreen) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support stopRecordingScreen method", e);
+        }
+        return driver.stopRecordingScreen(options);
+    }
+
+    /**
+     * Gather the output from the previously started screen recording to a media file
+     * with default options
+     *
+     * @return Base-64 encoded content of the recorded media file
+     */
+    default public String stopRecordingScreen() {
+        CanRecordScreen driver = null;
+        try {
+            driver = (CanRecordScreen) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support stopRecordingScreen method", e);
+        }
+        return driver.stopRecordingScreen();
+    }
+
 }

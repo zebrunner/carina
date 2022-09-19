@@ -56,6 +56,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebEleme
 
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.ExecutesMethod;
+import io.appium.java_client.android.AndroidBatteryInfo;
 import io.appium.java_client.android.StartsActivity;
 import io.appium.java_client.android.SupportsNetworkStateManagement;
 import io.appium.java_client.android.connection.HasNetworkConnection;
@@ -63,6 +64,7 @@ import io.appium.java_client.android.nativekey.AndroidKey;
 import io.appium.java_client.android.nativekey.KeyEvent;
 import io.appium.java_client.android.nativekey.KeyEventFlag;
 import io.appium.java_client.android.nativekey.PressesKey;
+import io.appium.java_client.battery.HasBattery;
 
 public interface IAndroidUtils extends IMobileUtils {
 
@@ -1288,5 +1290,20 @@ public interface IAndroidUtils extends IMobileUtils {
         } catch (Exception e) {
             UTILS_LOGGER.error("Error while setting to device default timezone and language!", e);
         }
+    }
+
+    /**
+     * Retrieves battery info from the device under test
+     *
+     * @return BatteryInfo instance, containing the battery information
+     */
+    default public AndroidBatteryInfo getBatteryInfo() {
+        HasBattery<AndroidBatteryInfo> driver = null;
+        try {
+            driver = (HasBattery<AndroidBatteryInfo>) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getBatteryInfo method", e);
+        }
+        return driver.getBatteryInfo();
     }
 }
