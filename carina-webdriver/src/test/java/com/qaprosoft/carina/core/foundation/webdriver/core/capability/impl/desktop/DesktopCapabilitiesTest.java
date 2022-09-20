@@ -144,23 +144,6 @@ public class DesktopCapabilitiesTest {
     }
 
     @Test(groups = {"DesktopCapabilitiesTestClass"})
-    public static void getIECapabilityTest() {
-        String testName = "ie - getIECapabilityTest";
-
-        IECapabilities ieCapabilities = new IECapabilities();
-        MutableCapabilities capabilities = ieCapabilities.getCapability(testName);
-
-        Assert.assertEquals(capabilities.getBrowserName(), Browser.IE.browserName(), "Returned browser name is not valid!");
-
-        Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
-
-        // investigate
-        // Assert.assertTrue((Boolean) capabilities.getCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS),
-        // "Returned capability value is not valid!");
-
-    }
-
-    @Test(groups = {"DesktopCapabilitiesTestClass"})
     public static void getChromeCapabilityHeadlessTest() {
         R.CONFIG.put(Configuration.Parameter.HEADLESS.getKey(), "true");
 

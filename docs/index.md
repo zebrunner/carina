@@ -12,7 +12,7 @@ Carina is a Java-based test automation framework that unites all testing layers:
 
 * Carina Framework is built on top of the most popular open-source solutions like Selenium, Appium, TestNG allowing to reduce dependence on the specific technology stack.
 
-* Carina supports all popular browsers (IE, Edge, Safari, Chrome, Firefox) and mobile devices (iOS/Android). A special feature for a mobile domain: it reuses test automation code between IOS/Android up to 70-80%.
+* Carina supports all popular browsers (Edge, Safari, Chrome, Firefox) and mobile devices (iOS/Android). A special feature for a mobile domain: it reuses test automation code between IOS/Android up to 70-80%.
 
 * Carina is cross-platform. Tests may be easily executed both on Unix or Windows OS. All you need is JDK 11 installed.
 

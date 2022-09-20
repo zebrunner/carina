@@ -15,32 +15,48 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
 
+import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import org.openqa.selenium.chromium.ChromiumOptions;
 import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.CapabilityType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
 public class EdgeCapabilities extends AbstractCapabilities<ChromiumOptions<?>> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public ChromiumOptions<?> getCapability(String testName) {
         ChromiumOptions<?> capabilities = new ChromiumOptions<>(CapabilityType.BROWSER_NAME, Browser.EDGE.browserName(), "ms:edgeOptions");
         initBaseCapabilities(capabilities, testName);
         addEdgeOptions(capabilities);
+        capabilities.addArguments("--start-maximized", "--ignore-ssl-errors");
+        capabilities.setAcceptInsecureCerts(true);
         return capabilities;
     }
 
     private void addEdgeOptions(ChromiumOptions<?> caps) {
         Map<String, Object> prefs = new HashMap<>();
         boolean needsPrefs = false;
+        // disable the "unsupported flag" prompt
+        caps.addArguments("--test-type");
+        // update browser language
+        String browserLang = Configuration.get(Configuration.Parameter.BROWSER_LANGUAGE);
+        if (!browserLang.isEmpty()) {
+            LOGGER.info("Set Edge language to: {}", browserLang);
+            caps.addArguments("--lang=" + browserLang);
+            prefs.put("intl.accept_languages", browserLang);
+            needsPrefs = true;
+        }
 
         if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD)) {
             prefs.put("download.prompt_for_download", false);
@@ -55,5 +71,11 @@ public class EdgeCapabilities extends AbstractCapabilities<ChromiumOptions<?>> {
             caps.setCapability("prefs", prefs);
         }
         caps.setCapability("ms:edgeChrominum", true);
+
+        String driverType = Configuration.getDriverType();
+        if (Configuration.getBoolean(Configuration.Parameter.HEADLESS)
+                && driverType.equals(SpecialKeywords.DESKTOP)) {
+            caps.setHeadless(Configuration.getBoolean(Configuration.Parameter.HEADLESS));
+        }
     }
 }

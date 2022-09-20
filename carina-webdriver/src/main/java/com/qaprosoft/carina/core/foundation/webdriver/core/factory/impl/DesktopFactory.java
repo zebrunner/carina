@@ -41,7 +41,6 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.ChromeCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.EdgeCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.FirefoxCapabilities;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.IECapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.OperaCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.SafariCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
@@ -93,8 +92,6 @@ public class DesktopFactory extends AbstractFactory {
         
         if (Browser.FIREFOX.browserName().equalsIgnoreCase(browser)) {
             return new FirefoxCapabilities().getCapability(name);
-        } else if (Browser.IE.browserName().equalsIgnoreCase(browser) || "ie".equalsIgnoreCase(browser)) {
-            return new IECapabilities().getCapability(name);
         } else if (Browser.SAFARI.browserName().equalsIgnoreCase(browser)) {
             return new SafariCapabilities().getCapability(name);
         } else if (Browser.CHROME.browserName().equalsIgnoreCase(browser)) {

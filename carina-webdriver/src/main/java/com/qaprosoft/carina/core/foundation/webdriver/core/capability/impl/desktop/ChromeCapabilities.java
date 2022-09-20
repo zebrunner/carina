@@ -53,6 +53,7 @@ public class ChromeCapabilities extends AbstractCapabilities<ChromeOptions> {
      */
     private void addChromeOptions(ChromeOptions options) {
         // add default carina options and arguments
+        // disable the "unsupported flag" prompt
         options.addArguments("--test-type");
         // prefs
         HashMap<String, Object> chromePrefs = new HashMap<>();
