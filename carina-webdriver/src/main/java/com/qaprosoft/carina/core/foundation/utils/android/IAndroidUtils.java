@@ -1697,4 +1697,34 @@ public interface IAndroidUtils extends IMobileUtils {
         }
         driver.setLocation(location);
     }
+
+
+
+    default public Activity getFocusActivity(Activity customActivity) {
+        Activity activity = new Activity(getCurrentPackage(), getCurrentActivity());
+        activity.setStopApp(false);
+        return activity;
+    }
+
+    /**
+     * Switch to focused app to interact with it (be it a native app or a browser)<br>
+     * Application will not be restarted
+     */
+    default public void switchToApp() {
+        switchToApp(getCurrentPackage(), getCurrentActivity());
+    }
+
+    /**
+     * Switch to another app to interact with it (be it a native app or a browser)<br>
+     * If the application is already open, then it will not be restarted<br>
+     * If you need more control over the activity settings of the launched application, use {@link #startActivity(Activity)}
+     *
+     * @param packageName name of the package, for example {@code com.solvd.carinademoapplication}
+     * @param activityName name of the activity in app, for example {@code .ActivityTestScreens}
+     */
+    default public void switchToApp(String packageName, String activityName) {
+        Activity activity = new Activity(packageName, activityName);
+        activity.setStopApp(false);
+        startActivity(activity);
+    }
 }
