@@ -3,7 +3,7 @@ To access this functionality from another places like your services, just implem
 
 > Each thread has their own named driver pool
 
-Supported Browsers: Chrome, Firefox, Internet Explorer, Microsoft Edge, Opera, Safari, etc.
+Supported Browsers: Chrome, Firefox, Microsoft Edge, Opera, Safari, etc.
 
 ## Initialization
 
@@ -30,14 +30,12 @@ public void carinaCapsTest() {
     HomePage homePageFirefox = new HomePage(getDriver("firefox")); // return named "firefox" driver from the pool to init HomePage.
     homePageFirefox.open();
 
-    // Safari, Edge, Opera and IE default capabilities builder usage:
+    // Safari, Edge and Opera default capabilities builder usage:
     HomePage homePageSafari = new HomePage(getDriver("safari", new SafariCapabilities().getCapability("Safari Browser")));
     homePageSafari.open();
     
     getDriver("edge", new EdgeCapabilities().getCapability("Edge Browser"));
     getDriver("opera", new OperaCapabilities().getCapability("Opera Browser"));
-    getDriver("ie", new IECapabilities().getCapability("Internet Explorer Browser"));
-
 }
 
 @Test
