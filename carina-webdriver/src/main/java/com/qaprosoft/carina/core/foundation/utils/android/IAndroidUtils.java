@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nullable;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
@@ -1698,33 +1700,36 @@ public interface IAndroidUtils extends IMobileUtils {
         driver.setLocation(location);
     }
 
-
-
-    default public Activity getFocusActivity(Activity customActivity) {
-        Activity activity = new Activity(getCurrentPackage(), getCurrentActivity());
-        activity.setStopApp(false);
-        return activity;
+    /**
+     * Switch to focused app to interact with it (be it a native app or a browser)<br>
+     * Application will not be restarted<br>
+     */
+    default public void switchToApp() {
+        switchToApp(getCurrentPackage(), getCurrentActivity(), false);
     }
 
     /**
      * Switch to focused app to interact with it (be it a native app or a browser)<br>
-     * Application will not be restarted
+     *
+     * @param isRerun set true if you want to reopen app
      */
-    default public void switchToApp() {
-        switchToApp(getCurrentPackage(), getCurrentActivity());
+    default public void switchToApp(boolean isRerun) {
+        switchToApp(getCurrentPackage(), getCurrentActivity(), isRerun);
     }
 
     /**
      * Switch to another app to interact with it (be it a native app or a browser)<br>
-     * If the application is already open, then it will not be restarted<br>
      * If you need more control over the activity settings of the launched application, use {@link #startActivity(Activity)}
      *
      * @param packageName name of the package, for example {@code com.solvd.carinademoapplication}
      * @param activityName name of the activity in app, for example {@code .ActivityTestScreens}
+     * @param isRerun set true if you want to reopen app
      */
-    default public void switchToApp(String packageName, String activityName) {
+    default public void switchToApp(String packageName, String activityName, boolean isRerun) {
         Activity activity = new Activity(packageName, activityName);
-        activity.setStopApp(false);
+        activity.setAppWaitPackage(packageName);
+        activity.setAppWaitActivity(activityName);
+        activity.setStopApp(isRerun);
         startActivity(activity);
     }
 }
