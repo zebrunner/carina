@@ -77,6 +77,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.LogicUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
+import com.qaprosoft.carina.core.foundation.utils.android.AndroidService;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
@@ -154,12 +155,17 @@ public class DriverHelper {
 
         setPageLoadTimeout(drv, timeout);
         DriverListener.setMessages(Messager.OPENED_URL.getMessage(url), Messager.NOT_OPENED_URL.getMessage(url));
-        
+
         // [VD] there is no sense to use fluent wait here as selenium just don't return something until page is ready!
         // explicitly limit time for the openURL operation
         try {
             Messager.OPENING_URL.info(url);
-            drv.get(decryptedURL);
+            if (SpecialKeywords.MOBILE.equals(Configuration.getDriverType()) &&
+                    SpecialKeywords.ANDROID.equalsIgnoreCase(Configuration.getPlatform())) {
+                new AndroidService().openURL(url);
+            } else {
+                drv.get(decryptedURL);
+            }
         } catch (UnhandledAlertException e) {
             drv.switchTo().alert().accept();
         } catch (TimeoutException e) {
