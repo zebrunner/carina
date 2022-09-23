@@ -33,10 +33,11 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCa
 
 public class EdgeCapabilities extends AbstractCapabilities<ChromiumOptions<?>> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    public static final String CAPABILITY = "ms:edgeOptions";
 
     @Override
     public ChromiumOptions<?> getCapability(String testName) {
-        ChromiumOptions<?> capabilities = new ChromiumOptions<>(CapabilityType.BROWSER_NAME, Browser.EDGE.browserName(), "ms:edgeOptions");
+        ChromiumOptions<?> capabilities = new ChromiumOptions<>(CapabilityType.BROWSER_NAME, Browser.EDGE.browserName(), CAPABILITY);
         initBaseCapabilities(capabilities, testName);
         addEdgeOptions(capabilities);
         capabilities.addArguments("--start-maximized", "--ignore-ssl-errors");

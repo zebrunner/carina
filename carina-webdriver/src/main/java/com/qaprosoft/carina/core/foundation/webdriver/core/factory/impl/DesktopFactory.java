@@ -20,6 +20,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
 
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.NoSuchSessionException;
@@ -27,9 +28,12 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.chromium.ChromiumDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.Browser;
+import org.openqa.selenium.remote.CommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Wait;
 import org.slf4j.Logger;
@@ -45,6 +49,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.deskt
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.SafariCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
+
+import io.appium.java_client.safari.SafariDriver;
 
 public class DesktopFactory extends AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -76,8 +82,18 @@ public class DesktopFactory extends AbstractFactory {
 
         try {
             EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(new URL(seleniumHost));
-            driver = new RemoteWebDriver(ce, capabilities);
-
+            String browser = Configuration.getBrowser();
+            if (Browser.CHROME.browserName().equalsIgnoreCase(browser)) {
+                driver = new ChromiumDriverWrapper(ce, capabilities, ChromeOptions.CAPABILITY);
+            } else if (Browser.EDGE.browserName().equalsIgnoreCase(browser)) {
+                driver = new ChromiumDriverWrapper(ce, capabilities, EdgeCapabilities.CAPABILITY);
+            } else if (Browser.SAFARI.browserName().equalsIgnoreCase(browser)) {
+                driver = new SafariDriver(ce, capabilities);
+            } else if (Browser.FIREFOX.browserName().equalsIgnoreCase(browser)) {
+                driver = new FirefoxWrapperDriver(ce, (FirefoxOptions) capabilities);
+            } else {
+                driver = new RemoteWebDriver(ce, capabilities);
+            }
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed selenium URL!", e);
         }
@@ -156,6 +172,14 @@ public class DesktopFactory extends AbstractFactory {
             }
         } catch (Exception e) {
             LOGGER.error("Unable to resize browser window", e);
+        }
+    }
+
+    private class ChromiumDriverWrapper extends ChromiumDriver {
+
+        protected ChromiumDriverWrapper(CommandExecutor commandExecutor, Capabilities capabilities,
+                String capabilityKey) {
+            super(commandExecutor, capabilities, capabilityKey);
         }
     }
 }
