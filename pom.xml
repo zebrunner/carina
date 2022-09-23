@@ -64,7 +64,7 @@
         <selenium.version>4.4.0</selenium.version>
         <appium.version>8.1.1</appium.version>
         <!-- Zebrunner integrations -->
-        <zebrunner-testng-pluggable.version>1.8.0.305-SNAPSHOT</zebrunner-testng-pluggable.version>
+        <zebrunner-testng-pluggable.version>1.8.0.310-SNAPSHOT</zebrunner-testng-pluggable.version>
         <!-- Others -->
         <azure-storage-blob.version>12.7.0</azure-storage-blob.version>
         <aws-java-sdk.version>1.11.923</aws-java-sdk.version>
