@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.decorators.Decorated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +40,7 @@ import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.notifica
 import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.settings.DateTimeSettingsPage;
 import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.tzchanger.TZChangerPage;
 
+import io.appium.java_client.android.Activity;
 import io.appium.java_client.android.AndroidDriver;
 
 public class AndroidService implements IDriverPool, IAndroidUtils {
@@ -96,8 +99,10 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
 
     /**
      * press Home button to open home screen
+     * 
+     * @deprecated duplicate, use {@link IAndroidUtils#pressHome()} instead
      */
-
+    @Deprecated(forRemoval = true, since = "8.x")
     public void gotoAndroidHome() {
         executeAdbCommand("shell input keyevent 3");
     }
@@ -107,7 +112,9 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
      *
      * @param pkg String
      * @param activity String
+     * @deprecated use {@link IAndroidUtils#startActivity(Activity)} ()} instead
      */
+    @Deprecated(forRemoval = true, since = "8.x")
     public void openApp(String pkg, String activity) {
         openApp(pkg.trim() + "/" + activity.trim());
     }
@@ -116,7 +123,10 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
      * openApp
      *
      * @param app String
+     * @deprecated use {@link IAndroidUtils#startActivity(Activity)} ()} or
+     *             {@link com.qaprosoft.carina.core.foundation.utils.mobile.IMobileUtils#startApp(String)} ()} instead
      */
+    @Deprecated(forRemoval = true, since = "8.x")
     public void openApp(String app) {
         String result = executeAdbCommand("shell am start -n " + app);
         if (result.contains("Exception")) {
@@ -134,7 +144,9 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
      * @param appPackageName for example:
      *            com.bamnetworks.mobile.android.gameday.atbat
      * @return boolean
+     * @deprecated use {@link IAndroidUtils#clearAppCache} instead
      */
+    @Deprecated(forRemoval = true, since = "8.x")
     public boolean clearApkCache(String appPackageName) {
         // Later can be used:
         /*
@@ -156,12 +168,14 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
      * get Current Focused Apk Package Name
      *
      * @return String
+     * @deprecated use {@link IAndroidUtils#getCurrentPackage()} instead
      */
+    @Deprecated(forRemoval = true, since = "8.x")
     public String getCurrentFocusedApkPackageName() {
         String res = "";
         String txt = getCurrentDeviceFocus();
         String regEx1 = ".*?";
-//        String regEx2 = "((?:[a-z][a-z\\.\\d\\-]+)\\.(?:[a-z][a-z\\-]+))(?![\\w\\.])";
+        // String regEx2 = "((?:[a-z][a-z\\.\\d\\-]+)\\.(?:[a-z][a-z\\-]+))(?![\\w\\.])";
         Pattern pattern1 = Pattern.compile(regEx1 + regEx1, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
         Matcher matcher1 = pattern1.matcher(txt);
         if (matcher1.find()) {
@@ -175,7 +189,9 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
      * get Current Focused Apk Details (apkPackage/apkActivity)
      * 
      * @return apkPackage/apkActivity to use it in openApp method.
+     * @deprecated use {@link IAndroidUtils#getCurrentPackageActivity()} ()}} instead
      */
+    @Deprecated(forRemoval = true, since = "8.x")
     public String getCurrentFocusedApkDetails() {
         try {
             String packageName = "";
@@ -204,11 +220,12 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
         }
     }
 
-   
-
     /**
      * Open Development Settings on device
+     * 
+     * @deprecated this method calls adb bypassing the driver, so use {@link IAndroidUtils#openDeveloperOptions()} instead
      */
+    @Deprecated(forRemoval = true, since = "8.x")
     public void openDeveloperOptions() {
         executeAdbCommand("shell am start -n com.android.settings/.DevelopmentSettings");
     }
@@ -219,14 +236,20 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
 
     /**
      * expandStatusBar
+     * 
+     * @deprecated duplicate, use {@link IAndroidUtils#openStatusBar()} instead
      */
+    @Deprecated(forRemoval = true, since = "8.x")
     public void expandStatusBar() {
         executeAdbCommand("shell service call statusbar 1");
     }
 
     /**
      * collapseStatusBar
+     * 
+     * @deprecated duplicate, use {@link IAndroidUtils#closeStatusBar()} instead
      */
+    @Deprecated(forRemoval = true, since = "8.x")
     public void collapseStatusBar() {
         executeAdbCommand("shell service call statusbar 2");
     }
@@ -415,7 +438,7 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
     public boolean findExpectedNotification(String expectedTitle, String expectedText, boolean partially) {
         // open notification
         try {
-            ((AndroidDriver) castDriver()).openNotifications();
+            castDriver(getDriver(), AndroidDriver.class).openNotifications();
             CommonUtils.pause(2); // wait while notifications are playing animation to
             // appear to avoid missed taps
         } catch (Exception e) {
@@ -1179,4 +1202,16 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
 
     // End of TimeZone private section
 
+    /**
+     * Clean driver from Decorator and cast driver to {{@code clazz}} class
+     * This method is duplicate from DriverListener class
+     */
+    private <T extends WebDriver> T castDriver(WebDriver driver, Class<T> clazz) {
+        T castDriver = null;
+        if (driver instanceof Decorated) {
+            driver = ((Decorated<WebDriver>) driver).getOriginal();
+        }
+        castDriver = clazz.cast(driver);
+        return castDriver;
+    }
 }

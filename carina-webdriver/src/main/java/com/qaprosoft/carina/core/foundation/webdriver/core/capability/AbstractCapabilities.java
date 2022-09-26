@@ -22,38 +22,40 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Proxy;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.net.PortProber;
-import org.openqa.selenium.remote.BrowserType;
+import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.browsermobproxy.ProxyPool;
+import com.qaprosoft.carina.browserupproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.proxy.SystemProxy;
 
-public abstract class AbstractCapabilities {
+import io.appium.java_client.remote.options.SupportsLanguageOption;
+import io.appium.java_client.remote.options.SupportsLocaleOption;
+
+public abstract class AbstractCapabilities<T extends MutableCapabilities> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static ArrayList<Integer> firefoxPorts = new ArrayList<Integer>();
+    private static final ArrayList<String> numericCaps = new ArrayList<>(Arrays.asList("idleTimeout", "waitForIdleTimeout"));
 
-    public abstract DesiredCapabilities getCapability(String testName);
-    
-    protected DesiredCapabilities initBaseCapabilities(DesiredCapabilities capabilities, String browser, String testName) {
+    /**
+     * Generate Capabilities according to configuration file
+     */
+    public abstract T getCapability(String testName);
 
-        capabilities.setBrowserName(browser);
+    protected T initBaseCapabilities(T capabilities, String testName) {
+
         if (!IDriverPool.DEFAULT.equalsIgnoreCase(testName)) {
             // #1573: remove "default" driver name capability registration
-            capabilities.setCapability("name", testName);
+            // capabilities.setCapability("name", testName);
+            // todo investigate is in work, if not, think about another path
+            R.CONFIG.put(SpecialKeywords.CAPABILITIES + ".name", testName, true);
         }
 
         Proxy proxy = setupProxy();
@@ -62,35 +64,69 @@ public abstract class AbstractCapabilities {
         }
 
         // add capabilities based on dynamic _config.properties variables
-        capabilities = initCapabilities(capabilities);
-        
-        return capabilities;
+        return initCapabilities(capabilities);
     }
 
-    protected DesiredCapabilities initCapabilities(DesiredCapabilities capabilities) {
-        ArrayList<String> numericCaps = new ArrayList<String>(
-                Arrays.asList("idleTimeout", "waitForIdleTimeout"));
-        
+    /**
+     * Add capabilities from configuration file to capabilities param
+     * 
+     * @param capabilities capabilities to which will be added the capabilities from the configuration file
+     * @return upgraded capabilities
+     */
+    protected T initCapabilities(T capabilities) {
         // read all properties which starts from "capabilities.*" prefix and add them into desired capabilities.
         final String prefix = SpecialKeywords.CAPABILITIES + ".";
+        boolean isW3C = Configuration.getBoolean(Parameter.W3C);
+        String provider = R.CONFIG.get(SpecialKeywords.PROVIDER);
+        String providerOptions = R.CONFIG.get(SpecialKeywords.PROVIDER_OPTIONS);
+
         @SuppressWarnings({ "unchecked", "rawtypes" })
         Map<String, String> capabilitiesMap = new HashMap(R.CONFIG.getProperties());
+        Map<String, Object> customCapabilities = new HashMap<>();
+
         for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
-            if (entry.getKey().toLowerCase().startsWith(prefix)) {
-                String value = R.CONFIG.get(entry.getKey());                
-                if (!value.isEmpty()) {
-                    String cap = entry.getKey().replaceAll(prefix, "");
-                    if (numericCaps.contains(cap) && isNumber(value)) {
-                        LOGGER.debug("Adding " + cap + " to capabilities as integer");
-                        capabilities.setCapability(cap, Integer.parseInt(value));
-                    } else if ("false".equalsIgnoreCase(value)) {
-                        capabilities.setCapability(cap, false);
-                    } else if ("true".equalsIgnoreCase(value)) {
-                        capabilities.setCapability(cap, true);
-                    } else {
-                        capabilities.setCapability(cap, value);
+
+            // ignore non-capabilities
+            if (!entry.getKey().toLowerCase().startsWith(prefix)) {
+                continue;
+            }
+
+            // provider and providerType is not w3c-compatible capability, so we ignore it
+            if (SpecialKeywords.PROVIDER.equalsIgnoreCase(entry.getKey()) ||
+                    SpecialKeywords.PROVIDER_OPTIONS.equalsIgnoreCase(entry.getKey())) {
+                continue;
+            }
+
+            // ignore empty capabilities
+            if (R.CONFIG.get(entry.getKey()).isEmpty()) {
+                continue;
+            }
+
+            String capabilityName = entry.getKey().replaceAll(prefix, "");
+            Object value = R.CONFIG.get(entry.getKey());
+
+            if (numericCaps.contains(capabilityName) && isNumber(entry.getValue())) {
+                LOGGER.debug("Adding {} to capabilities as integer", entry.getValue());
+                value = Integer.parseInt(entry.getValue());
+            } else if ("false".equalsIgnoreCase(entry.getValue())) {
+                value = false;
+            } else if ("true".equalsIgnoreCase(entry.getValue())) {
+                value = true;
+            }
+
+            if (isW3C) {
+                if (W3CCapabilityCommonKeys.INSTANCE.test(capabilityName)) {
+                    capabilities.setCapability(capabilityName, value);
+                } else {
+                    if (provider.isEmpty()) {
+                        throw new RuntimeException(
+                                "W3C enabled, but provider capability is empty. Please, provide 'provider' capability. Detected w3c-incompatible capability: "
+                                        + capabilityName);
                     }
+                    customCapabilities.put(capabilityName, value);
                 }
+            } else {
+                capabilities.setCapability(capabilityName, value);
             }
         }
 
@@ -99,72 +135,66 @@ public abstract class AbstractCapabilities {
 
         // for pc we may set browserName through Desired capabilities in our Test with a help of a method initBaseCapabilities,
         // so we don't want to override with value from config
-        String browser;
-        if (capabilities.getBrowserName() != null && capabilities.getBrowserName().length() > 0) {
-            browser = capabilities.getBrowserName();
-        } else {
-            browser = Configuration.getBrowser();
-        }
-
-        if (BrowserType.FIREFOX.equalsIgnoreCase(browser)) {
-            capabilities = addFirefoxOptions(capabilities);
-        } else if (BrowserType.CHROME.equalsIgnoreCase(browser)) {
-            capabilities = addChromeOptions(capabilities);
-        } else if (BrowserType.EDGE.equalsIgnoreCase(browser)) {
-            capabilities = addEdgeOptions(capabilities);
-        }
+        String browser = capabilities.getBrowserName() != null && capabilities.getBrowserName().length() > 0 ? capabilities.getBrowserName()
+                : Configuration.getBrowser();
 
         if (Configuration.getBoolean(Parameter.HEADLESS)) {
-            if (BrowserType.FIREFOX.equalsIgnoreCase(browser)
-                    || BrowserType.CHROME.equalsIgnoreCase(browser)
+            if (Browser.FIREFOX.browserName().equalsIgnoreCase(browser)
+                    || Browser.CHROME.browserName().equalsIgnoreCase(browser)
                     && Configuration.getDriverType().equalsIgnoreCase(SpecialKeywords.DESKTOP)) {
                 LOGGER.info("Browser will be started in headless mode. VNC and Video will be disabled.");
-                capabilities.setCapability("enableVNC", false);
-                capabilities.setCapability("enableVideo", false);
+                customCapabilities.put("enableVNC", false);
+                customCapabilities.put("enableVideo", false);
             } else {
-                LOGGER.error(String.format("Headless mode isn't supported by %s browser / platform.", browser));
+                LOGGER.error("Headless mode isn't supported by {} browser / platform.", browser);
             }
         }
 
+        if (isW3C && !customCapabilities.isEmpty()) {
+            capabilities.setCapability(provider + ":" + providerOptions, customCapabilities);
+        } else {
+            for (String capabilityName : customCapabilities.keySet()) {
+                capabilities.setCapability(capabilityName, customCapabilities.get(capabilityName));
+            }
+        }
         return capabilities;
     }
 
     protected Proxy setupProxy() {
-        ProxyPool.setupBrowserMobProxy();
+        ProxyPool.setupBrowserUpProxy();
         SystemProxy.setupProxy();
 
         String proxyHost = Configuration.get(Parameter.PROXY_HOST);
         String proxyPort = Configuration.get(Parameter.PROXY_PORT);
         String noProxy = Configuration.get(Parameter.NO_PROXY);
         
-        if (Configuration.get(Parameter.BROWSERMOB_PROXY).equals("true")) {
+        if (Configuration.get(Parameter.BROWSERUP_PROXY).equals("true")) {
             proxyPort = Integer.toString(ProxyPool.getProxyPortFromThread());
         }
         List<String> protocols = Arrays.asList(Configuration.get(Parameter.PROXY_PROTOCOLS).split("[\\s,]+"));
 
-        //TODO: test removal comparing with null
-        if (proxyHost != null && !proxyHost.isEmpty() && proxyPort != null && !proxyPort.isEmpty()) {
+        if (!proxyHost.isEmpty() && !proxyPort.isEmpty()) {
 
             org.openqa.selenium.Proxy proxy = new org.openqa.selenium.Proxy();
             String proxyAddress = String.format("%s:%s", proxyHost, proxyPort);
 
             if (protocols.contains("http")) {
-                LOGGER.info(String.format("Http proxy will be set: %s:%s", proxyHost, proxyPort));
+                LOGGER.info("Http proxy will be set: {}:{}", proxyHost, proxyPort);
                 proxy.setHttpProxy(proxyAddress);
             }
 
             if (protocols.contains("https")) {
-                LOGGER.info(String.format("Https proxy will be set: %s:%s", proxyHost, proxyPort));
+                LOGGER.info("Https proxy will be set: {}:{}", proxyHost, proxyPort);
                 proxy.setSslProxy(proxyAddress);
             }
 
             if (protocols.contains("ftp")) {
-                LOGGER.info(String.format("FTP proxy will be set: %s:%s", proxyHost, proxyPort));
+                LOGGER.info("FTP proxy will be set: {}:{}", proxyHost, proxyPort);
                 proxy.setFtpProxy(proxyAddress);
             }
 
             if (protocols.contains("socks")) {
-                LOGGER.info(String.format("Socks proxy will be set: %s:%s", proxyHost, proxyPort));
+                LOGGER.info("Socks proxy will be set: {}:{}", proxyHost, proxyPort);
                 proxy.setSocksProxy(proxyAddress);
             }
             
@@ -177,172 +207,9 @@ public abstract class AbstractCapabilities {
 
         return null;
     }
-
-    private DesiredCapabilities addEdgeOptions(DesiredCapabilities caps) {
-        Map<String, Object> prefs = new HashMap<>();
-        Map<String, Object> edgeOptions = new HashMap<>();
-
-        boolean needsPrefs = false;
-
-        if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD)) {
-            prefs.put("download.prompt_for_download", false);
-            if (!"zebrunner".equalsIgnoreCase(R.CONFIG.get("capabilities.provider"))) {
-                prefs.put("download.default_directory",
-                        ReportContext.getArtifactsFolder().getAbsolutePath());
-            }
-            needsPrefs = true;
-        }
-
-        if (needsPrefs) {
-            edgeOptions.put("prefs", prefs);
-        }
-        caps.setCapability("ms:edgeChrominum", true);
-        caps.setCapability("ms:edgeOptions", edgeOptions);
-
-        return caps;
-    }
-
-    private DesiredCapabilities addChromeOptions(DesiredCapabilities caps) {
-        // add default carina options and arguments
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("test-type");
-        
-        //prefs 
-        HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
-        boolean needsPrefs = false;
-        
-        //update browser language
-        String browserLang = Configuration.get(Parameter.BROWSER_LANGUAGE); 
-        if (!browserLang.isEmpty()) {
-            LOGGER.info("Set Chrome language to: " + browserLang);
-            options.addArguments("--lang=" + browserLang);
-            chromePrefs.put("intl.accept_languages", browserLang);
-            needsPrefs = true;
-        }
-
-        if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD)) {
-            chromePrefs.put("download.prompt_for_download", false);
-            if (!"zebrunner".equalsIgnoreCase(R.CONFIG.get("capabilities.provider"))) {
-                // don't override auto download dir for Zebrunner Selenium Grid (Selenoid)
-                chromePrefs.put("download.default_directory", ReportContext.getArtifactsFolder().getAbsolutePath());
-            }
-            chromePrefs.put("plugins.always_open_pdf_externally", true);
-            needsPrefs = true;
-        }
-
-        
-        // [VD] no need to set proxy via options anymore!
-        // moreover if below code is uncommented then we have double proxy start and mess in host:port values
-        
-        // setup default mobile chrome args and preferences
-        String driverType = Configuration.getDriverType();
-        if (SpecialKeywords.MOBILE.equals(driverType)) {
-            options.addArguments("--no-first-run");
-            options.addArguments("--disable-notifications");
-            options.setExperimentalOption("w3c", false);
-        }
-        
-        // add all custom chrome args
-        for (String arg: Configuration.get(Parameter.CHROME_ARGS).split(",")) {
-            if (arg.isEmpty()) {
-                continue;
-            }
-            options.addArguments(arg.trim());
-        }
     
-        // add all custom chrome experimental options, w3c=false
-        String experimentalOptions = Configuration.get(Parameter.CHROME_EXPERIMENTAL_OPTS);
-        if(!experimentalOptions.isEmpty()) {
-            needsPrefs = true;
-            for (String option: experimentalOptions.split(",")) {
-                if (option.isEmpty()) {
-                    continue;
-                }
 
-                //TODO: think about equal sign inside name or value later
-                option = option.trim();
-                String name = option.split("=")[0].trim();
-                String value = option.split("=")[1].trim();
-                if ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value)) {
-                    chromePrefs.put(name, Boolean.valueOf(value));
-                } else if (isNumber(value)) {
-                    chromePrefs.put(name, Long.valueOf(value));
-                } else {
-                    chromePrefs.put(name, value);
-                }
-            }
-        }
-
-        if (needsPrefs) {
-            options.setExperimentalOption("prefs", chromePrefs);
-        }
-        
-        // add all custom chrome mobileEmulation options, deviceName=Nexus 5
-        Map<String, String> mobileEmulation = new HashMap<>();
-        for (String option: Configuration.get(Parameter.CHROME_MOBILE_EMULATION_OPTS).split(",")) {
-            if (option.isEmpty()) {
-                continue;
-            }
-
-            option = option.trim();
-            String name = option.split("=")[0].trim();
-            String value = option.split("=")[1].trim();
-            mobileEmulation.put(name, value);
-        }
-        
-        if (!mobileEmulation.isEmpty()) {
-            options.setExperimentalOption("mobileEmulation", mobileEmulation);
-        }
-
-        if (Configuration.getBoolean(Parameter.HEADLESS)
-                && driverType.equals(SpecialKeywords.DESKTOP)) {
-            options.setHeadless(Configuration.getBoolean(Parameter.HEADLESS));
-        }
-
-        caps.setCapability(ChromeOptions.CAPABILITY, options);
-        return caps;
-    }
-
-
-    private DesiredCapabilities addFirefoxOptions(DesiredCapabilities caps) {
-        FirefoxProfile profile = getDefaultFirefoxProfile();
-        FirefoxOptions options = new FirefoxOptions().setProfile(profile);
-        caps.setCapability(FirefoxOptions.FIREFOX_OPTIONS, options);
-
-        // add all custom firefox args
-        for (String arg : Configuration.get(Parameter.FIREFOX_ARGS).split(",")) {
-            if (arg.isEmpty()) {
-                continue;
-            }
-            options.addArguments(arg.trim());
-        }
-        // add all custom firefox preferences
-        for (String preference : Configuration.get(Parameter.FIREFOX_PREFERENCES).split(",")) {
-            if (preference.isEmpty()) {
-                continue;
-            }
-            // TODO: think about equal sign inside name or value later
-            preference = preference.trim();
-            String name = preference.split("=")[0].trim();
-            String value = preference.split("=")[1].trim();
-            // TODO: test approach with numbers
-            if ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value)) {
-                options.addPreference(name, Boolean.valueOf(value));
-            } else {
-                options.addPreference(name, value);
-            }
-        }
-
-        String driverType = Configuration.getDriverType();
-        if (Configuration.getBoolean(Parameter.HEADLESS)
-                && driverType.equals(SpecialKeywords.DESKTOP)) {
-            options.setHeadless(Configuration.getBoolean(Parameter.HEADLESS));
-        }
-
-        return caps;
-    }
-
-    private boolean isNumber(String value){
+    protected boolean isNumber(String value) {
         if (value == null || value.isEmpty()){
             return false;
         }
@@ -357,65 +224,43 @@ public abstract class AbstractCapabilities {
     }
 
     /**
-     * Generate default default Carina FirefoxProfile.
-     *
-     * @return Firefox profile.
+     * Add locale and language capabilities to caps param
      */
-    // keep it public to be bale to get default and override on client layerI
-    public FirefoxProfile getDefaultFirefoxProfile() {
-        FirefoxProfile profile = new FirefoxProfile();
+    protected T setLocaleAndLanguage(T caps) {
+        /*
+         * http://appium.io/docs/en/writing-running-appium/caps/ locale and language
+         * Locale to set for iOS (XCUITest driver only) and Android.
+         * fr_CA format for iOS. CA format (country name abbreviation) for Android
+         */
 
-        // update browser language
-        String browserLang = Configuration.get(Parameter.BROWSER_LANGUAGE);
-        if (!browserLang.isEmpty()) {
-            LOGGER.info("Set Firefox lanaguage to: " + browserLang);
-            profile.setPreference("intl.accept_languages", browserLang);
-        }
+        // parse locale param as it has language and country by default like en_US
+        String localeValue = Configuration.get(Parameter.LOCALE);
+        LOGGER.debug("Default locale value is : {}", localeValue);
+        String[] values = localeValue.split("_");
+        if (values.length == 1) {
+            // only locale is present!
+            caps.setCapability(SupportsLocaleOption.LOCALE_OPTION, localeValue);
 
-        boolean generated = false;
-        int newPort = 7055;
-        int i = 100;
-        while (!generated && (--i > 0)) {
-            newPort = PortProber.findFreePort();
-            generated = firefoxPorts.add(newPort);
-        }
-        if (!generated) {
-            newPort = 7055;
-        }
-        if (firefoxPorts.size() > 20) {
-            firefoxPorts.remove(0);
-        }
-
-        profile.setPreference(FirefoxProfile.PORT_PREFERENCE, newPort);
-        LOGGER.debug("FireFox profile will use '" + newPort + "' port number.");
-
-        profile.setPreference("dom.max_chrome_script_run_time", 0);
-        profile.setPreference("dom.max_script_run_time", 0);
-
-        if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD) && !(Configuration.isNull(Configuration.Parameter.AUTO_DOWNLOAD_APPS)
-                || "".equals(Configuration.get(Configuration.Parameter.AUTO_DOWNLOAD_APPS)))) {
-            profile.setPreference("browser.download.folderList", 2);
-            if (!"zebrunner".equalsIgnoreCase(R.CONFIG.get("capabilities.provider"))) {
-                // don't override auto download dir for Zebrunner Selenium Grid (Selenoid)
-                profile.setPreference("browser.download.dir", ReportContext.getArtifactsFolder().getAbsolutePath());
+            String langValue = Configuration.get(Parameter.LANGUAGE);
+            if (!langValue.isEmpty()) {
+                LOGGER.debug("Default language value is : {}", langValue);
+                // provide extra capability language only if it exists among config parameters...
+                caps.setCapability(SupportsLanguageOption.LANGUAGE_OPTION, langValue);
             }
-            profile.setPreference("browser.helperApps.neverAsk.saveToDisk", Configuration.get(Configuration.Parameter.AUTO_DOWNLOAD_APPS));
-            profile.setPreference("browser.download.manager.showWhenStarting", false);
-            profile.setPreference("browser.download.saveLinkAsFilenameTimeout", 1);
-            profile.setPreference("pdfjs.disabled", true);
-            profile.setPreference("plugin.scan.plid.all", false);
-            profile.setPreference("plugin.scan.Acrobat", "99.0");
-        } else if (Configuration.getBoolean(Configuration.Parameter.AUTO_DOWNLOAD) && Configuration.isNull(Configuration.Parameter.AUTO_DOWNLOAD_APPS)
-                || "".equals(Configuration.get(Configuration.Parameter.AUTO_DOWNLOAD_APPS))) {
-            LOGGER.warn(
-                    "If you want to enable auto-download for FF please specify '" + Configuration.Parameter.AUTO_DOWNLOAD_APPS.getKey() + "' param");
+
+        } else if (values.length == 2) {
+            if (Configuration.getPlatform(caps).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+                LOGGER.debug("Put language and locale to android capabilities. language: {}; locale: {}", values[0], values[1]);
+                caps.setCapability(SupportsLanguageOption.LANGUAGE_OPTION, values[0]);
+                caps.setCapability(SupportsLocaleOption.LOCALE_OPTION, values[1]);
+            } else if (Configuration.getPlatform().equalsIgnoreCase(SpecialKeywords.IOS)) {
+                LOGGER.debug("Put language and locale to iOS capabilities. language: {}; locale: {}", values[0], localeValue);
+                caps.setCapability(SupportsLanguageOption.LANGUAGE_OPTION, values[0]);
+                caps.setCapability(SupportsLocaleOption.LOCALE_OPTION, localeValue);
+            }
+        } else {
+            LOGGER.error("Undefined locale provided (ignoring for mobile capabilitites): {}", localeValue);
         }
-
-        profile.setAcceptUntrustedCertificates(true);
-        profile.setAssumeUntrustedCertificateIssuer(true);
-
-        // TODO: implement support of custom args if any
-        return profile;
+        return caps;
     }
-    
 }

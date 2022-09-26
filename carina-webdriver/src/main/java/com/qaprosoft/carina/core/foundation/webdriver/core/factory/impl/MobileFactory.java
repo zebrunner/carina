@@ -18,28 +18,34 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.openqa.selenium.HasCapabilities;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.MobileCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.EspressoCapabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.UiAutomator2Capabilities;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.XCUITestCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.AndroidElement;
 import io.appium.java_client.ios.IOSDriver;
-import io.appium.java_client.ios.IOSElement;
+import io.appium.java_client.remote.AutomationName;
+import io.appium.java_client.remote.options.SupportsAutomationNameOption;
 
 /**
  * MobileFactory creates instance {@link WebDriver} for mobile testing.
@@ -50,13 +56,13 @@ public class MobileFactory extends AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public WebDriver create(String name, DesiredCapabilities capabilities, String seleniumHost) {
+    public WebDriver create(String name, MutableCapabilities capabilities, String seleniumHost) {
 
         if (seleniumHost == null) {
             seleniumHost = Configuration.getSeleniumUrl();
         }
 
-        String mobilePlatformName = Configuration.getPlatform(capabilities);
+        String mobilePlatformName = Configuration.getPlatform();
 
         // TODO: refactor to be able to remove SpecialKeywords.CUSTOM property completely
 
@@ -67,14 +73,15 @@ public class MobileFactory extends AbstractFactory {
             mobilePlatformName = SpecialKeywords.CUSTOM;
         }
         
-        if (seleniumHost.contains("hub.browserstack.com")) {
+        if (seleniumHost.contains("hub.browserstack.com") ||
+                seleniumHost.contains("hub-cloud.browserstack.com")) {
             //#1786 mobile drivers on browserstack should be started via CUSTOM - RemoteWebDriver driver
             mobilePlatformName = SpecialKeywords.CUSTOM;
         }
 
-        LOGGER.debug("selenium: " + seleniumHost);
+        LOGGER.debug("selenium: {}", seleniumHost);
 
-        RemoteWebDriver driver = null;
+        WebDriver driver = null;
         // if inside capabilities only singly "udid" capability then generate default one and append udid
         if (isCapabilitiesEmpty(capabilities)) {
             capabilities = getCapabilities(name);
@@ -82,22 +89,38 @@ public class MobileFactory extends AbstractFactory {
             String udid = capabilities.getCapability("udid").toString();
             capabilities = getCapabilities(name);
             capabilities.setCapability("udid", udid);
-            LOGGER.debug("Appended udid to cpabilities: " + capabilities);
+            LOGGER.debug("Appended udid to capabilities: {}", capabilities);
         }
 
-        LOGGER.debug("capabilities: " + capabilities);
+        if (Objects.equals(Configuration.get(Parameter.W3C), "false")) {
+            capabilities = removeAppiumPrefix(capabilities);
+        }
+
+        if (capabilities.getBrowserName() != null &&
+                (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.ANDROID) ||
+                        mobilePlatformName.equalsIgnoreCase(SpecialKeywords.IOS)) &&
+                (seleniumHost.contains("hub.browserstack.com") ||
+                        seleniumHost.contains("hub-cloud.browserstack.com"))) {
+            // when browser tests browserstack is not understand android platformName
+            capabilities.setCapability("platformName", "ANY");
+        }
+
+        LOGGER.debug("capabilities: {}", capabilities);
 
         try {
             EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
-            
+
             if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
-                driver = new AndroidDriver<AndroidElement>(ce, capabilities);
+                driver = new AndroidDriver(ce, capabilities);
+
             } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.IOS)
                     || mobilePlatformName.equalsIgnoreCase(SpecialKeywords.TVOS)) {
-                driver = new IOSDriver<IOSElement>(ce, capabilities);
+                driver = new IOSDriver(ce, capabilities);
+
             } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.CUSTOM)) {
                 // that's a case for custom mobile capabilities like browserstack or saucelabs
-                driver = new RemoteWebDriver(new URL(seleniumHost), capabilities);
+                driver =new RemoteWebDriver(new URL(seleniumHost), capabilities);
+
             } else {
                 throw new RuntimeException("Unsupported mobile platform: " + mobilePlatformName);
             }
@@ -122,7 +145,7 @@ public class MobileFactory extends AbstractFactory {
         }
 
         try {
-            Device device = new Device(driver.getCapabilities());
+            Device device = new Device(((HasCapabilities) driver).getCapabilities());
             IDriverPool.registerDevice(device);
             // will be performed just in case uninstall_related_apps flag marked as true
             device.uninstallRelatedApps();
@@ -139,11 +162,27 @@ public class MobileFactory extends AbstractFactory {
             throw e;
         }
 
+
+
         return driver;
     }
 
-    private DesiredCapabilities getCapabilities(String name) {
-        return new MobileCapabilities().getCapability(name);
+    private MutableCapabilities getCapabilities(String name) {
+        String platform = Configuration.getPlatform();
+        String automationName = R.CONFIG.get("capabilities." + SupportsAutomationNameOption.AUTOMATION_NAME_OPTION);
+
+        if (AutomationName.ESPRESSO.equalsIgnoreCase(automationName)) {
+            return new EspressoCapabilities().getCapability(name);
+        }
+
+        if (platform.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+            return new UiAutomator2Capabilities().getCapability(name);
+
+        } else if (platform.equalsIgnoreCase(SpecialKeywords.IOS)
+                || platform.equalsIgnoreCase(SpecialKeywords.TVOS)) {
+            return new XCUITestCapabilities().getCapability(name);
+        }
+        throw new RuntimeException("Unsupported platform: " + platform);
     }
 
     /**
@@ -160,9 +199,9 @@ public class MobileFactory extends AbstractFactory {
         String debugInfo = "";
         if (m.find()) {
             debugInfo = m.group(1);
-            LOGGER.debug("Extracted debug info: ".concat(debugInfo));
+            LOGGER.debug("Extracted debug info: {}", debugInfo);
         } else {
-            LOGGER.debug("Debug info hasn'been found");
+            LOGGER.debug("Debug info hasn't been found");
         }
         return debugInfo;
     }
@@ -189,9 +228,9 @@ public class MobileFactory extends AbstractFactory {
         String paramValue = "";
         if (m.find()) {
             paramValue = m.group(1);
-            LOGGER.debug(String.format("Found parameter: %s -> ", paramName).concat(paramValue));
+            LOGGER.debug("Found parameter: {} -> {}", paramName, paramValue);
         } else {
-            LOGGER.debug(String.format("Param '%s' hasn't been found in debug info: [%s]", paramName, debugInfo));
+            LOGGER.debug("Param '{}' hasn't been found in debug info: [{}]", paramName, debugInfo);
         }
 
         return paramValue;

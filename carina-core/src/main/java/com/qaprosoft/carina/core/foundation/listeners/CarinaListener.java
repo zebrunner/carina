@@ -37,7 +37,7 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.openqa.selenium.support.decorators.Decorated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.IClassListener;
@@ -59,7 +59,7 @@ import com.azure.storage.blob.models.BlobProperties;
 import com.qaprosoft.amazon.AmazonS3Manager;
 import com.qaprosoft.appcenter.AppCenterManager;
 import com.qaprosoft.azure.AzureManager;
-import com.qaprosoft.carina.browsermobproxy.ProxyPool;
+import com.qaprosoft.carina.browserupproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
@@ -89,7 +89,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.screenshot.AutoScreenshotR
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
 import com.zebrunner.agent.core.registrar.Artifact;
 import com.zebrunner.agent.core.registrar.CurrentTest;
-import com.zebrunner.agent.core.registrar.CurrentTestRun;
 import com.zebrunner.agent.core.registrar.Label;
 import com.zebrunner.agent.core.registrar.TestRail;
 import com.zebrunner.agent.core.registrar.label.CompositeLabelResolver;
@@ -185,7 +184,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         setThreadCount(suite);
         
         if (Configuration.getPlatform().equalsIgnoreCase(SpecialKeywords.API)) {
-            CurrentTestRun.setPlatform(SpecialKeywords.API);
+        //TODO: investigate this possible problem.
+           // CurrentTestRun.setPlatform(SpecialKeywords.API);
         }
 
         String mobileApp = Configuration.getMobileApp();
@@ -873,8 +873,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             for (Map.Entry<String, CarinaDriver> entry : drivers.entrySet()) {
                 WebDriver drv = entry.getValue().getDriver();
 
-                if (drv instanceof EventFiringWebDriver) {
-                    drv = ((EventFiringWebDriver) drv).getWrappedDriver();
+                if (drv instanceof Decorated<?>) {
+                    drv = (WebDriver) ((Decorated<?>) drv).getOriginal();
                 }
 
                 R.CONFIG.put(Parameter.ERROR_SCREENSHOT.getKey(), "true", true);

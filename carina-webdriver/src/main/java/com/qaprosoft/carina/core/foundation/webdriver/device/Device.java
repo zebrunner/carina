@@ -29,8 +29,8 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +45,8 @@ import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
+
+import io.appium.java_client.remote.MobileCapabilityType;
 
 public class Device implements IDriverPool {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -88,8 +90,8 @@ public class Device implements IDriverPool {
         // 1. read from CONFIG and specify if any: capabilities.deviceName
         // 2. read from capabilities object and set if if it is not null
         String deviceName = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_NAME);
-        if (capabilities.getCapability("deviceName") != null) {
-            deviceName = capabilities.getCapability("deviceName").toString();
+        if (capabilities.getCapability(MobileCapabilityType.DEVICE_NAME) != null) {
+            deviceName = capabilities.getCapability(MobileCapabilityType.DEVICE_NAME).toString();
         }
         if (capabilities.getCapability("deviceModel") != null) {
             // deviceModel is returned from capabilities with name of device for local appium runs
@@ -107,13 +109,13 @@ public class Device implements IDriverPool {
         }
         setType(deviceType);
 
-        setOs(Configuration.getPlatform(new DesiredCapabilities(capabilities)));
+        setOs(Configuration.getPlatform(new MutableCapabilities(capabilities)));
         
-        setOsVersion(Configuration.getPlatformVersion(new DesiredCapabilities(capabilities)));
+        setOsVersion(Configuration.getPlatformVersion(new MutableCapabilities(capabilities)));
 
         String deviceUdid = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_UDID);
-        if (capabilities.getCapability("udid") != null) {
-            deviceUdid = capabilities.getCapability("udid").toString();
+        if (capabilities.getCapability(MobileCapabilityType.UDID) != null) {
+            deviceUdid = capabilities.getCapability(MobileCapabilityType.UDID).toString();
         }
         setUdid(deviceUdid);
         
@@ -127,7 +129,7 @@ public class Device implements IDriverPool {
         @SuppressWarnings("unchecked")
         Map<String, Object> slotCap = (Map<String, Object>) capabilities.getCapability(SpecialKeywords.SLOT_CAPABILITIES);
         try {
-            if (slotCap != null && slotCap.containsKey("udid")) {
+            if (slotCap != null && slotCap.containsKey(MobileCapabilityType.UDID)) {
 
                 // restore device information from custom slotCapabilities map
                 /*
@@ -143,10 +145,10 @@ public class Device implements IDriverPool {
 
                 // That's a trusted information from Zebrunner Device Farm so we can override all values
                 setName((String) slotCap.get("deviceName"));
-                setOs((String) slotCap.get("platformName"));
-                setOsVersion((String) slotCap.get("platformVersion"));
+                setOs((String) slotCap.get(MobileCapabilityType.PLATFORM_NAME));
+                setOsVersion((String) slotCap.get(MobileCapabilityType.PLATFORM_VERSION));
                 setType((String) slotCap.get("deviceType"));
-                setUdid((String) slotCap.get("udid"));
+                setUdid((String) slotCap.get(MobileCapabilityType.UDID));
                 if (slotCap.containsKey("vnc")) {
                     setVnc((String) slotCap.get("vnc"));
                 }

@@ -26,7 +26,6 @@ public class DriverAugmenter extends Augmenter {
         super();
     }
 
-    @Override
     protected RemoteWebDriver extractRemoteWebDriver(WebDriver driver) {
         if (driver.getClass().isAnnotationPresent(Augmentable.class)
                 || driver

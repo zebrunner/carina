@@ -13,18 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.windows;
+package com.qaprosoft.carina.browserupproxy.rewrite;
 
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
+public enum HeaderMethod {
+    
+    ADD, UPDATE, REMOVE;
 
-import io.appium.java_client.windows.options.WindowsOptions;
-
-public class WindowsCapabilities extends AbstractCapabilities<WindowsOptions> {
-
-    @Override
-    public WindowsOptions getCapability(String testName) {
-        WindowsOptions capabilities = new WindowsOptions();
-        initCapabilities(capabilities);
-        return capabilities;
-    }    
 }

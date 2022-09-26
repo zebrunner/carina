@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.utils.android;
 public class Permissions {
 
     public enum Permission {
+        // https://github.com/appium/appium-uiautomator2-driver#mobile-changepermissions
         CAMERA_ACCESS("android.permission.CAMERA"),
         READ_EXTERNAL_STORAGE(
                 "android.permission.READ_EXTERNAL_STORAGE"),
@@ -30,7 +31,7 @@ public class Permissions {
         ACCESS_LOCATION_EXTRA_COMMANDS(
                 "android.permission.ACCESS_LOCATION_EXTRA_COMMANDS");
 
-        private String permission;
+        private final String permission;
 
         private Permission(String permission) {
             this.permission = permission;
@@ -46,7 +47,7 @@ public class Permissions {
         GRANTED("granted"),
         REQUESTED("requested");
 
-        private String status;
+        private final String status;
 
         private PermissionType(String status) {
             this.status = status;

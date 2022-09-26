@@ -126,7 +126,7 @@ public class SystemProxy {
      * @param destinationPort resource port
      * @param timeoutMillis int
      * @return true if resource is available through proxy and false otherwise
-     * @throws UnknownHostException
+     * @throws UnknownHostException if no IP address for the host could be found, or if a scope_id was specified for a global IPv6 address.
      */
     public static boolean isResourceAvailableUsingProxy(String proxyAddress, int proxyPort, Proxy.Type protocol,
             String destinationAddress, int destinationPort, int timeoutMillis) throws UnknownHostException {

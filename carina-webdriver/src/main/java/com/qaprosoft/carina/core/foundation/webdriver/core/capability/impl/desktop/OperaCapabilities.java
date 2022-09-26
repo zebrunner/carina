@@ -15,19 +15,20 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
 
-import org.openqa.selenium.remote.BrowserType;
+import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
-public class OperaCapabilities extends AbstractCapabilities {
-    public DesiredCapabilities getCapability(String testName) {
-        DesiredCapabilities capabilities = new DesiredCapabilities();
-        capabilities = initBaseCapabilities(capabilities, BrowserType.OPERA_BLINK, testName);
-        capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
-        capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
-        
+public class OperaCapabilities extends AbstractCapabilities<MutableCapabilities> {
+
+    @Override
+    public MutableCapabilities getCapability(String testName) {
+        MutableCapabilities capabilities = new MutableCapabilities();
+        initBaseCapabilities(capabilities, testName);
+        capabilities.setCapability(CapabilityType.BROWSER_NAME, Browser.OPERA.browserName());
+
         //TODO: add support for AUTO_DOWNLOAD and PROXY
         return capabilities;
     }

@@ -27,8 +27,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.internal.Locatable;
-import org.openqa.selenium.internal.WrapsElement;
+import org.openqa.selenium.WrapsElement;
+import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
@@ -55,6 +55,9 @@ public class ExtendedFieldDecorator implements FieldDecorator {
         this.webDriver = webDriver;
     }
 
+    /**
+     * @param field page element to be decorated
+     */
     public Object decorate(ClassLoader loader, Field field) {
         if ((!field.isAnnotationPresent(FindBy.class) && !field.isAnnotationPresent(ExtendedFindBy.class))
                 /*
@@ -121,15 +124,20 @@ public class ExtendedFieldDecorator implements FieldDecorator {
         return true;
     }
 
+    /**
+     * @param field page element to be proxied
+     * @param locator {{{@link com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator}}}
+     */
     protected ExtendedWebElement proxyForLocator(ClassLoader loader, Field field, ElementLocator locator) {
         InvocationHandler handler = new LocatingElementHandler(locator);
         WebElement proxy = (WebElement) Proxy.newProxyInstance(loader, new Class[] { WebElement.class, WrapsElement.class, Locatable.class },
                 handler);
-        /**
-         * Questionable place - called ExtendedWebElement constructor with no initializing searchContext
-         */
-        return new ExtendedWebElement(proxy, field.getName(),
-                field.isAnnotationPresent(FindBy.class) || field.isAnnotationPresent(ExtendedFindBy.class)? new LocalizedAnnotations(field).buildBy() : null);
+        By by = null;
+        if (field.isAnnotationPresent(FindBy.class) || field.isAnnotationPresent(ExtendedFindBy.class)) {
+            by = new LocalizedAnnotations(field).buildBy();
+        }
+
+        return new ExtendedWebElement(proxy, field.getName(), by);
     }
 
     @SuppressWarnings("unchecked")

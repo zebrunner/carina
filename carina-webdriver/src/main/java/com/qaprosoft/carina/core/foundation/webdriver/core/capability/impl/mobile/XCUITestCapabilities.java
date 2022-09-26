@@ -13,25 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
-
-import org.openqa.selenium.ie.InternetExplorerDriver;
-import org.openqa.selenium.remote.BrowserType;
-import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
+package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile;
 
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
-public class IECapabilities extends AbstractCapabilities {
+import io.appium.java_client.ios.options.XCUITestOptions;
 
-    public DesiredCapabilities getCapability(String testName) {
-        DesiredCapabilities capabilities = new DesiredCapabilities();
-        capabilities = initBaseCapabilities(capabilities, BrowserType.IE, testName);
-        capabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
-        capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
-        capabilities.setCapability(CapabilityType.TAKES_SCREENSHOT, false);
+public class XCUITestCapabilities extends AbstractCapabilities<XCUITestOptions> {
 
+    @Override
+    public XCUITestOptions getCapability(String testName) {
+        XCUITestOptions capabilities = new XCUITestOptions();
+        // this step should be executed before initCapabilities() to be able to override this capabilities by default appium approach.
+        setLocaleAndLanguage(capabilities);
+        // add capabilities based on dynamic _config.properties variables
+        initCapabilities(capabilities);
         return capabilities;
     }
-
 }

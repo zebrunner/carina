@@ -58,7 +58,7 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.imgscalr.Scalr;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.openqa.selenium.support.decorators.Decorated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -79,7 +79,8 @@ import com.zebrunner.agent.core.registrar.Artifact;
 
 public class ReportContext {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    public static final String ARTIFACTS_FOLDER = "downloads"; //renamed to downloads to avoid automatic upload on our old Zebrunner ci-pipeline versions
+    public static final String ARTIFACTS_FOLDER = "downloads"; // renamed to downloads to avoid automatic upload on our old Zebrunner ci-pipeline
+                                                               // versions
 
     private static final String GALLERY_ZIP = "gallery-lib.zip";
     private static final String REPORT_NAME = "/report.html";
@@ -103,7 +104,8 @@ public class ReportContext {
     private static Map<String, String> screenSteps = Collections.synchronizedMap(new HashMap<String, String>());
 
     /**
-     * Creates base directory for tests execution to save screenshots, logs etc 
+     * Creates base directory for tests execution to save screenshots, logs etc
+     * 
      * @return base root folder for run.
      */
     public static File getBaseDir() {
@@ -138,7 +140,8 @@ public class ReportContext {
     }
 
     /**
-     * Creates temp directory for tests execution 
+     * Creates temp directory for tests execution
+     * 
      * @return temp folder for run.
      */
     public static synchronized File getTempDir() {
@@ -164,7 +167,7 @@ public class ReportContext {
     /**
      * Creates unique test directory for test
      * 
-     * @param dirName String 
+     * @param dirName String
      * @return test log/screenshot folder.
      */
     private static File getTestDir(String dirName) {
@@ -216,16 +219,15 @@ public class ReportContext {
                 throw new RuntimeException("Test Folder(s) not created: " + testDir.getAbsolutePath());
             }
         }
-        
+
         testDirectory.set(testDir);
         return testDir;
     }
 
-
     public static synchronized File getArtifactsFolder() {
         File dir = null;
         try {
-            // artifacts directory should use canonical path otherwise auto download feature is broken in browsers 
+            // artifacts directory should use canonical path otherwise auto download feature is broken in browsers
             if (!Configuration.get(Parameter.CUSTOM_ARTIFACTS_FOLDER).isEmpty()) {
                 dir = new File(Configuration.get(Parameter.CUSTOM_ARTIFACTS_FOLDER)).getCanonicalFile();
             } else {
@@ -241,7 +243,7 @@ public class ReportContext {
             } else {
                 LOGGER.debug("Artifacts folder already exists: " + dir.getAbsolutePath());
             }
-            
+
             if (!dir.isDirectory()) {
                 throw new RuntimeException("Artifacts folder is not a folder: " + dir.getAbsolutePath());
             }
@@ -266,10 +268,10 @@ public class ReportContext {
         String hostUrl = getUrl(driver, "");
         String username = getField(hostUrl, 1);
         String password = getField(hostUrl, 2);
-        
+
         try {
             HttpURLConnection con = (HttpURLConnection) new URL(hostUrl).openConnection();
-            con.setInstanceFollowRedirects(true); //explicitly define as true because default value doesn't work and return 301 status
+            con.setInstanceFollowRedirects(true); // explicitly define as true because default value doesn't work and return 301 status
             con.setRequestMethod("GET");
 
             if (!username.isEmpty() && !password.isEmpty()) {
@@ -285,7 +287,6 @@ public class ReportContext {
                 throw new RuntimeException("Invalid session id. Something wrong with driver");
             }
 
-
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 String hrefAttributePattern = "href=([\"'])((?:(?!\\1)[^\\\\]|(?:\\\\\\\\)*\\\\[^\\\\])*)\\1";
                 Pattern pattern = Pattern.compile(hrefAttributePattern);
@@ -299,16 +300,16 @@ public class ReportContext {
 
         } catch (IOException e) {
             LOGGER.debug("Something went wrong when try to get artifacts from remote", e);
-        } 
+        }
 
         return artifactNames;
     }
-    
+
     /**
      * Get artifacts from auto download folder of local or remove driver session by pattern
      * 
      * @param driver WebDriver
-     * @param pattern String - regex for artifacts 
+     * @param pattern String - regex for artifacts
      * @return list of artifact files
      */
     public static List<File> getArtifacts(WebDriver driver, String pattern) {
@@ -326,7 +327,7 @@ public class ReportContext {
                     .add(getArtifact(driver, fileName));
         }
         return artifacts;
-    }    
+    }
 
     /**
      * Get artifact from auto download folder of local or remove driver session by name
@@ -340,17 +341,17 @@ public class ReportContext {
         if (file.exists()) {
             return file;
         }
-        
+
         String path = file.getAbsolutePath();
         LOGGER.debug("artifact file to download: " + path);
 
         String url = getUrl(driver, name);
         String username = getField(url, 1);
         String password = getField(url, 2);
-        
+
         if (!username.isEmpty() && !password.isEmpty()) {
             Authenticator.setDefault(new CustomAuthenticator(username, password));
-        }        
+        }
 
         if (checkArtifactUsingHttp(url, username, password)) {
             try {
@@ -364,7 +365,7 @@ public class ReportContext {
         }
 
         // publish as test artifact to Zebrunner Reporting
-        Artifact.attachToTest(name, file); 
+        Artifact.attachToTest(name, file);
 
         return file;
     }
@@ -412,13 +413,13 @@ public class ReportContext {
         return matcher.find() ? matcher.group(position) : "";
 
     }
-    
+
     /**
      * Generate file in artifacts location and register in Zebrunner Reporting
      * 
      * @param name String
      * @param source InputStream
-     */    
+     */
     public static void saveArtifact(String name, InputStream source) throws IOException {
         File artifact = new File(String.format("%s/%s", getArtifactsFolder(), name));
         artifact.createNewFile();
@@ -429,8 +430,9 @@ public class ReportContext {
 
     /**
      * Copy file into artifacts location and register in Zebrunner Reporting
+     * 
      * @param source File
-     */    
+     */
 
     public static void saveArtifact(File source) throws IOException {
         File artifact = new File(String.format("%s/%s", getArtifactsFolder(), source.getName()));
@@ -438,7 +440,7 @@ public class ReportContext {
         FileUtils.copyFile(source, artifact);
         
         Artifact.attachToTest(source.getName(), artifact);
-    }    
+    }
 
     /**
      * generate url for artifact by name
@@ -449,8 +451,9 @@ public class ReportContext {
      */
     private static String getUrl(WebDriver driver, String name) {
         String seleniumHost = Configuration.getSeleniumUrl().replace("wd/hub", "download/");
-        WebDriver drv = (driver instanceof EventFiringWebDriver) ? ((EventFiringWebDriver) driver).getWrappedDriver() : driver;
-        String sessionId = ((RemoteWebDriver) drv).getSessionId().toString();
+        RemoteWebDriver drv = driver instanceof Decorated ? (RemoteWebDriver) (((Decorated<WebDriver>) driver).getOriginal())
+                : (RemoteWebDriver) driver;
+        String sessionId = drv.getSessionId().toString();
         String url = seleniumHost + sessionId + "/" + name;
         LOGGER.debug("url: " + url);
         return url;
@@ -826,7 +829,6 @@ public class ReportContext {
         }
         return null;
     }
-    
 
     // Converting InputStream to String
     private static String readStream(InputStream in) {
@@ -851,7 +853,7 @@ public class ReportContext {
         }
         return response.toString();
     }
-    
+
     public static class CustomAuthenticator extends Authenticator {
 
         String username;
@@ -865,6 +867,6 @@ public class ReportContext {
         protected PasswordAuthentication getPasswordAuthentication() {
             return new PasswordAuthentication(username, password.toCharArray());
         }
-    }    
+    }
 
 }

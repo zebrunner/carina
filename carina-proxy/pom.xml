@@ -7,8 +7,8 @@
 	<artifactId>carina-proxy</artifactId>
 	<packaging>jar</packaging>
 
-	<name>BrowserMobProxy Core</name>
-	<description>BrowserMob Proxy module web, mobile, API testing.</description>
+	<name>BrowserUpProxy Core</name>
+	<description>BrowserUp Proxy module web, mobile, API testing.</description>
 
 	<parent>
 		<groupId>com.qaprosoft</groupId>
@@ -28,7 +28,7 @@
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-utils</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
@@ -40,15 +40,22 @@
 		</dependency>
 
 		<dependency>
-			<groupId>net.lightbody.bmp</groupId>
-			<artifactId>browsermob-core</artifactId>
-			<version>2.1.5</version>
+			<groupId>com.browserup</groupId>
+			<artifactId>browserup-proxy-core</artifactId>
+			<version>2.1.2</version>
+			<exclusions>
+				<!-- We have an error if we do not exclude netty-codec -->
+				<exclusion>
+					<groupId>io.netty</groupId>
+					<artifactId>netty-codec</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-all</artifactId>
-			<version>4.1.42.Final</version>
+			<version>4.1.80.Final</version>
 		</dependency>
 
 		<!-- Test utilities -->
@@ -72,7 +79,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>com.qaprosoft.carina.browsermobproxy.ProxyPool</mainClass>
+							<mainClass>com.qaprosoft.carina.browserupproxy.ProxyPool</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>

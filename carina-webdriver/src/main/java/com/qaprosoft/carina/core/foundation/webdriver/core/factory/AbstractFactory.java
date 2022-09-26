@@ -16,18 +16,26 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory;
 
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
-import org.openqa.selenium.support.events.WebDriverEventListener;
+import org.openqa.selenium.support.events.EventFiringDecorator;
+import org.openqa.selenium.support.events.WebDriverListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.R;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
+
+import io.appium.java_client.internal.CapabilityHelpers;
 
 /**
  * Base implementation of WebDriver factory.
@@ -36,29 +44,27 @@ import com.qaprosoft.carina.core.foundation.utils.R;
  */
 public abstract class AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     /**
-     * Creates new instance of {@link WebDriver} according to specified {@link DesiredCapabilities}.
+     * Creates new instance of {@link WebDriver} according to specified {@link MutableCapabilities}.
      * 
      * @param testName - where driver is initiated
-     * @param capabilities - driver desired capabilitues
+     * @param capabilities - driver capabilities
      * @param seleniumHost - selenium server URL
      * @return instance of {@link WebDriver}
      */
-    abstract public WebDriver create(String testName, DesiredCapabilities capabilities, String seleniumHost);
+    public abstract WebDriver create(String testName, MutableCapabilities capabilities, String seleniumHost);
 
     /**
-     * If any listeners specified, converts RemoteWebDriver to EventFiringWebDriver and registers all listeners.
+     * If any listeners specified, converts RemoteWebDriver to EventFiringDecorator and registers all listeners.
      * 
-     * @param driver - instance of @link WebDriver}
-     * @param listeners - instances of {@link WebDriverEventListener}
+     * @param driver - instance of {@link WebDriver}
+     * @param listeners - instances of {@link WebDriverListener}
      * @return driver with registered listeners
      */
-    public WebDriver registerListeners(WebDriver driver, WebDriverEventListener... listeners) {
+    public WebDriver registerListeners(WebDriver driver, WebDriverListener... listeners) {
         if (!ArrayUtils.isEmpty(listeners)) {
-            driver = new EventFiringWebDriver(driver);
-            for (WebDriverEventListener listener : listeners) {
-                ((EventFiringWebDriver) driver).register(listener);
-            }
+            driver = new EventFiringDecorator<>(listeners).decorate(driver);
         }
         return driver;
     }
@@ -77,4 +83,12 @@ public abstract class AbstractFactory {
         return R.CONFIG.getBoolean(capability);
     }
 
+    protected MutableCapabilities removeAppiumPrefix(MutableCapabilities capabilities) {
+        MutableCapabilities allCapabilities = new MutableCapabilities();
+        for (String capabilityName : capabilities.asMap().keySet()) {
+            String cleanCapabilityName = StringUtils.removeStart(capabilityName, CapabilityHelpers.APPIUM_PREFIX);
+            allCapabilities.setCapability(cleanCapabilityName, capabilities.getCapability(capabilityName));
+        }
+        return allCapabilities;
+    }
 }

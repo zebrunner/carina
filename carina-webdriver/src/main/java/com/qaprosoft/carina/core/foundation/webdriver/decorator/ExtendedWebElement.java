@@ -17,7 +17,6 @@ package com.qaprosoft.carina.core.foundation.webdriver.decorator;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.nio.file.Files;
@@ -27,10 +26,10 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -43,13 +42,13 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WrapsDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
-import org.openqa.selenium.remote.SessionId;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.openqa.selenium.support.decorators.Decorated;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
@@ -62,7 +61,6 @@ import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
-import com.qaprosoft.carina.core.foundation.exception.DriverPoolException;
 import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -71,18 +69,12 @@ import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
-import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
-import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.LocatorConverter;
-import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.CaseInsensitiveConverter;
-import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.ParamsToConvert;
-import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.Platform;
 import com.sun.jersey.core.util.Base64;
 
-import io.appium.java_client.MobileBy;
+import io.appium.java_client.AppiumBy;
 
 public class ExtendedWebElement implements IWebElement {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -105,8 +97,6 @@ public class ExtendedWebElement implements IWebElement {
     private String name;
     private By by;
 
-    private boolean caseInsensitive;
-
     private ElementLoadingStrategy loadingStrategy = ElementLoadingStrategy.valueOf(Configuration.get(Parameter.ELEMENT_LOADING_STRATEGY));
 
     private boolean isLocalized = false;
@@ -114,8 +104,6 @@ public class ExtendedWebElement implements IWebElement {
     // Converted array of objects to String for dynamic element locators
     private String formatValues = "";
 
-    private LocatorConverter caseInsensitiveConverter;
-    
     public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext) {
         if (by == null) {
             throw new RuntimeException("By couldn't be null!");
@@ -145,144 +133,88 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     public ExtendedWebElement(WebElement element, String name) {
-    	this.name = name;
+        this.name = name;
         this.element = element;
-        
-        //read searchContext from not null elements only
-        if (element == null) {
+
+        // read searchContext from not null elements only
+        if (this.element == null) {
             // it seems like we have to specify WebElement or By annotation! Add verification that By is valid in this case!
-            if (getBy() == null) {
+            if (this.by == null) {
                 try {
                     throw new RuntimeException("review stacktrace to analyze why tempBy is not populated correctly via reflection!");
                 } catch (Throwable thr) {
-                    LOGGER.warn("getBy() is null!", thr);
+                    LOGGER.warn("by is null!", thr);
                 }
             }
             return;
         }
 
-		try {
-			Field locatorField, searchContextField, byContextField, caseInsensitiveContextField = null;
-			SearchContext tempSearchContext = null;
+        try {
+            SearchContext tempSearchContext = null;
 
-			if (element.getClass().toString().contains("EventFiringWebDriver$EventFiringWebElement")) {
-				// reuse reflection to get internal fields
-				locatorField = element.getClass().getDeclaredField("underlyingElement");
-				locatorField.setAccessible(true);
-				element = (RemoteWebElement) locatorField.get(element);
-			}
+            // if the element is decorated, we take its decorated context
+            if (element instanceof Decorated &&
+                    ((Decorated<?>) element).getOriginal() instanceof RemoteWebElement) {
+                tempSearchContext = (SearchContext) ((Decorated<?>) element).getDecorator().getDecoratedDriver();
+                // if the element is RemoteWebElement, we take its context as is
+            } else if (element instanceof RemoteWebElement) {
+                tempSearchContext = ((RemoteWebElement) element).getWrappedDriver();
+                // we create proxy for {{ExtendedElementLocator}}, so we can get info from it
+            } else if (element instanceof Proxy) {
+                InvocationHandler innerProxy = Proxy.getInvocationHandler(element);
+                ExtendedElementLocator locator = (ExtendedElementLocator) (FieldUtils.getDeclaredField(innerProxy.getClass(), "locator", true))
+                        .get(innerProxy);
 
-			if (element instanceof RemoteWebElement) {
-				tempSearchContext = ((RemoteWebElement) element).getWrappedDriver();
-			} else if (element instanceof Proxy) {
-				InvocationHandler innerProxy = Proxy.getInvocationHandler(((Proxy) element));
-
-				locatorField = innerProxy.getClass().getDeclaredField("locator");
-				locatorField.setAccessible(true);
-
-                ExtendedElementLocator locator = (ExtendedElementLocator) locatorField.get(innerProxy);
                 this.isLocalized = locator.isLocalized();
-
                 if (isLocalized) {
                     this.name = locator.getClassName() + "." + name;
                 }
 
-				searchContextField = locator.getClass().getDeclaredField("searchContext");
-				searchContextField.setAccessible(true);
-				this.searchContext = tempSearchContext = (SearchContext) searchContextField.get(locator);
+                this.searchContext = locator.getSearchContext();
+                tempSearchContext = this.searchContext;
 
-                caseInsensitiveContextField = locator.getClass().getDeclaredField("caseInsensitive");
-                caseInsensitiveContextField.setAccessible(true);
-                this.caseInsensitive = (Boolean) caseInsensitiveContextField.get(locator);
-
-                byContextField = locator.getClass().getDeclaredField("by");
-                byContextField.setAccessible(true);
-                //TODO: identify if it is a child element and
-                //	1. get rootBy
-                //  2. append current "by" to the rootBy
+                // TODO: identify if it is a child element and
+                // 1. get rootBy
+                // 2. append current "by" to the rootBy
                 // -> it should allow to search via regular driver and fluent waits - getBy()
-                this.by = (By) byContextField.get(locator);
+                this.by = locator.getBy();
 
                 while (tempSearchContext instanceof Proxy) {
-                    innerProxy = Proxy.getInvocationHandler(((Proxy) tempSearchContext));
-
-					locatorField = innerProxy.getClass().getDeclaredField("locator");
-					locatorField.setAccessible(true);
-
-					locator = (ExtendedElementLocator) locatorField.get(innerProxy);
-                    // #1691 fix L10N Localized annotation does not work when elements are nested and the
-                    // parent element does not have an annotation.
-					//this.isLocalized = locator.isLocalized();
-
-					searchContextField = locator.getClass().getDeclaredField("searchContext");
-					searchContextField.setAccessible(true);
-					tempSearchContext = (SearchContext) searchContextField.get(locator);
-
-                    caseInsensitiveContextField = locator.getClass().getDeclaredField("caseInsensitive");
-                    caseInsensitiveContextField.setAccessible(true);
-                    this.caseInsensitive = (Boolean) caseInsensitiveContextField.get(locator);
-
-                    if (this.caseInsensitive) {
-                        CaseInsensitiveXPath csx = locator.getCaseInsensitiveXPath();
-                        Platform platform = Objects.equals(Configuration.getMobileApp(), "") ? Platform.WEB : Platform.MOBILE;
-                        caseInsensitiveConverter = new CaseInsensitiveConverter(
-                                new ParamsToConvert(csx.id(), csx.name(), csx.text(), csx.classAttr()), platform);
-                    }
-				}
-			}
-
-			if (tempSearchContext instanceof EventFiringWebDriver) {
-				EventFiringWebDriver eventFirDriver = (EventFiringWebDriver) tempSearchContext;
-				this.driver = eventFirDriver.getWrappedDriver();
-				//TODO: [VD] it seems like method more and more complex. Let's analyze and avoid return from this line
-				return;
-			}
-
-			if (tempSearchContext != null && tempSearchContext.getClass().toString().contains("EventFiringWebDriver$EventFiringWebElement")) {
-				// reuse reflection to get internal fields
-				locatorField = tempSearchContext.getClass().getDeclaredField("underlyingElement");
-				locatorField.setAccessible(true);
-				this.searchContext = tempSearchContext = (RemoteWebElement) locatorField.get(tempSearchContext);
-			}
-
-			if (tempSearchContext instanceof RemoteWebElement) {
-//				this.driver = ((RemoteWebElement) searchContext).getWrappedDriver();
-				tempSearchContext = ((RemoteWebElement) tempSearchContext).getWrappedDriver();
-			}
-			if (tempSearchContext != null && tempSearchContext instanceof RemoteWebDriver) {
-				SessionId sessionId = ((RemoteWebDriver) tempSearchContext).getSessionId();
-				if (this.searchContext == null) {
-					// do not override if it was already initialized as it has
-					// real searchContext which shouldn't be replaced by actual driver
-					this.searchContext = tempSearchContext; 
-				}
-				//this.driver = (WebDriver) tempSearchContext;
-				// that's the only place to use DriverPool to get driver.
-                try {
-                    //try to search securely in driver pool by sessionId
-                    this.driver = IDriverPool.getDriver(sessionId);
-                } catch (DriverPoolException ex) {
-                    // seems like driver started outside of IDriverPool so try to register it as well
-                    this.driver = (WebDriver) tempSearchContext;
+                    innerProxy = Proxy.getInvocationHandler(tempSearchContext);
+                    locator = (ExtendedElementLocator) FieldUtils.getDeclaredField(innerProxy.getClass(), "locator", true)
+                            .get(innerProxy);
+                    tempSearchContext = locator.getSearchContext();
                 }
-			} else {
-				LOGGER.error("Undefined error for searchContext: " + tempSearchContext.toString());
-			}
-		} catch (NoSuchFieldException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (ClassCastException e) {
-			e.printStackTrace();
-		} catch (Throwable thr) {
-			thr.printStackTrace();
-			LOGGER.error("Unable to get Driver, searchContext and By via reflection!", thr);
+            }
+
+            // initialize context if it is not initialized
+            if (this.searchContext == null) {
+                this.searchContext = tempSearchContext;
+            }
+
+            // FIXME: DefaultDecorated cannot be cast to (SearchContext, WebElement, WebDriver), so we get original element / driver and
+            // set this.driver as original driver
+            if (tempSearchContext instanceof Decorated<?>) {
+                tempSearchContext = (SearchContext) ((Decorated<?>) tempSearchContext).getOriginal();
+            }
+
+            // search driver in hierarchy
+            while (!(tempSearchContext instanceof WebDriver)) {
+                tempSearchContext = ((WrapsDriver) tempSearchContext).getWrappedDriver();
+            }
+
+            this.driver = (WebDriver) tempSearchContext;
+
+        } catch (IllegalAccessException | ClassCastException e) {
+            e.printStackTrace();
+        } catch (Throwable thr) {
+            thr.printStackTrace();
+            LOGGER.error("Unable to get Driver, searchContext and By via reflection!", thr);
         } finally {
             if (this.searchContext == null) {
                 throw new RuntimeException("review stacktrace to analyze why searchContext is not populated correctly via reflection!");
             }
         }
-
     }
 
 
@@ -333,14 +265,14 @@ public class ExtendedWebElement implements IWebElement {
 	 * @return element existence status.
 	 */
 	public boolean isPresent(By by, long timeout) {
-	    boolean res = false;
-	    try {
-	        res = waitUntil(getDefaultCondition(by), timeout);
+        boolean res = false;
+        try {
+            res = waitUntil(getDefaultCondition(by), timeout);
         } catch (StaleElementReferenceException e) {
             // there is no sense to continue as StaleElementReferenceException captured
             LOGGER.debug("waitUntil: StaleElementReferenceException", e);
         }
-	    return res;
+        return res;
 	}
 	
 	
@@ -356,16 +288,13 @@ public class ExtendedWebElement implements IWebElement {
             LOGGER.warn("Fluent wait less than 1sec timeout might hangs! Updating to 1 sec.");
             timeout = 1;
         }
-        
+
         long retryInterval = getRetryInterval(timeout);
-        
-        //try to use better tickMillis clock
-        Wait<WebDriver> wait = new WebDriverWait(getDriver(), 
-                java.time.Clock.tickMillis(java.time.ZoneId.systemDefault()), 
-                Sleeper.SYSTEM_SLEEPER, 
-                timeout, 
-                retryInterval)
-                .withTimeout(Duration.ofSeconds(timeout));
+
+        // try to use better tickMillis clock
+        Wait<WebDriver> wait = new WebDriverWait(getDriver(), Duration.ofSeconds(timeout), Duration.ofMillis(retryInterval),
+                java.time.Clock.tickMillis(java.time.ZoneId.systemDefault()), Sleeper.SYSTEM_SLEEPER)
+                        .withTimeout(Duration.ofSeconds(timeout));
 
         // [VD] Notes:
         // do not ignore TimeoutException or NoSuchSessionException otherwise you can wait for minutes instead of timeout!
@@ -374,11 +303,11 @@ public class ExtendedWebElement implements IWebElement {
         
         // 7.3.17-SNAPSHOT. Removed NoSuchSessionException (Mar-11-2022)
         //.ignoring(NoSuchSessionException.class) // why do we ignore noSuchSession? Just to minimize errors?
-        
+
         // 7.3.20.1686-SNAPSHOT. Removed ignoring WebDriverException (Jun-03-2022).
         // Goal to test if inside timeout happens first and remove interruption and future call
         // removed ".ignoring(NoSuchElementException.class);" as NotFoundException ignored by waiter itself
-        // added explicit .withTimeout(Duration.ofSeconds(timeout));        
+        // added explicit .withTimeout(Duration.ofSeconds(timeout));
 
         LOGGER.debug("waitUntil: starting... timeout: " + timeout);
         boolean res = false;
@@ -400,7 +329,7 @@ public class ExtendedWebElement implements IWebElement {
             throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + this.by.toString());
         }
         if (elements.size() > 1) {
-            //TODO: think about moving into the debug or info level
+            // TODO: think about moving into the debug or info level
             LOGGER.warn(String.format("returned first but found %d elements by xpath: %s", elements.size(), getBy()));
         }
         this.element = elements.get(0);
@@ -434,12 +363,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return By by
      */
     public By getBy() {
-        // todo move this code from getter
-        By value = by;
-        if (caseInsensitiveConverter != null) {
-           value = caseInsensitiveConverter.convert(this.by);
-        }
-        return value;
+        return this.by;
     }
 
     public void setBy(By by) {
@@ -981,7 +905,7 @@ public class ExtendedWebElement implements IWebElement {
             // there is no sense to continue as StaleElementReferenceException captured
             LOGGER.debug("waitUntil: StaleElementReferenceException", e);
         }
-        
+
         return res;
     }
 
@@ -1134,7 +1058,7 @@ public class ExtendedWebElement implements IWebElement {
                 // if element not found it will cause NoSuchElementException
                 findElement();
             }
-            
+
             // if element is stale, it will cause StaleElementReferenceException
             if (this.element.isDisplayed()) {
                 LOGGER.info("Element {} detected. Waiting until disappear...", this.element.getTagName());
@@ -1143,11 +1067,11 @@ public class ExtendedWebElement implements IWebElement {
                 // no sense to continue as element is not displayed so return asap
                 return true;
             }
-            
+
             res = waitUntil(ExpectedConditions.or(ExpectedConditions.stalenessOf(this.element),
                     ExpectedConditions.invisibilityOf(this.element)),
                     timeout);
-            
+
         } catch (NoSuchElementException | StaleElementReferenceException e) {
             // element not present so means disappear
             LOGGER.debug("Element disappeared as exception catched: {}", e.getMessage());
@@ -1168,35 +1092,19 @@ public class ExtendedWebElement implements IWebElement {
         By resultBy = null;
 
         if (locator.startsWith(LocatorType.ID.getStartsWith())) {
-            if (caseInsensitiveConverter != null) {
-                resultBy = caseInsensitiveConverter.convert(resultBy);
-            } else {
                 resultBy = By.id(String.format(StringUtils.remove(locator, LocatorType.ID.getStartsWith()), objects));
-            }
         }
 
         if (locator.startsWith(LocatorType.NAME.getStartsWith())) {
-            if (caseInsensitiveConverter != null) {
-                resultBy = caseInsensitiveConverter.convert(resultBy);
-            } else {
-                resultBy = By.id(String.format(StringUtils.remove(locator, LocatorType.NAME.getStartsWith()), objects));
-            }
+                resultBy = By.name(String.format(StringUtils.remove(locator, LocatorType.NAME.getStartsWith()), objects));
         }
 
         if (locator.startsWith(LocatorType.XPATH.getStartsWith())) {
-            if (caseInsensitiveConverter != null) {
-                resultBy = caseInsensitiveConverter.convert(resultBy);
-            } else {
                 resultBy = By.xpath(String.format(StringUtils.remove(locator, LocatorType.XPATH.getStartsWith()), objects));
-            }
         }
 
         if (locator.startsWith(LocatorType.LINKTEXT.getStartsWith())) {
-            if (caseInsensitiveConverter != null) {
-                resultBy = caseInsensitiveConverter.convert(resultBy);
-            } else {
-                resultBy = By.xpath(String.format(StringUtils.remove(locator, LocatorType.LINKTEXT.getStartsWith()), objects));
-            }
+                resultBy = By.linkText(String.format(StringUtils.remove(locator, LocatorType.LINKTEXT.getStartsWith()), objects));
         }
 
         if (locator.startsWith(LocatorType.PARTIAL_LINK_TEXT.getStartsWith())) {
@@ -1215,15 +1123,15 @@ public class ExtendedWebElement implements IWebElement {
          * All ClassChain locators start from **. e.g FindBy(xpath = "**'/XCUIElementTypeStaticText[`name CONTAINS[cd] '%s'`]")
          */
         if (locator.startsWith("By.IosClassChain: **")) {
-            resultBy = MobileBy.iOSClassChain(String.format(StringUtils.remove(locator, "By.IosClassChain: "), objects));
+            resultBy = AppiumBy.iOSClassChain(String.format(StringUtils.remove(locator, "By.IosClassChain: "), objects));
         }
 
         if (locator.startsWith("By.IosNsPredicate: **")) {
-            resultBy = MobileBy.iOSNsPredicateString(String.format(StringUtils.remove(locator, "By.IosNsPredicate: "), objects));
+            resultBy = AppiumBy.iOSNsPredicateString(String.format(StringUtils.remove(locator, "By.IosNsPredicate: "), objects));
         }
 
-        if (locator.startsWith(LocatorType.ACCESSIBILITY_ID.getStartsWith())) {
-            resultBy = MobileBy.AccessibilityId(String.format(StringUtils.remove(locator, LocatorType.ACCESSIBILITY_ID.getStartsWith()), objects));
+        if (locator.startsWith("By.AccessibilityId: ")) {
+            resultBy = AppiumBy.accessibilityId(String.format(StringUtils.remove(locator, LocatorType.ACCESSIBILITY_ID.getStartsWith()), objects));
         }
 
         if (locator.startsWith(LocatorType.IMAGE.getStartsWith())) {
@@ -1238,13 +1146,13 @@ public class ExtendedWebElement implements IWebElement {
                         "Error while reading image file after formatting. Formatted locator : " + formattedLocator, e);
             }
             LOGGER.debug("Base64 image representation has benn successfully obtained after formatting.");
-            resultBy = MobileBy.image(base64image);
+            resultBy = AppiumBy.image(base64image);
         }
 
         if (locator.startsWith(LocatorType.ANDROID_UI_AUTOMATOR.getStartsWith())) {
-            resultBy = MobileBy
-                    .AndroidUIAutomator(String.format(StringUtils.remove(locator, LocatorType.ANDROID_UI_AUTOMATOR.getStartsWith()), objects));
-            LOGGER.debug("Formatted locator is : {}", resultBy);
+            resultBy = AppiumBy
+                    .androidUIAutomator(String.format(StringUtils.remove(locator, LocatorType.ANDROID_UI_AUTOMATOR.getStartsWith()), objects));
+            LOGGER.debug("Formatted locator is : " + resultBy);
         }
 
         if (resultBy == null) {
@@ -1436,7 +1344,7 @@ public class ExtendedWebElement implements IWebElement {
             this.element = getElement();
             output = overrideAction(actionName, inputArgs);
         } catch (StaleElementReferenceException e) {
-            //TODO: analyze mobile testing for staled elements. Potentially it should be fixed by appium java client already
+            // TODO: analyze mobile testing for staled elements. Potentially it should be fixed by appium java client already
             // sometime Appium instead printing valid StaleElementException generate java.lang.ClassCastException:
             // com.google.common.collect.Maps$TransformedEntriesMap cannot be cast to java.lang.String
             LOGGER.debug("catched StaleElementReferenceException: ", e);
@@ -1543,7 +1451,7 @@ public class ExtendedWebElement implements IWebElement {
 						Messager.FILE_NOT_ATTACHED.getMessage(textLog, getNameWithLocator()));
 
 				((JavascriptExecutor) getDriver()).executeScript("arguments[0].style.display = 'block';", element);
-				((RemoteWebDriver) castDriver(getDriver())).setFileDetector(new LocalFileDetector());
+                DriverListener.castDriver(getDriver(), RemoteWebDriver.class).setFileDetector(new LocalFileDetector());
 				element.sendKeys(decryptedText);
 			}
 
@@ -1729,13 +1637,7 @@ public class ExtendedWebElement implements IWebElement {
 		}
 		return driver;
     }
-    
-    private WebDriver castDriver(WebDriver drv) {
-        if (drv instanceof EventFiringWebDriver) {
-            drv = ((EventFiringWebDriver) drv).getWrappedDriver();
-        }
-        return drv;
-    }
+
     
 	//TODO: investigate how can we merge the similar functionality in ExtendedWebElement, DriverHelper and LocalizedAnnotations
     public By generateByForList(By by, int index) {
@@ -1777,15 +1679,15 @@ public class ExtendedWebElement implements IWebElement {
          * All ClassChain locators start from **. e.g FindBy(xpath = "**'/XCUIElementTypeStaticText[`name CONTAINS[cd] '%s'`]")
          */
         if (locator.startsWith("By.IosClassChain: **")) {
-            resBy = MobileBy.iOSClassChain(StringUtils.remove(locator, "By.IosClassChain: ") + "[" + index + "]");
+            resBy = AppiumBy.iOSClassChain(StringUtils.remove(locator, "By.IosClassChain: ") + "[" + index + "]");
         }
 
         if (locator.startsWith("By.IosNsPredicate: **")) {
-            resBy = MobileBy.iOSNsPredicateString(StringUtils.remove(locator, "By.IosNsPredicate: ") + "[" + index + "]");
+            resBy = AppiumBy.iOSNsPredicateString(StringUtils.remove(locator, "By.IosNsPredicate: ") + "[" + index + "]");
         }
 
         if (locator.startsWith(LocatorType.ACCESSIBILITY_ID.getStartsWith())) {
-            resBy = MobileBy.AccessibilityId(StringUtils.remove(locator, LocatorType.ACCESSIBILITY_ID.getStartsWith()) + "[" + index + "]");
+            resBy = AppiumBy.accessibilityId(StringUtils.remove(locator, LocatorType.ACCESSIBILITY_ID.getStartsWith()) + "[" + index + "]");
         }
 
         if (resBy == null) {
@@ -1870,7 +1772,7 @@ public class ExtendedWebElement implements IWebElement {
         }
         return waitCondition;
     }
-    
+
     private long getRetryInterval(long timeout) {
         long retryInterval = RETRY_TIME;
         if (timeout >= 3 && timeout <= 10) {

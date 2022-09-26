@@ -3,7 +3,7 @@ To access this functionality from another places like your services, just implem
 
 > Each thread has their own named driver pool
 
-Supported Browsers: Chrome, Firefox, Internet Explorer, Microsoft Edge, Opera, Safari, etc.
+Supported Browsers: Chrome, Firefox, Microsoft Edge, Opera, Safari, etc.
 
 ## Initialization
 
@@ -12,9 +12,9 @@ Supported Browsers: Chrome, Firefox, Internet Explorer, Microsoft Edge, Opera, S
 
 * **getDriver(String name)** start named driver session using default capabilities from configuration. This allows to start several drivers (up to 3 according to `max_driver_count` property).
 
-* **getDriver(String name, DesiredCapabilities capabilities)** start named driver session using custom capabilities.
+* **getDriver(String name, MutableCapabilities capabilities)** start named driver session using custom capabilities.
 
-* **getDriver(String name, DesiredCapabilities capabilities, String seleniumHost)** start named driver session using custom capabilities vs custom selenium URL.
+* **getDriver(String name, MutableCapabilities capabilities, String seleniumHost)** start named driver session using custom capabilities vs custom selenium URL.
 
 Example:
 ```
@@ -30,20 +30,19 @@ public void carinaCapsTest() {
     HomePage homePageFirefox = new HomePage(getDriver("firefox")); // return named "firefox" driver from the pool to init HomePage.
     homePageFirefox.open();
 
-    // Safari, Edge, Opera and IE default capabilities builder usage:
+    // Safari, Edge and Opera default capabilities builder usage:
     HomePage homePageSafari = new HomePage(getDriver("safari", new SafariCapabilities().getCapability("Safari Browser")));
     homePageSafari.open();
     
     getDriver("edge", new EdgeCapabilities().getCapability("Edge Browser"));
     getDriver("opera", new OperaCapabilities().getCapability("Opera Browser"));
-    getDriver("ie", new IECapabilities().getCapability("Internet Explorer Browser"));
-
 }
 
 @Test
-public void desiredCapsTest() {
-    // Manage DesiredCapabilities on your own to build complicated caps structure:
-    DesiredCapabilities capabilities = DesiredCapabilities.safari();
+public void mutableCapsTest() {
+    // Manage MutableCapabilities on your own to build complicated caps structure:
+    MutableCapabilities capabilities = new MutableCapabilities();
+    capabilities.setCapability(CapabilityType.BROWSER_NAME, Browser.SAFARI.browserName());
     capabilities.setCapability(CapabilityType.PLATFORM_NAME, SpecialKeywords.MAC);
 
     HomePage safariHomePage = new HomePage(getDriver("safari", capabilities));
@@ -98,18 +97,15 @@ chrome_mobile_emulation_opts=
 To provide complicated structures, use the advanced approach to build capabilities/options/arguments:
 ```
 public void someTest() {
-    FirefoxOptions options = new FirefoxOptions();
-    options.addArguments("--no-first-run");
-    options.addArguments("--disable-notifications");
+  FirefoxOptions options = new FirefoxOptions();
+  options.addArguments("--no-first-run");
+  options.addArguments("--disable-notifications");
+  options.setPlatformName(SpecialKeywords.MAC);
 
-    DesiredCapabilities capabilities = DesiredCapabilities.firefox();
-    capabilities.setCapability(CapabilityType.PLATFORM_NAME, SpecialKeywords.MAC);
-    capabilities.setCapability(FirefoxOptions.FIREFOX_OPTIONS, options);
+  HomePage homePage = new HomePage(getDriver("firefox", options));
+  homePage.open();
 
-    HomePage homePage = new HomePage(getDriver("firefox", capabilities));
-    homePage.open();
-
-    Assert.assertTrue(homePage.isPageOpened());
+  Assert.assertTrue(homePage.isPageOpened());
 }
 ```
 
@@ -178,7 +174,7 @@ The earliest stage you can start driver is `@BeforeSuite()`.
 
 **How to start different tests on different devices?**
 
-Start driver with custom DesiredCapabilities to launch on different devices. Also, you can use `CapabilitiesLoader` to manage capabilities at run-time:
+Start driver with custom MutableCapabilities to launch on different devices. Also, you can use `CapabilitiesLoader` to manage capabilities at run-time:
 
 ```
 // Update default capabilities globally to start future drivers **for all tests** on iPhone_12 

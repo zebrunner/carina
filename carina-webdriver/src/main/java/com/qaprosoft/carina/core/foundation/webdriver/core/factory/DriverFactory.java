@@ -16,14 +16,16 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory;
 
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.support.events.WebDriverEventListener;
+import org.openqa.selenium.support.events.EventFiringDecorator;
+import org.openqa.selenium.support.events.WebDriverListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,24 +34,27 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.DesktopFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.MacFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.MobileFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.WindowsFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.zebrunner.agent.core.webdriver.RemoteWebDriverFactory;
 
 /**
- * DriverFactory produces driver instance with desired capabilities according to
- * configuration.
+ * DriverFactory produces driver instance with capabilities according to configuration.
  *
  * @author Alexey Khursevich (hursevich@gmail.com)
  */
 public class DriverFactory {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-	public static WebDriver create(String testName, DesiredCapabilities capabilities, String seleniumHost) {
+    // class have only static methods, so constructor should be hidden
+    private DriverFactory() {
+    }
+
+    public static WebDriver create(String testName, MutableCapabilities capabilities, String seleniumHost) {
 		LOGGER.debug("DriverFactory start...");
-		AbstractFactory factory;
+        AbstractFactory factory = null;
 
         URL seleniumUrl = RemoteWebDriverFactory.getSeleniumHubUrl();
         if (seleniumUrl != null) {
@@ -71,48 +76,56 @@ public class DriverFactory {
             factory = new WindowsFactory();
             break;
 
+        case SpecialKeywords.MAC:
+            factory = new MacFactory();
+            break;
+
 		default:
 			throw new RuntimeException("Unsupported driver_type: " + driverType);
-		}
+        }
 
-		LOGGER.info("Starting driver session...");
-		WebDriver driver = factory.create(testName, capabilities, seleniumHost);
-        driver = factory.registerListeners(driver, getEventListeners());
+        LOGGER.info("Starting driver session...");
+        WebDriver driver = factory.create(testName, capabilities, seleniumHost);
+        driver = new EventFiringDecorator<WebDriver>(getEventListeners(driver))
+                .decorate(driver);
         LOGGER.info("Driver session started.");
-		LOGGER.debug("DriverFactory finish...");
+        LOGGER.debug("DriverFactory finish...");
 
-		return driver;
-	}
-	
-	   /**
-     * Reads 'driver_event_listeners' configuration property and initializes
-     * appropriate array of driver event listeners.
-     * 
-     * @return array of driver listeners
+        return driver;
+    }
+
+    /**
+     * Reads 'driver_event_listeners' configuration property and initializes appropriate array of driver event listeners.
+     *
+     * @return list of driver listeners (default listener plus custom listeners)
      */
-    private static WebDriverEventListener[] getEventListeners() {
-        List<WebDriverEventListener> listeners = new ArrayList<>();
-        try {
-            //explicitly add default carina com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener
-            DriverListener driverListener = new DriverListener();
-            listeners.add(driverListener);
+    private static WebDriverListener[] getEventListeners(WebDriver driver) {
+        List<WebDriverListener> listeners = new ArrayList<>();
 
-            String listenerClasses = Configuration.get(Parameter.DRIVER_EVENT_LISTENERS);
-            if (!StringUtils.isEmpty(listenerClasses)) {
-                for (String listenerClass : listenerClasses.split(",")) {
+        // explicitly add default carina com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener
+        DriverListener driverListener = new DriverListener(driver);
+        listeners.add(driverListener);
+
+        String listenerClasses = Configuration.get(Parameter.DRIVER_EVENT_LISTENERS);
+
+        if (!StringUtils.isEmpty(listenerClasses)) {
+            for (String listenerClass : listenerClasses.split(",")) {
+                try {
                     Class<?> clazz = Class.forName(listenerClass);
-                    if (WebDriverEventListener.class.isAssignableFrom(clazz)) {
-                        WebDriverEventListener listener = (WebDriverEventListener) clazz.newInstance();
+                    if (WebDriverListener.class.isAssignableFrom(clazz)) {
+                        WebDriverListener listener = (WebDriverListener) clazz.getDeclaredConstructor().newInstance();
                         listeners.add(listener);
-                        LOGGER.debug("Webdriver event listener registered: " + clazz.getName());
+                        LOGGER.debug("Webdriver event listener registered: {}", clazz.getName());
                     }
+                } catch (ClassNotFoundException e) {
+                    LOGGER.error("Unable to register '{}' webdriver event listener! Class was not found", listenerClass, e);
+
+                } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
+                    LOGGER.error("Unable to register '{}' webdriver event listener! Please, investigate stacktrace!", listenerClass, e);
                 }
             }
-            
-        } catch (Exception e) {
-            LOGGER.error("Unable to register webdriver event listeners!", e);
         }
-        return listeners.toArray(new WebDriverEventListener[listeners.size()]);
+        return listeners.toArray(new WebDriverListener[0]);
     }
 
 }

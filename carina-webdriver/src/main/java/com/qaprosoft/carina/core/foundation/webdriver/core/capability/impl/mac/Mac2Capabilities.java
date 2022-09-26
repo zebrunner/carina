@@ -13,10 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.browsermobproxy.rewrite;
+package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mac;
 
-public enum HeaderMethod {
-    
-    ADD, UPDATE, REMOVE;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
+import io.appium.java_client.mac.options.Mac2Options;
+
+public class Mac2Capabilities extends AbstractCapabilities<Mac2Options> {
+
+    @Override
+    public Mac2Options getCapability(String testName) {
+        Mac2Options capabilities = new Mac2Options();
+        initCapabilities(capabilities);
+        return capabilities;
+    }
 }

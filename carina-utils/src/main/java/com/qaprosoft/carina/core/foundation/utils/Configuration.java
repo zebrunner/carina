@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.MutableCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,13 +83,13 @@ public class Configuration {
         
         NO_PROXY("no_proxy"),
 
-        BROWSERMOB_PROXY("browsermob_proxy"),
+        BROWSERUP_PROXY("browserup_proxy"),
 
-        BROWSERMOB_PORT("browsermob_port"),
+        BROWSERUP_PORT("browserup_port"),
 
-        BROWSERMOB_PORTS_RANGE("browsermob_ports_range"),
+        BROWSERUP_PORTS_RANGE("browserup_ports_range"),
 
-        BROWSERMOB_MITM("browsermob_disabled_mitm"),
+        BROWSERUP_MITM("browserup_disabled_mitm"),
 
         PROXY_SET_TO_SYSTEM("proxy_set_to_system"),
 
@@ -207,8 +207,12 @@ public class Configuration {
         ASSIGNEE("assignee"),
         
         // sha1
-        GIT_HASH("git_hash");
-        
+        GIT_HASH("git_hash"),
+
+        LANGUAGE("language"),
+
+        W3C("w3c");
+
         private final String key;
 
         Parameter(String key) {
@@ -223,10 +227,9 @@ public class Configuration {
     /**
      * Returns configuration value from startup properties or from configuration
      * file if not found in startup args.
-     * 
-     * @param param
-     *            - parameter key.
-     * @return parameter value if it is found by key or default value if not.
+     *
+     * @param param parameter key.
+     * @return The parameter value if it is found by key, or "" if not
      */
     public static String get(Parameter param) {
         String value = R.CONFIG.get(param.getKey());
@@ -327,16 +330,16 @@ public class Configuration {
      * @return String platform name
      */
     public static String getPlatform() {
-        return getPlatform(new DesiredCapabilities());
+        return getPlatform(new MutableCapabilities());
     }
 
     /**
-     * Get platform name from configuration properties or DesiredCapabilities.
-     * @param caps
-     *            DesiredCapabilities
+     * Get platform name from configuration properties or MutableCapabilities.
+     * 
+     * @param caps MutableCapabilities
      * @return String platform name
      */
-    public static String getPlatform(DesiredCapabilities caps) {
+    public static String getPlatform(MutableCapabilities caps) {
         // any platform by default
         String platform = "*";
         
@@ -367,10 +370,10 @@ public class Configuration {
     }
     
     public static String getPlatformVersion() {
-        return getPlatformVersion(new DesiredCapabilities());
+        return getPlatformVersion(new MutableCapabilities());
     }
     
-    public static String getPlatformVersion(DesiredCapabilities caps) {
+    public static String getPlatformVersion(MutableCapabilities caps) {
         // default "os_version=value" should be used to determine current platform
         String platformVersion = "";
 
@@ -395,8 +398,14 @@ public class Configuration {
         return platformVersion;
     }
 
+    /**
+     * Takes browserName from browser configuration parameter - see {{@link Configuration.Parameter}} or
+     * capabilities.browserName (priority)
+     * 
+     * @return browser name
+     */
     public static String getBrowser() {
-        String browser = "";
+        String browser = StringUtils.EMPTY;
         if (!Configuration.get(Parameter.BROWSER).isEmpty()) {
             // default "browser=value" should be used to determine current browser
             browser = Configuration.get(Parameter.BROWSER);
@@ -420,37 +429,66 @@ public class Configuration {
         return browserVersion;
     }
 
+    /**
+     * Returns driver type depends on platform and browser
+     * 
+     * @return driver type
+     */
     public static String getDriverType() {
 
         String platform = getPlatform();
-        if (platform.equalsIgnoreCase(SpecialKeywords.ANDROID) || platform.equalsIgnoreCase(SpecialKeywords.IOS) || platform.equalsIgnoreCase(SpecialKeywords.TVOS)) {
+        String browserName = Configuration.getBrowser();
+
+        if (platform.equalsIgnoreCase(SpecialKeywords.ANDROID) ||
+                platform.equalsIgnoreCase(SpecialKeywords.IOS) ||
+                platform.equalsIgnoreCase(SpecialKeywords.TVOS)) {
             return SpecialKeywords.MOBILE;
+        }
+
+        if (!StringUtils.isEmpty(browserName)) {
+            return SpecialKeywords.DESKTOP;
         }
         
         if (SpecialKeywords.WINDOWS.equalsIgnoreCase(platform)) {
             return SpecialKeywords.WINDOWS;
         }
 
+        if (SpecialKeywords.MAC.equalsIgnoreCase(platform)) {
+            return SpecialKeywords.MAC;
+        }
+
+        // todo this method should not returns default values as desktop
         return SpecialKeywords.DESKTOP;
     }
 
-    public static String getDriverType(DesiredCapabilities capabilities) {
+    public static String getDriverType(MutableCapabilities capabilities) {
         if (capabilities == null) {
             // calculate driver type based on config.properties arguments
             return getDriverType();
         }
 
-        String platform = "";
+        String platform = StringUtils.EMPTY;
+        String browserName = getBrowser();
         if (capabilities.getCapability("platformName") != null) {
             platform = capabilities.getCapability("platformName").toString();
         }
 
-        if (SpecialKeywords.ANDROID.equalsIgnoreCase(platform) || SpecialKeywords.IOS.equalsIgnoreCase(platform) || SpecialKeywords.TVOS.equalsIgnoreCase(platform)) {
+        if (SpecialKeywords.ANDROID.equalsIgnoreCase(platform) ||
+                SpecialKeywords.IOS.equalsIgnoreCase(platform) ||
+                SpecialKeywords.TVOS.equalsIgnoreCase(platform)) {
             return SpecialKeywords.MOBILE;
         }
-        
+
+        if (!StringUtils.isEmpty(browserName)) {
+            return SpecialKeywords.DESKTOP;
+        }
+
         if (SpecialKeywords.WINDOWS.equalsIgnoreCase(platform)) {
             return SpecialKeywords.WINDOWS;
+        }
+
+        if (SpecialKeywords.MAC.equalsIgnoreCase(platform)) {
+            return SpecialKeywords.MAC;
         }
 
         // handle use-case when we provide only uuid object among desired capabilities
@@ -459,6 +497,7 @@ public class Configuration {
             return SpecialKeywords.MOBILE;
         }
 
+        // todo this method should not returns default values as desktop
         return SpecialKeywords.DESKTOP;
     }
 

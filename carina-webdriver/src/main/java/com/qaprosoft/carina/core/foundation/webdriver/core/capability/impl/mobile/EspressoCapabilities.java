@@ -13,18 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.windows;
+package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile;
 
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
-import io.appium.java_client.windows.options.WindowsOptions;
+import io.appium.java_client.android.options.EspressoOptions;
 
-public class WindowsCapabilities extends AbstractCapabilities<WindowsOptions> {
+public class EspressoCapabilities extends AbstractCapabilities<EspressoOptions> {
 
     @Override
-    public WindowsOptions getCapability(String testName) {
-        WindowsOptions capabilities = new WindowsOptions();
+    public EspressoOptions getCapability(String testName) {
+        EspressoOptions capabilities = new EspressoOptions();
+        // this step should be executed before initCapabilities() to be able to override this capabilities by default appium approach.
+        setLocaleAndLanguage(capabilities);
+        // add capabilities based on dynamic _config.properties variables
         initCapabilities(capabilities);
         return capabilities;
-    }    
+    }
 }

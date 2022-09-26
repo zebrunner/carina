@@ -15,7 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver;
 
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -60,7 +60,7 @@ import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.json.JsonException;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.openqa.selenium.support.decorators.Decorated;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
@@ -77,6 +77,7 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.LogicUtils;
 import com.qaprosoft.carina.core.foundation.utils.Messager;
+import com.qaprosoft.carina.core.foundation.utils.android.AndroidService;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
@@ -151,24 +152,29 @@ public class DriverHelper {
         final String decryptedURL = getEnvArgURL(cryptoTool.decryptByPattern(url, CRYPTO_PATTERN));
         this.pageURL = decryptedURL;
         WebDriver drv = getDriver();
-        
+
         setPageLoadTimeout(drv, timeout);
         DriverListener.setMessages(Messager.OPENED_URL.getMessage(url), Messager.NOT_OPENED_URL.getMessage(url));
-        
+
         // [VD] there is no sense to use fluent wait here as selenium just don't return something until page is ready!
         // explicitly limit time for the openURL operation
         try {
             Messager.OPENING_URL.info(url);
-            drv.get(decryptedURL);
+            if (SpecialKeywords.MOBILE.equals(Configuration.getDriverType()) &&
+                    SpecialKeywords.ANDROID.equalsIgnoreCase(Configuration.getPlatform())) {
+                new AndroidService().openURL(url);
+            } else {
+                drv.get(decryptedURL);
+            }
         } catch (UnhandledAlertException e) {
             drv.switchTo().alert().accept();
         } catch (TimeoutException e) {
-            trigger("window.stop();"); //try to cancel page loading
+            trigger("window.stop();"); // try to cancel page loading
             Assert.fail("Unable to open url during " + timeout + "sec!");
         } catch (Exception e) {
             Assert.fail("Undefined error on open url detected: " + e.getMessage(), e);
         } finally {
-            //restore default pageLoadTimeout driver timeout
+            // restore default pageLoadTimeout driver timeout
             setPageLoadTimeout(drv, getPageLoadTimeout());
             LOGGER.debug("finished driver.get call.");
         }
@@ -678,13 +684,13 @@ public class DriverHelper {
 
     private String getSelenoidClipboardUrl(WebDriver driver) {
         String seleniumHost = Configuration.getSeleniumUrl().replace("wd/hub", "clipboard/");
-        if (seleniumHost.isEmpty()){
+        if (seleniumHost.isEmpty()) {
             seleniumHost = Configuration.getEnvArg(Parameter.URL.getKey()).replace("wd/hub", "clipboard/");
         }
-        WebDriver drv = (driver instanceof EventFiringWebDriver) ? ((EventFiringWebDriver) driver).getWrappedDriver() : driver;
+        WebDriver drv = (driver instanceof Decorated<?>) ? (WebDriver) ((Decorated<?>) driver).getOriginal() : driver;
         String sessionId = ((RemoteWebDriver) drv).getSessionId().toString();
         String url = seleniumHost + sessionId;
-        LOGGER.debug("url: " + url);
+        LOGGER.debug("url: {}", url);
         return url;
     }
 
@@ -958,8 +964,9 @@ public class DriverHelper {
      */
     public void acceptAlert() {
         WebDriver drv = getDriver();
+
         long retryInterval = getRetryInterval(EXPLICIT_TIMEOUT);
-        Wait<WebDriver> wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, retryInterval);
+        Wait<WebDriver> wait = new WebDriverWait(drv, Duration.ofSeconds(EXPLICIT_TIMEOUT), Duration.ofMillis(retryInterval));
         try {
             wait.until((Function<WebDriver, Object>) dr -> isAlertPresent());
             drv.switchTo().alert().accept();
@@ -975,7 +982,7 @@ public class DriverHelper {
     public void cancelAlert() {
         WebDriver drv = getDriver();
         long retryInterval = getRetryInterval(EXPLICIT_TIMEOUT);
-        Wait<WebDriver> wait = new WebDriverWait(drv, EXPLICIT_TIMEOUT, retryInterval);
+        Wait<WebDriver> wait = new WebDriverWait(drv, Duration.ofSeconds(EXPLICIT_TIMEOUT), Duration.ofMillis(retryInterval));
         try {
             wait.until((Function<WebDriver, Object>) dr -> isAlertPresent());
             drv.switchTo().alert().dismiss();
@@ -1009,9 +1016,9 @@ public class DriverHelper {
     public boolean isPageOpened(final AbstractPage page, long timeout) {
         boolean result;
         final WebDriver drv = getDriver();
-        
-        long retryInterval = getRetryInterval(timeout);        
-        Wait<WebDriver> wait = new WebDriverWait(drv, timeout, retryInterval);
+
+        long retryInterval = getRetryInterval(timeout);
+        Wait<WebDriver> wait = new WebDriverWait(drv, Duration.ofSeconds(timeout), Duration.ofMillis(retryInterval));
         try {
             wait.until((Function<WebDriver, Object>) dr -> LogicUtils.isURLEqual(page.getPageURL(), drv.getCurrentUrl()));
             result = true;
@@ -1176,7 +1183,7 @@ public class DriverHelper {
     		return null;
     	}
 
-    	return new ExtendedWebElement(by, name, getDriver(), getDriver());
+        return new ExtendedWebElement(by, name, getDriver(), getDriver());
     }
 
     /**
@@ -1254,9 +1261,8 @@ public class DriverHelper {
 		boolean result;
         long startMillis = 0;
 		final WebDriver drv = getDriver();
-		
-		long retryInterval = getRetryInterval(timeout);
-		Wait<WebDriver> wait = new WebDriverWait(drv, timeout, retryInterval);
+        long retryInterval = getRetryInterval(timeout);
+        Wait<WebDriver> wait = new WebDriverWait(drv, Duration.ofSeconds(timeout), Duration.ofMillis(retryInterval));
 		try {
 		    startMillis = System.currentTimeMillis();
 			wait.until(condition);
@@ -1309,27 +1315,28 @@ public class DriverHelper {
         }
         return url;
     }
-    
+
     private static void setPageLoadTimeout(WebDriver drv, long timeout) {
         try {
-            drv.manage().timeouts().pageLoadTimeout(timeout, TimeUnit.SECONDS);
+            drv.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(timeout));
         } catch (UnsupportedCommandException e) {
-            //TODO: review upcoming appium 2.0 changes
+            // TODO: review upcoming appium 2.0 changes
             LOGGER.debug("Appium: Not implemented yet for pageLoad timeout!");
+        } catch (WebDriverException e) {
+            LOGGER.debug("Appium: Not implemented yet for pageLoad timeout!", e);
         }
-        
+
     }
 
-    
     private long getPageLoadTimeout() {
         long timeout = 300;
         // #1705: limit pageLoadTimeout driver timeout by idleTimeout
-//        if (!R.CONFIG.get("capabilities.idleTimeout").isEmpty()) {
-//            long idleTimeout = R.CONFIG.getLong("capabilities.idleTimeout");
-//            if (idleTimeout < timeout) {
-//                timeout = idleTimeout;
-//            }
-//        }
+        // if (!R.CONFIG.get("capabilities.idleTimeout").isEmpty()) {
+        // long idleTimeout = R.CONFIG.getLong("capabilities.idleTimeout");
+        // if (idleTimeout < timeout) {
+        // timeout = idleTimeout;
+        // }
+        // }
         return timeout;
     }
 
