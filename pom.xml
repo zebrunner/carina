@@ -64,7 +64,7 @@
         <selenium.version>4.4.0</selenium.version>
         <appium.version>8.1.1</appium.version>
         <!-- Zebrunner integrations -->
-        <zebrunner-testng-pluggable.version>1.8.0.312-SNAPSHOT</zebrunner-testng-pluggable.version>
+        <zebrunner-testng-pluggable.version>1.8.0</zebrunner-testng-pluggable.version>
         <!-- Others -->
         <azure-storage-blob.version>12.7.0</azure-storage-blob.version>
         <aws-java-sdk.version>1.11.923</aws-java-sdk.version>
@@ -99,7 +99,7 @@
         <module>carina-core</module>
         <module>carina-azure</module>
     </modules>
-    <repositories>
+    <!--repositories>
         <repository>
             <id>zebrunner_snapshots</id>
             <name>zebrunner Snapshots</name>
@@ -111,7 +111,7 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-    </repositories>
+    </repositories-->
     <profiles>
         <profile>
             <id>default</id>
