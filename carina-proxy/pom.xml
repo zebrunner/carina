@@ -44,7 +44,7 @@
 			<artifactId>browserup-proxy-core</artifactId>
 			<version>2.1.2</version>
 			<exclusions>
-				<!-- We have an error if we do not exclude netty-codec -->
+				<!-- 4.1.50.Final netty-codec is too old -->
 				<exclusion>
 					<groupId>io.netty</groupId>
 					<artifactId>netty-codec</artifactId>
