@@ -89,6 +89,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.screenshot.AutoScreenshotR
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
 import com.zebrunner.agent.core.registrar.Artifact;
 import com.zebrunner.agent.core.registrar.CurrentTest;
+import com.zebrunner.agent.core.registrar.CurrentTestRun;
 import com.zebrunner.agent.core.registrar.Label;
 import com.zebrunner.agent.core.registrar.TestRail;
 import com.zebrunner.agent.core.registrar.label.CompositeLabelResolver;
@@ -182,10 +183,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         updateAppPath();
         
         setThreadCount(suite);
-        
+
         if (Configuration.getPlatform().equalsIgnoreCase(SpecialKeywords.API)) {
-        //TODO: investigate this possible problem.
-           // CurrentTestRun.setPlatform(SpecialKeywords.API);
+            CurrentTestRun.setPlatform(SpecialKeywords.API);
         }
 
         String mobileApp = Configuration.getMobileApp();
