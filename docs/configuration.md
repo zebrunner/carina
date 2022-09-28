@@ -256,6 +256,11 @@ All the project configuration properties are located in a **_config.properties**
 		<td>Path to a directory with tls secure keys</td>
 		<td>./tls/keysecure</td>
 	</tr>
+    <tr>
+		<td>w3c</td>
+		<td>Enable capabilities processing according to w3c.**Default: false**</td>
+		<td>false</td>
+	</tr>
 </table>
 Most of the properties may be read in the following way:
 

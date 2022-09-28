@@ -63,7 +63,23 @@ capabilities.app=https://qaprosoft.s3-us-west-2.amazonaws.com/carinademoexample.
 capabilities.newCommandTimeout=180
 ```
 
-Visit [Selenium](https://www.selenium.dev/documentation/legacy/desired_capabilities/) or [Appium](https://appium.io/docs/en/writing-running-appium/caps/) to see all capabilities.
+Visit these resources to see all capabilities:
+- [Selenium](https://w3c.github.io/webdriver/#capabilities)
+- [Appium - XCUITest](https://github.com/appium/appium-xcuitest-driver#capabilities)
+- [Appium - UiAutomator2](https://github.com/appium/appium-uiautomator2-driver#capabilities)
+- [Appium - Espresso](https://github.com/appium/appium-espresso-driver#capabilities)
+- [Appium - Gecko](https://github.com/appium/appium-geckodriver#usage)
+- [Appium - Safari](https://github.com/appium/appium-safari-driver#usage)
+- [Appium - Windows](https://github.com/appium/appium-windows-driver#usage)
+
+You can also look at outdated list of capabilities:
+- [Selenium](https://www.selenium.dev/documentation/legacy/desired_capabilities/)
+- [Appium](https://appium.io/docs/en/writing-running-appium/caps/)
+
+**Important**: capabilities should not be added to the configuration file with the `appium:` prefix!
+If you want the capabilities to be handled according to w3c, set the value of the w3c parameter in the config file to true.
+Also, if you use w3c mode, and at the same time use the capabilities specific to the service where you 
+run the tests, add `capabilities.provider` to the config file, for example `capabilities.provider=zebrunner`.
 
 The most popular capabilities sets can be declared in properties files and reused via `custom_capabilities` configuration parameter.
 It can be convenient for external hub providers like Zebrunner Device Farm, BrowserStack, Sauce Labs, etc.
