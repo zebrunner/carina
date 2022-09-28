@@ -15,7 +15,7 @@
     
     
       
-        <title>Program flow - Carina</title>
+        <title>Mobile - Carina</title>
       
     
     
@@ -55,7 +55,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#faq" class="md-skip">
+        <a href="#mobile" class="md-skip">
           Skip to content
         </a>
       
@@ -82,7 +82,7 @@
           </span>
           <span class="md-header-nav__topic md-ellipsis">
             
-              Program flow
+              Mobile
             
           </span>
         </div>
@@ -317,12 +317,10 @@
       
       
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+  <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-7" type="checkbox" id="nav-7" checked>
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-7" type="checkbox" id="nav-7">
     
     <label class="md-nav__link" for="nav-7">
       Advanced
@@ -392,49 +390,11 @@
           
           
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="__toc">
-        Program flow
-        <span class="md-nav__icon md-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9h14V7H3v2m0 4h14v-2H3v2m0 4h14v-2H3v2m16 0h2v-2h-2v2m0-10v2h2V7h-2m0 6h2v-2h-2v2z"/></svg>
-        </span>
-      </label>
-    
-    <a href="./" title="Program flow" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../program_flow/" title="Program flow" class="md-nav__link">
       Program flow
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
-      </span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#faq" class="md-nav__link">
-    FAQ
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-    
   </li>
 
         
@@ -569,9 +529,49 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#faq" class="md-nav__link">
-    FAQ
+  <a href="#mobile" class="md-nav__link">
+    Mobile
   </a>
+  
+    <nav class="md-nav" aria-label="Mobile">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#run-one-test-on-android-and-ios-in-parallel" class="md-nav__link">
+    Run one test on android and ios in parallel
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run-tests-on-tvos-androidtv" class="md-nav__link">
+    Run tests on tvOS, AndroidTV
+  </a>
+  
+    <nav class="md-nav" aria-label="Run tests on tvOS, AndroidTV">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#run-tests-on-tvos" class="md-nav__link">
+    Run tests on tvOS
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run-tests-on-androidtv" class="md-nav__link">
+    Run tests on AndroidTV
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -587,7 +587,7 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/zebrunner/carina/edit/master/docs/advanced/program_flow.md" title="Edit this page" class="md-content__button md-icon">
+                  <a href="https://github.com/zebrunner/carina/edit/master/docs/advanced/mobile.md" title="Edit this page" class="md-content__button md-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
                   </a>
                 
@@ -595,143 +595,78 @@
                   
                 
                 
-                  <h1>Program flow</h1>
+                  <h1>Mobile</h1>
                 
-                <p>Under the hood, Carina uses TestNG framework, so the first class to initialize is <code>RemoteTestNGStarter</code> class. Program lifecycle logic can be observed at <code>TestNG</code> <a href="https://github.com/cbeust/testng/blob/c394d371224b7d1aa3872c34c1f7818e2b9335f9/testng-core/src/main/java/org/testng/TestNG.java#L1058">run()</a> method.</p>
-<p>The initializing turn comes to Carina when <a href="https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListenerChain.java">CarinaListenerChain</a> object is created.
-It extends <a href="http://javadox.com/com.nordstrom.tools/testng-foundation/1.10.0/com/nordstrom/automation/testng/package-summary.html">ListenerChain</a>
-which will create, sort and attach <a href="https://github.com/zebrunner/carina/blob/60bea823c0921cb808e4c68eb6c056710a72b847/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/IAbstractTest.java#L49">IAbstractTest</a> listeners <code>CarinaListener.class, TestRunListener.class, FilterTestsListener.class</code>. This whole sequence is described in <code>TestRunner</code> <a href="https://github.com/cbeust/testng/blob/c394d371224b7d1aa3872c34c1f7818e2b9335f9/testng-core/src/main/java/org/testng/TestRunner.java#L229">init()</a> method.</p>
-<p>These listeners are being attached and created when transform(IListenersAnnotation annotation, Class testClass) method is called.</p>
-<ul>
-<li>
-<p><a href="https://github.com/zebrunner/carina/blob/1202f5f7a660e53ab463548dd111682b310be261/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/FilterTestsListener.java#L33">FilterTestsListener</a> which is resposible for tets execution <a href="https://zebrunner.github.io/carina/configuration/#tests-execution-filter-configuration">rules</a></p>
-</li>
-<li>
-<p><code>TestRunListener</code> which is implemented in the Zebrunner agent. </p>
-</li>
-<li>
-<p><a href="https://github.com/zebrunner/carina/blob/1202f5f7a660e53ab463548dd111682b310be261/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListener.java#L105">CarinaListener</a> which is the main Carina TestNG listener.</p>
-</li>
-</ul>
-<p>Because CarinaListener object is created, the class static field is initialized in it. There are several important steps inside:</p>
-<ul>
-<li>R.reinit(). This method loads default values for all parameters from <a href="https://github.com/zebrunner/carina/blob/master/carina-core/src/main/resources">carina-core</a>, then overrides them with user's configurations (_api.properties, _config.properties, _testdata.properties, _email.properties, _report.properties, _database.properties).</li>
-<li>Configure log4j2x properties </li>
-<li>Initialize L10N feature.</li>
-</ul>
-<p>Then standard listeners according to their implementations in TestNG:</p>
-<p><img alt="Report link" src="../../img/debug_entry_point1.png" /></p>
-<p>Then overridden TestNG methods</p>
-<ul>
-<li>
-<p><code>FilterTestsListener-&gt;onStart(ISuite suite)</code></p>
-</li>
-<li>
-<p><code>TestRunListener-&gt;onStart(ISuite suite)</code></p>
-</li>
-<li>
-<p><code>CarinaListener-&gt;onStart(ISuite suite)</code></p>
-</li>
-<li>
-<p>Now your test class is considered initialized and <code>onStart(ITestContext testContext)</code> method is called.</p>
-</li>
-<li>
-<p><code>onBeforeClass(ITestClass testClass)</code>. Complete the steps described in <code>@BeforeClass</code> annotation from your test.</p>
-</li>
-<li>
-<p><code>onTestStart(ITestResult result)</code> provides described data to test.</p>
-</li>
-</ul>
-<p>Next, <code>TestRunner.class</code> runs code described in your test class. The following route depends on what you are doing in your test:</p>
-<p><strong>UI (web, mobile)</strong></p>
-<pre><code>@Test @MethodOwner()
-public void webTest() {
-   HomePage chromeHomePage = new HomePage(getDriver());
-   chromeHomePage.open();
-   Assert.assertTrue(chromeHomePage.isPageOpened(), &quot;Chrome home page is not opened!&quot;); 
-} 
-</code></pre>
-
-<p>Debug entry point at : <a href="https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/gui/AbstractPage.java">AbstractPage</a> constructor and <a href="https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/webdriver/IDriverPool.java">IDriverPool</a> getDriver() method.</p>
-<p><strong>API</strong></p>
-<pre><code>@Test()
-public void testCreateUser() throws Exception {
-   PostUserMethod api = new PostUserMethod();
-   api.expectResponseStatus(HttpResponseStatusType.CREATED_201);
-   api.callAPI();
-   api.validateResponse();
+                <h2 id="mobile">Mobile</h2>
+<h3 id="run-one-test-on-android-and-ios-in-parallel">Run one test on android and ios in parallel</h3>
+<p>To run tests on multiple devices, including different platforms, you can use a data provider. For example, you can create a data provider like:</p>
+<pre><code>@DataProvider(parallel = true, name = &quot;capabilitiesDataProvider&quot;)
+public static Object[][] capabilitiesDataProvider() {
+    return new Object[][] {
+        { &quot;Samsung Galaxy M52 5G&quot;, &quot;Android&quot;, &quot;https://qaprosoft.s3-us-west-2.amazonaws.com/carinademoexample.apk&quot; },
+        { &quot;iPhone 8 Plus&quot;, &quot;iOS&quot;, &quot;https://qaprosoft.s3-us-west-2.amazonaws.com/carinademoexample.zip&quot; }
+    };
 }
 </code></pre>
 
-<p>Debug entry point at : <a href="https://github.com/zebrunner/carina/blob/master/carina-api/src/main/java/com/qaprosoft/carina/core/foundation/api/AbstractApiMethodV2.java">AbstractApiMethodV2</a> constructor.</p>
-<p><strong>Database</strong></p>
-<pre><code>@Test
-public void createUser() {
+<p>and the test that this data provider uses:</p>
+<pre><code>@Test(dataProvider = &quot;capabilitiesDataProvider&quot;)
+public void testLoginUser(String deviceName, String platformName, String app) {
+    R.CONFIG.put(&quot;capabilities.deviceName&quot;, deviceName, true);
+    R.CONFIG.put(&quot;capabilities.platformName&quot;, platformName, true);
+    R.CONFIG.put(&quot;capabilities.app&quot;, app, true);
 
-   User USER = new User() {{
-                     setUsername(&quot;bmarley&quot;);
-                     setFirstName(&quot;Bob&quot;);
-                     setLastName(&quot;Marley&quot;);
-                     setStatus(Status.ACTIVE);
-   }};
-
-   try (SqlSession session = ConnectionFactory.getSqlSessionFactory().openSession(true)) {
-     UserMapper userMapper = session.getMapper(UserMapper.class);
-     userMapper.create(USER);
-     checkUser(userMapper.findById(USER.getId()));
-   }
+    WelcomePageBase welcomePage = initPage(getDriver(), WelcomePageBase.class);
+    Assert.assertTrue(welcomePage.isPageOpened(), &quot;Welcome page isn't opened&quot;);
+    ...
 }
 </code></pre>
 
-<p>These are user's classes, samples at carina-demo: <a href="https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/mappers/UserMapper.java">UserMapper</a>, <a href="https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/ConnectionFactory.java">ConnectionFactory</a>, <a href="https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/models/User.java">User</a>.</p>
-<h3 id="faq">FAQ</h3>
-<p><strong>Dependent vs. independent tests. Which approach is better?</strong></p>
-<p>Try to develop fully independent tests to reuse all the benefits of the multi-threading execution. For example, <a href="https://zebrunner.com/">Zebrunner Selenium Grid</a> provides <strong>1000 threads</strong> as default limitation and allows to execute your full regression scenarios in minutes!
-Use dependent methods via <code>dependsOnMethods</code> Test Annotation only if it is really required by Test logic. Carina will preserve all drivers for dependent methods so you can start a driver in one method and proceed with the page in another.</p>
-<pre><code>public class WebSampleSingleDriver implements IAbstractTest {
-    HomePage homePage = null;
-    CompareModelsPage comparePage = null;
-    List&lt;ModelSpecs&gt; specs = new ArrayList&lt;&gt;();
+<p>Thus, you can throw up any capability, capabilities will also be taken from the config file.</p>
+<p>In the TestNG xml suite file, do not forget to specify the number of parallel streams for the data provider <code>data-provider-thread-count</code>, 
+for example:</p>
+<pre><code>&lt;suite name=&quot;Carina Demo Tests - Mobile Sample (Android)&quot; verbose=&quot;1&quot; parallel=&quot;methods&quot; data-provider-thread-count=&quot;5&quot;&gt;
 
-    @BeforeSuite
-    public void startDriver() {
-        // Open GSM Arena home page and verify page is opened
-        homePage = new HomePage(getDriver());
-    }
+</code></pre>
 
-    @Test
-    public void testOpenPage() {
-        homePage.open();
-        Assert.assertTrue(homePage.isPageOpened(), &quot;Home page is not opened&quot;);
-    }
-
-    @Test(dependsOnMethods=&quot;testOpenPage&quot;) //for dependent tests Carina keeps driver sessions by default
-    public void testOpenCompare() {
-        // Open GSM Arena home page and verify page is opened
-        // Open model compare page
-        FooterMenu footerMenu = homePage.getFooterMenu();
-        Assert.assertTrue(footerMenu.isUIObjectPresent(2), &quot;Footer menu wasn't found!&quot;);
-        comparePage = footerMenu.openComparePage();
-
-    }
-
-    @Test(dependsOnMethods=&quot;testOpenCompare&quot;) //for dependent tests Carina keeps driver sessions by default
-    public void testReadSpecs() {
-        // Compare 3 models
-        specs = comparePage.compareModels(&quot;Samsung Galaxy J3&quot;, &quot;Samsung Galaxy J5&quot;, &quot;Samsung Galaxy J7 Pro&quot;);
-    }
-
-    @Test(dependsOnMethods=&quot;testReadSpecs&quot;) //for dependent tests Carina keeps driver sessions by default
-    public void testCompareModels() {
-        // Verify model announced dates
-        SoftAssert() softAssert = new SoftAssert();
-        softAssert.assertEquals(specs.get(0).readSpec(SpecType.ANNOUNCED), &quot;2016, March 31&quot;);
-        softAssert.assertEquals(specs.get(1).readSpec(SpecType.ANNOUNCED), &quot;2015, June 19&quot;);
-        softAssert.assertEquals(specs.get(2).readSpec(SpecType.ANNOUNCED), &quot;2017, June&quot;);
-        softAssert.assertAll();
-    }
+<h3 id="run-tests-on-tvos-androidtv">Run tests on tvOS, AndroidTV</h3>
+<h4 id="run-tests-on-tvos">Run tests on tvOS</h4>
+<p>To run tests for <a href="https://developer.apple.com/tvos/">tvOS</a>, set the capability value of <code>platformName</code> to <code>tvOS</code> in <code>_config.properties</code>, for example:</p>
+<pre><code>capabilities.platformName=tvOS #here
+capabilities.platformVersion=12.2
+capabilities.deviceName=Apple TV
+capabilities.deviceType=tv # carina custom capability
+ ..
 }
 </code></pre>
+
+<p>TvOS provides remote controller based actions. Appium provides Buttons actions via mobile: pressButton. These are menu, up/down/left/right, home, 
+playpause and select. You can emulate these actions like this:</p>
+<pre><code>JavascriptExecutor driver = (JavascriptExecutor)getDriver();
+Map&lt;String, String&gt; commandHomeAttributes = ImmutableMap.of(&quot;name&quot;, &quot;Home&quot;));
+driver.executeScript(&quot;mobile: pressButton&quot;, commandHomeAttributes);
+Map&lt;String, String&gt; commandUpAttributes = ImmutableMap.of(&quot;name&quot;, &quot;Home&quot;));
+driver.executeScript(&quot;mobile: pressButton&quot;, commandUpAttributes);
+</code></pre>
+
+<p>Also, to emulate transitions between elements, you can use a simple click on the element you are looking for.</p>
+<p>For more info visit <a href="https://appium.io/docs/en/writing-running-appium/ios/ios-tvos/">tvOS appium support</a>.</p>
+<p>In the implementation of tests, the idea is the same as in <a href="https://zebrunner.github.io/carina/automation/mobile/">mobile-testing</a>.</p>
+<h4 id="run-tests-on-androidtv">Run tests on AndroidTV</h4>
+<p>To get started, enable <a href="https://developer.android.com/studio/debug/dev-options">developer options</a>. To connect to a device, you need to know at 
+least the Device Name, Platform Name, and Platform Version.
+You specify this data as a capabilities in <code>_config.properties</code>, for example:</p>
+<pre><code>capabilities.platformName=Android
+capabilities.platformVersion=11
+capabilities.deviceName=Redmi TV
+capabilities.deviceType=tv # carina custom capability
+...
+</code></pre>
+
+<p>When testing, you will simulate pressing buttons from the remote control. To do this, you can use the <strong>pressKeyboardKey</strong> method from
+<strong>IAndroidUtils</strong> with key event parameters <strong>AndroidKey.DPAD_UP</strong>, <strong>AndroidKey.DPAD_DOWN</strong>, <strong>AndroidKey.DPAD_LEFT</strong>, <strong>AndroidKey.DPAD_RIGHT</strong>,
+<strong>AndroidKey.DPAD_CENTER</strong> and other. For more info see <a href="https://developer.android.com/training/tv/start/controllers#tv-ui-events">TV UI events</a>.</p>
+<p>In the implementation of tests, the idea is the same as in <a href="https://zebrunner.github.io/carina/automation/mobile/">mobile-testing</a>.</p>
                 
               
               
@@ -746,41 +681,6 @@ Use dependent methods via <code>dependsOnMethods</code> Test Annotation only if 
       
         
 <footer class="md-footer">
-  
-    <div class="md-footer-nav">
-      <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
-        
-          <a href="../localization/" title="Localization" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
-            <div class="md-footer-nav__button md-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
-            </div>
-            <div class="md-footer-nav__title">
-              <div class="md-ellipsis">
-                <span class="md-footer-nav__direction">
-                  Previous
-                </span>
-                Localization
-              </div>
-            </div>
-          </a>
-        
-        
-          <a href="../proxy/" title="Proxy" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
-            <div class="md-footer-nav__title">
-              <div class="md-ellipsis">
-                <span class="md-footer-nav__direction">
-                  Next
-                </span>
-                Proxy
-              </div>
-            </div>
-            <div class="md-footer-nav__button md-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
-            </div>
-          </a>
-        
-      </nav>
-    </div>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
