@@ -22,6 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
@@ -83,6 +84,18 @@ public class MobileFactory extends AbstractFactory {
             capabilities = getCapabilities(name);
             capabilities.setCapability("udid", udid);
             LOGGER.debug("Appended udid to cpabilities: " + capabilities);
+        }
+
+        // #1839 Unable to start Chrome browser across Android 13 devices
+        if (SpecialKeywords.ANDROID.equalsIgnoreCase(Configuration.getPlatform(capabilities)) &&
+                Configuration.getPlatformVersion(capabilities).startsWith("13") &&
+                BrowserType.CHROME.equalsIgnoreCase(capabilities.getBrowserName())) {
+            LOGGER.warn("An attempt to launch chrome on android version 13 was detected. "
+                    + "Capabilities will be overwritten to correctly open the chrome browser");
+            capabilities.setBrowserName(null);
+            capabilities.setCapability("appPackage", "com.android.chrome");
+            capabilities.setCapability("appActivity", "com.google.android.apps.chrome.Main");
+            capabilities.setCapability("autoWebview", "true");
         }
 
         LOGGER.debug("capabilities: " + capabilities);
