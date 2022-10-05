@@ -18,9 +18,11 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -86,6 +88,7 @@ public class MobileFactory extends AbstractFactory {
             LOGGER.debug("Appended udid to cpabilities: " + capabilities);
         }
 
+        boolean isChromeAndroid13 = false;
         // #1839 Unable to start Chrome browser across Android 13 devices
         if (SpecialKeywords.ANDROID.equalsIgnoreCase(Configuration.getPlatform(capabilities)) &&
                 Configuration.getPlatformVersion(capabilities).startsWith("13") &&
@@ -94,17 +97,29 @@ public class MobileFactory extends AbstractFactory {
                     + "Capabilities will be overwritten to correctly open the chrome browser");
             capabilities.setBrowserName(null);
             capabilities.setCapability("appPackage", "com.android.chrome");
-            capabilities.setCapability("appActivity", "com.google.android.apps.chrome.Main");
-            capabilities.setCapability("autoWebview", "true");
+            capabilities.setCapability("appActivity", "com.google.android.apps.chrome.IntentDispatcher");
+            capabilities.setCapability("intentAction", "android.intent.action.VIEW " + Configuration.get(Parameter.URL));
+            capabilities.setCapability("intentCategory", "android.intent.category.DEFAULT");
+            isChromeAndroid13 = true;
         }
 
         LOGGER.debug("capabilities: " + capabilities);
 
         try {
             EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
-            
+
             if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
                 driver = new AndroidDriver<AndroidElement>(ce, capabilities);
+
+                if (isChromeAndroid13) {
+                    AndroidDriver ad = ((AndroidDriver<AndroidElement>) driver);
+                    Set<String> contextList = ad.getContextHandles();
+                    String webViewContext = contextList.stream()
+                            .filter(context -> context.contains("WEBVIEW"))
+                            .findFirst().orElse("WEBVIEW_chrome");
+                    CommonUtils.pause(3);
+                    ad.context(webViewContext);
+                }
             } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.IOS)
                     || mobilePlatformName.equalsIgnoreCase(SpecialKeywords.TVOS)) {
                 driver = new IOSDriver<IOSElement>(ce, capabilities);
