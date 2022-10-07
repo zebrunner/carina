@@ -42,6 +42,8 @@ import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.decorators.Decorated;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Wait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -349,6 +351,7 @@ public class Screenshot {
             if (driver.getClass().toString().contains("windows")) {
                 File screenshot = ((WindowsDriver) driver).getScreenshotAs(OutputType.FILE);
                 screenShot = ImageIO.read(screenshot);
+                // Appium driver and it's descendant classes contains 'java_client' in classname
             } else if (driver.getClass().toString().contains("java_client")) {
                 // Mobile Native app
                 File screenshot = ((AppiumDriver) driver).getScreenshotAs(OutputType.FILE);
@@ -411,21 +414,23 @@ public class Screenshot {
         BufferedImage screenShot = null;
         // default timeout for driver quit 1/3 of explicit
         long timeout = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / 3;
-        Duration defaultImplicitWaitTimeout = augmentedDriver.manage().timeouts().getImplicitWaitTimeout();
+        setPageLoadTimeout(augmentedDriver, timeout);
         try {
+            Wait<WebDriver> screenshotTakeWait = new FluentWait<>(augmentedDriver)
+                    .pollingEvery(Duration.ofSeconds(timeout))
+                    .withTimeout(Duration.ofSeconds(timeout));
+
             LOGGER.debug("starting screenshot capturing...");
-            augmentedDriver.manage()
-                    .timeouts()
-                    .implicitlyWait(Duration.ofSeconds(timeout));
-            screenShot = ImageIO.read(((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE));
+            File capturedScreenshot = screenshotTakeWait.until(driver -> ((TakesScreenshot) augmentedDriver)
+                    .getScreenshotAs(OutputType.FILE));
+            screenShot = ImageIO.read(capturedScreenshot);
         } catch (TimeoutException e) {
             LOGGER.warn("Unable to capture screenshot during {} sec!", timeout);
         } catch (Exception e) {
-            String message = "Undefined error on capture screenshot detected: " + e.getMessage();
-            LOGGER.error(message);
+            LOGGER.error("Undefined error on capture screenshot detected: {}", e.getMessage());
         } finally {
-            // restore default implicit wait driver timeout
-            augmentedDriver.manage().timeouts().implicitlyWait(defaultImplicitWaitTimeout);
+            // restore default pageLoadTimeout driver timeout
+            setPageLoadTimeout(augmentedDriver, getPageLoadTimeout());
             LOGGER.debug("finished screenshot call.");
         }
         return screenShot;
