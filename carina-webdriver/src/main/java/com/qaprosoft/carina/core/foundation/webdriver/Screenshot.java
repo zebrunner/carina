@@ -329,73 +329,75 @@ public class Screenshot {
     }
 
     /**
-     * Makes fullsize screenshot using javascript (May not work properly with
+     * Makes full size screenshot using javascript (May not work properly with
      * popups and active js-elements on the page)
      *
-     * @param driver
-     *            - webDriver.
-     * @param augmentedDriver
-     *            - webDriver.
-     * @exception Exception can be cause by read() or getScreenshotAs() methods
+     * @param driver web driver
+     * @param augmentedDriver augmented driver
+     * @exception Exception can be caused by read() or getScreenshotAs() methods
      *
-     * @return screenshot image
+     * @return a screenshot if it was produced successfully, or null otherwise
      */
     private static BufferedImage takeFullScreenshot(WebDriver driver, WebDriver augmentedDriver) {
         BufferedImage screenShot = null;
         // default timeout for full size screenshot is EXPLICIT_TIMEOUT /2
         long timeout = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / 2;
-        
         setPageLoadTimeout(augmentedDriver, timeout);
+
+        Wait<WebDriver> driverWait = new FluentWait<>(driver)
+                .pollingEvery(Duration.ofSeconds(timeout))
+                .withTimeout(Duration.ofSeconds(timeout));
+        Wait<WebDriver> augmentedDriverWait = new FluentWait<>(augmentedDriver)
+                .pollingEvery(
+                        Duration.ofSeconds(timeout))
+                .withTimeout(Duration.ofSeconds(timeout));
         try {
             LOGGER.debug("starting full size screenshot capturing...");
             if (driver.getClass().toString().contains("windows")) {
-                File screenshot = ((WindowsDriver) driver).getScreenshotAs(OutputType.FILE);
-                screenShot = ImageIO.read(screenshot);
+                File capturedScreenshot = driverWait.until(drv -> ((WindowsDriver) drv)
+                        .getScreenshotAs(OutputType.FILE));
+                screenShot = ImageIO.read(capturedScreenshot);
                 // Appium driver and it's descendant classes contains 'java_client' in classname
             } else if (driver.getClass().toString().contains("java_client")) {
                 // Mobile Native app
-                File screenshot = ((AppiumDriver) driver).getScreenshotAs(OutputType.FILE);
-                screenShot = ImageIO.read(screenshot);
+                File capturedScreenshot = driverWait.until(drv -> ((AppiumDriver) drv)
+                        .getScreenshotAs(OutputType.FILE));
+                screenShot = ImageIO.read(capturedScreenshot);
             } else if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
-                ru.yandex.qatools.ashot.Screenshot screenshot;
+
                 if (Configuration.getPlatform().equals("ANDROID")) {
                     String pixelRatio = String.valueOf(((HasCapabilities) augmentedDriver).getCapabilities().getCapability("pixelRatio"));
-                    if (!pixelRatio.equals("null")) {
-                        float dpr = Float.parseFloat(pixelRatio);
-                        screenshot = (new AShot()).shootingStrategy(ShootingStrategies
-                                .viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_BLOCK, SpecialKeywords.DEFAULT_BLOCK,
-                                        dpr))
-                                .takeScreenshot(augmentedDriver);
-                        screenShot = screenshot.getImage();
-                    } else {
-                        screenshot = (new AShot()).shootingStrategy(ShootingStrategies
-                                .viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_BLOCK, SpecialKeywords.DEFAULT_BLOCK,
-                                        SpecialKeywords.DEFAULT_DPR))
-                                .takeScreenshot(augmentedDriver);
-                        screenShot = screenshot.getImage();
-                    }
+                    float dpr = !pixelRatio.equals("null") ? Float.parseFloat(pixelRatio) : SpecialKeywords.DEFAULT_DPR;
+                    screenShot = augmentedDriverWait.until(drv -> (new AShot()).shootingStrategy(ShootingStrategies
+                            .viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_BLOCK, SpecialKeywords.DEFAULT_BLOCK,
+                                    dpr))
+                            .takeScreenshot(drv))
+                            .getImage();
                 } else {
                     int deviceWidth = augmentedDriver.manage().window().getSize().getWidth();
-                    String deviceName = "";
-                    deviceName = String
-                            .valueOf(((HasCapabilities) augmentedDriver).getCapabilities().getCapability(MobileCapabilityType.DEVICE_NAME));
-                    screenshot = new AShot().shootingStrategy(getScreenshotShuttingStrategy(deviceWidth, deviceName)).takeScreenshot(augmentedDriver);
-                    screenShot = screenshot.getImage();
+                    String deviceName = String.valueOf(((HasCapabilities) augmentedDriver)
+                            .getCapabilities()
+                            .getCapability(MobileCapabilityType.DEVICE_NAME));
+
+                    screenShot = augmentedDriverWait.until(drv -> new AShot()
+                            .shootingStrategy(getScreenshotShuttingStrategy(deviceWidth, deviceName))
+                            .takeScreenshot(augmentedDriver))
+                            .getImage();
                 }
             } else {
                 // regular web
-                ru.yandex.qatools.ashot.Screenshot screenshot;
-                    screenshot = (new AShot()).shootingStrategy(ShootingStrategies.viewportPasting(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT))
-                            .takeScreenshot(augmentedDriver);
-                    screenShot = screenshot.getImage();
+                screenShot = augmentedDriverWait.until(drv -> new AShot()
+                        .shootingStrategy(ShootingStrategies.viewportPasting(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT))
+                        .takeScreenshot(drv))
+                        .getImage();
             }
         } catch (TimeoutException e) {
-            LOGGER.warn("Unable to capture screenshot during " + timeout + " sec!");
+            LOGGER.warn("Unable to capture screenshot during {} sec!", timeout);
         } catch (Exception e) {
             // for undefined failure keep full stacktrace to handle later correctly!
             LOGGER.error("Undefined error on capture full screenshot detected!", e);
         } finally {
-            //restore default pageLoadTimeout driver timeout
+            // restore default pageLoadTimeout driver timeout
             setPageLoadTimeout(augmentedDriver, getPageLoadTimeout());
             LOGGER.debug("finished full size screenshot call.");
         }
