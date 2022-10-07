@@ -400,48 +400,46 @@ public class Screenshot {
     }
 
     /**
-     * Makes screenshot of visible part of the page
+     * Take screenshot of visible part of the page
      *
-     * @param augmentedDriver
-     *            - webDriver.
-     * @exception Exception can be cause by read() or getScreenshotAs() methods
+     * @param augmentedDriver augmented driver
+     * @exception Exception can be caused by read() or getScreenshotAs() methods
      *
-     * @return screenshot image
+     * @return a screenshot if it was produced successfully, or null otherwise
      */
     private static BufferedImage takeVisibleScreenshot(WebDriver augmentedDriver) throws Exception {
-        
         BufferedImage screenShot = null;
         // default timeout for driver quit 1/3 of explicit
         long timeout = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / 3;
-        setPageLoadTimeout(augmentedDriver, timeout);
-        
+        Duration defaultImplicitWaitTimeout = augmentedDriver.manage().timeouts().getImplicitWaitTimeout();
         try {
             LOGGER.debug("starting screenshot capturing...");
+            augmentedDriver.manage()
+                    .timeouts()
+                    .implicitlyWait(Duration.ofSeconds(timeout));
             screenShot = ImageIO.read(((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE));
         } catch (TimeoutException e) {
-            LOGGER.warn("Unable to capture screenshot during " + timeout + " sec!");
+            LOGGER.warn("Unable to capture screenshot during {} sec!", timeout);
         } catch (Exception e) {
             String message = "Undefined error on capture screenshot detected: " + e.getMessage();
             LOGGER.error(message);
         } finally {
-            //restore default pageLoadTimeout driver timeout
-            setPageLoadTimeout(augmentedDriver, getPageLoadTimeout());
+            // restore default implicit wait driver timeout
+            augmentedDriver.manage().timeouts().implicitlyWait(defaultImplicitWaitTimeout);
             LOGGER.debug("finished screenshot call.");
         }
-        return screenShot;        
-    	
+        return screenShot;
     }
 
-
-	/**
-	 * Analyze if screenshot can be captured using the most common reason when
-	 * driver is died etc.
-	 *
-	 * @param message
-	 *            - error message (stacktrace).
-	 *
-	 * @return boolean
-	 */
+    /**
+     * Analyze if screenshot can be captured using the most common reason when
+     * driver is died etc.
+     *
+     * @param message
+     *            - error message (stacktrace).
+     *
+     * @return boolean
+     */
 	public static boolean isCaptured(String message){
 		// [VD] do not use below line as it is too common!
 		// || message.contains("timeout")
