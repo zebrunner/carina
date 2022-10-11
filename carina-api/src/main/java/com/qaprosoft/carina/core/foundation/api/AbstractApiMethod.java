@@ -19,6 +19,7 @@ import static io.restassured.RestAssured.given;
 
 import java.io.PrintStream;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.AnnotatedElement;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -70,6 +71,8 @@ public abstract class AbstractApiMethod extends HttpClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    private final AnnotatedElement anchorElement;
+
     private StringBuilder bodyContent;
     protected String methodPath;
     protected HttpMethodType methodType;
@@ -81,23 +84,31 @@ public abstract class AbstractApiMethod extends HttpClient {
     private boolean ignoreSSL = Configuration.getBoolean(Parameter.IGNORE_SSL);
 
     public AbstractApiMethod() {
-        init(getClass());
-        bodyContent = new StringBuilder();
-        request = given();
-        initContentTypeFromAnnotation();
-        replaceUrlPlaceholders();
+        this(null);
     }
 
-    @SuppressWarnings({ "rawtypes" })
-    private void init(Class clazz) {
-        RequestStartLine startLine = ContextResolverChain.resolveUrl(clazz)
-                .orElseThrow(() -> new RuntimeException("Method type and path are not specified for: " + clazz.getSimpleName()));
-        this.methodPath = startLine.getUrl();
-        this.methodType = startLine.getMethodType();
+    AbstractApiMethod(AnnotatedElement anchorElement) {
+        this.anchorElement = anchorElement != null
+                ? anchorElement
+                : this.getClass();
+
+        RequestStartLine requestStartLine = ContextResolverChain.resolveUrl(this.anchorElement)
+                .orElseThrow(() -> new RuntimeException("Method type and path are not specified for: " + this.getClass().getSimpleName()));
+
+        this.methodPath = requestStartLine.getUrl();
+        this.methodType = requestStartLine.getMethodType();
+        this.bodyContent = new StringBuilder();
+        this.request = given();
+
+        initContentTypeFromAnnotation();
+        replaceUrlPlaceholders();
+
+        ContextResolverChain.resolveQueryParams(anchorElement)
+                .ifPresent(queryParams -> request.queryParams(queryParams));
     }
 
     private void initContentTypeFromAnnotation() {
-        String contentType = ContextResolverChain.resolveContentType(this.getClass())
+        String contentType = ContextResolverChain.resolveContentType(this.anchorElement)
                 .orElse(ContentTypeEnum.JSON.getMainStringValue());
         this.request.contentType(contentType);
         this.contentTypeEnum = Arrays.stream(ContentTypeEnum.values())
@@ -119,6 +130,9 @@ public abstract class AbstractApiMethod extends HttpClient {
                 replaceUrlPlaceholder(param, R.CONFIG.get(newParam));
             }
         }
+
+        ContextResolverChain.resolvePathVariables(anchorElement)
+                .ifPresent(pathVariables -> pathVariables.forEach((key, value) -> replaceUrlPlaceholder(key, value.toString())));
     }
 
     private List<String> getParamsFromUrl() {
@@ -136,8 +150,12 @@ public abstract class AbstractApiMethod extends HttpClient {
         for (String headerKeyValue : headerKeyValues) {
             String key = headerKeyValue.split("=", 2)[0];
             String value = headerKeyValue.split("=", 2)[1];
-            request.header(key, value);
+            setHeader(key, value);
         }
+    }
+
+    public void setHeader(String key, Object value) {
+        request.header(key, value);
     }
 
     public void addUrlParameter(String key, String value) {
@@ -173,7 +191,7 @@ public abstract class AbstractApiMethod extends HttpClient {
         request.given().cookie(key, value);
     }
 
-    public void addCookies(Map<String, String> cookies) {
+    public void addCookies(Map<String, ?> cookies) {
         request.given().cookies(cookies);
     }
 
@@ -217,7 +235,7 @@ public abstract class AbstractApiMethod extends HttpClient {
 
     private void initLogging(PrintStream ps) {
         if (logRequest) {
-            Set<String> headers = ContextResolverChain.resolveHiddenRequestHeadersInLogs(this.getClass())
+            Set<String> headers = ContextResolverChain.resolveHiddenRequestHeadersInLogs(this.anchorElement)
                     .orElse(Collections.emptySet());
             RequestLoggingFilter fHeaders = new RequestLoggingFilter(LogDetail.HEADERS, true, ps, true, headers);
 
@@ -226,7 +244,7 @@ public abstract class AbstractApiMethod extends HttpClient {
             RequestLoggingFilter fMethod = new RequestLoggingFilter(LogDetail.METHOD, ps);
             RequestLoggingFilter fUri = new RequestLoggingFilter(LogDetail.URI, ps);
 
-            RequestLoggingFilter fBody = ContextResolverChain.resolveHiddenRequestBodyPartsInLogs(this.getClass())
+            RequestLoggingFilter fBody = ContextResolverChain.resolveHiddenRequestBodyPartsInLogs(this.anchorElement)
                     .<RequestLoggingFilter>map(paths -> new CarinaRequestBodyLoggingFilter(true, ps, paths, contentTypeEnum))
                     .orElseGet(() -> new RequestLoggingFilter(LogDetail.BODY, ps));
             request.filters(fMethod, fUri, fParams, fCookies, fHeaders, fBody);
@@ -237,7 +255,7 @@ public abstract class AbstractApiMethod extends HttpClient {
             ResponseLoggingFilter fHeaders = new ResponseLoggingFilter(LogDetail.HEADERS, ps);
             ResponseLoggingFilter fCookies = new ResponseLoggingFilter(LogDetail.COOKIES, ps);
 
-            ResponseLoggingFilter fBody = ContextResolverChain.resolveHiddenResponseBodyPartsInLogs(this.getClass())
+            ResponseLoggingFilter fBody = ContextResolverChain.resolveHiddenResponseBodyPartsInLogs(this.anchorElement)
                     .<ResponseLoggingFilter>map(paths -> new CarinaResponseBodyLoggingFilter(true, ps, Matchers.any(Integer.class), paths, contentTypeEnum))
                     .orElseGet(() -> new ResponseLoggingFilter(LogDetail.BODY, ps));
             request.filters(fBody, fCookies, fHeaders, fStatus);
@@ -352,4 +370,7 @@ public abstract class AbstractApiMethod extends HttpClient {
         setSSLContext(new SSLContextBuilder(true).createSSLContext());
     }
 
+    protected AnnotatedElement getAnchorElement() {
+        return anchorElement;
+    }
 }

@@ -25,8 +25,9 @@ import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 
 public class APIMethodBuilder {
-    private File temp;
-    private PrintStream ps;
+
+    private final File temp;
+    private final PrintStream ps;
 
     public APIMethodBuilder() {
         temp = new File(String.format("%s/%s.tmp", ReportContext.getTempDir().getAbsolutePath(), UUID.randomUUID()));

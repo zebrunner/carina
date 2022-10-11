@@ -2,56 +2,81 @@ package com.qaprosoft.carina.core.foundation.api.resolver;
 
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
 
+import java.lang.reflect.AnnotatedElement;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
 public class ContextResolverChain {
 
-    private static final List<ContextResolver> CONTEXT_RESOLVERS = List.of(
+    private static final List<ContextResolver<? extends AnnotatedElement>> CONTEXT_RESOLVERS = List.of(
             new AnnotationContextResolver(),
-            new PropertiesContextResolver()
+            new PropertiesContextResolver(),
+            new MethodBasedContextResolver()
     );
 
-    public static Optional<RequestStartLine> resolveUrl(Class<?> clazz) {
-        return getResolverValue(resolver -> resolver.resolveUrl(clazz));
+    public static Optional<RequestStartLine> resolveUrl(AnnotatedElement element) {
+        return getResolverValue(resolver -> resolver.resolveUrl(element), element);
     }
 
-    public static Optional<String> resolveContentType(Class<?> clazz) {
-        return getResolverValue(resolver -> resolver.resolveContentType(clazz));
+    public static Optional<String> resolveContentType(AnnotatedElement element) {
+        return getResolverValue(resolver -> resolver.resolveContentType(element), element);
     }
 
-    public static Optional<Set<String>> resolveHiddenRequestBodyPartsInLogs(Class<?> clazz) {
-        return getResolverValue(resolver -> resolver.resolveHiddenRequestBodyPartsInLogs(clazz))
+    public static Optional<Set<String>> resolveHiddenRequestBodyPartsInLogs(AnnotatedElement element) {
+        return getResolverValue(resolver -> resolver.resolveHiddenRequestBodyPartsInLogs(element), element)
                 .map(Set::of);
     }
 
-    public static Optional<Set<String>> resolveHiddenResponseBodyPartsInLogs(Class<?> clazz) {
-        return getResolverValue(resolver -> resolver.resolveHiddenResponseBodyPartsInLogs(clazz))
+    public static Optional<Set<String>> resolveHiddenResponseBodyPartsInLogs(AnnotatedElement element) {
+        return getResolverValue(resolver -> resolver.resolveHiddenResponseBodyPartsInLogs(element), element)
                 .map(Set::of);
     }
 
-    public static Optional<Set<String>> resolveHiddenRequestHeadersInLogs(Class<?> clazz) {
-        return getResolverValue(resolver -> resolver.resolveHiddenRequestHeadersInLogs(clazz))
+    public static Optional<Set<String>> resolveHiddenRequestHeadersInLogs(AnnotatedElement element) {
+        return getResolverValue(resolver -> resolver.resolveHiddenRequestHeadersInLogs(element), element)
                 .map(Set::of);
     }
 
-    public static Optional<String> resolveRequestTemplatePath(Class<?> clazz) {
-        return getResolverValue(resolver -> resolver.resolveRequestTemplatePath(clazz));
+    public static Optional<String> resolveRequestTemplatePath(AnnotatedElement element) {
+        return getResolverValue(resolver -> resolver.resolveRequestTemplatePath(element), element);
     }
 
-    public static Optional<String> resolveResponseTemplatePath(Class<?> clazz) {
-        return getResolverValue(resolver -> resolver.resolveResponseTemplatePath(clazz));
+    public static Optional<String> resolveResponseTemplatePath(AnnotatedElement element) {
+        return getResolverValue(resolver -> resolver.resolveResponseTemplatePath(element), element);
     }
 
-    public static Optional<HttpResponseStatusType> resolveSuccessfulHttpStatus(Class<?> clazz) {
-        return getResolverValue(resolver -> resolver.resolveSuccessfulHttpStatus(clazz));
+    public static Optional<HttpResponseStatusType> resolveSuccessfulHttpStatus(AnnotatedElement element) {
+        return getResolverValue(resolver -> resolver.resolveSuccessfulHttpStatus(element), element);
     }
 
-    private static <T> Optional<T> getResolverValue(Function<ContextResolver, Optional<T>> methodCaller) {
+    public static Optional<Map<String, ?>> resolvePathVariables(AnnotatedElement element) {
+        return getResolverValue(resolver -> resolver.resolvePathVariables(element), element);
+    }
+
+    public static Optional<Map<String, ?>> resolveQueryParams(AnnotatedElement element) {
+        return getResolverValue(resolver -> resolver.resolveQueryParams(element), element);
+    }
+
+    public static Optional<Map<String, ?>> resolveProperties(AnnotatedElement element) {
+        return getResolverValue(resolver -> resolver.resolveProperties(element), element);
+    }
+
+    public static Optional<Map<String, ?>> resolveHeaders(AnnotatedElement element) {
+        return getResolverValue(resolver -> resolver.resolveHeaders(element), element);
+    }
+
+    public static Optional<Map<String, ?>> resolveCookies(AnnotatedElement element) {
+        return getResolverValue(resolver -> resolver.resolveCookies(element), element);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> Optional<T> getResolverValue(Function<ContextResolver<AnnotatedElement>, Optional<T>> methodCaller, AnnotatedElement element) {
         return CONTEXT_RESOLVERS.stream()
-                .map(methodCaller)
+                .filter(contextResolver -> contextResolver.isSupportedType(element))
+                .map(contextResolver -> methodCaller.apply((ContextResolver<AnnotatedElement>) contextResolver))
                 .filter(Optional::isPresent)
                 .findFirst()
                 .orElse(Optional.empty());

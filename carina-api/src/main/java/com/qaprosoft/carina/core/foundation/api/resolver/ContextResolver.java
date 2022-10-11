@@ -3,28 +3,58 @@ package com.qaprosoft.carina.core.foundation.api.resolver;
 import com.qaprosoft.carina.core.foundation.api.AbstractApiMethod;
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Member;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-interface ContextResolver {
+interface ContextResolver<E extends AnnotatedElement> {
 
-    Optional<RequestStartLine> resolveUrl(Class<?> clazz);
+    Optional<RequestStartLine> resolveUrl(E element);
 
-    Optional<String> resolveContentType(Class<?> clazz);
+    Optional<String> resolveContentType(E element);
 
-    Optional<String[]> resolveHiddenRequestBodyPartsInLogs(Class<?> clazz);
+    Optional<String[]> resolveHiddenRequestBodyPartsInLogs(E element);
 
-    Optional<String[]> resolveHiddenResponseBodyPartsInLogs(Class<?> clazz);
+    Optional<String[]> resolveHiddenResponseBodyPartsInLogs(E element);
 
-    Optional<String[]> resolveHiddenRequestHeadersInLogs(Class<?> clazz);
+    Optional<String[]> resolveHiddenRequestHeadersInLogs(E element);
 
-    Optional<String> resolveRequestTemplatePath(Class<?> clazz);
+    Optional<String> resolveRequestTemplatePath(E element);
 
-    Optional<String> resolveResponseTemplatePath(Class<?> clazz);
+    Optional<String> resolveResponseTemplatePath(E element);
 
-    Optional<HttpResponseStatusType> resolveSuccessfulHttpStatus(Class<?> clazz);
+    Optional<HttpResponseStatusType> resolveSuccessfulHttpStatus(E element);
 
-    default Optional<Class<?>> findParentClass(Class<?> clazz, Predicate<Class<?>> condition) {
+    Optional<Map<String, ?>> resolvePathVariables(E element);
+
+    Optional<Map<String, ?>> resolveQueryParams(E element);
+
+    Optional<Map<String, ?>> resolveProperties(E element);
+
+    Optional<Map<String, ?>> resolveHeaders(E element);
+
+    Optional<Map<String, ?>> resolveCookies(E element);
+
+    boolean isSupportedType(AnnotatedElement element);
+
+    default <A extends Annotation> Optional<A> findAnnotationValue(AnnotatedElement element, Class<A> annClazz) {
+        A result = null;
+        if (element.isAnnotationPresent(annClazz)) {
+            result = element.getAnnotation(annClazz);
+        }
+        return Optional.ofNullable(result);
+    }
+
+    default <A extends Annotation> Optional<A> findClassAnnotationValue(AnnotatedElement element, Class<A> annCLazz) {
+        return findParentClass(element, c -> c.isAnnotationPresent(annCLazz))
+                .map(c -> c.getAnnotation(annCLazz));
+    }
+
+    default Optional<Class<?>> findParentClass(AnnotatedElement element, Predicate<Class<?>> condition) {
+        Class<?> clazz = Member.class.isAssignableFrom(element.getClass()) ? ((Member) element).getDeclaringClass() : (Class<?>) element;
         return findParentClass(clazz, AbstractApiMethod.class, condition);
     }
 

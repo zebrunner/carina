@@ -10,61 +10,87 @@ import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePath;
 import com.qaprosoft.carina.core.foundation.api.annotation.SuccessfulHttpStatus;
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
 
-import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
+import java.util.Map;
 import java.util.Optional;
 
-class AnnotationContextResolver implements ContextResolver {
+class AnnotationContextResolver implements ContextResolver<Class<?>> {
 
     @Override
-    public Optional<RequestStartLine> resolveUrl(Class<?> clazz) {
-        return findAnnotationValue(clazz, Endpoint.class)
+    public Optional<RequestStartLine> resolveUrl(Class<?> element) {
+        return findClassAnnotationValue(element, Endpoint.class)
                 .map(endpoint -> new RequestStartLine(endpoint.url(), endpoint.methodType()));
     }
 
     @Override
-    public Optional<String> resolveContentType(Class<?> clazz) {
-        return findAnnotationValue(clazz, ContentType.class)
+    public Optional<String> resolveContentType(Class<?> element) {
+        return findClassAnnotationValue(element, ContentType.class)
                 .map(ContentType::type);
     }
 
     @Override
-    public Optional<String[]> resolveHiddenRequestBodyPartsInLogs(Class<?> clazz) {
-        return findAnnotationValue(clazz, HideRequestBodyPartsInLogs.class)
+    public Optional<String[]> resolveHiddenRequestBodyPartsInLogs(Class<?> element) {
+        return findClassAnnotationValue(element, HideRequestBodyPartsInLogs.class)
                 .map(HideRequestBodyPartsInLogs::paths);
     }
 
     @Override
-    public Optional<String[]> resolveHiddenResponseBodyPartsInLogs(Class<?> clazz) {
-        return findAnnotationValue(clazz, HideResponseBodyPartsInLogs.class)
+    public Optional<String[]> resolveHiddenResponseBodyPartsInLogs(Class<?> element) {
+        return findClassAnnotationValue(element, HideResponseBodyPartsInLogs.class)
                 .map(HideResponseBodyPartsInLogs::paths);
     }
 
     @Override
-    public Optional<String[]> resolveHiddenRequestHeadersInLogs(Class<?> clazz) {
-        return findAnnotationValue(clazz, HideRequestHeadersInLogs.class)
+    public Optional<String[]> resolveHiddenRequestHeadersInLogs(Class<?> element) {
+        return findClassAnnotationValue(element, HideRequestHeadersInLogs.class)
                 .map(HideRequestHeadersInLogs::headers);
     }
 
     @Override
-    public Optional<String> resolveRequestTemplatePath(Class<?> clazz) {
-        return findAnnotationValue(clazz, RequestTemplatePath.class)
+    public Optional<String> resolveRequestTemplatePath(Class<?> element) {
+        return findClassAnnotationValue(element, RequestTemplatePath.class)
                 .map(RequestTemplatePath::path);
     }
 
     @Override
-    public Optional<String> resolveResponseTemplatePath(Class<?> clazz) {
-        return findAnnotationValue(clazz, ResponseTemplatePath.class)
+    public Optional<String> resolveResponseTemplatePath(Class<?> element) {
+        return findClassAnnotationValue(element, ResponseTemplatePath.class)
                 .map(ResponseTemplatePath::path);
     }
 
     @Override
-    public Optional<HttpResponseStatusType> resolveSuccessfulHttpStatus(Class<?> clazz) {
-        return findAnnotationValue(clazz, SuccessfulHttpStatus.class)
+    public Optional<HttpResponseStatusType> resolveSuccessfulHttpStatus(Class<?> element) {
+        return findClassAnnotationValue(element, SuccessfulHttpStatus.class)
                 .map(SuccessfulHttpStatus::status);
     }
 
-    private <A extends Annotation> Optional<A> findAnnotationValue(Class<?> inClass, Class<A> annCLazz) {
-        return findParentClass(inClass, c -> c.isAnnotationPresent(annCLazz))
-                .map(c -> c.getAnnotation(annCLazz));
+    @Override
+    public Optional<Map<String, ?>> resolvePathVariables(Class<?> element) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Map<String, ?>> resolveQueryParams(Class<?> element) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Map<String, ?>> resolveProperties(Class<?> element) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Map<String, ?>> resolveHeaders(Class<?> element) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Map<String, ?>> resolveCookies(Class<?> element) {
+        return Optional.empty();
+    }
+
+    @Override
+    public boolean isSupportedType(AnnotatedElement element) {
+        return element instanceof Class;
     }
 }

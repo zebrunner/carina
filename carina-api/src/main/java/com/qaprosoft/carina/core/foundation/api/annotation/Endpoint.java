@@ -22,7 +22,7 @@ import java.lang.annotation.Target;
 
 import com.qaprosoft.carina.core.foundation.api.http.HttpMethodType;
 
-@Target(value = ElementType.TYPE)
+@Target(value = { ElementType.TYPE, ElementType.METHOD })
 @Retention(value = RetentionPolicy.RUNTIME)
 public @interface Endpoint {
 

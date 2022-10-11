@@ -16,9 +16,16 @@
 package com.qaprosoft.carina.core.foundation.api.http;
 
 public enum ContentTypeEnum {
+
     JSON(new String[] { "application/json" }),
     XML(new String[] { "application/xml", "text/xml" }),
-    NA(new String[] { "n/a" }),;
+    NA(new String[] { "n/a" });
+
+    private final String[] stringValues;
+
+    ContentTypeEnum(String[] stringValues) {
+        this.stringValues = stringValues;
+    }
 
     public String[] getStringValues() {
         return stringValues;
@@ -26,11 +33,5 @@ public enum ContentTypeEnum {
 
     public String getMainStringValue() {
         return stringValues[0];
-    }
-
-    private String[] stringValues;
-
-    ContentTypeEnum(String[] stringValues) {
-        this.stringValues = stringValues;
     }
 }
