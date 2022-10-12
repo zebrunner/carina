@@ -13,7 +13,7 @@ class PropertiesContextResolver implements ContextResolver<Class<?>> {
 
     @Override
     public Optional<RequestStartLine> resolveUrl(Class<?> element) {
-        return findParentClass(element, c -> R.API.containsKey(c.getSimpleName()))
+        return ResolverUtils.findParentClass(element, c -> R.API.containsKey(c.getSimpleName()))
                 .map(c -> R.API.get(c.getSimpleName()))
                 .map(PropertiesContextResolver::resolveStartLine);
     }

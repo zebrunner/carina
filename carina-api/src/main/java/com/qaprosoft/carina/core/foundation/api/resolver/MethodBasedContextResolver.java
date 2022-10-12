@@ -21,21 +21,10 @@ import com.qaprosoft.carina.core.foundation.api.binding.RuntimeMethod;
 import com.qaprosoft.carina.core.foundation.api.http.HttpMethodType;
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class MethodBasedContextResolver implements ContextResolver<RuntimeMethod> {
 
@@ -53,7 +42,7 @@ public class MethodBasedContextResolver implements ContextResolver<RuntimeMethod
     }
 
     private String resolveGlobalPath(AnnotatedElement method) {
-        return findClassAnnotationValue(method, EndpointTemplate.class)
+        return ResolverUtils.findClassAnnotationValue(method, EndpointTemplate.class)
                 .map(EndpointTemplate::url)
                 .orElse(null);
     }
@@ -78,129 +67,111 @@ public class MethodBasedContextResolver implements ContextResolver<RuntimeMethod
 
     @Override
     public Optional<String> resolveContentType(RuntimeMethod element) {
-        return findAnnotationValue(element.getMethod(), ContentType.class)
-                .map(ContentType::type);
+        return ResolverUtils.resolveAnnotationValueFromMethod(
+                element.getMethod(),
+                ContentType.class,
+                ContentType::type,
+                "content type"
+        );
     }
 
     @Override
     public Optional<String[]> resolveHiddenRequestBodyPartsInLogs(RuntimeMethod element) {
-        return findAnnotationValue(element.getMethod(), HideRequestBodyPartsInLogs.class)
-                .map(HideRequestBodyPartsInLogs::paths);
+        return ResolverUtils.resolveAnnotationValueFromMethod(
+                element.getMethod(),
+                HideRequestBodyPartsInLogs.class,
+                HideRequestBodyPartsInLogs::paths,
+                "hidden request body parts"
+        );
     }
 
     @Override
     public Optional<String[]> resolveHiddenResponseBodyPartsInLogs(RuntimeMethod element) {
-        return findAnnotationValue(element.getMethod(), HideResponseBodyPartsInLogs.class)
-                .map(HideResponseBodyPartsInLogs::paths);
+        return ResolverUtils.resolveAnnotationValueFromMethod(
+                element.getMethod(),
+                HideResponseBodyPartsInLogs.class,
+                HideResponseBodyPartsInLogs::paths,
+                "hidden response body parts"
+        );
     }
 
     @Override
     public Optional<String[]> resolveHiddenRequestHeadersInLogs(RuntimeMethod element) {
-        return findAnnotationValue(element.getMethod(), HideRequestHeadersInLogs.class)
-                .map(HideRequestHeadersInLogs::headers);
+        return ResolverUtils.resolveAnnotationValueFromMethod(
+                element.getMethod(),
+                HideRequestHeadersInLogs.class,
+                HideRequestHeadersInLogs::headers,
+                "hidden request headers"
+        );
     }
 
     @Override
     public Optional<String> resolveRequestTemplatePath(RuntimeMethod element) {
-        return resolveAnnotatedItem(
+        return ResolverUtils.resolveAnnotationValueFromParameter(
+                element.getMethod(),
+                RequestTemplatePathParam.class,
+                RequestTemplatePath.class,
+                Object::toString,
+                RequestTemplatePath::path,
                 "request template path",
-                () -> resolveAnnotatedParameterValues(element.getMethod(), RequestTemplatePathParam.class, element.getArgs()),
-                () -> createSingleElementList(findAnnotationValue(element.getMethod(), RequestTemplatePath.class)
-                        .map(RequestTemplatePath::path)
-                        .orElse(null))
-        ).flatMap(result -> Optional.of(result.toString()));
+                element.getArgs()
+        );
     }
 
     @Override
     public Optional<String> resolveResponseTemplatePath(RuntimeMethod element) {
-        return resolveAnnotatedItem(
+        return ResolverUtils.resolveAnnotationValueFromParameter(
+                element.getMethod(),
+                ResponseTemplatePathParam.class,
+                ResponseTemplatePath.class,
+                Object::toString,
+                ResponseTemplatePath::path,
                 "response template path",
-                () -> resolveAnnotatedParameterValues(element.getMethod(), ResponseTemplatePathParam.class, element.getArgs()),
-                () -> createSingleElementList(findAnnotationValue(element.getMethod(), ResponseTemplatePath.class)
-                        .map(ResponseTemplatePath::path)
-                        .orElse(null))
-        ).flatMap(result -> Optional.of(result.toString()));
+                element.getArgs()
+        );
     }
 
     @Override
     public Optional<HttpResponseStatusType> resolveSuccessfulHttpStatus(RuntimeMethod element) {
-        return resolveAnnotatedItem(
-                "response template path",
-                () -> resolveAnnotatedParameterValues(element.getMethod(), SuccessfulHttpStatusParam.class, element.getArgs()),
-                () -> createSingleElementList(findAnnotationValue(element.getMethod(), SuccessfulHttpStatus.class)
-                        .map(SuccessfulHttpStatus::status)
-                        .orElse(null))
-        ).flatMap(result -> Optional.of(HttpResponseStatusType.valueOf(result.toString())));
+        return ResolverUtils.resolveAnnotationValueFromParameter(
+                element.getMethod(),
+                SuccessfulHttpStatusParam.class,
+                SuccessfulHttpStatus.class,
+                obj -> HttpResponseStatusType.valueOf(obj.toString()),
+                SuccessfulHttpStatus::status,
+                "successful http status",
+                element.getArgs()
+        );
     }
 
     @Override
     public Optional<Map<String, ?>> resolvePathVariables(RuntimeMethod element) {
-        Map<String, ?> result = resolveNamedParameters(element.getMethod(), PathVariable.class, PathVariable::value, element.getArgs());
+        Map<String, ?> result = ResolverUtils.resolveNamedAnnotatedParameterValues(element.getMethod(), PathVariable.class, PathVariable::value, element.getArgs());
         return Optional.of(result);
     }
 
     @Override
     public Optional<Map<String, ?>> resolveQueryParams(RuntimeMethod element) {
-        Map<String, ?> result = resolveNamedParameters(element.getMethod(), QueryParam.class, QueryParam::value, element.getArgs());
+        Map<String, ?> result = ResolverUtils.resolveNamedAnnotatedParameterValues(element.getMethod(), QueryParam.class, QueryParam::value, element.getArgs());
         return Optional.of(result);
     }
 
     @Override
     public Optional<Map<String, ?>> resolveProperties(RuntimeMethod element) {
-        Map<String, ?> result = resolveNamedParameters(element.getMethod(), Property.class, Property::value, element.getArgs());
+        Map<String, ?> result = ResolverUtils.resolveNamedAnnotatedParameterValues(element.getMethod(), Property.class, Property::value, element.getArgs());
         return Optional.of(result);
     }
 
     @Override
     public Optional<Map<String, ?>> resolveHeaders(RuntimeMethod element) {
-        Map<String, ?> result = resolveNamedParameters(element.getMethod(), Header.class, Header::key, element.getArgs());
+        Map<String, ?> result = ResolverUtils.resolveNamedAnnotatedParameterValues(element.getMethod(), Header.class, Header::key, element.getArgs());
         return Optional.of(result);
     }
 
     @Override
     public Optional<Map<String, ?>> resolveCookies(RuntimeMethod element) {
-        Map<String, ?> result = resolveNamedParameters(element.getMethod(), Cookie.class, Cookie::key, element.getArgs());
+        Map<String, ?> result = ResolverUtils.resolveNamedAnnotatedParameterValues(element.getMethod(), Cookie.class, Cookie::key, element.getArgs());
         return Optional.of(result);
-    }
-
-    private static <A extends Annotation> Map<String, Object> resolveNamedParameters(Method method, Class<A> annotationClass, Function<A, String> nameGetter, Object... values) {
-        Parameter[] parameters = method.getParameters();
-        return resolveAnnotatedParameterIndexesStream(method, annotationClass)
-                .collect(Collectors.toMap(index -> nameGetter.apply(parameters[index].getAnnotation(annotationClass)), index -> values[index]));
-    }
-
-    private static <A extends Annotation> List<?> resolveAnnotatedParameterValues(Method method, Class<A> annotationClass, Object... values) {
-        return resolveAnnotatedParameterIndexesStream(method, annotationClass)
-                .map(index -> values[index])
-                .collect(Collectors.toList());
-    }
-
-    private static <A extends Annotation> Stream<Integer> resolveAnnotatedParameterIndexesStream(Method method, Class<A> annotationClass) {
-        Parameter[] parameters = method.getParameters();
-        return IntStream.range(0, parameters.length)
-                .boxed()
-                .filter(index -> parameters[index].isAnnotationPresent(annotationClass));
-    }
-
-    @SafeVarargs
-    private Optional<?> resolveAnnotatedItem(String errorMessageItem, Supplier<List<?>>... valueSuppliers) {
-        return Arrays.stream(valueSuppliers)
-                .map(Supplier::get)
-                .peek(results -> {
-                    if (results.size() > 1) {
-                        throw new RuntimeException(String.format("The %s cannot be recognized. More than one value was found", errorMessageItem));
-                    }
-                })
-                .filter(results -> results.size() == 1)
-                .map(results -> results.get(0))
-                .filter(Objects::nonNull)
-                .findFirst();
-    }
-
-    private static <V> List<V> createSingleElementList(V element) {
-        List<V> result = new ArrayList<>();
-        result.add(element);
-        return result;
     }
 
     @Override

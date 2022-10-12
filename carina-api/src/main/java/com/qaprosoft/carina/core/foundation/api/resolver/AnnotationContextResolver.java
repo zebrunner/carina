@@ -18,49 +18,49 @@ class AnnotationContextResolver implements ContextResolver<Class<?>> {
 
     @Override
     public Optional<RequestStartLine> resolveUrl(Class<?> element) {
-        return findClassAnnotationValue(element, Endpoint.class)
+        return ResolverUtils.findClassAnnotationValue(element, Endpoint.class)
                 .map(endpoint -> new RequestStartLine(endpoint.url(), endpoint.methodType()));
     }
 
     @Override
     public Optional<String> resolveContentType(Class<?> element) {
-        return findClassAnnotationValue(element, ContentType.class)
+        return ResolverUtils.findClassAnnotationValue(element, ContentType.class)
                 .map(ContentType::type);
     }
 
     @Override
     public Optional<String[]> resolveHiddenRequestBodyPartsInLogs(Class<?> element) {
-        return findClassAnnotationValue(element, HideRequestBodyPartsInLogs.class)
+        return ResolverUtils.findClassAnnotationValue(element, HideRequestBodyPartsInLogs.class)
                 .map(HideRequestBodyPartsInLogs::paths);
     }
 
     @Override
     public Optional<String[]> resolveHiddenResponseBodyPartsInLogs(Class<?> element) {
-        return findClassAnnotationValue(element, HideResponseBodyPartsInLogs.class)
+        return ResolverUtils.findClassAnnotationValue(element, HideResponseBodyPartsInLogs.class)
                 .map(HideResponseBodyPartsInLogs::paths);
     }
 
     @Override
     public Optional<String[]> resolveHiddenRequestHeadersInLogs(Class<?> element) {
-        return findClassAnnotationValue(element, HideRequestHeadersInLogs.class)
+        return ResolverUtils.findClassAnnotationValue(element, HideRequestHeadersInLogs.class)
                 .map(HideRequestHeadersInLogs::headers);
     }
 
     @Override
     public Optional<String> resolveRequestTemplatePath(Class<?> element) {
-        return findClassAnnotationValue(element, RequestTemplatePath.class)
+        return ResolverUtils.findClassAnnotationValue(element, RequestTemplatePath.class)
                 .map(RequestTemplatePath::path);
     }
 
     @Override
     public Optional<String> resolveResponseTemplatePath(Class<?> element) {
-        return findClassAnnotationValue(element, ResponseTemplatePath.class)
+        return ResolverUtils.findClassAnnotationValue(element, ResponseTemplatePath.class)
                 .map(ResponseTemplatePath::path);
     }
 
     @Override
     public Optional<HttpResponseStatusType> resolveSuccessfulHttpStatus(Class<?> element) {
-        return findClassAnnotationValue(element, SuccessfulHttpStatus.class)
+        return ResolverUtils.findClassAnnotationValue(element, SuccessfulHttpStatus.class)
                 .map(SuccessfulHttpStatus::status);
     }
 
