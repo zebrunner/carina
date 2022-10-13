@@ -96,6 +96,8 @@ public class ExtendedWebElement implements IWebElement {
     // searchContext is used for searching element by default
     private WebDriver driver;
     private SearchContext searchContext;
+    // todo replace by boolean after successfully testing
+    private Boolean isSearchContextWebElement = null;
 
     private CryptoTool cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
 
@@ -132,6 +134,7 @@ public class ExtendedWebElement implements IWebElement {
         this.name = name;
         this.driver = driver;
         this.searchContext = searchContext;
+        this.isSearchContextWebElement = this.searchContext instanceof WebElement;
     }
 
     public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext, Object[] formatValues) {
@@ -281,6 +284,7 @@ public class ExtendedWebElement implements IWebElement {
             if (this.searchContext == null) {
                 throw new RuntimeException("review stacktrace to analyze why searchContext is not populated correctly via reflection!");
             }
+            this.isSearchContextWebElement = this.searchContext instanceof WebElement;
         }
 
     }
@@ -320,22 +324,24 @@ public class ExtendedWebElement implements IWebElement {
      * @return element existence status.
      */
     public boolean isPresent(long timeout) {
-    	return isPresent(getBy(), timeout);
+        boolean isPresent = false;
+        try {
+            isPresent = waitUntil(getDefaultCondition(), timeout);
+        } catch (StaleElementReferenceException e) {
+            // there is no sense to continue as StaleElementReferenceException captured
+            LOGGER.debug("waitUntil: StaleElementReferenceException", e);
+        }
+        return isPresent;
     }
-    
-	/**
-	 * Check that element with By present within specified timeout.
-	 *
-	 * @param by
-	 *            - By.
-	 * @param timeout
-	 *            - timeout.
-	 * @return element existence status.
-	 */
+
+    /**
+     * @deprecated this method is incorrect. Use {@link #isPresent()} or {@link #isPresent(long)} instead
+     */
+    @Deprecated(since = "7.4.27", forRemoval = true)
 	public boolean isPresent(By by, long timeout) {
 	    boolean res = false;
 	    try {
-	        res = waitUntil(getDefaultCondition(by), timeout);
+	        res = waitUntil(getDefaultCondition(), timeout);
         } catch (StaleElementReferenceException e) {
             // there is no sense to continue as StaleElementReferenceException captured
             LOGGER.debug("waitUntil: StaleElementReferenceException", e);
@@ -462,7 +468,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return String text
      */
     public String getText() {
-        return (String) doAction(ACTION_NAME.GET_TEXT, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        return (String) doAction(ACTION_NAME.GET_TEXT, EXPLICIT_TIMEOUT, getDefaultCondition());
     }
 
     /**
@@ -471,7 +477,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return Point location
      */
     public Point getLocation() {
-        return (Point) doAction(ACTION_NAME.GET_LOCATION, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        return (Point) doAction(ACTION_NAME.GET_LOCATION, EXPLICIT_TIMEOUT, getDefaultCondition());
     }
 
     /**
@@ -480,7 +486,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return Dimension size
      */
     public Dimension getSize() {
-        return (Dimension) doAction(ACTION_NAME.GET_SIZE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        return (Dimension) doAction(ACTION_NAME.GET_SIZE, EXPLICIT_TIMEOUT, getDefaultCondition());
     }
 
     /**
@@ -490,7 +496,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return String attribute value
      */
     public String getAttribute(String name) {
-        return (String) doAction(ACTION_NAME.GET_ATTRIBUTE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), name);
+        return (String) doAction(ACTION_NAME.GET_ATTRIBUTE, EXPLICIT_TIMEOUT, getDefaultCondition(), name);
     }
 
     /**
@@ -506,7 +512,7 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout to wait
      */
     public void click(long timeout) {
-        click(timeout, getDefaultCondition(getBy()));
+        click(timeout, getDefaultCondition());
     }
     
 	/**
@@ -533,7 +539,7 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout to wait
      */
     public void clickByJs(long timeout) {
-        clickByJs(timeout, getDefaultCondition(getBy()));
+        clickByJs(timeout, getDefaultCondition());
     }
     
     /**
@@ -560,7 +566,7 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout to wait
      */
     public void clickByActions(long timeout) {
-        clickByActions(timeout, getDefaultCondition(getBy()));
+        clickByActions(timeout, getDefaultCondition());
     }
     
     /**
@@ -587,7 +593,7 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout to wait
      */
     public void doubleClick(long timeout) {
-        doubleClick(timeout, getDefaultCondition(getBy()));
+        doubleClick(timeout, getDefaultCondition());
     }
     /**
      * Double Click on element.
@@ -614,7 +620,7 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout to wait
      */
     public void rightClick(long timeout) {
-        rightClick(timeout, getDefaultCondition(getBy()));
+        rightClick(timeout, getDefaultCondition());
     }
     
     /**
@@ -642,7 +648,7 @@ public class ExtendedWebElement implements IWebElement {
 	 * @param yOffset y offset for moving
      */
     public void hover(Integer xOffset, Integer yOffset) {
-        doAction(ACTION_NAME.HOVER, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), xOffset, yOffset);
+        doAction(ACTION_NAME.HOVER, EXPLICIT_TIMEOUT, getDefaultCondition(), xOffset, yOffset);
     }
     
     /**
@@ -686,7 +692,7 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout to wait
      */
     public void sendKeys(Keys keys, long timeout) {
-        sendKeys(keys, timeout, getDefaultCondition(getBy()));
+        sendKeys(keys, timeout, getDefaultCondition());
     }
     
 	/**
@@ -718,7 +724,7 @@ public class ExtendedWebElement implements IWebElement {
      * @param timeout to wait
      */
     public void type(String text, long timeout) {
-        type(text, timeout, getDefaultCondition(getBy()));
+        type(text, timeout, getDefaultCondition());
     }
     
 	/**
@@ -765,7 +771,7 @@ public class ExtendedWebElement implements IWebElement {
      * @param filePath path
      */
     public void attachFile(String filePath) {
-        doAction(ACTION_NAME.ATTACH_FILE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), filePath);
+        doAction(ACTION_NAME.ATTACH_FILE, EXPLICIT_TIMEOUT, getDefaultCondition(), filePath);
     }
 
     /**
@@ -774,7 +780,7 @@ public class ExtendedWebElement implements IWebElement {
      * for checkbox Element
      */
     public void check() {
-        doAction(ACTION_NAME.CHECK, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        doAction(ACTION_NAME.CHECK, EXPLICIT_TIMEOUT, getDefaultCondition());
     }
 
     /**
@@ -783,7 +789,7 @@ public class ExtendedWebElement implements IWebElement {
      * for checkbox Element
      */
     public void uncheck() {
-        doAction(ACTION_NAME.UNCHECK, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        doAction(ACTION_NAME.UNCHECK, EXPLICIT_TIMEOUT, getDefaultCondition());
     }
 
     /**
@@ -792,7 +798,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return - current state
      */
     public boolean isChecked() {
-        return (boolean) doAction(ACTION_NAME.IS_CHECKED, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        return (boolean) doAction(ACTION_NAME.IS_CHECKED, EXPLICIT_TIMEOUT, getDefaultCondition());
     }
 
     /**
@@ -801,7 +807,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return selected value
      */
     public String getSelectedValue() {
-        return (String) doAction(ACTION_NAME.GET_SELECTED_VALUE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        return (String) doAction(ACTION_NAME.GET_SELECTED_VALUE, EXPLICIT_TIMEOUT, getDefaultCondition());
     }
 
     /**
@@ -811,7 +817,7 @@ public class ExtendedWebElement implements IWebElement {
      */
     @SuppressWarnings("unchecked")
 	public List<String> getSelectedValues() {
-        return (List<String>) doAction(ACTION_NAME.GET_SELECTED_VALUES, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
+        return (List<String>) doAction(ACTION_NAME.GET_SELECTED_VALUES, EXPLICIT_TIMEOUT, getDefaultCondition());
     }
 
     /**
@@ -821,7 +827,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return true if item selected, otherwise false.
      */
     public boolean select(final String selectText) {
-        return (boolean) doAction(ACTION_NAME.SELECT, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), selectText);
+        return (boolean) doAction(ACTION_NAME.SELECT, EXPLICIT_TIMEOUT, getDefaultCondition(), selectText);
     }
 
     /**
@@ -831,7 +837,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return boolean.
      */
     public boolean select(final String[] values) {
-        return (boolean) doAction(ACTION_NAME.SELECT_VALUES, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), values);
+        return (boolean) doAction(ACTION_NAME.SELECT_VALUES, EXPLICIT_TIMEOUT, getDefaultCondition(), values);
     }
 
     /**
@@ -847,7 +853,7 @@ public class ExtendedWebElement implements IWebElement {
      *         } };
      */
     public boolean selectByMatcher(final BaseMatcher<String> matcher) {
-        return (boolean) doAction(ACTION_NAME.SELECT_BY_MATCHER, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), matcher);
+        return (boolean) doAction(ACTION_NAME.SELECT_BY_MATCHER, EXPLICIT_TIMEOUT, getDefaultCondition(), matcher);
     }
 
     /**
@@ -857,7 +863,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return true if item selected, otherwise false.
      */
     public boolean selectByPartialText(final String partialSelectText) {
-        return (boolean) doAction(ACTION_NAME.SELECT_BY_PARTIAL_TEXT, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()),
+        return (boolean) doAction(ACTION_NAME.SELECT_BY_PARTIAL_TEXT, EXPLICIT_TIMEOUT, getDefaultCondition(),
                 partialSelectText);
     }
 
@@ -868,7 +874,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return true if item selected, otherwise false.
      */
     public boolean select(final int index) {
-        return (boolean) doAction(ACTION_NAME.SELECT_BY_INDEX, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), index);
+        return (boolean) doAction(ACTION_NAME.SELECT_BY_INDEX, EXPLICIT_TIMEOUT, getDefaultCondition(), index);
     }
 
     // --------------------------------------------------------------------------
@@ -901,15 +907,15 @@ public class ExtendedWebElement implements IWebElement {
 			}
 		}
 
-    	ExpectedCondition<?> waitCondition;
-    	
         // [VD] replace presenceOfElementLocated and visibilityOf conditions by single "visibilityOfElementLocated"
         // visibilityOf: Does not check for presence of the element as the error explains it.
         // visibilityOfElementLocated: Checks to see if the element is present and also visible. To check visibility, it makes sure that the element
         // has a height and width greater than 0.
-    	
-        waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
-    	return waitUntil(waitCondition, timeout);
+        ExpectedCondition<?> visibilityCondition = this.isSearchContextWebElement
+                ? ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) this.searchContext, getBy())
+                : ExpectedConditions.visibilityOfElementLocated(getBy());
+
+        return waitUntil(visibilityCondition, timeout);
     }
 
     /**
@@ -938,15 +944,37 @@ public class ExtendedWebElement implements IWebElement {
      * @return element clickability status.
      */
     public boolean isClickable(long timeout) {
-    	ExpectedCondition<?> waitCondition;
-    	
-		if (element != null) {
-			waitCondition = ExpectedConditions.elementToBeClickable(element);
-		} else {
-            waitCondition = ExpectedConditions.elementToBeClickable(getBy());
-		}
-		
-    	return waitUntil(waitCondition, timeout);
+        ExpectedCondition<?> condition = null;
+        if (element != null) {
+            condition = ExpectedConditions.elementToBeClickable(this.element);
+        } else {
+            if (this.isSearchContextWebElement) {
+                condition = new ExpectedCondition<WebElement>() {
+                    @Override
+                    public WebElement apply(WebDriver driver) {
+                        List<WebElement> elements = ExpectedConditions.visibilityOfNestedElementsLocatedBy(((WebElement) searchContext), getBy())
+                                .apply(getDriver());
+                        try {
+                            if (!elements.isEmpty() && elements.get(0) != null && elements.get(0).isEnabled()) {
+                                return elements.get(0);
+                            }
+                            return null;
+                        } catch (StaleElementReferenceException e) {
+                            return null;
+                        }
+                    }
+
+                    @Override
+                    public String toString() {
+                        return "element to be clickable: " + getBy();
+                    }
+                };
+            } else {
+                condition = ExpectedConditions.elementToBeClickable(getBy());
+            }
+
+        }
+        return waitUntil(condition, timeout);
     }
 
     /**
@@ -967,11 +995,12 @@ public class ExtendedWebElement implements IWebElement {
 	public boolean isVisible(long timeout) {
 		ExpectedCondition<?> waitCondition;
 
-        if (element != null) {
-            waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(getBy()),
-                    ExpectedConditions.visibilityOf(element));
+        if (this.element != null) {
+            waitCondition = ExpectedConditions.visibilityOf(this.element);
         } else {
-            waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
+            waitCondition = this.isSearchContextWebElement
+                    ? ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) this.searchContext, getBy())
+                    : ExpectedConditions.visibilityOfElementLocated(getBy());
         }
 
         boolean res = false;
@@ -981,7 +1010,6 @@ public class ExtendedWebElement implements IWebElement {
             // there is no sense to continue as StaleElementReferenceException captured
             LOGGER.debug("waitUntil: StaleElementReferenceException", e);
         }
-        
         return res;
     }
 
@@ -1004,18 +1032,39 @@ public class ExtendedWebElement implements IWebElement {
      * @return element with text existence status.
      */
     public boolean isElementWithTextPresent(final String text, long timeout) {
-    	final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
-		ExpectedCondition<Boolean> textCondition;
-		if (element != null) {
-			textCondition = ExpectedConditions.textToBePresentInElement(element, decryptedText);
-		} else {
-            textCondition = ExpectedConditions.textToBePresentInElementLocated(getBy(), decryptedText);
-		}
-		return waitUntil(textCondition, timeout);
-    	//TODO: restore below code as only projects are migrated to "isElementWithContainTextPresent"
-//    	return waitUntil(ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
-//				ExpectedConditions.textToBe(getBy(), decryptedText)), timeout);
+        final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
 
+        ExpectedCondition<Boolean> textCondition = null;
+        if (this.element != null) {
+            textCondition = ExpectedConditions.textToBePresentInElement(this.element, decryptedText);
+        } else {
+            if (this.isSearchContextWebElement) {
+                textCondition = new ExpectedCondition<Boolean>() {
+                    @Override
+                    public Boolean apply(WebDriver driver) {
+                        try {
+                            String elementText = searchContext.findElement(getBy()).getText();
+                            return elementText.contains(decryptedText);
+                        } catch (StaleElementReferenceException e) {
+                            return null;
+                        }
+                    }
+
+                    @Override
+                    public String toString() {
+                        return String.format("text ('%s') to be present in element found by %s",
+                                text, getBy());
+                    }
+                };
+            } else {
+                textCondition = ExpectedConditions.textToBePresentInElementLocated(getBy(), decryptedText);
+            }
+        }
+
+        return waitUntil(textCondition, timeout);
+        // TODO: restore below code as only projects are migrated to "isElementWithContainTextPresent"
+        // return waitUntil(ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
+        // ExpectedConditions.textToBe(getBy(), decryptedText)), timeout);
     }
     
     public void assertElementWithTextPresent(final String text) {
@@ -1083,11 +1132,11 @@ public class ExtendedWebElement implements IWebElement {
      * @return ExtendedWebElement if exists otherwise null.
      */
     public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
-        if (isPresent(by, timeout)) {
-            return new ExtendedWebElement(by, name, this.driver, getElement());
-        } else {
-        	throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
+        ExtendedWebElement foundElement = new ExtendedWebElement(by, name, this.driver, getElement());
+        if (!foundElement.isPresent(timeout)) {
+            throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by);
         }
+        return foundElement;
     }
 
     public List<ExtendedWebElement> findExtendedWebElements(By by) {
@@ -1095,25 +1144,23 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     public List<ExtendedWebElement> findExtendedWebElements(final By by, long timeout) {
-        List<ExtendedWebElement> extendedWebElements = new ArrayList<ExtendedWebElement>();
-        List<WebElement> webElements = new ArrayList<WebElement>();
-        
-        if (isPresent(by, timeout)) {
-            webElements = getElement().findElements(by);
-        } else {
-        	throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
+        ExtendedWebElement anyElement = new ExtendedWebElement(by, "any element", this.driver, getElement());
+
+        if (!anyElement.isPresent(timeout)) {
+            throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by);
         }
 
+        List<ExtendedWebElement> extendedWebElements = new ArrayList<>();
+
         int i = 1;
-        for (WebElement element : webElements) {
+        for (WebElement el : getElement().findElements(by)) {
             String name = "undefined";
             try {
-                name = element.getText();
+                name = el.getText();
             } catch (Exception e) {
                 /* do nothing */
                 LOGGER.debug("Error while getting text from element.", e);
             }
-
             // we can't initiate ExtendedWebElement using by as it belongs to the list of elements
             extendedWebElements.add(new ExtendedWebElement(generateByForList(by, i), name, this.driver, getElement()));
             i++;
@@ -1798,77 +1845,35 @@ public class ExtendedWebElement implements IWebElement {
     /**
      * Get element waiting condition depends on element loading strategy
      */
-    private ExpectedCondition<?> getDefaultCondition(By by) {
+    private ExpectedCondition<?> getDefaultCondition() {
         // generate the most popular waitCondition to check if element visible or present
-        ExpectedCondition<?> waitCondition = null;
-        // need to get root element from with we will try to find element by By
+        ExpectedCondition<?> condition = null;
+
+        ExpectedCondition<?> presenceCondition = this.isSearchContextWebElement
+                ? ExpectedConditions.presenceOfNestedElementLocatedBy((WebElement) this.searchContext, getBy())
+                : ExpectedConditions.presenceOfElementLocated(getBy());
+
+        ExpectedCondition<?> visibilityCondition = this.isSearchContextWebElement
+                ? ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) this.searchContext, getBy())
+                : ExpectedConditions.visibilityOfElementLocated(getBy());
+
+        ExpectedCondition<?> visibilityElementCondition = ExpectedConditions.visibilityOf(this.element);
+
         switch (loadingStrategy) {
         case BY_PRESENCE: {
-            if (element != null) {
-                if (searchContext instanceof RemoteWebElement) {
-                    WebElement contextElement = searchContext.findElement(By.xpath("."));
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by),
-                            ExpectedConditions.visibilityOf(element));
-                } else {
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
-                            ExpectedConditions.visibilityOf(element));
-                }
-            } else {
-                if (searchContext instanceof RemoteWebElement) {
-                    WebElement contextElement = searchContext.findElement(By.xpath("."));
-                    waitCondition = ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by);
-                } else {
-                    waitCondition = ExpectedConditions.presenceOfElementLocated(by);
-
-                }
-            }
+            condition = (this.element != null) ? ExpectedConditions.or(visibilityElementCondition, presenceCondition) : presenceCondition;
             break;
         }
         case BY_VISIBILITY: {
-            if (element != null) {
-                if (searchContext instanceof RemoteWebElement) {
-                    WebElement contextElement = searchContext.findElement(By.xpath("."));
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by),
-                            ExpectedConditions.visibilityOf(element));
-                } else {
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(by),
-                            ExpectedConditions.visibilityOf(element));
-                }
-            } else {
-                if (searchContext instanceof RemoteWebElement) {
-                    WebElement contextElement = searchContext.findElement(By.xpath("."));
-                    waitCondition = ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by);
-                } else {
-                    waitCondition = ExpectedConditions.visibilityOfElementLocated(by);
-                }
-            }
+            condition = (this.element != null) ? ExpectedConditions.or(visibilityElementCondition, visibilityCondition) : visibilityCondition;
             break;
         }
         case BY_PRESENCE_OR_VISIBILITY:
-            if (element != null) {
-                if (searchContext instanceof RemoteWebElement) {
-                    WebElement contextElement = searchContext.findElement(By.xpath("."));
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by),
-                            ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by),
-                            ExpectedConditions.visibilityOf(element));
-                } else {
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
-                            ExpectedConditions.visibilityOfElementLocated(by),
-                            ExpectedConditions.visibilityOf(element));
-                }
-            } else {
-                if (searchContext instanceof RemoteWebElement) {
-                    WebElement contextElement = searchContext.findElement(By.xpath("."));
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by),
-                            ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by));
-                } else {
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
-                            ExpectedConditions.visibilityOfElementLocated(by));
-                }
-            }
+            condition = (this.element != null) ? ExpectedConditions.or(visibilityElementCondition, visibilityCondition, presenceCondition)
+                    : ExpectedConditions.or(visibilityCondition, presenceCondition);
             break;
         }
-        return waitCondition;
+        return condition;
     }
     
     private long getRetryInterval(long timeout) {
