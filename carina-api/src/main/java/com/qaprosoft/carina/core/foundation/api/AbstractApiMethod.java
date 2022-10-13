@@ -94,7 +94,7 @@ public abstract class AbstractApiMethod extends HttpClient {
                 ? anchorElement
                 : this.getClass();
 
-        this.interceptorChain = new InterceptorChain(anchorElement);
+        this.interceptorChain = new InterceptorChain(this.anchorElement);
 
         RequestStartLine requestStartLine = ContextResolverChain.resolveUrl(this.anchorElement)
                 .orElseThrow(() -> new RuntimeException("Method type and path are not specified for: " + this.getClass().getSimpleName()));

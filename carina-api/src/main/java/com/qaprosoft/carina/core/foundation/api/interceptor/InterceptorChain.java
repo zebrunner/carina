@@ -47,6 +47,9 @@ public class InterceptorChain {
 
     private void processLinkedInterceptors(AnnotatedElement element) {
         List<LinkedInterceptors> linkedInterceptorsAnnotations = ResolverUtils.resolveAllAnnotatedItemsByChain(element, LinkedInterceptors.class);
+
+        Collections.reverse(linkedInterceptorsAnnotations);
+
         List<Class<? extends ApiMethodInterceptor>> interceptorClasses = linkedInterceptorsAnnotations.stream()
                 .map(LinkedInterceptors::classes)
                 .flatMap(Arrays::stream)
@@ -61,9 +64,7 @@ public class InterceptorChain {
             }
         }
 
-        interceptors.addAll(globalInterceptors);
-
-        Collections.reverse(interceptors);
+        interceptors.addAll(0, globalInterceptors);
     }
 
     private static ApiMethodInterceptor createInstance(Class<? extends ApiMethodInterceptor> interceptorClass) {
