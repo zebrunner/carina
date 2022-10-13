@@ -13,9 +13,13 @@ class PropertiesContextResolver implements ContextResolver<Class<?>> {
 
     @Override
     public Optional<RequestStartLine> resolveUrl(Class<?> element) {
-        return ResolverUtils.findParentClass(element, c -> R.API.containsKey(c.getSimpleName()))
-                .map(c -> R.API.get(c.getSimpleName()))
-                .map(PropertiesContextResolver::resolveStartLine);
+        try {
+            return ResolverUtils.findFirstParentClass(element, c -> R.API.containsKey(c.getSimpleName()))
+                    .map(c -> R.API.get(c.getSimpleName()))
+                    .map(PropertiesContextResolver::resolveStartLine);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(String.format("While searching for an url and type for a %s class in a properties file. %s", element.getSimpleName(), e.getMessage()), e);
+        }
     }
 
     private static RequestStartLine resolveStartLine(String typePath) {

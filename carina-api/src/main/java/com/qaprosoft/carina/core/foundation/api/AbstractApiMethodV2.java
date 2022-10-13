@@ -87,6 +87,8 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         initPaths(rqPath, rsPath);
         initHeaders();
         setProperties(properties);
+
+        getInterceptorChain().onInstantiation(this);
     }
 
     private void initHeaders() {

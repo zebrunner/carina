@@ -1,25 +1,16 @@
 package com.qaprosoft.carina.core.foundation.api.annotation;
 
+import com.qaprosoft.carina.core.foundation.api.interceptor.ApiMethodInterceptor;
+
 import java.lang.annotation.ElementType;
-import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Repeatable(Cookie.List.class)
 @Target(value = { ElementType.TYPE, ElementType.METHOD })
 @Retention(value = RetentionPolicy.RUNTIME)
-public @interface Cookie {
+public @interface LinkedInterceptors {
 
-    String key();
+    Class<? extends ApiMethodInterceptor>[] classes() default {};
 
-    String value();
-
-    @Target(value = { ElementType.TYPE, ElementType.METHOD })
-    @Retention(value = RetentionPolicy.RUNTIME)
-    @interface List {
-
-        Cookie[] value();
-
-    }
 }

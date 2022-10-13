@@ -32,6 +32,7 @@ import java.util.Set;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 
+import com.qaprosoft.carina.core.foundation.api.interceptor.InterceptorChain;
 import com.qaprosoft.carina.core.foundation.api.resolver.ContextResolverChain;
 import com.qaprosoft.carina.core.foundation.api.resolver.RequestStartLine;
 import org.apache.commons.lang3.ArrayUtils;
@@ -72,6 +73,7 @@ public abstract class AbstractApiMethod extends HttpClient {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final AnnotatedElement anchorElement;
+    private final InterceptorChain interceptorChain;
 
     private StringBuilder bodyContent;
     protected String methodPath;
@@ -91,6 +93,8 @@ public abstract class AbstractApiMethod extends HttpClient {
         this.anchorElement = anchorElement != null
                 ? anchorElement
                 : this.getClass();
+
+        this.interceptorChain = new InterceptorChain(anchorElement);
 
         RequestStartLine requestStartLine = ContextResolverChain.resolveUrl(this.anchorElement)
                 .orElseThrow(() -> new RuntimeException("Method type and path are not specified for: " + this.getClass().getSimpleName()));
@@ -281,6 +285,8 @@ public abstract class AbstractApiMethod extends HttpClient {
             initLogging(ps);
         }
 
+        getInterceptorChain().onBeforeCall();
+
         Response rs;
         try {
             rs = HttpClient.send(request, methodPath, methodType);
@@ -372,5 +378,9 @@ public abstract class AbstractApiMethod extends HttpClient {
 
     protected AnnotatedElement getAnchorElement() {
         return anchorElement;
+    }
+
+    InterceptorChain getInterceptorChain() {
+        return interceptorChain;
     }
 }

@@ -2,9 +2,11 @@ package com.qaprosoft.carina.core.foundation.api.resolver;
 
 import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
 import com.qaprosoft.carina.core.foundation.api.annotation.Cookie;
+import com.qaprosoft.carina.core.foundation.api.annotation.CookieParam;
 import com.qaprosoft.carina.core.foundation.api.annotation.Endpoint;
 import com.qaprosoft.carina.core.foundation.api.annotation.EndpointTemplate;
 import com.qaprosoft.carina.core.foundation.api.annotation.Header;
+import com.qaprosoft.carina.core.foundation.api.annotation.HeaderParam;
 import com.qaprosoft.carina.core.foundation.api.annotation.HideRequestBodyPartsInLogs;
 import com.qaprosoft.carina.core.foundation.api.annotation.HideRequestHeadersInLogs;
 import com.qaprosoft.carina.core.foundation.api.annotation.HideResponseBodyPartsInLogs;
@@ -23,8 +25,11 @@ import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MethodBasedContextResolver implements ContextResolver<RuntimeMethod> {
 
@@ -42,7 +47,7 @@ public class MethodBasedContextResolver implements ContextResolver<RuntimeMethod
     }
 
     private String resolveGlobalPath(AnnotatedElement method) {
-        return ResolverUtils.findClassAnnotationValue(method, EndpointTemplate.class)
+        return ResolverUtils.findFirstClassAnnotation(method, EndpointTemplate.class)
                 .map(EndpointTemplate::url)
                 .orElse(null);
     }
@@ -67,7 +72,7 @@ public class MethodBasedContextResolver implements ContextResolver<RuntimeMethod
 
     @Override
     public Optional<String> resolveContentType(RuntimeMethod element) {
-        return ResolverUtils.resolveAnnotationValueFromMethod(
+        return ResolverUtils.resolveFirstAnnotationValueStartingFromMethod(
                 element.getMethod(),
                 ContentType.class,
                 ContentType::type,
@@ -77,7 +82,7 @@ public class MethodBasedContextResolver implements ContextResolver<RuntimeMethod
 
     @Override
     public Optional<String[]> resolveHiddenRequestBodyPartsInLogs(RuntimeMethod element) {
-        return ResolverUtils.resolveAnnotationValueFromMethod(
+        return ResolverUtils.resolveFirstAnnotationValueStartingFromMethod(
                 element.getMethod(),
                 HideRequestBodyPartsInLogs.class,
                 HideRequestBodyPartsInLogs::paths,
@@ -87,7 +92,7 @@ public class MethodBasedContextResolver implements ContextResolver<RuntimeMethod
 
     @Override
     public Optional<String[]> resolveHiddenResponseBodyPartsInLogs(RuntimeMethod element) {
-        return ResolverUtils.resolveAnnotationValueFromMethod(
+        return ResolverUtils.resolveFirstAnnotationValueStartingFromMethod(
                 element.getMethod(),
                 HideResponseBodyPartsInLogs.class,
                 HideResponseBodyPartsInLogs::paths,
@@ -97,7 +102,7 @@ public class MethodBasedContextResolver implements ContextResolver<RuntimeMethod
 
     @Override
     public Optional<String[]> resolveHiddenRequestHeadersInLogs(RuntimeMethod element) {
-        return ResolverUtils.resolveAnnotationValueFromMethod(
+        return ResolverUtils.resolveFirstAnnotationValueStartingFromMethod(
                 element.getMethod(),
                 HideRequestHeadersInLogs.class,
                 HideRequestHeadersInLogs::headers,
@@ -107,7 +112,7 @@ public class MethodBasedContextResolver implements ContextResolver<RuntimeMethod
 
     @Override
     public Optional<String> resolveRequestTemplatePath(RuntimeMethod element) {
-        return ResolverUtils.resolveAnnotationValueFromParameter(
+        return ResolverUtils.resolveFirstAnnotationValueStartingFromParameter(
                 element.getMethod(),
                 RequestTemplatePathParam.class,
                 RequestTemplatePath.class,
@@ -120,7 +125,7 @@ public class MethodBasedContextResolver implements ContextResolver<RuntimeMethod
 
     @Override
     public Optional<String> resolveResponseTemplatePath(RuntimeMethod element) {
-        return ResolverUtils.resolveAnnotationValueFromParameter(
+        return ResolverUtils.resolveFirstAnnotationValueStartingFromParameter(
                 element.getMethod(),
                 ResponseTemplatePathParam.class,
                 ResponseTemplatePath.class,
@@ -133,7 +138,7 @@ public class MethodBasedContextResolver implements ContextResolver<RuntimeMethod
 
     @Override
     public Optional<HttpResponseStatusType> resolveSuccessfulHttpStatus(RuntimeMethod element) {
-        return ResolverUtils.resolveAnnotationValueFromParameter(
+        return ResolverUtils.resolveFirstAnnotationValueStartingFromParameter(
                 element.getMethod(),
                 SuccessfulHttpStatusParam.class,
                 SuccessfulHttpStatus.class,
@@ -164,13 +169,32 @@ public class MethodBasedContextResolver implements ContextResolver<RuntimeMethod
 
     @Override
     public Optional<Map<String, ?>> resolveHeaders(RuntimeMethod element) {
-        Map<String, ?> result = ResolverUtils.resolveNamedAnnotatedParameterValues(element.getMethod(), Header.class, Header::key, element.getArgs());
+        Map<String, ?> paramHeader = ResolverUtils.resolveNamedAnnotatedParameterValues(element.getMethod(), HeaderParam.class, HeaderParam::key, element.getArgs());
+        Map<String, ?> headers = ResolverUtils.resolveAllAnnotatedItemsByChain(element.getMethod(), Header.class).stream()
+                .collect(Collectors.toMap(Header::key, Header::value));
+        Map<String, ?> headerLists = ResolverUtils.resolveAllAnnotatedItemsByChain(element.getMethod(), Header.List.class).stream()
+                .flatMap(list -> Arrays.stream(list.value()))
+                .collect(Collectors.toMap(Header::key, Header::value));
+
+        Map<String, ?> result = Stream.of(paramHeader.entrySet(), headers.entrySet(), headerLists.entrySet())
+                .flatMap(Collection::stream)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
         return Optional.of(result);
     }
 
     @Override
     public Optional<Map<String, ?>> resolveCookies(RuntimeMethod element) {
-        Map<String, ?> result = ResolverUtils.resolveNamedAnnotatedParameterValues(element.getMethod(), Cookie.class, Cookie::key, element.getArgs());
+        Map<String, ?> paramCookie = ResolverUtils.resolveNamedAnnotatedParameterValues(element.getMethod(), CookieParam.class, CookieParam::key, element.getArgs());
+        Map<String, ?> cookies = ResolverUtils.resolveAllAnnotatedItemsByChain(element.getMethod(), Cookie.class).stream()
+                .collect(Collectors.toMap(Cookie::key, Cookie::value));
+        Map<String, ?> cookieList = ResolverUtils.resolveAllAnnotatedItemsByChain(element.getMethod(), Cookie.List.class).stream()
+                .flatMap(list -> Arrays.stream(list.value()))
+                .collect(Collectors.toMap(Cookie::key, Cookie::value));
+
+        Map<String, ?> result = Stream.of(paramCookie.entrySet(), cookies.entrySet(), cookieList.entrySet())
+                .flatMap(Collection::stream)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         return Optional.of(result);
     }
 
