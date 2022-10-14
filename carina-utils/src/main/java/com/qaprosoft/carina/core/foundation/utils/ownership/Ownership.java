@@ -19,22 +19,13 @@ import java.lang.reflect.Method;
 
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.zebrunner.agent.core.registrar.maintainer.MaintainerResolver;
+import org.apache.commons.lang3.StringUtils;
 
 public class Ownership implements MaintainerResolver {
-    private String owner = "";
-
-    public Ownership(String owner) {
-        if (owner != null) {
-            this.owner = owner;
-        }
-    }
-    
-    public Ownership() {
-        this("");
-    }
 
     @Override
     public String resolve(Class<?> clazz, Method method) {
+        String owner = StringUtils.EMPTY;
         // Get a handle to the class and method
         // We can't use getMethod() because we may have parameterized tests
         // for which we don't know the matching signature
@@ -51,7 +42,7 @@ public class Ownership implements MaintainerResolver {
         // do a scan for single Methodowner annotation as well)
         if (testMethod != null && testMethod.isAnnotationPresent(MethodOwner.class)) {
             MethodOwner methodAnnotation = testMethod.getAnnotation(MethodOwner.class);
-            this.owner = methodAnnotation.owner();
+            owner = methodAnnotation.owner();
         }
         
         // scan all MethodOwner annotations to find default ownership without any platform
@@ -60,7 +51,7 @@ public class Ownership implements MaintainerResolver {
             for (MethodOwner methodOwner : methodAnnotation.value()) {
                 String actualPlatform = methodOwner.platform();
                 if (actualPlatform.isEmpty()) {
-                    this.owner = methodOwner.owner();
+                    owner = methodOwner.owner();
                     break;
                 }            
             }
@@ -75,12 +66,12 @@ public class Ownership implements MaintainerResolver {
                 String expectedPlatform = Configuration.getPlatform();
                 
                 if (!actualPlatform.isEmpty() && isValidPlatform(actualPlatform, expectedPlatform)) {
-                    this.owner = methodOwner.owner();
+                    owner = methodOwner.owner();
                 }               
             }
         }
 
-        return this.owner;
+        return owner;
     }
     
     private static boolean isValidPlatform(String actualPlatform, String expectedPlatform) {

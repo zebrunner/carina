@@ -77,6 +77,7 @@ import com.qaprosoft.carina.core.foundation.utils.Messager;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.ZebrunnerNameResolver;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
+import com.qaprosoft.carina.core.foundation.utils.ownership.SuiteOwnerResolver;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.utils.tag.PriorityManager;
 import com.qaprosoft.carina.core.foundation.utils.tag.TagManager;
@@ -169,8 +170,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     public void onStart(ISuite suite) {
         LOGGER.debug("CarinaListener->onStart(ISuite suite)");
 
+        ChainedMaintainerResolver.addLast(new SuiteOwnerResolver(suite));
         // first means that ownership/maintainer resolver from carina has higher priority
-        ChainedMaintainerResolver.addFirst(new Ownership(suite.getParameter("suiteOwner")));
+        ChainedMaintainerResolver.addFirst(new Ownership());
 
         if (!"INFO".equalsIgnoreCase(Configuration.get(Parameter.CORE_LOG_LEVEL))) {
             LoggerContext ctx = (LoggerContext) LogManager.getContext(this.getClass().getClassLoader(), false);
