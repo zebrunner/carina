@@ -193,6 +193,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             // [VD] do not move into the static block as Zebrunner reporting need registered test run!
             Artifact.attachReferenceToTestRun("app", mobileApp);
         }
+
+        CurrentTestRun.setLocale(Configuration.get(Parameter.LOCALE));
+
         // register app_version/build as artifact if available...
         Configuration.setBuild(Configuration.get(Parameter.APP_VERSION));
         
