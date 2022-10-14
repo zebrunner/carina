@@ -28,6 +28,8 @@ interface ContextResolver<E extends AnnotatedElement> {
 
     Optional<Map<String, ?>> resolveQueryParams(E element);
 
+    Optional<String> resolvePropertiesPath(E element);
+
     Optional<Map<String, ?>> resolveProperties(E element);
 
     Optional<Map<String, ?>> resolveHeaders(E element);

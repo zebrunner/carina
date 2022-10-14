@@ -85,6 +85,11 @@ class PropertiesContextResolver implements ContextResolver<Class<?>> {
     }
 
     @Override
+    public Optional<String> resolvePropertiesPath(Class<?> element) {
+        return Optional.empty();
+    }
+
+    @Override
     public Optional<Map<String, ?>> resolveHeaders(Class<?> element) {
         return Optional.empty();
     }

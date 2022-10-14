@@ -23,6 +23,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
 import com.qaprosoft.apitools.builder.PropertiesProcessor;
@@ -67,11 +68,11 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     }
 
     public AbstractApiMethodV2(String rqPath, String rsPath) {
-        this(rqPath, rsPath, new Properties());
+        this(rqPath, rsPath, (Properties) null);
     }
 
     public AbstractApiMethodV2(String rqPath, String rsPath, String propertiesPath) {
-        this(rqPath, rsPath, loadProperties(propertiesPath));
+        this(rqPath, rsPath, loadProperties(propertiesPath).orElse(null));
     }
 
     public AbstractApiMethodV2(String rqPath, String rsPath, Properties properties) {
@@ -79,15 +80,26 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     }
 
     AbstractApiMethodV2(AnnotatedElement anchorElement) {
-        this(anchorElement, null, null, new Properties());
+        this(anchorElement, null, null, null);
     }
 
     private AbstractApiMethodV2(AnnotatedElement anchorElement, String rqPath, String rsPath, Properties properties) {
         super(anchorElement);
         initPaths(rqPath, rsPath);
         initHeaders();
-        setProperties(properties);
+        initProperties(properties);
+
         getInterceptorChain().onInstantiation();
+    }
+
+    private void initProperties(Properties properties) {
+        if (properties == null) {
+            properties = loadProperties(
+                    ContextResolverChain.resolvePropertiesPath(getAnchorElement())
+                            .orElse(null)
+            ).orElse(new Properties());
+        }
+        setProperties(properties);
     }
 
     private void initHeaders() {
@@ -183,16 +195,14 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
      * @param propertiesPath String path to properties file
      */
     public void setProperties(String propertiesPath) {
-        Properties properties = loadProperties(propertiesPath);
-        setProperties(properties);
+        loadProperties(propertiesPath)
+                .ifPresent(this::setProperties);
     }
 
-    private static Properties loadProperties(String propertiesPath) {
-        Properties properties;
+    private static Optional<Properties> loadProperties(String propertiesPath) {
+        Properties properties = null;
 
-        if (propertiesPath == null) {
-            properties = new Properties();
-        } else {
+        if (propertiesPath != null) {
             URL baseResource = ClassLoader.getSystemResource(propertiesPath);
             if (baseResource != null) {
                 properties = new Properties();
@@ -206,7 +216,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
                 throw new RuntimeException("Properties can't be found by path: " + propertiesPath);
             }
         }
-        return properties;
+        return Optional.ofNullable(properties);
     }
 
     public void ignorePropertiesProcessor(Class<? extends PropertiesProcessor> ignoredPropertiesProcessorClass) {

@@ -63,7 +63,7 @@ public class ResolverUtils {
                 .map(Supplier::get)
                 .peek(results -> {
                     if (results.size() > 1) {
-                        throw new RuntimeException(String.format("The %s cannot be recognized. More than one value was found", errorMessageItem));
+                        throw new RuntimeException(String.format("The %s cannot be recognized. More than one candidate has been found", errorMessageItem));
                     }
                 })
                 .filter(results -> results.size() == 1)

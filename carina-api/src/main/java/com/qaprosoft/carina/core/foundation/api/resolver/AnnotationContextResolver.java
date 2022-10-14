@@ -75,6 +75,11 @@ class AnnotationContextResolver implements ContextResolver<Class<?>> {
     }
 
     @Override
+    public Optional<String> resolvePropertiesPath(Class<?> element) {
+        return Optional.empty();
+    }
+
+    @Override
     public Optional<Map<String, ?>> resolveProperties(Class<?> element) {
         return Optional.empty();
     }

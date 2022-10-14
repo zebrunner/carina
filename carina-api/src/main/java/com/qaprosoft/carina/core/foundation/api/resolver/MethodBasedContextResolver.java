@@ -11,6 +11,8 @@ import com.qaprosoft.carina.core.foundation.api.annotation.HideRequestBodyPartsI
 import com.qaprosoft.carina.core.foundation.api.annotation.HideRequestHeadersInLogs;
 import com.qaprosoft.carina.core.foundation.api.annotation.HideResponseBodyPartsInLogs;
 import com.qaprosoft.carina.core.foundation.api.annotation.PathVariable;
+import com.qaprosoft.carina.core.foundation.api.annotation.PropertiesPath;
+import com.qaprosoft.carina.core.foundation.api.annotation.PropertiesPathParam;
 import com.qaprosoft.carina.core.foundation.api.annotation.Property;
 import com.qaprosoft.carina.core.foundation.api.annotation.QueryParam;
 import com.qaprosoft.carina.core.foundation.api.annotation.RequestTemplatePath;
@@ -165,6 +167,19 @@ public class MethodBasedContextResolver implements ContextResolver<RuntimeMethod
     public Optional<Map<String, ?>> resolveProperties(RuntimeMethod element) {
         Map<String, ?> result = ResolverUtils.resolveNamedAnnotatedParameterValues(element.getMethod(), Property.class, Property::value, element.getArgs());
         return Optional.of(result);
+    }
+
+    @Override
+    public Optional<String> resolvePropertiesPath(RuntimeMethod element) {
+        return ResolverUtils.resolveFirstAnnotationValueStartingFromParameter(
+                element.getMethod(),
+                PropertiesPathParam.class,
+                PropertiesPath.class,
+                Object::toString,
+                PropertiesPath::path,
+                "properties path",
+                element.getArgs()
+        );
     }
 
     @Override

@@ -64,6 +64,10 @@ public class ContextResolverChain {
         return getResolverValue(resolver -> resolver.resolveProperties(element), element);
     }
 
+    public static Optional<String> resolvePropertiesPath(AnnotatedElement element) {
+        return getResolverValue(resolver -> resolver.resolvePropertiesPath(element), element);
+    }
+
     public static Optional<Map<String, ?>> resolveHeaders(AnnotatedElement element) {
         return getResolverValue(resolver -> resolver.resolveHeaders(element), element);
     }
