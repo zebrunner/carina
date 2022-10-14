@@ -164,12 +164,6 @@ public class MethodBasedContextResolver implements ContextResolver<RuntimeMethod
     }
 
     @Override
-    public Optional<Map<String, ?>> resolveProperties(RuntimeMethod element) {
-        Map<String, ?> result = ResolverUtils.resolveNamedAnnotatedParameterValues(element.getMethod(), Property.class, Property::value, element.getArgs());
-        return Optional.of(result);
-    }
-
-    @Override
     public Optional<String> resolvePropertiesPath(RuntimeMethod element) {
         return ResolverUtils.resolveFirstAnnotationValueStartingFromParameter(
                 element.getMethod(),
@@ -180,6 +174,12 @@ public class MethodBasedContextResolver implements ContextResolver<RuntimeMethod
                 "properties path",
                 element.getArgs()
         );
+    }
+
+    @Override
+    public Optional<Map<String, ?>> resolveProperties(RuntimeMethod element) {
+        Map<String, ?> result = ResolverUtils.resolveNamedAnnotatedParameterValues(element.getMethod(), Property.class, Property::value, element.getArgs());
+        return Optional.of(result);
     }
 
     @Override

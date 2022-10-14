@@ -26,8 +26,8 @@ import com.qaprosoft.carina.core.foundation.utils.Configuration;
 
 public class CryptoProcessor implements PropertiesProcessor {
 
-    private static CryptoTool cryptoTool = new CryptoTool(Configuration.get(Configuration.Parameter.CRYPTO_KEY_PATH));
-    private static Pattern CRYPT_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
+    private static final CryptoTool cryptoTool = new CryptoTool(Configuration.get(Configuration.Parameter.CRYPTO_KEY_PATH));
+    private static final Pattern CRYPT_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
 
     @Override
     public Properties process(Properties in) {

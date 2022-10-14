@@ -1,18 +1,25 @@
 package com.qaprosoft.carina.core.foundation.api.resolver;
 
 import com.qaprosoft.carina.core.foundation.api.annotation.ContentType;
+import com.qaprosoft.carina.core.foundation.api.annotation.Cookie;
 import com.qaprosoft.carina.core.foundation.api.annotation.Endpoint;
+import com.qaprosoft.carina.core.foundation.api.annotation.Header;
 import com.qaprosoft.carina.core.foundation.api.annotation.HideRequestBodyPartsInLogs;
 import com.qaprosoft.carina.core.foundation.api.annotation.HideRequestHeadersInLogs;
 import com.qaprosoft.carina.core.foundation.api.annotation.HideResponseBodyPartsInLogs;
+import com.qaprosoft.carina.core.foundation.api.annotation.PropertiesPath;
 import com.qaprosoft.carina.core.foundation.api.annotation.RequestTemplatePath;
 import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePath;
 import com.qaprosoft.carina.core.foundation.api.annotation.SuccessfulHttpStatus;
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
 
 import java.lang.reflect.AnnotatedElement;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 class AnnotationContextResolver implements ContextResolver<Class<?>> {
 
@@ -76,7 +83,8 @@ class AnnotationContextResolver implements ContextResolver<Class<?>> {
 
     @Override
     public Optional<String> resolvePropertiesPath(Class<?> element) {
-        return Optional.empty();
+        return ResolverUtils.findFirstClassAnnotation(element, PropertiesPath.class)
+                .map(PropertiesPath::path);
     }
 
     @Override
@@ -86,12 +94,31 @@ class AnnotationContextResolver implements ContextResolver<Class<?>> {
 
     @Override
     public Optional<Map<String, ?>> resolveHeaders(Class<?> element) {
-        return Optional.empty();
+        Map<String, ?> headers = ResolverUtils.resolveAllAnnotatedItemsByChain(element, Header.class).stream()
+                .collect(Collectors.toMap(Header::key, Header::value));
+        Map<String, ?> headerLists = ResolverUtils.resolveAllAnnotatedItemsByChain(element, Header.List.class).stream()
+                .flatMap(list -> Arrays.stream(list.value()))
+                .collect(Collectors.toMap(Header::key, Header::value));
+
+        Map<String, ?> result = Stream.of(headers.entrySet(), headerLists.entrySet())
+                .flatMap(Collection::stream)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        return Optional.of(result);
     }
 
     @Override
     public Optional<Map<String, ?>> resolveCookies(Class<?> element) {
-        return Optional.empty();
+        Map<String, ?> cookies = ResolverUtils.resolveAllAnnotatedItemsByChain(element, Cookie.class).stream()
+                .collect(Collectors.toMap(Cookie::key, Cookie::value));
+        Map<String, ?> cookieList = ResolverUtils.resolveAllAnnotatedItemsByChain(element, Cookie.List.class).stream()
+                .flatMap(list -> Arrays.stream(list.value()))
+                .collect(Collectors.toMap(Cookie::key, Cookie::value));
+
+        Map<String, ?> result = Stream.of(cookies.entrySet(), cookieList.entrySet())
+                .flatMap(Collection::stream)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        return Optional.of(result);
     }
 
     @Override

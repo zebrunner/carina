@@ -347,15 +347,15 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
      */
     public void validateResponse(String... validationFlags) {
         switch (contentTypeEnum) {
-        case JSON:
-            validateResponse(JSONCompareMode.NON_EXTENSIBLE, validationFlags);
-            break;
-        case XML:
-            validateXmlResponse(XmlCompareMode.STRICT);
-            break;
-        default:
-            throw new RuntimeException("Unsupported argument of content type");
-        }
+            case JSON:
+                validateResponse(JSONCompareMode.NON_EXTENSIBLE, validationFlags);
+                break;
+            case XML:
+                validateXmlResponse(XmlCompareMode.STRICT);
+                break;
+            default:
+                throw new RuntimeException("Unsupported argument of content type");
+            }
     }
 
     /**
