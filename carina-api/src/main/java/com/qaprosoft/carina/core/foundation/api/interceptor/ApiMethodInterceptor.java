@@ -1,11 +1,11 @@
 package com.qaprosoft.carina.core.foundation.api.interceptor;
 
-import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
+import com.qaprosoft.carina.core.foundation.api.AbstractApiMethod;
 
-public interface ApiMethodInterceptor {
+public interface ApiMethodInterceptor<M extends AbstractApiMethod> {
 
-    void onInstantiation(AbstractApiMethodV2 apiMethod);
+    void onInstantiation(M apiMethod);
 
-    void onBeforeCall(AbstractApiMethodV2 apiMethod);
+    void onBeforeCall(M apiMethod);
 
 }
