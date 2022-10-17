@@ -97,11 +97,14 @@ PatchPostsMethod=PATCH:${base_url}/posts/1
 
 Approach based on initialisation of super class constructor is deprecated and more convenient way is to use annotations. They can be used over class declarations. For api testing we can use such annotations:
 
-1. @ContentType - is used to define the value of Content-type header in response;
-2. @Endpoint - defines the place that APIs send requests and where the resource lives
-3. @RequestTemplatePath - contains a path from source root to request template file.
-4. @ResponseTemplatePath - contains a path from source root to response template file.
-5. @SuccessfulHttpStatus - specifies the expected HTTP status
+1. `@ContentType` - is used to define the value of Content-type header in response
+2. `@Cookie` - is used to specify cookies in the request
+3. `@Endpoint` - defines the place that APIs send requests and where the resource lives
+4. `@Header` - is used to specify headers in the request
+5. `@PropertiesPath` - contains a path from source root to properties file
+6. `@RequestTemplatePath` - contains a path from source root to request template file
+7. `@ResponseTemplatePath` - contains a path from source root to response template file
+8. `@SuccessfulHttpStatus` - specifies the expected HTTP status
 
 In this case we don’t need to define _api.properties file and call the constructor of a super class, but if we have some properties file used in this request we should explicitly set it in test method. Insead of callAPI() and expectResponseStatus() methods we can use callAPIExpectSuccess() that will call API expecting http status in response taken from @SuccessfulHttpStatus value.
 ```java
@@ -209,6 +212,119 @@ public class APISampleTest implements IAbstractTest {
 6. Validate the response by a template or parse some data by JSON path
 7. Make further calls using the data from the previous call if needed
 
+#### REST service call domain object (Declarative approach)
+
+Approach based on implicit instantiation of the `AbstractApiMethod`.
+This is useful for:
+- Improving the readability of the `AbstractApiMethod` description
+- The ability to better structure the description of endpoints
+- Reduction of time for the implementation of the desired `AbstractApiMethod`
+
+This approach only needs the description of the desired method:
+```java
+package com.qaprosoft.carina.demo.api;
+
+import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
+import com.qaprosoft.carina.core.foundation.api.annotation.Endpoint;
+import com.qaprosoft.carina.core.foundation.api.annotation.EndpointTemplate;
+import com.qaprosoft.carina.core.foundation.api.annotation.PathVariable;
+import com.qaprosoft.carina.core.foundation.api.annotation.PropertiesPath;
+import com.qaprosoft.carina.core.foundation.api.annotation.PropertiesPathParam;
+import com.qaprosoft.carina.core.foundation.api.annotation.RequestTemplatePath;
+import com.qaprosoft.carina.core.foundation.api.annotation.RequestTemplatePathParam;
+import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePath;
+import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePathParam;
+import com.qaprosoft.carina.core.foundation.api.annotation.SuccessfulHttpStatus;
+import com.qaprosoft.carina.core.foundation.api.http.HttpMethodType;
+import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
+
+@EndpointTemplate(url = "${config.env.base_url}/users")
+public interface UserTemplate {
+
+    @Endpoint(url = "/", methodType = HttpMethodType.POST)
+    AbstractApiMethodV2 create(@RequestTemplatePathParam String rqPath, @ResponseTemplatePathParam String rsPath, @PropertiesPathParam String propsPath);
+
+    @Endpoint(url = "/", methodType = HttpMethodType.GET)
+    @ResponseTemplatePath(path = "api/users/_get/rs.json")
+    @PropertiesPath(path = "api/users/user.properties")
+    AbstractApiMethodV2 getAll();
+
+    @Endpoint(url = "/${id}", methodType = HttpMethodType.DELETE)
+    @RequestTemplatePath(path = "api/users/_delete/rq.json")
+    @ResponseTemplatePath(path = "api/users/_delete/rs.json")
+    @SuccessfulHttpStatus(status = HttpResponseStatusType.OK_200)
+    AbstractApiMethodV2 deleteById(@PathVariable("id") Long id);
+
+}
+```
+All the annotations of the *Annotation based approach* work here as well (except of the @Endpoint annotation).
+In this approach, it is possible to use these annotations not only on the class but also on the method.
+
+In addition, you can apply the following annotations:
+
+1. `@CookieParam` - is used to specify cookies in the request (to use near parameters)
+2. `@EndpointTemplate` - defines the part of the request URL. This part will be associated with each method URL
+3. `@HeaderParam` - is used to specify headers in the request (to use near parameters)
+4. `@PathVariable` - is used to specify named URL placeholder value. Placeholder will be replaced automatically (to use near parameters)
+5. `@PropertiesPathParam` - contains a path from source root to properties file (to use near parameters)
+6. `@Property` - is used to specify additional properties. These properties will be automatically added to the future method instance (to use near parameters)
+7. `@QueryParam` - is used to specify URL query parameters. These query parameters will be automatically added to the URL (to use near parameters)
+8. `@RequestTemplatePathParam` - contains a path from source root to request template file (to use near parameters)
+9. `@ResponseTemplatePathParam` - contains a path from source root to response template file (to use near parameters)
+10. `@SuccessfulHttpStatusParam` -  specifies the expected HTTP status (to use near parameters)
+
+Now you can invoke a `prepareTemplate` method from `TemplateFactory` to use proxy implementation in the test
+```java
+@Test()
+@MethodOwner(owner = "qpsdemo")
+public void testCreateUser() {
+    UserTemplate userTemplate = TemplateFactory.prepareTemplate(UserTemplate.class);
+    PostUserMethod api = userTemplate.create("api/users/_post/rq.json", "api/users/_post/rs.json", "api/users/user.properties");
+    api.expectResponseStatus(HttpResponseStatusType.CREATED_201);
+    api.callAPI();
+    api.validateResponse();
+}
+```
+To make test class clean you can implement the interface and use the proxy class inside
+```java
+package com.qaprosoft.carina.demo.api.impl;
+
+import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
+import com.qaprosoft.carina.demo.api.UserTemplate;
+
+public class UserTemplateImpl implements UserTemplate {
+    
+    private final UserTemplate userTemplate;
+
+    public UserTemplateImpl(UserTemplate userTemplate) {
+        this.userTemplate = userTemplate;
+    }
+
+    @Override
+    public AbstractApiMethodV2 create(String rqPath, String rsPath, String propsPath) {
+        AbstractApiMethodV2 apiMethod = userTemplate.create(rqPath, rsPath, propsPath);
+        apiMethod.addProperty("prop", "val");
+        return apiMethod;
+    }
+
+    @Override
+    public AbstractApiMethodV2 getAll() {
+        AbstractApiMethodV2 apiMethod = userTemplate.getAll();
+        apiMethod.addCookie("cookie", "val");
+        return apiMethod;
+    }
+
+    @Override
+    public AbstractApiMethodV2 deleteById(Long id) {
+        AbstractApiMethodV2 apiMethod = userTemplate.deleteById(id);
+        apiMethod.setHeader("header", "val");
+        return apiMethod;
+    }
+}
+```
+
+To perform the general logic under multiple API templates you can create interceptors.
+
 ### Useful features
 The framework contains a list of useful features for building requests and validation of responses. It makes the support of such tests easier and at the same time minimizes the amount of test data.
 
@@ -234,6 +350,61 @@ response is considered successful, action that will be executed after all api ca
         Assert.assertFalse(response.isEmpty(), "Response should exists");
     }
 ```
+#### Handling and changing AbstractApiMethod on-the-fly
+This option provides the ability to handling and changing your AbstractApiMethod - 
+create an implementation of `ApiMethodInterceptor` interface
+```java
+package com.qaprosoft.carina.demo.api.interceptor;
+
+import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
+import com.qaprosoft.carina.core.foundation.api.interceptor.ApiMethodInterceptor;
+
+public class CustomInterceptor implements ApiMethodInterceptor<AbstractApiMethodV2> {
+
+    @Override
+    public void onInstantiation(AbstractApiMethodV2 apiMethod) {
+        // do something with an API method after it has been instantiated
+    }
+
+    @Override
+    public void onBeforeCall(AbstractApiMethodV2 apiMethod) {
+        // do something with an API method after it has been created
+    }
+}
+```
+
+and add this class into `@LinkedInterceptors` annotation:
+
+- *Annotation based approach*
+
+```java
+@Endpoint(url = "${config.env.base_url}/users/1", methodType = HttpMethodType.DELETE)
+@LinkedInterceptors(classes = { CustomInterceptor.class })
+public class DeleteUserMethod extends AbstractApiMethodV2 {
+}
+```
+
+- *Declarative based approach*
+
+```java
+@EndpointTemplate(url = "${config.env.base_url}/users")
+@LinkedInterceptors(classes = { CustomInterceptor.class })
+public interface UserTemplate {
+
+    @Endpoint(url = "/", methodType = HttpMethodType.GET)
+    @LinkedInterceptors(classes = { OtherCustomInterceptor.class })
+    AbstractApiMethodV2 getAll();
+    
+}
+```
+Also it possible to create globals interceptors.
+Just create a file named `com.qaprosoft.carina.core.foundation.api.interceptor.ApiMethodInterceptor`
+in `/resources/META-INF/services` folder and set the path(s) of your implementation(s) into it:
+```
+com.qaprosoft.carina.demo.CustomInterceptor
+com.qaprosoft.carina.demo.OtherCustomInterceptor
+```
+
 #### Wildcards
 In some cases, you may need to generate data in the request to make the request data unique. The best way to do this is to use wildcards for data generation:
 ```json
