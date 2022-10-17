@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import org.testng.TestRunner;
 
 public class CryptoTool {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -66,12 +67,12 @@ public class CryptoTool {
         try {
             this.key = SecretKeyManager.loadKey(new File(cryptoKeyPath), cryptoKeyType);
         } catch (IOException e) {
-            LOGGER.error("Can't load secret key!", e);
+            throw new RuntimeException("Can't load secret key!", e);
         }
         try {
             this.cipher = Cipher.getInstance(algorithm);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-            LOGGER.error("Exception on getting cipher instance", e);
+            throw new RuntimeException("Exception on getting cipher instance", e);
         }
     }
 
