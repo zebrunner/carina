@@ -43,9 +43,9 @@ public class SpecialKeywords {
     public static final String EXCEL_DS_FLAG = "{excel_ds_flag}";
     public static final String EXCEL_DS_FILE = "{excel_ds_file}";
     public static final String EXCEL_DS_SHEET = "{excel_ds_sheet}";
-    @Deprecated
+    @Deprecated(since = "8.0.1", forRemoval = true)
     public static final String EXCEL_DS_CUSTOM_PROVIDER = "{excel_ds_custom_provider}";
-    @Deprecated
+    @Deprecated(since = "8.0.1", forRemoval = true)
     public static final String DS_CUSTOM_PROVIDER = "{ds_custom_provider}";
     public static final String DS_ARGS = "{ds_args}";
     public static final String DS_UID = "{ds_uid}";
@@ -63,10 +63,15 @@ public class SpecialKeywords {
     public static final String HTML_REPORT = "emailable-report.html";
     public static final String NULL = "NULL";
 
+    public static final String TEST_NAME_MAP = "{map}";
+    public static final String TEST_NAME = "{test_name}";
+    public static final String TEST_NAME_TUID = "{tuid}";
+    public static final String TEST_NAME_CLASS = "{test_class}";
     public static final String METHOD_NAME = "{method_name}";
     public static final String METHOD_DESCRIPTION = "{method_description}";
     public static final String METHOD_PRIORITY = "{method_priority}";
     public static final String METHOD_THREAD_POOL_SIZE = "{method_thread_pool_size}";
+    public static final String METHOD_GROUP_NAMES = "{group_names}";
 
     public static final String TEST_NAME_ARGS_MAP = "testNameArgsMap";
 

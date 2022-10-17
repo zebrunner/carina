@@ -86,40 +86,50 @@ public class TestNamingService {
      */     
     @SuppressWarnings("unlikely-arg-type")
     private static String setTestName(ITestResult result) {
-        String name = "";
-
+        String name = StringUtils.EMPTY;
         if (result.getTestContext() == null) {
             throw new RuntimeException("Unable to set Test name without testContext!");
         }
-        @SuppressWarnings("unchecked")
-        Map<Object[], String> testnameMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP);
 
-        if (testnameMap != null) {
-            String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));
-            if (testnameMap.containsKey(testHash)) {
-                name = testnameMap.get(testHash);
-            }
-        }
+        ITestNGMethod method = result.getMethod();
 
-        if (name.isEmpty()) {
-            name = result.getTestContext().getCurrentXmlTest().getName();
-        }
+        name = Configuration.get(Configuration.Parameter.TEST_NAMING_PATTERN);
+        String testNameMapName = getTestNameMapName(result);
+        name = name.replace(SpecialKeywords.TEST_NAME_MAP, testNameMapName)
+                .replace(SpecialKeywords.TEST_NAME,
+                        testNameMapName.isEmpty() ? result.getTestContext().getCurrentXmlTest().getName() : "")
+                .replace(SpecialKeywords.TEST_NAME_TUID, getMethodUID(result))
+                .replace(SpecialKeywords.METHOD_NAME, method.getMethodName())
+                .replace(SpecialKeywords.METHOD_PRIORITY, String.valueOf(method.getPriority()))
+                .replace(SpecialKeywords.METHOD_THREAD_POOL_SIZE, String.valueOf(method.getThreadPoolSize()))
+                .replace(SpecialKeywords.METHOD_GROUP_NAMES, String.join(", ", method.getGroups()))
+                .replace(SpecialKeywords.METHOD_DESCRIPTION, String.valueOf(method.getDescription()))
+                .replace(SpecialKeywords.TEST_NAME_CLASS, method.getTestClass().getRealClass().getSimpleName())
+                .trim();
 
-        String methodUID = getMethodUID(result);
-            if (!methodUID.isEmpty()) {
-                name = methodUID + " - " + name;
-            }
-
-        name = name + " - " + getMethodName(result);
-        LOGGER.debug("testName: " + name);
+        LOGGER.debug("testName: {}", name);
 
         // introduce invocation count calculation here as in multi threading mode TestNG doesn't provide valid
         // getInvocationCount() value
         name = appendDataProviderLine(result, name);
         name = appendInvocationCount(result, name);
-        
+
         testName.set(name);
         return testName.get();
+    }
+
+    private static String getTestNameMapName(ITestResult result) {
+        String testNameMapName = StringUtils.EMPTY;
+        @SuppressWarnings("unchecked")
+        Map<Object[], String> testNameMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP);
+
+        if (testNameMap != null) {
+            String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));
+            if (testNameMap.containsKey(testHash)) {
+                testNameMapName = testNameMap.get(testHash);
+            }
+        }
+        return testNameMapName;
     }
 
     private static String getMethodUID(ITestResult result) {
@@ -143,8 +153,7 @@ public class TestNamingService {
 
                     methodUID = result.getParameters()[i].toString();
                     if (methodUID.contains(SpecialKeywords.TUID + ":")) {
-                        methodUID = methodUID.replace(SpecialKeywords.TUID + ":", "")
-                                .trim();
+                        methodUID = methodUID.replace(SpecialKeywords.TUID + ":", "");
                     }
                     break;
                 }
@@ -161,6 +170,7 @@ public class TestNamingService {
      * @param result ITestResult
      * @return String method name
      */
+    @Deprecated(since = "8.0.1", forRemoval = true)
     public static String getMethodName(ITestResult result) {
         // adjust testName using pattern
         ITestNGMethod m = result.getMethod();
@@ -169,6 +179,7 @@ public class TestNamingService {
         name = name.replace(SpecialKeywords.METHOD_NAME, m.getMethodName());
         name = name.replace(SpecialKeywords.METHOD_PRIORITY, String.valueOf(m.getPriority()));
         name = name.replace(SpecialKeywords.METHOD_THREAD_POOL_SIZE, String.valueOf(m.getThreadPoolSize()));
+        name = name.replace(SpecialKeywords.METHOD_GROUP_NAMES, Arrays.toString(m.getGroups()));
 
         if (m.getDescription() != null) {
             LOGGER.debug("Test method description: " + m.getDescription());
@@ -194,7 +205,6 @@ public class TestNamingService {
      * calculate InvocationCount number based on test name
      * 
      * @param testResult ITestResult
-     * @param testName String
      * @return int invCount
      */
     private static String appendInvocationCount(ITestResult testResult, String testName) {
