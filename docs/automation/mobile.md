@@ -96,7 +96,7 @@ We can provide any Appium capability in the **_config.properties** file using `c
 Actual list of Appium capabilities can be found [here](https://appium.io/docs/en/writing-running-appium/caps/).
 
 ### Example for Android of _config.properties:
-```
+```properties
 selenium_url=http://localhost:4723/wd/hub
 #============ Android Local Mobile ===================#
 capabilities.platformName=ANDROID
@@ -108,7 +108,7 @@ capabilities.autoGrantPermissions=true
 ```
 
 ### Example for iOS of _config.properties:
-```
+```properties
 selenium_url=http://localhost:4723/wd/hub
 #======== Local Run for iOS Mobile ===============#
 capabilities.platformName=iOS
@@ -123,7 +123,7 @@ The main idea is the same as in [web-testing](http://zebrunner.github.io/carina/
 ### How to find locators for Android application
 To obtain the locators of elements from an Android app different programs are used such as Appium itself or convenient Android SDK tool: `uiautomatorviewer`.
 Example:
-```
+```java
  @FindBy(xpath = "//*[@resource-id='name_input']")
  private ExtendedWebElement input;
 ```
@@ -133,14 +133,14 @@ Example:
 To obtain the locators of elements from an iOS app different programs are used such as Appium itself or convenient [Macaca App Inspector](https://macacajs.github.io/app-inspector/).
 To speed up element detection @Predicate annotation can be used used. Complicate "xpath" can't be used with predicates. 
 Example:
-```
+```java
 @FindBy(xpath = "name = 'DONE'")
 @Predicate
 protected ExtendedWebElement doneButton;
 ```
 Another possibility to find the element is to use @ClassChain annotation.
 Example:
-```
+```java
 @FindBy(xpath = "**/XCUIElementTypeStaticText[`name=='Developer'`]")
 @ClassChain
 protected ExtendedWebElement developerText;
@@ -148,12 +148,12 @@ protected ExtendedWebElement developerText;
 
 Starting from Carina version 6.0.12, it's recommended to use @ExtendedFindBy() annotation.
 Example:
-```
+```java
 @ExtendedFindBy(iosClassChain = "**/XCUIElementTypeStaticText[`name=='Developer'`]")
 protected ExtendedWebElement developerText;
 ```
 or 
-```
+```java
 @ExtendedFindBy(iosPredicate = "name = 'DONE'")
 protected ExtendedWebElement developerText;
 ```
@@ -161,7 +161,7 @@ protected ExtendedWebElement developerText;
 ### Implementation of tests
 Carina framework uses TestNG for test organization. In general, test represents a manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:
 
-```
+```java
 public class SampleTest implements IAbstractTest {
 
     String name = "My name";
@@ -169,19 +169,19 @@ public class SampleTest implements IAbstractTest {
 
     @Test()
     public void sendName() {
-    	FirstPage  firstPage = new FirstPage(getDriver());
-    	GoogleTestPage googleTestPage = new GoogleTestPage(getDriver());
-    	MyWayOfHelloPage myWayOfHelloPage = new MyWayOfHelloPage(getDriver());
-    			firstPage.clickOnGooleButton();
-    			googleTestPage.setName(name);
-    			googleTestPage.clickOnSpinner();
-    			googleTestPage.selectCar(carName);
-    			googleTestPage.clickOnSendYourNameButton();
-    			Assert.assertTrue(myWayOfHelloPage.isTextElementPresent(name), "Assert message" );
-    			Assert.assertTrue(myWayOfHelloPage.isTextElementPresent(carName.toLowerCase()), "Assert message" );
-    			
-    }
+    	FirstPage firstPage = new FirstPage(getDriver());
+        firstPage.clickOnGooleButton();
 
+        GoogleTestPage googleTestPage = new GoogleTestPage(getDriver());
+        googleTestPage.setName(name);
+        googleTestPage.clickOnSpinner();
+        googleTestPage.selectCar(carName);
+        googleTestPage.clickOnSendYourNameButton();
+        
+        MyWayOfHelloPage myWayOfHelloPage = new MyWayOfHelloPage(getDriver());
+        Assert.assertTrue(myWayOfHelloPage.isTextElementPresent(name), "Assert message" );
+        Assert.assertTrue(myWayOfHelloPage.isTextElementPresent(carName.toLowerCase()), "Assert message" );
+    }
 }
 ```
 
@@ -205,7 +205,7 @@ Children pages should extend BasePage implementing all abstract methods. Annotat
 **Examples:**
 
 **Common (Base) Page**
-```
+```java
 public abstract class HomePageBase extends AbstractPage {
 
     public HomePageBase(WebDriver driver) {
@@ -219,7 +219,7 @@ public abstract class HomePageBase extends AbstractPage {
 ```
 
 **Android Page**
-```
+```java
 @DeviceType(pageType = DeviceType.Type.ANDROID_PHONE, parentClass = HomePageBase.class)
 public class HomePage extends HomePageBase {
 
@@ -247,7 +247,7 @@ public class HomePage extends HomePageBase {
 ```
 
 **iOS Page**
-```
+```java
 @DeviceType(pageType = Type.IOS_PHONE, parentClass = HomePageBase.class)
 public class HomePage extends HomePageBase {
 
@@ -274,18 +274,19 @@ public class HomePage extends HomePageBase {
         compareTextView.click();
         return CustomTypePageFactory.initPage(getDriver(), ComparePageBase.class);
     }
+}
 ```
 
 Inside every test, Carina operates with an abstract base page using CustomTypePageFactory and substitutes it by the real implementation based on the desired capabilities in _config.properties etc.
 
 **Example:**
-```
+```java
 @Test
-    public void comparePhonesTest() {
-        HomePageBase homePage = CustomTypePageFactory.initPage(getDriver(), HomePageBase.class);
-        ComparePageBase phoneFinderPage = homePage.openCompare();
-        ...
-    }
+public void comparePhonesTest() {
+    HomePageBase homePage = CustomTypePageFactory.initPage(getDriver(), HomePageBase.class);
+    ComparePageBase phoneFinderPage = homePage.openCompare();
+    ...
+}
 ```
 
 If there are differences in application according to OS version, just implement the pages for different versions and include the version parameter in @DeviceType for every page.
@@ -293,15 +294,19 @@ If there are differences in application according to OS version, just implement 
 **Example:**
 
 For Android 8 (either 8.0 or 8.1)
-```
+```java
 @DeviceType(pageType = DeviceType.Type.ANDROID_PHONE, version = "8", parentClass = HomePageBase.class)
 public class HomePage extends HomePageBase {
+    ...
+}
 ```
 
 Or for a specific version
-```
+```java
 @DeviceType(pageType = DeviceType.Type.ANDROID_PHONE, version = "8.1", parentClass = HomePageBase.class)
 public class HomePage extends HomePageBase {
+    ...
+}
 ```
 
 ### How to use Find by Image strategy
@@ -310,7 +315,7 @@ Find by image strategy is based on [appium implementation](https://github.com/ap
 Find by image logic is covered by ```@ExtendedFindBy``` annotation. 
 
 **Example:**
-```
+```java
 @ExtendedFindBy(image = "images/singUp6.png")
 private ExtendedWebElement signUpBtn;
 ```
@@ -323,7 +328,7 @@ Be sure your image size is less than the real screen size. Real iOS screen sizes
 
 In carina-demo there is an example of a [tool](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/MobileContextUtils.java),
 that can change context of application. Just add needed context as a field in [View](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/MobileContextUtils.java#L51) enum.
-```
+```java
 // for example
 NATIVE("NATIVE_APP"),
 WEB1("WEBVIEW_chromeapp"),
@@ -331,7 +336,7 @@ WEB2("WEBVIEW_opera");
 ```
 
 Then change context in your test/page class where needed.
-```
+```java
 public void testWebView() {
     WelcomePageBase welcomePage = initPage(getDriver(), WelcomePageBase.class);
     LoginPageBase loginPage = welcomePage.clickNextBtn();
@@ -346,6 +351,7 @@ public void testWebView() {
     contactUsPage.typeEmail("some@email.com");
     contactUsPage.typeQuestion("This is a message");
     contactUsPage.submit();
+    
     Assert.assertTrue(contactUsPage.isErrorMessagePresent() || contactUsPage.isRecaptchaPresent(),
         "Error message or captcha was not displayed");
 }
