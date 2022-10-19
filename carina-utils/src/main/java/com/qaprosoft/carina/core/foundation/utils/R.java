@@ -30,9 +30,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.exception.InvalidConfigurationException;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.zebrunner.carina.crypto.Algorithm;
+import com.zebrunner.carina.crypto.CryptoTool;
+import com.zebrunner.carina.crypto.CryptoToolBuilder;
 
 /**
  * R - loads properties from resource files.
@@ -59,8 +61,6 @@ public enum R {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final String OVERRIDE_SIGN = "_";
-
-    private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
 
     private String resourceFile;
 
@@ -288,7 +288,7 @@ public enum R {
      * @return config value
      */
     public String getDecrypted(String key) {
-        return decrypt(get(key), CRYPTO_PATTERN);
+        return decrypt(get(key), Configuration.get(Parameter.CRYPTO_PATTERN));
     }
 
     /**
@@ -377,11 +377,14 @@ public enum R {
         return testProperties.get();
     }
 
-    private String decrypt(String content, Pattern pattern) {
+    private String decrypt(String content, String pattern) {
         try {
-            // keep constructor with parametrized CRYPTO_KEY_PATH to run unit tests successfully!
-            CryptoTool cryptoTool = new CryptoTool(Configuration.get(Configuration.Parameter.CRYPTO_KEY_PATH));
-            return cryptoTool.decryptByPattern(content, pattern);
+            CryptoTool cryptoTool = CryptoToolBuilder.builder()
+                    .chooseAlgorithm(Algorithm.find(Configuration.get(Parameter.CRYPTO_ALGORITHM)))
+                    .setKey(Configuration.get(Parameter.CRYPTO_KEY_VALUE))
+                    .build();
+
+            return cryptoTool.decrypt(content, pattern);
         } catch (Exception e) {
             LOGGER.error("Error during decrypting '" + content + "'. Please check error: ", e);
             return content;

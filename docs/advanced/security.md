@@ -17,7 +17,7 @@ com.qaprosoft.carina.core.foundation.crypto.CryptoConsole -decrypt -file "csv_fi
 **To generate an individual crypto key:**
 
 1. Go to "Run configuration" in Eclipse
-2. Create a new Java application configuration selecting the project and the main class **com.qaprosoft.carina.core.foundation.crypto.CryptoConsole**:
+2. Create a new Java application configuration selecting the project and the main class **com.zebrunner.carina.crypto.CryptoConsole**:
 ![Security Config 1](../img/security-config-1.png)
 3. Set arguments
 ![Security Config 2](../img/security-config-2.png)

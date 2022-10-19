@@ -20,14 +20,19 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.zebrunner.carina.crypto.Algorithm;
+import com.zebrunner.carina.crypto.CryptoTool;
+import com.zebrunner.carina.crypto.CryptoToolBuilder;
 
 public class CryptoProcessor implements PropertiesProcessor {
 
-    private static CryptoTool cryptoTool = new CryptoTool(Configuration.get(Configuration.Parameter.CRYPTO_KEY_PATH));
-    private static Pattern CRYPT_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
+    private static CryptoTool cryptoTool = CryptoToolBuilder.builder()
+            .chooseAlgorithm(Algorithm.find(Configuration.get(Configuration.Parameter.CRYPTO_ALGORITHM)))
+            .setKey(Configuration.get(Configuration.Parameter.CRYPTO_KEY_VALUE))
+            .build();
+    private static String cryptPatternAsText = Configuration.get(Configuration.Parameter.CRYPTO_PATTERN);
+    private static Pattern CRYPT_PATTERN = Pattern.compile(cryptPatternAsText);
 
     @Override
     public Properties process(Properties in) {
@@ -39,7 +44,7 @@ public class CryptoProcessor implements PropertiesProcessor {
 
             while (cryptoMatcher.find()) {
                 String toReplace = cryptoMatcher.group();
-                tmp = tmp.replace(toReplace, cryptoTool.decryptByPattern(toReplace, CRYPT_PATTERN));
+                tmp = tmp.replace(toReplace, cryptoTool.decrypt(toReplace, cryptPatternAsText));
                 crypted = true;
             }
 

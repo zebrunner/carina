@@ -22,15 +22,15 @@ import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.models.BlobProperties;
 import com.azure.storage.blob.models.BlobStorageException;
 import com.azure.storage.common.StorageSharedKeyCredential;
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.zebrunner.carina.crypto.Algorithm;
+import com.zebrunner.carina.crypto.CryptoTool;
+import com.zebrunner.carina.crypto.CryptoToolBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
-import java.util.regex.Pattern;
 
 public class AzureManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -42,12 +42,16 @@ public class AzureManager {
     public synchronized static AzureManager getInstance() {
         if (instance == null) {
             instance = new AzureManager();
-            CryptoTool cryptoTool = new CryptoTool(Configuration.get(Configuration.Parameter.CRYPTO_KEY_PATH));
-            Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
+            CryptoTool cryptoTool = CryptoToolBuilder.builder()
+                    .chooseAlgorithm(Algorithm.find(Configuration.get(Configuration.Parameter.CRYPTO_ALGORITHM)))
+                    .setKey(Configuration.get(Configuration.Parameter.CRYPTO_KEY_VALUE))
+                    .build();
+
+            String CRYPTO_PATTERN = Configuration.get(Configuration.Parameter.CRYPTO_PATTERN);
 
             String accountName = Configuration.get(Configuration.Parameter.AZURE_ACCOUNT_NAME);
-            String endpoint = cryptoTool.decryptByPattern(Configuration.get(Configuration.Parameter.AZURE_BLOB_URL), CRYPTO_PATTERN);
-            String secretKey = cryptoTool.decryptByPattern(Configuration.get(Configuration.Parameter.AZURE_ACCESS_KEY_TOKEN), CRYPTO_PATTERN);
+            String endpoint = cryptoTool.decrypt(Configuration.get(Configuration.Parameter.AZURE_BLOB_URL), CRYPTO_PATTERN);
+            String secretKey = cryptoTool.decrypt(Configuration.get(Configuration.Parameter.AZURE_ACCESS_KEY_TOKEN), CRYPTO_PATTERN);
 
             // Create a SharedKeyCredential
             StorageSharedKeyCredential credential = new StorageSharedKeyCredential(accountName, secretKey);

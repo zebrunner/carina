@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.utils.messager;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.testng.Reporter;
@@ -33,7 +34,7 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 
 public interface IMessager {
 
-    Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
+    Pattern CRYPTO_PATTERN = Pattern.compile(Configuration.get(Configuration.Parameter.CRYPTO_PATTERN));
 
     String getPattern();
 

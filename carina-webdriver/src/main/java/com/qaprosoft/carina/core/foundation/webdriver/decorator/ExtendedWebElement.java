@@ -28,6 +28,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import com.zebrunner.carina.crypto.Algorithm;
+import com.zebrunner.carina.crypto.CryptoTool;
+import com.zebrunner.carina.crypto.CryptoToolBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.hamcrest.BaseMatcher;
@@ -60,7 +63,6 @@ import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -89,9 +91,12 @@ public class ExtendedWebElement implements IWebElement {
     private WebDriver driver;
     private SearchContext searchContext;
 
-    private CryptoTool cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
+    private CryptoTool cryptoTool = CryptoToolBuilder.builder()
+            .chooseAlgorithm(Algorithm.find(Configuration.get(Configuration.Parameter.CRYPTO_ALGORITHM)))
+            .setKey(Configuration.get(Parameter.CRYPTO_KEY_VALUE))
+            .build();
 
-    private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
+    private static String CRYPTO_PATTERN = Configuration.get(Parameter.CRYPTO_PATTERN);
 
     private WebElement element = null;
     private String name;
@@ -928,7 +933,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return element with text existence status.
      */
     public boolean isElementWithTextPresent(final String text, long timeout) {
-    	final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
+    	final String decryptedText = cryptoTool.decrypt(text, CRYPTO_PATTERN);
 		ExpectedCondition<Boolean> textCondition;
 		if (element != null) {
 			textCondition = ExpectedConditions.textToBePresentInElement(element, decryptedText);
@@ -1420,7 +1425,7 @@ public class ExtendedWebElement implements IWebElement {
 
 			@Override
 			public void doType(String text) {
-				final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
+				final String decryptedText = cryptoTool.decrypt(text, CRYPTO_PATTERN);
 
 /*				if (!element.getText().isEmpty()) {
     				DriverListener.setMessages(Messager.KEYS_CLEARED_IN_ELEMENT.getMessage(getName()),
@@ -1443,7 +1448,7 @@ public class ExtendedWebElement implements IWebElement {
 
 			@Override
 			public void doAttachFile(String filePath) {
-				final String decryptedText = cryptoTool.decryptByPattern(filePath, CRYPTO_PATTERN);
+				final String decryptedText = cryptoTool.decrypt(filePath, CRYPTO_PATTERN);
 
 				String textLog = (!decryptedText.equals(filePath) ? "********" : filePath);
 
@@ -1534,7 +1539,7 @@ public class ExtendedWebElement implements IWebElement {
 			
 			@Override
 			public boolean doSelect(String text) {
-				final String decryptedSelectText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
+				final String decryptedSelectText = cryptoTool.decrypt(text, CRYPTO_PATTERN);
 				
 				String textLog = (!decryptedSelectText.equals(text) ? "********" : text);
 				

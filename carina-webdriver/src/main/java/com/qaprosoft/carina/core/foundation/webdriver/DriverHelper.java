@@ -71,7 +71,6 @@ import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.retry.ActionPoller;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -82,6 +81,9 @@ import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.gui.AbstractPage;
+import com.zebrunner.carina.crypto.Algorithm;
+import com.zebrunner.carina.crypto.CryptoTool;
+import com.zebrunner.carina.crypto.CryptoToolBuilder;
 
 /**
  * DriverHelper - WebDriver wrapper for logging and reporting features. Also it
@@ -106,10 +108,13 @@ public class DriverHelper {
 
     protected CryptoTool cryptoTool;
 
-    protected static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
+    protected static String CRYPTO_PATTERN = Configuration.get(Parameter.CRYPTO_PATTERN);
 
     public DriverHelper() {
-        cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
+        cryptoTool = CryptoToolBuilder.builder()
+                .chooseAlgorithm(Algorithm.find(Configuration.get(Parameter.CRYPTO_ALGORITHM)))
+                .setKey(Configuration.get(Parameter.CRYPTO_KEY_VALUE))
+                .build();
     }
 
     public DriverHelper(WebDriver driver) {
@@ -149,7 +154,7 @@ public class DriverHelper {
      *            long
      */
     public void openURL(String url, long timeout) {
-        final String decryptedURL = getEnvArgURL(cryptoTool.decryptByPattern(url, CRYPTO_PATTERN));
+        final String decryptedURL = getEnvArgURL(cryptoTool.decrypt(url, CRYPTO_PATTERN));
         this.pageURL = decryptedURL;
         WebDriver drv = getDriver();
 
@@ -605,7 +610,7 @@ public class DriverHelper {
      * @return validation result.
      */
     public boolean isUrlAsExpected(String expectedURL, long timeout) {
-        String decryptedURL = cryptoTool.decryptByPattern(expectedURL, CRYPTO_PATTERN);
+        String decryptedURL = cryptoTool.decrypt(expectedURL, CRYPTO_PATTERN);
         decryptedURL = getEnvArgURL(decryptedURL);
         
         String actualUrl = getCurrentUrl(timeout);
@@ -764,7 +769,7 @@ public class DriverHelper {
      * @return validation result.
      */
     public boolean isTitleAsExpected(final String expectedTitle) {
-        final String decryptedExpectedTitle = cryptoTool.decryptByPattern(expectedTitle, CRYPTO_PATTERN);
+        final String decryptedExpectedTitle = cryptoTool.decrypt(expectedTitle, CRYPTO_PATTERN);
         String title = getTitle(EXPLICIT_TIMEOUT);
         boolean result = title.contains(decryptedExpectedTitle);
         if (result) {
@@ -784,7 +789,7 @@ public class DriverHelper {
      * @return validation result.
      */
     public boolean isTitleAsExpectedPattern(String expectedPattern) {
-        final String decryptedExpectedPattern = cryptoTool.decryptByPattern(expectedPattern, CRYPTO_PATTERN);
+        final String decryptedExpectedPattern = cryptoTool.decrypt(expectedPattern, CRYPTO_PATTERN);
         
         String actual = getTitle(EXPLICIT_TIMEOUT);
         Pattern p = Pattern.compile(decryptedExpectedPattern);
@@ -1073,7 +1078,7 @@ public class DriverHelper {
      *             If unable to open tab
      */
     public void openTab(String url) {
-        final String decryptedURL = cryptoTool.decryptByPattern(url, CRYPTO_PATTERN);
+        final String decryptedURL = cryptoTool.decrypt(url, CRYPTO_PATTERN);
         String script = "var d=document,a=d.createElement('a');a.target='_blank';a.href='%s';a.innerHTML='.';d.body.appendChild(a);return a";
         Object element = trigger(String.format(script, decryptedURL));
         if (element instanceof WebElement) {

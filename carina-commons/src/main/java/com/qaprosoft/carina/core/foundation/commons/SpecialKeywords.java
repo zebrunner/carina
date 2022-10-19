@@ -33,7 +33,9 @@ public class SpecialKeywords {
     public static final String L10N_PATTERN = String.format("\\{(%s:.[^\\'\\\"]*)}", L10N);
 
     public static final String EXCEL = "\\{excel:.*\\}";
+    @Deprecated(forRemoval = true, since = "8.0.1")
     public static final String CRYPT = "\\{crypt:[^\\{\\}]*\\}";
+    @Deprecated(forRemoval = true, since = "8.0.1")
     public static final String CRYPT_WRAPPER = "{crypt:%s}";
     public static final String PLACEHOLER = "\\$\\{[^\\{\\}]*\\}";
 
@@ -124,9 +126,13 @@ public class SpecialKeywords {
 
     
     // ------------- CARINA CRYPTO DEFAULT PROPERTIES -----------------
+    @Deprecated(forRemoval = true, since = "8.0.1")
     public static final String CRYPTO_ALGORITHM = "AES/ECB/PKCS5Padding";
+    @Deprecated(forRemoval = true, since = "8.0.1")
     public static final String CRYPTO_KEY_TYPE = "AES";
+    @Deprecated(forRemoval = true, since = "8.0.1")
     public static final int CRYPTO_KEY_SIZE = 128;
+    @Deprecated(forRemoval = true, since = "8.0.1")
     public static final String CRYPTO_KEY_PATH = "./src/main/resources/crypto.key";
 
     // ------------- PROXY PROPERTIES ---------------------------------

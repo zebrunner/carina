@@ -32,8 +32,13 @@
 		<!-- Carina sub-modules dependencies -->
 
 		<dependency>
-			<groupId>com.qaprosoft</groupId>
+			<groupId>com.zebrunner</groupId>
 			<artifactId>carina-crypto</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.qaprosoft</groupId>
+			<artifactId>carina-commons</artifactId>
 		</dependency>
 
 		<dependency>

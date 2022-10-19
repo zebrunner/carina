@@ -139,7 +139,14 @@ public class Configuration {
 
         TIME_FORMAT("time_format"),
 
+        @Deprecated(since = "8.0.1", forRemoval = true)
         CRYPTO_KEY_PATH("crypto_key_path"),
+
+        CRYPTO_KEY_VALUE("crypto_key_value"),
+
+        CRYPTO_PATTERN("crypto_pattern"),
+
+        CRYPTO_ALGORITHM("crypto_algorithm"),
 
         SUITE_NAME("suite_name"),
 
@@ -265,7 +272,7 @@ public class Configuration {
                 // do nothing
                 continue;
             }
-            if (!Parameter.CRYPTO_KEY_PATH.equals(param) && !Configuration.get(param).isEmpty() && R.CONFIG.isOverwritten(param.getKey())) {
+            if (!Parameter.CRYPTO_KEY_VALUE.equals(param) && !Configuration.get(param).isEmpty() && R.CONFIG.isOverwritten(param.getKey())) {
                 asString.append(String.format("%s=%s%n", param.getKey(), Configuration.get(param)));
             }
         }

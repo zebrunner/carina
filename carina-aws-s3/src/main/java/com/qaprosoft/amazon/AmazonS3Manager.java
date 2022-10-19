@@ -42,11 +42,12 @@ import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.amazonaws.services.s3.transfer.Download;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
+import com.zebrunner.carina.crypto.Algorithm;
+import com.zebrunner.carina.crypto.CryptoTool;
+import com.zebrunner.carina.crypto.CryptoToolBuilder;
 
 public class AmazonS3Manager {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -60,8 +61,10 @@ public class AmazonS3Manager {
         if (instance == null) {
             instance = new AmazonS3Manager();
             
-            CryptoTool cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
-            Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
+            CryptoTool cryptoTool = CryptoToolBuilder.builder()
+                    .chooseAlgorithm(Algorithm.find(Configuration.get(Parameter.CRYPTO_ALGORITHM)))
+                    .setKey(Configuration.get(Parameter.CRYPTO_KEY_VALUE))
+                    .build();
 
             AmazonS3ClientBuilder builder = AmazonS3ClientBuilder.standard();
             
@@ -70,8 +73,8 @@ public class AmazonS3Manager {
                 builder.withRegion(Regions.fromName(s3region));
             }
             
-            String accessKey = cryptoTool.decryptByPattern(Configuration.get(Parameter.ACCESS_KEY_ID), CRYPTO_PATTERN);
-            String secretKey = cryptoTool.decryptByPattern(Configuration.get(Parameter.SECRET_KEY), CRYPTO_PATTERN);
+            String accessKey = cryptoTool.decrypt(Configuration.get(Parameter.ACCESS_KEY_ID), Configuration.get(Parameter.CRYPTO_PATTERN));
+            String secretKey = cryptoTool.decrypt(Configuration.get(Parameter.SECRET_KEY), Configuration.get(Parameter.CRYPTO_PATTERN));
             if (!accessKey.isEmpty() && !secretKey.isEmpty()) {
                 BasicAWSCredentials creds = new BasicAWSCredentials(accessKey, secretKey);
                 builder.withCredentials(new AWSStaticCredentialsProvider(creds)).build();

@@ -92,14 +92,13 @@
         <module>carina-proxy</module>
         <module>carina-utils</module>
         <module>carina-reporting</module>
-        <module>carina-crypto</module>
         <module>carina-webdriver</module>
         <module>carina-aws-s3</module>
         <module>carina-appcenter</module>
         <module>carina-core</module>
         <module>carina-azure</module>
     </modules>
-    <!--repositories>
+    <repositories>
         <repository>
             <id>zebrunner_snapshots</id>
             <name>zebrunner Snapshots</name>
@@ -111,7 +110,7 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-    </repositories-->
+    </repositories>
     <profiles>
         <profile>
             <id>default</id>
@@ -375,9 +374,9 @@
                 <version>1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>com.qaprosoft</groupId>
+                <groupId>com.zebrunner</groupId>
                 <artifactId>carina-crypto</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.qaprosoft</groupId>
