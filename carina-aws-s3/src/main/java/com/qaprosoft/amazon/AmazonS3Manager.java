@@ -59,8 +59,7 @@ public class AmazonS3Manager {
 
     public static synchronized AmazonS3Manager getInstance() {
         if (instance == null) {
-            instance = new AmazonS3Manager();
-            
+
             CryptoTool cryptoTool = CryptoToolBuilder.builder()
                     .chooseAlgorithm(Algorithm.find(Configuration.get(Parameter.CRYPTO_ALGORITHM)))
                     .setKey(Configuration.get(Parameter.CRYPTO_KEY_VALUE))
@@ -81,7 +80,7 @@ public class AmazonS3Manager {
             }
             
             s3client = builder.build();
-            
+            instance = new AmazonS3Manager();
         }
         return instance;
     }
