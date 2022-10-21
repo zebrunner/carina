@@ -232,6 +232,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     public void beforeConfiguration(ITestResult result) {
         LOGGER.debug("CarinaListener->beforeConfiguration");
         super.beforeConfiguration(result);
+
         // remember active test phase to organize valid driver pool manipulation
         // process
         if (result.getMethod().isBeforeSuiteConfiguration()) {

@@ -23,16 +23,20 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.SkipException;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.exception.InvalidConfigurationException;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.zebrunner.carina.crypto.Algorithm;
+import com.zebrunner.carina.crypto.CryptoTool;
+import com.zebrunner.carina.crypto.CryptoToolBuilder;
 
 /**
  * R - loads properties from resource files.
@@ -59,8 +63,6 @@ public enum R {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final String OVERRIDE_SIGN = "_";
-
-    private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
 
     private String resourceFile;
 
@@ -288,7 +290,7 @@ public enum R {
      * @return config value
      */
     public String getDecrypted(String key) {
-        return decrypt(get(key), CRYPTO_PATTERN);
+        return decrypt(get(key), Configuration.get(Parameter.CRYPTO_PATTERN));
     }
 
     /**
@@ -377,15 +379,28 @@ public enum R {
         return testProperties.get();
     }
 
-    private String decrypt(String content, Pattern pattern) {
-        try {
-            // keep constructor with parametrized CRYPTO_KEY_PATH to run unit tests successfully!
-            CryptoTool cryptoTool = new CryptoTool(Configuration.get(Configuration.Parameter.CRYPTO_KEY_PATH));
-            return cryptoTool.decryptByPattern(content, pattern);
-        } catch (Exception e) {
-            LOGGER.error("Error during decrypting '" + content + "'. Please check error: ", e);
-            return content;
+    private String decrypt(String content, String pattern) {
+        Matcher cryptoMatcher = Pattern.compile(pattern)
+                .matcher(content);
+
+        if (cryptoMatcher.find()) {
+            try {
+                String cryptoKey = Configuration.get(Parameter.CRYPTO_KEY_VALUE);
+                if (cryptoKey.isEmpty()) {
+                    throw new SkipException("Encrypted data detected, but the crypto key is not found!");
+                }
+
+                CryptoTool cryptoTool = CryptoToolBuilder.builder()
+                        .chooseAlgorithm(Algorithm.find(Configuration.get(Parameter.CRYPTO_ALGORITHM)))
+                        .setKey(cryptoKey)
+                        .build();
+
+                return cryptoTool.decrypt(content, pattern);
+            } catch (Exception e) {
+                LOGGER.error("Error during decrypting '" + content + "'. Please check error: ", e);
+            }
         }
+        return content;
     }
 
 }

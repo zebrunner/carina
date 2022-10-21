@@ -7,17 +7,25 @@ Anyone may generate their own security key and encrypt the data using this key, 
 ## Secured data preparation
 For secured data preparation, we implemented a special tool that helps to generate crypto keys and encrypt/decrypt test data files. Here is a usage tip:
 ```
-com.qaprosoft.carina.core.foundation.crypto.CryptoConsole -generate -key_file "file_path_to_save_key"
-com.qaprosoft.carina.core.foundation.crypto.CryptoConsole -encrypt -string "string_to_encrypt" -key_file "key_file_path"
-com.qaprosoft.carina.core.foundation.crypto.CryptoConsole -decrypt -string "string_to_decrypt" -key_file "key_file_path"
-com.qaprosoft.carina.core.foundation.crypto.CryptoConsole -encrypt -file "csv_file_to_encrypt" -key_file "key_file_path"
-com.qaprosoft.carina.core.foundation.crypto.CryptoConsole -decrypt -file "csv_file_to_decrypt" -key_file "key_file_path"
+com.zebrunner.carina.crypto.CryptoConsole -help
+com.zebrunner.carina.crypto.CryptoConsole -generate -algorithm "algorithm" -keysize="key size"
+com.zebrunner.carina.crypto.CryptoConsole -encrypt -algorithm "algorithm" -key="key" -string="string_to_encrypt"
+com.zebrunner.carina.crypto.CryptoConsole -encrypt -algorithm "algorithm" -key="key" -string="string_to_encrypt"
+com.zebrunner.carina.crypto.CryptoConsole -encrypt -algorithm "algorithm" -key="key" -pattern="pattern" -string="string_to_encrypt"
+com.zebrunner.carina.crypto.CryptoConsole -encrypt -algorithm "algorithm" -key="key" -wrapper="wrapper" -string="string_to_encrypt"
+com.zebrunner.carina.crypto.CryptoConsole -encrypt -algorithm "algorithm" -key="key" -pattern="pattern" -wrapper="wrapper" -string="string_to_encrypt"
+com.zebrunner.carina.crypto.CryptoConsole -decrypt -algorithm "algorithm" -key="key" -string="string_to_encrypt"
+com.zebrunner.carina.crypto.CryptoConsole -decrypt -algorithm "algorithm" -key="key" -pattern="pattern" -string="string_to_encrypt"
+com.zebrunner.carina.crypto.CryptoConsole -decrypt -algorithm "algorithm" -key="key" -wrapper="wrapper" -string="string_to_encrypt"
+com.zebrunner.carina.crypto.CryptoConsole -decrypt -algorithm "algorithm" -key="key" -pattern="pattern" -wrapper="wrapper" -string="string_to_encrypt"
+com.zebrunner.carina.crypto.CryptoConsole -encrypt -algorithm "algorithm" -key="key" -file="path_to_file_to_encrypt"
+com.zebrunner.carina.crypto.CryptoConsole -decrypt -algorithm "algorithm" -key="key" -file="path_to_file_to_encrypt"
 ```
 
 **To generate an individual crypto key:**
 
 1. Go to "Run configuration" in Eclipse
-2. Create a new Java application configuration selecting the project and the main class **com.qaprosoft.carina.core.foundation.crypto.CryptoConsole**:
+2. Create a new Java application configuration selecting the project and the main class **com.zebrunner.carina.crypto.CryptoConsole**:
 ![Security Config 1](../img/security-config-1.png)
 3. Set arguments
 ![Security Config 2](../img/security-config-2.png)
@@ -30,7 +38,7 @@ com.qaprosoft.carina.core.foundation.crypto.CryptoConsole -decrypt -file "csv_fi
 1. Prepare an input file  using the pattern {crypt:str_to_encrypt} for secured values
 ![Security Config 4](../img/security-config4.png)
 2. Prepare an input file  using the pattern {crypt:str_to_encrypt} for secured values.
-Go to “Run configuration”, navigate to the arguments tab and execute the encryption command specifying the key path and input file:
+Go to “Run configuration”, navigate to the arguments tab and execute the encryption command specifying the key and input file:
 ![Security Config 5](../img/security-config5.png)
 3. A file with encrypted data will be generated:
 ![Security Config 6](../img/security-config6.png)
@@ -52,8 +60,11 @@ To decrypt your string use it like this:
 ```
 String value = "test@gmail.com/{crypt:8O9iA4+f3nMzz85szmvKmQ==}"
 
-CryptoTool cryptoTool = new CryptoTool("path_to_your_crypto_key");
-Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
-String decryptedValue = cryptoTool.decryptByPattern(value, CRYPTO_PATTERN);
+CryptoTool cryptoTool = CryptoToolBuilder.builder()
+                    .chooseAlgorithm(Algorithm.find(Configuration.get(Parameter.CRYPTO_ALGORITHM)))
+                    .setKey(Configuration.get(Parameter.CRYPTO_KEY_VALUE))
+                    .build();
+String CRYPTO_PATTERN = Configuration.get(Parameter.CRYPTO_PATTERN);
+String decryptedValue = cryptoTool.decrypt(value, CRYPTO_PATTERN);
 ```
 As a result `decryptedValue` will be `test@gmail.com/EncryptMe`.

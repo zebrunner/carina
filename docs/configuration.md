@@ -247,9 +247,9 @@ All the project configuration properties are located in a **_config.properties**
 		<td>HH:mm:ss.SSS, HH:mm a zzz</td>
 	</tr>
 	<tr>
-		<td>crypto_key_path</td>
-		<td>Path to a file with a crypto key</td>
-		<td>./src/main/resources/crypto.key</td>
+		<td>crypto_key_value</td>
+		<td>crypto key</td>
+		<td>OIujpEmIVZ0C9kOkXniFRw==</td>
 	</tr>
 	<tr>
 		<td>tls_keysecure_location</td>

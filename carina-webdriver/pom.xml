@@ -56,7 +56,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.qaprosoft</groupId>
+			<groupId>com.zebrunner</groupId>
 			<artifactId>carina-crypto</artifactId>
 		</dependency>
 
