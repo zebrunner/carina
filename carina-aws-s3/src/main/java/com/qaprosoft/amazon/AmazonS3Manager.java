@@ -64,6 +64,7 @@ public class AmazonS3Manager {
                     .chooseAlgorithm(Algorithm.find(Configuration.get(Parameter.CRYPTO_ALGORITHM)))
                     .setKey(Configuration.get(Parameter.CRYPTO_KEY_VALUE))
                     .build();
+            String CRYPTO_PATTERN = Configuration.get(Parameter.CRYPTO_PATTERN);
 
             AmazonS3ClientBuilder builder = AmazonS3ClientBuilder.standard();
             
@@ -72,8 +73,8 @@ public class AmazonS3Manager {
                 builder.withRegion(Regions.fromName(s3region));
             }
             
-            String accessKey = cryptoTool.decrypt(Configuration.get(Parameter.ACCESS_KEY_ID), Configuration.get(Parameter.CRYPTO_PATTERN));
-            String secretKey = cryptoTool.decrypt(Configuration.get(Parameter.SECRET_KEY), Configuration.get(Parameter.CRYPTO_PATTERN));
+            String accessKey = cryptoTool.decrypt(Configuration.get(Parameter.ACCESS_KEY_ID), CRYPTO_PATTERN);
+            String secretKey = cryptoTool.decrypt(Configuration.get(Parameter.SECRET_KEY), CRYPTO_PATTERN);
             if (!accessKey.isEmpty() && !secretKey.isEmpty()) {
                 BasicAWSCredentials creds = new BasicAWSCredentials(accessKey, secretKey);
                 builder.withCredentials(new AWSStaticCredentialsProvider(creds)).build();
