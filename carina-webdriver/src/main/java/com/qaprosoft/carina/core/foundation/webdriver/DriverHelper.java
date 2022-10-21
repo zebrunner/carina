@@ -69,6 +69,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
+import org.testng.SkipException;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.retry.ActionPoller;
@@ -106,15 +107,11 @@ public class DriverHelper {
     
     protected String pageURL = getUrl();
 
-    protected CryptoTool cryptoTool;
+    protected CryptoTool cryptoTool = null;
 
     protected static String CRYPTO_PATTERN = Configuration.get(Parameter.CRYPTO_PATTERN);
 
     public DriverHelper() {
-        cryptoTool = CryptoToolBuilder.builder()
-                .chooseAlgorithm(Algorithm.find(Configuration.get(Parameter.CRYPTO_ALGORITHM)))
-                .setKey(Configuration.get(Parameter.CRYPTO_KEY_VALUE))
-                .build();
     }
 
     public DriverHelper(WebDriver driver) {
@@ -154,7 +151,7 @@ public class DriverHelper {
      *            long
      */
     public void openURL(String url, long timeout) {
-        final String decryptedURL = getEnvArgURL(cryptoTool.decrypt(url, CRYPTO_PATTERN));
+        final String decryptedURL = getEnvArgURL(decryptIfEncrypted(url));
         this.pageURL = decryptedURL;
         WebDriver drv = getDriver();
 
@@ -610,7 +607,7 @@ public class DriverHelper {
      * @return validation result.
      */
     public boolean isUrlAsExpected(String expectedURL, long timeout) {
-        String decryptedURL = cryptoTool.decrypt(expectedURL, CRYPTO_PATTERN);
+        String decryptedURL = decryptIfEncrypted(expectedURL);
         decryptedURL = getEnvArgURL(decryptedURL);
         
         String actualUrl = getCurrentUrl(timeout);
@@ -769,7 +766,7 @@ public class DriverHelper {
      * @return validation result.
      */
     public boolean isTitleAsExpected(final String expectedTitle) {
-        final String decryptedExpectedTitle = cryptoTool.decrypt(expectedTitle, CRYPTO_PATTERN);
+        final String decryptedExpectedTitle = decryptIfEncrypted(expectedTitle);
         String title = getTitle(EXPLICIT_TIMEOUT);
         boolean result = title.contains(decryptedExpectedTitle);
         if (result) {
@@ -789,7 +786,7 @@ public class DriverHelper {
      * @return validation result.
      */
     public boolean isTitleAsExpectedPattern(String expectedPattern) {
-        final String decryptedExpectedPattern = cryptoTool.decrypt(expectedPattern, CRYPTO_PATTERN);
+        final String decryptedExpectedPattern = decryptIfEncrypted(expectedPattern);
         
         String actual = getTitle(EXPLICIT_TIMEOUT);
         Pattern p = Pattern.compile(decryptedExpectedPattern);
@@ -1078,7 +1075,7 @@ public class DriverHelper {
      *             If unable to open tab
      */
     public void openTab(String url) {
-        final String decryptedURL = cryptoTool.decrypt(url, CRYPTO_PATTERN);
+        final String decryptedURL = decryptIfEncrypted(url);
         String script = "var d=document,a=d.createElement('a');a.target='_blank';a.href='%s';a.innerHTML='.';d.body.appendChild(a);return a";
         Object element = trigger(String.format(script, decryptedURL));
         if (element instanceof WebElement) {
@@ -1354,5 +1351,29 @@ public class DriverHelper {
             retryInterval = 1000;
         }
         return retryInterval;
+    }
+
+    private String decryptIfEncrypted(String text) {
+        Matcher cryptoMatcher = Pattern.compile(CRYPTO_PATTERN)
+                .matcher(text);
+        String decryptedText = text;
+        if (cryptoMatcher.find()) {
+            initCryptoTool();
+            decryptedText = this.cryptoTool.decrypt(text, CRYPTO_PATTERN);
+        }
+        return decryptedText;
+    }
+
+    private void initCryptoTool() {
+        if (this.cryptoTool == null) {
+            String cryptoKey = Configuration.get(Parameter.CRYPTO_KEY_VALUE);
+            if (cryptoKey.isEmpty()) {
+                throw new SkipException("Encrypted data detected, but the crypto key is not found!");
+            }
+            this.cryptoTool = CryptoToolBuilder.builder()
+                    .chooseAlgorithm(Algorithm.find(Configuration.get(Configuration.Parameter.CRYPTO_ALGORITHM)))
+                    .setKey(cryptoKey)
+                    .build();
+        }
     }
 }

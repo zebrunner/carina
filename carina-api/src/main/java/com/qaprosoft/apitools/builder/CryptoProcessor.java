@@ -20,6 +20,8 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.testng.SkipException;
+
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.zebrunner.carina.crypto.Algorithm;
 import com.zebrunner.carina.crypto.CryptoTool;
@@ -27,24 +29,22 @@ import com.zebrunner.carina.crypto.CryptoToolBuilder;
 
 public class CryptoProcessor implements PropertiesProcessor {
 
-    private static CryptoTool cryptoTool = CryptoToolBuilder.builder()
-            .chooseAlgorithm(Algorithm.find(Configuration.get(Configuration.Parameter.CRYPTO_ALGORITHM)))
-            .setKey(Configuration.get(Configuration.Parameter.CRYPTO_KEY_VALUE))
-            .build();
-    private static String cryptPatternAsText = Configuration.get(Configuration.Parameter.CRYPTO_PATTERN);
-    private static Pattern CRYPT_PATTERN = Pattern.compile(cryptPatternAsText);
+    private  CryptoTool cryptoTool = null;
+    private final String cryptoPatternAsText = Configuration.get(Configuration.Parameter.CRYPTO_PATTERN);
+    private final Pattern cryptoPattern = Pattern.compile(cryptoPatternAsText);
 
     @Override
     public Properties process(Properties in) {
         Properties out = new Properties();
         for (Entry<Object, Object> entry : in.entrySet()) {
-            Matcher cryptoMatcher = CRYPT_PATTERN.matcher(entry.getValue().toString());
+            Matcher cryptoMatcher = cryptoPattern.matcher(entry.getValue().toString());
             String tmp = entry.getValue().toString();
             boolean crypted = false;
 
             while (cryptoMatcher.find()) {
+                initCryptoTool();
                 String toReplace = cryptoMatcher.group();
-                tmp = tmp.replace(toReplace, cryptoTool.decrypt(toReplace, cryptPatternAsText));
+                tmp = tmp.replace(toReplace, cryptoTool.decrypt(toReplace, cryptoPatternAsText));
                 crypted = true;
             }
 
@@ -52,5 +52,18 @@ public class CryptoProcessor implements PropertiesProcessor {
                 out.put(entry.getKey(), tmp);
         }
         return out;
+    }
+
+    private void initCryptoTool() {
+        if (this.cryptoTool == null) {
+            String cryptoKey = Configuration.get(Configuration.Parameter.CRYPTO_KEY_VALUE);
+            if (cryptoKey.isEmpty()) {
+                throw new SkipException("Encrypted data detected, but the crypto key is not found!");
+            }
+            this.cryptoTool = CryptoToolBuilder.builder()
+                    .chooseAlgorithm(Algorithm.find(Configuration.get(Configuration.Parameter.CRYPTO_ALGORITHM)))
+                    .setKey(cryptoKey)
+                    .build();
+        }
     }
 }

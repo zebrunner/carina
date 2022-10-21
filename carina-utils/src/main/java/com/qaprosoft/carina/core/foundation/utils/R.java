@@ -23,11 +23,13 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.SkipException;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.exception.InvalidConfigurationException;
@@ -378,17 +380,27 @@ public enum R {
     }
 
     private String decrypt(String content, String pattern) {
-        try {
-            CryptoTool cryptoTool = CryptoToolBuilder.builder()
-                    .chooseAlgorithm(Algorithm.find(Configuration.get(Parameter.CRYPTO_ALGORITHM)))
-                    .setKey(Configuration.get(Parameter.CRYPTO_KEY_VALUE))
-                    .build();
+        Matcher cryptoMatcher = Pattern.compile(pattern)
+                .matcher(content);
 
-            return cryptoTool.decrypt(content, pattern);
-        } catch (Exception e) {
-            LOGGER.error("Error during decrypting '" + content + "'. Please check error: ", e);
-            return content;
+        if (cryptoMatcher.find()) {
+            try {
+                String cryptoKey = Configuration.get(Parameter.CRYPTO_KEY_VALUE);
+                if (cryptoKey.isEmpty()) {
+                    throw new SkipException("Encrypted data detected, but the crypto key is not found!");
+                }
+
+                CryptoTool cryptoTool = CryptoToolBuilder.builder()
+                        .chooseAlgorithm(Algorithm.find(Configuration.get(Parameter.CRYPTO_ALGORITHM)))
+                        .setKey(cryptoKey)
+                        .build();
+
+                return cryptoTool.decrypt(content, pattern);
+            } catch (Exception e) {
+                LOGGER.error("Error during decrypting '" + content + "'. Please check error: ", e);
+            }
         }
+        return content;
     }
 
 }
