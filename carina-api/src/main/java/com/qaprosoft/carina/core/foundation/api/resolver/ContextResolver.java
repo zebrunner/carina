@@ -20,6 +20,8 @@ interface ContextResolver<E extends AnnotatedElement> {
 
     Optional<String> resolveRequestTemplatePath(E element);
 
+    Optional<RequestBodyContainer> resolveRequestBody(E element);
+
     Optional<String> resolveResponseTemplatePath(E element);
 
     Optional<HttpResponseStatusType> resolveSuccessfulHttpStatus(E element);

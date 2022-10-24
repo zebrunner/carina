@@ -1,9 +1,10 @@
 package com.qaprosoft.carina.core.foundation.api.interceptor;
 
+import com.qaprosoft.apitools.annotation.AnnotationContext;
+import com.qaprosoft.apitools.annotation.AnnotationUtils;
 import com.qaprosoft.carina.core.foundation.api.AbstractApiMethod;
 import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
 import com.qaprosoft.carina.core.foundation.api.annotation.LinkedInterceptors;
-import com.qaprosoft.carina.core.foundation.api.resolver.ResolverUtils;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.ArrayList;
@@ -46,6 +47,10 @@ public class InterceptorChain {
         doAction(interceptor -> interceptor.onBeforeCall(this.apiMethod));
     }
 
+    public void onAfterCall() {
+        doAction(interceptor -> interceptor.onAfterCall(this.apiMethod));
+    }
+
     private void doAction(Consumer<ApiMethodInterceptor<AbstractApiMethod>> action) {
         this.interceptors.forEach(interceptor -> doAction(interceptor, action));
     }
@@ -72,7 +77,9 @@ public class InterceptorChain {
 
     @SuppressWarnings("unchecked")
     private void processLinkedInterceptors(AnnotatedElement element) {
-        List<LinkedInterceptors> linkedInterceptorsAnnotations = ResolverUtils.resolveAllAnnotatedItemsByChain(element, LinkedInterceptors.class);
+        List<LinkedInterceptors> linkedInterceptorsAnnotations = AnnotationUtils.findAllAnnotationContextsByChain(element, LinkedInterceptors.class).stream()
+                .map(AnnotationContext::getAnnotation)
+                .collect(Collectors.toList());
 
         Collections.reverse(linkedInterceptorsAnnotations);
 

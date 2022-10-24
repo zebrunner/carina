@@ -44,6 +44,10 @@ public class ContextResolverChain {
         return getResolverValue(resolver -> resolver.resolveRequestTemplatePath(element), element);
     }
 
+    public static Optional<RequestBodyContainer> resolveRequestBody(AnnotatedElement element) {
+        return getResolverValue(resolver -> resolver.resolveRequestBody(element), element);
+    }
+
     public static Optional<String> resolveResponseTemplatePath(AnnotatedElement element) {
         return getResolverValue(resolver -> resolver.resolveResponseTemplatePath(element), element);
     }

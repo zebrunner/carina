@@ -292,9 +292,13 @@ public abstract class AbstractApiMethod extends HttpClient {
         try {
             rs = HttpClient.send(request, methodPath, methodType);
         } finally {
-            if (ps != null)
+            if (ps != null) {
                 ps.close();
+            }
         }
+
+        getInterceptorChain().onAfterCall();
+
         return rs;
     }
 

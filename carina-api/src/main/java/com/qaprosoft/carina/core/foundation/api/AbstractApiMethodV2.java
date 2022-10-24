@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qaprosoft.apitools.builder.PropertiesProcessor;
 import com.qaprosoft.apitools.validation.JsonComparatorContext;
 import com.qaprosoft.apitools.validation.JsonKeywordsComparator;
@@ -52,6 +54,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     
     private static final String ACCEPT_ALL_HEADER = "Accept=*/*";
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private Properties properties;
     private List<Class<? extends PropertiesProcessor>> ignoredPropertiesProcessorClasses;
@@ -139,6 +142,19 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         this.rsPath = path;
     }
 
+    public void setRequestBody(Object body) {
+        setRequestBody(body, OBJECT_MAPPER);
+    }
+
+    public void setRequestBody(Object body, ObjectMapper objectMapper) {
+        try {
+            String bodyContent = objectMapper.writeValueAsString(body);
+            setBodyContent(bodyContent);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
     private void initBodyContent() {
         if (rqPath != null) {
             TemplateMessage tm = new TemplateMessage();
@@ -146,6 +162,14 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
             tm.setTemplatePath(rqPath);
             tm.setPropertiesStorage(properties);
             setBodyContent(tm.getMessageText());
+        } else {
+            ContextResolverChain.resolveRequestBody(getAnchorElement()).ifPresent(requestBodyContainer -> {
+                if (requestBodyContainer.isJson()) {
+                    setBodyContent(requestBodyContainer.getBody().toString());
+                } else {
+                    setRequestBody(requestBodyContainer.getBody());
+                }
+            });
         }
     }
 

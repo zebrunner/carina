@@ -8,4 +8,6 @@ public interface ApiMethodInterceptor<M extends AbstractApiMethod> {
 
     void onBeforeCall(M apiMethod);
 
+    void onAfterCall(M apiMethod);
+
 }

@@ -1,5 +1,6 @@
 package com.qaprosoft.carina.core.foundation.api.resolver;
 
+import com.qaprosoft.apitools.annotation.AnnotationUtils;
 import com.qaprosoft.carina.core.foundation.api.http.HttpMethodType;
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
 import com.qaprosoft.carina.core.foundation.utils.R;
@@ -14,7 +15,8 @@ class PropertiesContextResolver implements ContextResolver<Class<?>> {
     @Override
     public Optional<RequestStartLine> resolveUrl(Class<?> element) {
         try {
-            return ResolverUtils.findFirstParentClass(element, c -> R.API.containsKey(c.getSimpleName()))
+            return AnnotationUtils.findFirstConditionalElementByChain(element, el -> R.API.containsKey(((Class<?>) el).getSimpleName()))
+                    .map(c -> (Class<?>) c)
                     .map(c -> R.API.get(c.getSimpleName()))
                     .map(PropertiesContextResolver::resolveStartLine);
         } catch (RuntimeException e) {
@@ -56,6 +58,11 @@ class PropertiesContextResolver implements ContextResolver<Class<?>> {
 
     @Override
     public Optional<String> resolveRequestTemplatePath(Class<?> element) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<RequestBodyContainer> resolveRequestBody(Class<?> element) {
         return Optional.empty();
     }
 

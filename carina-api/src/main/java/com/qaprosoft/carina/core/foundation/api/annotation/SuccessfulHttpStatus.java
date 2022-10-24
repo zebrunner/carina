@@ -22,7 +22,7 @@ import java.lang.annotation.Target;
 
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
 
-@Target(value = { ElementType.TYPE, ElementType.METHOD })
+@Target(value = { ElementType.TYPE, ElementType.METHOD, ElementType.ANNOTATION_TYPE })
 @Retention(value = RetentionPolicy.RUNTIME)
 public @interface SuccessfulHttpStatus {
 

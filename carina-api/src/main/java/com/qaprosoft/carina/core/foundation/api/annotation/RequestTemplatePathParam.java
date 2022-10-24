@@ -7,5 +7,6 @@ import java.lang.annotation.Target;
 
 @Target(value = { ElementType.PARAMETER })
 @Retention(value = RetentionPolicy.RUNTIME)
+@RequestTemplatePath(path = "")
 public @interface RequestTemplatePathParam {
 }

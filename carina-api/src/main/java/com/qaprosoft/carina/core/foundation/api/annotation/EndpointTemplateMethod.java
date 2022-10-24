@@ -1,18 +1,18 @@
 package com.qaprosoft.carina.core.foundation.api.annotation;
 
-import com.qaprosoft.apitools.annotation.processor.RelatedTo;
+import com.qaprosoft.carina.core.foundation.api.http.HttpMethodType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(value = { ElementType.PARAMETER })
+@Target(value = { ElementType.METHOD, ElementType.ANNOTATION_TYPE })
 @Retention(value = RetentionPolicy.RUNTIME)
-@Header(key = "", value = "")
-public @interface HeaderParam {
+public @interface EndpointTemplateMethod {
 
-    @RelatedTo(annotationClass = Header.class, field = "key")
-    String key();
+    String url() default "";
+
+    HttpMethodType methodType();
 
 }

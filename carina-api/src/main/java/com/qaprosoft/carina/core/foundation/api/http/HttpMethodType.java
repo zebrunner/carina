@@ -21,6 +21,7 @@ package com.qaprosoft.carina.core.foundation.api.http;
  * @author Alex Khursevich
  */
 public enum HttpMethodType {
+
     HEAD(1, "HEAD"),
     GET(2, "GET"),
     PUT(3, "PUT"),
@@ -29,8 +30,8 @@ public enum HttpMethodType {
     PATCH(6, "PATCH"),
 	OPTIONS(7, "OPTIONS");
 
-    private int code;
-    private String name;
+    private final int code;
+    private final String name;
 
     HttpMethodType(int code, String name) {
         this.code = code;

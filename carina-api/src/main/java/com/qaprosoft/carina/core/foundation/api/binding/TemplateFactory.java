@@ -22,7 +22,7 @@ public class TemplateFactory {
     }
 
     static <M> M proxyTemplate(Class<M> mClass) {
-        InvocationHandler handler = new TemplateInvocationHandler();
+        InvocationHandler handler = new TemplateInvocationHandler(mClass);
         return proxyTemplate(mClass, handler);
     }
 

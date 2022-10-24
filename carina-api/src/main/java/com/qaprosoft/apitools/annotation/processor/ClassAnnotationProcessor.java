@@ -1,0 +1,69 @@
+package com.qaprosoft.apitools.annotation.processor;
+
+import com.qaprosoft.apitools.annotation.AnnotationContext;
+import com.qaprosoft.apitools.annotation.AnnotationProcessorUtils;
+import com.qaprosoft.apitools.annotation.AnnotationUtils;
+import com.qaprosoft.apitools.annotation.FirstElementStrategy;
+import com.qaprosoft.carina.core.foundation.api.AbstractApiMethod;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+
+public class ClassAnnotationProcessor implements AnnotationProcessor<Class<?>> {
+
+    private static final Function<Class<?>, Stream<Class<?>>> superClassesGetter =
+            clazz -> Stream.concat(Stream.of(clazz.getSuperclass()), Arrays.stream(clazz.getInterfaces()));
+
+    @Override
+    public <A extends Annotation> Optional<AnnotationContext<A, Class<?>>> findFirstAnnotationContext(Class<?> element, Class<A> annClass) {
+        Optional<AnnotationContext<A, Class<?>>> result;
+        try {
+            result = findFirstClassInHierarchy(element, annClass)
+                    .flatMap(clazz -> AnnotationProcessorUtils.getAnnotation(clazz, annClass))
+                    .map(annotation -> new AnnotationContext<>(annotation, element));
+        } catch (RuntimeException e) {
+            throw new RuntimeException(String.format("During %s annotation processing. %s", annClass.getSimpleName(), e.getMessage()), e);
+        }
+        return result;
+    }
+
+    @Override
+    public <A extends Annotation> Optional<Class<?>> findFirstConditionalElement(Class<?> element, Predicate<Class<?>> condition) {
+        Optional<Class<?>> result;
+        try {
+            result = findFirstClassInHierarchy(element, condition);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(String.format("During %s class processing. %s", element.getSimpleName(), e.getMessage()), e);
+        }
+        return result;
+    }
+
+    private static <A extends Annotation> Optional<Class<?>> findFirstClassInHierarchy(Class<?> element, Class<A> annClass) {
+        return findFirstClassInHierarchy(element, c -> AnnotationUtils.isAnnotatedPresent(c, annClass));
+    }
+
+    private static <A extends Annotation> Optional<Class<?>> findFirstClassInHierarchy(Class<?> element, Predicate<Class<?>> condition) {
+        return AnnotationProcessorUtils.findFirstItemInHierarchy(element, AbstractApiMethod.class, condition, c -> c, superClassesGetter, FirstElementStrategy.ON_SAME_LEVEL);
+    }
+
+    @Override
+    public <A extends Annotation> List<AnnotationContext<A, Class<?>>> findAllAnnotationContexts(Class<?> element, Class<A> annClass) {
+        Function<Class<?>, AnnotationContext<A, Class<?>>> preparator = foundClass -> new AnnotationContext<>(AnnotationProcessorUtils.getAnnotation(foundClass, annClass).orElse(null), foundClass);
+        return findAllClassesInHierarchy(element, annClass, preparator);
+    }
+
+    private static <A extends Annotation> List<AnnotationContext<A, Class<?>>> findAllClassesInHierarchy(Class<?> element, Class<A> annClass, Function<Class<?>, AnnotationContext<A, Class<?>>> preparator) {
+        return AnnotationProcessorUtils.findAllItemsInHierarchy(element, AbstractApiMethod.class, c -> AnnotationUtils.isAnnotatedPresent(c, annClass), preparator, superClassesGetter);
+    }
+
+    @Override
+    public AnnotatedElement covertToNextLevel(Class<?> element) {
+        return element;
+    }
+}
