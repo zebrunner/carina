@@ -68,6 +68,7 @@ public enum R {
 
     // temporary thread/test properties which is cleaned on afterTest phase for current thread. It can override any value from below R enum maps
     private static ThreadLocal<Properties> testProperties = new ThreadLocal<>();
+    private static final ThreadLocal<Map<String, String>> PROPERTY_OVERWRITE_NOTIFICATIONS = new ThreadLocal<>();
 
     private static Map<String, Properties> defaultPropertiesHolder = new HashMap<>();
     // permanent global configuration map 
@@ -265,9 +266,15 @@ public enum R {
     public String get(String key) {
         String value = getTestProperties().getProperty(key);
         if (value != null) {
+            if (PROPERTY_OVERWRITE_NOTIFICATIONS.get() == null) {
+                PROPERTY_OVERWRITE_NOTIFICATIONS.set(new HashMap<>());
+            }
             // do not warn user about this system property update
-            if (!Parameter.ERROR_SCREENSHOT.getKey().equals(key)) {
-                System.out.println("Overridden '" + key + "=" + value + "' property will be used for current test!");
+            if (!Parameter.ERROR_SCREENSHOT.getKey().equals(key) &&
+                    !(PROPERTY_OVERWRITE_NOTIFICATIONS.get().containsKey(key) &&
+                            value.equals(PROPERTY_OVERWRITE_NOTIFICATIONS.get().get(key)))) {
+                LOGGER.warn("Overridden '{}={}' property will be used for current test!", key, value);
+                PROPERTY_OVERWRITE_NOTIFICATIONS.get().put(key, value);
             }
             return value;
         }
@@ -367,6 +374,7 @@ public enum R {
     
     public void clearTestProperties() {
         testProperties.remove();
+        PROPERTY_OVERWRITE_NOTIFICATIONS.remove();
     }
     
     public Properties getTestProperties() {
