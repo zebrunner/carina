@@ -25,7 +25,6 @@ import org.openqa.selenium.chromium.ChromiumOptions;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.remote.Browser;
-import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.CapabilityType;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -126,7 +125,7 @@ public class DesktopCapabilitiesTest {
         SafariCapabilities safariCapabilities = new SafariCapabilities();
         SafariOptions capabilities = safariCapabilities.getCapability(testName);
 
-        Assert.assertEquals(capabilities.getBrowserName(), BrowserType.SAFARI, "Returned browser name is not valid!");
+        Assert.assertEquals(capabilities.getBrowserName(), Browser.SAFARI.browserName(), "Returned browser name is not valid!");
 
         Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
     }
