@@ -58,7 +58,9 @@ public enum R {
 
     DATABASE("database.properties"),
 
-    ZAFIRA("zafira.properties");
+    ZAFIRA("zafira.properties"),
+
+    AGENT("agent.properties");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
