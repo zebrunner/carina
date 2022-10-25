@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -133,6 +134,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         // Technically, this happen when the maven-surefire-plugin has not set inherited program arguments (passed to mvn process).
         // That is why it is necessary to reinit R class here when TestNG loads the CarinaListener class.
         R.reinit();
+        registerDecryptAgentProperties();
         
         LOGGER.info(Configuration.asString());
         // Configuration.validateConfiguration();
@@ -927,4 +929,61 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     }
 
+    /**
+     * Register agent properties from agent.properties file (if exists) as system properties.
+     * Yaml configuration will be ignored.
+     * If system property already have property(ies), we will no rewrite it
+     */
+    private void registerDecryptAgentProperties() {
+        if (ClassLoader.getSystemResource("agent.properties") == null) {
+            return;
+        }
+
+        if (ClassLoader.getSystemResource("agent.yaml") != null ||
+                ClassLoader.getSystemResource("agent.yml") != null) {
+            // use sout instead of logger because agent intercept call of logger
+            System.out.println(
+                    "[WARN] You have agent.properties and agent.yaml/agent.yml! Use only one type of config file for agent.\n"
+                            + "Yaml files does not supported by Carina Framework. All properties in your agent.properties file will have"
+                            + " more priority over yaml agent configuration."
+                            + "If you want to support cryptography for agent, use agent.properties.");
+        }
+
+        Properties properties = R.AGENT.getProperties();
+        Set<String> propertyNames = properties.stringPropertyNames();
+        for (String name : propertyNames) {
+            String value = R.AGENT.getDecrypted(name);
+            String systemPropertyName = convertPropertyToSystemProperty(name);
+            String systemValue = System.getProperty(systemPropertyName);
+            if (systemValue == null) {
+                System.setProperty(systemPropertyName, value);
+            }
+        }
+    }
+
+    /**
+     * This method is a hotfix for naming difference between agent.properties and system properties
+     */
+    private String convertPropertyToSystemProperty(String propertyName) {
+        String systemProperty = propertyName;
+        if ("reporting.project-key".equals(propertyName)) {
+            systemProperty = "reporting.projectKey";
+        }
+        if ("reporting.server.access-token".equals(propertyName)) {
+            systemProperty = "reporting.server.accessToken";
+        }
+
+        if ("reporting.run.display-name".equals(propertyName)) {
+            systemProperty = "reporting.run.displayName";
+        }
+
+        if ("reporting.run.retry-known-issues".equals(propertyName)) {
+            systemProperty = "reporting.run.retryKnownIssues";
+        }
+
+        if ("reporting.run.substitute-remote-web-drivers".equals(propertyName)) {
+            systemProperty = "reporting.run.substituteRemoteWebDrivers";
+        }
+        return systemProperty;
+    }
 }
