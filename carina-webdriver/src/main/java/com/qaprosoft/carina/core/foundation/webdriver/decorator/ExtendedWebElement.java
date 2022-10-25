@@ -1033,7 +1033,6 @@ public class ExtendedWebElement implements IWebElement {
         	throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
         }
 
-        int i = 1;
         for (WebElement element : webElements) {
             String name = "undefined";
             try {
@@ -1046,7 +1045,6 @@ public class ExtendedWebElement implements IWebElement {
             //using ExtendedWebElement Constructor which takes in WebElement, name and By as the arguments
             setElement(element);
             extendedWebElements.add(new ExtendedWebElement(getElement(), name, by));
-            i++;
         }
         return extendedWebElements;
     }
