@@ -942,7 +942,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
         if (ClassLoader.getSystemResource("agent.yaml") != null ||
                 ClassLoader.getSystemResource("agent.yml") != null) {
-            LOGGER.warn(
+            System.out.println(
                     "You have agent.properties and agent.yaml/agent.yml! Use only one type of config file for agent.\n"
                             + "Yaml files does not supported by Carina Framework. All properties in your agent.properties file will have"
                             + " more priority over yaml agent configuration."
