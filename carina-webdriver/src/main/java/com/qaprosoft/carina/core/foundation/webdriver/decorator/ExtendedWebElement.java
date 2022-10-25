@@ -159,7 +159,8 @@ public class ExtendedWebElement implements IWebElement {
             // if the element is decorated, we take its decorated context
             if (element instanceof Decorated &&
                     ((Decorated<?>) element).getOriginal() instanceof RemoteWebElement) {
-                tempSearchContext = (SearchContext) ((Decorated<?>) element).getDecorator().getDecoratedDriver();
+                //getDecoratedDriver cannot cast to SearchContext, so getting the Original Element/Driver
+                tempSearchContext = (SearchContext) ((Decorated<?>) element).getDecorator().getDecoratedDriver().getOriginal();
                 // if the element is RemoteWebElement, we take its context as is
             } else if (element instanceof RemoteWebElement) {
                 tempSearchContext = ((RemoteWebElement) element).getWrappedDriver();
@@ -1042,8 +1043,9 @@ public class ExtendedWebElement implements IWebElement {
                 LOGGER.debug("Error while getting text from element.", e);
             }
 
-            // we can't initiate ExtendedWebElement using by as it belongs to the list of elements
-            extendedWebElements.add(new ExtendedWebElement(generateByForList(by, i), name, this.driver, getElement()));
+            //using ExtendedWebElement Constructor which takes in WebElement, name and By as the arguments
+            setElement(element);
+            extendedWebElements.add(new ExtendedWebElement(getElement(), name, by));
             i++;
         }
         return extendedWebElements;
