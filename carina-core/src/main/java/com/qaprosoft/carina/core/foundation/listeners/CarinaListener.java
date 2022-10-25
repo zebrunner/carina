@@ -21,7 +21,6 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -942,8 +941,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
         if (ClassLoader.getSystemResource("agent.yaml") != null ||
                 ClassLoader.getSystemResource("agent.yml") != null) {
+            // use sout instead of logger because agent intercept call of logger
             System.out.println(
-                    "You have agent.properties and agent.yaml/agent.yml! Use only one type of config file for agent.\n"
+                    "[WARN] You have agent.properties and agent.yaml/agent.yml! Use only one type of config file for agent.\n"
                             + "Yaml files does not supported by Carina Framework. All properties in your agent.properties file will have"
                             + " more priority over yaml agent configuration."
                             + "If you want to support cryptography for agent, use agent.properties.");
