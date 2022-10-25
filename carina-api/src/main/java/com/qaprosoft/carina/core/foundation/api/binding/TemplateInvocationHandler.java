@@ -53,7 +53,8 @@ public class TemplateInvocationHandler implements InvocationHandler {
 
     private static boolean isMethodValid(Method method) {
         return !Modifier.isStatic(method.getModifiers())
+                && !method.isDefault()
                 && Modifier.isPublic(method.getModifiers())
-                && !AnnotationUtils.isAnnotatedPresent(method, EndpointTemplateMethod.class);
+                && AnnotationUtils.isAnnotatedPresent(method, EndpointTemplateMethod.class);
     }
 }

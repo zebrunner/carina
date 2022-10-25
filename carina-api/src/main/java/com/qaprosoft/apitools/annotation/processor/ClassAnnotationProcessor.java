@@ -3,7 +3,7 @@ package com.qaprosoft.apitools.annotation.processor;
 import com.qaprosoft.apitools.annotation.AnnotationContext;
 import com.qaprosoft.apitools.annotation.AnnotationProcessorUtils;
 import com.qaprosoft.apitools.annotation.AnnotationUtils;
-import com.qaprosoft.apitools.annotation.FirstElementStrategy;
+import com.qaprosoft.apitools.annotation.FirstElementDuplicateStrategy;
 import com.qaprosoft.carina.core.foundation.api.AbstractApiMethod;
 
 import java.lang.annotation.Annotation;
@@ -49,7 +49,7 @@ public class ClassAnnotationProcessor implements AnnotationProcessor<Class<?>> {
     }
 
     private static <A extends Annotation> Optional<Class<?>> findFirstClassInHierarchy(Class<?> element, Predicate<Class<?>> condition) {
-        return AnnotationProcessorUtils.findFirstItemInHierarchy(element, AbstractApiMethod.class, condition, c -> c, superClassesGetter, FirstElementStrategy.ON_SAME_LEVEL);
+        return AnnotationProcessorUtils.findFirstFoundItemInHierarchy(element, AbstractApiMethod.class, condition, c -> c, superClassesGetter, FirstElementDuplicateStrategy.ON_SAME_LEVEL);
     }
 
     @Override

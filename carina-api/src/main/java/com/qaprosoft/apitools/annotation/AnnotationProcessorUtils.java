@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -68,7 +69,7 @@ public class AnnotationProcessorUtils {
             return es;
         }, ae -> Arrays.stream(ae.getDeclaredAnnotations()));
 
-        return findFirstItemInHierarchy(element, Object.class, e -> doOnType(e, Annotation::annotationType, AnnotatedElement::getClass).equals(annClass), e -> e, superElementGetter, FirstElementStrategy.ANY);
+        return findItemBeforeFirstItemInHierarchy(element, Object.class, e -> doOnType(e, Annotation::annotationType, AnnotatedElement::getClass).equals(annClass), e -> e, superElementGetter, FirstElementDuplicateStrategy.ANY);
     }
 
     private static <R> R doOnType(Object e, Function<Annotation, R> onAnnotation, Function<AnnotatedElement, R> onAnnotatedElement) {
@@ -83,15 +84,20 @@ public class AnnotationProcessorUtils {
         return result;
     }
 
-    public static <R, E> Optional<E> findFirstItemInHierarchy(E element, E untilElement, Predicate<E> condition, Function<E, R> preparator, Function<E, Stream<E>> superElementsGetter, FirstElementStrategy firstElementStrategy) {
-        return findFirstItemsGraphNodeInHierarchy(element, untilElement, condition, preparator, superElementsGetter, firstElementStrategy)
-                .map(Map.Entry::getKey);
+    public static <R, E> Optional<E> findItemBeforeFirstItemInHierarchy(E element, E untilElement, Predicate<E> condition, Function<E, R> preparator, Function<E, Stream<E>> superElementsGetter, FirstElementDuplicateStrategy firstElementDuplicateStrategy) {
+        return findFirstItemsGraphNodeInHierarchy(element, untilElement, condition, preparator, superElementsGetter, firstElementDuplicateStrategy)
+                .map(entry -> entry.getKey() == null ? element : entry.getKey());
     }
 
-    private static <R, E> Optional<Map.Entry<E, List<R>>> findFirstItemsGraphNodeInHierarchy(E element, E untilElement, Predicate<E> condition, Function<E, R> preparator, Function<E, Stream<E>> superElementsGetter, FirstElementStrategy firstElementStrategy) {
+    public static <R, E> Optional<R> findFirstFoundItemInHierarchy(E element, E untilElement, Predicate<E> condition, Function<E, R> preparator, Function<E, Stream<E>> superElementsGetter, FirstElementDuplicateStrategy firstElementDuplicateStrategy) {
+        return findFirstItemsGraphNodeInHierarchy(element, untilElement, condition, preparator, superElementsGetter, firstElementDuplicateStrategy)
+                .flatMap(entry -> entry.getValue().stream().findFirst());
+    }
+
+    private static <R, E> Optional<Map.Entry<E, List<R>>> findFirstItemsGraphNodeInHierarchy(E element, E untilElement, Predicate<E> condition, Function<E, R> preparator, Function<E, Stream<E>> superElementsGetter, FirstElementDuplicateStrategy firstElementDuplicateStrategy) {
         Map<E, List<R>> result = findAllItemsGraphInHierarchy(element, untilElement, condition, preparator, superElementsGetter);
 
-        String[] duplicates = firstElementStrategy.getDuplicatesRecognizer().apply(
+        String[] duplicates = firstElementDuplicateStrategy.getDuplicatesRecognizer().apply(
                         result.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
                 ).stream()
                 .map(Object::toString)
@@ -108,15 +114,15 @@ public class AnnotationProcessorUtils {
     public static <R, E> List<R> findAllItemsInHierarchy(E clazz, E untilClass, Predicate<E> condition, Function<E, R> preparator, Function<E, Stream<E>> superElementsGetter) {
         Map<E, List<R>> result = findAllItemsGraphInHierarchy(clazz, untilClass, condition, preparator, superElementsGetter);
 
-        return result.entrySet().stream()
-                .flatMap(entry -> entry.getValue().stream())
+        return result.values().stream()
+                .flatMap(Collection::stream)
                 .collect(Collectors.toList());
     }
 
     private static <R, E> Map<E, List<R>> findAllItemsGraphInHierarchy(E element, E untilElement, Predicate<E> condition, Function<E, R> preparator, Function<E, Stream<E>> superElementsGetter) {
         Map<E, List<R>> result = new LinkedHashMap<>();
 
-        findAllItemsGraphInHierarchy(element, element, untilElement, condition, preparator, result, superElementsGetter);
+        findAllItemsGraphInHierarchy(null, element, untilElement, condition, preparator, result, superElementsGetter);
 
         return result;
     }
@@ -131,7 +137,7 @@ public class AnnotationProcessorUtils {
             Function<E, Stream<E>> superElementsGetter
     ) {
         if (element != null && !element.equals(untilElement)) {
-            collector.putIfAbsent(element, new ArrayList<>());
+            collector.putIfAbsent(previousElement, new ArrayList<>());
 
             if (condition.test(element)) {
                 collector.get(previousElement).add(preparator.apply(element));

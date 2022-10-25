@@ -7,9 +7,10 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public enum FirstElementStrategy {
+public enum FirstElementDuplicateStrategy {
 
     ON_SAME_LEVEL(collector -> collector.values().stream()
+            .takeWhile(items -> items.size() != 1)
             .filter(items -> items.size() > 1)
             .flatMap(Collection::stream)
             .collect(Collectors.toList())),
@@ -25,7 +26,7 @@ public enum FirstElementStrategy {
 
     private final Function<Map<?, List<?>>, List<?>> duplicatesRecognizer;
 
-    FirstElementStrategy(Function<Map<?, List<?>>, List<?>> duplicatesRecognizer) {
+    FirstElementDuplicateStrategy(Function<Map<?, List<?>>, List<?>> duplicatesRecognizer) {
         this.duplicatesRecognizer = duplicatesRecognizer;
     }
 
