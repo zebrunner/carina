@@ -1170,7 +1170,6 @@ public class DriverHelper {
      *            Selenium By locator
      * @return ExtendedWebElement if exists otherwise null.
      */
-    @Deprecated(since = "7.4.21", forRemoval = true)
     public ExtendedWebElement findExtendedWebElement(By by) {
         return findExtendedWebElement(by, by.toString(), EXPLICIT_TIMEOUT);
     }
@@ -1184,7 +1183,6 @@ public class DriverHelper {
      * @param timeout to wait
      * @return ExtendedWebElement if exists otherwise null.
      */
-    @Deprecated(since = "7.4.21", forRemoval = true)
     public ExtendedWebElement findExtendedWebElement(By by, long timeout) {
         return findExtendedWebElement(by, by.toString(), timeout);
     }
@@ -1199,7 +1197,6 @@ public class DriverHelper {
      *            Element name
      * @return ExtendedWebElement if exists otherwise null.
      */
-    @Deprecated(since = "7.4.21", forRemoval = true)
     public ExtendedWebElement findExtendedWebElement(final By by, String name) {
         return findExtendedWebElement(by, name, EXPLICIT_TIMEOUT);
     }
@@ -1216,7 +1213,6 @@ public class DriverHelper {
      *            Timeout to find
      * @return ExtendedWebElement if exists otherwise null.
      */
-    @Deprecated(since = "7.4.21", forRemoval = true)
     public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
 		DriverListener.setMessages(Messager.ELEMENT_FOUND.getMessage(name),
 				Messager.ELEMENT_NOT_FOUND.getMessage(name));
@@ -1237,7 +1233,6 @@ public class DriverHelper {
      *            Selenium By locator
      * @return List of ExtendedWebElement.
      */
-    @Deprecated(since = "7.4.21", forRemoval = true)
     public List<ExtendedWebElement> findExtendedWebElements(By by) {
         return findExtendedWebElements(by, EXPLICIT_TIMEOUT);
     }
@@ -1253,7 +1248,6 @@ public class DriverHelper {
      *            Timeout to find
      * @return List of ExtendedWebElement.
      */
-    @Deprecated(since = "7.4.21", forRemoval = true)
     public List<ExtendedWebElement> findExtendedWebElements(final By by, long timeout) {
         List<ExtendedWebElement> extendedWebElements = new ArrayList<>();
 
@@ -1264,7 +1258,6 @@ public class DriverHelper {
     	}
 
         List<WebElement> webElements = getDriver().findElements(by);
-    	int i = 1;
         for (WebElement element : webElements) {
             try {
                 name = element.getText();
@@ -1272,10 +1265,9 @@ public class DriverHelper {
             	/* do nothing and keep 'undefined' for control name */
             }
 
-            ExtendedWebElement tempElement = new ExtendedWebElement(element, name);
-            tempElement.setBy(tempElement.generateByForList(by, i));
-            extendedWebElements.add(tempElement);          
-            i++;
+            ExtendedWebElement tempElement = new ExtendedWebElement(by, name, getDriver(), getDriver());
+            tempElement.setElement(element);
+            extendedWebElements.add(tempElement);
         }
         return extendedWebElements;
     }

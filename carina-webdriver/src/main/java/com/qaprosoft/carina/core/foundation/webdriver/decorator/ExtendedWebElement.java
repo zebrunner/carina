@@ -139,11 +139,17 @@ public class ExtendedWebElement implements IWebElement {
         this.formatValues = Arrays.toString(formatValues);
     }
 
+    /**
+     * This constructor shouldn't be called explicitly. For proxied elements only
+     */
     public ExtendedWebElement(WebElement element, String name, By by) {
         this(element, name);
         this.by = by;
     }
 
+    /**
+     * This constructor shouldn't be called explicitly. For proxied elements only
+     */
     public ExtendedWebElement(WebElement element, String name) {
     	this.name = name;
         this.element = element;
@@ -1083,11 +1089,11 @@ public class ExtendedWebElement implements IWebElement {
      * @return ExtendedWebElement if exists otherwise null.
      */
     public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
-        if (isPresent(by, timeout)) {
-            return new ExtendedWebElement(by, name, this.driver, getElement());
-        } else {
-        	throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
+        ExtendedWebElement element = new ExtendedWebElement(by, name, this.driver, getElement());
+        if (!element.isPresent(timeout)) {
+            throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
         }
+        return element;
     }
 
     public List<ExtendedWebElement> findExtendedWebElements(By by) {
@@ -1095,16 +1101,13 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     public List<ExtendedWebElement> findExtendedWebElements(final By by, long timeout) {
-        List<ExtendedWebElement> extendedWebElements = new ArrayList<ExtendedWebElement>();
-        List<WebElement> webElements = new ArrayList<WebElement>();
-        
-        if (isPresent(by, timeout)) {
-            webElements = getElement().findElements(by);
-        } else {
-        	throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
+        ExtendedWebElement firstTempElement = new ExtendedWebElement(by, "first element", getDriver(), getElement());
+        if (!firstTempElement.isPresent(timeout)) {
+            throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
         }
 
-        int i = 1;
+        List<WebElement> webElements = getElement().findElements(by);
+        List<ExtendedWebElement> extendedWebElements = new ArrayList<>();
         for (WebElement element : webElements) {
             String name = "undefined";
             try {
@@ -1114,9 +1117,9 @@ public class ExtendedWebElement implements IWebElement {
                 LOGGER.debug("Error while getting text from element.", e);
             }
 
-            // we can't initiate ExtendedWebElement using by as it belongs to the list of elements
-            extendedWebElements.add(new ExtendedWebElement(generateByForList(by, i), name, this.driver, getElement()));
-            i++;
+            ExtendedWebElement tempElement = new ExtendedWebElement(by, name, getDriver(), getElement());
+            tempElement.setElement(element);
+            extendedWebElements.add(tempElement);
         }
         return extendedWebElements;
     }
@@ -1729,7 +1732,7 @@ public class ExtendedWebElement implements IWebElement {
 		}
 		return driver;
     }
-    
+
     private WebDriver castDriver(WebDriver drv) {
         if (drv instanceof EventFiringWebDriver) {
             drv = ((EventFiringWebDriver) drv).getWrappedDriver();
@@ -1737,6 +1740,11 @@ public class ExtendedWebElement implements IWebElement {
         return drv;
     }
     
+
+    /**
+     * @deprecated when we search list of elements we do not needed for generating by with index
+     */
+    @Deprecated(forRemoval = true, since = "8.0.1")
 	//TODO: investigate how can we merge the similar functionality in ExtendedWebElement, DriverHelper and LocalizedAnnotations
     public By generateByForList(By by, int index) {
         String locator = by.toString();
