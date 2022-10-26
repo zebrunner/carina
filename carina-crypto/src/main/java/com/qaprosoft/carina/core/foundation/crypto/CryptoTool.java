@@ -66,12 +66,12 @@ public class CryptoTool {
         try {
             this.key = SecretKeyManager.loadKey(new File(cryptoKeyPath), cryptoKeyType);
         } catch (IOException e) {
-            throw new RuntimeException("Can't load secret key!", e);
+            LOGGER.error("Can't load secret key!", e);
         }
         try {
             this.cipher = Cipher.getInstance(algorithm);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-            throw new RuntimeException("Exception on getting cipher instance", e);
+            LOGGER.error("Exception on getting cipher instance", e);
         }
     }
 
