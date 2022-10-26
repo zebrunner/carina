@@ -11,4 +11,6 @@ public @interface QueryParam {
 
     String key();
 
+    String value();
+
 }

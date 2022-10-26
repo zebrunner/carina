@@ -227,7 +227,7 @@ package com.qaprosoft.carina.demo.api;
 import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
 import com.qaprosoft.carina.core.foundation.api.annotation.Endpoint;
 import com.qaprosoft.carina.core.foundation.api.annotation.EndpointTemplate;
-import com.qaprosoft.carina.core.foundation.api.annotation.PathVariable;
+import com.qaprosoft.carina.core.foundation.api.annotation.PathParam;
 import com.qaprosoft.carina.core.foundation.api.annotation.PropertiesPath;
 import com.qaprosoft.carina.core.foundation.api.annotation.PropertiesPathParam;
 import com.qaprosoft.carina.core.foundation.api.annotation.RequestTemplatePath;

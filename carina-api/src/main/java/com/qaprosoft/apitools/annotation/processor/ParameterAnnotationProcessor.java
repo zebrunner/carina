@@ -3,6 +3,7 @@ package com.qaprosoft.apitools.annotation.processor;
 import com.qaprosoft.apitools.annotation.AnnotationContext;
 import com.qaprosoft.apitools.annotation.AnnotationProcessorUtils;
 import com.qaprosoft.apitools.annotation.AnnotationUtils;
+import com.qaprosoft.apitools.annotation.ParameterAnnotationContext;
 import com.qaprosoft.carina.core.foundation.api.binding.RuntimeMethod;
 import com.qaprosoft.carina.core.foundation.exception.NotSupportedOperationException;
 
@@ -30,7 +31,7 @@ public class ParameterAnnotationProcessor implements AnnotationProcessor<Runtime
 
         return result.entrySet().stream()
                 .findFirst()
-                .map(entry -> new AnnotationContext<>(entry.getKey(), element, entry.getValue().orElse(null)));
+                .map(entry -> new ParameterAnnotationContext<>(entry.getKey(), element, entry.getValue().orElse(null)));
     }
 
     @Override
@@ -41,7 +42,7 @@ public class ParameterAnnotationProcessor implements AnnotationProcessor<Runtime
     @Override
     public <A extends Annotation> List<AnnotationContext<A, RuntimeMethod>> findAllAnnotationContexts(RuntimeMethod element, Class<A> annClass) {
         return findAnnotatedParameters(element.getMethod(), annClass, element.getArgs()).entrySet().stream()
-                .map(entry -> new AnnotationContext<>(entry.getKey(), element, entry.getValue().orElse(null)))
+                .map(entry -> new ParameterAnnotationContext<>(entry.getKey(), element, entry.getValue().orElse(null)))
                 .collect(Collectors.toList());
     }
 

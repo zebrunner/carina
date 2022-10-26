@@ -56,8 +56,8 @@ public class ContextResolverChain {
         return getResolverValue(resolver -> resolver.resolveSuccessfulHttpStatus(element), element);
     }
 
-    public static Optional<Map<String, ?>> resolvePathVariables(AnnotatedElement element) {
-        return getResolverValue(resolver -> resolver.resolvePathVariables(element), element);
+    public static Optional<Map<String, ?>> resolvePathParams(AnnotatedElement element) {
+        return getResolverValue(resolver -> resolver.resolvePathParams(element), element);
     }
 
     public static Optional<Map<String, ?>> resolveQueryParams(AnnotatedElement element) {

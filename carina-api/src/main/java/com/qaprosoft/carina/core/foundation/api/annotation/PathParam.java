@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Target(value = { ElementType.PARAMETER })
 @Retention(value = RetentionPolicy.RUNTIME)
-public @interface PathVariable {
+public @interface PathParam {
 
     String value();
 

@@ -77,7 +77,7 @@ class PropertiesContextResolver implements ContextResolver<Class<?>> {
     }
 
     @Override
-    public Optional<Map<String, ?>> resolvePathVariables(Class<?> element) {
+    public Optional<Map<String, ?>> resolvePathParams(Class<?> element) {
         return Optional.empty();
     }
 

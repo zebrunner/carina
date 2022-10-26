@@ -127,17 +127,19 @@ public abstract class AbstractApiMethod extends HttpClient {
         final String configParam = "config.";
         List<String> params = getParamsFromUrl();
         for (String param : params) {
-            if (param.startsWith(envParam)) {
-                String newParam = StringUtils.substringAfter(param, envParam);
-                replaceUrlPlaceholder(param, Configuration.getEnvArg(newParam));
-            } else if (param.startsWith(configParam)) {
-                String newParam = StringUtils.substringAfter(param, configParam);
-                replaceUrlPlaceholder(param, R.CONFIG.get(newParam));
+            if (param != null) {
+                if (param.startsWith(envParam)) {
+                    String newParam = StringUtils.substringAfter(param, envParam);
+                    replaceUrlPlaceholder(param, Configuration.getEnvArg(newParam));
+                } else if (param.startsWith(configParam)) {
+                    String newParam = StringUtils.substringAfter(param, configParam);
+                    replaceUrlPlaceholder(param, R.CONFIG.get(newParam));
+                }
             }
         }
 
-        ContextResolverChain.resolvePathVariables(anchorElement)
-                .ifPresent(pathVariables -> pathVariables.forEach((key, value) -> replaceUrlPlaceholder(key, value.toString())));
+        ContextResolverChain.resolvePathParams(anchorElement)
+                .ifPresent(pathParams -> pathParams.forEach((key, value) -> replaceUrlPlaceholder(key, value.toString())));
     }
 
     private List<String> getParamsFromUrl() {

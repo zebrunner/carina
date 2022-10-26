@@ -26,7 +26,7 @@ interface ContextResolver<E extends AnnotatedElement> {
 
     Optional<HttpResponseStatusType> resolveSuccessfulHttpStatus(E element);
 
-    Optional<Map<String, ?>> resolvePathVariables(E element);
+    Optional<Map<String, ?>> resolvePathParams(E element);
 
     Optional<Map<String, ?>> resolveQueryParams(E element);
 

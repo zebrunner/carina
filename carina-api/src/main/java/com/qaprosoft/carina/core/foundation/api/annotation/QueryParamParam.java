@@ -9,12 +9,10 @@ import java.lang.annotation.Target;
 
 @Target(value = { ElementType.PARAMETER })
 @Retention(value = RetentionPolicy.RUNTIME)
-@QueryParam(key = "")
+@QueryParam(key = "", value = "")
 public @interface QueryParamParam {
 
     @RelatedTo(annotationClass = QueryParam.class, field = "key")
     String key();
-
-    String value();
 
 }
