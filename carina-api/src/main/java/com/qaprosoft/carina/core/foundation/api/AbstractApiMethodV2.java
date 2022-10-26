@@ -164,11 +164,13 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
             setBodyContent(tm.getMessageText());
         } else {
             ContextResolverChain.resolveRequestBody(getAnchorElement()).ifPresent(requestBodyContainer -> {
-                if (requestBodyContainer.isJson()) {
-                    setBodyContent(requestBodyContainer.getBody().toString());
-                } else {
-                    setRequestBody(requestBodyContainer.getBody());
-                }
+                requestBodyContainer.getBody().ifPresent(body -> {
+                    if (requestBodyContainer.isJson()) {
+                        setBodyContent(body.toString());
+                    } else {
+                        setRequestBody(body);
+                    }
+                });
             });
         }
     }

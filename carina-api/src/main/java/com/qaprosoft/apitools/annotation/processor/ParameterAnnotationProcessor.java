@@ -22,7 +22,7 @@ public class ParameterAnnotationProcessor implements AnnotationProcessor<Runtime
 
     @Override
     public <A extends Annotation> Optional<AnnotationContext<A, RuntimeMethod>> findFirstAnnotationContext(RuntimeMethod element, Class<A> annClass) {
-        Map<A, Object> result = findAnnotatedParameters(element.getMethod(), annClass, element.getArgs());
+        Map<A, Optional<Object>> result = findAnnotatedParameters(element.getMethod(), annClass, element.getArgs());
 
         if (result.size() > 1) {
             throw new RuntimeException("During %s annotation processing. More than one candidate has been found.");
@@ -30,7 +30,7 @@ public class ParameterAnnotationProcessor implements AnnotationProcessor<Runtime
 
         return result.entrySet().stream()
                 .findFirst()
-                .map(entry -> new AnnotationContext<>(entry.getKey(), element, entry.getValue()));
+                .map(entry -> new AnnotationContext<>(entry.getKey(), element, entry.getValue().orElse(null)));
     }
 
     @Override
@@ -41,14 +41,14 @@ public class ParameterAnnotationProcessor implements AnnotationProcessor<Runtime
     @Override
     public <A extends Annotation> List<AnnotationContext<A, RuntimeMethod>> findAllAnnotationContexts(RuntimeMethod element, Class<A> annClass) {
         return findAnnotatedParameters(element.getMethod(), annClass, element.getArgs()).entrySet().stream()
-                .map(entry -> new AnnotationContext<>(entry.getKey(), element, entry.getValue()))
+                .map(entry -> new AnnotationContext<>(entry.getKey(), element, entry.getValue().orElse(null)))
                 .collect(Collectors.toList());
     }
 
-    private static <A extends Annotation> Map<A, Object> findAnnotatedParameters(Method method, Class<A> annClass, Object... values) {
+    private static <A extends Annotation> Map<A, Optional<Object>> findAnnotatedParameters(Method method, Class<A> annClass, Object... values) {
         Parameter[] parameters = method.getParameters();
         return findAnnotatedParameterIndexesStream(method, annClass)
-                .collect(Collectors.toMap(index -> AnnotationProcessorUtils.getAnnotation(parameters[index], annClass).orElse(null), index -> values[index]));
+                .collect(Collectors.toMap(index -> AnnotationProcessorUtils.getAnnotation(parameters[index], annClass).orElse(null), index -> Optional.ofNullable(values[index])));
     }
 
     private static <A extends Annotation> Stream<Integer> findAnnotatedParameterIndexesStream(Method method, Class<A> annotationClass) {

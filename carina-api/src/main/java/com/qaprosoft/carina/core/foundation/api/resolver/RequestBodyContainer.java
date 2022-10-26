@@ -1,5 +1,7 @@
 package com.qaprosoft.carina.core.foundation.api.resolver;
 
+import java.util.Optional;
+
 public class RequestBodyContainer {
 
     private Object body;
@@ -10,8 +12,8 @@ public class RequestBodyContainer {
         this.json = json;
     }
 
-    public Object getBody() {
-        return body;
+    public Optional<Object> getBody() {
+        return Optional.ofNullable(body);
     }
 
     public void setBody(Object body) {
