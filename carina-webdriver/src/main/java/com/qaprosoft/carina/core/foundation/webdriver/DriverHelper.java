@@ -1161,120 +1161,100 @@ public class DriverHelper {
     // --------------------------------------------------------------------------
     // Helpers
     // --------------------------------------------------------------------------
-    
+
     /**
-     * Find Extended Web Element on page using By.
+     * Find element on the page<br>
+     * Element search is limited by the {@link Parameter#EXPLICIT_TIMEOUT}
      *
-     * @deprecated {@link ExtendedWebElement#format(Object...) "Use format method instead"}
-     * @param by
-     *            Selenium By locator
-     * @return ExtendedWebElement if exists otherwise null.
+     * @param by see {@link By}
+     * @return {@link ExtendedWebElement} if exists, {@code null} otherwise
      */
-    @Deprecated(since = "7.4.21", forRemoval = true)
     public ExtendedWebElement findExtendedWebElement(By by) {
         return findExtendedWebElement(by, by.toString(), EXPLICIT_TIMEOUT);
     }
 
     /**
-     * Find Extended Web Element on page using By.
+     * Find element on the page
      *
-     * @deprecated {@link ExtendedWebElement#format(Object...) "Use format method instead"}
-     * @param by
-     *            Selenium By locator
-     * @param timeout to wait
-     * @return ExtendedWebElement if exists otherwise null.
+     * @param by see {@link By}
+     * @param timeout time to wait, in seconds
+     * @return {@link ExtendedWebElement} if exists, {@code null} otherwise
      */
-    @Deprecated(since = "7.4.21", forRemoval = true)
     public ExtendedWebElement findExtendedWebElement(By by, long timeout) {
         return findExtendedWebElement(by, by.toString(), timeout);
     }
 
     /**
-     * Find Extended Web Element on page using By.
+     * Find element on the page<br>
+     * Element search is limited by the {@link Parameter#EXPLICIT_TIMEOUT}
      *
-     * @deprecated {@link ExtendedWebElement#format(Object...) "Use format method instead"}
-     * @param by
-     *            Selenium By locator
-     * @param name
-     *            Element name
-     * @return ExtendedWebElement if exists otherwise null.
+     * @param by see {@link By}
+     * @param name the name that will be given to the found element
+     * @return {@link ExtendedWebElement} if exists, {@code null} otherwise
      */
-    @Deprecated(since = "7.4.21", forRemoval = true)
     public ExtendedWebElement findExtendedWebElement(final By by, String name) {
         return findExtendedWebElement(by, name, EXPLICIT_TIMEOUT);
     }
 
     /**
-     * Find Extended Web Element on page using By.
+     * Find element on the page
      *
-     * @deprecated {@link ExtendedWebElement#format(Object...) "Use format method instead"}
-     * @param by
-     *            Selenium By locator
-     * @param name
-     *            Element name
-     * @param timeout
-     *            Timeout to find
-     * @return ExtendedWebElement if exists otherwise null.
+     * @param by see {@link By}
+     * @param name the name that will be given to the found element
+     * @param timeout time to wait, in seconds
+     * @return {@link ExtendedWebElement} if exists, {@code null} otherwise
      */
-    @Deprecated(since = "7.4.21", forRemoval = true)
     public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
-		DriverListener.setMessages(Messager.ELEMENT_FOUND.getMessage(name),
-				Messager.ELEMENT_NOT_FOUND.getMessage(name));
-    	
-    	if (!waitUntil(ExpectedConditions.presenceOfElementLocated(by), timeout)) {
-    		Messager.ELEMENT_NOT_FOUND.error(name);
-    		return null;
-    	}
+        DriverListener.setMessages(Messager.ELEMENT_FOUND.getMessage(name), Messager.ELEMENT_NOT_FOUND.getMessage(name));
+
+        if (!waitUntil(ExpectedConditions.presenceOfElementLocated(by), timeout)) {
+            Messager.ELEMENT_NOT_FOUND.error(name);
+            return null;
+        }
 
     	return new ExtendedWebElement(by, name, getDriver(), getDriver());
     }
 
     /**
-     * Find List of Extended Web Elements on page using By and explicit timeout.
+     * Find elements on the page<br>
+     * Elements search is limited by the {@link Parameter#EXPLICIT_TIMEOUT}
      *
-     * @deprecated {@link ExtendedWebElement#format(Object...) "Use format method instead"}
-     * @param by
-     *            Selenium By locator
-     * @return List of ExtendedWebElement.
+     * @param by see {@link By}
+     * @return list of {@link ExtendedWebElement}s, empty list otherwise
      */
-    @Deprecated(since = "7.4.21", forRemoval = true)
     public List<ExtendedWebElement> findExtendedWebElements(By by) {
         return findExtendedWebElements(by, EXPLICIT_TIMEOUT);
     }
 
     /**
-     * Find List of Extended Web Elements on page using By.
+     * Find elements on the page
      *
-     * @deprecated {@link ExtendedWebElement#format(Object...) "Use format method instead"}
-     * 
-     * @param by
-     *            Selenium By locator
-     * @param timeout
-     *            Timeout to find
-     * @return List of ExtendedWebElement.
+     * @param by see {@link By}
+     * @param timeout time to wait, in seconds
+     * @return list of {@link ExtendedWebElement}s if found, empty list otherwise
      */
-    @Deprecated(since = "7.4.21", forRemoval = true)
     public List<ExtendedWebElement> findExtendedWebElements(final By by, long timeout) {
         List<ExtendedWebElement> extendedWebElements = new ArrayList<>();
 
         String name = "undefined";
-    	if (!waitUntil(ExpectedConditions.presenceOfElementLocated(by), timeout)) {
-    		Messager.ELEMENT_NOT_FOUND.info(name);
+        if (!waitUntil(ExpectedConditions.presenceOfElementLocated(by), timeout)) {
+            Messager.ELEMENT_NOT_FOUND.info(name);
     		return extendedWebElements;
     	}
 
         List<WebElement> webElements = getDriver().findElements(by);
-    	int i = 1;
+        int i = 1;
         for (WebElement element : webElements) {
             try {
                 name = element.getText();
             } catch (Exception e) {
-            	/* do nothing and keep 'undefined' for control name */
+                /* do nothing and keep 'undefined' for control name */
             }
 
-            ExtendedWebElement tempElement = new ExtendedWebElement(element, name);
+            ExtendedWebElement tempElement = new ExtendedWebElement(by, name, getDriver(), getDriver());
             tempElement.setBy(tempElement.generateByForList(by, i));
-            extendedWebElements.add(tempElement);          
+            tempElement.setElement(element);
+            extendedWebElements.add(tempElement);
             i++;
         }
         return extendedWebElements;
