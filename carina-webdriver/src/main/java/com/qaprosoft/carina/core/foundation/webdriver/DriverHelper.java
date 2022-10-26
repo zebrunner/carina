@@ -17,7 +17,10 @@ package com.qaprosoft.carina.core.foundation.webdriver;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.invoke.MethodHandles;
 import java.net.HttpURLConnection;
@@ -675,6 +678,53 @@ public class DriverHelper {
         return clipboardText;
     }
 
+    /**
+     * Set text to clipboard
+     * @param text text
+     * @return true if successfull, false otherwise
+     */
+    public boolean setClipboardText(String text) {
+        boolean isSuccessful = false;
+        try {
+            LOGGER.debug("Trying to set text to clipboard on the remote machine with hub...");
+            String url = getSelenoidClipboardUrl(getDriver());
+            String username = getField(url, 1);
+            String password = getField(url, 2);
+
+            HttpURLConnection.setFollowRedirects(false);
+            HttpURLConnection con = (HttpURLConnection) new URL(url)
+                    .openConnection();
+            con.setRequestMethod("POST");
+            con.setDoOutput(true);
+
+            if (!username.isEmpty() && !password.isEmpty()) {
+                String usernameColonPassword = username + ":" + password;
+                String basicAuthPayload = "Basic " + Base64.getEncoder().encodeToString(usernameColonPassword.getBytes());
+                con.addRequestProperty("Authorization", basicAuthPayload);
+            }
+
+            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+            wr.writeBytes(text);
+            wr.flush();
+            wr.close();
+
+            int status = con.getResponseCode();
+            if (!(200 <= status && status <= 299)) {
+                throw new IOException("Response status code is not successful");
+            }
+            isSuccessful = true;
+        } catch (Exception e) {
+            LOGGER.error("Error occurred when try to set clipboard to remote machine with hub", e);
+            try {
+                LOGGER.debug("Trying to set clipboard to the local java machine...");
+                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(text), null);
+                isSuccessful = true;
+            } catch (Exception ex) {
+                LOGGER.error("Error occurred when try to set clipboard to the local machine", ex);
+            }
+        }
+        return isSuccessful;
+    }
 
     private String getSelenoidClipboardUrl(WebDriver driver) {
         String seleniumHost = Configuration.getSeleniumUrl().replace("wd/hub", "clipboard/");
