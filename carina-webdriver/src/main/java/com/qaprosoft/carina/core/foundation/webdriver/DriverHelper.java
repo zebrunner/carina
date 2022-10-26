@@ -1252,7 +1252,6 @@ public class DriverHelper {
     	}
 
         List<WebElement> webElements = getDriver().findElements(by);
-        int i = 1;
         for (WebElement element : webElements) {
             try {
                 name = element.getText();
@@ -1261,10 +1260,8 @@ public class DriverHelper {
             }
 
             ExtendedWebElement tempElement = new ExtendedWebElement(by, name, getDriver(), getDriver());
-            tempElement.setBy(tempElement.generateByForList(by, i));
             tempElement.setElement(element);
             extendedWebElements.add(tempElement);
-            i++;
         }
         return extendedWebElements;
     }
