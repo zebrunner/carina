@@ -41,15 +41,15 @@ public class AnnotationProcessorUtils {
                 relatedMethods.stream()
                         .filter(m -> m.getDeclaredAnnotation(RelatedTo.class).field().equals(method.getName()))
                         .findFirst()
-                        .map(m -> invokeMethod(m, foundAnnotation))
-                        .orElseGet(() -> invokeMethod(method, annotation))
+                        .map(m -> invokeMethod(m, foundAnnotation, args))
+                        .orElseGet(() -> invokeMethod(method, annotation, args))
         );
     }
 
     @SuppressWarnings("unchecked")
-    private static <R> R invokeMethod(Method method, Object instance) {
+    private static <R> R invokeMethod(Method method, Object instance, Object[] args) {
         try {
-            return (R) method.invoke(instance);
+            return (R) method.invoke(instance, args);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }

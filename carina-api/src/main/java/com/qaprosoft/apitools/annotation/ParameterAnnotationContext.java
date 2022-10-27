@@ -15,8 +15,17 @@ public class ParameterAnnotationContext<A extends Annotation, E extends Annotate
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    public <V> V getValue(Function<A, V> valueGetter) {
+        return getMaybeValue(valueGetter).orElse(null);
+    }
+
+    @Override
     public <V> Optional<V> getMaybeValue(Function<A, V> valueGetter) {
         return Optional.ofNullable((V) value);
+    }
+
+    @Override
+    public Optional<Object> getMaybeValue() {
+        return Optional.ofNullable(value);
     }
 }

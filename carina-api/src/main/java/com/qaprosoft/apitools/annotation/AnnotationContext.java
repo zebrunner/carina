@@ -19,9 +19,12 @@ public class AnnotationContext<A extends Annotation, E extends AnnotatedElement>
         return getMaybeValue(valueGetter).orElse(null);
     }
 
-    @SuppressWarnings("unchecked")
     public <V> Optional<V> getMaybeValue(Function<A, V> valueGetter) {
         return Optional.ofNullable(valueGetter.apply(annotation));
+    }
+
+    public Optional<Object> getMaybeValue() {
+        return Optional.ofNullable(annotation);
     }
 
     public A getAnnotation() {
