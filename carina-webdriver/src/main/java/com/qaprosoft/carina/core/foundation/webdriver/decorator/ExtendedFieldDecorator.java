@@ -157,6 +157,7 @@ public class ExtendedFieldDecorator implements FieldDecorator {
         } catch (Exception e) {
             throw new RuntimeException("Error creating UIObject!", e);
         }
+        uiObject.setRootExtendedElement(new ExtendedWebElement(proxy, field.getName(), getLocatorBy(locator)));
         uiObject.setName(field.getName());
         uiObject.setRootElement(proxy);
         uiObject.setRootBy(getLocatorBy(locator));
@@ -174,7 +175,7 @@ public class ExtendedFieldDecorator implements FieldDecorator {
     @SuppressWarnings("unchecked")
     protected <T extends AbstractUIObject> List<T> proxyForListUIObjects(ClassLoader loader, Field field,
             ElementLocator locator) {
-        InvocationHandler handler = new AbstractUIObjectListHandler<T>((Class<?>) getListType(field), webDriver,
+        InvocationHandler handler = new AbstractUIObjectListHandler<T>(loader, (Class<?>) getListType(field), webDriver,
                 locator, field.getName());
         List<T> proxies = (List<T>) Proxy.newProxyInstance(loader, new Class[] { List.class }, handler);
         return proxies;
