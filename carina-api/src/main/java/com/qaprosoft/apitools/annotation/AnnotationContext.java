@@ -15,16 +15,26 @@ public class AnnotationContext<A extends Annotation, E extends AnnotatedElement>
         this.element = element;
     }
 
-    public <V> V getValue(Function<A, V> valueGetter) {
-        return getMaybeValue(valueGetter).orElse(null);
+    public <V> V getValue(Function<A, ?> valueGetter, Function<Object, V> valueConverter, V other) {
+        return getMaybeValue(valueGetter)
+                .map(valueConverter)
+                .orElse(other);
     }
 
-    public <V> Optional<V> getMaybeValue(Function<A, V> valueGetter) {
+    public Object getValue(Function<A, ?> valueGetter, Object other) {
+        return getValue(valueGetter, o -> o, other);
+    }
+
+    public Object getValue(Function<A, ?> valueGetter) {
+        return getValue(valueGetter, null);
+    }
+
+    public Optional<Object> getMaybeValue(Function<A, ?> valueGetter) {
         return Optional.ofNullable(valueGetter.apply(annotation));
     }
 
-    public Optional<Object> getMaybeValue() {
-        return Optional.ofNullable(annotation);
+    public boolean isValueExist(Function<A, ?> valueGetter) {
+        return getMaybeValue(valueGetter).isPresent();
     }
 
     public A getAnnotation() {

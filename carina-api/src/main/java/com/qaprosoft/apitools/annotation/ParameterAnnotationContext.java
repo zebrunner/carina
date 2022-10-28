@@ -15,17 +15,17 @@ public class ParameterAnnotationContext<A extends Annotation, E extends Annotate
     }
 
     @Override
-    public <V> V getValue(Function<A, V> valueGetter) {
+    public Object getValue(Function<A, ?> valueGetter) {
         return getMaybeValue(valueGetter).orElse(null);
     }
 
     @Override
-    public <V> Optional<V> getMaybeValue(Function<A, V> valueGetter) {
-        return Optional.ofNullable((V) value);
+    public Optional<Object> getMaybeValue(Function<A, ?> valueGetter) {
+        return Optional.ofNullable(value);
     }
 
     @Override
-    public Optional<Object> getMaybeValue() {
-        return Optional.ofNullable(value);
+    public boolean isValueExist(Function<A, ?> valueGetter) {
+        return value != null;
     }
 }
