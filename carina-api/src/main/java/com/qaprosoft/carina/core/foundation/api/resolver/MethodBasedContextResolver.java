@@ -108,7 +108,7 @@ public class MethodBasedContextResolver implements ContextResolver<RuntimeMethod
     @Override
     public Optional<RequestBodyContainer> resolveRequestBody(RuntimeMethod element) {
         return AnnotationUtils.findFirstAnnotationContextByChain(element, RequestBody.class)
-                .map(context -> new RequestBodyContainer(context.getValue(requestBody -> null, Object::toString, null), context.getAnnotation().json()));
+                .map(context -> new RequestBodyContainer(context.getValue(requestBody -> null), context.getAnnotation().json()));
     }
 
     @Override
