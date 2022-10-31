@@ -17,6 +17,7 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desk
 
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -30,6 +31,15 @@ import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
 public class ChromeCapabilities extends AbstractCapabilities<ChromeOptions> {
+    /**
+     * --disable-dev-shm-usage:<br>
+     * By default, Docker runs a container with a /dev/shm shared memory space 64MB.
+     * This is typically too small for Chrome and will cause Chrome to crash when
+     * rendering large pages. To fix, launch the browser with the --disable-dev-shm-usage flag.
+     * This will write shared memory files into /tmp instead of /dev/shm<br>
+     * Related Carina issue: https://github.com/zebrunner/carina/issues/1911
+     */
+    private static final List<String> chromeArguments = List.of("--start-maximized", "--disable-dev-shm-usage", "--ignore-ssl-errors");
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
@@ -41,7 +51,7 @@ public class ChromeCapabilities extends AbstractCapabilities<ChromeOptions> {
         ChromeOptions options = new ChromeOptions();
         initBaseCapabilities(options, testName);
         addChromeOptions(options);
-        options.addArguments("--start-maximized", "--ignore-ssl-errors");
+        options.addArguments(chromeArguments);
         options.setAcceptInsecureCerts(true);
         return options;
     }
