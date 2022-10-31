@@ -1027,7 +1027,6 @@ public interface IAndroidUtils extends IMobileUtils {
      * @param link URL to trigger
      */
     default public void openURL(String link) {
-        // TODO: #1380 make openURL call from this mobile interface in DriverHelper
         UTILS_LOGGER.info("Following link will be triggered via ADB: {}", link);
         executeShell(String.format("am start -a android.intent.action.VIEW %s", link));
     }
