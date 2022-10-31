@@ -21,24 +21,21 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Pdf;
+import org.openqa.selenium.PrintsPage;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.print.PageMargin;
+import org.openqa.selenium.print.PrintOptions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.PageSize;
-import com.itextpdf.text.RectangleReadOnly;
-import com.itextpdf.text.pdf.PdfWriter;
 import com.qaprosoft.carina.core.foundation.listeners.TestNamingService;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.factory.ICustomTypePageFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.PageOpeningStrategy;
 
 /**
@@ -143,39 +140,45 @@ public abstract class AbstractPage extends AbstractUIObject implements ICustomTy
 		return String.join(" ", this.getClass().getSimpleName().split("(?=\\p{Upper})"));
 	}
 
-    public String savePageAsPdf(boolean scaled) throws IOException, DocumentException {
-        String pdfName = "";
-
-        // Define test screenshot root
-        String test = TestNamingService.getTestName();
-
-        File testRootDir = ReportContext.getTestDir();
+    /**
+     * Save page as Pdf
+     * 
+     * @return path to the pdf
+     * @throws IOException if something went wrong when try to write pdf as file
+     */
+    public String savePageAsPdf(boolean scaled) throws IOException {
         File artifactsFolder = ReportContext.getArtifactsFolder();
 
-        String fileID = test.replaceAll("\\W+", "_") + "-" + System.currentTimeMillis();
-        pdfName = fileID + ".pdf";
+        String fullPdfPath = String.format("%s%s%s.pdf",
+                artifactsFolder.getAbsolutePath(),
+                File.pathSeparator,
+                TestNamingService.getTestName()
+                        .replaceAll("\\W+", "_") + "-" + System.currentTimeMillis());
 
-        String fullPdfPath = artifactsFolder.getAbsolutePath() + "/" + pdfName;
-        // TODO: test this implementation and change back to capture if necessary
-        Image image = Image.getInstance(testRootDir.getAbsolutePath() + "/" + Screenshot.capture(getDriver(), "", true));
-        Document document = null;
-        if (scaled) {
-            document = new Document(PageSize.A4, 10, 10, 10, 10);
-            if (image.getHeight() > (document.getPageSize().getHeight() - 20)
-                    || image.getScaledWidth() > (document.getPageSize().getWidth() - 20)) {
-                image.scaleToFit(document.getPageSize().getWidth() - 20, document.getPageSize().getHeight() - 20);
-            }
-        } else {
-            document = new Document(new RectangleReadOnly(image.getScaledWidth(), image.getScaledHeight()));
+        PrintsPage printsPage;
+        try {
+            printsPage = (PrintsPage) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support savePageAsPdf method", e);
         }
-        PdfWriter.getInstance(document, new FileOutputStream(fullPdfPath));
-        document.open();
-        document.add(image);
-        document.close();
+        PrintOptions printOptions = new PrintOptions();
+
+        if (scaled) {
+            printOptions.setOrientation(PrintOptions.Orientation.PORTRAIT);
+            printOptions.setPageMargin(new PageMargin(10, 10, 10, 10));
+            printOptions.setScale(2);
+        }
+
+        Pdf pdf = printsPage.print(printOptions);
+
+        try (FileOutputStream fileOutputStream = new FileOutputStream(fullPdfPath)) {
+            byte[] byteArray = java.util.Base64.getDecoder().decode(pdf.getContent());
+            fileOutputStream.write(byteArray);
+        }
         return fullPdfPath;
     }
 
-    public String savePageAsPdf() throws IOException, DocumentException {
+    public String savePageAsPdf() throws IOException {
         return savePageAsPdf(true);
     }
 
