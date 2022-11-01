@@ -127,7 +127,7 @@ public class MethodBasedContextResolver implements ContextResolver<RuntimeMethod
     public Optional<Map<String, ?>> resolvePathParams(RuntimeMethod element) {
         Map<String, ?> result = AnnotationUtils.findAllAnnotationContextsByChain(element, PathParam.class).stream()
                 .filter(context -> context.isValueExist(null))
-                .collect(Collectors.toMap(context -> context.getAnnotation().value(), context -> context.getValue(null)));
+                .collect(Collectors.toMap(context -> context.getAnnotation().key(), context -> context.getValue(null)));
         return Optional.of(result);
     }
 

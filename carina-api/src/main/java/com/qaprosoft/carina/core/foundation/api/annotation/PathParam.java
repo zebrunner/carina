@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 @Retention(value = RetentionPolicy.RUNTIME)
 public @interface PathParam {
 
-    String value();
+    String key();
 
 }
