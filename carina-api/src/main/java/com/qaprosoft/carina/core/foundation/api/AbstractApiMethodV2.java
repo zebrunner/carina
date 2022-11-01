@@ -82,7 +82,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         this(null, rqPath, rsPath, properties);
     }
 
-    AbstractApiMethodV2(AnnotatedElement anchorElement) {
+    public AbstractApiMethodV2(AnnotatedElement anchorElement) {
         this(anchorElement, null, null, null);
     }
 

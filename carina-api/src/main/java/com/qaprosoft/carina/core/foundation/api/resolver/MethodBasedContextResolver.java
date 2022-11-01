@@ -127,7 +127,7 @@ public class MethodBasedContextResolver implements ContextResolver<RuntimeMethod
     public Optional<Map<String, ?>> resolvePathParams(RuntimeMethod element) {
         Map<String, ?> result = AnnotationUtils.findAllAnnotationContextsByChain(element, PathParam.class).stream()
                 .filter(context -> context.isValueExist(null))
-                .collect(Collectors.toMap(context -> context.getAnnotation().key(), context -> context.getValue(null)));
+                .collect(Collectors.toMap(context -> context.getAnnotation().key(), context -> context.getValue(null), (o, o2) -> o));
         return Optional.of(result);
     }
 
@@ -135,15 +135,15 @@ public class MethodBasedContextResolver implements ContextResolver<RuntimeMethod
     public Optional<Map<String, ?>> resolveQueryParams(RuntimeMethod element) {
         Map<String, ?> queryParams = AnnotationUtils.findAllAnnotationContextsByChain(element, QueryParam.class).stream()
                 .filter(context -> context.isValueExist(QueryParam::value))
-                .collect(Collectors.toMap(context -> context.getAnnotation().key(), context -> context.getValue(QueryParam::value, Object::toString, null)));
+                .collect(Collectors.toMap(context -> context.getAnnotation().key(), context -> context.getValue(QueryParam::value, Object::toString, null), (o, o2) -> o));
         Map<String, ?> queryParamsLists = AnnotationUtils.findAllAnnotationContextsByChain(element, QueryParam.List.class).stream()
                 .flatMap(list -> Arrays.stream(list.getAnnotation().value()))
                 .filter(annotation -> annotation.value() != null)
-                .collect(Collectors.toMap(QueryParam::key, QueryParam::value));
+                .collect(Collectors.toMap(QueryParam::key, QueryParam::value, (o, o2) -> o));
 
         Map<String, ?> result = Stream.of(queryParams.entrySet(), queryParamsLists.entrySet())
                 .flatMap(Collection::stream)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o));
 
         return Optional.of(result);
     }
@@ -158,7 +158,7 @@ public class MethodBasedContextResolver implements ContextResolver<RuntimeMethod
     public Optional<Map<String, ?>> resolveProperties(RuntimeMethod element) {
         Map<String, ?> result = AnnotationUtils.findAllAnnotationContextsByChain(element, Property.class).stream()
                 .filter(context -> context.getMaybeValue(Property::value).isPresent())
-                .collect(Collectors.toMap(context -> context.getAnnotation().value(), context -> context.getValue(Property::value)));
+                .collect(Collectors.toMap(context -> context.getAnnotation().value(), context -> context.getValue(Property::value), (o, o2) -> o));
         return Optional.of(result);
     }
 
@@ -166,15 +166,15 @@ public class MethodBasedContextResolver implements ContextResolver<RuntimeMethod
     public Optional<Map<String, ?>> resolveHeaders(RuntimeMethod element) {
         Map<String, ?> headers = AnnotationUtils.findAllAnnotationContextsByChain(element, Header.class).stream()
                 .filter(context -> context.isValueExist(Header::value))
-                .collect(Collectors.toMap(context -> context.getAnnotation().key(), context -> context.getValue(Header::value)));
+                .collect(Collectors.toMap(context -> context.getAnnotation().key(), context -> context.getValue(Header::value), (o, o2) -> o));
         Map<String, ?> headerLists = AnnotationUtils.findAllAnnotationContextsByChain(element, Header.List.class).stream()
                 .flatMap(list -> Arrays.stream(list.getAnnotation().value()))
                 .filter(annotation -> annotation.value() != null)
-                .collect(Collectors.toMap(Header::key, Header::value));
+                .collect(Collectors.toMap(Header::key, Header::value, (o, o2) -> o));
 
         Map<String, ?> result = Stream.of(headers.entrySet(), headerLists.entrySet())
                 .flatMap(Collection::stream)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o));
 
         return Optional.of(result);
     }
@@ -183,15 +183,15 @@ public class MethodBasedContextResolver implements ContextResolver<RuntimeMethod
     public Optional<Map<String, ?>> resolveCookies(RuntimeMethod element) {
         Map<String, ?> cookies = AnnotationUtils.findAllAnnotationContextsByChain(element, Cookie.class).stream()
                 .filter(context -> context.isValueExist(Cookie::value))
-                .collect(Collectors.toMap(context -> context.getAnnotation().key(), context -> context.getValue(Cookie::value), (c1, c2) -> c1));
+                .collect(Collectors.toMap(context -> context.getAnnotation().key(), context -> context.getValue(Cookie::value), (o, o2) -> o));
         Map<String, ?> cookieList = AnnotationUtils.findAllAnnotationContextsByChain(element, Cookie.List.class).stream()
                 .flatMap(list -> Arrays.stream(list.getAnnotation().value()))
                 .filter(annotation -> annotation.value() != null)
-                .collect(Collectors.toMap(Cookie::key, Cookie::value, (c1, c2) -> c1));
+                .collect(Collectors.toMap(Cookie::key, Cookie::value, (o, o2) -> o));
 
         Map<String, ?> result = Stream.of(cookies.entrySet(), cookieList.entrySet())
                 .flatMap(Collection::stream)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o));
 
         return Optional.of(result);
     }

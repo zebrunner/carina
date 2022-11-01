@@ -122,7 +122,7 @@ class AnnotationContextResolver implements ContextResolver<Class<?>> {
 
         Map<String, ?> result = Stream.of(headers, headerLists)
                 .flatMap(Collection::stream)
-                .collect(Collectors.toMap(Header::key, Header::value));
+                .collect(Collectors.toMap(Header::key, Header::value, (o, o2) -> o));
 
         return Optional.of(result);
     }
@@ -140,7 +140,7 @@ class AnnotationContextResolver implements ContextResolver<Class<?>> {
 
         Map<String, ?> result = Stream.of(headers, headerLists)
                 .flatMap(Collection::stream)
-                .collect(Collectors.toMap(Cookie::key, Cookie::value));
+                .collect(Collectors.toMap(Cookie::key, Cookie::value, (o, o2) -> o));
 
         return Optional.of(result);
     }

@@ -2,6 +2,7 @@ package com.qaprosoft.carina.core.foundation.api.binding;
 
 import com.qaprosoft.apitools.annotation.AnnotationUtils;
 import com.qaprosoft.carina.core.foundation.api.AbstractApiMethod;
+import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
 import com.qaprosoft.carina.core.foundation.api.MethodBasedApiMethod;
 import com.qaprosoft.carina.core.foundation.api.annotation.EndpointTemplateMethod;
 
@@ -32,21 +33,9 @@ public class TemplateInvocationHandler implements InvocationHandler {
                 throw new RuntimeException(String.format("Method %s should return instance of %s class", method.getName(), AbstractApiMethod.class.getName()));
             }
             AnnotatedElement anchorElement = new RuntimeMethod(proxy, method, args);
-            result = new MethodBasedApiMethod(anchorElement);
+            result = createAnchorElementBasedInstance(method.getReturnType(), anchorElement);
         } else {
-            try {
-                result = MethodHandles.lookup()
-                        .findSpecial(
-                                originalClass,
-                                method.getName(),
-                                MethodType.methodType(method.getReturnType(), method.getParameterTypes()),
-                                originalClass
-                        )
-                        .bindTo(proxy)
-                        .invokeWithArguments();
-            } catch (Throwable e) {
-                throw new RuntimeException(e.getMessage(), e);
-            }
+            result = invokeNotSuitableMethod(originalClass, proxy, method);
         }
         return result;
     }
@@ -56,5 +45,31 @@ public class TemplateInvocationHandler implements InvocationHandler {
                 && !method.isDefault()
                 && Modifier.isPublic(method.getModifiers())
                 && AnnotationUtils.isAnnotatedPresent(method, EndpointTemplateMethod.class);
+    }
+
+    private static Object createAnchorElementBasedInstance(Class<?> targetClass, AnnotatedElement anchorElement) {
+        try {
+            return AbstractApiMethod.class.equals(targetClass) || AbstractApiMethodV2.class.equals(targetClass)
+                    ? new MethodBasedApiMethod(anchorElement)
+                    : targetClass.getDeclaredConstructor(AnnotatedElement.class).newInstance(anchorElement);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    private static Object invokeNotSuitableMethod(Class<?> originalClass, Object proxy, Method method) {
+        try {
+            return MethodHandles.lookup()
+                    .findSpecial(
+                            originalClass,
+                            method.getName(),
+                            MethodType.methodType(method.getReturnType(), method.getParameterTypes()),
+                            originalClass
+                    )
+                    .bindTo(proxy)
+                    .invokeWithArguments();
+        } catch (Throwable e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 }
