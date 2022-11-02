@@ -13,28 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.retry;
+package com.zebrunner.carina.utils;
 
-import com.zebrunner.carina.utils.Configuration;
-import com.zebrunner.carina.utils.retry.RetryAnalyzer;
 import org.testng.Assert;
-import org.testng.Reporter;
 import org.testng.annotations.Test;
 
-public class RetryTest {
+import com.zebrunner.carina.utils.common.CommonUtils;
 
-    private static final int maxRetryCount = Configuration.getInt(Configuration.Parameter.RETRY_COUNT);
+public class CommonUtilsTest {
 
     @Test
-    public void testRetryAnalyzer() {
-        RetryAnalyzer retryAnalyzer = new RetryAnalyzer();
-
-        for (int i = 0; i < maxRetryCount; i++) {
-            Assert.assertTrue(retryAnalyzer.retry(Reporter.getCurrentTestResult()),
-                    "retryAnalyzer retried " + i + " times, but had to " + maxRetryCount);
-        }
-
-        Assert.assertFalse(retryAnalyzer.retry(Reporter.getCurrentTestResult()), "Run count is more than " + maxRetryCount);
+    public void testPause() {
+        long pause = 2L;
+        long startTime = System.currentTimeMillis();
+        CommonUtils.pause(pause);
+        long endTime = System.currentTimeMillis();
+        long actualPause = (endTime - startTime) / 1000;
+        Assert.assertEquals(actualPause, pause);
     }
-
 }

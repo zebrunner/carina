@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.db.mongo;
+package com.zebrunner.carina.utils.db.mongo;
 
 import java.net.UnknownHostException;
 import java.util.regex.Pattern;

@@ -14,9 +14,8 @@
  * limitations under the License.
  *******************************************************************************/
 
-package com.qaprosoft.carina.core.utils;
+package com.zebrunner.carina.utils;
 
-import com.zebrunner.carina.utils.XmlFormatter;
 import com.zebrunner.carina.utils.marshaller.MarshallerHelper;
 import com.zebrunner.carina.utils.marshaller.exception.ParserException;
 import org.testng.Assert;

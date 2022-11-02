@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.utils;
+package com.zebrunner.carina.utils;
 
 import com.zebrunner.carina.utils.tag.Priority;
 import com.zebrunner.carina.utils.tag.PriorityManager;

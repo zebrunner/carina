@@ -13,22 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.utils;
+package com.zebrunner.carina.utils;
+
+import java.io.InputStream;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.zebrunner.carina.utils.common.CommonUtils;
-
-public class CommonUtilsTest {
-
+/**
+ * Tests for {@link PDFUtil}
+ */
+public class PDFUtilTest {
     @Test
-    public void testPause() {
-        long pause = 2L;
-        long startTime = System.currentTimeMillis();
-        CommonUtils.pause(pause);
-        long endTime = System.currentTimeMillis();
-        long actualPause = (endTime - startTime) / 1000;
-        Assert.assertEquals(actualPause, pause);
+    public void testReadTxtFromPDF() {
+        InputStream is = PDFUtilTest.class.getClassLoader().getResourceAsStream("test.pdf");
+        String text = PDFUtil.readTxtFromPDF(is, 1, 1);
+        Assert.assertNotNull(text);
+        Assert.assertTrue(text.contains("This is Carina PDF test!"));
     }
 }

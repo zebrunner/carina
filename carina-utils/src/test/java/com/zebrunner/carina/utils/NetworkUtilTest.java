@@ -13,24 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.utils;
+package com.zebrunner.carina.utils;
 
-import java.io.InputStream;
-
+import com.zebrunner.carina.utils.NetworkUtil;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.zebrunner.carina.utils.PDFUtil;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-/**
- * Tests for {@link PDFUtil}
- */
-public class PDFUtilTest {
+public class NetworkUtilTest {
+
+    private static final String IP_ADDRESS_REGEX = "\\b((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\\.|$)){4}\\b";
+
     @Test
-    public void testReadTxtFromPDF() {
-        InputStream is = PDFUtilTest.class.getClassLoader().getResourceAsStream("test.pdf");
-        String text = PDFUtil.readTxtFromPDF(is, 1, 1);
-        Assert.assertNotNull(text);
-        Assert.assertTrue(text.contains("This is Carina PDF test!"));
+    public void testValidIpAddress() {
+        String currentIpAddress = NetworkUtil.getIpAddress();
+
+        Matcher matcher = Pattern.compile(IP_ADDRESS_REGEX).matcher(currentIpAddress);
+
+        Assert.assertTrue(matcher.matches(), currentIpAddress + " is not valid");
     }
+
 }

@@ -13,26 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.utils;
+package com.zebrunner.carina.utils.retry;
 
-import com.zebrunner.carina.utils.NetworkUtil;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.retry.RetryAnalyzer;
 import org.testng.Assert;
+import org.testng.Reporter;
 import org.testng.annotations.Test;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+public class RetryTest {
 
-public class NetworkUtilTest {
-
-    private static final String IP_ADDRESS_REGEX = "\\b((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\\.|$)){4}\\b";
+    private static final int maxRetryCount = Configuration.getInt(Configuration.Parameter.RETRY_COUNT);
 
     @Test
-    public void testValidIpAddress() {
-        String currentIpAddress = NetworkUtil.getIpAddress();
+    public void testRetryAnalyzer() {
+        RetryAnalyzer retryAnalyzer = new RetryAnalyzer();
 
-        Matcher matcher = Pattern.compile(IP_ADDRESS_REGEX).matcher(currentIpAddress);
+        for (int i = 0; i < maxRetryCount; i++) {
+            Assert.assertTrue(retryAnalyzer.retry(Reporter.getCurrentTestResult()),
+                    "retryAnalyzer retried " + i + " times, but had to " + maxRetryCount);
+        }
 
-        Assert.assertTrue(matcher.matches(), currentIpAddress + " is not valid");
+        Assert.assertFalse(retryAnalyzer.retry(Reporter.getCurrentTestResult()), "Run count is more than " + maxRetryCount);
     }
 
 }
