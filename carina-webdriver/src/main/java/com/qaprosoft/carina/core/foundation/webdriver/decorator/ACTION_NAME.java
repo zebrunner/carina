@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.performance;
+package com.qaprosoft.carina.core.foundation.webdriver.decorator;
 
 
 public enum ACTION_NAME {
