@@ -26,7 +26,6 @@ import org.testng.ITestContext;
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
-import com.qaprosoft.carina.core.foundation.exception.InvalidArgsException;
 
 public class DSBean {
     Map<String, String> testParams;

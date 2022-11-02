@@ -21,24 +21,6 @@ import org.testng.annotations.Test;
 public class ExceptionsTest {
 
     @Test
-    public void testInvalidArgsExceptionWithText() {
-        try {
-            throw new InvalidArgsException("test");
-        } catch (InvalidArgsException e) {
-            Assert.assertEquals(e.getMessage(), "Invalid test arguments exception: test", "Message wasn't overridden in " + e.getClass().getName());
-        }
-    }
-
-    @Test
-    public void testInvalidArgsExceptionWithoutText() {
-        try {
-            throw new InvalidArgsException();
-        } catch (InvalidArgsException e) {
-            Assert.assertEquals(e.getMessage(), "Invalid test arguments exception", "Message wasn't overridden in " + e.getClass().getName());
-        }
-    }
-
-    @Test
     public void testInvalidConfigurationExceptionWithText() {
         try {
             throw new InvalidConfigurationException("test");

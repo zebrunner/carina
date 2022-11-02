@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSParser;
-import com.qaprosoft.carina.core.foundation.exception.InvalidArgsException;
 import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
 
 public class ParameterGenerator {
@@ -123,7 +122,7 @@ public class ParameterGenerator {
 
     private static String getValueFromXLS(String xlsSheetKey) {
         if (StringUtils.isEmpty(xlsSheetKey)) {
-            throw new InvalidArgsException("Invalid excel key, should be 'xls_file#sheet#key'.");
+            throw new IllegalArgumentException("Invalid test arguments exception: Invalid excel key, should be 'xls_file#sheet#key'.");
         }
 
         String xls = xlsSheetKey.split("#")[0];

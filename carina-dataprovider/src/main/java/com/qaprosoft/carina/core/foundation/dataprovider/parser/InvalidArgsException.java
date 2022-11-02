@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.exception;
+package com.qaprosoft.carina.core.foundation.dataprovider.parser;
 
 /*
  * Exception may be thrown when invalid test arguments were specified.
  * 
  * @author Alex Khursevich
  */
-public class InvalidArgsException extends RuntimeException {
+class InvalidArgsException extends RuntimeException {
     private static final long serialVersionUID = 1204359727358878608L;
 
     public InvalidArgsException() {
