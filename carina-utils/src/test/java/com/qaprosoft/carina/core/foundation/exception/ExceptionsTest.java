@@ -15,28 +15,14 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.exception;
 
+import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.qaprosoft.carina.core.foundation.utils.R;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 public class ExceptionsTest {
-
-    @Test
-    public void testNotSupportedOperationExceptionWithText() {
-        try {
-            throw new NotSupportedOperationException("test");
-        } catch (NotSupportedOperationException e) {
-            Assert.assertEquals(e.getMessage(), "Not supported operation: test!", "Message wasn't overridden in " + e.getClass().getName());
-        }
-    }
-
-    @Test
-    public void testNotSupportedOperationExceptionWithoutText() {
-        try {
-            throw new NotSupportedOperationException();
-        } catch (NotSupportedOperationException e) {
-            Assert.assertEquals(e.getMessage(), "Not supported operation!", "Message wasn't overridden in " + e.getClass().getName());
-        }
-    }
 
     @Test
     public void testPlaceholderResolverExceptionWithText() {
