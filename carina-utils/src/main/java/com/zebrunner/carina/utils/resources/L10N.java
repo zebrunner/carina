@@ -34,7 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.asserts.SoftAssert;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.common.SpecialKeywords;
 
 /*
  * http://maven.apache.org/surefire/maven-surefire-plugin/examples/class-loading.html

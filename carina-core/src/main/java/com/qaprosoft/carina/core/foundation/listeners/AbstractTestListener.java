@@ -30,7 +30,7 @@ import org.testng.ITestResult;
 import org.testng.TestListenerAdapter;
 import org.testng.internal.annotations.DisabledRetryAnalyzer;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.common.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.zebrunner.carina.utils.report.ReportContext;
 import com.zebrunner.carina.utils.report.TestResultItem;

@@ -24,7 +24,7 @@ import org.testng.ISuite;
 import org.testng.ISuiteListener;
 import org.testng.ITestNGMethod;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.common.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.filter.Filter;
 import com.qaprosoft.carina.core.foundation.filter.IFilter;
 import com.qaprosoft.carina.core.foundation.filter.rule.Rule;
