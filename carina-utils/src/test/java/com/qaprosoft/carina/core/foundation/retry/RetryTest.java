@@ -15,7 +15,8 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.retry;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.retry.RetryAnalyzer;
 import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.Test;

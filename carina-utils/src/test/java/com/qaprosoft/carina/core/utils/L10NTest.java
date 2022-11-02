@@ -15,7 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.utils;
 
-import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
+import com.zebrunner.carina.utils.resources.L10N;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

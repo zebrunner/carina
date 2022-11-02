@@ -15,7 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.utils;
 
-import com.qaprosoft.carina.core.foundation.utils.StringGenerator;
+import com.zebrunner.carina.utils.StringGenerator;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

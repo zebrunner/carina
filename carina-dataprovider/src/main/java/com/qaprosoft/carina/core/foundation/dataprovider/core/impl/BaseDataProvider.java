@@ -25,7 +25,7 @@ import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
-import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
+import com.zebrunner.carina.utils.ParameterGenerator;
 
 /**
  * Created by Patotsky on 19.12.2014.

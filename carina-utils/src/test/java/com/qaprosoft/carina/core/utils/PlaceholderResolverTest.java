@@ -20,7 +20,7 @@ import java.util.Properties;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.utils.PlaceholderResolver;
+import com.zebrunner.carina.utils.PlaceholderResolver;
 
 /**
  * Tests for {@link PlaceholderResolver}

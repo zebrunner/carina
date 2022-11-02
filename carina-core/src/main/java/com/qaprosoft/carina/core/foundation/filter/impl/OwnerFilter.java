@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.testng.ITestNGMethod;
 
 import com.qaprosoft.carina.core.foundation.filter.IFilter;
-import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
+import com.zebrunner.carina.utils.ownership.MethodOwner;
 
 public class OwnerFilter implements IFilter {
 

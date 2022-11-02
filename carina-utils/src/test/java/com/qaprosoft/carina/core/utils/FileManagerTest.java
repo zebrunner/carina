@@ -28,8 +28,8 @@ import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.utils.FileManager;
-import com.qaprosoft.carina.core.foundation.utils.ZipManager;
+import com.zebrunner.carina.utils.FileManager;
+import com.zebrunner.carina.utils.ZipManager;
 
 public class FileManagerTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

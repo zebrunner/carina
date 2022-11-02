@@ -20,7 +20,7 @@ import java.io.InputStream;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.utils.PDFUtil;
+import com.zebrunner.carina.utils.PDFUtil;
 
 /**
  * Tests for {@link PDFUtil}

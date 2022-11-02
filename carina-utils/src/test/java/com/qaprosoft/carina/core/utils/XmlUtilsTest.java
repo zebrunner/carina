@@ -16,9 +16,9 @@
 
 package com.qaprosoft.carina.core.utils;
 
-import com.qaprosoft.carina.core.foundation.utils.XmlFormatter;
-import com.qaprosoft.carina.core.foundation.utils.marshaller.MarshallerHelper;
-import com.qaprosoft.carina.core.foundation.utils.marshaller.exception.ParserException;
+import com.zebrunner.carina.utils.XmlFormatter;
+import com.zebrunner.carina.utils.marshaller.MarshallerHelper;
+import com.zebrunner.carina.utils.marshaller.exception.ParserException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

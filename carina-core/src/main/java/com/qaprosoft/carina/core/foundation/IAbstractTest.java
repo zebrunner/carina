@@ -30,10 +30,10 @@ import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactor
 import com.qaprosoft.carina.core.foundation.listeners.CarinaListener;
 import com.qaprosoft.carina.core.foundation.listeners.FilterTestsListener;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestCases;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
-import com.qaprosoft.carina.core.foundation.utils.factory.ICustomTypePageFactory;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration.Parameter;
+import com.zebrunner.carina.utils.common.CommonUtils;
+import com.zebrunner.carina.utils.factory.ICustomTypePageFactory;
 import com.zebrunner.agent.core.registrar.CurrentTest;
 import com.zebrunner.agent.testng.listener.TestRunListener;
 

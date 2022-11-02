@@ -15,11 +15,11 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.utils;
 
-import com.qaprosoft.carina.core.foundation.utils.tag.Priority;
-import com.qaprosoft.carina.core.foundation.utils.tag.PriorityManager;
-import com.qaprosoft.carina.core.foundation.utils.tag.TagManager;
-import com.qaprosoft.carina.core.foundation.utils.tag.TestPriority;
-import com.qaprosoft.carina.core.foundation.utils.tag.TestTag;
+import com.zebrunner.carina.utils.tag.Priority;
+import com.zebrunner.carina.utils.tag.PriorityManager;
+import com.zebrunner.carina.utils.tag.TagManager;
+import com.zebrunner.carina.utils.tag.TestPriority;
+import com.zebrunner.carina.utils.tag.TestTag;
 import com.zebrunner.agent.core.registrar.domain.LabelDTO;
 import org.testng.Assert;
 import org.testng.ITestResult;

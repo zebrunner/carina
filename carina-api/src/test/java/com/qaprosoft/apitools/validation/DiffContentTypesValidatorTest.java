@@ -28,7 +28,7 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
-import com.qaprosoft.carina.core.foundation.utils.R;
+import com.zebrunner.carina.utils.R;
 import com.qaprosoft.mock.apimethod.NoContentTypeMethod;
 import com.qaprosoft.mock.apimethod.XmlContentTypeMethod;
 import com.qaprosoft.mock.server.MockServer;

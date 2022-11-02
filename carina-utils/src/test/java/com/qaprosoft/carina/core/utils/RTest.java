@@ -18,7 +18,7 @@ package com.qaprosoft.carina.core.utils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.utils.R;
+import com.zebrunner.carina.utils.R;
 
 /**
  * Tests for {@link R}

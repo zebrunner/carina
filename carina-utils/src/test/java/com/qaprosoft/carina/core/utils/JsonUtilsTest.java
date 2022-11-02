@@ -16,7 +16,7 @@
 package com.qaprosoft.carina.core.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.qaprosoft.carina.core.foundation.utils.JsonUtils;
+import com.zebrunner.carina.utils.JsonUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
