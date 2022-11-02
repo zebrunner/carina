@@ -21,24 +21,6 @@ import org.testng.annotations.Test;
 public class ExceptionsTest {
 
     @Test
-    public void testRequiredCtorNotFoundExceptionWithText() {
-        try {
-            throw new RequiredCtorNotFoundException("test");
-        } catch (RequiredCtorNotFoundException e) {
-            Assert.assertEquals(e.getMessage(), "Required constructor isn't found: test", "Message wasn't overridden in " + e.getClass().getName());
-        }
-    }
-
-    @Test
-    public void testRequiredCtorNotFoundExceptionWithoutText() {
-        try {
-            throw new RequiredCtorNotFoundException();
-        } catch (RequiredCtorNotFoundException e) {
-            Assert.assertEquals(e.getMessage(), "Required constructor isn't found.", "Message wasn't overridden in " + e.getClass().getName());
-        }
-    }
-
-    @Test
     public void testTestCreationExceptionWithText() {
         try {
             throw new TestCreationException("test");

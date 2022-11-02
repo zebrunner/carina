@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.exception;
+package com.qaprosoft.carina.core.foundation.utils.factory;
 
-public class RequiredCtorNotFoundException extends RuntimeException {
+class RequiredCtorNotFoundException extends RuntimeException {
 
     private static final long serialVersionUID = -8715912005469790072L;
 
