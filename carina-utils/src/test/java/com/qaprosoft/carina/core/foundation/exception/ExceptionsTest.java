@@ -21,24 +21,6 @@ import org.testng.annotations.Test;
 public class ExceptionsTest {
 
     @Test
-    public void testDataLoadingExceptionWithText() {
-        try {
-            throw new DataLoadingException("test");
-        } catch (DataLoadingException e) {
-            Assert.assertEquals(e.getMessage(), "Can't load data: test", "Message wasn't overridden in " + e.getClass().getName());
-        }
-    }
-
-    @Test
-    public void testDataLoadingExceptionWithoutText() {
-        try {
-            throw new DataLoadingException();
-        } catch (DataLoadingException e) {
-            Assert.assertEquals(e.getMessage(), "Can't load data.", "Message wasn't overridden in " + e.getClass().getName());
-        }
-    }
-
-    @Test
     public void testDriverPoolExceptionWithText() {
         try {
             throw new DriverPoolException("test");

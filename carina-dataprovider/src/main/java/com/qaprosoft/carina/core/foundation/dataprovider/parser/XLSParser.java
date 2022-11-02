@@ -35,7 +35,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.exception.DataLoadingException;
 import com.qaprosoft.carina.core.foundation.exception.InvalidArgsException;
 
 public class XLSParser extends AbstractXLSParser {

@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.exception;
+package com.qaprosoft.carina.core.foundation.dataprovider.parser;
 
 /*
  * Exception may be thrown when exception in data loading occurred.
  * 
  * @author Alex Khursevich
  */
-public class DataLoadingException extends RuntimeException {
+class DataLoadingException extends RuntimeException {
     private static final long serialVersionUID = -6264855148555485530L;
 
     public DataLoadingException() {
