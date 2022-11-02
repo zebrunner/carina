@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory;
 import org.testng.SkipException;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.exception.InvalidConfigurationException;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.zebrunner.carina.crypto.Algorithm;
 import com.zebrunner.carina.crypto.CryptoTool;

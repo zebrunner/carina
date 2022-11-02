@@ -21,25 +21,6 @@ import org.testng.annotations.Test;
 public class ExceptionsTest {
 
     @Test
-    public void testInvalidConfigurationExceptionWithText() {
-        try {
-            throw new InvalidConfigurationException("test");
-        } catch (InvalidConfigurationException e) {
-            Assert.assertEquals(e.getMessage(), "test", "Message wasn't overridden in " + e.getClass().getName());
-        }
-    }
-
-    @Test
-    public void testInvalidConfigurationExceptionWithoutText() {
-        try {
-            Exception e = new Exception("test");
-            throw new InvalidConfigurationException(e);
-        } catch (InvalidConfigurationException e) {
-            Assert.assertEquals(e.getMessage(), "java.lang.Exception: test", "Message wasn't overridden in " + e.getClass().getName());
-        }
-    }
-
-    @Test
     public void testNotSupportedOperationExceptionWithText() {
         try {
             throw new NotSupportedOperationException("test");

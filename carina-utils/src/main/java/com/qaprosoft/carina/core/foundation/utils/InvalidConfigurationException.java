@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.exception;
+package com.qaprosoft.carina.core.foundation.utils;
 
-public class InvalidConfigurationException extends RuntimeException {
+class InvalidConfigurationException extends RuntimeException {
     private static final long serialVersionUID = 8617043525402250600L;
 
     public InvalidConfigurationException(Exception e) {
