@@ -21,24 +21,6 @@ import org.testng.annotations.Test;
 public class ExceptionsTest {
 
     @Test
-    public void testDriverPoolExceptionWithText() {
-        try {
-            throw new DriverPoolException("test");
-        } catch (DriverPoolException e) {
-            Assert.assertEquals(e.getMessage(), "test", "Message wasn't overridden in " + e.getClass().getName());
-        }
-    }
-
-    @Test
-    public void testDriverPoolExceptionWithoutText() {
-        try {
-            throw new DriverPoolException();
-        } catch (DriverPoolException e) {
-            Assert.assertEquals(e.getMessage(), "Undefined failure in DriverPool!", "Message wasn't overridden in " + e.getClass().getName());
-        }
-    }
-
-    @Test
     public void testInvalidArgsExceptionWithText() {
         try {
             throw new InvalidArgsException("test");
