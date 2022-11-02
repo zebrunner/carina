@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.exception;
+package com.qaprosoft.carina.core.foundation.utils;
 
-public class PlaceholderResolverException extends RuntimeException {
+class PlaceholderResolverException extends RuntimeException {
     private static final long serialVersionUID = -1666532382220155518L;
 
     public PlaceholderResolverException() {

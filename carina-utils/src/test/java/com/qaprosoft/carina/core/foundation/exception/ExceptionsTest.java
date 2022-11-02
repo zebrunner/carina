@@ -15,32 +15,10 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.exception;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.R;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 public class ExceptionsTest {
-
-    @Test
-    public void testPlaceholderResolverExceptionWithText() {
-        try {
-            throw new PlaceholderResolverException("test");
-        } catch (PlaceholderResolverException e) {
-            Assert.assertEquals(e.getMessage(), "Value not found by key 'test'", "Message wasn't overridden in " + e.getClass().getName());
-        }
-    }
-
-    @Test
-    public void testPlaceholderResolverExceptionWithoutText() {
-        try {
-            throw new PlaceholderResolverException();
-        } catch (PlaceholderResolverException e) {
-            Assert.assertNull(e.getMessage(), "Message wasn't overridden in " + e.getClass().getName());
-        }
-    }
 
     @Test
     public void testRequiredCtorNotFoundExceptionWithText() {

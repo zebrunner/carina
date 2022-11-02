@@ -25,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.exception.PlaceholderResolverException;
 
 /**
  * PlaceholderResolver - resolves placeholders in properties.
