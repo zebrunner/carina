@@ -24,6 +24,7 @@ import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.Reporter;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
@@ -50,6 +51,11 @@ public class QTestTest implements IQTestManager {
     @BeforeSuite()
     public void initData(ITestContext context) {
         context.getSuite().setAttribute(SpecialKeywords.QTEST_PROJECT_ID, PROJECT_ID);
+    }
+
+    @BeforeMethod(onlyForGroups = "change-platform-name")
+    public void beforeMethod() {
+        R.CONFIG.put("capabilities.platformName", "*", true);
     }
 
     @Test
@@ -113,7 +119,7 @@ public class QTestTest implements IQTestManager {
     }
 
 
-    @Test
+    @Test(groups = "change-platform-name")
     @QTestCases(id = FIRST_TEST_ID, platform = "ios")
     @QTestCases(id = SECOND_TEST_ID, platform = "android")
     public void testQTestByPlatform() {
@@ -125,7 +131,7 @@ public class QTestTest implements IQTestManager {
 
         LOGGER.info(QTestUdids.toString());
 
-        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, SpecialKeywords.IOS);
+        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, SpecialKeywords.IOS, true);
 
         QTestUdids = getQTestCasesUuid(result);
 
@@ -133,7 +139,7 @@ public class QTestTest implements IQTestManager {
 
         Assert.assertEquals(QTestUdids.size(), 1);
 
-        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, SpecialKeywords.ANDROID);
+        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, SpecialKeywords.ANDROID, true);
 
         QTestUdids = getQTestCasesUuid(result);
 
@@ -141,7 +147,7 @@ public class QTestTest implements IQTestManager {
 
         Assert.assertEquals(QTestUdids.size(), 1);
 
-        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, "");
+        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, "", true);
     }
 
 

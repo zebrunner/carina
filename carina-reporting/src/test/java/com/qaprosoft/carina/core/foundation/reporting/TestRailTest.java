@@ -24,6 +24,7 @@ import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.Reporter;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
@@ -51,6 +52,11 @@ public class TestRailTest implements ITestRailManager {
     @BeforeSuite()
     public void initData(ITestContext context) {
         context.getSuite().setAttribute(SpecialKeywords.TESTRAIL_SUITE_ID, SUITE_ID);
+    }
+
+    @BeforeMethod(onlyForGroups = "change-platform-name")
+    public void beforeMethod() {
+        R.CONFIG.put("capabilities.platformName", "*", true);
     }
 
     @Test
@@ -110,7 +116,7 @@ public class TestRailTest implements ITestRailManager {
         Assert.assertEquals(testRailUdids.size(), 2);
     }
 
-    @Test
+    @Test(groups = "change-platform-name")
     @TestRailCases(testCasesId = FIRST_TEST_ID, platform = "ios")
     @TestRailCases(testCasesId = SECOND_TEST_ID, platform = "android")
     public void testTestRailByPlatform() {
@@ -120,7 +126,7 @@ public class TestRailTest implements ITestRailManager {
 
         Assert.assertEquals(testRailUdids.size(), 0);
 
-        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, SpecialKeywords.IOS);
+        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, SpecialKeywords.IOS, true);
 
         testRailUdids = getTestRailCasesUuid(result);
 
@@ -128,7 +134,7 @@ public class TestRailTest implements ITestRailManager {
 
         Assert.assertEquals(testRailUdids.size(), 1);
 
-        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, SpecialKeywords.ANDROID);
+        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, SpecialKeywords.ANDROID, true);
 
         testRailUdids = getTestRailCasesUuid(result);
 
@@ -136,7 +142,7 @@ public class TestRailTest implements ITestRailManager {
 
         Assert.assertEquals(testRailUdids.size(), 1);
 
-        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, "");
+        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, "", true);
     }
 
 
