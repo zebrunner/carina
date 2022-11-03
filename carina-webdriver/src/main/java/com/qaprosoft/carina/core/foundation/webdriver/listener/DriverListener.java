@@ -30,7 +30,7 @@ import org.openqa.selenium.support.events.WebDriverListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zebrunner.carina.utils.report.ReportContext;
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.zebrunner.carina.utils.Configuration.Parameter;
 import com.zebrunner.carina.utils.FileManager;
 import com.zebrunner.carina.utils.R;

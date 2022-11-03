@@ -19,7 +19,7 @@ import java.io.File;
 import java.io.PrintStream;
 import java.util.UUID;
 
-import com.zebrunner.carina.utils.report.ReportContext;
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
 
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;

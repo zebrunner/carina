@@ -32,9 +32,9 @@ import org.testng.internal.annotations.DisabledRetryAnalyzer;
 
 import com.zebrunner.carina.utils.common.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
-import com.zebrunner.carina.utils.report.ReportContext;
-import com.zebrunner.carina.utils.report.TestResultItem;
-import com.zebrunner.carina.utils.report.TestResultType;
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
+import com.qaprosoft.carina.core.foundation.report.TestResultItem;
+import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
 import com.zebrunner.carina.utils.retry.RetryAnalyzer;
 import com.zebrunner.carina.utils.DateUtils;

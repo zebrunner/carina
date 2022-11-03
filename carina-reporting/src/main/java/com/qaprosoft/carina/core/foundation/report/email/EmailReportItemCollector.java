@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.testng.ITestResult;
 
-import com.zebrunner.carina.utils.report.TestResultItem;
+import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
 
 /**

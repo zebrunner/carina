@@ -32,6 +32,11 @@
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-utils</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>com.qaprosoft</groupId>
+			<artifactId>carina-reporting</artifactId>
+		</dependency>
 		
 		<dependency>
 			<groupId>com.qaprosoft</groupId>

@@ -48,7 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zebrunner.carina.utils.common.SpecialKeywords;
-import com.zebrunner.carina.utils.report.ReportContext;
+import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;

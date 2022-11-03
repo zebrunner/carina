@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.zebrunner.carina.utils.report;
+package com.qaprosoft.carina.core.foundation.report;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
