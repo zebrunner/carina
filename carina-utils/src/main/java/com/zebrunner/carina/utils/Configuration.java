@@ -25,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zebrunner.carina.utils.common.SpecialKeywords;
-import com.zebrunner.agent.core.registrar.CurrentTestRun;
 
 /**
  * Configuration utility.
@@ -525,7 +524,7 @@ public class Configuration {
     }
     
     /**
-     * Register APP_VERSION number in CONFIG space and as Zebrunner Reporting build number if not empty.
+     * Register APP_VERSION number in CONFIG space
      *
      * @param build String
      */
@@ -533,7 +532,7 @@ public class Configuration {
         R.CONFIG.put(Parameter.APP_VERSION.getKey(), build);
         if (!build.isEmpty()) {
             LOGGER.debug("build: " + build);
-            CurrentTestRun.setBuild(build);
+//            CurrentTestRun.setBuild(build);
         }
     }
 
