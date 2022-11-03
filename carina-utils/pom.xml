@@ -11,20 +11,19 @@
 	<description>Set of useful carina core utilities.</description>
 
 	<parent>
-		<groupId>com.qaprosoft</groupId>
-		<artifactId>carina</artifactId>
+		<groupId>com.zebrunner</groupId>
+		<artifactId>carina-parent</artifactId>
 		<version>1.0-SNAPSHOT</version>
-		<relativePath>..</relativePath>
+		<relativePath/>
 	</parent>
 
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
+		<carina.crypto.version>1.0.0-SNAPSHOT</carina.crypto.version>
 		<pdfbox.version>2.0.24</pdfbox.version>
 		<mongo-java-driver.version>2.11.3</mongo-java-driver.version>
 		<joda-time.version>2.9.9</joda-time.version>
-		
 		<common-net.version>3.3</common-net.version>
 	</properties>
 
@@ -34,6 +33,7 @@
 		<dependency>
 			<groupId>com.zebrunner</groupId>
 			<artifactId>carina-crypto</artifactId>
+			<version>${carina.crypto.version}</version>
 		</dependency>
 
 		<dependency>
