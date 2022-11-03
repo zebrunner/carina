@@ -13,8 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.zebrunner.carina.utils.tag;
+package com.qaprosoft.carina.core.foundation.report.tag;
 
-public enum Priority {
-    P0,P1,P2,P3,P4,P5,P6
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+/**
+ * This defines the 'TestPriority' annotation used to specify the
+ * TestNG methods tag.
+ */
+@Retention(value = java.lang.annotation.RetentionPolicy.RUNTIME)
+@Target(value = java.lang.annotation.ElementType.METHOD)
+public @interface TestPriority {
+    Priority value();
 }
+
+

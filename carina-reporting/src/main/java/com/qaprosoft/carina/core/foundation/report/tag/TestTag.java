@@ -14,7 +14,7 @@
  * limitations under the License.
  *******************************************************************************/
 
-package com.zebrunner.carina.utils.tag;
+package com.qaprosoft.carina.core.foundation.report.tag;
 
 import java.lang.annotation.*;
 

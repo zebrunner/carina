@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
 import org.testng.ITestNGMethod;
 
 import com.qaprosoft.carina.core.foundation.filter.IFilter;
-import com.zebrunner.carina.utils.tag.Priority;
-import com.zebrunner.carina.utils.tag.TestPriority;
+import com.qaprosoft.carina.core.foundation.report.tag.Priority;
+import com.qaprosoft.carina.core.foundation.report.tag.TestPriority;
 
 public class PriorityFilter implements IFilter {
 
