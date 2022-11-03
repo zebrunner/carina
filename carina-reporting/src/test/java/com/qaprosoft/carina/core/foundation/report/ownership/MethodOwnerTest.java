@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.zebrunner.carina.utils;
+package com.qaprosoft.carina.core.foundation.report.ownership;
 
+import com.zebrunner.carina.utils.R;
+import com.zebrunner.carina.utils.common.SpecialKeywords;
 import org.testng.Assert;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
 
-import com.zebrunner.carina.utils.common.SpecialKeywords;
-import com.zebrunner.carina.utils.ownership.MethodOwner;
-import com.zebrunner.carina.utils.ownership.Ownership;
 
 /**
  * Tests for {@link Ownership}

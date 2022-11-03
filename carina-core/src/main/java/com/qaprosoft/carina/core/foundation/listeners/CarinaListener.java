@@ -30,6 +30,8 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import com.qaprosoft.carina.core.foundation.report.ownership.Ownership;
+import com.qaprosoft.carina.core.foundation.report.ownership.SuiteOwnerResolver;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
@@ -77,8 +79,6 @@ import com.zebrunner.carina.utils.FileManager;
 import com.zebrunner.carina.utils.Messager;
 import com.zebrunner.carina.utils.R;
 import com.zebrunner.carina.utils.ZebrunnerNameResolver;
-import com.zebrunner.carina.utils.ownership.Ownership;
-import com.zebrunner.carina.utils.ownership.SuiteOwnerResolver;
 import com.zebrunner.carina.utils.resources.L10N;
 import com.zebrunner.carina.utils.tag.PriorityManager;
 import com.zebrunner.carina.utils.tag.TagManager;

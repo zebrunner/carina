@@ -20,12 +20,12 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.qaprosoft.carina.core.foundation.report.ownership.MethodOwner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestNGMethod;
 
 import com.qaprosoft.carina.core.foundation.filter.IFilter;
-import com.zebrunner.carina.utils.ownership.MethodOwner;
 
 public class OwnerFilter implements IFilter {
 
