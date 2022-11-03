@@ -78,7 +78,7 @@ import com.zebrunner.carina.utils.DateUtils;
 import com.zebrunner.carina.utils.FileManager;
 import com.zebrunner.carina.utils.Messager;
 import com.zebrunner.carina.utils.R;
-import com.zebrunner.carina.utils.ZebrunnerNameResolver;
+import com.qaprosoft.carina.core.foundation.report.ZebrunnerNameResolver;
 import com.zebrunner.carina.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.report.tag.PriorityManager;
 import com.qaprosoft.carina.core.foundation.report.tag.TagManager;
