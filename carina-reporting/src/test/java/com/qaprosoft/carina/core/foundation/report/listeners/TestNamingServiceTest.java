@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.zebrunner.carina.utils.listeners;
+package com.qaprosoft.carina.core.foundation.report.listeners;
 
-import com.zebrunner.carina.utils.listeners.TestNamingService;
 import org.testng.Assert;
 import org.testng.ITestResult;
 import org.testng.Reporter;
