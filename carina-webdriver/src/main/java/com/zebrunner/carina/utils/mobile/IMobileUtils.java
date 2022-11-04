@@ -28,7 +28,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import com.zebrunner.carina.utils.Configuration;
-import com.zebrunner.carina.utils.Messager;
+import com.zebrunner.carina.utils.messager.Messager;
 import com.zebrunner.carina.utils.android.AndroidService;
 import com.zebrunner.carina.utils.android.DeviceTimeZone;
 import com.zebrunner.carina.utils.android.IAndroidUtils;

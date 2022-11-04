@@ -65,7 +65,7 @@ import com.zebrunner.carina.utils.common.SpecialKeywords;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.Configuration.Parameter;
 import com.zebrunner.carina.utils.IWebElement;
-import com.zebrunner.carina.utils.Messager;
+import com.zebrunner.carina.utils.messager.Messager;
 import com.zebrunner.carina.utils.R;
 import com.zebrunner.carina.utils.common.CommonUtils;
 import com.zebrunner.carina.utils.resources.L10N;
