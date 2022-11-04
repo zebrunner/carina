@@ -36,7 +36,7 @@ import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
-import com.zebrunner.carina.utils.retry.RetryAnalyzer;
+import com.zebrunner.carina.retry.RetryAnalyzer;
 import com.zebrunner.carina.utils.DateUtils;
 import com.zebrunner.carina.utils.messager.Messager;
 import com.zebrunner.carina.utils.ParameterGenerator;

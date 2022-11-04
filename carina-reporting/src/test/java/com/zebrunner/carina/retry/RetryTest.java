@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.zebrunner.carina.utils.retry;
+package com.zebrunner.carina.retry;
 
 import com.zebrunner.carina.utils.Configuration;
-import com.zebrunner.carina.utils.retry.RetryAnalyzer;
 import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
