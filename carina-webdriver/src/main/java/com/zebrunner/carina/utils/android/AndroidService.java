@@ -24,7 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.zebrunner.carina.utils.mobile.android.DeviceTimeZone;
-import com.zebrunner.carina.utils.mobile.android.recorder.utils.CmdLine;
+import com.zebrunner.carina.utils.mobile.android.CmdLine;
 import com.zebrunner.carina.utils.common.CommonUtils;
 import com.zebrunner.carina.utils.mobile.IMobileUtils;
 import com.zebrunner.carina.utils.mobile.notifications.android.Notification;
