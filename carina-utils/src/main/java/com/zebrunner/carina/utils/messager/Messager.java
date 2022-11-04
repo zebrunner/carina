@@ -21,8 +21,6 @@ import java.lang.invoke.MethodHandles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zebrunner.carina.utils.messager.IMessager;
-
 /**
  * ReportMessage is used for reporting informational and error messages both
  * using logger and testsNG Reporter.
