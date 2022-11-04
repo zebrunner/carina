@@ -27,7 +27,7 @@ import com.zebrunner.carina.utils.mobile.android.DeviceTimeZone;
 import com.zebrunner.carina.utils.mobile.android.CmdLine;
 import com.zebrunner.carina.utils.common.CommonUtils;
 import com.zebrunner.carina.utils.mobile.IMobileUtils;
-import com.zebrunner.carina.utils.mobile.notifications.android.Notification;
+import com.zebrunner.carina.utils.mobile.android.Notification;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.decorators.Decorated;
 import org.slf4j.Logger;

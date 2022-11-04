@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.zebrunner.carina.utils.mobile.notifications;
+package com.zebrunner.carina.utils.mobile.android;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
