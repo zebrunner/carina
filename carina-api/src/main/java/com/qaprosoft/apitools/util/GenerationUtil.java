@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.zebrunner.carina.utils;
+package com.qaprosoft.apitools.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

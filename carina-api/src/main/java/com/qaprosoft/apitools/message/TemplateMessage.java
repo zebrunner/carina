@@ -24,7 +24,7 @@ import org.apache.commons.configuration2.CompositeConfiguration;
 
 import com.qaprosoft.apitools.builder.MessageBuilder;
 import com.qaprosoft.apitools.builder.PropertiesProcessorMain;
-import com.zebrunner.carina.utils.properties.PropertiesUtil;
+import com.qaprosoft.apitools.util.PropertiesUtil;
 
 public class TemplateMessage extends Message {
 

@@ -21,7 +21,7 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.zebrunner.carina.utils.GenerationUtil;
+import com.qaprosoft.apitools.util.GenerationUtil;
 
 public class GenerateProcessor implements PropertiesProcessor {
 
