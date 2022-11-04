@@ -13,27 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.report.qtest;
+package com.zebrunner.carina.report.email;
 
-import java.lang.annotation.*;
+import java.util.Comparator;
 
-/**
- * This defines the 'QTestCases' annotation used to specify the
- * qTest test case id values that the TestNG test maps to
- */
+import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 
-@Repeatable(QTestCases.List.class)
-@Target({ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface QTestCases {
-    String id();
+public class EmailReportItemComparator implements Comparator<TestResultItem> {
 
-    String platform() default "";
-    String locale() default "";
-
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target({ElementType.METHOD})
-    @interface List {
-        QTestCases[] value();
+    @Override
+    public int compare(TestResultItem item1, TestResultItem item2) {
+        if (!item1.getPack().equals(item2.getPack())) {
+            return item1.getPack().compareTo(item2.getPack());
+        } else {
+            return item1.getTest().compareTo(item2.getTest());
+        }
     }
 }

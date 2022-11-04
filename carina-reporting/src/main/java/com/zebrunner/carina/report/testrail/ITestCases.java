@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.report.testrail;
+package com.zebrunner.carina.report.testrail;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -13,24 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.report.email;
+package com.zebrunner.carina.report.testrail;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.lang.annotation.*;
 
-public class EmailValidator {
+@Repeatable(TestRailCases.List.class)
+@Target({ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface TestRailCases {
+    String testCasesId();
 
-    private Pattern pattern;
-    private Matcher matcher;
+    String platform() default "";
+    String locale() default "";
+    String suiteId() default "";
 
-    private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-
-    public EmailValidator() {
-        pattern = Pattern.compile(EMAIL_PATTERN);
-    }
-
-    public boolean validate(final String email) {
-        matcher = pattern.matcher(email);
-        return matcher.matches();
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.METHOD})
+    @interface List {
+        TestRailCases[] value();
     }
 }

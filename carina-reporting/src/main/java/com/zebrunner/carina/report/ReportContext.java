@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.report;
+package com.zebrunner.carina.report;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
@@ -67,7 +67,7 @@ import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 import com.zebrunner.carina.utils.common.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.report.log.ThreadLogAppender;
+import com.zebrunner.carina.report.log.ThreadLogAppender;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.Configuration.Parameter;
 import com.zebrunner.carina.utils.file.ZipManager;

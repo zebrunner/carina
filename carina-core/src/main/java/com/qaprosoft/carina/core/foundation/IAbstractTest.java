@@ -29,7 +29,7 @@ import com.nordstrom.automation.testng.LinkedListeners;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactory;
 import com.qaprosoft.carina.core.foundation.listeners.CarinaListener;
 import com.qaprosoft.carina.core.foundation.listeners.FilterTestsListener;
-import com.qaprosoft.carina.core.foundation.report.testrail.ITestCases;
+import com.zebrunner.carina.report.testrail.ITestCases;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.Configuration.Parameter;
 import com.zebrunner.carina.utils.common.CommonUtils;

@@ -34,7 +34,7 @@ import com.zebrunner.carina.utils.mobile.android.DeviceTimeZone;
 import com.zebrunner.carina.utils.mobile.android.AdbExecutor;
 import com.zebrunner.carina.utils.mobile.android.CmdLine;
 import com.zebrunner.carina.utils.common.CommonUtils;
-import com.qaprosoft.carina.core.foundation.report.ReportContext;
+import com.zebrunner.carina.report.ReportContext;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;

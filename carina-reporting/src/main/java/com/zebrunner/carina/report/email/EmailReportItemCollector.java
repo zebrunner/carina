@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.report.email;
+package com.zebrunner.carina.report.email;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -29,8 +29,8 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 import com.zebrunner.carina.utils.common.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.report.qtest.IQTestManager;
-import com.qaprosoft.carina.core.foundation.report.qtest.QTestCases;
+import com.zebrunner.carina.report.qtest.IQTestManager;
+import com.zebrunner.carina.report.qtest.QTestCases;
 import com.zebrunner.carina.utils.Configuration.Parameter;
 import com.zebrunner.carina.utils.R;
 

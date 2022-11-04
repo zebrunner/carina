@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.report.qtest;
+package com.zebrunner.carina.report.testrail;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
@@ -26,19 +26,14 @@ import org.testng.ISuite;
 import org.testng.ITestResult;
 
 import com.zebrunner.carina.utils.common.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.report.testrail.ITestCases;
 
-public interface IQTestManager extends ITestCases {
-    static final Logger QTEST_LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+public interface ITestRailManager extends ITestCases {
+    static final Logger TESTRAIL_LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    default Set<String> getQTestCasesUuid(ITestResult result) {
+    default Set<String> getTestRailCasesUuid(ITestResult result) {
         Set<String> testCases = new HashSet<String>();
 
-        int projectID = getQTestProjectIdFromSuite(result.getTestContext().getSuite());
-        if (projectID == -1) {
-            // no sense to return something as integration data not provided
-            return testCases;
-        }
+        int suiteID = getTestRailSuiteIdFromSuite(result.getTestContext().getSuite());
 
         // Get a handle to the class and method
         Class<?> testClass;
@@ -58,39 +53,41 @@ public interface IQTestManager extends ITestCases {
             }
 
             if (testMethod != null) {
-                if (testMethod.isAnnotationPresent(QTestCases.class)) {
-                    QTestCases methodAnnotation = testMethod.getAnnotation(QTestCases.class);
+                if (testMethod.isAnnotationPresent(TestRailCases.class)) {
+                    TestRailCases methodAnnotation = testMethod.getAnnotation(TestRailCases.class);
                     String platform = methodAnnotation.platform();
                     String locale = methodAnnotation.locale();
-                    if (isValidPlatform(platform) && isValidLocale(locale)) {
-                        String[] testCaseList = methodAnnotation.id().split(",");
+                    String expectedSuiteId = methodAnnotation.suiteId();
+                    if (isValidPlatform(platform) && isValidLocale(locale) && isValidSuite(suiteID, expectedSuiteId)) {
+                        String[] testCaseList = methodAnnotation.testCasesId().split(",");
                         for (String tcase : testCaseList) {
                             tcase = tcase.trim();
                             if (!tcase.isEmpty()) {
                                 testCases.add(tcase);
-                                QTEST_LOGGER.debug("qTest test case uuid '" + tcase + "' is registered.");
+                                TESTRAIL_LOGGER.debug("TestRail test case uuid '" + tcase + "' is registered.");
                             } else {
-                                QTEST_LOGGER.error("qTest test case uuid was not registered because of an empty value");
+                                TESTRAIL_LOGGER.error("TestRail test case uuid was not registered because of an empty value");
                             }
                         }
 
                     }
                 }
-                if (testMethod.isAnnotationPresent(QTestCases.List.class)) {
-                    QTestCases.List methodAnnotation = testMethod.getAnnotation(QTestCases.List.class);
-                    for (QTestCases tcLocal : methodAnnotation.value()) {
+                if (testMethod.isAnnotationPresent(TestRailCases.List.class)) {
+                    TestRailCases.List methodAnnotation = testMethod.getAnnotation(TestRailCases.List.class);
+                    for (TestRailCases tcLocal : methodAnnotation.value()) {
 
                         String platform = tcLocal.platform();
                         String locale = tcLocal.locale();
-                        if (isValidPlatform(platform) && isValidLocale(locale)) {
-                            String[] testCaseList = tcLocal.id().split(",");
+                        String expectedSuiteId = tcLocal.suiteId();
+                        if (isValidPlatform(platform) && isValidLocale(locale) && isValidSuite(suiteID, expectedSuiteId)) {
+                            String[] testCaseList = tcLocal.testCasesId().split(",");
                             for (String tcase : testCaseList) {
                                 tcase = tcase.trim();
                                 if (!tcase.isEmpty()) {
                                     testCases.add(tcase);
-                                    QTEST_LOGGER.debug("qTest test case uuid '" + tcase + "' is registered.");
+                                    TESTRAIL_LOGGER.debug("TestRail test case uuid '" + tcase + "' is registered.");
                                 } else {
-                                    QTEST_LOGGER.error("qTest test case uuid was not registered because of an empty value");
+                                    TESTRAIL_LOGGER.error("TestRail test case uuid was not registered because of an empty value");
                                 }
                             }
                         }
@@ -98,14 +95,14 @@ public interface IQTestManager extends ITestCases {
                 }
             }
         } catch (ClassNotFoundException e) {
-            QTEST_LOGGER.error("Can't find test class!", e);
+            TESTRAIL_LOGGER.error("Can't find test class!", e);
         }
 
         // append cases id values from ITestCases map (custom TestNG provider)
         for (String entry : getCases()) {
-            entry=entry.trim();
-            if (!entry.isEmpty()){
-                testCases.add(entry);
+            entry = entry.trim();
+            if (!entry.isEmpty()) {
+                testCases.add(entry.trim());
             }
         }
         clearCases();
@@ -113,26 +110,34 @@ public interface IQTestManager extends ITestCases {
         return testCases;
     }
 
-    default String getQTestProjectId(ISuite suite) {
-        int projectId = getQTestProjectIdFromSuite(suite);
+    @Deprecated
+    default String getTestRailProjectId(ISuite suite) {
+        return "";
+    }
 
-        if (projectId == -1) {
+    default String getTestRailSuiteId(ISuite suite) {
+        int suiteID = getTestRailSuiteIdFromSuite(suite);
+
+        if (suiteID == -1) {
             return "";
         } else {
-            return String.valueOf(projectId);
+            return String.valueOf(suiteID);
         }
     }
 
-
-    private int getQTestProjectIdFromSuite(ISuite suite) {
-        if (suite.getParameter(SpecialKeywords.QTEST_PROJECT_ID) != null) {
-            return Integer.parseInt(suite.getParameter(SpecialKeywords.QTEST_PROJECT_ID).trim());
-        } else if (suite.getAttribute(SpecialKeywords.QTEST_PROJECT_ID) != null) {
+    private int getTestRailSuiteIdFromSuite(ISuite suite) {
+        if (suite.getParameter(SpecialKeywords.TESTRAIL_SUITE_ID) != null) {
+            return Integer.parseInt(suite.getParameter(SpecialKeywords.TESTRAIL_SUITE_ID).trim());
+        } else if (suite.getAttribute(SpecialKeywords.TESTRAIL_SUITE_ID) != null) {
             //use-case to support unit tests
-            return Integer.parseInt(suite.getAttribute(SpecialKeywords.QTEST_PROJECT_ID).toString().trim());
+            return Integer.parseInt(suite.getAttribute(SpecialKeywords.TESTRAIL_SUITE_ID).toString().trim());
         } else {
             return -1;
         }
+    }
+    
+    private boolean isValidSuite(int actualSuiteId, String expectedSuiteId) {
+        return expectedSuiteId.isEmpty() || expectedSuiteId.equalsIgnoreCase(String.valueOf(actualSuiteId));
     }
 
 }

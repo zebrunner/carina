@@ -13,23 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.report.testrail;
+package com.zebrunner.carina.report.qtest;
 
 import java.lang.annotation.*;
 
-@Repeatable(TestRailCases.List.class)
+/**
+ * This defines the 'QTestCases' annotation used to specify the
+ * qTest test case id values that the TestNG test maps to
+ */
+
+@Repeatable(QTestCases.List.class)
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TestRailCases {
-    String testCasesId();
+public @interface QTestCases {
+    String id();
 
     String platform() default "";
     String locale() default "";
-    String suiteId() default "";
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.METHOD})
     @interface List {
-        TestRailCases[] value();
+        QTestCases[] value();
     }
 }

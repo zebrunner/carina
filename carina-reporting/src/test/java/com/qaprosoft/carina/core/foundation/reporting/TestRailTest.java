@@ -29,8 +29,8 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 import com.zebrunner.carina.utils.common.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.report.testrail.ITestRailManager;
-import com.qaprosoft.carina.core.foundation.report.testrail.TestRailCases;
+import com.zebrunner.carina.report.testrail.ITestRailManager;
+import com.zebrunner.carina.report.testrail.TestRailCases;
 import com.zebrunner.carina.utils.Configuration.Parameter;
 import com.zebrunner.carina.utils.R;
 

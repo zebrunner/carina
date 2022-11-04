@@ -17,9 +17,9 @@ package com.qaprosoft.carina.core.foundation.reporting;
 
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
-import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
-import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemComparator;
-import com.qaprosoft.carina.core.foundation.report.email.EmailValidator;
+import com.zebrunner.carina.report.email.EmailReportItemCollector;
+import com.zebrunner.carina.report.email.EmailReportItemComparator;
+import com.zebrunner.carina.report.email.EmailValidator;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

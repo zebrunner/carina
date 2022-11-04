@@ -13,20 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.report.email;
+package com.zebrunner.carina.report.email;
 
-import java.util.Comparator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import com.qaprosoft.carina.core.foundation.report.TestResultItem;
+public class EmailValidator {
 
-public class EmailReportItemComparator implements Comparator<TestResultItem> {
+    private Pattern pattern;
+    private Matcher matcher;
 
-    @Override
-    public int compare(TestResultItem item1, TestResultItem item2) {
-        if (!item1.getPack().equals(item2.getPack())) {
-            return item1.getPack().compareTo(item2.getPack());
-        } else {
-            return item1.getTest().compareTo(item2.getTest());
-        }
+    private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+
+    public EmailValidator() {
+        pattern = Pattern.compile(EMAIL_PATTERN);
+    }
+
+    public boolean validate(final String email) {
+        matcher = pattern.matcher(email);
+        return matcher.matches();
     }
 }
