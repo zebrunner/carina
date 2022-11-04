@@ -30,8 +30,8 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import com.qaprosoft.carina.core.foundation.report.ownership.Ownership;
-import com.qaprosoft.carina.core.foundation.report.ownership.SuiteOwnerResolver;
+import com.zebrunner.carina.report.ownership.Ownership;
+import com.zebrunner.carina.report.ownership.SuiteOwnerResolver;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;

@@ -15,6 +15,8 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.report.ownership;
 
+import com.zebrunner.carina.report.ownership.MethodOwner;
+import com.zebrunner.carina.report.ownership.Ownership;
 import com.zebrunner.carina.utils.R;
 import com.zebrunner.carina.utils.common.SpecialKeywords;
 import org.testng.Assert;

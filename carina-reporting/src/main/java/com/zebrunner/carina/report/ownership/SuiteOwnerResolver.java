@@ -1,4 +1,4 @@
-package com.qaprosoft.carina.core.foundation.report.ownership;
+package com.zebrunner.carina.report.ownership;
 
 import java.lang.reflect.Method;
 

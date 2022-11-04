@@ -20,7 +20,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.qaprosoft.carina.core.foundation.report.ownership.MethodOwner;
+import com.zebrunner.carina.report.ownership.MethodOwner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestNGMethod;
