@@ -15,7 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.report;
 
-import com.qaprosoft.carina.core.foundation.report.listeners.TestNamingService;
+import com.zebrunner.carina.listeners.TestNamingService;
 import org.testng.ITestResult;
 
 import com.zebrunner.agent.testng.core.testname.TestNameResolver;

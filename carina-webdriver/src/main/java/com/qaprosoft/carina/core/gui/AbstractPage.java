@@ -33,7 +33,7 @@ import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.RectangleReadOnly;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.qaprosoft.carina.core.foundation.report.listeners.TestNamingService;
+import com.zebrunner.carina.listeners.TestNamingService;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.Configuration.Parameter;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.report.listeners;
+package com.zebrunner.carina.listeners;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Parameter;

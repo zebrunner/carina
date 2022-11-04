@@ -19,7 +19,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Map;
 
-import com.qaprosoft.carina.core.foundation.report.listeners.TestNamingService;
+import com.zebrunner.carina.listeners.TestNamingService;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
