@@ -30,8 +30,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.zebrunner.carina.utils.Configuration;
-import com.zebrunner.carina.utils.android.recorder.utils.AdbExecutor;
-import com.zebrunner.carina.utils.android.recorder.utils.CmdLine;
+import com.zebrunner.carina.utils.mobile.android.DeviceTimeZone;
+import com.zebrunner.carina.utils.mobile.android.recorder.utils.AdbExecutor;
+import com.zebrunner.carina.utils.mobile.android.recorder.utils.CmdLine;
 import com.zebrunner.carina.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import org.apache.commons.io.FilenameUtils;

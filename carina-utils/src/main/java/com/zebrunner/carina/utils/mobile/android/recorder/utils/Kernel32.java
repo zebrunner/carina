@@ -13,31 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.zebrunner.carina.utils.android.recorder.exception;
+package com.zebrunner.carina.utils.mobile.android.recorder.utils;
 
-/**
- * Created by YP.
- * Date: 8/19/2014
- * Time: 12:35 AM
- */
-public class ExecutorException extends Exception {
+import com.sun.jna.Native;
 
-    private static final long serialVersionUID = -2841173595515246802L;
+interface Kernel32 extends W32API {
+    Kernel32 INSTANCE = (Kernel32) Native.loadLibrary("kernel32", Kernel32.class, DEFAULT_OPTIONS);
 
-    public ExecutorException() {
-        super();
-    }
+    HANDLE GetCurrentProcess();
 
-    public ExecutorException(String message) {
-        super(message);
-    }
-
-    public ExecutorException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public ExecutorException(Throwable cause) {
-        super(cause);
-    }
-
+    int GetProcessId(HANDLE Process);
 }

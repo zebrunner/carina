@@ -30,7 +30,7 @@ import javax.annotation.Nullable;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.messager.Messager;
 import com.zebrunner.carina.utils.android.AndroidService;
-import com.zebrunner.carina.utils.android.DeviceTimeZone;
+import com.zebrunner.carina.utils.mobile.android.DeviceTimeZone;
 import com.zebrunner.carina.utils.android.IAndroidUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.DeviceRotation;

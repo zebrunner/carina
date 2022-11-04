@@ -32,7 +32,7 @@ import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.Configuration.Parameter;
 import com.zebrunner.carina.utils.NetworkUtil;
 import com.zebrunner.carina.utils.R;
-import com.zebrunner.carina.utils.android.recorder.utils.AdbExecutor;
+import com.zebrunner.carina.utils.mobile.android.recorder.utils.AdbExecutor;
 import com.zebrunner.carina.utils.common.CommonUtils;
 
 public final class ProxyPool {

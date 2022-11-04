@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.zebrunner.carina.utils.android.recorder.utils;
+package com.zebrunner.carina.utils.mobile.android.recorder.utils;
 
 import java.io.Closeable;
 import java.io.InputStream;
@@ -24,10 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.zebrunner.carina.utils.mobile.android.recorder.exception.ExecutorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.zebrunner.carina.utils.android.recorder.exception.ExecutorException;
 
 /**
  * Created by YP.
