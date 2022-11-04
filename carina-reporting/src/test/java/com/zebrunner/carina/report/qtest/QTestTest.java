@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.reporting;
+package com.zebrunner.carina.report.qtest;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Set;
@@ -29,8 +29,6 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 import com.zebrunner.carina.utils.common.SpecialKeywords;
-import com.zebrunner.carina.report.qtest.IQTestManager;
-import com.zebrunner.carina.report.qtest.QTestCases;
 import com.zebrunner.carina.utils.Configuration.Parameter;
 import com.zebrunner.carina.utils.R;
 

@@ -13,13 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.reporting;
+package com.zebrunner.carina.report.email;
 
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;
-import com.zebrunner.carina.report.email.EmailReportItemCollector;
-import com.zebrunner.carina.report.email.EmailReportItemComparator;
-import com.zebrunner.carina.report.email.EmailValidator;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
