@@ -20,8 +20,6 @@ import java.util.Properties;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.zebrunner.carina.utils.PlaceholderResolver;
-
 /**
  * Tests for {@link PlaceholderResolver}
  */

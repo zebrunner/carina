@@ -15,7 +15,7 @@
  *******************************************************************************/
 package com.zebrunner.carina.utils;
 
-class PlaceholderResolverException extends RuntimeException {
+public class PlaceholderResolverException extends RuntimeException {
     private static final long serialVersionUID = -1666532382220155518L;
 
     public PlaceholderResolverException() {

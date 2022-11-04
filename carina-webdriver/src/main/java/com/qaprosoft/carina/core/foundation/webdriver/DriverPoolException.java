@@ -15,7 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver;
 
-class DriverPoolException extends RuntimeException {
+public class DriverPoolException extends RuntimeException {
 	private static final long serialVersionUID = 5200458288468528656L;
 
     public DriverPoolException() {

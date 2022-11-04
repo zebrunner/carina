@@ -18,8 +18,6 @@ package com.zebrunner.carina.utils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.zebrunner.carina.utils.R;
-
 /**
  * Tests for {@link R}
  */

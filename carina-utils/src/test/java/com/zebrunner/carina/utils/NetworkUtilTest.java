@@ -15,7 +15,6 @@
  *******************************************************************************/
 package com.zebrunner.carina.utils;
 
-import com.zebrunner.carina.utils.NetworkUtil;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

@@ -15,7 +15,7 @@
  *******************************************************************************/
 package com.zebrunner.carina.utils;
 
-class InvalidConfigurationException extends RuntimeException {
+public class InvalidConfigurationException extends RuntimeException {
     private static final long serialVersionUID = 8617043525402250600L;
 
     public InvalidConfigurationException(Exception e) {

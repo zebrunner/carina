@@ -16,7 +16,6 @@
 package com.zebrunner.carina.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.zebrunner.carina.utils.JsonUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

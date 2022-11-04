@@ -15,8 +15,6 @@
  *******************************************************************************/
 package com.zebrunner.carina.utils;
 
-import com.zebrunner.carina.utils.DateUtils;
-import com.zebrunner.carina.utils.R;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
