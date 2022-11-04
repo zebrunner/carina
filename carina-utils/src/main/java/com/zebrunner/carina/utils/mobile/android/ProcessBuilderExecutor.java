@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.zebrunner.carina.utils.mobile.android.recorder.exception.ExecutorException;
+import com.zebrunner.carina.utils.mobile.android.exception.ExecutorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

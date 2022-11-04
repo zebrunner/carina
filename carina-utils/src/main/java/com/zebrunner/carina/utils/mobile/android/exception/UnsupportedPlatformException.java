@@ -13,31 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.zebrunner.carina.utils.mobile.android.recorder.exception;
+package com.zebrunner.carina.utils.mobile.android.exception;
 
 /**
- * Created by YP.
- * Date: 8/19/2014
- * Time: 12:35 AM
+ *
  */
-public class ExecutorException extends Exception {
+public class UnsupportedPlatformException extends Exception {
 
-    private static final long serialVersionUID = -2841173595515246802L;
+    private static final long serialVersionUID = 7271195042561257354L;
 
-    public ExecutorException() {
+    public UnsupportedPlatformException() {
         super();
     }
 
-    public ExecutorException(String message) {
+    public UnsupportedPlatformException(String message) {
         super(message);
     }
 
-    public ExecutorException(String message, Throwable cause) {
+    public UnsupportedPlatformException(String message, Throwable cause) {
         super(message, cause);
     }
-
-    public ExecutorException(Throwable cause) {
-        super(cause);
-    }
-
 }
