@@ -201,8 +201,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         CurrentTestRun.setLocale(Configuration.get(Parameter.LOCALE));
 
         // register app_version/build as artifact if available...
-        Configuration.setBuild(Configuration.get(Parameter.APP_VERSION));
-        
+        CurrentTestRun.setBuild(Configuration.get(Parameter.APP_VERSION));
+
         String sha1 = Configuration.get(Parameter.GIT_HASH);
         if (!sha1.isEmpty()) {
             Label.attachToTestRun("sha1", sha1);
