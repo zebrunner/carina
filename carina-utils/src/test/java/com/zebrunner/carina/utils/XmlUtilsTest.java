@@ -18,6 +18,7 @@ package com.zebrunner.carina.utils;
 
 import com.zebrunner.carina.utils.marshaller.MarshallerHelper;
 import com.zebrunner.carina.utils.marshaller.exception.ParserException;
+import com.zebrunner.carina.utils.xml.XmlFormatter;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
