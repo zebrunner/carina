@@ -53,7 +53,7 @@ public class AmazonS3Manager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String CRYPTO_PATTERN = Configuration.get(Configuration.Parameter.CRYPTO_PATTERN);
-    private static volatile AmazonS3Manager instance;
+    private static AmazonS3Manager instance;
     private CryptoTool crypto;
     private AmazonS3 s3;
 
