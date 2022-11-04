@@ -304,22 +304,21 @@ public class AmazonS3Manager {
      *            .*prod-google-release.*
      * @return S3ObjectSummary
      */
-    public final S3ObjectSummary getLatestBuildArtifact(final String bucket, final String key,
-                                                        final Pattern pattern) {
+    public S3ObjectSummary getLatestBuildArtifact(String bucket, String key, Pattern pattern) {
         if (pattern == null) {
             throw new RuntimeException("pattern is null!");
         }
         S3ObjectSummary latestBuild = null;
         ObjectListing objBuilds = this.s3.listObjects(bucket, key);
-        int iteration = 0;
-        final int limit = 100;
+        int i = 0;
+        int limit = 100;
         boolean isTruncated = false;
         // by default S3 return only 1000 objects summary so need while cycle here
         do {
-            LOGGER.info("looking for s3 artifact using iteration #" + iteration);
-            for (final S3ObjectSummary obj : objBuilds.getObjectSummaries()) {
+            LOGGER.info("looking for s3 artifact using iteration #" + i);
+            for (S3ObjectSummary obj : objBuilds.getObjectSummaries()) {
                 LOGGER.debug("Existing S3 artifact: " + obj.getKey());
-                final Matcher matcher = pattern.matcher(obj.getKey());
+                Matcher matcher = pattern.matcher(obj.getKey());
                 if (matcher.find()) {
                     if (latestBuild == null) {
                         latestBuild = obj;
@@ -330,8 +329,8 @@ public class AmazonS3Manager {
                 }
             }
             isTruncated = objBuilds.isTruncated();
-            objBuilds = this.s3.listNextBatchOfObjects(objBuilds);
-        } while (isTruncated && ++iteration < limit);
+            objBuilds = s3.listNextBatchOfObjects(objBuilds);
+        } while (isTruncated && ++i < limit);
         if (latestBuild == null) {
             LOGGER.error("Unable to find S3 build artifact by pattern: " + pattern);
         } else {
