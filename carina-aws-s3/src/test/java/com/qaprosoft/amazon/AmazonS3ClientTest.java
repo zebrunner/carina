@@ -22,10 +22,10 @@ import org.testng.annotations.Test;
 
 public class AmazonS3ClientTest {
 
-//    @Test()
-//    public void testS3ManagerInit() {
-//        Assert.assertNotNull(AmazonS3Manager.getInstance(), "Singleton for AmazonS3Manager is null!");
-//    }
+    @Test()
+    public void testS3ManagerInit() {
+        Assert.assertNotNull(AmazonS3Manager.getInstance(), "Singleton for AmazonS3Manager is null!");
+    }
 
     @Test()
     public void testPutKeyNull() {
@@ -107,13 +107,13 @@ public class AmazonS3ClientTest {
         }
     }
 
-//    @Test()
-//    public void testgeneratePreSignURL() {
-//        URL url = AmazonS3Manager.getInstance().generatePreSignUrl("carina.qaprosoft.com", "test.txt", 1000 * 60 * 10);
-//        System.out.println(url.toString());
-//        // Example:
-//        // https://carina.qaprosoft.com.s3.amazonaws.com/test.txt?AWSAccessKeyId=AKIAIF43YTFM7RWG7EVQ&Expires=1506266253&Signature=um7fDD2cZmTKLd%2BLZYs0Yq2%2Fc50%3D
-//        // TODO: add verification that file is accessible without creds
-//    }
+    @Test()
+    public void testgeneratePreSignURL() {
+        URL url = AmazonS3Manager.getInstance().generatePreSignUrl("carina.qaprosoft.com", "test.txt", 1000 * 60 * 10);
+        System.out.println(url.toString());
+        // Example:
+        // https://carina.qaprosoft.com.s3.amazonaws.com/test.txt?AWSAccessKeyId=AKIAIF43YTFM7RWG7EVQ&Expires=1506266253&Signature=um7fDD2cZmTKLd%2BLZYs0Yq2%2Fc50%3D
+        // TODO: add verification that file is accessible without creds
+    }
 
 }
