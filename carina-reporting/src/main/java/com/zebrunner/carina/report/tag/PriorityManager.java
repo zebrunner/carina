@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.report.tag;
+package com.zebrunner.carina.report.tag;
 
 import java.lang.reflect.Method;
 import java.util.Collections;

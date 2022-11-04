@@ -13,8 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.report.tag;
 
-public enum Priority {
-    P0,P1,P2,P3,P4,P5,P6
+package com.zebrunner.carina.report.tag;
+
+import java.lang.annotation.*;
+
+@Repeatable(TestTag.List.class)
+@Target({ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface TestTag {
+    String name();
+
+    String value();
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.METHOD})
+    @interface List {
+
+        TestTag[] value();
+    }
 }

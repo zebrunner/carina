@@ -16,6 +16,11 @@
 package com.qaprosoft.carina.core.foundation.report.tag;
 
 import com.zebrunner.agent.core.registrar.domain.LabelDTO;
+import com.zebrunner.carina.report.tag.Priority;
+import com.zebrunner.carina.report.tag.PriorityManager;
+import com.zebrunner.carina.report.tag.TagManager;
+import com.zebrunner.carina.report.tag.TestPriority;
+import com.zebrunner.carina.report.tag.TestTag;
 import org.testng.Assert;
 import org.testng.ITestResult;
 import org.testng.Reporter;
