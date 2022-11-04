@@ -17,6 +17,7 @@ package com.zebrunner.carina.utils;
 
 import java.io.InputStream;
 
+import com.zebrunner.carina.utils.file.PDFUtil;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

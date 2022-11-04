@@ -23,13 +23,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import com.zebrunner.carina.utils.file.FileManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.zebrunner.carina.utils.FileManager;
-import com.zebrunner.carina.utils.ZipManager;
+import com.zebrunner.carina.utils.file.ZipManager;
 
 public class FileManagerTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

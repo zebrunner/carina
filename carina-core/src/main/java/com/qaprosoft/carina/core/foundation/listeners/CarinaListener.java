@@ -75,7 +75,7 @@ import com.qaprosoft.carina.core.foundation.skip.ExpectedSkipManager;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.Configuration.Parameter;
 import com.zebrunner.carina.utils.DateUtils;
-import com.zebrunner.carina.utils.FileManager;
+import com.zebrunner.carina.utils.file.FileManager;
 import com.zebrunner.carina.utils.messager.Messager;
 import com.zebrunner.carina.utils.R;
 import com.qaprosoft.carina.core.foundation.report.ZebrunnerNameResolver;

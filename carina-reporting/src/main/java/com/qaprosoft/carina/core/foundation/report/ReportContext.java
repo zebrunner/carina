@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
-import com.zebrunner.carina.utils.FileManager;
+import com.zebrunner.carina.utils.file.FileManager;
 import com.zebrunner.carina.utils.R;
 import com.zebrunner.carina.utils.common.CommonUtils;
 import org.apache.commons.io.FileUtils;
@@ -70,7 +70,7 @@ import com.zebrunner.carina.utils.common.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.report.log.ThreadLogAppender;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.Configuration.Parameter;
-import com.zebrunner.carina.utils.ZipManager;
+import com.zebrunner.carina.utils.file.ZipManager;
 import com.zebrunner.agent.core.registrar.Artifact;
 
 /*
