@@ -373,11 +373,6 @@
                 <version>1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>com.zebrunner</groupId>
-                <artifactId>carina-crypto</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
                 <groupId>com.qaprosoft</groupId>
                 <artifactId>carina-webdriver</artifactId>
                 <version>1.0-SNAPSHOT</version>
@@ -391,6 +386,12 @@
                 <groupId>com.qaprosoft</groupId>
                 <artifactId>carina-core</artifactId>
                 <version>1.0-SNAPSHOT</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.zebrunner</groupId>
+                <artifactId>carina-crypto</artifactId>
+                <version>1.0.0</version>
             </dependency>
 
             <!-- Define 3rd party compile-time dependencies here for children. 
