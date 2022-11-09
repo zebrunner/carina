@@ -15,7 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.filter;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
 import org.testng.ITestNGMethod;
 
 import java.util.*;

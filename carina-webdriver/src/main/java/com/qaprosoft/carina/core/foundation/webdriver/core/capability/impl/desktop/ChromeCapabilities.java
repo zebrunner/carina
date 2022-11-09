@@ -23,7 +23,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.R;

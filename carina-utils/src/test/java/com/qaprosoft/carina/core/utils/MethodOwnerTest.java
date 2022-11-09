@@ -20,7 +20,7 @@ import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
 import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;

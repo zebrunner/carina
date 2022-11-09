@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.testng.ISuite;
 import org.testng.ITestResult;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
 
 public interface ITestRailManager extends ITestCases {
     static final Logger TESTRAIL_LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

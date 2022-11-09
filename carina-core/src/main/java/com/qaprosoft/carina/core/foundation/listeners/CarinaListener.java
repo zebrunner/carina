@@ -61,7 +61,7 @@ import com.qaprosoft.amazon.AmazonS3Manager;
 import com.qaprosoft.appcenter.AppCenterManager;
 import com.qaprosoft.azure.AzureManager;
 import com.qaprosoft.carina.browserupproxy.ProxyPool;
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.TestResultType;

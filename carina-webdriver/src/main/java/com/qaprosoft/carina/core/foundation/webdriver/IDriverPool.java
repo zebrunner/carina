@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 import com.qaprosoft.carina.browserupproxy.ProxyPool;
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.exception.DriverPoolException;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;

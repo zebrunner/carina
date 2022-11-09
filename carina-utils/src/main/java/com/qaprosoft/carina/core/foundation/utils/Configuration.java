@@ -24,7 +24,7 @@ import org.openqa.selenium.MutableCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
 import com.zebrunner.agent.core.registrar.CurrentTestRun;
 
 /**

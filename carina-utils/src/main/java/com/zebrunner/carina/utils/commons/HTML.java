@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.commons;
+package com.zebrunner.carina.utils.commons;
 
 /*
  * HTML - base html tags and attributes

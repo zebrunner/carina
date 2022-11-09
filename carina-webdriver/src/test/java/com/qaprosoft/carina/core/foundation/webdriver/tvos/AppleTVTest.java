@@ -15,17 +15,17 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.tvos;
 
-import static com.qaprosoft.carina.core.foundation.commons.SpecialKeywords.DESKTOP;
-import static com.qaprosoft.carina.core.foundation.commons.SpecialKeywords.MOBILE;
-import static com.qaprosoft.carina.core.foundation.commons.SpecialKeywords.MOBILE_DEVICE_PLATFORM;
-import static com.qaprosoft.carina.core.foundation.commons.SpecialKeywords.TVOS;
+import static com.zebrunner.carina.utils.commons.SpecialKeywords.DESKTOP;
+import static com.zebrunner.carina.utils.commons.SpecialKeywords.MOBILE;
+import static com.zebrunner.carina.utils.commons.SpecialKeywords.MOBILE_DEVICE_PLATFORM;
+import static com.zebrunner.carina.utils.commons.SpecialKeywords.TVOS;
 
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.CapabilityType;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
