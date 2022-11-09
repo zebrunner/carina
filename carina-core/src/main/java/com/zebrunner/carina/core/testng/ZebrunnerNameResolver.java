@@ -13,19 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.utils.tag;
+package com.zebrunner.carina.core.testng;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import org.testng.ITestResult;
 
-/**
- * This defines the 'TestPriority' annotation used to specify the
- * TestNG methods tag.
- */
-@Retention(value = java.lang.annotation.RetentionPolicy.RUNTIME)
-@Target(value = java.lang.annotation.ElementType.METHOD)
-public @interface TestPriority {
-    Priority value();
+import com.zebrunner.agent.testng.core.testname.TestNameResolver;
+
+public class ZebrunnerNameResolver implements TestNameResolver {
+
+    @Override
+    public String resolve(ITestResult result) {
+        return TestNamingService.getTestName(result);
+    }
+
 }
-
-

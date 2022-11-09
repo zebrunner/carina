@@ -52,9 +52,9 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.imgscalr.Scalr;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -63,15 +63,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.log.ThreadLogAppender;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.FileManager;
 import com.qaprosoft.carina.core.foundation.utils.R;
 import com.qaprosoft.carina.core.foundation.utils.ZipManager;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
-import com.zebrunner.agent.core.registrar.Artifact;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
 
 /*
  * Be careful with LOGGER usage here because potentially it could do recursive call together with ThreadLogAppender functionality
@@ -365,8 +363,12 @@ public class ReportContext {
         }
 
         // publish as test artifact to Zebrunner Reporting
-        Artifact.attachToTest(name, file);
-
+        try {
+            Class<?> artifactClass = ClassUtils.getClass("com.zebrunner.agent.core.registrar.Artifact");
+            MethodUtils.invokeStaticMethod(artifactClass, "attachToTest", name, file);
+        } catch (Exception e) {
+            LOGGER.debug("Cannot attach artifact to test using agent", e);
+        }
         return file;
     }
 
@@ -424,8 +426,12 @@ public class ReportContext {
         File artifact = new File(String.format("%s/%s", getArtifactsFolder(), name));
         artifact.createNewFile();
         FileUtils.writeByteArrayToFile(artifact, IOUtils.toByteArray(source));
-        
-        Artifact.attachToTest(name, IOUtils.toByteArray(source));
+        try {
+            Class<?> artifactClass = ClassUtils.getClass("com.zebrunner.agent.core.registrar.Artifact");
+            MethodUtils.invokeStaticMethod(artifactClass, "attachToTest", name, IOUtils.toByteArray(source));
+        } catch (Exception e) {
+            LOGGER.debug("Cannot attach artifact to test using agent", e);
+        }
     }
 
     /**
@@ -438,8 +444,12 @@ public class ReportContext {
         File artifact = new File(String.format("%s/%s", getArtifactsFolder(), source.getName()));
         artifact.createNewFile();
         FileUtils.copyFile(source, artifact);
-        
-        Artifact.attachToTest(source.getName(), artifact);
+        try {
+            Class<?> artifactClass = ClassUtils.getClass("com.zebrunner.agent.core.registrar.Artifact");
+            MethodUtils.invokeStaticMethod(artifactClass, "attachToTest", source.getName(), artifact);
+        } catch (Exception e) {
+            LOGGER.debug("Cannot attach artifact to test using agent", e);
+        }
     }
 
     /**
@@ -461,14 +471,15 @@ public class ReportContext {
 
     private static void stopThreadLogAppender() {
         try {
-            LoggerContext loggerContext = (LoggerContext) LogManager.getContext(true);
-            ThreadLogAppender appender = loggerContext.getConfiguration().getAppender("ThreadLogAppender");;
+            Class<?> logManagerClass = ClassUtils.getClass("org.apache.logging.log4j.LogManager");
+            Object loggerContext = MethodUtils.invokeStaticMethod(logManagerClass, "getContext", true);
+            Object configuration = MethodUtils.invokeMethod(loggerContext, "getConfiguration");
+            Object appender = MethodUtils.invokeMethod(configuration, "getAppender", "ThreadLogAppender");
             if (appender != null) {
-                appender.stop();
+                MethodUtils.invokeMethod(appender, "stop");
             }
-
         } catch (Exception e) {
-            LOGGER.error("Exception while closing thread log appender.", e);
+            LOGGER.debug("Exception while closing thread log appender.", e);
         }
     }
 

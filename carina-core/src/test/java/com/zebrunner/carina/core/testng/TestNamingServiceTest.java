@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.listeners;
+package com.zebrunner.carina.core.testng;
 
 import org.testng.Assert;
 import org.testng.ITestResult;

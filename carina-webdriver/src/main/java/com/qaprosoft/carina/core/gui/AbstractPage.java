@@ -33,7 +33,6 @@ import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.RectangleReadOnly;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.qaprosoft.carina.core.foundation.listeners.TestNamingService;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
@@ -143,16 +142,20 @@ public abstract class AbstractPage extends AbstractUIObject implements ICustomTy
 		return String.join(" ", this.getClass().getSimpleName().split("(?=\\p{Upper})"));
 	}
 
-    public String savePageAsPdf(boolean scaled) throws IOException, DocumentException {
+    /**
+     * Save page as pdf
+     */
+    public String savePageAsPdf(boolean scaled, String fileName) throws IOException, DocumentException {
         String pdfName = "";
 
         // Define test screenshot root
-        String test = TestNamingService.getTestName();
+        // use fileName instead
+        // String test = TestNamingService.getTestName();
 
         File testRootDir = ReportContext.getTestDir();
         File artifactsFolder = ReportContext.getArtifactsFolder();
 
-        String fileID = test.replaceAll("\\W+", "_") + "-" + System.currentTimeMillis();
+        String fileID = fileName.replaceAll("\\W+", "_") + "-" + System.currentTimeMillis();
         pdfName = fileID + ".pdf";
 
         String fullPdfPath = artifactsFolder.getAbsolutePath() + "/" + pdfName;
@@ -175,8 +178,8 @@ public abstract class AbstractPage extends AbstractUIObject implements ICustomTy
         return fullPdfPath;
     }
 
-    public String savePageAsPdf() throws IOException, DocumentException {
-        return savePageAsPdf(true);
+    public String savePageAsPdf(String fileName) throws IOException, DocumentException {
+        return savePageAsPdf(true, fileName);
     }
 
     /**

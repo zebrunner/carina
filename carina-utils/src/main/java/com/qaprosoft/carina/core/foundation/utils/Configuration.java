@@ -16,16 +16,18 @@
 package com.qaprosoft.carina.core.foundation.utils;
 
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.openqa.selenium.MutableCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.zebrunner.agent.core.registrar.CurrentTestRun;
 
 /**
  * Configuration utility.
@@ -532,8 +534,13 @@ public class Configuration {
     public static void setBuild(String build) {
         R.CONFIG.put(Parameter.APP_VERSION.getKey(), build);
         if (!build.isEmpty()) {
-            LOGGER.debug("build: " + build);
-            CurrentTestRun.setBuild(build);
+            LOGGER.debug("build: {}", build);
+            try {
+                Class<?> artifactClass = ClassUtils.getClass("com.zebrunner.agent.core.registrar.CurrentTestRun");
+                MethodUtils.invokeStaticMethod(artifactClass, "setBuild", build);
+            } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+                LOGGER.debug("Cannot attach build because Zebrunner agent does not loaded in classloader");
+            }
         }
     }
 

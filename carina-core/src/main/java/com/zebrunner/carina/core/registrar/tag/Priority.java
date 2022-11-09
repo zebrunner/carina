@@ -13,18 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.utils;
+package com.zebrunner.carina.core.registrar.tag;
 
-import org.testng.ITestResult;
-
-import com.qaprosoft.carina.core.foundation.listeners.TestNamingService;
-import com.zebrunner.agent.testng.core.testname.TestNameResolver;
-
-public class ZebrunnerNameResolver implements TestNameResolver {
-
-    @Override
-    public String resolve(ITestResult result) {
-        return TestNamingService.getTestName(result);
-    }
-
+public enum Priority {
+    P0,P1,P2,P3,P4,P5,P6
 }

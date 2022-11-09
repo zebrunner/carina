@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration packages="com.zebrunner.agent.core.logging.log4j2, com.qaprosoft.carina.core.foundation.log">
+<configuration packages="com.zebrunner.agent.core.logging.log4j2, com.zebrunner.carina.core.log">
    <properties>
       <property name="carina-pattern">%d{yyyy-MM-dd HH:mm:ss} %c{1} [%t%X{threadId}] [%p] %m%n</property>
       <property name="zebrunner-pattern">[%d{HH:mm:ss}] %-5p (%F:%L) - %m%n</property>

@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.testng.ITestNGMethod;
 
 import com.qaprosoft.carina.core.foundation.filter.IFilter;
-import com.qaprosoft.carina.core.foundation.utils.tag.TestTag;
+import com.zebrunner.carina.core.registrar.tag.TestTag;
 
 public class TagFilter implements IFilter {
 

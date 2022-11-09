@@ -13,23 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
+package com.zebrunner.carina.core.registrar.tag;
 
-package com.qaprosoft.carina.core.foundation.utils.tag;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-import java.lang.annotation.*;
-
-@Repeatable(TestTag.List.class)
-@Target({ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface TestTag {
-    String name();
-
-    String value();
-
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target({ElementType.METHOD})
-    @interface List {
-
-        TestTag[] value();
-    }
+/**
+ * This defines the 'TestPriority' annotation used to specify the
+ * TestNG methods tag.
+ */
+@Retention(value = java.lang.annotation.RetentionPolicy.RUNTIME)
+@Target(value = java.lang.annotation.ElementType.METHOD)
+public @interface TestPriority {
+    Priority value();
 }
+
+

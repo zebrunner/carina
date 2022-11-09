@@ -13,31 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.utils.ownership;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Repeatable;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package com.zebrunner.carina.core.registrar.tag;
 
-/**
- * This defines the 'MethodOwner' annotation used to specify the
- * TestNG methods owners.
- * 
- */
-@Repeatable(MethodOwner.List.class)
-@Retention(value = RetentionPolicy.RUNTIME)
-@Target(value = ElementType.METHOD)
-public @interface MethodOwner {
-    String owner() default "";
+import java.lang.annotation.*;
 
-    String platform() default "";
-    
+@Repeatable(TestTag.List.class)
+@Target({ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface TestTag {
+    String name();
+
+    String value();
+
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.METHOD})
     @interface List {
-    	MethodOwner[] value();
+
+        TestTag[] value();
     }
-    
 }

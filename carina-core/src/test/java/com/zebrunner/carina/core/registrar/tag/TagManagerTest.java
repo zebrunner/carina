@@ -13,13 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.utils;
+package com.zebrunner.carina.core.registrar.tag;
 
-import com.qaprosoft.carina.core.foundation.utils.tag.Priority;
-import com.qaprosoft.carina.core.foundation.utils.tag.PriorityManager;
-import com.qaprosoft.carina.core.foundation.utils.tag.TagManager;
-import com.qaprosoft.carina.core.foundation.utils.tag.TestPriority;
-import com.qaprosoft.carina.core.foundation.utils.tag.TestTag;
 import com.zebrunner.agent.core.registrar.domain.LabelDTO;
 import org.testng.Assert;
 import org.testng.ITestResult;

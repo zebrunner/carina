@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.log;
+package com.zebrunner.carina.core.log;
 
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import org.apache.logging.log4j.core.Appender;
