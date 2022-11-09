@@ -51,7 +51,6 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.report.ReportContext;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.webdriver.augmenter.DriverAugmenter;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
 
 import io.appium.java_client.AppiumDriver;
@@ -229,8 +228,6 @@ public class Screenshot {
                 screenName = System.currentTimeMillis() + ".png";
                 String screenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
 
-                WebDriver augmentedDriver = driver;
-
                 //hotfix to converting proxy into the valid driver
                 if (driver instanceof Proxy) {
     				try {
@@ -241,24 +238,19 @@ public class Screenshot {
         				Field locatorField = innerProxy.getClass().getDeclaredField("arg$2");
         				locatorField.setAccessible(true);
 
-        				augmentedDriver = driver = (WebDriver) locatorField.get(innerProxy);
+        				driver = (WebDriver) locatorField.get(innerProxy);
     				} catch (Exception e) {
     					//do nothing and receive augmenting warning in the logs
     				}
-                }
-
-                if (!driver.toString().contains("AppiumNativeDriver")) {
-                    // do not augment for Appium 1.x anymore
-                    augmentedDriver = new DriverAugmenter().augment(driver);
                 }
 
                 BufferedImage screen;
 
                 // Create screenshot
                 if (fullSize) {
-                    screen = takeFullScreenshot(driver, augmentedDriver);
+                    screen = takeFullScreenshot(driver);
                 } else {
-                    screen = takeVisibleScreenshot(augmentedDriver);
+                    screen = takeVisibleScreenshot(driver);
                 }
 
                 if (screen == null) {
@@ -332,61 +324,57 @@ public class Screenshot {
      * Makes full size screenshot using javascript (May not work properly with
      * popups and active js-elements on the page)
      *
-     * @param driver web driver
-     * @param augmentedDriver augmented driver
+     * @param driver web driver without listeners (original)
      * @exception Exception can be caused by read() or getScreenshotAs() methods
      *
      * @return a screenshot if it was produced successfully, or null otherwise
      */
-    private static BufferedImage takeFullScreenshot(WebDriver driver, WebDriver augmentedDriver) {
+    private static BufferedImage takeFullScreenshot(WebDriver driver) {
         BufferedImage screenShot = null;
         // default timeout for full size screenshot is EXPLICIT_TIMEOUT /2
         long timeout = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / 2;
-        setPageLoadTimeout(augmentedDriver, timeout);
+        setPageLoadTimeout(driver, timeout);
 
-        Wait<WebDriver> driverWait = new FluentWait<>(driver)
+        Wait<WebDriver> wait = new FluentWait<>(driver)
                 .pollingEvery(Duration.ofSeconds(timeout))
                 .withTimeout(Duration.ofSeconds(timeout));
-        Wait<WebDriver> augmentedDriverWait = new FluentWait<>(augmentedDriver)
-                .pollingEvery(
-                        Duration.ofSeconds(timeout))
-                .withTimeout(Duration.ofSeconds(timeout));
+
         try {
             LOGGER.debug("starting full size screenshot capturing...");
             if (driver.getClass().toString().contains("windows")) {
-                File capturedScreenshot = driverWait.until(drv -> ((WindowsDriver) drv)
+                File capturedScreenshot = wait.until(drv -> ((WindowsDriver) drv)
                         .getScreenshotAs(OutputType.FILE));
                 screenShot = ImageIO.read(capturedScreenshot);
                 // Appium driver and it's descendant classes contains 'java_client' in classname
             } else if (driver.getClass().toString().contains("java_client")) {
                 // Mobile Native app
-                File capturedScreenshot = driverWait.until(drv -> ((AppiumDriver) drv)
+                File capturedScreenshot = wait.until(drv -> ((AppiumDriver) drv)
                         .getScreenshotAs(OutputType.FILE));
                 screenShot = ImageIO.read(capturedScreenshot);
             } else if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
 
                 if (Configuration.getPlatform().equals("ANDROID")) {
-                    String pixelRatio = String.valueOf(((HasCapabilities) augmentedDriver).getCapabilities().getCapability("pixelRatio"));
+                    String pixelRatio = String.valueOf(((HasCapabilities) driver).getCapabilities().getCapability("pixelRatio"));
                     float dpr = !pixelRatio.equals("null") ? Float.parseFloat(pixelRatio) : SpecialKeywords.DEFAULT_DPR;
-                    screenShot = augmentedDriverWait.until(drv -> (new AShot()).shootingStrategy(ShootingStrategies
+                    screenShot = wait.until(drv -> (new AShot()).shootingStrategy(ShootingStrategies
                             .viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_BLOCK, SpecialKeywords.DEFAULT_BLOCK,
                                     dpr))
                             .takeScreenshot(drv))
                             .getImage();
                 } else {
-                    int deviceWidth = augmentedDriver.manage().window().getSize().getWidth();
-                    String deviceName = String.valueOf(((HasCapabilities) augmentedDriver)
+                    int deviceWidth = driver.manage().window().getSize().getWidth();
+                    String deviceName = String.valueOf(((HasCapabilities) driver)
                             .getCapabilities()
                             .getCapability(MobileCapabilityType.DEVICE_NAME));
 
-                    screenShot = augmentedDriverWait.until(drv -> new AShot()
+                    screenShot = wait.until(drv -> new AShot()
                             .shootingStrategy(getScreenshotShuttingStrategy(deviceWidth, deviceName))
-                            .takeScreenshot(augmentedDriver))
+                            .takeScreenshot(driver))
                             .getImage();
                 }
             } else {
                 // regular web
-                screenShot = augmentedDriverWait.until(drv -> new AShot()
+                screenShot = wait.until(drv -> new AShot()
                         .shootingStrategy(ShootingStrategies.viewportPasting(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT))
                         .takeScreenshot(drv))
                         .getImage();
@@ -398,7 +386,7 @@ public class Screenshot {
             LOGGER.error("Undefined error on capture full screenshot detected!", e);
         } finally {
             // restore default pageLoadTimeout driver timeout
-            setPageLoadTimeout(augmentedDriver, getPageLoadTimeout());
+            setPageLoadTimeout(driver, getPageLoadTimeout());
             LOGGER.debug("finished full size screenshot call.");
         }
         return screenShot;
@@ -407,23 +395,23 @@ public class Screenshot {
     /**
      * Take screenshot of visible part of the page
      *
-     * @param augmentedDriver augmented driver
+     * @param driver web driver without listeners (original)
      * @exception Exception can be caused by read() or getScreenshotAs() methods
      *
      * @return a screenshot if it was produced successfully, or null otherwise
      */
-    private static BufferedImage takeVisibleScreenshot(WebDriver augmentedDriver) throws Exception {
+    private static BufferedImage takeVisibleScreenshot(WebDriver driver) throws Exception {
         BufferedImage screenShot = null;
         // default timeout for driver quit 1/3 of explicit
         long timeout = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / 3;
-        setPageLoadTimeout(augmentedDriver, timeout);
+        setPageLoadTimeout(driver, timeout);
         try {
-            Wait<WebDriver> screenshotTakeWait = new FluentWait<>(augmentedDriver)
+            Wait<WebDriver> wait = new FluentWait<>(driver)
                     .pollingEvery(Duration.ofSeconds(timeout))
                     .withTimeout(Duration.ofSeconds(timeout));
 
             LOGGER.debug("starting screenshot capturing...");
-            File capturedScreenshot = screenshotTakeWait.until(driver -> ((TakesScreenshot) augmentedDriver)
+            File capturedScreenshot = wait.until(drv -> ((TakesScreenshot) drv)
                     .getScreenshotAs(OutputType.FILE));
             screenShot = ImageIO.read(capturedScreenshot);
         } catch (TimeoutException e) {
@@ -432,7 +420,7 @@ public class Screenshot {
             LOGGER.error("Undefined error on capture screenshot detected: {}", e.getMessage());
         } finally {
             // restore default pageLoadTimeout driver timeout
-            setPageLoadTimeout(augmentedDriver, getPageLoadTimeout());
+            setPageLoadTimeout(driver, getPageLoadTimeout());
             LOGGER.debug("finished screenshot call.");
         }
         return screenShot;
