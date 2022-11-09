@@ -15,8 +15,8 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.screenshot;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration.Parameter;
 
 public class DebugLevelScreenshotRule implements IScreenshotRule {
     @Override

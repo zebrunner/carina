@@ -27,10 +27,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.report.ReportContext;
-import com.qaprosoft.carina.core.foundation.report.TestResultItem;
-import com.qaprosoft.carina.core.foundation.report.TestResultType;
-import com.qaprosoft.carina.core.foundation.utils.R;
+import com.zebrunner.carina.utils.report.ReportContext;
+import com.zebrunner.carina.utils.report.TestResultItem;
+import com.zebrunner.carina.utils.report.TestResultType;
+import com.zebrunner.carina.utils.R;
 
 /**
  * EmailReportGenerator generates emailable report using data from test suite log.

@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 
 import org.testng.SkipException;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.crypto.Algorithm;
 import com.zebrunner.carina.crypto.CryptoTool;
 import com.zebrunner.carina.crypto.CryptoToolBuilder;

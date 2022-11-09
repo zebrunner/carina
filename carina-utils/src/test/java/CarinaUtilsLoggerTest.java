@@ -5,7 +5,6 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.Properties;
 
-import com.qaprosoft.carina.core.foundation.utils.R;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;

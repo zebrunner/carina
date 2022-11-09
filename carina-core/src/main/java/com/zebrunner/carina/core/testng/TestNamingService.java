@@ -32,7 +32,7 @@ import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
 
 public class TestNamingService {

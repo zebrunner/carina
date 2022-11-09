@@ -28,7 +28,7 @@ import com.zebrunner.carina.utils.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.filter.Filter;
 import com.qaprosoft.carina.core.foundation.filter.IFilter;
 import com.qaprosoft.carina.core.foundation.filter.rule.Rule;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration;
 
 public class FilterTestsListener implements ISuiteListener {
 

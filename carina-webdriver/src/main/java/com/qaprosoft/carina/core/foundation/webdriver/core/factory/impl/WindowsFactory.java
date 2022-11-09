@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.windows.WindowsCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 

@@ -21,7 +21,7 @@ import org.testng.Reporter;
 import org.testng.annotations.Test;
 
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.R;
+import com.zebrunner.carina.utils.R;
 
 /**
  * Tests for {@link Ownership}

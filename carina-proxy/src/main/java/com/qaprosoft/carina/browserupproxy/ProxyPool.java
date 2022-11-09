@@ -28,12 +28,12 @@ import org.testng.Assert;
 
 import com.browserup.bup.BrowserUpProxy;
 import com.browserup.bup.BrowserUpProxyServer;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.NetworkUtil;
-import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
-import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration.Parameter;
+import com.zebrunner.carina.utils.NetworkUtil;
+import com.zebrunner.carina.utils.R;
+import com.zebrunner.carina.utils.android.recorder.utils.AdbExecutor;
+import com.zebrunner.carina.utils.common.CommonUtils;
 
 public final class ProxyPool {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

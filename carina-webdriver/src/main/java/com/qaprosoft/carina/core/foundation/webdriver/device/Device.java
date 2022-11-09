@@ -35,15 +35,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.report.ReportContext;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.AdbExecutor;
-import com.qaprosoft.carina.core.foundation.utils.android.recorder.utils.CmdLine;
-import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
-import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
-import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
+import com.zebrunner.carina.utils.report.ReportContext;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration.Parameter;
+import com.zebrunner.carina.utils.R;
+import com.zebrunner.carina.utils.android.recorder.utils.AdbExecutor;
+import com.zebrunner.carina.utils.android.recorder.utils.CmdLine;
+import com.zebrunner.carina.utils.common.CommonUtils;
+import com.zebrunner.carina.utils.factory.DeviceType;
+import com.zebrunner.carina.utils.factory.DeviceType.Type;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 
 import io.appium.java_client.remote.MobileCapabilityType;

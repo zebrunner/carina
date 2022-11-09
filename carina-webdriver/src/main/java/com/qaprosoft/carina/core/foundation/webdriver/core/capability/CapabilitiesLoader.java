@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.R;
+import com.zebrunner.carina.utils.R;
 
 /**
  * Created by yauhenipatotski on 10/26/15.

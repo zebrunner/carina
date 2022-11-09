@@ -1,7 +1,7 @@
 package com.qaprosoft.carina.core.foundation.api;
 
 import com.qaprosoft.carina.core.foundation.api.log.ConditionalLoggingOutputStream;
-import com.qaprosoft.carina.core.foundation.retry.ActionPoller;
+import com.zebrunner.carina.utils.retry.ActionPoller;
 import io.restassured.response.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

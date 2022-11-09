@@ -17,7 +17,7 @@ package com.zebrunner.carina.core.registrar.ownership;
 
 import java.lang.reflect.Method;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.agent.core.registrar.maintainer.MaintainerResolver;
 import org.apache.commons.lang3.StringUtils;
 

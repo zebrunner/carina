@@ -70,7 +70,7 @@ Now we are ready to create REST service domain object which will be used to inte
 package com.qaprosoft.carina.demo.api;
 
 import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import Configuration;
 
 public class PostUserMethod extends AbstractApiMethodV2 {
     public PostUserMethod() {

@@ -17,7 +17,7 @@ package com.qaprosoft.carina.core.foundation.report.email;
 
 import java.util.Comparator;
 
-import com.qaprosoft.carina.core.foundation.report.TestResultItem;
+import com.zebrunner.carina.utils.report.TestResultItem;
 
 public class EmailReportItemComparator implements Comparator<TestResultItem> {
 

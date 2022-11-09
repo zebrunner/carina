@@ -19,8 +19,8 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.R;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.XCUITestCapabilities;
 
 import io.appium.java_client.ios.options.XCUITestOptions;

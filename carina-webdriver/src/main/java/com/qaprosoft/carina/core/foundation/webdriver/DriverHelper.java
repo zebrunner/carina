@@ -74,12 +74,12 @@ import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.SkipException;
 
-import com.qaprosoft.carina.core.foundation.retry.ActionPoller;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.LogicUtils;
-import com.qaprosoft.carina.core.foundation.utils.Messager;
-import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
+import com.zebrunner.carina.utils.retry.ActionPoller;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration.Parameter;
+import com.zebrunner.carina.utils.LogicUtils;
+import com.zebrunner.carina.utils.Messager;
+import com.zebrunner.carina.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.gui.AbstractPage;
