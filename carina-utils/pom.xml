@@ -17,68 +17,92 @@
 		<relativePath>..</relativePath>
 	</parent>
 
-
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
+		<carina-crypto.version>1.0.0</carina-crypto.version>
 		<pdfbox.version>2.0.24</pdfbox.version>
 		<mongo-java-driver.version>2.11.3</mongo-java-driver.version>
 		<joda-time.version>2.9.9</joda-time.version>
-		
 		<common-net.version>3.3</common-net.version>
+		<selenium.version>4.4.0</selenium.version>
+		<jna.version>3.0.9</jna.version>
+		<rest-assured.version>4.3.0</rest-assured.version>
+		<jackson.version>2.13.3</jackson.version>
+		<imgscalr-lib.version>4.2</imgscalr-lib.version>
+		<gson.version>2.9.0</gson.version>
+		<jaxb-api.version>2.2.2</jaxb-api.version>
+		<mokito-core.version>2.18.0</mokito-core.version>
+		<!-- Never add mockito-all as compile dependency as it has their own invalid hamcrest-all implementation otherwise api fail to common with:
+                        org.hamcrest.core.IsInstanceOf.any(Ljava/lang/Class;)Lorg/hamcrest/Matcher
+                 -->
+
+		<!-- Commons -->
+		<commons-lang3.version>3.5</commons-lang3.version>
+		<commons-io.version>2.7</commons-io.version>
+		<!-- Logging -->
+		<slf4j.version>1.7.30</slf4j.version>
 	</properties>
 
 	<dependencies>
 		<!-- Carina sub-modules dependencies -->
-
 		<dependency>
 			<groupId>com.zebrunner</groupId>
 			<artifactId>carina-crypto</artifactId>
+			<version>${carina-crypto.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
 		</dependency>
 
 		<!-- Other dependencies -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
+			<version>${commons-lang3.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
+			<version>${commons-io.version}</version>
 		</dependency>
 
 		<dependency>
 			<!-- 8 compilation failures without it -->
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-support</artifactId>
+			<version>${selenium.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-api</artifactId>
+			<version>${selenium.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-remote-driver</artifactId>
+			<version>${selenium.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.sun.jna</groupId>
 			<artifactId>jna</artifactId>
+			<version>${jna.version}</version>
 		</dependency>
 
 		<dependency>
 		    <groupId>io.rest-assured</groupId>
 		    <artifactId>rest-assured</artifactId>
+			<version>${rest-assured.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>io.rest-assured</groupId>
 			<artifactId>json-path</artifactId>
+			<version>${rest-assured.version}</version>
 		</dependency>
 
 		<!-- Carina-utils only dependencies -->
@@ -97,16 +121,19 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
+			<version>${jackson.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-annotations</artifactId>
+			<version>${jackson.version}</version>
 		</dependency>
 
 		<dependency>
@@ -131,21 +158,26 @@
 		<dependency>
 			<groupId>org.imgscalr</groupId>
 			<artifactId>imgscalr-lib</artifactId>
+			<version>${imgscalr-lib.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
+			<version>${gson.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>
+			<version>${jaxb-api.version}</version>
+			<scope>runtime</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
+			<version>${mokito-core.version}</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -153,6 +185,8 @@
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
+			<version>${testng.version}</version>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 
