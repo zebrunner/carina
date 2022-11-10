@@ -366,7 +366,7 @@ public class ReportContext {
             Class<?> artifactClass = ClassUtils.getClass("com.zebrunner.agent.core.registrar.Artifact");
             MethodUtils.invokeStaticMethod(artifactClass, "attachToTest", name, file);
         } catch (Exception e) {
-            LOGGER.debug("Cannot attach artifact to test using agent", e);
+            LOGGER.debug("Cannot attach artifact to the test.", e);
         }
         return file;
     }
@@ -429,7 +429,7 @@ public class ReportContext {
             Class<?> artifactClass = ClassUtils.getClass("com.zebrunner.agent.core.registrar.Artifact");
             MethodUtils.invokeStaticMethod(artifactClass, "attachToTest", name, IOUtils.toByteArray(source));
         } catch (Exception e) {
-            LOGGER.debug("Cannot attach artifact to test using agent", e);
+            LOGGER.debug("Cannot attach artifact to the test.", e);
         }
     }
 
@@ -447,7 +447,7 @@ public class ReportContext {
             Class<?> artifactClass = ClassUtils.getClass("com.zebrunner.agent.core.registrar.Artifact");
             MethodUtils.invokeStaticMethod(artifactClass, "attachToTest", source.getName(), artifact);
         } catch (Exception e) {
-            LOGGER.debug("Cannot attach artifact to test using agent", e);
+            LOGGER.debug("Cannot attach artifact to the test.", e);
         }
     }
 

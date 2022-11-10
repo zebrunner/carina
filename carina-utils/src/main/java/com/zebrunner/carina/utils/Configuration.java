@@ -539,7 +539,7 @@ public class Configuration {
                 Class<?> artifactClass = ClassUtils.getClass("com.zebrunner.agent.core.registrar.CurrentTestRun");
                 MethodUtils.invokeStaticMethod(artifactClass, "setBuild", build);
             } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
-                LOGGER.debug("Cannot attach build because Zebrunner agent does not loaded in classloader");
+                LOGGER.debug("Cannot attach build to the current test run.", e);
             }
         }
     }

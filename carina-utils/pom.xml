@@ -5,11 +5,13 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>carina-utils</artifactId>
+	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>Carina Core Utils</name>
 	<description>Set of useful carina core utilities.</description>
 
+	<!-- TODO REMOVE PARENT -->
 	<parent>
 		<groupId>com.qaprosoft</groupId>
 		<artifactId>carina</artifactId>
@@ -17,8 +19,36 @@
 		<relativePath>..</relativePath>
 	</parent>
 
+	<licenses>
+		<license>
+			<name>Apache Software License v2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<name>Alex Khursevich</name>
+			<email>alex@zebrunner.com</email>
+			<organization>Zebrunner</organization>
+			<organizationUrl>https://zebrunner.com</organizationUrl>
+		</developer>
+		<developer>
+			<name>Vadim Delendik</name>
+			<email>vdelendik@zebrunner.com</email>
+			<organization>Zebrunner</organization>
+			<organizationUrl>https://zebrunner.com</organizationUrl>
+		</developer>
+	</developers>
+
+	<scm>
+		<url>https://github.com/zebrunner/carina-utils.git</url>
+	</scm>
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>11</java.version>
 		<carina-crypto.version>1.0.0</carina-crypto.version>
 		<pdfbox.version>2.0.24</pdfbox.version>
 		<mongo-java-driver.version>2.11.3</mongo-java-driver.version>
@@ -35,7 +65,6 @@
 		<!-- Never add mockito-all as compile dependency as it has their own invalid hamcrest-all implementation otherwise api fail to common with:
                         org.hamcrest.core.IsInstanceOf.any(Ljava/lang/Class;)Lorg/hamcrest/Matcher
                  -->
-
 		<!-- Commons -->
 		<commons-lang3.version>3.5</commons-lang3.version>
 		<commons-io.version>2.7</commons-io.version>
@@ -190,6 +219,195 @@
 		</dependency>
 	</dependencies>
 
+	<profiles>
+		<profile>
+			<id>default</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<configuration>
+							<release>${java.version}</release>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>${maven-surefire-plugin.version}</version>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>${maven-source-plugin.version}</version>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-compiler-plugin</artifactId>
+							<version>${maven-compiler-plugin.version}</version>
+							<configuration>
+								<release>${java.version}</release>
+							</configuration>
+						</plugin>
+						<plugin>
+							<artifactId>maven-assembly-plugin</artifactId>
+							<version>${maven-assembly-plugin.version}</version>
+							<configuration>
+								<descriptorRefs>
+									<descriptorRef>jar-with-dependencies</descriptorRef>
+								</descriptorRefs>
+							</configuration>
+						</plugin>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-source-plugin</artifactId>
+							<version>${maven-source-plugin.version}</version>
+							<executions>
+								<execution>
+									<id>attach-sources</id>
+									<goals>
+										<goal>jar</goal>
+									</goals>
+								</execution>
+							</executions>
+						</plugin>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-javadoc-plugin</artifactId>
+							<version>${maven-javadoc-plugin.version}</version>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+		</profile>
+		<profile>
+			<id>release</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<configuration>
+							<release>${java.version}</release>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>${maven-surefire-plugin.version}</version>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>${maven-source-plugin.version}</version>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>${maven-javadoc-plugin.version}</version>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>${maven-gpg-plugin.version}</version>
+						<configuration>
+							<!-- Prevent `gpg` from using pinentry programs -->
+							<gpgArguments>
+								<arg>--pinentry-mode</arg>
+								<arg>loopback</arg>
+							</gpgArguments>
+						</configuration>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-compiler-plugin</artifactId>
+							<version>${maven-compiler-plugin.version}</version>
+							<configuration>
+								<release>${java.version}</release>
+							</configuration>
+						</plugin>
+						<plugin>
+							<artifactId>maven-assembly-plugin</artifactId>
+							<configuration>
+								<archive>
+									<manifest>
+										<mainClass>com.qaprosoft.carina.core.foundation.AbstractTest</mainClass>
+									</manifest>
+								</archive>
+								<descriptorRefs>
+									<descriptorRef>jar-with-dependencies</descriptorRef>
+								</descriptorRefs>
+							</configuration>
+						</plugin>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-source-plugin</artifactId>
+							<version>${maven-source-plugin.version}</version>
+							<executions>
+								<execution>
+									<id>attach-sources</id>
+									<goals>
+										<goal>jar</goal>
+									</goals>
+								</execution>
+							</executions>
+						</plugin>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-javadoc-plugin</artifactId>
+							<version>${maven-javadoc-plugin.version}</version>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+		</profile>
+	</profiles>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -226,4 +444,16 @@
 		</plugins>
 	</build>
 
+	<distributionManagement>
+		<repository>
+			<id>QPS_Nexus</id>
+			<name>Qaprosoft Releases</name>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+		</repository>
+		<snapshotRepository>
+			<id>ZBR_Nexus</id>
+			<name>Zebrunner Snapshots</name>
+			<url>https://nexus.zebrunner.dev/repository/ce-snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
 </project>
