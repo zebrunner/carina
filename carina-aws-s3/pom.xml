@@ -26,7 +26,7 @@
 	<dependencies>
 		<!-- Carina sub-modules dependencies -->
 		<dependency>
-			<groupId>com.qaprosoft</groupId>
+			<groupId>com.zebrunner</groupId>
 			<artifactId>carina-utils</artifactId>
 		</dependency>
 
