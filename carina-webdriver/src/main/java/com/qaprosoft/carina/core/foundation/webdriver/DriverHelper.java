@@ -78,7 +78,7 @@ import com.zebrunner.carina.utils.retry.ActionPoller;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.Configuration.Parameter;
 import com.zebrunner.carina.utils.LogicUtils;
-import com.zebrunner.carina.utils.Messager;
+import com.zebrunner.carina.utils.messager.Messager;
 import com.zebrunner.carina.utils.common.CommonUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
