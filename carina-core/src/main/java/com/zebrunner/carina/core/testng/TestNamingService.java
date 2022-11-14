@@ -16,16 +16,14 @@
 package com.zebrunner.carina.core.testng;
 
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.lang3.ClassUtils;
+import com.zebrunner.agent.testng.listener.RunContextService;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.reflect.MethodUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
@@ -235,26 +233,13 @@ public class TestNamingService {
         ITestContext testContext = testResult.getTestContext();
         Object[] parameters = testResult.getParameters();
 
-        int dataProviderSize = 0;
-        try {
-            Class<?> artifactClass = ClassUtils.getClass("com.zebrunner.agent.testng.listener.RunContextService");
-            MethodUtils.invokeStaticMethod(artifactClass, "getDataProviderSize", testMethod, testContext);
-        } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
-            LOGGER.debug("Cannot get  dataprovider size because Zebrunner agent does not load in classloader");
-        }
+        int dataProviderSize = RunContextService.getDataProviderSize(testMethod, testContext);
 
         if (dataProviderSize > 0) {
             // adding extra zero at the beginning of the data provider line number
             int indexMaxLength = Integer.toString(dataProviderSize).length() + 1;
             String lineFormat = " [L%0" + indexMaxLength + "d]";
-            int index = 0;
-            try {
-                Class<?> artifactClass = ClassUtils.getClass("com.zebrunner.agent.testng.listener.RunContextService");
-                index = (int) MethodUtils.invokeStaticMethod(artifactClass, "getCurrentDataProviderIndex",
-                        testMethod, testContext, parameters) + 1;
-            } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
-                LOGGER.debug("Cannot get  dataprovider size because Zebrunner agent does not load in classloader");
-            }
+            int index = RunContextService.getCurrentDataProviderIndex(testMethod, testContext, parameters) + 1;
             testName += String.format(lineFormat, index);
         }
         return testName;
