@@ -143,7 +143,8 @@ public abstract class AbstractPage extends AbstractUIObject implements ICustomTy
 	}
 
     /**
-     * Save page as pdf
+     * Save page as pdf<br>
+     * If you want to set fileName as test name, use TestNamingService.getTestName()
      */
     public String savePageAsPdf(boolean scaled, String fileName) throws IOException, DocumentException {
         String pdfName = "";
@@ -178,6 +179,10 @@ public abstract class AbstractPage extends AbstractUIObject implements ICustomTy
         return fullPdfPath;
     }
 
+    /**
+     * Save page as pdf<br>
+     * If you want to set fileName as test name, use TestNamingService.getTestName()
+     */
     public String savePageAsPdf(String fileName) throws IOException, DocumentException {
         return savePageAsPdf(true, fileName);
     }
