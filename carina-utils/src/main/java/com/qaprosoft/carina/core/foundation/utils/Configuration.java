@@ -240,6 +240,18 @@ public class Configuration {
         return !(value == null || value.equalsIgnoreCase(SpecialKeywords.NULL)) ? value : StringUtils.EMPTY;
     }
 
+    /**
+     * Get decrypted configuration value from startup properties or from configuration
+     * file if not found in startup args.
+     *
+     * @param param parameter key.
+     * @return The decrypted parameter value if it is found by key, "" otherwise
+     */
+    public static String getDecrypted(Parameter param) {
+        String value = R.CONFIG.getDecrypted(param.getKey());
+        return !(value == null || value.equalsIgnoreCase(SpecialKeywords.NULL)) ? value : StringUtils.EMPTY;
+    }
+
     public static int getInt(Parameter param) {
         return Integer.valueOf(get(param).trim());
     }

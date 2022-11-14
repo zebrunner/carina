@@ -23,25 +23,17 @@ import com.azure.storage.blob.models.BlobProperties;
 import com.azure.storage.blob.models.BlobStorageException;
 import com.azure.storage.common.StorageSharedKeyCredential;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.zebrunner.carina.crypto.Algorithm;
-import com.zebrunner.carina.crypto.CryptoTool;
-import com.zebrunner.carina.crypto.CryptoToolBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.SkipException;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class AzureManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static volatile AzureManager instance = null;
-    private static String CRYPTO_PATTERN = Configuration.get(Configuration.Parameter.CRYPTO_PATTERN);
 
     private BlobServiceClient blobServiceClient = null;
-    private CryptoTool cryptoTool = null;
 
     private AzureManager() {}
 
@@ -49,8 +41,8 @@ public class AzureManager {
         if (instance == null) {
             AzureManager azureManager = new AzureManager();
             String accountName = Configuration.get(Configuration.Parameter.AZURE_ACCOUNT_NAME);
-            String endpoint = azureManager.decryptIfEncrypted(Configuration.get(Configuration.Parameter.AZURE_BLOB_URL));
-            String secretKey = azureManager.decryptIfEncrypted(Configuration.get(Configuration.Parameter.AZURE_ACCESS_KEY_TOKEN));
+            String endpoint = Configuration.getDecrypted(Configuration.Parameter.AZURE_BLOB_URL);
+            String secretKey = Configuration.getDecrypted(Configuration.Parameter.AZURE_ACCESS_KEY_TOKEN);
 
             // Create a SharedKeyCredential
             StorageSharedKeyCredential credential = new StorageSharedKeyCredential(accountName, secretKey);
@@ -64,30 +56,6 @@ public class AzureManager {
         }
 
         return instance;
-    }
-
-    private String decryptIfEncrypted(String text) {
-        Matcher cryptoMatcher = Pattern.compile(CRYPTO_PATTERN)
-                .matcher(text);
-        String decryptedText = text;
-        if (cryptoMatcher.find()) {
-            initCryptoTool();
-            decryptedText = this.cryptoTool.decrypt(text, CRYPTO_PATTERN);
-        }
-        return decryptedText;
-    }
-
-    private void initCryptoTool() {
-        if (this.cryptoTool == null) {
-            String cryptoKey = Configuration.get(Configuration.Parameter.CRYPTO_KEY_VALUE);
-            if (cryptoKey.isEmpty()) {
-                throw new SkipException("Encrypted data detected, but the crypto key is not found!");
-            }
-            this.cryptoTool = CryptoToolBuilder.builder()
-                    .chooseAlgorithm(Algorithm.find(Configuration.get(Configuration.Parameter.CRYPTO_ALGORITHM)))
-                    .setKey(cryptoKey)
-                    .build();
-        }
     }
 
     public BlobServiceClient getClient() {

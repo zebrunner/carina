@@ -45,16 +45,10 @@ import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.qaprosoft.carina.core.foundation.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
-import com.zebrunner.carina.crypto.Algorithm;
-import com.zebrunner.carina.crypto.CryptoTool;
-import com.zebrunner.carina.crypto.CryptoToolBuilder;
-import org.testng.SkipException;
 
 public class AmazonS3Manager {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static volatile AmazonS3Manager instance = null;
-    private static String CRYPTO_PATTERN = Configuration.get(Parameter.CRYPTO_PATTERN);
-    private CryptoTool cryptoTool = null;
     private AmazonS3 s3client = null;
 
     private AmazonS3Manager() {
@@ -70,8 +64,8 @@ public class AmazonS3Manager {
                 builder.withRegion(Regions.fromName(s3region));
             }
 
-            String accessKey = amazonS3Manager.decryptIfEncrypted(Configuration.get(Parameter.ACCESS_KEY_ID));
-            String secretKey = amazonS3Manager.decryptIfEncrypted(Configuration.get(Parameter.SECRET_KEY));
+            String accessKey = Configuration.getDecrypted(Parameter.ACCESS_KEY_ID);
+            String secretKey = Configuration.getDecrypted(Parameter.SECRET_KEY);
             if (!accessKey.isEmpty() && !secretKey.isEmpty()) {
                 BasicAWSCredentials creds = new BasicAWSCredentials(accessKey, secretKey);
                 builder.withCredentials(new AWSStaticCredentialsProvider(creds)).build();
@@ -81,30 +75,6 @@ public class AmazonS3Manager {
             instance = amazonS3Manager;
         }
         return instance;
-    }
-
-    private String decryptIfEncrypted(String text) {
-        Matcher cryptoMatcher = Pattern.compile(CRYPTO_PATTERN)
-                .matcher(text);
-        String decryptedText = text;
-        if (cryptoMatcher.find()) {
-            initCryptoTool();
-            decryptedText = this.cryptoTool.decrypt(text, CRYPTO_PATTERN);
-        }
-        return decryptedText;
-    }
-
-    private void initCryptoTool() {
-        if (this.cryptoTool == null) {
-            String cryptoKey = Configuration.get(Parameter.CRYPTO_KEY_VALUE);
-            if (cryptoKey.isEmpty()) {
-                throw new SkipException("Encrypted data detected, but the crypto key is not found!");
-            }
-            this.cryptoTool = CryptoToolBuilder.builder()
-                    .chooseAlgorithm(Algorithm.find(Configuration.get(Configuration.Parameter.CRYPTO_ALGORITHM)))
-                    .setKey(cryptoKey)
-                    .build();
-        }
     }
 
     public AmazonS3 getClient() {

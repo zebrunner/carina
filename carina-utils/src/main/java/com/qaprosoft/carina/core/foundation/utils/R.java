@@ -68,6 +68,12 @@ public enum R {
 
     private String resourceFile;
 
+    // store crypto pattern as pattern to increase performance
+    private volatile Pattern cryptoPattern = null;
+    private volatile String cryptoPatternAsString = null;
+    // store crypto tool to increase performance
+    private volatile CryptoTool cryptoTool = null;
+
     // temporary thread/test properties which is cleaned on afterTest phase for current thread. It can override any value from below R enum maps
     private static ThreadLocal<Properties> testProperties = new ThreadLocal<>();
     private static final ThreadLocal<Map<String, String>> PROPERTY_OVERWRITE_NOTIFICATIONS = new ThreadLocal<>();
@@ -299,7 +305,46 @@ public enum R {
      * @return config value
      */
     public String getDecrypted(String key) {
-        return decrypt(get(key), Configuration.get(Parameter.CRYPTO_PATTERN));
+        String originalValue = get(key);
+
+        if (this.cryptoPattern == null) {
+            synchronized (this) {
+                if (this.cryptoPattern == null) {
+                    this.cryptoPatternAsString = Configuration.get(Parameter.CRYPTO_PATTERN);
+                    this.cryptoPattern = Pattern.compile(this.cryptoPatternAsString);
+                }
+            }
+        }
+        Matcher cryptoMatcher = this.cryptoPattern.matcher(originalValue);
+
+        if (cryptoMatcher.find()) {
+            if (this.cryptoTool == null) {
+                synchronized (this) {
+                    if (this.cryptoTool == null) {
+                        String cryptoKey = Configuration.get(Parameter.CRYPTO_KEY_VALUE);
+                        if (cryptoKey.isEmpty()) {
+                            throw new SkipException("Encrypted data detected, but the crypto key is not found!");
+                        }
+
+                        try {
+                            this.cryptoTool = CryptoToolBuilder.builder()
+                                    .chooseAlgorithm(Algorithm.find(Configuration.get(Parameter.CRYPTO_ALGORITHM)))
+                                    .setKey(cryptoKey)
+                                    .build();
+                        } catch (Exception e) {
+                            throw new SkipException("Cannot create instance of crypto tool.", e);
+                        }
+                    }
+                }
+            }
+
+            try {
+                return this.cryptoTool.decrypt(originalValue, this.cryptoPatternAsString);
+            } catch (Exception e) {
+                throw new SkipException(String.format("Error during decrypting '%s'. Please check error: ", originalValue), e);
+            }
+        }
+        return originalValue;
     }
 
     /**
@@ -387,30 +432,6 @@ public enum R {
         }
         
         return testProperties.get();
-    }
-
-    private String decrypt(String content, String pattern) {
-        Matcher cryptoMatcher = Pattern.compile(pattern)
-                .matcher(content);
-
-        if (cryptoMatcher.find()) {
-            try {
-                String cryptoKey = Configuration.get(Parameter.CRYPTO_KEY_VALUE);
-                if (cryptoKey.isEmpty()) {
-                    throw new SkipException("Encrypted data detected, but the crypto key is not found!");
-                }
-
-                CryptoTool cryptoTool = CryptoToolBuilder.builder()
-                        .chooseAlgorithm(Algorithm.find(Configuration.get(Parameter.CRYPTO_ALGORITHM)))
-                        .setKey(cryptoKey)
-                        .build();
-
-                return cryptoTool.decrypt(content, pattern);
-            } catch (Exception e) {
-                LOGGER.error("Error during decrypting '" + content + "'. Please check error: ", e);
-            }
-        }
-        return content;
     }
 
 }
