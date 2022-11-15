@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import com.zebrunner.carina.utils.report.TestResult;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
@@ -383,8 +384,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             // String suiteName = getSuiteName(context);
             String title = getTitle(suite.getXmlSuite());
 
-            TestResultType testResult = EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
-            String status = testResult.getName();
+            TestResult testResult = EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
+            String status = testResult.getTestResultType().getName();
 
             title = status + ": " + title;
 
