@@ -27,7 +27,7 @@ import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByM
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSParser;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSTable;
-import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
+import com.zebrunner.carina.utils.ParameterGenerator;
 
 /**
  * Created by Patotsky on 16.12.2014.
