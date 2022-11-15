@@ -16,9 +16,6 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory;
 
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -31,9 +28,7 @@ import org.openqa.selenium.support.events.WebDriverListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
+import com.zebrunner.carina.utils.R;
 
 import io.appium.java_client.internal.CapabilityHelpers;
 

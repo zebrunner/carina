@@ -18,7 +18,7 @@ package com.qaprosoft.mock.apimethod;
 import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
 import com.qaprosoft.carina.core.foundation.api.annotation.*;
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration;
 
 @ContentType(type = "application/xml")
 @SuccessfulHttpStatus(status = HttpResponseStatusType.OK_200)

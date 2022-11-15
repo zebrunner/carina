@@ -16,8 +16,8 @@
 package com.qaprosoft.azure;
 
 import com.azure.storage.blob.models.BlobProperties;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.FileManager;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.FileManager;
 import org.apache.commons.codec.binary.Base64;
 import org.testng.Assert;
 import org.testng.annotations.Test;

@@ -34,7 +34,7 @@ import org.testng.ITestNGMethod;
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByMapper;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
-import com.qaprosoft.carina.core.foundation.utils.ParameterGenerator;
+import com.zebrunner.carina.utils.ParameterGenerator;
 
 import au.com.bytecode.opencsv.CSVReader;
 
