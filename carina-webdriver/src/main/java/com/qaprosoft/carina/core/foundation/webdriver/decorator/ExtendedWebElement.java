@@ -1717,18 +1717,16 @@ public class ExtendedWebElement implements IWebElement {
         switch (loadingStrategy) {
         case BY_PRESENCE: {
             if (element != null) {
-                if (searchContext instanceof RemoteWebElement) {
-                    WebElement contextElement = searchContext.findElement(By.xpath("."));
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by),
+                if (searchContext instanceof WebElement) {
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy((WebElement) searchContext, by),
                             ExpectedConditions.visibilityOf(element));
                 } else {
                     waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
                             ExpectedConditions.visibilityOf(element));
                 }
             } else {
-                if (searchContext instanceof RemoteWebElement) {
-                    WebElement contextElement = searchContext.findElement(By.xpath("."));
-                    waitCondition = ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by);
+                if (searchContext instanceof WebElement) {
+                    waitCondition = ExpectedConditions.presenceOfNestedElementLocatedBy((WebElement) searchContext, by);
                 } else {
                     waitCondition = ExpectedConditions.presenceOfElementLocated(by);
 
@@ -1738,18 +1736,16 @@ public class ExtendedWebElement implements IWebElement {
         }
         case BY_VISIBILITY: {
             if (element != null) {
-                if (searchContext instanceof RemoteWebElement) {
-                    WebElement contextElement = searchContext.findElement(By.xpath("."));
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by),
+                if (searchContext instanceof WebElement) {
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by),
                             ExpectedConditions.visibilityOf(element));
                 } else {
                     waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(by),
                             ExpectedConditions.visibilityOf(element));
                 }
             } else {
-                if (searchContext instanceof RemoteWebElement) {
-                    WebElement contextElement = searchContext.findElement(By.xpath("."));
-                    waitCondition = ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by);
+                if (searchContext instanceof WebElement) {
+                    waitCondition = ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by);
                 } else {
                     waitCondition = ExpectedConditions.visibilityOfElementLocated(by);
                 }
@@ -1758,10 +1754,9 @@ public class ExtendedWebElement implements IWebElement {
         }
         case BY_PRESENCE_OR_VISIBILITY:
             if (element != null) {
-                if (searchContext instanceof RemoteWebElement) {
-                    WebElement contextElement = searchContext.findElement(By.xpath("."));
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by),
-                            ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by),
+                if (searchContext instanceof WebElement) {
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy((WebElement) searchContext, by),
+                            ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by),
                             ExpectedConditions.visibilityOf(element));
                 } else {
                     waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
@@ -1769,10 +1764,9 @@ public class ExtendedWebElement implements IWebElement {
                             ExpectedConditions.visibilityOf(element));
                 }
             } else {
-                if (searchContext instanceof RemoteWebElement) {
-                    WebElement contextElement = searchContext.findElement(By.xpath("."));
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by),
-                            ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by));
+                if (searchContext instanceof WebElement) {
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy((WebElement) searchContext, by),
+                            ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by));
                 } else {
                     waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
                             ExpectedConditions.visibilityOfElementLocated(by));
