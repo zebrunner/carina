@@ -1036,15 +1036,9 @@ public class ExtendedWebElement implements IWebElement {
 
         List<WebElement> webElements = getElement().findElements(by);
         List<ExtendedWebElement> extendedWebElements = new ArrayList<>();
+        int i = 1;
         for (WebElement element : webElements) {
-            String name = "undefined";
-            try {
-                name = element.getText();
-            } catch (Exception e) {
-                /* do nothing */
-                LOGGER.debug("Error while getting text from element.", e);
-            }
-
+            String name = String.format("ExtendedWebElement - [%d]", i++);
             ExtendedWebElement tempElement = new ExtendedWebElement(by, name, getDriver(), getElement());
             tempElement.setElement(element);
             extendedWebElements.add(tempElement);
