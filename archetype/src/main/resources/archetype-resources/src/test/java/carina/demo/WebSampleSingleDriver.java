@@ -12,7 +12,7 @@ import org.testng.annotations.Test;
 
 import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import com.zebrunner.agent.core.annotation.TestLabel;
-import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
+import com.zebrunner.carina.core.registrar.ownership.MethodOwner;
 import ${package}.carina.demo.gui.components.FooterMenu;
 import ${package}.carina.demo.gui.components.compare.ModelSpecs;
 import ${package}.carina.demo.gui.components.compare.ModelSpecs.SpecType;

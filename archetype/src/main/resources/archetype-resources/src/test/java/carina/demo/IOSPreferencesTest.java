@@ -7,7 +7,7 @@ import org.openqa.selenium.WebDriver;
 import org.testng.annotations.Test;
 
 import com.qaprosoft.carina.core.foundation.IAbstractTest;
-import com.qaprosoft.carina.core.foundation.utils.mobile.IMobileUtils;
+import com.zebrunner.carina.utils.mobile.IMobileUtils;
 import ${package}.carina.demo.mobile.gui.pages.ios.PreferencesPage;
 
 public class IOSPreferencesTest implements IAbstractTest, IMobileUtils {

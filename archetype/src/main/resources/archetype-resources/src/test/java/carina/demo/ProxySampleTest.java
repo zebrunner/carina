@@ -15,8 +15,8 @@ import org.testng.annotations.Test;
 
 import com.qaprosoft.carina.browserupproxy.ProxyPool;
 import com.qaprosoft.carina.core.foundation.IAbstractTest;
-import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
+import com.zebrunner.carina.utils.R;
+import com.zebrunner.carina.core.registrar.ownership.MethodOwner;
 import ${package}.carina.demo.gui.pages.HomePage;
 import ${package}.carina.demo.gui.pages.NewsPage;
 import com.zebrunner.agent.core.registrar.Artifact;
