@@ -1028,14 +1028,22 @@ public class ExtendedWebElement implements IWebElement {
         return findExtendedWebElements(by, EXPLICIT_TIMEOUT);
     }
 
+    /**
+     * Get list of {@link ExtendedWebElement}s. Search of elements starts from current {@link ExtendedWebElement}
+     *
+     * @param by see {@link By}
+     * @param timeout timeout of checking the presence of the element(s)
+     * @return list of ExtendedWebElements if found, empty list otherwise
+     */
     public List<ExtendedWebElement> findExtendedWebElements(final By by, long timeout) {
-        ExtendedWebElement firstTempElement = new ExtendedWebElement(by, "first element", getDriver(), getElement());
-        if (!firstTempElement.isPresent(timeout)) {
-            throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
+        List<ExtendedWebElement> extendedWebElements = new ArrayList<>();
+        ExtendedWebElement firstElement = new ExtendedWebElement(by, "first element", getDriver(), getElement());
+        if (!firstElement.isPresent(timeout)) {
+            LOGGER.info("FAIL: element(s) '{}' is not found!", by);
+            return extendedWebElements;
         }
 
         List<WebElement> webElements = getElement().findElements(by);
-        List<ExtendedWebElement> extendedWebElements = new ArrayList<>();
         int i = 1;
         for (WebElement element : webElements) {
             String name = String.format("ExtendedWebElement - [%d]", i++);
