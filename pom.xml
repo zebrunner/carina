@@ -44,7 +44,7 @@
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <jacoco-maven-plugin>0.8.7</jacoco-maven-plugin>
 
-        <carina-utils.version>1.0.0-SNAPSHOT</carina-utils.version>
+        <carina-utils.version>1.0.0</carina-utils.version>
         <!-- Testings -->
         <testng.version>7.6.1</testng.version>
         <testng-foundation.version>2.0.1</testng-foundation.version>
@@ -97,7 +97,7 @@
         <module>carina-core</module>
         <module>carina-azure</module>
     </modules>
-    <repositories>
+    <!--repositories>
         <repository>
             <id>zebrunner_snapshots</id>
             <name>zebrunner Snapshots</name>
@@ -109,7 +109,7 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-    </repositories>
+    </repositories-->
     <profiles>
         <profile>
             <id>default</id>
