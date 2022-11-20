@@ -23,7 +23,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -31,10 +34,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -44,6 +49,13 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.zebrunner.carina.crypto.Algorithm;
+import com.zebrunner.carina.crypto.CryptoTool;
+import com.zebrunner.carina.crypto.CryptoToolBuilder;
+import com.zebrunner.carina.utils.LogicUtils;
+import com.zebrunner.carina.utils.common.CommonUtils;
+import com.zebrunner.carina.utils.messager.Messager;
+import com.zebrunner.carina.utils.retry.ActionPoller;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptException;
@@ -74,20 +86,21 @@ import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.SkipException;
 
-
-import com.zebrunner.carina.utils.retry.ActionPoller;
-import com.zebrunner.carina.utils.Configuration;
-import com.zebrunner.carina.utils.Configuration.Parameter;
-import com.zebrunner.carina.utils.LogicUtils;
-import com.zebrunner.carina.utils.messager.Messager;
-import com.zebrunner.carina.utils.common.CommonUtils;
-
+import com.github.kklisura.cdt.services.ChromeDevToolsService;
+import com.github.kklisura.cdt.services.WebSocketService;
+import com.github.kklisura.cdt.services.config.ChromeDevToolsServiceConfiguration;
+import com.github.kklisura.cdt.services.exceptions.WebSocketServiceException;
+import com.github.kklisura.cdt.services.impl.ChromeDevToolsServiceImpl;
+import com.github.kklisura.cdt.services.impl.WebSocketServiceImpl;
+import com.github.kklisura.cdt.services.invocation.CommandInvocationHandler;
+import com.github.kklisura.cdt.services.utils.ProxyUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.gui.AbstractPage;
-import com.zebrunner.carina.crypto.Algorithm;
-import com.zebrunner.carina.crypto.CryptoTool;
-import com.zebrunner.carina.crypto.CryptoToolBuilder;
+
+import com.zebrunner.carina.utils.Configuration.Parameter;
+import com.zebrunner.carina.utils.Configuration;
+
 
 /**
  * DriverHelper - WebDriver wrapper for logging and reporting features. Also it
@@ -1324,7 +1337,44 @@ public class DriverHelper {
         }
         
     }
-	
+
+    /**
+     * Get dev tools
+     */
+    public ChromeDevToolsService getDevTools(WebDriver driver) throws URISyntaxException {
+        try {
+            URI selenoidDevToolsURL = new URI(getSelenoidDevToolsUrl(driver));
+            WebSocketService webSocketService = WebSocketServiceImpl.create(selenoidDevToolsURL);
+
+            final CommandInvocationHandler invocationHandler = new CommandInvocationHandler();
+            final Map<Method, Object> commandsCache = new ConcurrentHashMap<>();
+            final ChromeDevToolsService devtools = ProxyUtils.createProxyFromAbstract(
+                    ChromeDevToolsServiceImpl.class,
+                    new Class[] { WebSocketService.class, ChromeDevToolsServiceConfiguration.class },
+                    new Object[] { webSocketService, new ChromeDevToolsServiceConfiguration() },
+                    (unused, method, args) -> commandsCache.computeIfAbsent(
+                            method, key -> ProxyUtils.createProxy(method.getReturnType(), invocationHandler)));
+            invocationHandler.setChromeDevToolsService(devtools);
+            return devtools;
+        } catch (WebSocketServiceException e) {
+            throw new UnsupportedOperationException("Cannot connect to devtools");
+        }
+    }
+
+    private String getSelenoidDevToolsUrl(WebDriver driver) {
+        String seleniumHost = Configuration.getSeleniumUrl().replace("wd/hub", "devtools/")
+                .replaceFirst("http(s)?:[/][/]", "wss://");
+
+        if (seleniumHost.isEmpty()) {
+            seleniumHost = Configuration.getEnvArg(Parameter.URL.getKey()).replace("wd/hub", "devtools/");
+        }
+        WebDriver drv = (driver instanceof Decorated<?>) ? (WebDriver) ((Decorated<?>) driver).getOriginal() : driver;
+        String sessionId = ((RemoteWebDriver) drv).getSessionId().toString();
+        String url = seleniumHost + sessionId;
+        LOGGER.debug("url: {}", url);
+        return url;
+    }
+
     private String getUrl() {
         String url = "";
         if (Configuration.getEnvArg(Parameter.URL.getKey()).isEmpty()) {

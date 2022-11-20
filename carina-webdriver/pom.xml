@@ -28,6 +28,7 @@
 		<itext.version>5.5.13.2</itext.version>
 		<reflections.version>0.9.10</reflections.version>
 		<mockito-all.version>1.10.19</mockito-all.version>
+		<cdt-java-client.version>4.0.0</cdt-java-client.version>
 
 	</properties>
 
@@ -191,6 +192,12 @@
 			<artifactId>mockito-all</artifactId>
 			<version>${mockito-all.version}</version>
 			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.github.kklisura.cdt</groupId>
+			<artifactId>cdt-java-client</artifactId>
+			<version>4.0.0</version>
 		</dependency>
 
 		<!-- Test utilities -->
