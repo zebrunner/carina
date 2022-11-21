@@ -20,12 +20,11 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
 	</properties>
 
 	<dependencies>
 		<dependency>
-			<groupId>com.qaprosoft</groupId>
+			<groupId>com.zebrunner</groupId>
 			<artifactId>carina-utils</artifactId>
 		</dependency>
 

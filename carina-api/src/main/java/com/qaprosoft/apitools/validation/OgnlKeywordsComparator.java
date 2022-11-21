@@ -1,6 +1,6 @@
 package com.qaprosoft.apitools.validation;
 
-import com.qaprosoft.carina.core.foundation.utils.JsonUtils;
+import com.zebrunner.carina.utils.JsonUtils;
 import ognl.Ognl;
 import ognl.OgnlException;
 import org.slf4j.Logger;

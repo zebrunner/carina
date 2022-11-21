@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -29,6 +30,7 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import com.zebrunner.carina.utils.report.TestResult;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
@@ -60,26 +62,27 @@ import com.qaprosoft.amazon.AmazonS3Manager;
 import com.qaprosoft.appcenter.AppCenterManager;
 import com.qaprosoft.azure.AzureManager;
 import com.qaprosoft.carina.browserupproxy.ProxyPool;
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.report.ReportContext;
-import com.qaprosoft.carina.core.foundation.report.TestResultItem;
-import com.qaprosoft.carina.core.foundation.report.TestResultType;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.report.ReportContext;
+import com.zebrunner.carina.utils.report.TestResultItem;
+import com.zebrunner.carina.utils.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
 import com.qaprosoft.carina.core.foundation.report.qtest.IQTestManager;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestRailManager;
 import com.qaprosoft.carina.core.foundation.skip.ExpectedSkipManager;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.DateUtils;
-import com.qaprosoft.carina.core.foundation.utils.FileManager;
-import com.qaprosoft.carina.core.foundation.utils.Messager;
-import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.ZebrunnerNameResolver;
-import com.qaprosoft.carina.core.foundation.utils.ownership.Ownership;
-import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
-import com.qaprosoft.carina.core.foundation.utils.tag.PriorityManager;
-import com.qaprosoft.carina.core.foundation.utils.tag.TagManager;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration.Parameter;
+import com.zebrunner.carina.utils.DateUtils;
+import com.zebrunner.carina.utils.FileManager;
+import com.zebrunner.carina.utils.messager.Messager;
+import com.zebrunner.carina.utils.R;
+import com.zebrunner.carina.core.testng.ZebrunnerNameResolver;
+import com.zebrunner.carina.core.registrar.ownership.Ownership;
+import com.zebrunner.carina.core.registrar.ownership.SuiteOwnerResolver;
+import com.zebrunner.carina.utils.resources.L10N;
+import com.zebrunner.carina.core.registrar.tag.PriorityManager;
+import com.zebrunner.carina.core.registrar.tag.TagManager;
 import com.qaprosoft.carina.core.foundation.webdriver.CarinaDriver;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase;
@@ -132,6 +135,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         // Technically, this happen when the maven-surefire-plugin has not set inherited program arguments (passed to mvn process).
         // That is why it is necessary to reinit R class here when TestNG loads the CarinaListener class.
         R.reinit();
+        registerDecryptAgentProperties();
         
         LOGGER.info(Configuration.asString());
         // Configuration.validateConfiguration();
@@ -169,8 +173,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     public void onStart(ISuite suite) {
         LOGGER.debug("CarinaListener->onStart(ISuite suite)");
 
+        ChainedMaintainerResolver.addLast(new SuiteOwnerResolver(suite));
         // first means that ownership/maintainer resolver from carina has higher priority
-        ChainedMaintainerResolver.addFirst(new Ownership(suite.getParameter("suiteOwner")));
+        ChainedMaintainerResolver.addFirst(new Ownership());
 
         if (!"INFO".equalsIgnoreCase(Configuration.get(Parameter.CORE_LOG_LEVEL))) {
             LoggerContext ctx = (LoggerContext) LogManager.getContext(this.getClass().getClassLoader(), false);
@@ -193,6 +198,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             // [VD] do not move into the static block as Zebrunner reporting need registered test run!
             Artifact.attachReferenceToTestRun("app", mobileApp);
         }
+
+        CurrentTestRun.setLocale(Configuration.get(Parameter.LOCALE));
+
         // register app_version/build as artifact if available...
         Configuration.setBuild(Configuration.get(Parameter.APP_VERSION));
         
@@ -227,6 +235,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     public void beforeConfiguration(ITestResult result) {
         LOGGER.debug("CarinaListener->beforeConfiguration");
         super.beforeConfiguration(result);
+
         // remember active test phase to organize valid driver pool manipulation
         // process
         if (result.getMethod().isBeforeSuiteConfiguration()) {
@@ -375,8 +384,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             // String suiteName = getSuiteName(context);
             String title = getTitle(suite.getXmlSuite());
 
-            TestResultType testResult = EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
-            String status = testResult.getName();
+            TestResult testResult = EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
+            String status = testResult.getTestResultType().getName();
 
             title = status + ": " + title;
 
@@ -921,4 +930,61 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     }
 
+    /**
+     * Register agent properties from agent.properties file (if exists) as system properties.
+     * Yaml configuration will be ignored.
+     * If system property already have property(ies), we will no rewrite it
+     */
+    private void registerDecryptAgentProperties() {
+        if (ClassLoader.getSystemResource("agent.properties") == null) {
+            return;
+        }
+
+        if (ClassLoader.getSystemResource("agent.yaml") != null ||
+                ClassLoader.getSystemResource("agent.yml") != null) {
+            // use sout instead of logger because agent intercept call of logger
+            System.out.println(
+                    "[WARN] You have agent.properties and agent.yaml/agent.yml! Use only one type of config file for agent.\n"
+                            + "Yaml files does not supported by Carina Framework. All properties in your agent.properties file will have"
+                            + " more priority over yaml agent configuration."
+                            + "If you want to support cryptography for agent, use agent.properties.");
+        }
+
+        Properties properties = R.AGENT.getProperties();
+        Set<String> propertyNames = properties.stringPropertyNames();
+        for (String name : propertyNames) {
+            String value = R.AGENT.getDecrypted(name);
+            String systemPropertyName = convertPropertyToSystemProperty(name);
+            String systemValue = System.getProperty(systemPropertyName);
+            if (systemValue == null) {
+                System.setProperty(systemPropertyName, value);
+            }
+        }
+    }
+
+    /**
+     * This method is a hotfix for naming difference between agent.properties and system properties
+     */
+    private String convertPropertyToSystemProperty(String propertyName) {
+        String systemProperty = propertyName;
+        if ("reporting.project-key".equals(propertyName)) {
+            systemProperty = "reporting.projectKey";
+        }
+        if ("reporting.server.access-token".equals(propertyName)) {
+            systemProperty = "reporting.server.accessToken";
+        }
+
+        if ("reporting.run.display-name".equals(propertyName)) {
+            systemProperty = "reporting.run.displayName";
+        }
+
+        if ("reporting.run.retry-known-issues".equals(propertyName)) {
+            systemProperty = "reporting.run.retryKnownIssues";
+        }
+
+        if ("reporting.run.substitute-remote-web-drivers".equals(propertyName)) {
+            systemProperty = "reporting.run.substituteRemoteWebDrivers";
+        }
+        return systemProperty;
+    }
 }

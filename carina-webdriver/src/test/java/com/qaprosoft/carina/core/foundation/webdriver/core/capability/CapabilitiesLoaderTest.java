@@ -19,7 +19,7 @@ import org.openqa.selenium.MutableCapabilities;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.utils.R;
+import com.zebrunner.carina.utils.R;
 
 public class CapabilitiesLoaderTest {
 

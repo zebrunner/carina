@@ -356,3 +356,15 @@ public void testWebView() {
         "Error message or captcha was not displayed");
 }
 ```
+
+## FAQ
+
+**Where can I find mobile-specific methods?**
+
+* [IMobileUtils](https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/utils/mobile/IMobileUtils.java) -
+contains methods for interacting with both IOS and Android devices
+* [IAndroidUtils](https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/utils/android/IAndroidUtils.java),
+[AndroidService](https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/utils/android/AndroidService.java) -
+contains methods for interacting with Android devices only
+* [IOSUtils](https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/utils/ios/IOSUtils.java) -
+contains methods for interacting with IOS devices only

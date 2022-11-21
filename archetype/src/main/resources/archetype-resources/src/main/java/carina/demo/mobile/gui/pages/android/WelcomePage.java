@@ -3,8 +3,8 @@
 #set( $symbol_escape = '\' )
 package ${package}.carina.demo.mobile.gui.pages.android;
 
-import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType;
-import com.qaprosoft.carina.core.foundation.utils.factory.DeviceType.Type;
+import com.zebrunner.carina.utils.factory.DeviceType;
+import com.zebrunner.carina.utils.factory.DeviceType.Type;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import ${package}.carina.demo.mobile.gui.pages.common.LoginPageBase;
 import ${package}.carina.demo.mobile.gui.pages.common.WelcomePageBase;

@@ -13,7 +13,7 @@ import org.testng.annotations.Test;
 
 import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
-import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
+import com.zebrunner.carina.core.registrar.ownership.MethodOwner;
 
 
 public class XlsDataproviderRetryTest implements IAbstractTest {

@@ -45,6 +45,7 @@ nav:
       - Database: advanced/database.md
       - DataProvider: advanced/dataprovider.md
       - Driver: advanced/driver.md
+      - Mobile: advanced/mobile.md
       - Localization: advanced/localization.md
       - Program flow: advanced/program_flow.md
       - Proxy: advanced/proxy.md

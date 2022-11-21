@@ -18,8 +18,8 @@ package com.qaprosoft.carina.core.foundation.api;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.R;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.R;
 import com.qaprosoft.mock.apimethod.AutoReplaceUrlPartsMethod;
 import com.qaprosoft.mock.apimethod.NoPlaceholdersInURLMethod;
 import com.qaprosoft.mock.apimethod.PutDocMethod;

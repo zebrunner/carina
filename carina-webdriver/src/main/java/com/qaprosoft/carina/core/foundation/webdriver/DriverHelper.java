@@ -17,7 +17,10 @@ package com.qaprosoft.carina.core.foundation.webdriver;
 
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.invoke.MethodHandles;
 import java.net.HttpURLConnection;
@@ -69,19 +72,22 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
+import org.testng.SkipException;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
-import com.qaprosoft.carina.core.foundation.retry.ActionPoller;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.LogicUtils;
-import com.qaprosoft.carina.core.foundation.utils.Messager;
-import com.qaprosoft.carina.core.foundation.utils.android.AndroidService;
-import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
+
+import com.zebrunner.carina.utils.retry.ActionPoller;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration.Parameter;
+import com.zebrunner.carina.utils.LogicUtils;
+import com.zebrunner.carina.utils.messager.Messager;
+import com.zebrunner.carina.utils.common.CommonUtils;
+
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.gui.AbstractPage;
+import com.zebrunner.carina.crypto.Algorithm;
+import com.zebrunner.carina.crypto.CryptoTool;
+import com.zebrunner.carina.crypto.CryptoToolBuilder;
 
 /**
  * DriverHelper - WebDriver wrapper for logging and reporting features. Also it
@@ -104,12 +110,11 @@ public class DriverHelper {
     
     protected String pageURL = getUrl();
 
-    protected CryptoTool cryptoTool;
+    protected CryptoTool cryptoTool = null;
 
-    protected static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
+    protected static String CRYPTO_PATTERN = Configuration.get(Parameter.CRYPTO_PATTERN);
 
     public DriverHelper() {
-        cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
     }
 
     public DriverHelper(WebDriver driver) {
@@ -149,23 +154,18 @@ public class DriverHelper {
      *            long
      */
     public void openURL(String url, long timeout) {
-        final String decryptedURL = getEnvArgURL(cryptoTool.decryptByPattern(url, CRYPTO_PATTERN));
+        final String decryptedURL = getEnvArgURL(decryptIfEncrypted(url));
         this.pageURL = decryptedURL;
         WebDriver drv = getDriver();
 
         setPageLoadTimeout(drv, timeout);
         DriverListener.setMessages(Messager.OPENED_URL.getMessage(url), Messager.NOT_OPENED_URL.getMessage(url));
-
+        
         // [VD] there is no sense to use fluent wait here as selenium just don't return something until page is ready!
         // explicitly limit time for the openURL operation
         try {
             Messager.OPENING_URL.info(url);
-            if (SpecialKeywords.MOBILE.equals(Configuration.getDriverType()) &&
-                    SpecialKeywords.ANDROID.equalsIgnoreCase(Configuration.getPlatform())) {
-                new AndroidService().openURL(url);
-            } else {
-                drv.get(decryptedURL);
-            }
+            drv.get(decryptedURL);
         } catch (UnhandledAlertException e) {
             drv.switchTo().alert().accept();
         } catch (TimeoutException e) {
@@ -605,7 +605,7 @@ public class DriverHelper {
      * @return validation result.
      */
     public boolean isUrlAsExpected(String expectedURL, long timeout) {
-        String decryptedURL = cryptoTool.decryptByPattern(expectedURL, CRYPTO_PATTERN);
+        String decryptedURL = decryptIfEncrypted(expectedURL);
         decryptedURL = getEnvArgURL(decryptedURL);
         
         String actualUrl = getCurrentUrl(timeout);
@@ -681,6 +681,53 @@ public class DriverHelper {
         return clipboardText;
     }
 
+    /**
+     * Set text to clipboard
+     * @param text text
+     * @return true if successfull, false otherwise
+     */
+    public boolean setClipboardText(String text) {
+        boolean isSuccessful = false;
+        try {
+            LOGGER.debug("Trying to set text to clipboard on the remote machine with hub...");
+            String url = getSelenoidClipboardUrl(getDriver());
+            String username = getField(url, 1);
+            String password = getField(url, 2);
+
+            HttpURLConnection.setFollowRedirects(false);
+            HttpURLConnection con = (HttpURLConnection) new URL(url)
+                    .openConnection();
+            con.setRequestMethod("POST");
+            con.setDoOutput(true);
+
+            if (!username.isEmpty() && !password.isEmpty()) {
+                String usernameColonPassword = username + ":" + password;
+                String basicAuthPayload = "Basic " + Base64.getEncoder().encodeToString(usernameColonPassword.getBytes());
+                con.addRequestProperty("Authorization", basicAuthPayload);
+            }
+
+            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+            wr.writeBytes(text);
+            wr.flush();
+            wr.close();
+
+            int status = con.getResponseCode();
+            if (!(200 <= status && status <= 299)) {
+                throw new IOException("Response status code is not successful");
+            }
+            isSuccessful = true;
+        } catch (Exception e) {
+            LOGGER.error("Error occurred when try to set clipboard to remote machine with hub", e);
+            try {
+                LOGGER.debug("Trying to set clipboard to the local java machine...");
+                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(text), null);
+                isSuccessful = true;
+            } catch (Exception ex) {
+                LOGGER.error("Error occurred when try to set clipboard to the local machine", ex);
+            }
+        }
+        return isSuccessful;
+    }
 
     private String getSelenoidClipboardUrl(WebDriver driver) {
         String seleniumHost = Configuration.getSeleniumUrl().replace("wd/hub", "clipboard/");
@@ -764,7 +811,7 @@ public class DriverHelper {
      * @return validation result.
      */
     public boolean isTitleAsExpected(final String expectedTitle) {
-        final String decryptedExpectedTitle = cryptoTool.decryptByPattern(expectedTitle, CRYPTO_PATTERN);
+        final String decryptedExpectedTitle = decryptIfEncrypted(expectedTitle);
         String title = getTitle(EXPLICIT_TIMEOUT);
         boolean result = title.contains(decryptedExpectedTitle);
         if (result) {
@@ -784,7 +831,7 @@ public class DriverHelper {
      * @return validation result.
      */
     public boolean isTitleAsExpectedPattern(String expectedPattern) {
-        final String decryptedExpectedPattern = cryptoTool.decryptByPattern(expectedPattern, CRYPTO_PATTERN);
+        final String decryptedExpectedPattern = decryptIfEncrypted(expectedPattern);
         
         String actual = getTitle(EXPLICIT_TIMEOUT);
         Pattern p = Pattern.compile(decryptedExpectedPattern);
@@ -1073,7 +1120,7 @@ public class DriverHelper {
      *             If unable to open tab
      */
     public void openTab(String url) {
-        final String decryptedURL = cryptoTool.decryptByPattern(url, CRYPTO_PATTERN);
+        final String decryptedURL = decryptIfEncrypted(url);
         String script = "var d=document,a=d.createElement('a');a.target='_blank';a.href='%s';a.innerHTML='.';d.body.appendChild(a);return a";
         Object element = trigger(String.format(script, decryptedURL));
         if (element instanceof WebElement) {
@@ -1118,121 +1165,93 @@ public class DriverHelper {
     // --------------------------------------------------------------------------
     // Helpers
     // --------------------------------------------------------------------------
-    
+
     /**
-     * Find Extended Web Element on page using By.
+     * Find element on the page<br>
+     * Element search is limited by the {@link Parameter#EXPLICIT_TIMEOUT}
      *
-     * @deprecated {@link ExtendedWebElement#format(Object...) "Use format method instead"}
-     * @param by
-     *            Selenium By locator
-     * @return ExtendedWebElement if exists otherwise null.
+     * @param by see {@link By}
+     * @return {@link ExtendedWebElement} if exists, {@code null} otherwise
      */
-    @Deprecated(since = "7.4.21", forRemoval = true)
     public ExtendedWebElement findExtendedWebElement(By by) {
         return findExtendedWebElement(by, by.toString(), EXPLICIT_TIMEOUT);
     }
 
     /**
-     * Find Extended Web Element on page using By.
+     * Find element on the page
      *
-     * @deprecated {@link ExtendedWebElement#format(Object...) "Use format method instead"}
-     * @param by
-     *            Selenium By locator
-     * @param timeout to wait
-     * @return ExtendedWebElement if exists otherwise null.
+     * @param by see {@link By}
+     * @param timeout time to wait, in seconds
+     * @return {@link ExtendedWebElement} if exists, {@code null} otherwise
      */
-    @Deprecated(since = "7.4.21", forRemoval = true)
     public ExtendedWebElement findExtendedWebElement(By by, long timeout) {
         return findExtendedWebElement(by, by.toString(), timeout);
     }
 
     /**
-     * Find Extended Web Element on page using By.
+     * Find element on the page<br>
+     * Element search is limited by the {@link Parameter#EXPLICIT_TIMEOUT}
      *
-     * @deprecated {@link ExtendedWebElement#format(Object...) "Use format method instead"}
-     * @param by
-     *            Selenium By locator
-     * @param name
-     *            Element name
-     * @return ExtendedWebElement if exists otherwise null.
+     * @param by see {@link By}
+     * @param name the name that will be given to the found element
+     * @return {@link ExtendedWebElement} if exists, {@code null} otherwise
      */
-    @Deprecated(since = "7.4.21", forRemoval = true)
     public ExtendedWebElement findExtendedWebElement(final By by, String name) {
         return findExtendedWebElement(by, name, EXPLICIT_TIMEOUT);
     }
 
     /**
-     * Find Extended Web Element on page using By.
+     * Find element on the page
      *
-     * @deprecated {@link ExtendedWebElement#format(Object...) "Use format method instead"}
-     * @param by
-     *            Selenium By locator
-     * @param name
-     *            Element name
-     * @param timeout
-     *            Timeout to find
-     * @return ExtendedWebElement if exists otherwise null.
+     * @param by see {@link By}
+     * @param name the name that will be given to the found element
+     * @param timeout time to wait, in seconds
+     * @return {@link ExtendedWebElement} if exists, {@code null} otherwise
      */
-    @Deprecated(since = "7.4.21", forRemoval = true)
     public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
-		DriverListener.setMessages(Messager.ELEMENT_FOUND.getMessage(name),
-				Messager.ELEMENT_NOT_FOUND.getMessage(name));
-    	
-    	if (!waitUntil(ExpectedConditions.presenceOfElementLocated(by), timeout)) {
-    		Messager.ELEMENT_NOT_FOUND.error(name);
-    		return null;
-    	}
+        DriverListener.setMessages(Messager.ELEMENT_FOUND.getMessage(name), Messager.ELEMENT_NOT_FOUND.getMessage(name));
+
+        if (!waitUntil(ExpectedConditions.presenceOfElementLocated(by), timeout)) {
+            Messager.ELEMENT_NOT_FOUND.error(name);
+            return null;
+        }
 
         return new ExtendedWebElement(by, name, getDriver(), getDriver());
     }
 
     /**
-     * Find List of Extended Web Elements on page using By and explicit timeout.
+     * Find elements on the page<br>
+     * Elements search is limited by the {@link Parameter#EXPLICIT_TIMEOUT}
      *
-     * @deprecated {@link ExtendedWebElement#format(Object...) "Use format method instead"}
-     * @param by
-     *            Selenium By locator
-     * @return List of ExtendedWebElement.
+     * @param by see {@link By}
+     * @return list of {@link ExtendedWebElement}s, empty list otherwise
      */
-    @Deprecated(since = "7.4.21", forRemoval = true)
     public List<ExtendedWebElement> findExtendedWebElements(By by) {
         return findExtendedWebElements(by, EXPLICIT_TIMEOUT);
     }
 
     /**
-     * Find List of Extended Web Elements on page using By.
+     * Find elements on the page
      *
-     * @deprecated {@link ExtendedWebElement#format(Object...) "Use format method instead"}
-     * 
-     * @param by
-     *            Selenium By locator
-     * @param timeout
-     *            Timeout to find
-     * @return List of ExtendedWebElement.
+     * @param by see {@link By}
+     * @param timeout time to wait, in seconds
+     * @return list of {@link ExtendedWebElement}s if found, empty list otherwise
      */
-    @Deprecated(since = "7.4.21", forRemoval = true)
     public List<ExtendedWebElement> findExtendedWebElements(final By by, long timeout) {
         List<ExtendedWebElement> extendedWebElements = new ArrayList<>();
 
-        String name = "undefined";
-    	if (!waitUntil(ExpectedConditions.presenceOfElementLocated(by), timeout)) {
-    		Messager.ELEMENT_NOT_FOUND.info(name);
+        if (!waitUntil(ExpectedConditions.presenceOfElementLocated(by), timeout)) {
+            Messager.ELEMENT_NOT_FOUND.info(by.toString());
     		return extendedWebElements;
     	}
 
         List<WebElement> webElements = getDriver().findElements(by);
-    	int i = 1;
+        int i = 1;
         for (WebElement element : webElements) {
-            try {
-                name = element.getText();
-            } catch (Exception e) {
-            	/* do nothing and keep 'undefined' for control name */
-            }
-
-            ExtendedWebElement tempElement = new ExtendedWebElement(element, name);
-            tempElement.setBy(tempElement.generateByForList(by, i));
-            extendedWebElements.add(tempElement);          
-            i++;
+            String name = String.format("ExtendedWebElement - [%d]", i++);
+            ExtendedWebElement tempElement = new ExtendedWebElement(by, name, getDriver(), getDriver());
+            tempElement.setElement(element);
+            extendedWebElements.add(tempElement);
         }
         return extendedWebElements;
     }
@@ -1349,5 +1368,29 @@ public class DriverHelper {
             retryInterval = 1000;
         }
         return retryInterval;
+    }
+
+    private String decryptIfEncrypted(String text) {
+        Matcher cryptoMatcher = Pattern.compile(CRYPTO_PATTERN)
+                .matcher(text);
+        String decryptedText = text;
+        if (cryptoMatcher.find()) {
+            initCryptoTool();
+            decryptedText = this.cryptoTool.decrypt(text, CRYPTO_PATTERN);
+        }
+        return decryptedText;
+    }
+
+    private void initCryptoTool() {
+        if (this.cryptoTool == null) {
+            String cryptoKey = Configuration.get(Parameter.CRYPTO_KEY_VALUE);
+            if (cryptoKey.isEmpty()) {
+                throw new SkipException("Encrypted data detected, but the crypto key is not found!");
+            }
+            this.cryptoTool = CryptoToolBuilder.builder()
+                    .chooseAlgorithm(Algorithm.find(Configuration.get(Configuration.Parameter.CRYPTO_ALGORITHM)))
+                    .setKey(cryptoKey)
+                    .build();
+        }
     }
 }

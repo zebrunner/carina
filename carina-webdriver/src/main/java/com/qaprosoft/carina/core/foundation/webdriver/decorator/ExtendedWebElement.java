@@ -26,6 +26,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -58,21 +59,24 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
+import org.testng.SkipException;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
-import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.IWebElement;
-import com.qaprosoft.carina.core.foundation.utils.Messager;
-import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
-import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.performance.ACTION_NAME;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration.Parameter;
+import com.zebrunner.carina.utils.IWebElement;
+import com.zebrunner.carina.utils.messager.Messager;
+import com.zebrunner.carina.utils.R;
+import com.zebrunner.carina.utils.common.CommonUtils;
+import com.zebrunner.carina.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
 import com.sun.jersey.core.util.Base64;
+import com.zebrunner.carina.crypto.Algorithm;
+import com.zebrunner.carina.crypto.CryptoTool;
+import com.zebrunner.carina.crypto.CryptoToolBuilder;
 
 import io.appium.java_client.AppiumBy;
 
@@ -89,9 +93,9 @@ public class ExtendedWebElement implements IWebElement {
     private WebDriver driver;
     private SearchContext searchContext;
 
-    private CryptoTool cryptoTool = new CryptoTool(Configuration.get(Parameter.CRYPTO_KEY_PATH));
+    private CryptoTool cryptoTool = null;
 
-    private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
+    private static String CRYPTO_PATTERN = Configuration.get(Parameter.CRYPTO_PATTERN);
 
     private WebElement element = null;
     private String name;
@@ -127,11 +131,17 @@ public class ExtendedWebElement implements IWebElement {
         this.formatValues = Arrays.toString(formatValues);
     }
 
+    /**
+     * This constructor shouldn't be called explicitly. For proxied elements only
+     */
     public ExtendedWebElement(WebElement element, String name, By by) {
         this(element, name);
         this.by = by;
     }
 
+    /**
+     * This constructor shouldn't be called explicitly. For proxied elements only
+     */
     public ExtendedWebElement(WebElement element, String name) {
         this.name = name;
         this.element = element;
@@ -928,7 +938,7 @@ public class ExtendedWebElement implements IWebElement {
      * @return element with text existence status.
      */
     public boolean isElementWithTextPresent(final String text, long timeout) {
-    	final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
+    	final String decryptedText = decryptIfEncrypted(text);
 		ExpectedCondition<Boolean> textCondition;
 		if (element != null) {
 			textCondition = ExpectedConditions.textToBePresentInElement(element, decryptedText);
@@ -1007,40 +1017,39 @@ public class ExtendedWebElement implements IWebElement {
      * @return ExtendedWebElement if exists otherwise null.
      */
     public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
-        if (isPresent(by, timeout)) {
-            return new ExtendedWebElement(by, name, this.driver, getElement());
-        } else {
-        	throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
+        ExtendedWebElement element = new ExtendedWebElement(by, name, this.driver, getElement());
+        if (!element.isPresent(timeout)) {
+            throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
         }
+        return element;
     }
 
     public List<ExtendedWebElement> findExtendedWebElements(By by) {
         return findExtendedWebElements(by, EXPLICIT_TIMEOUT);
     }
 
+    /**
+     * Get list of {@link ExtendedWebElement}s. Search of elements starts from current {@link ExtendedWebElement}
+     *
+     * @param by see {@link By}
+     * @param timeout timeout of checking the presence of the element(s)
+     * @return list of ExtendedWebElements if found, empty list otherwise
+     */
     public List<ExtendedWebElement> findExtendedWebElements(final By by, long timeout) {
-        List<ExtendedWebElement> extendedWebElements = new ArrayList<ExtendedWebElement>();
-        List<WebElement> webElements = new ArrayList<WebElement>();
-        
-        if (isPresent(by, timeout)) {
-            webElements = getElement().findElements(by);
-        } else {
-        	throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
+        List<ExtendedWebElement> extendedWebElements = new ArrayList<>();
+        ExtendedWebElement firstElement = new ExtendedWebElement(by, "first element", getDriver(), getElement());
+        if (!firstElement.isPresent(timeout)) {
+            LOGGER.info("FAIL: element(s) '{}' is not found!", by);
+            return extendedWebElements;
         }
 
+        List<WebElement> webElements = getElement().findElements(by);
         int i = 1;
         for (WebElement element : webElements) {
-            String name = "undefined";
-            try {
-                name = element.getText();
-            } catch (Exception e) {
-                /* do nothing */
-                LOGGER.debug("Error while getting text from element.", e);
-            }
-
-            // we can't initiate ExtendedWebElement using by as it belongs to the list of elements
-            extendedWebElements.add(new ExtendedWebElement(generateByForList(by, i), name, this.driver, getElement()));
-            i++;
+            String name = String.format("ExtendedWebElement - [%d]", i++);
+            ExtendedWebElement tempElement = new ExtendedWebElement(by, name, getDriver(), getElement());
+            tempElement.setElement(element);
+            extendedWebElements.add(tempElement);
         }
         return extendedWebElements;
     }
@@ -1420,7 +1429,7 @@ public class ExtendedWebElement implements IWebElement {
 
 			@Override
 			public void doType(String text) {
-				final String decryptedText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
+				final String decryptedText = decryptIfEncrypted(text);
 
 /*				if (!element.getText().isEmpty()) {
     				DriverListener.setMessages(Messager.KEYS_CLEARED_IN_ELEMENT.getMessage(getName()),
@@ -1443,7 +1452,7 @@ public class ExtendedWebElement implements IWebElement {
 
 			@Override
 			public void doAttachFile(String filePath) {
-				final String decryptedText = cryptoTool.decryptByPattern(filePath, CRYPTO_PATTERN);
+				final String decryptedText = decryptIfEncrypted(filePath);
 
 				String textLog = (!decryptedText.equals(filePath) ? "********" : filePath);
 
@@ -1534,7 +1543,7 @@ public class ExtendedWebElement implements IWebElement {
 			
 			@Override
 			public boolean doSelect(String text) {
-				final String decryptedSelectText = cryptoTool.decryptByPattern(text, CRYPTO_PATTERN);
+				final String decryptedSelectText = decryptIfEncrypted(text);
 				
 				String textLog = (!decryptedSelectText.equals(text) ? "********" : text);
 				
@@ -1638,7 +1647,10 @@ public class ExtendedWebElement implements IWebElement {
 		return driver;
     }
 
-    
+    /**
+     * @deprecated when we search list of elements we do not needed for generating by with index
+     */
+    @Deprecated(forRemoval = true, since = "8.0.1")
 	//TODO: investigate how can we merge the similar functionality in ExtendedWebElement, DriverHelper and LocalizedAnnotations
     public By generateByForList(By by, int index) {
         String locator = by.toString();
@@ -1707,18 +1719,16 @@ public class ExtendedWebElement implements IWebElement {
         switch (loadingStrategy) {
         case BY_PRESENCE: {
             if (element != null) {
-                if (searchContext instanceof RemoteWebElement) {
-                    WebElement contextElement = searchContext.findElement(By.xpath("."));
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by),
+                if (searchContext instanceof WebElement) {
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy((WebElement) searchContext, by),
                             ExpectedConditions.visibilityOf(element));
                 } else {
                     waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
                             ExpectedConditions.visibilityOf(element));
                 }
             } else {
-                if (searchContext instanceof RemoteWebElement) {
-                    WebElement contextElement = searchContext.findElement(By.xpath("."));
-                    waitCondition = ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by);
+                if (searchContext instanceof WebElement) {
+                    waitCondition = ExpectedConditions.presenceOfNestedElementLocatedBy((WebElement) searchContext, by);
                 } else {
                     waitCondition = ExpectedConditions.presenceOfElementLocated(by);
 
@@ -1728,18 +1738,16 @@ public class ExtendedWebElement implements IWebElement {
         }
         case BY_VISIBILITY: {
             if (element != null) {
-                if (searchContext instanceof RemoteWebElement) {
-                    WebElement contextElement = searchContext.findElement(By.xpath("."));
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by),
+                if (searchContext instanceof WebElement) {
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by),
                             ExpectedConditions.visibilityOf(element));
                 } else {
                     waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(by),
                             ExpectedConditions.visibilityOf(element));
                 }
             } else {
-                if (searchContext instanceof RemoteWebElement) {
-                    WebElement contextElement = searchContext.findElement(By.xpath("."));
-                    waitCondition = ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by);
+                if (searchContext instanceof WebElement) {
+                    waitCondition = ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by);
                 } else {
                     waitCondition = ExpectedConditions.visibilityOfElementLocated(by);
                 }
@@ -1748,10 +1756,9 @@ public class ExtendedWebElement implements IWebElement {
         }
         case BY_PRESENCE_OR_VISIBILITY:
             if (element != null) {
-                if (searchContext instanceof RemoteWebElement) {
-                    WebElement contextElement = searchContext.findElement(By.xpath("."));
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by),
-                            ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by),
+                if (searchContext instanceof WebElement) {
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy((WebElement) searchContext, by),
+                            ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by),
                             ExpectedConditions.visibilityOf(element));
                 } else {
                     waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
@@ -1759,10 +1766,9 @@ public class ExtendedWebElement implements IWebElement {
                             ExpectedConditions.visibilityOf(element));
                 }
             } else {
-                if (searchContext instanceof RemoteWebElement) {
-                    WebElement contextElement = searchContext.findElement(By.xpath("."));
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by),
-                            ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by));
+                if (searchContext instanceof WebElement) {
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy((WebElement) searchContext, by),
+                            ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by));
                 } else {
                     waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
                             ExpectedConditions.visibilityOfElementLocated(by));
@@ -1782,6 +1788,30 @@ public class ExtendedWebElement implements IWebElement {
             retryInterval = 1000;
         }
         return retryInterval;
+    }
+
+    private String decryptIfEncrypted(String text) {
+        Matcher cryptoMatcher = Pattern.compile(CRYPTO_PATTERN)
+                .matcher(text);
+        String decryptedText = text;
+        if (cryptoMatcher.find()) {
+            initCryptoTool();
+            decryptedText = this.cryptoTool.decrypt(text, CRYPTO_PATTERN);
+        }
+        return decryptedText;
+    }
+
+    private void initCryptoTool() {
+        if (this.cryptoTool == null) {
+            String cryptoKey = Configuration.get(Parameter.CRYPTO_KEY_VALUE);
+            if (cryptoKey.isEmpty()) {
+                throw new SkipException("Encrypted data detected, but the crypto key is not found!");
+            }
+            this.cryptoTool = CryptoToolBuilder.builder()
+                    .chooseAlgorithm(Algorithm.find(Configuration.get(Configuration.Parameter.CRYPTO_ALGORITHM)))
+                    .setKey(cryptoKey)
+                    .build();
+        }
     }
 
 }

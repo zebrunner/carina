@@ -5,7 +5,7 @@ import com.qaprosoft.apitools.annotation.AnnotationProcessorUtils;
 import com.qaprosoft.apitools.annotation.AnnotationUtils;
 import com.qaprosoft.apitools.annotation.ParameterAnnotationContext;
 import com.qaprosoft.carina.core.foundation.api.binding.RuntimeMethod;
-import com.qaprosoft.carina.core.foundation.exception.NotSupportedOperationException;
+import com.zebrunner.carina.utils.exception.NotSupportedOperationException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;

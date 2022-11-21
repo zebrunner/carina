@@ -23,10 +23,10 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.testng.ITestContext;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
-import com.qaprosoft.carina.core.foundation.exception.InvalidArgsException;
+import com.zebrunner.carina.utils.exception.InvalidArgsException;
 
 public class DSBean {
     Map<String, String> testParams;
