@@ -59,8 +59,7 @@ public class APISampleTest implements IAbstractTest {
         PostUserMethod api = new PostUserMethod();
         api.getProperties().remove("name");
         api.getProperties().remove("username");
-        api.expectResponseStatus(HttpResponseStatusType.CREATED_201);
-        api.callAPI();
+        api.callAPIExpectSuccess();
         api.validateResponse();
     }
 
@@ -68,8 +67,7 @@ public class APISampleTest implements IAbstractTest {
     @MethodOwner(owner = "qpsdemo")
     public void testGetUsers() {
         GetUserMethods getUsersMethods = new GetUserMethods();
-        getUsersMethods.expectResponseStatus(HttpResponseStatusType.OK_200);
-        getUsersMethods.callAPI();
+        getUsersMethods.callAPIExpectSuccess();
         getUsersMethods.validateResponse(JSONCompareMode.STRICT, JsonCompareKeywords.ARRAY_CONTAINS.getKey());
         getUsersMethods.validateResponseAgainstSchema("api/users/_get/rs.schema");
     }
@@ -79,8 +77,8 @@ public class APISampleTest implements IAbstractTest {
     @TestPriority(Priority.P1)
     public void testDeleteUsers() {
         DeleteUserMethod deleteUserMethod = new DeleteUserMethod();
-        deleteUserMethod.expectResponseStatus(HttpResponseStatusType.OK_200);
-        deleteUserMethod.callAPI();
+        deleteUserMethod.setProperties("api/users/user.properties");
+        deleteUserMethod.callAPIExpectSuccess();
         deleteUserMethod.validateResponse();
     }
 

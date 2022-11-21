@@ -1,0 +1,12 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org">
+    <soapenv:Header/>
+    <soapenv:Body>
+        <tem:AddInteger>
+            <tem:Arg1>${symbol_dollar}{firstNumber}</tem:Arg1>
+            <tem:Arg2>${symbol_dollar}{secondNumber}</tem:Arg2>
+        </tem:AddInteger>
+    </soapenv:Body>
+</soapenv:Envelope>

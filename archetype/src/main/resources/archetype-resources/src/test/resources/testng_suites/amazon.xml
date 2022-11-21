@@ -1,0 +1,19 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite verbose="1" name="Carina Demo Tests - Amazon" parallel="methods" thread-count="3">
+
+    <parameter name="suiteOwner" value="qpsdemo"/>
+    <parameter name="jenkinsJobName" value="Amazon-Demo-Test"/>
+    <parameter name="jenkinsJobType" value="api"/>
+    <parameter name="jenkinsEnvironments" value="DEMO"/>
+    <parameter name="jenkinsRegressionPipeline" value="api_regression, full_regression"/>
+
+    <test name="Amazon test">
+        <classes>
+            <class name="${package}.carina.demo.AmazonS3Test" />
+        </classes>
+    </test>
+
+</suite>

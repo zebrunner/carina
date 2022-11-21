@@ -1,0 +1,14 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:s="http://www.w3.org/2001/XMLSchema">
+    <SOAP-ENV:Body>
+        <LookupCityResponse xmlns="http://tempuri.org">
+            <LookupCityResult>
+                <City>New York</City>
+                <State>NY</State>
+                <Zip>10005</Zip>
+            </LookupCityResult>
+        </LookupCityResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
