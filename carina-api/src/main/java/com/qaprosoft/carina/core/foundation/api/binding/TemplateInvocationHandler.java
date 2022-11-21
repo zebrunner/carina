@@ -35,7 +35,7 @@ public class TemplateInvocationHandler implements InvocationHandler {
             AnnotatedElement anchorElement = new RuntimeMethod(proxy, method, args);
             result = createAnchorElementBasedInstance(method.getReturnType(), anchorElement);
         } else {
-            result = invokeNotSuitableMethod(originalClass, proxy, method);
+            result = invokeNotSuitableMethod(originalClass, proxy, method, args);
         }
         return result;
     }
@@ -57,7 +57,7 @@ public class TemplateInvocationHandler implements InvocationHandler {
         }
     }
 
-    private static Object invokeNotSuitableMethod(Class<?> originalClass, Object proxy, Method method) {
+    private static Object invokeNotSuitableMethod(Class<?> originalClass, Object proxy, Method method, Object[] args) {
         try {
             return MethodHandles.lookup()
                     .findSpecial(
@@ -67,7 +67,7 @@ public class TemplateInvocationHandler implements InvocationHandler {
                             originalClass
                     )
                     .bindTo(proxy)
-                    .invokeWithArguments();
+                    .invokeWithArguments(args);
         } catch (Throwable e) {
             throw new RuntimeException(e.getMessage(), e);
         }
