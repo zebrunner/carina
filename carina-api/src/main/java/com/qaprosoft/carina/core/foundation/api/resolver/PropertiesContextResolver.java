@@ -2,7 +2,7 @@ package com.qaprosoft.carina.core.foundation.api.resolver;
 
 import com.qaprosoft.carina.core.foundation.api.http.HttpMethodType;
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
-import com.qaprosoft.carina.core.foundation.utils.R;
+import com.zebrunner.carina.utils.R;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Optional;

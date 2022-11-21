@@ -6,7 +6,7 @@ package ${package}.carina.demo;
 import org.testng.annotations.Test;
 
 import com.qaprosoft.carina.core.foundation.IAbstractTest;
-import com.qaprosoft.carina.core.foundation.utils.mobile.IMobileUtils;
+import com.zebrunner.carina.utils.mobile.IMobileUtils;
 import ${package}.carina.demo.mobile.gui.pages.ios.SaucePage;
 
 public class IOSSafariTest implements IAbstractTest, IMobileUtils {

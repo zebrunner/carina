@@ -43,6 +43,8 @@
         <maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <jacoco-maven-plugin>0.8.7</jacoco-maven-plugin>
+
+        <carina-utils.version>1.0.0</carina-utils.version>
         <!-- Testings -->
         <testng.version>7.6.1</testng.version>
         <testng-foundation.version>2.0.1</testng-foundation.version>
@@ -63,7 +65,7 @@
         <selenium.version>4.4.0</selenium.version>
         <appium.version>8.2.0</appium.version>
         <!-- Zebrunner integrations -->
-        <zebrunner-testng-pluggable.version>1.9.0</zebrunner-testng-pluggable.version>
+        <zebrunner-testng-pluggable.version>1.9.1</zebrunner-testng-pluggable.version>
         <!-- Others -->
         <azure-storage-blob.version>12.7.0</azure-storage-blob.version>
         <aws-java-sdk.version>1.11.923</aws-java-sdk.version>
@@ -85,11 +87,9 @@
 
     </properties>
     <modules>
-        <module>carina-commons</module>
         <module>carina-api</module>
         <module>carina-dataprovider</module>
         <module>carina-proxy</module>
-        <module>carina-utils</module>
         <module>carina-reporting</module>
         <module>carina-webdriver</module>
         <module>carina-aws-s3</module>
@@ -97,7 +97,7 @@
         <module>carina-core</module>
         <module>carina-azure</module>
     </modules>
-    <repositories>
+    <!--repositories>
         <repository>
             <id>zebrunner_snapshots</id>
             <name>zebrunner Snapshots</name>
@@ -109,7 +109,7 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-    </repositories>
+    </repositories-->
     <profiles>
         <profile>
             <id>default</id>
@@ -334,11 +334,6 @@
             </dependency>
             <dependency>
                 <groupId>com.qaprosoft</groupId>
-                <artifactId>carina-commons</artifactId>
-                <version>1.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>com.qaprosoft</groupId>
                 <artifactId>carina-api</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>
@@ -363,19 +358,14 @@
                 <version>1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>com.qaprosoft</groupId>
+                <groupId>com.zebrunner</groupId>
                 <artifactId>carina-utils</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <version>${carina-utils.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.qaprosoft</groupId>
                 <artifactId>carina-reporting</artifactId>
                 <version>1.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>com.zebrunner</groupId>
-                <artifactId>carina-crypto</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.qaprosoft</groupId>
@@ -499,11 +489,6 @@
                 <version>${selenium.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.sun.jna</groupId>
-                <artifactId>jna</artifactId>
-                <version>${jna.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>io.appium</groupId>
                 <artifactId>java-client</artifactId>
                 <version>${appium.version}</version>
@@ -604,17 +589,7 @@
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-core</artifactId>
-                <version>${jackson.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>${jackson.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-annotations</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
             <dependency>

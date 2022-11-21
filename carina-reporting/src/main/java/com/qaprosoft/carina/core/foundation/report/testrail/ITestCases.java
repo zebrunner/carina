@@ -18,8 +18,8 @@ package com.qaprosoft.carina.core.foundation.report.testrail;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration.Parameter;
 
 public interface ITestCases {
     ThreadLocal<List<String>> casesIds = ThreadLocal.withInitial(ArrayList::new);

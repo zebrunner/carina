@@ -26,11 +26,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.report.ReportContext;
-import com.qaprosoft.carina.core.foundation.report.TestResultItem;
-import com.qaprosoft.carina.core.foundation.report.TestResultType;
-import com.qaprosoft.carina.core.foundation.utils.R;
+import com.zebrunner.carina.utils.R;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.report.ReportContext;
+import com.zebrunner.carina.utils.report.TestResult;
+import com.zebrunner.carina.utils.report.TestResultItem;
+import com.zebrunner.carina.utils.report.TestResultType;
 
 /**
  * EmailReportGenerator generates emailable report using data from test suite log.
@@ -215,7 +216,7 @@ public class EmailReportGenerator {
         return passCount > 0 ? (int) (((double) passCount) / ((double) passCount + (double) failCount + (double) skipCount) * 100) : 0;
     }
 
-    public static TestResultType getSuiteResult(List<TestResultItem> ris) {
+    public static TestResult getSuiteResult(List<TestResultItem> ris) {
         int passed = 0;
         int failed = 0;
         int failedKnownIssue = 0;
@@ -241,19 +242,18 @@ public class EmailReportGenerator {
                 break;
             }
         }
-        TestResultType result;
+        TestResult result = new TestResult(TestResultType.FAIL);
         if (passed > 0 && failedKnownIssue == 0 && failed == 0 && skipped == 0) {
-            result = TestResultType.PASS;
+            result.setTestResultType(TestResultType.PASS);
         } else if (passed >= 0 && failedKnownIssue > 0 && failed == 0 && skipped == 0) {
-            result = TestResultType.PASS_WITH_KNOWN_ISSUES;
+            result.setTestResultType(TestResultType.PASS_WITH_KNOWN_ISSUES);
         } else if (passed >= 0 && failed == 0 && skipped > 0) {
-            result = TestResultType.SKIP;
-        } else {
-            result = TestResultType.FAIL;
+            result.setTestResultType(TestResultType.SKIP);
         }
-        result.setPassed(passed);
-        result.setFailed(failed + failedKnownIssue);
-        result.setSkipped(skipped);
+
+        result.setAmountOfPassed(passed);
+        result.setAmountOfFailed(failed + failedKnownIssue);
+        result.setAmountOfSkipped(skipped);
 
         return result;
     }

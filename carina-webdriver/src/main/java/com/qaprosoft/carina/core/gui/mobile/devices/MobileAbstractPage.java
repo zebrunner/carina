@@ -17,8 +17,8 @@ package com.qaprosoft.carina.core.gui.mobile.devices;
 
 import org.openqa.selenium.WebDriver;
 
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.mobile.IMobileUtils;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.mobile.IMobileUtils;
 import com.qaprosoft.carina.core.gui.AbstractPage;
 
 public abstract class MobileAbstractPage extends AbstractPage implements IMobileUtils {

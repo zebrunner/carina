@@ -61,15 +61,15 @@ import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.SkipException;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.performance.ACTION_NAME;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.IWebElement;
-import com.qaprosoft.carina.core.foundation.utils.Messager;
-import com.qaprosoft.carina.core.foundation.utils.R;
-import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
-import com.qaprosoft.carina.core.foundation.utils.resources.L10N;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.performance.ACTION_NAME;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration.Parameter;
+import com.zebrunner.carina.utils.IWebElement;
+import com.zebrunner.carina.utils.messager.Messager;
+import com.zebrunner.carina.utils.R;
+import com.zebrunner.carina.utils.common.CommonUtils;
+import com.zebrunner.carina.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
@@ -1028,23 +1028,25 @@ public class ExtendedWebElement implements IWebElement {
         return findExtendedWebElements(by, EXPLICIT_TIMEOUT);
     }
 
+    /**
+     * Get list of {@link ExtendedWebElement}s. Search of elements starts from current {@link ExtendedWebElement}
+     *
+     * @param by see {@link By}
+     * @param timeout timeout of checking the presence of the element(s)
+     * @return list of ExtendedWebElements if found, empty list otherwise
+     */
     public List<ExtendedWebElement> findExtendedWebElements(final By by, long timeout) {
-        ExtendedWebElement firstTempElement = new ExtendedWebElement(by, "first element", getDriver(), getElement());
-        if (!firstTempElement.isPresent(timeout)) {
-            throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
+        List<ExtendedWebElement> extendedWebElements = new ArrayList<>();
+        ExtendedWebElement firstElement = new ExtendedWebElement(by, "first element", getDriver(), getElement());
+        if (!firstElement.isPresent(timeout)) {
+            LOGGER.info("FAIL: element(s) '{}' is not found!", by);
+            return extendedWebElements;
         }
 
         List<WebElement> webElements = getElement().findElements(by);
-        List<ExtendedWebElement> extendedWebElements = new ArrayList<>();
+        int i = 1;
         for (WebElement element : webElements) {
-            String name = "undefined";
-            try {
-                name = element.getText();
-            } catch (Exception e) {
-                /* do nothing */
-                LOGGER.debug("Error while getting text from element.", e);
-            }
-
+            String name = String.format("ExtendedWebElement - [%d]", i++);
             ExtendedWebElement tempElement = new ExtendedWebElement(by, name, getDriver(), getElement());
             tempElement.setElement(element);
             extendedWebElements.add(tempElement);
@@ -1717,18 +1719,16 @@ public class ExtendedWebElement implements IWebElement {
         switch (loadingStrategy) {
         case BY_PRESENCE: {
             if (element != null) {
-                if (searchContext instanceof RemoteWebElement) {
-                    WebElement contextElement = searchContext.findElement(By.xpath("."));
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by),
+                if (searchContext instanceof WebElement) {
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy((WebElement) searchContext, by),
                             ExpectedConditions.visibilityOf(element));
                 } else {
                     waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
                             ExpectedConditions.visibilityOf(element));
                 }
             } else {
-                if (searchContext instanceof RemoteWebElement) {
-                    WebElement contextElement = searchContext.findElement(By.xpath("."));
-                    waitCondition = ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by);
+                if (searchContext instanceof WebElement) {
+                    waitCondition = ExpectedConditions.presenceOfNestedElementLocatedBy((WebElement) searchContext, by);
                 } else {
                     waitCondition = ExpectedConditions.presenceOfElementLocated(by);
 
@@ -1738,18 +1738,16 @@ public class ExtendedWebElement implements IWebElement {
         }
         case BY_VISIBILITY: {
             if (element != null) {
-                if (searchContext instanceof RemoteWebElement) {
-                    WebElement contextElement = searchContext.findElement(By.xpath("."));
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by),
+                if (searchContext instanceof WebElement) {
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by),
                             ExpectedConditions.visibilityOf(element));
                 } else {
                     waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(by),
                             ExpectedConditions.visibilityOf(element));
                 }
             } else {
-                if (searchContext instanceof RemoteWebElement) {
-                    WebElement contextElement = searchContext.findElement(By.xpath("."));
-                    waitCondition = ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by);
+                if (searchContext instanceof WebElement) {
+                    waitCondition = ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by);
                 } else {
                     waitCondition = ExpectedConditions.visibilityOfElementLocated(by);
                 }
@@ -1758,10 +1756,9 @@ public class ExtendedWebElement implements IWebElement {
         }
         case BY_PRESENCE_OR_VISIBILITY:
             if (element != null) {
-                if (searchContext instanceof RemoteWebElement) {
-                    WebElement contextElement = searchContext.findElement(By.xpath("."));
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by),
-                            ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by),
+                if (searchContext instanceof WebElement) {
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy((WebElement) searchContext, by),
+                            ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by),
                             ExpectedConditions.visibilityOf(element));
                 } else {
                     waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
@@ -1769,10 +1766,9 @@ public class ExtendedWebElement implements IWebElement {
                             ExpectedConditions.visibilityOf(element));
                 }
             } else {
-                if (searchContext instanceof RemoteWebElement) {
-                    WebElement contextElement = searchContext.findElement(By.xpath("."));
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy(contextElement, by),
-                            ExpectedConditions.visibilityOfNestedElementsLocatedBy(contextElement, by));
+                if (searchContext instanceof WebElement) {
+                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy((WebElement) searchContext, by),
+                            ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by));
                 } else {
                     waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
                             ExpectedConditions.visibilityOfElementLocated(by));

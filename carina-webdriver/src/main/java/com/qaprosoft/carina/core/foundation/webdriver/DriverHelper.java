@@ -74,13 +74,14 @@ import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.SkipException;
 
-import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.retry.ActionPoller;
-import com.qaprosoft.carina.core.foundation.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.utils.LogicUtils;
-import com.qaprosoft.carina.core.foundation.utils.Messager;
-import com.qaprosoft.carina.core.foundation.utils.common.CommonUtils;
+
+import com.zebrunner.carina.utils.retry.ActionPoller;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration.Parameter;
+import com.zebrunner.carina.utils.LogicUtils;
+import com.zebrunner.carina.utils.messager.Messager;
+import com.zebrunner.carina.utils.common.CommonUtils;
+
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.gui.AbstractPage;
@@ -1239,20 +1240,15 @@ public class DriverHelper {
     public List<ExtendedWebElement> findExtendedWebElements(final By by, long timeout) {
         List<ExtendedWebElement> extendedWebElements = new ArrayList<>();
 
-        String name = "undefined";
         if (!waitUntil(ExpectedConditions.presenceOfElementLocated(by), timeout)) {
-            Messager.ELEMENT_NOT_FOUND.info(name);
+            Messager.ELEMENT_NOT_FOUND.info(by.toString());
     		return extendedWebElements;
     	}
 
         List<WebElement> webElements = getDriver().findElements(by);
+        int i = 1;
         for (WebElement element : webElements) {
-            try {
-                name = element.getText();
-            } catch (Exception e) {
-                /* do nothing and keep 'undefined' for control name */
-            }
-
+            String name = String.format("ExtendedWebElement - [%d]", i++);
             ExtendedWebElement tempElement = new ExtendedWebElement(by, name, getDriver(), getDriver());
             tempElement.setElement(element);
             extendedWebElements.add(tempElement);
