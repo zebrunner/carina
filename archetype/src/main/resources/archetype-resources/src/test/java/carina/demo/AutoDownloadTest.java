@@ -7,12 +7,18 @@ import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.UUID;
+import java.time.Duration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
+
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.FluentWait;
 
 import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import com.zebrunner.carina.utils.report.ReportContext;
@@ -67,11 +73,17 @@ public class AutoDownloadTest implements IAbstractTest {
         DriverHelper driverHelper = new DriverHelper(getDriver());
         driverHelper.openURL(url1);
         driverHelper.openURL(url2);
-        pause(1);
 
-        List<String> fileNames = ReportContext.listArtifacts(getDriver());
-        Assert.assertTrue(fileNames.contains("tropiko.zip"), "tropiko.zip not found");
-        Assert.assertTrue(fileNames.contains("solar.zip"), "solar.zip not found");
+        FluentWait<WebDriver> wait = new FluentWait<>(getDriver())
+                .pollingEvery(Duration.ofSeconds(1))
+                .withTimeout(Duration.ofSeconds(30));
+
+        SoftAssert softAssert = new SoftAssert();
+
+        softAssert.assertTrue(isArtifactPresent(wait, "tropiko.zip"), "tropiko.zip not found");
+        softAssert.assertTrue(isArtifactPresent(wait, "solar.zip"), "solar.zip not found");
+
+        softAssert.assertAll();
 
         List<File> files = ReportContext.getArtifacts(getDriver(), ".+");
         Assert.assertEquals(files.size(), 2);
@@ -82,6 +94,22 @@ public class AutoDownloadTest implements IAbstractTest {
         files = ReportContext.getArtifacts(getDriver(), "UUID.randomUUID().toString()");
         Assert.assertEquals(files.size(), 0);
 
+    }
+
+    private static boolean isArtifactPresent(FluentWait<WebDriver> wait, String name) {
+        boolean isFound = false;
+        try {
+            isFound = wait.until(dr -> {
+                List<String> list = ReportContext.listArtifacts(dr);
+                if (list.contains(name)) {
+                    return true;
+                }
+                return null;
+            });
+        } catch (TimeoutException e) {
+            // do nothing
+        }
+        return isFound;
     }
 
 }

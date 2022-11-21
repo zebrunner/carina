@@ -1,0 +1,11 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org">
+    <soapenv:Header/>
+    <soapenv:Body>
+        <tem:LookupCity>
+            <tem:zip>${symbol_dollar}{zipCode}</tem:zip>
+        </tem:LookupCity>
+    </soapenv:Body>
+</soapenv:Envelope>

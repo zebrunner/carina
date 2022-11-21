@@ -1,0 +1,12 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <AddIntegerResponse xmlns="http://tempuri.org">
+            <${symbol_pound}if firstNumber?? and secondNumber??>
+                <AddIntegerResult>${symbol_dollar}{firstNumber+secondNumber}</AddIntegerResult>
+            </${symbol_pound}if>
+        </AddIntegerResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
