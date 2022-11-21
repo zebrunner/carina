@@ -39,7 +39,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.qaprosoft</groupId>
+			<groupId>com.zebrunner</groupId>
 			<artifactId>carina-proxy</artifactId>
 			<exclusions>
 				<exclusion>
