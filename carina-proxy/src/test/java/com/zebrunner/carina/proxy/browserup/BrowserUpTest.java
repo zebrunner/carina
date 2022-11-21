@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.browserupproxy;
+package com.zebrunner.carina.proxy.browserup;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
@@ -27,6 +27,8 @@ import javax.net.ssl.SSLContext;
 
 import com.browserup.bup.BrowserUpProxy;
 import com.browserup.bup.proxy.CaptureType;
+import com.zebrunner.carina.proxy.browserup.LocalTrustStoreBuilder;
+import com.zebrunner.carina.proxy.browserup.ProxyPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -35,7 +37,7 @@ import org.testng.annotations.*;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.Configuration.Parameter;
 import com.zebrunner.carina.utils.R;
-import com.qaprosoft.carina.proxy.SystemProxy;
+import com.zebrunner.carina.proxy.SystemProxy;
 
 public class BrowserUpTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

@@ -78,7 +78,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>com.qaprosoft.carina.browserupproxy.ProxyPool</mainClass>
+							<mainClass>com.zebrunner.carina.proxy.browserup.ProxyPool</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>

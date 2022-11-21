@@ -13,16 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.browserupproxy;
+package com.zebrunner.carina.proxy.browserup;
 
 import com.browserup.bup.BrowserUpProxy;
+import com.zebrunner.carina.proxy.browserup.ProxyPool;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.zebrunner.carina.utils.R;
-import com.qaprosoft.carina.proxy.SystemProxy;
+import com.zebrunner.carina.proxy.SystemProxy;
 
 
 public class BrowserUpPortsRangeTest {

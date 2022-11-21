@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.browserupproxy.rewrite;
+package com.zebrunner.carina.proxy.browserup.rewrite;
 
 public enum HeaderMethod {
     

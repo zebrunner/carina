@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.proxy;
+package com.zebrunner.carina.proxy;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;

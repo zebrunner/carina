@@ -37,7 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
-import com.qaprosoft.carina.browserupproxy.ProxyPool;
+import com.zebrunner.carina.proxy.browserup.ProxyPool;
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
 import com.zebrunner.carina.utils.exception.DriverPoolException;
 import com.zebrunner.carina.utils.Configuration;

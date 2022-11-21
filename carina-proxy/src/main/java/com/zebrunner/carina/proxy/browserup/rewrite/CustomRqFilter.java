@@ -13,71 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.browserupproxy.rewrite;
+package com.zebrunner.carina.proxy.browserup.rewrite;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.browserup.bup.filters.ResponseFilter;
+import com.browserup.bup.filters.RequestFilter;
 import com.browserup.bup.util.HttpMessageContents;
 import com.browserup.bup.util.HttpMessageInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
 
+
 /**
- * Class wrapper for ResponseFilter. Rewrite rules can be configured as separate
+ * Class wrapper for RequestFilter. Rewrite rules can be configured as separate
  * Java Beans and can be passed into this class. Fitler's will be applied.
  *
  */
-public class CustomRsFilter implements ResponseFilter {
+public class CustomRqFilter implements RequestFilter {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
+    
     private List<RewriteItem> rewrites = new ArrayList<>();
 
-    /**
-     * Update response headers
-     * @param rs HttpResponse
-     * @param headers List&lt;HeaderItem&gt;
-     */
-    private void applyHeaders(HttpResponse rs, List<HeaderItem> headers) {
-        for (HeaderItem headerItem : headers) {
-            LOGGER.debug("Rewrite header: ".concat(headerItem.toString()));
-            switch (headerItem.getMethod()) {
-            case ADD:
-                rs.headers().add(headerItem.getHeader().getKey(), headerItem.getHeader().getValue());
-                break;
-            case REMOVE:
-                rs.headers().remove(headerItem.getHeader().getKey());
-                break;
-            case UPDATE:
-                rs.headers().set(headerItem.getHeader().getKey(), headerItem.getHeader().getValue());
-                break;
-            default:
-                break;
-            }
-        }
-    }
-
-    public CustomRsFilter(List<RewriteItem> rewrites) {
-        this.rewrites = rewrites;
-    }
-
     @Override
-    public void filterResponse(HttpResponse response, HttpMessageContents contents, HttpMessageInfo messageInfo) {
+    public HttpResponse filterRequest(HttpRequest rq, HttpMessageContents contents, HttpMessageInfo messageInfo) {
         if (rewrites.isEmpty()) {
-            return;
+            return null;
         }
-
-        String reqUrl = messageInfo.getOriginalUrl();
+        String reqUrl = rq.getUri();
         for (RewriteItem rewriteItem : rewrites) {
-            if (reqUrl.matches(rewriteItem.getHost())) {
+            if(reqUrl.matches(rewriteItem.getHost())) {
                 // headers rewrite
-                LOGGER.debug("Rewrite rule will be applied for host: {}", reqUrl);
-                applyHeaders(response, rewriteItem.getHeaders());
+                LOGGER.debug("Rewrite rule will be applied for host: ".concat(reqUrl));
+                rq = applyHeaders(rq, rewriteItem.getHeaders());
 
                 // body rewrite
                 String content = contents.getTextContents();
@@ -85,7 +58,38 @@ public class CustomRsFilter implements ResponseFilter {
                 contents.setTextContents(replacedContent);
             }
         }
-
+        
+        return null;
+    }
+    
+    
+    /**
+     * Apply headers to request
+     * @param req HttpRequest
+     * @param headers List&lt;HeaderItem&gt;
+     * @return updated request
+     */
+    private HttpRequest applyHeaders(HttpRequest req, List<HeaderItem> headers) {
+        for (HeaderItem headerItem : headers) {
+            switch (headerItem.getMethod()) {
+            case ADD:
+                req.headers().add(headerItem.getHeader().getKey(), headerItem.getHeader().getValue());
+                break;
+            case REMOVE:
+                req.headers().remove(headerItem.getHeader().getKey());
+                break;
+            case UPDATE:
+                req.headers().set(headerItem.getHeader().getKey(), headerItem.getHeader().getValue());
+                break;
+            default:
+                break;
+            }
+        }
+        return req;
+    }
+    
+    public CustomRqFilter (List<RewriteItem> rewrites) {
+        this.rewrites = rewrites;
     }
 
 }
