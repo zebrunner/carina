@@ -27,7 +27,6 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-import com.zebrunner.carina.utils.android.IAndroidUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.DeviceRotation;
 import org.openqa.selenium.Dimension;
@@ -45,15 +44,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.zebrunner.carina.utils.Configuration;
-import com.zebrunner.carina.utils.Configuration.Parameter;
-import com.zebrunner.carina.utils.messager.Messager;
-import com.zebrunner.carina.utils.android.AndroidService;
-import com.zebrunner.carina.utils.android.DeviceTimeZone;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration.Parameter;
+import com.zebrunner.carina.utils.android.AndroidService;
+import com.zebrunner.carina.utils.android.DeviceTimeZone;
+import com.zebrunner.carina.utils.android.IAndroidUtils;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.messager.Messager;
 
 import io.appium.java_client.HasAppStrings;
 import io.appium.java_client.HasDeviceTime;
@@ -69,6 +69,8 @@ import io.appium.java_client.appmanagement.BaseActivateApplicationOptions;
 import io.appium.java_client.appmanagement.BaseInstallApplicationOptions;
 import io.appium.java_client.appmanagement.BaseRemoveApplicationOptions;
 import io.appium.java_client.appmanagement.BaseTerminateApplicationOptions;
+import io.appium.java_client.clipboard.ClipboardContentType;
+import io.appium.java_client.clipboard.HasClipboard;
 import io.appium.java_client.remote.SupportsContextSwitching;
 import io.appium.java_client.remote.SupportsLocation;
 import io.appium.java_client.remote.SupportsRotation;
@@ -1674,6 +1676,68 @@ public interface IMobileUtils extends IDriverPool {
             throw new UnsupportedOperationException("Driver is not support stopRecordingScreen method", e);
         }
         return driver.stopRecordingScreen();
+    }
+
+    /**
+     * Set the content of device's clipboard.
+     *
+     * @param contentType one of supported content types.
+     * @param base64Content base64-encoded content to be set.
+     */
+    public default void setClipboard(ClipboardContentType contentType, byte[] base64Content) {
+        HasClipboard driver = null;
+        try {
+            driver = (HasClipboard) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support setClipboard method", e);
+        }
+        driver.setClipboard(contentType, base64Content);
+    }
+
+    /**
+     * Get the content of the clipboard.
+     *
+     * @param contentType one of supported content types.
+     * @return the actual content of the clipboard as base64-encoded string or an empty string if the clipboard is empty.
+     */
+    public default String getClipboard(ClipboardContentType contentType) {
+        HasClipboard driver = null;
+        try {
+            driver = (HasClipboard) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getClipboard method", e);
+        }
+        return driver.getClipboard(contentType);
+    }
+
+    /**
+     * Set the clipboard text.
+     *
+     * @param text the actual text to be set.
+     */
+    public default void setClipboardText(String text) {
+        HasClipboard driver = null;
+        try {
+            driver = (HasClipboard) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support setClipboardText method", e);
+        }
+        driver.setClipboardText(text);
+    }
+
+    /**
+     * Get the clipboard text.
+     *
+     * @return either the text, which is stored in the clipboard or an empty string if the clipboard is empty.
+     */
+    public default String getClipboardText() {
+        HasClipboard driver = null;
+        try {
+            driver = (HasClipboard) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getClipboardText method", e);
+        }
+        return driver.getClipboardText();
     }
 
 }
