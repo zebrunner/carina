@@ -21,13 +21,13 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nullable;
 
-import com.zebrunner.carina.utils.android.IAndroidUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.DeviceRotation;
 import org.openqa.selenium.Dimension;
@@ -45,30 +45,35 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.zebrunner.carina.utils.Configuration;
-import com.zebrunner.carina.utils.Configuration.Parameter;
-import com.zebrunner.carina.utils.messager.Messager;
-import com.zebrunner.carina.utils.android.AndroidService;
-import com.zebrunner.carina.utils.android.DeviceTimeZone;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration.Parameter;
+import com.zebrunner.carina.utils.android.AndroidService;
+import com.zebrunner.carina.utils.android.DeviceTimeZone;
+import com.zebrunner.carina.utils.android.IAndroidUtils;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.messager.Messager;
 
 import io.appium.java_client.HasAppStrings;
 import io.appium.java_client.HasDeviceTime;
 import io.appium.java_client.HasOnScreenKeyboard;
+import io.appium.java_client.HasSettings;
 import io.appium.java_client.HidesKeyboard;
 import io.appium.java_client.InteractsWithApps;
 import io.appium.java_client.LocksDevice;
 import io.appium.java_client.PullsFiles;
 import io.appium.java_client.PushesFiles;
+import io.appium.java_client.Setting;
 import io.appium.java_client.SupportsLegacyAppManagement;
 import io.appium.java_client.appmanagement.ApplicationState;
 import io.appium.java_client.appmanagement.BaseActivateApplicationOptions;
 import io.appium.java_client.appmanagement.BaseInstallApplicationOptions;
 import io.appium.java_client.appmanagement.BaseRemoveApplicationOptions;
 import io.appium.java_client.appmanagement.BaseTerminateApplicationOptions;
+import io.appium.java_client.clipboard.ClipboardContentType;
+import io.appium.java_client.clipboard.HasClipboard;
 import io.appium.java_client.remote.SupportsContextSwitching;
 import io.appium.java_client.remote.SupportsLocation;
 import io.appium.java_client.remote.SupportsRotation;
@@ -1674,6 +1679,215 @@ public interface IMobileUtils extends IDriverPool {
             throw new UnsupportedOperationException("Driver is not support stopRecordingScreen method", e);
         }
         return driver.stopRecordingScreen();
+    }
+
+    /**
+     * Set the content of device's clipboard.
+     *
+     * @param contentType one of supported content types.
+     * @param base64Content base64-encoded content to be set.
+     */
+    public default void setClipboard(ClipboardContentType contentType, byte[] base64Content) {
+        HasClipboard driver = null;
+        try {
+            driver = (HasClipboard) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support setClipboard method", e);
+        }
+        driver.setClipboard(contentType, base64Content);
+    }
+
+    /**
+     * Get the content of the clipboard.
+     *
+     * @param contentType one of supported content types.
+     * @return the actual content of the clipboard as base64-encoded string or an empty string if the clipboard is empty.
+     */
+    public default String getClipboard(ClipboardContentType contentType) {
+        HasClipboard driver = null;
+        try {
+            driver = (HasClipboard) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getClipboard method", e);
+        }
+        return driver.getClipboard(contentType);
+    }
+
+    /**
+     * Set the clipboard text.
+     *
+     * @param text the actual text to be set.
+     */
+    public default void setTextToClipboard(String text) {
+        HasClipboard driver = null;
+        try {
+            driver = (HasClipboard) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support setTextToClipboard method", e);
+        }
+        driver.setClipboardText(text);
+    }
+
+    /**
+     * Get the clipboard text.
+     *
+     * @return either the text, which is stored in the clipboard or an empty string if the clipboard is empty.
+     */
+    public default String getTextFromClipboard() {
+        HasClipboard driver = null;
+        try {
+            driver = (HasClipboard) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getTextFromClipboard method", e);
+        }
+        return driver.getClipboardText();
+    }
+
+    /**
+     * Set a setting for this test session.
+     *
+     * @param setting setting you wish to set.
+     * @param value value of the setting.
+     * @return {@link HasSettings} instance for chaining.
+     */
+    public default HasSettings setSetting(Setting setting, Object value) {
+        HasSettings driver = null;
+        try {
+            driver = (HasSettings) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support setSetting method", e);
+        }
+        return driver.setSetting(setting, value);
+    }
+
+    /**
+     * Set a setting for this test session.
+     *
+     * @param settingName setting name you wish to set.
+     * @param value value of the setting.
+     * @return {@link HasSettings} instance for chaining.
+     */
+    public default HasSettings setSetting(String settingName, Object value) {
+        HasSettings driver = null;
+        try {
+            driver = (HasSettings) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support setSetting method", e);
+        }
+        return driver.setSetting(settingName, value);
+    }
+
+    /**
+     * Sets settings for this test session.
+     *
+     * @param settings a map with settings, where key is the setting name you wish to set and value is the value of
+     *            the setting.
+     * @return {@link HasSettings} {@link HasSettings} instance for chaining.
+     */
+    public default HasSettings setSettings(EnumMap<Setting, Object> settings) {
+        HasSettings driver = null;
+        try {
+            driver = (HasSettings) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support setSettings method", e);
+        }
+        return driver.setSettings(settings);
+    }
+
+    /**
+     * Sets settings for this test session.
+     *
+     * @param settings a map with settings, where key is the setting name you wish to set and value is the value of
+     *            the setting.
+     * @return {@link HasSettings} instance for chaining.
+     */
+    public default HasSettings setSettings(Map<String, Object> settings) {
+        HasSettings driver = null;
+        try {
+            driver = (HasSettings) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support setSettings method", e);
+        }
+        return driver.setSettings(settings);
+    }
+
+    /**
+     * Get settings stored for this test session.
+     *
+     * @return JsonObject, a straight-up hash of settings.
+     */
+    public default Map<String, Object> getSettings() {
+        HasSettings driver = null;
+        try {
+            driver = (HasSettings) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getSettings method", e);
+        }
+        return driver.getSettings();
+    }
+
+    /**
+     * Get capabilities of the current driver
+     * 
+     * @return see {@link Capabilities}
+     */
+    public default Capabilities getCapabilities() {
+        HasCapabilities driver = null;
+        try {
+            driver = (HasCapabilities) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getCapabilities method", e);
+        }
+        return driver.getCapabilities();
+    }
+
+    /**
+     * Drag and drop
+     * 
+     * @param dragMeElement element to drag
+     * @param dropZoneElement drop zone element
+     */
+    public default void dragAndDrop(ExtendedWebElement dragMeElement, ExtendedWebElement dropZoneElement) {
+
+        Dimension dragMeElementSize = dragMeElement.getSize();
+        Point dragMeElementLocation = dragMeElement.getLocation();
+        Point dragMeElementCenter = new Point(dragMeElementLocation.getX() + dragMeElementSize.getWidth() / 2,
+                dragMeElementLocation.getY() + dragMeElementSize.getHeight() / 2);
+
+        Dimension dropZoneElementSize = dropZoneElement.getSize();
+        Point dropZoneElementLocation = dropZoneElement.getLocation();
+        Point dropZoneElementCenter = new Point(dropZoneElementLocation.getX() + dropZoneElementSize.getWidth() / 2,
+                dropZoneElementLocation.getY() + dropZoneElementSize.getHeight() / 2);
+
+        dragAndDrop(dragMeElementCenter.x, dragMeElementCenter.y, dropZoneElementCenter.x, dropZoneElementCenter.y,
+                Duration.ofMillis(1000), Duration.ofMillis(1000));
+    }
+
+    /**
+     * Drag and drop
+     * 
+     * @param fromX x point of the drag and drop element
+     * @param fromY y point of the drag and drop element
+     * @param toX x point of the drop zone
+     * @param toY y point of the drop zone
+     * @param pressingTime time of clicking on the element to be dragged
+     */
+    public default void dragAndDrop(int fromX, int fromY, int toX, int toY, Duration pressingTime, Duration dragTime) {
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+        Sequence sequence = new Sequence(finger, 1);
+        sequence.addAction(finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.viewport(), fromX, fromY));
+        sequence.addAction(finger.createPointerDown(PointerInput.MouseButton.MIDDLE.asArg()));
+        sequence.addAction(new Pause(finger, pressingTime));
+        sequence.addAction(finger.createPointerMove(dragTime, PointerInput.Origin.viewport(), toX, toY));
+        sequence.addAction(finger.createPointerUp(PointerInput.MouseButton.MIDDLE.asArg()));
+
+        Interactive drv = null;
+        try {
+            drv = (Interactive) getDriver();
+            drv.perform(List.of(sequence));
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support dragAndDrop method", e);
+        }
     }
 
 }

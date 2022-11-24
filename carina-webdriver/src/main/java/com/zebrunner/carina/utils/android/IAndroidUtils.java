@@ -22,6 +22,7 @@ import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
@@ -29,8 +30,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import com.zebrunner.carina.utils.Configuration;
-import com.zebrunner.carina.utils.mobile.IMobileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
@@ -46,16 +45,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableMap;
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.zebrunner.carina.utils.report.ReportContext;
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
+import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.android.Permissions.Permission;
 import com.zebrunner.carina.utils.android.Permissions.PermissionAction;
 import com.zebrunner.carina.utils.android.Permissions.PermissionType;
 import com.zebrunner.carina.utils.android.recorder.utils.AdbExecutor;
 import com.zebrunner.carina.utils.android.recorder.utils.CmdLine;
 import com.zebrunner.carina.utils.common.CommonUtils;
-import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.mobile.IMobileUtils;
+import com.zebrunner.carina.utils.report.ReportContext;
 
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.ExecutesMethod;
@@ -68,6 +69,7 @@ import io.appium.java_client.android.GsmSignalStrength;
 import io.appium.java_client.android.GsmVoiceState;
 import io.appium.java_client.android.HasAndroidClipboard;
 import io.appium.java_client.android.HasAndroidDeviceDetails;
+import io.appium.java_client.android.HasAndroidSettings;
 import io.appium.java_client.android.HasSupportedPerformanceDataType;
 import io.appium.java_client.android.NetworkSpeed;
 import io.appium.java_client.android.PowerACState;
@@ -88,7 +90,6 @@ import io.appium.java_client.clipboard.ClipboardContentType;
  * Contains utility methods for working with android devices
  */
 public interface IAndroidUtils extends IMobileUtils {
-    // todo add HasAndroidSettings methods
     // todo add methods from ListensToLogcatMessages
     // todo add methods from ExecuteCDPCommand
     // TODO: review carefully and remove duplicates and migrate completely to fluent waits
@@ -1729,4 +1730,240 @@ public interface IAndroidUtils extends IMobileUtils {
         activity.setStopApp(isRerun);
         startActivity(activity);
     }
+
+    /**
+     * Set the `ignoreUnimportantViews` setting. *Android-only method*.
+     * Sets whether Android devices should use `setCompressedLayoutHeirarchy()`
+     * which ignores all views which are marked IMPORTANT_FOR_ACCESSIBILITY_NO
+     * or IMPORTANT_FOR_ACCESSIBILITY_AUTO (and have been deemed not important
+     * by the system), in an attempt to make things less confusing or faster.
+     *
+     * @param compress ignores unimportant views if true, doesn't ignore otherwise.
+     * @return {@link HasAndroidSettings} instance for chaining.
+     */
+    public default HasAndroidSettings ignoreUnimportantViews(Boolean compress) {
+        HasAndroidSettings driver = null;
+        try {
+            driver = (HasAndroidSettings) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support ignoreUnimportantViews method", e);
+        }
+        return driver.ignoreUnimportantViews(compress);
+    }
+
+    /**
+     * Invoke {@code setWaitForIdleTimeout} in {@code com.android.uiautomator.core.Configurator}.
+     *
+     * @param timeout a negative value would reset to its default value. Minimum time unit
+     *            resolution is one millisecond.
+     * @return {@link HasAndroidSettings} instance for chaining.
+     */
+    public default HasAndroidSettings configuratorSetWaitForIdleTimeout(Duration timeout) {
+        HasAndroidSettings driver = null;
+        try {
+            driver = (HasAndroidSettings) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support configuratorSetWaitForIdleTimeout method", e);
+        }
+        return driver.configuratorSetWaitForIdleTimeout(timeout);
+    }
+
+    /**
+     * Invoke {@code setWaitForSelectorTimeout} in {@code com.android.uiautomator.core.Configurator}.
+     *
+     * @param timeout a negative value would reset to its default value. Minimum time unit
+     *            resolution is one millisecond.
+     * @return {@link HasAndroidSettings} instance for chaining.
+     */
+    public default HasAndroidSettings configuratorSetWaitForSelectorTimeout(Duration timeout) {
+        HasAndroidSettings driver = null;
+        try {
+            driver = (HasAndroidSettings) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support configuratorSetWaitForSelectorTimeout method", e);
+        }
+        return driver.configuratorSetWaitForSelectorTimeout(timeout);
+    }
+
+    /**
+     * Invoke {@code setScrollAcknowledgmentTimeout} in {@code com.android.uiautomator.core.Configurator}.
+     *
+     * @param timeout a negative value would reset to its default value. Minimum time unit
+     *            resolution is one millisecond
+     * @return {@link HasAndroidSettings} instance for chaining.
+     */
+    public default HasAndroidSettings configuratorSetScrollAcknowledgmentTimeout(Duration timeout) {
+        HasAndroidSettings driver = null;
+        try {
+            driver = (HasAndroidSettings) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support configuratorSetScrollAcknowledgmentTimeout method", e);
+        }
+        return driver.configuratorSetScrollAcknowledgmentTimeout(timeout);
+    }
+
+    /**
+     * Invoke {@code configuratorSetKeyInjectionDelay} in {@code com.android.uiautomator.core.Configurator}.
+     *
+     * @param delay a negative value would reset to its default value. Minimum time unit
+     *            resolution is one millisecond.
+     * @return {@link HasAndroidSettings} instance for chaining.
+     */
+    public default HasAndroidSettings configuratorSetKeyInjectionDelay(Duration delay) {
+        HasAndroidSettings driver = null;
+        try {
+            driver = (HasAndroidSettings) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support configuratorSetKeyInjectionDelay method", e);
+        }
+        return driver.configuratorSetKeyInjectionDelay(delay);
+    }
+
+    /**
+     * Invoke {@code setActionAcknowledgmentTimeout} in {@code com.android.uiautomator.core.Configurator}.
+     *
+     * @param timeout a negative value would reset to its default value. Minimum time unit
+     *            resolution is one millisecond
+     * @return {@link HasAndroidSettings} instance for chaining.
+     */
+    public default HasAndroidSettings configuratorSetActionAcknowledgmentTimeout(Duration timeout) {
+        HasAndroidSettings driver = null;
+        try {
+            driver = (HasAndroidSettings) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support configuratorSetActionAcknowledgmentTimeout method", e);
+        }
+        return driver.configuratorSetActionAcknowledgmentTimeout(timeout);
+    }
+
+    /**
+     * Setting this value to true will enforce source tree dumper
+     * to transliterate all class names used as XML tags to the limited
+     * set of ASCII characters supported by Apache Harmony
+     * lib and used by default in Android to avoid possible
+     * XML parsing exceptions caused by XPath lookup.
+     * The Unicode to ASCII transliteration is based on
+     * JUnidecode library (https://github.com/gcardone/junidecode).
+     * Works for UIAutomator2 only.
+     *
+     * @param enabled either true or false. The default value if false.
+     * @return {@link HasAndroidSettings} instance for chaining.
+     */
+    public default HasAndroidSettings normalizeTagNames(boolean enabled) {
+        HasAndroidSettings driver = null;
+        try {
+            driver = (HasAndroidSettings) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support normalizeTagNames method", e);
+        }
+        return driver.normalizeTagNames(enabled);
+    }
+
+    /**
+     * Whether to return compact (standards-compliant) and faster responses in find element/s
+     * (the default setting). If set to false then the response may also contain other
+     * available element attributes.
+     *
+     * @param enabled Either true or false. The default value if true.
+     * @return {@link HasAndroidSettings} instance for chaining.
+     */
+    public default HasAndroidSettings setShouldUseCompactResponses(boolean enabled) {
+        HasAndroidSettings driver = null;
+        try {
+            driver = (HasAndroidSettings) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support setShouldUseCompactResponses method", e);
+        }
+        return driver.setShouldUseCompactResponses(enabled);
+    }
+
+    /**
+     * Which attributes should be returned if compact responses are disabled.
+     * It works only if shouldUseCompactResponses is false. Defaults to "" (empty string).
+     *
+     * @param attrNames the comma-separated list of fields to return with each element.
+     * @return {@link HasAndroidSettings} instance for chaining.
+     */
+    public default HasAndroidSettings setElementResponseAttributes(String attrNames) {
+        HasAndroidSettings driver = null;
+        try {
+            driver = (HasAndroidSettings) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support setElementResponseAttributes method", e);
+        }
+        return driver.setElementResponseAttributes(attrNames);
+    }
+
+    /**
+     * Set whether the source output/xpath search should consider all elements, visible and invisible.
+     * Disabling this setting speeds up source and xml search. Works for UIAutomator2 only.
+     *
+     * @param enabled Either true or false. The default value if false.
+     * @return {@link HasAndroidSettings} instance for chaining.
+     */
+    public default HasAndroidSettings allowInvisibleElements(boolean enabled) {
+        HasAndroidSettings driver = null;
+        try {
+            driver = (HasAndroidSettings) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support allowInvisibleElements method", e);
+        }
+        return driver.allowInvisibleElements(enabled);
+    }
+
+    /**
+     * Whether to enable or disable the notification listener.
+     * No toast notifications are going to be added into page source output if
+     * this setting is disabled.
+     * Works for UIAutomator2 only.
+     *
+     * @param enabled either true or false. The default value if true.
+     * @return {@link HasAndroidSettings} instance for chaining
+     */
+    public default HasAndroidSettings enableNotificationListener(boolean enabled) {
+        HasAndroidSettings driver = null;
+        try {
+            driver = (HasAndroidSettings) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support enableNotificationListener method", e);
+        }
+        return driver.enableNotificationListener(enabled);
+    }
+
+    /**
+     * Whether to enable or disable shutdown the server through
+     * the broadcast receiver on ACTION_POWER_DISCONNECTED.
+     *
+     * @param enabled either true or false. The default value if true.
+     * @return {@link HasAndroidSettings} instance for chaining
+     */
+    public default HasAndroidSettings shutdownOnPowerDisconnect(boolean enabled) {
+        HasAndroidSettings driver = null;
+        try {
+            driver = (HasAndroidSettings) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support shutdownOnPowerDisconnect method", e);
+        }
+        return driver.shutdownOnPowerDisconnect(enabled);
+    }
+
+    /**
+     * Turn on or off the tracking of scroll events as they happen.
+     * If {@code true}, a field {@code lastScrollData} is added to the results of
+     * {@code getSession}, which can then be used to check on scroll progress.
+     * Turning this feature off significantly increases touch action performance.
+     *
+     * @param enabled either true or false. The default value if true.
+     * @return {@link HasAndroidSettings} instance for chaining.
+     */
+    public default HasAndroidSettings setTrackScrollEvents(boolean enabled) {
+        HasAndroidSettings driver = null;
+        try {
+            driver = (HasAndroidSettings) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support setTrackScrollEvents method", e);
+        }
+        return driver.setTrackScrollEvents(enabled);
+    }
+
 }
