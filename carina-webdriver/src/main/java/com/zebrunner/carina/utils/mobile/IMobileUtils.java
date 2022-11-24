@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,11 +59,13 @@ import com.zebrunner.carina.utils.messager.Messager;
 import io.appium.java_client.HasAppStrings;
 import io.appium.java_client.HasDeviceTime;
 import io.appium.java_client.HasOnScreenKeyboard;
+import io.appium.java_client.HasSettings;
 import io.appium.java_client.HidesKeyboard;
 import io.appium.java_client.InteractsWithApps;
 import io.appium.java_client.LocksDevice;
 import io.appium.java_client.PullsFiles;
 import io.appium.java_client.PushesFiles;
+import io.appium.java_client.Setting;
 import io.appium.java_client.SupportsLegacyAppManagement;
 import io.appium.java_client.appmanagement.ApplicationState;
 import io.appium.java_client.appmanagement.BaseActivateApplicationOptions;
@@ -1738,6 +1741,89 @@ public interface IMobileUtils extends IDriverPool {
             throw new UnsupportedOperationException("Driver is not support getClipboardText method", e);
         }
         return driver.getClipboardText();
+    }
+
+    /**
+     * Set a setting for this test session.
+     *
+     * @param setting setting you wish to set.
+     * @param value value of the setting.
+     * @return {@link HasSettings} instance for chaining.
+     */
+    public default HasSettings setSetting(Setting setting, Object value) {
+        HasSettings driver = null;
+        try {
+            driver = (HasSettings) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support setSetting method", e);
+        }
+        return driver.setSetting(setting, value);
+    }
+
+    /**
+     * Set a setting for this test session.
+     *
+     * @param settingName setting name you wish to set.
+     * @param value value of the setting.
+     * @return {@link HasSettings} instance for chaining.
+     */
+    public default HasSettings setSetting(String settingName, Object value) {
+        HasSettings driver = null;
+        try {
+            driver = (HasSettings) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support setSetting method", e);
+        }
+        return driver.setSetting(settingName, value);
+    }
+
+    /**
+     * Sets settings for this test session.
+     *
+     * @param settings a map with settings, where key is the setting name you wish to set and value is the value of
+     *            the setting.
+     * @return {@link HasSettings} {@link HasSettings} instance for chaining.
+     */
+    public default HasSettings setSettings(EnumMap<Setting, Object> settings) {
+        HasSettings driver = null;
+        try {
+            driver = (HasSettings) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support setSettings method", e);
+        }
+        return driver.setSettings(settings);
+    }
+
+    /**
+     * Sets settings for this test session.
+     *
+     * @param settings a map with settings, where key is the setting name you wish to set and value is the value of
+     *            the setting.
+     * @return {@link HasSettings} instance for chaining.
+     */
+    public default HasSettings setSettings(Map<String, Object> settings) {
+        HasSettings driver = null;
+        try {
+            driver = (HasSettings) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support setSettings method", e);
+        }
+        return driver.setSettings(settings);
+    }
+
+    /**
+     * Get settings stored for this test session.
+     *
+     * @return JsonObject, a straight-up hash of settings.
+     */
+    public default Map<String, Object> getSettings() {
+        HasSettings driver = null;
+        try {
+            driver = (HasSettings) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getSettings method", e);
+        }
+        return driver.getSettings();
     }
 
 }
