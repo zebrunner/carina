@@ -45,6 +45,8 @@
         <jacoco-maven-plugin>0.8.7</jacoco-maven-plugin>
 
         <carina-utils.version>1.0.0</carina-utils.version>
+        <carina-proxy.version>1.0.0-SNAPSHOT</carina-proxy.version>
+
         <!-- Testings -->
         <testng.version>7.6.1</testng.version>
         <testng-foundation.version>2.0.1</testng-foundation.version>
@@ -89,7 +91,6 @@
     <modules>
         <module>carina-api</module>
         <module>carina-dataprovider</module>
-        <module>carina-proxy</module>
         <module>carina-reporting</module>
         <module>carina-webdriver</module>
         <module>carina-aws-s3</module>
@@ -97,7 +98,7 @@
         <module>carina-core</module>
         <module>carina-azure</module>
     </modules>
-    <!--repositories>
+    <repositories>
         <repository>
             <id>zebrunner_snapshots</id>
             <name>zebrunner Snapshots</name>
@@ -109,7 +110,7 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-    </repositories-->
+    </repositories>
     <profiles>
         <profile>
             <id>default</id>
@@ -328,9 +329,9 @@
             <!-- Project Level Dependencies: Manage them here at one place; pull specific
                                          dependency as needed in child -->
             <dependency>
-                <groupId>com.qaprosoft</groupId>
+                <groupId>com.zebrunner</groupId>
                 <artifactId>carina-proxy</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <version>${carina-proxy.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.qaprosoft</groupId>

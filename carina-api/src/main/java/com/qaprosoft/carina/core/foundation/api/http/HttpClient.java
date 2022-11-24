@@ -15,7 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.api.http;
 
-import com.qaprosoft.carina.proxy.SystemProxy;
+import com.zebrunner.carina.proxy.SystemProxy;
 
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
