@@ -66,7 +66,7 @@ public class LocalizedAnnotations extends Annotations {
             param = StringUtils.remove(param, LocatorType.XPATH.getStartsWith());
             by = AppiumBy.iOSClassChain(param);
         } else if (getField().isAnnotationPresent(AccessibilityId.class)) {
-            param = StringUtils.remove(param, LocatorType.NAME.getStartsWith()));
+            param = StringUtils.remove(param, LocatorType.NAME.getStartsWith());
             by = AppiumBy.accessibilityId(param);
         } else if (getField().isAnnotationPresent(ExtendedFindBy.class)) {
             By extendedBy = createExtendedBy(param);
@@ -81,44 +81,23 @@ public class LocalizedAnnotations extends Annotations {
     }
 
     private By createBy(String locator) {
-        if (locator.startsWith("id=")) {
-            return By.id(StringUtils.remove(locator, "id="));
-        } else if (locator.startsWith("name=")) {
-            return By.name(StringUtils.remove(locator, "name="));
-        } else if (locator.startsWith("xpath=")) {
-            return By.xpath(StringUtils.remove(locator, "xpath="));
-        } else if (locator.startsWith("linkText=")) {
-            return By.linkText(StringUtils.remove(locator, "linkText="));
-        } else if (locator.startsWith("partialLinkText=")) {
-            return By.partialLinkText(StringUtils.remove(locator, "partialLinkText="));
-        } else if (locator.startsWith("cssSelector=")) {
-            return By.cssSelector(StringUtils.remove(locator, "cssSelector="));
-        } else if (locator.startsWith("css=")) {
-            return By.cssSelector(StringUtils.remove(locator, "css="));
-        } else if (locator.startsWith("tagName=")) {
-            return By.tagName(StringUtils.remove(locator, "tagName="));
-        } else if (locator.startsWith("className=")) {
-            return By.className(StringUtils.remove(locator, "className="));
-        } else if (locator.startsWith("By.id: ")) {
-            return By.id(StringUtils.remove(locator, "By.id: "));
-        } else if (locator.startsWith("By.name: ")) {
-            return By.name(StringUtils.remove(locator, "By.name: "));
-        } else if (locator.startsWith("By.xpath: ")) {
-            return By.xpath(StringUtils.remove(locator, "By.xpath: "));
-        } else if (locator.startsWith("By.linkText: ")) {
-            return By.linkText(StringUtils.remove(locator, "By.linkText: "));
-        } else if (locator.startsWith("By.partialLinkText: ")) {
-            return By.partialLinkText(StringUtils.remove(locator, "By.partialLinkText: "));
-        } else if (locator.startsWith("By.css: ")) {
-            return By.cssSelector(StringUtils.remove(locator, "By.css: "));
-        } else if (locator.startsWith("By.cssSelector: ")) {
-            return By.cssSelector(StringUtils.remove(locator, "By.cssSelector: "));
-        } else if (locator.startsWith("By.className: ")) {
-            return By.className(StringUtils.remove(locator, "By.className: "));
-        } else if (locator.startsWith("By.tagName: ")) {
-            return By.tagName(StringUtils.remove(locator, "By.tagName: "));
-        }       
-
+        if (LocatorType.ID.is(locator)) {
+            return LocatorType.ID.buildLocatorFromString(locator);
+        } else if (LocatorType.NAME.is(locator)) {
+            return LocatorType.NAME.buildLocatorFromString(locator);
+        } else if (LocatorType.XPATH.is(locator)) {
+            return LocatorType.XPATH.buildLocatorFromString(locator);
+        } else if (LocatorType.LINKTEXT.is(locator)) {
+            return LocatorType.LINKTEXT.buildLocatorFromString(locator);
+        } else if (LocatorType.PARTIAL_LINK_TEXT.is(locator)) {
+            return LocatorType.PARTIAL_LINK_TEXT.buildLocatorFromString(locator);
+        } else if (LocatorType.CSS.is(locator)) {
+            return LocatorType.CSS.buildLocatorFromString(locator);
+        } else if (LocatorType.CLASSNAME.is(locator)) {
+            return LocatorType.CLASSNAME.buildLocatorFromString(locator);
+        } else if (LocatorType.TAG_NAME.is(locator)) {
+            return LocatorType.TAG_NAME.buildLocatorFromString(locator);
+        }
         throw new RuntimeException(String.format("Unable to generate By using locator: '%s'!", locator));
     }
 
