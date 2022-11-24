@@ -20,30 +20,26 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.WrapsElement;
+import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
-import com.qaprosoft.carina.core.foundation.webdriver.locator.LocalizedAnnotations;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
 
 public class LocatingListHandler implements InvocationHandler {
-    private final ElementLocator locator;
-    private String name;
-    private By by;
+    private final ExtendedElementLocator locator;
+    private final String name;
     private final ClassLoader loader;
 
     public LocatingListHandler(ClassLoader loader, ElementLocator locator, Field field){
         this.loader = loader;
-        this.locator = locator;
+        this.locator = (ExtendedElementLocator) locator;
         this.name = field.getName();
-        this.by = new LocalizedAnnotations(field).buildBy();
     }
 
     public Object invoke(Object object, Method method, Object[] objects) throws Throwable {
@@ -58,24 +54,19 @@ public class LocatingListHandler implements InvocationHandler {
 //    		LOGGER.error("List is not present: " + by);
 //    	}
 
-    	
     	List<WebElement> elements = locator.findElements();
-        List<ExtendedWebElement> extendedWebElements = null;
+        List<ExtendedWebElement> extendedWebElements = elements.parallelStream()
+                .map(element -> {
+                    InvocationHandler handler = new LocatingListsElementHandler(element, locator);
+                    WebElement proxy = (WebElement) Proxy.newProxyInstance(loader,
+                            new Class[] { WebElement.class, WrapsElement.class, Locatable.class },
+                            handler);
+                    return new ExtendedWebElement(proxy, null);
+                }).collect(Collectors.toList());
         int i = 0;
-        if (elements != null) {
-            extendedWebElements = new ArrayList<ExtendedWebElement>();
-            for (WebElement element : elements) {
-                InvocationHandler handler = new LocatingListsElementHandler(element, locator);
-                WebElement proxy = (WebElement) Proxy.newProxyInstance(loader, new Class[]{WebElement.class, WrapsElement.class, Locatable.class},
-                        handler);
-                ExtendedWebElement webElement = new ExtendedWebElement(proxy, name + i, by);
-
-                Field searchContextField = locator.getClass().getDeclaredField("searchContext");
-                searchContextField.setAccessible(true);
-                webElement.setSearchContext((SearchContext) searchContextField.get(locator));
-                extendedWebElements.add(webElement);
-                i++;
-            }
+        boolean isLocalized = locator.isLocalized();
+        for (ExtendedWebElement el : extendedWebElements) {
+            el.setName(isLocalized ? locator.getClassName() + "." + name + i++ : name + i++);
         }
 
         try {

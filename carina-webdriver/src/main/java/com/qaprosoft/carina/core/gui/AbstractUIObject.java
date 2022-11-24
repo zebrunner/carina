@@ -36,7 +36,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLoc
 public abstract class AbstractUIObject extends DriverHelper {
     protected String name;
 
-    protected WebElement rootElement;
+    protected ExtendedWebElement rootElement;
     protected By rootBy;
 
     protected ExtendedWebElement uiLoadedMarker;
@@ -122,11 +122,11 @@ public abstract class AbstractUIObject extends DriverHelper {
         this.name = name;
     }
 
-    public WebElement getRootElement() {
+    public ExtendedWebElement getRootElement() {
         return rootElement;
     }
 
-    public void setRootElement(WebElement element) {
+    public void setRootElement(ExtendedWebElement element) {
         this.rootElement = element;
     }
 

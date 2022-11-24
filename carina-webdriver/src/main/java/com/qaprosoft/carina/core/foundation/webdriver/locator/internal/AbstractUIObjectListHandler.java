@@ -16,78 +16,89 @@
 package com.qaprosoft.carina.core.foundation.webdriver.locator.internal;
 
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.lang.reflect.Proxy;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WrapsElement;
+import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
 import com.qaprosoft.carina.core.gui.AbstractUIObject;
 
 public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements InvocationHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     
-    private Class<?> clazz;
-    private WebDriver webDriver;
-    private final ElementLocator locator;
-    private String name;
+    private final Class<?> clazz;
+    private final WebDriver webDriver;
+    private final ExtendedElementLocator locator;
+    private final String name;
+    private final ClassLoader classLoader;
 
-    private By locatorBy;
+    private final By locatorBy;
 
-    public AbstractUIObjectListHandler(Class<?> clazz, WebDriver webDriver, ElementLocator locator, String name) {
+    public AbstractUIObjectListHandler(ClassLoader classLoader, Class<?> clazz, WebDriver webDriver, ElementLocator locator, String name) {
+        this.classLoader = classLoader;
         this.clazz = clazz;
         this.webDriver = webDriver;
-        this.locator = locator;
+        this.locator = (ExtendedElementLocator) locator;
         this.name = name;
-        this.locatorBy = getLocatorBy(locator);
+        this.locatorBy = this.locator.getBy();
     }
 
     @SuppressWarnings("unchecked")
     public Object invoke(Object object, Method method, Object[] objects) throws Throwable {
-    	
-		// Hotfix for huge and expected regression in carina: we lost managed
-		// time delays with lists manipulations
-		// Temporary we are going to restore explicit waiter here with hardcoded
-		// timeout before we find better solution
-		// Pros: super fast regression issue which block UI execution
-		// Cons: there is no way to manage timeouts in this places
+
+        // Hotfix for huge and expected regression in carina: we lost managed
+        // time delays with lists manipulations
+        // Temporary we are going to restore explicit waiter here with hardcoded
+        // timeout before we find better solution
+        // Pros: super fast regression issue which block UI execution
+        // Cons: there is no way to manage timeouts in this places
 
         // #1458: AbstractUIObjectListHandler waitUntil pause
-//    	waitUntil(ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(locatorBy),
-//    			ExpectedConditions.visibilityOfElementLocated(locatorBy)));
+        // waitUntil(ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(locatorBy),
+        // ExpectedConditions.visibilityOfElementLocated(locatorBy)));
 
-    	List<WebElement> elements = locator.findElements();
-        List<T> uIObjects = new ArrayList<T>();
+        List<T> uIObjects = locator.findElements()
+                .parallelStream()
+                .map(element -> {
+                    try {
+                        T uiObject = (T) clazz.getConstructor(WebDriver.class, SearchContext.class)
+                                .newInstance(webDriver, element);
+                        InvocationHandler handler = new LocatingListsElementHandler(element, locator);
+                        WebElement proxy = (WebElement) Proxy.newProxyInstance(classLoader,
+                                new Class[] { WebElement.class, WrapsElement.class, Locatable.class },
+                                handler);
+                        uiObject.setRootElement(new ExtendedWebElement(proxy, null));
+                        uiObject.setRootBy(locatorBy);
+                        return uiObject;
+                    } catch (NoSuchElementException | NoSuchMethodException | IllegalAccessException | InvocationTargetException
+                            | InstantiationException e) {
+                        LOGGER.error("Implement appropriate AbstractUIObject constructor for auto-initialization: " + e.getMessage(), e);
+                        throw new RuntimeException("Implement appropriate AbstractUIObject constructor for auto-initialization: " + e.getMessage(),
+                                e);
+                    }
+                })
+                .collect(Collectors.toList());
+
         int index = 0;
-        if (elements != null) {
-            for (WebElement element : elements) {
-                T uiObject;
-                try {
-                    uiObject = (T) clazz.getConstructor(WebDriver.class, SearchContext.class)
-                            .newInstance(
-                                    webDriver, element);
-                } catch (NoSuchMethodException e) {
-                    LOGGER.error("Implement appropriate AbstractUIObject constructor for auto-initialization: "
-                            + e.getMessage());
-                    throw new RuntimeException(
-                            "Implement appropriate AbstractUIObject constructor for auto-initialization: "
-                                    + e.getMessage(),
-                            e);
-                }
-                uiObject.setName(String.format("%s - %d", name, index++));
-                uiObject.setRootElement(element);
-                uiObject.setRootBy(locatorBy);
-                uIObjects.add(uiObject);
-            }
+
+        for (T uiObject : uIObjects) {
+            boolean isLocalized = locator.isLocalized();
+            uiObject.setName(isLocalized ? locator.getClassName() + "." + name + index++ : name + index++);
         }
 
         try {
@@ -95,31 +106,6 @@ public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements 
         } catch (InvocationTargetException e) {
             throw e.getCause();
         }
-    }
-    
-    private By getLocatorBy(ElementLocator locator) {
-    	By rootBy = null;
-    	
-        //TODO: get root by annotation from ElementLocator to be able to append by for those elements and reuse fluent waits
-		try {
-			Field byContextField = null;
-
-			byContextField = locator.getClass().getDeclaredField("by");
-			byContextField.setAccessible(true);
-			rootBy = (By) byContextField.get(locator);
-
-		} catch (NoSuchFieldException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (ClassCastException e) {
-			e.printStackTrace();
-		} catch (Throwable thr) {
-			thr.printStackTrace();
-			LOGGER.error("Unable to get rootBy via reflection!", thr);
-		}
-    	
-    	return rootBy;
     }
     
 }

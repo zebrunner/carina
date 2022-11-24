@@ -126,6 +126,7 @@ public class ExtendedWebElement implements IWebElement {
     /**
      * This constructor shouldn't be called explicitly. For proxied elements only
      */
+    @Deprecated(forRemoval = true)
     public ExtendedWebElement(WebElement element, String name, By by) {
         this(element, name);
         this.by = by;
@@ -140,6 +141,7 @@ public class ExtendedWebElement implements IWebElement {
 
         // read searchContext from not null elements only
         if (this.element == null) {
+            // [AS] this situation will never happens because proxy object will always exists. By locator contains only in proxy
             // it seems like we have to specify WebElement or By annotation! Add verification that By is valid in this case!
             if (this.by == null) {
                 try {
@@ -168,9 +170,6 @@ public class ExtendedWebElement implements IWebElement {
                         .get(innerProxy);
 
                 this.isLocalized = locator.isLocalized();
-                if (isLocalized) {
-                    this.name = locator.getClassName() + "." + name;
-                }
 
                 this.searchContext = locator.getSearchContext();
                 tempSearchContext = this.searchContext;
@@ -1290,7 +1289,7 @@ public class ExtendedWebElement implements IWebElement {
 
 	private Object doAction(ACTION_NAME actionName, long timeout, ExpectedCondition<?> waitCondition,
 			Object...inputArgs) {
-		
+
 		if (waitCondition != null) {
 			//do verification only if waitCondition is not null
 			if (!waitUntil(waitCondition, timeout)) {
@@ -1298,7 +1297,7 @@ public class ExtendedWebElement implements IWebElement {
 				LOGGER.error(Messager.ELEMENT_CONDITION_NOT_VERIFIED.getMessage(actionName.getKey(), getNameWithLocator()));
 			}
 		}
-		
+
         if (isLocalized) {
             isLocalized = false; // single verification is enough for this particular element
             L10N.verify(this);
@@ -1647,70 +1646,35 @@ public class ExtendedWebElement implements IWebElement {
      * Get element waiting condition depends on element loading strategy
      */
     private ExpectedCondition<?> getDefaultCondition(By by) {
+        List<ExpectedCondition<?>> conditions = new ArrayList<>();
         // generate the most popular waitCondition to check if element visible or present
-        ExpectedCondition<?> waitCondition = null;
         // need to get root element from with we will try to find element by By
-        switch (loadingStrategy) {
-        case BY_PRESENCE: {
-            if (element != null) {
-                if (searchContext instanceof WebElement) {
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy((WebElement) searchContext, by),
-                            ExpectedConditions.visibilityOf(element));
-                } else {
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
-                            ExpectedConditions.visibilityOf(element));
-                }
-            } else {
-                if (searchContext instanceof WebElement) {
-                    waitCondition = ExpectedConditions.presenceOfNestedElementLocatedBy((WebElement) searchContext, by);
-                } else {
-                    waitCondition = ExpectedConditions.presenceOfElementLocated(by);
 
-                }
-            }
-            break;
-        }
-        case BY_VISIBILITY: {
+        if (ElementLoadingStrategy.BY_PRESENCE.equals(loadingStrategy) ||
+                ElementLoadingStrategy.BY_PRESENCE_OR_VISIBILITY.equals(loadingStrategy)) {
             if (element != null) {
-                if (searchContext instanceof WebElement) {
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by),
-                            ExpectedConditions.visibilityOf(element));
-                } else {
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(by),
-                            ExpectedConditions.visibilityOf(element));
-                }
-            } else {
-                if (searchContext instanceof WebElement) {
-                    waitCondition = ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by);
-                } else {
-                    waitCondition = ExpectedConditions.visibilityOfElementLocated(by);
-                }
+                conditions.add(ExpectedConditions.visibilityOf(element));
             }
-            break;
+            if (searchContext instanceof WebElement) {
+                conditions.add(ExpectedConditions.presenceOfNestedElementLocatedBy((WebElement) searchContext, by));
+            } else {
+                conditions.add(ExpectedConditions.presenceOfElementLocated(by));
+            }
         }
-        case BY_PRESENCE_OR_VISIBILITY:
+
+        if (ElementLoadingStrategy.BY_VISIBILITY.equals(loadingStrategy) ||
+                ElementLoadingStrategy.BY_PRESENCE_OR_VISIBILITY.equals(loadingStrategy)) {
             if (element != null) {
-                if (searchContext instanceof WebElement) {
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy((WebElement) searchContext, by),
-                            ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by),
-                            ExpectedConditions.visibilityOf(element));
-                } else {
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
-                            ExpectedConditions.visibilityOfElementLocated(by),
-                            ExpectedConditions.visibilityOf(element));
-                }
-            } else {
-                if (searchContext instanceof WebElement) {
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy((WebElement) searchContext, by),
-                            ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by));
-                } else {
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
-                            ExpectedConditions.visibilityOfElementLocated(by));
-                }
+                conditions.add(ExpectedConditions.visibilityOf(element));
             }
-            break;
+
+            if (searchContext instanceof WebElement) {
+                conditions.add(ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by));
+            } else {
+                conditions.add(ExpectedConditions.visibilityOfElementLocated(by));
+            }
         }
-        return waitCondition;
+        return ExpectedConditions.or(conditions.toArray(new ExpectedCondition[0]));
     }
 
     private long getRetryInterval(long timeout) {

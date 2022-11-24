@@ -18,24 +18,15 @@ package com.qaprosoft.carina.core.foundation.webdriver.locator;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Objects;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.zebrunner.carina.utils.Configuration;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Localized;
-import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.CaseInsensitiveConverter;
-import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.ParamsToConvert;
-import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.Platform;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
 
 /**
  * The default element locator, which will lazily locate an element or an
@@ -45,12 +36,10 @@ import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinse
  * {@link org.openqa.selenium.support.CacheLookup}.
  */
 public class ExtendedElementLocator implements ElementLocator {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final SearchContext searchContext;
-    private By by;
-    private String className;
-    private boolean caseInsensitive = false;
+    private final By by;
+    private final String className;
     private boolean localized = false;
     
     /**
@@ -60,74 +49,29 @@ public class ExtendedElementLocator implements ElementLocator {
      * @param field The field on the Page Object that will hold the located
      *            value
      */
-    public ExtendedElementLocator(SearchContext searchContext, Field field) {
+    public ExtendedElementLocator(SearchContext searchContext, Field field, By by) {
+        this.by = by;
         this.searchContext = searchContext;
         String[] classPath = field.getDeclaringClass().toString().split("\\.");
-        this.className = classPath[classPath.length-1];
-
-        if (field.isAnnotationPresent(FindBy.class) || field.isAnnotationPresent(ExtendedFindBy.class)) {
-            LocalizedAnnotations annotations = new LocalizedAnnotations(field);
-            this.by = annotations.buildBy();
-            if (field.isAnnotationPresent(CaseInsensitiveXPath.class)) {
-                CaseInsensitiveXPath csx = field.getAnnotation(CaseInsensitiveXPath.class);
-                Platform platform = Objects.equals(Configuration.getMobileApp(), "") ? Platform.WEB : Platform.MOBILE;
-
-                this.by = new CaseInsensitiveConverter(new ParamsToConvert(csx.id(), csx.name(),
-                        csx.text(), csx.classAttr()), platform)
-                        .convert(this.by);
-                caseInsensitive = true;
-            }
-
-            if (field.isAnnotationPresent(Localized.class)) {
-                this.localized = true;
-            }
-        }
+        this.className = classPath[classPath.length - 1];
     }
 
     /**
      * Find the element.
      */
     public WebElement findElement() {
-
-        if (by == null) {
-            throw new NullPointerException("By cannot be null");
-        }
-
-        //TODO: test how findElements work for web and android
-        // maybe migrate to the latest appium java driver and reuse original findElement!
-        List<WebElement> elements = searchContext.findElements(by);
-
-        WebElement element = null;
-        if (elements.size() == 1) {
-            element = elements.get(0);
-        } else if (elements.size() > 1) {
-            element = elements.get(0);
-            LOGGER.debug(elements.size() + " elements detected by: " + by.toString());
-        }
-
-        if (element == null) {
+        try {
+            return searchContext.findElement(this.by);
+        } catch (NoSuchElementException e) {
             throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by);
         }
-        return element;
     }
 
     /**
      * Find the element list.
      */
     public List<WebElement> findElements() {
-        List<WebElement> elements = null;
-
-        try {
-            elements = searchContext.findElements(by);
-        } catch (NoSuchElementException e) {
-            LOGGER.debug("Unable to find elements: " + e.getMessage());
-        }
-
-        if (elements == null) {
-            throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
-        }
-
-        return elements;
+        return searchContext.findElements(this.by);
     }
 
     public SearchContext getSearchContext() {
@@ -138,8 +82,8 @@ public class ExtendedElementLocator implements ElementLocator {
         return this.localized;
     }
 
-    public boolean isCaseInsensitive() {
-        return this.caseInsensitive;
+    public void setIsLocalized(boolean isLocalized) {
+        this.localized = isLocalized;
     }
 
     public By getBy() {
