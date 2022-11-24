@@ -1826,4 +1826,19 @@ public interface IMobileUtils extends IDriverPool {
         return driver.getSettings();
     }
 
+    /**
+     * Get capabilities of the current driver
+     * 
+     * @return see {@link Capabilities}
+     */
+    public default Capabilities getCapabilities() {
+        HasCapabilities driver = null;
+        try {
+            driver = (HasCapabilities) getDriver();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getCapabilities method", e);
+        }
+        return driver.getCapabilities();
+    }
+
 }
