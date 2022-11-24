@@ -15,13 +15,9 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.decorator;
 
-import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,7 +25,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.hamcrest.BaseMatcher;
 import org.openqa.selenium.By;
@@ -61,24 +56,21 @@ import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.SkipException;
 
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.zebrunner.carina.utils.performance.ACTION_NAME;
-import com.zebrunner.carina.utils.Configuration;
-import com.zebrunner.carina.utils.Configuration.Parameter;
-import com.zebrunner.carina.utils.IWebElement;
-import com.zebrunner.carina.utils.messager.Messager;
-import com.zebrunner.carina.utils.R;
-import com.zebrunner.carina.utils.common.CommonUtils;
-import com.zebrunner.carina.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
-import com.sun.jersey.core.util.Base64;
 import com.zebrunner.carina.crypto.Algorithm;
 import com.zebrunner.carina.crypto.CryptoTool;
 import com.zebrunner.carina.crypto.CryptoToolBuilder;
-
-import io.appium.java_client.AppiumBy;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration.Parameter;
+import com.zebrunner.carina.utils.IWebElement;
+import com.zebrunner.carina.utils.R;
+import com.zebrunner.carina.utils.common.CommonUtils;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.messager.Messager;
+import com.zebrunner.carina.utils.performance.ACTION_NAME;
+import com.zebrunner.carina.utils.resources.L10N;
 
 public class ExtendedWebElement implements IWebElement {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -1616,61 +1608,38 @@ public class ExtendedWebElement implements IWebElement {
      * @deprecated when we search list of elements we do not needed for generating by with index
      */
     @Deprecated(forRemoval = true, since = "8.0.1")
-	//TODO: investigate how can we merge the similar functionality in ExtendedWebElement, DriverHelper and LocalizedAnnotations
+    // TODO: investigate how can we merge the similar functionality in ExtendedWebElement, DriverHelper and LocalizedAnnotations
     public By generateByForList(By by, int index) {
         String locator = by.toString();
         By resBy = null;
 
-        if (locator.startsWith(LocatorType.ID.getStartsWith())) {
-            resBy = By.id(StringUtils.remove(locator, LocatorType.ID.getStartsWith()) + "[" + index + "]");
+        if (LocatorType.ID.is(locator)) {
+            resBy = LocatorType.ID.buildLocatorFromString(locator + "[" + index + "]");
+        } else if (LocatorType.NAME.is(locator)) {
+            resBy = LocatorType.NAME.buildLocatorFromString(locator + "[" + index + "]");
+        } else if (LocatorType.XPATH.is(locator)) {
+            resBy = LocatorType.XPATH.buildLocatorFromString(locator + "[" + index + "]");
+        } else if (LocatorType.LINKTEXT.is(locator)) {
+            resBy = LocatorType.LINKTEXT.buildLocatorFromString(locator + "[" + index + "]");
+        } else if (LocatorType.CLASSNAME.is(locator)) {
+            resBy = LocatorType.CLASSNAME.buildLocatorFromString(locator + "[" + index + "]");
+        } else if (LocatorType.PARTIAL_LINK_TEXT.is(locator)) {
+            resBy = LocatorType.PARTIAL_LINK_TEXT.buildLocatorFromString(locator + "[" + index + "]");
+        } else if (LocatorType.CSS.is(locator)) {
+            resBy = LocatorType.CSS.buildLocatorFromString(locator + ":nth-child(" + index + ")");
+        } else if (LocatorType.TAG_NAME.is(locator)) {
+            resBy = LocatorType.TAG_NAME.buildLocatorFromString(locator + "[" + index + "]");
+        } else if (LocatorType.IOS_CLASS_CHAIN.is(locator)) {
+            resBy = LocatorType.IOS_CLASS_CHAIN.buildLocatorFromString(locator + "[" + index + "]");
+        } else if (LocatorType.IOS_NS_PREDICATE.is(locator)) {
+            resBy = LocatorType.IOS_NS_PREDICATE.buildLocatorFromString(locator + "[" + index + "]");
+        } else if (LocatorType.ACCESSIBILITY_ID.is(locator)) {
+            resBy = LocatorType.ACCESSIBILITY_ID.buildLocatorFromString(locator + "[" + index + "]");
         }
-
-        if (locator.startsWith(LocatorType.NAME.getStartsWith())) {
-            resBy = By.name(StringUtils.remove(locator, LocatorType.NAME.getStartsWith()) + "[" + index + "]");
-        }
-
-        if (locator.startsWith(LocatorType.XPATH.getStartsWith())) {
-            resBy = By.xpath(StringUtils.remove(locator, LocatorType.XPATH.getStartsWith()) + "[" + index + "]");
-        }
-        if (locator.startsWith(LocatorType.LINKTEXT.getStartsWith())) {
-            resBy = By.linkText(StringUtils.remove(locator, LocatorType.LINKTEXT.getStartsWith()) + "[" + index + "]");
-        }
-
-        if (locator.startsWith(LocatorType.CLASSNAME.getStartsWith())) {
-            resBy = By.className(StringUtils.remove(locator, LocatorType.CLASSNAME.getStartsWith()) + "[" + index + "]");
-        }
-
-        if (locator.startsWith(LocatorType.PARTIAL_LINK_TEXT.getStartsWith())) {
-            resBy = By.partialLinkText(StringUtils.remove(locator, LocatorType.PARTIAL_LINK_TEXT.getStartsWith()) + "[" + index + "]");
-        }
-
-        if (locator.startsWith(LocatorType.CSS.getStartsWith())) {
-            resBy = By.cssSelector(StringUtils.remove(locator, LocatorType.CSS.getStartsWith()) + ":nth-child(" + index + ")");
-        }
-
-        if (locator.startsWith(LocatorType.TAG_NAME.getStartsWith())) {
-            resBy = By.tagName(StringUtils.remove(locator, LocatorType.TAG_NAME.getStartsWith()) + "[" + index + "]");
-        }
-
-        /*
-         * All ClassChain locators start from **. e.g FindBy(xpath = "**'/XCUIElementTypeStaticText[`name CONTAINS[cd] '%s'`]")
-         */
-        if (locator.startsWith("By.IosClassChain: **")) {
-            resBy = AppiumBy.iOSClassChain(StringUtils.remove(locator, "By.IosClassChain: ") + "[" + index + "]");
-        }
-
-        if (locator.startsWith("By.IosNsPredicate: **")) {
-            resBy = AppiumBy.iOSNsPredicateString(StringUtils.remove(locator, "By.IosNsPredicate: ") + "[" + index + "]");
-        }
-
-        if (locator.startsWith(LocatorType.ACCESSIBILITY_ID.getStartsWith())) {
-            resBy = AppiumBy.accessibilityId(StringUtils.remove(locator, LocatorType.ACCESSIBILITY_ID.getStartsWith()) + "[" + index + "]");
-        }
-
         if (resBy == null) {
-            throw new RuntimeException("Locator formatting failed - no suitable locator type found for generating by for element of list");
+            throw new RuntimeException(String.format("Generate by for list failed - no suitable locator type found."
+                    + " Investigate why '%s' was not detected.", locator));
         }
-
         return resBy;
     }
 
