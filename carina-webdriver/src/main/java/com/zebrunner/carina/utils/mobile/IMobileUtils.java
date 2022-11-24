@@ -1841,4 +1841,53 @@ public interface IMobileUtils extends IDriverPool {
         return driver.getCapabilities();
     }
 
+    /**
+     * Drag and drop
+     * 
+     * @param dragMeElement element to drag
+     * @param dropZoneElement drop zone element
+     */
+    public default void dragAndDrop(ExtendedWebElement dragMeElement, ExtendedWebElement dropZoneElement) {
+
+        Dimension dragMeElementSize = dragMeElement.getSize();
+        Point dragMeElementLocation = dragMeElement.getLocation();
+        Point dragMeElementCenter = new Point(dragMeElementLocation.getX() + dragMeElementSize.getWidth() / 2,
+                dragMeElementLocation.getY() + dragMeElementSize.getHeight() / 2);
+
+        Dimension dropZoneElementSize = dropZoneElement.getSize();
+        Point dropZoneElementLocation = dropZoneElement.getLocation();
+        Point dropZoneElementCenter = new Point(dropZoneElementLocation.getX() + dropZoneElementSize.getWidth() / 2,
+                dropZoneElementLocation.getY() + dropZoneElementSize.getHeight() / 2);
+
+        dragAndDrop(dragMeElementCenter.x, dragMeElementCenter.y, dropZoneElementCenter.x, dropZoneElementCenter.y,
+                Duration.ofMillis(1000), Duration.ofMillis(1000));
+    }
+
+    /**
+     * Drag and drop
+     * 
+     * @param fromX x point of the drag and drop element
+     * @param fromY y point of the drag and drop element
+     * @param toX x point of the drop zone
+     * @param toY y point of the drop zone
+     * @param pressingTime time of clicking on the element to be dragged
+     */
+    public default void dragAndDrop(int fromX, int fromY, int toX, int toY, Duration pressingTime, Duration dragTime) {
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+        Sequence sequence = new Sequence(finger, 1);
+        sequence.addAction(finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.viewport(), fromX, fromY));
+        sequence.addAction(finger.createPointerDown(PointerInput.MouseButton.MIDDLE.asArg()));
+        sequence.addAction(new Pause(finger, pressingTime));
+        sequence.addAction(finger.createPointerMove(dragTime, PointerInput.Origin.viewport(), toX, toY));
+        sequence.addAction(finger.createPointerUp(PointerInput.MouseButton.MIDDLE.asArg()));
+
+        Interactive drv = null;
+        try {
+            drv = (Interactive) getDriver();
+            drv.perform(List.of(sequence));
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support dragAndDrop method", e);
+        }
+    }
+
 }
