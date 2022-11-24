@@ -1718,12 +1718,12 @@ public interface IMobileUtils extends IDriverPool {
      *
      * @param text the actual text to be set.
      */
-    public default void setClipboardText(String text) {
+    public default void setTextToClipboard(String text) {
         HasClipboard driver = null;
         try {
             driver = (HasClipboard) getDriver();
         } catch (ClassCastException e) {
-            throw new UnsupportedOperationException("Driver is not support setClipboardText method", e);
+            throw new UnsupportedOperationException("Driver is not support setTextToClipboard method", e);
         }
         driver.setClipboardText(text);
     }
@@ -1733,12 +1733,12 @@ public interface IMobileUtils extends IDriverPool {
      *
      * @return either the text, which is stored in the clipboard or an empty string if the clipboard is empty.
      */
-    public default String getClipboardText() {
+    public default String getTextFromClipboard() {
         HasClipboard driver = null;
         try {
             driver = (HasClipboard) getDriver();
         } catch (ClassCastException e) {
-            throw new UnsupportedOperationException("Driver is not support getClipboardText method", e);
+            throw new UnsupportedOperationException("Driver is not support getTextFromClipboard method", e);
         }
         return driver.getClipboardText();
     }
