@@ -1100,76 +1100,39 @@ public class ExtendedWebElement implements IWebElement {
         String locator = by.toString();
         By resultBy = null;
 
-        if (locator.startsWith(LocatorType.ID.getStartsWith())) {
-                resultBy = By.id(String.format(StringUtils.remove(locator, LocatorType.ID.getStartsWith()), objects));
-        }
-
-        if (locator.startsWith(LocatorType.NAME.getStartsWith())) {
-                resultBy = By.name(String.format(StringUtils.remove(locator, LocatorType.NAME.getStartsWith()), objects));
-        }
-
-        if (locator.startsWith(LocatorType.XPATH.getStartsWith())) {
-                resultBy = By.xpath(String.format(StringUtils.remove(locator, LocatorType.XPATH.getStartsWith()), objects));
-        }
-
-        if (locator.startsWith(LocatorType.LINKTEXT.getStartsWith())) {
-                resultBy = By.linkText(String.format(StringUtils.remove(locator, LocatorType.LINKTEXT.getStartsWith()), objects));
-        }
-
-        if (locator.startsWith(LocatorType.PARTIAL_LINK_TEXT.getStartsWith())) {
-            resultBy = By.partialLinkText(String.format(StringUtils.remove(locator, LocatorType.PARTIAL_LINK_TEXT.getStartsWith()), objects));
-        }
-
-        if (locator.startsWith(LocatorType.CSS.getStartsWith())) {
-            resultBy = By.cssSelector(String.format(StringUtils.remove(locator, LocatorType.CSS.getStartsWith()), objects));
-        }
-
-        if (locator.startsWith(LocatorType.TAG_NAME.getStartsWith())) {
-            resultBy = By.tagName(String.format(StringUtils.remove(locator, LocatorType.TAG_NAME.getStartsWith()), objects));
-        }
-
-        /*
-         * All ClassChain locators start from **. e.g FindBy(xpath = "**'/XCUIElementTypeStaticText[`name CONTAINS[cd] '%s'`]")
-         */
-        if (locator.startsWith("By.IosClassChain: **")) {
-            resultBy = AppiumBy.iOSClassChain(String.format(StringUtils.remove(locator, "By.IosClassChain: "), objects));
-        }
-
-
-
-        if (locator.startsWith("By.IosNsPredicate: **")) {
-            resultBy = AppiumBy.iOSNsPredicateString(String.format(StringUtils.remove(locator, "By.IosNsPredicate: "), objects));
-        }
-
-        if (locator.startsWith("By.AccessibilityId: ")) {
-            resultBy = AppiumBy.accessibilityId(String.format(StringUtils.remove(locator, LocatorType.ACCESSIBILITY_ID.getStartsWith()), objects));
-        }
-
-        if (locator.startsWith(LocatorType.IMAGE.getStartsWith())) {
-            String formattedLocator = String.format(StringUtils.remove(locator, LocatorType.IMAGE.getStartsWith()), objects);
-            Path path = Paths.get(formattedLocator);
-            LOGGER.debug("Formatted locator is : {}", formattedLocator);
-            String base64image;
-            try {
-                base64image = new String(Base64.encode(Files.readAllBytes(path)));
-            } catch (IOException e) {
-                throw new RuntimeException(
-                        "Error while reading image file after formatting. Formatted locator : " + formattedLocator, e);
-            }
+        if(LocatorType.ID.is(locator)) {
+            resultBy = LocatorType.ID.buildLocatorFromString(locator, objects);
+        } else if(LocatorType.NAME.is(locator)) {
+            resultBy = LocatorType.NAME.buildLocatorFromString(locator, objects);
+        } else if(LocatorType.XPATH.is(locator)) {
+            resultBy = LocatorType.XPATH.buildLocatorFromString(locator, objects);
+        } else if(LocatorType.LINKTEXT.is(locator)) {
+            resultBy = LocatorType.LINKTEXT.buildLocatorFromString(locator, objects);
+        } else if(LocatorType.PARTIAL_LINK_TEXT.is(locator)) {
+            resultBy = LocatorType.PARTIAL_LINK_TEXT.buildLocatorFromString(locator, objects);
+        } else if(LocatorType.CSS.is(locator)) {
+            resultBy = LocatorType.CSS.buildLocatorFromString(locator, objects);
+        } else if(LocatorType.TAG_NAME.is(locator)) {
+            resultBy = LocatorType.TAG_NAME.buildLocatorFromString(locator, objects);
+        } else if(LocatorType.IOS_CLASS_CHAIN.is(locator)) {
+            resultBy = LocatorType.IOS_CLASS_CHAIN.buildLocatorFromString(locator, objects);
+        } else if(LocatorType.IOS_NS_PREDICATE.is(locator)) {
+            resultBy = LocatorType.IOS_NS_PREDICATE.buildLocatorFromString(locator, objects);
+        } else if(LocatorType.ACCESSIBILITY_ID.is(locator)) {
+            resultBy = LocatorType.ACCESSIBILITY_ID.buildLocatorFromString(locator, objects);
+        } else if(LocatorType.ANDROID_UI_AUTOMATOR.is(locator)) {
+            resultBy = LocatorType.ANDROID_UI_AUTOMATOR.buildLocatorFromString(locator, objects);
+        } else if(LocatorType.IMAGE.is(locator)) {
+            resultBy = LocatorType.IMAGE.buildLocatorFromString(locator, objects);
             LOGGER.debug("Base64 image representation has benn successfully obtained after formatting.");
-            resultBy = AppiumBy.image(base64image);
-        }
-
-        if (locator.startsWith(LocatorType.ANDROID_UI_AUTOMATOR.getStartsWith())) {
-            resultBy = AppiumBy
-                    .androidUIAutomator(String.format(StringUtils.remove(locator, LocatorType.ANDROID_UI_AUTOMATOR.getStartsWith()), objects));
-            LOGGER.debug("Formatted locator is : " + resultBy);
         }
 
         if (resultBy == null) {
-            throw new RuntimeException("Locator formatting failed - no suitable locator type found for formatting");
+            throw new RuntimeException(String.format("Locator formatting failed - no suitable locator type found for formatting. "
+                    + "Investigate why '%s' was not formatted", locator));
         }
 
+        LOGGER.debug("Formatted locator is : {}", resultBy);
         return new ExtendedWebElement(resultBy, name, this.driver, this.searchContext, objects);
     }
 

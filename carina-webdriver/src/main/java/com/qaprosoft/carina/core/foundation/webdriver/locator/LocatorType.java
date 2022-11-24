@@ -1,9 +1,14 @@
 package com.qaprosoft.carina.core.foundation.webdriver.locator;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 
-import com.zebrunner.carina.utils.exception.NotImplementedException;
+import com.sun.jersey.core.util.Base64;
 
 import io.appium.java_client.AppiumBy;
 
@@ -91,13 +96,20 @@ public enum LocatorType {
     },
     IMAGE("By.Image: ") {
         public By buildLocatorFromString(String locator) {
-            // todo add realization
-            throw new NotImplementedException();
+            return AppiumBy.image(StringUtils.remove(locator, getStartsWith()));
         }
 
         public By buildLocatorFromString(String locator, Object... objects) {
-            // todo add realization
-            throw new NotImplementedException();
+            String formattedLocator = String.format(StringUtils.remove(locator, getStartsWith()), objects);
+            Path path = Paths.get(formattedLocator);
+            String base64image;
+            try {
+                base64image = new String(Base64.encode(Files.readAllBytes(path)));
+            } catch (IOException e) {
+                throw new RuntimeException(
+                        "Error while reading image file after formatting. Formatted locator : " + formattedLocator, e);
+            }
+            return AppiumBy.image(base64image);
         }
     },
     ACCESSIBILITY_ID("AppiumBy.AccessibilityId: ") {
