@@ -110,6 +110,8 @@ public class LocalizedAnnotations extends Annotations {
             return LocatorType.IOS_NS_PREDICATE.buildLocatorFromString(locator);
         } else if (LocatorType.ACCESSIBILITY_ID.is(locator)) {
             return LocatorType.ACCESSIBILITY_ID.buildLocatorFromString(locator);
+        } else if (LocatorType.IMAGE.is(locator)) {
+            return LocatorType.IMAGE.buildLocatorFromString(locator);
         } else if (LocatorType.XPATH.is(locator)) {
             // for @ExtendedFindBy 'text' attribute L10N supporting
             return LocatorType.XPATH.buildLocatorFromString(locator);
