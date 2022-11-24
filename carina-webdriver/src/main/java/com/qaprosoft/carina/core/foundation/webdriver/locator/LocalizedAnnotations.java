@@ -26,11 +26,11 @@ import org.openqa.selenium.support.pagefactory.Annotations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.zebrunner.carina.utils.resources.L10N;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.AccessibilityId;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.ClassChain;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Predicate;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.resources.L10N;
 
 import io.appium.java_client.AppiumBy;
 
@@ -59,21 +59,21 @@ public class LocalizedAnnotations extends Annotations {
 
         if (getField().isAnnotationPresent(Predicate.class)) {
             // TODO: analyze howto determine iOS or Android predicate
-            param = StringUtils.remove(param, "By.xpath: ");
+            param = StringUtils.remove(param, LocatorType.XPATH.getStartsWith());
             by = AppiumBy.iOSNsPredicateString(param);
             // by = AppiumBy.androidUIAutomator(param);
         } else if (getField().isAnnotationPresent(ClassChain.class)) {
-            param = StringUtils.remove(param, "By.xpath: ");
+            param = StringUtils.remove(param, LocatorType.XPATH.getStartsWith());
             by = AppiumBy.iOSClassChain(param);
         } else if (getField().isAnnotationPresent(AccessibilityId.class)) {
-            param = StringUtils.remove(param, "By.name: ");
+            param = StringUtils.remove(param, LocatorType.NAME.getStartsWith()));
             by = AppiumBy.accessibilityId(param);
         } else if (getField().isAnnotationPresent(ExtendedFindBy.class)) {
             By extendedBy = createExtendedBy(param);
             if (extendedBy != null) {
                 by = extendedBy;
             }
-            LOGGER.debug("Annotation ExtendedFindBy has been detected. Returning locator : " + by);
+            LOGGER.debug("Annotation ExtendedFindBy has been detected. Returning locator : {}", by);
         } else {
             by = createBy(param);
         }
@@ -123,16 +123,18 @@ public class LocalizedAnnotations extends Annotations {
     }
 
     private By createExtendedBy(String locator) {
-        if (locator.startsWith("By.AndroidUIAutomator: ")) {
-            return AppiumBy.androidUIAutomator(StringUtils.remove(locator, "By.AndroidUIAutomator: "));
-        } else if (locator.startsWith("By.IosClassChain: ")) {
-            return AppiumBy.iOSClassChain(StringUtils.remove(locator, "By.IosClassChain: "));
-        } else if (locator.startsWith("By.IosNsPredicate: ")) {
-            return AppiumBy.iOSNsPredicateString(StringUtils.remove(locator, "By.IosNsPredicate: "));
-        } else if (locator.startsWith("By.xpath: ")) { // for @ExtendedFindBy 'text' attribute L10N supporting
-            return By.xpath(StringUtils.remove(locator, "By.xpath: "));
+        if (LocatorType.ANDROID_UI_AUTOMATOR.is(locator)) {
+            return LocatorType.ANDROID_UI_AUTOMATOR.buildLocatorFromString(locator);
+        } else if (LocatorType.IOS_CLASS_CHAIN.is(locator)) {
+            return LocatorType.IOS_CLASS_CHAIN.buildLocatorFromString(locator);
+        } else if (LocatorType.IOS_NS_PREDICATE.is(locator)) {
+            return LocatorType.IOS_NS_PREDICATE.buildLocatorFromString(locator);
+        } else if (LocatorType.ACCESSIBILITY_ID.is(locator)) {
+            return LocatorType.ACCESSIBILITY_ID.buildLocatorFromString(locator);
+        } else if (LocatorType.XPATH.is(locator)) {
+            // for @ExtendedFindBy 'text' attribute L10N supporting
+            return LocatorType.XPATH.buildLocatorFromString(locator);
         }
-
         return null;
     }
 }

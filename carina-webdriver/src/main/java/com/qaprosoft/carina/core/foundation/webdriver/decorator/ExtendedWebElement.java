@@ -1135,6 +1135,8 @@ public class ExtendedWebElement implements IWebElement {
             resultBy = AppiumBy.iOSClassChain(String.format(StringUtils.remove(locator, "By.IosClassChain: "), objects));
         }
 
+
+
         if (locator.startsWith("By.IosNsPredicate: **")) {
             resultBy = AppiumBy.iOSNsPredicateString(String.format(StringUtils.remove(locator, "By.IosNsPredicate: "), objects));
         }
