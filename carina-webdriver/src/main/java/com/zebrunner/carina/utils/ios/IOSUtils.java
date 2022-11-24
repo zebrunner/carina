@@ -14,6 +14,7 @@ import io.appium.java_client.ios.HasIOSSettings;
 import io.appium.java_client.ios.IOSBatteryInfo;
 import io.appium.java_client.ios.PerformsTouchID;
 import io.appium.java_client.ios.ShakesDevice;
+import io.appium.java_client.ios.options.XCUITestOptions;
 
 /**
  * Contains utility methods for working with ios
@@ -344,5 +345,19 @@ public interface IOSUtils extends IMobileUtils {
             throw new UnsupportedOperationException("Driver is not support setKeyboardPrediction method", e);
         }
         return driver.setKeyboardPrediction(enabled);
+    }
+
+    /**
+     * Get capabilities from driver as {@link io.appium.java_client.ios.options.XCUITestOptions}
+     *
+     * @return see {@link io.appium.java_client.ios.options.XCUITestOptions}
+     */
+    public default XCUITestOptions getXCUITestOptions() {
+        try {
+            return (XCUITestOptions) getCapabilities();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getXCUITestOptions method."
+                    + "The driver was created with a different type of capabilities.", e);
+        }
     }
 }

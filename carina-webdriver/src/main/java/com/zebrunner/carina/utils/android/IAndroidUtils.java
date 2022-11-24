@@ -83,6 +83,7 @@ import io.appium.java_client.android.nativekey.AndroidKey;
 import io.appium.java_client.android.nativekey.KeyEvent;
 import io.appium.java_client.android.nativekey.KeyEventFlag;
 import io.appium.java_client.android.nativekey.PressesKey;
+import io.appium.java_client.android.options.UiAutomator2Options;
 import io.appium.java_client.battery.HasBattery;
 import io.appium.java_client.clipboard.ClipboardContentType;
 
@@ -1964,6 +1965,20 @@ public interface IAndroidUtils extends IMobileUtils {
             throw new UnsupportedOperationException("Driver is not support setTrackScrollEvents method", e);
         }
         return driver.setTrackScrollEvents(enabled);
+    }
+
+    /**
+     * Get capabilities from driver as {@link UiAutomator2Options}
+     *
+     * @return see {@link UiAutomator2Options}
+     */
+    public default UiAutomator2Options getUiAutomator2Options() {
+        try {
+            return (UiAutomator2Options) getCapabilities();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getUiAutomator2Options method."
+                    + "The driver was created with a different type of capabilities.", e);
+        }
     }
 
 }

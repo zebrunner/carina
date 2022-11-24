@@ -70,6 +70,7 @@ import io.appium.java_client.SupportsLegacyAppManagement;
 import io.appium.java_client.appmanagement.ApplicationState;
 import io.appium.java_client.appmanagement.BaseActivateApplicationOptions;
 import io.appium.java_client.appmanagement.BaseInstallApplicationOptions;
+import io.appium.java_client.appmanagement.BaseOptions;
 import io.appium.java_client.appmanagement.BaseRemoveApplicationOptions;
 import io.appium.java_client.appmanagement.BaseTerminateApplicationOptions;
 import io.appium.java_client.clipboard.ClipboardContentType;
@@ -1890,4 +1891,17 @@ public interface IMobileUtils extends IDriverPool {
         }
     }
 
+    /**
+     * Get capabilities from driver as {@link BaseOptions}
+     * 
+     * @return see {@link BaseOptions}
+     */
+    public default BaseOptions<?> getBaseOptions() {
+        try {
+            return (BaseOptions<?>) getCapabilities();
+        } catch (ClassCastException e) {
+            throw new UnsupportedOperationException("Driver is not support getBaseOptions method. "
+                    + "The driver was created with a different type of capabilities.", e);
+        }
+    }
 }
