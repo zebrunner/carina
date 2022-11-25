@@ -50,8 +50,7 @@ public @interface ExtendedFindBy {
     public static class FindByBuilder extends ExtendedFindByBuilder {
         public By buildIt(Object annotation, Field field) {
             ExtendedFindBy findBy = (ExtendedFindBy) annotation;
-            By ans = buildByFromShortFindBy(findBy);
-            return ans;
+            return buildByFromShortFindBy(findBy);
         }
     }
 }
