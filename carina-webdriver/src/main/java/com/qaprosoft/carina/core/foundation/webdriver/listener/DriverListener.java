@@ -30,16 +30,21 @@ import org.openqa.selenium.support.events.WebDriverListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zebrunner.carina.utils.report.ReportContext;
-import com.zebrunner.carina.utils.Configuration.Parameter;
-import com.zebrunner.carina.utils.FileManager;
-import com.zebrunner.carina.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 import com.zebrunner.agent.core.registrar.Artifact;
+import com.zebrunner.carina.utils.Configuration.Parameter;
+import com.zebrunner.carina.utils.FileManager;
+import com.zebrunner.carina.utils.R;
+import com.zebrunner.carina.utils.report.ReportContext;
 
 /**
- * ScreenshotEventListener - captures screenshot after essential webdriver event.
+ * Default driver listener<br>
+ * If you want to create your own driver event listener, it must necessarily implement the
+ * {@link WebDriverListener} interface and it must have a default constructor,
+ * or if you need a driver in methods where the driver is not passed as a parameter,
+ * then add a constructor that takes a single parameter of the {@link WebDriver} type.<br>
+ * DriverListener - captures screenshot after essential webdriver event.
  * IMPORTANT! Please avoid any driver calls with extra listeners (recursive exception generation)
  * 
  * @author Alex Khursevich (alex@qaprosoft.com)
@@ -49,7 +54,7 @@ public class DriverListener implements WebDriverListener, IDriverPool {
     private static final ThreadLocal<String> CURRENT_POSITIVE_MESSAGE = new ThreadLocal<>();
     private static final ThreadLocal<String> CURRENT_NEGATIVE_MESSAGE = new ThreadLocal<>();
 
-    private WebDriver driver  = null;
+    private WebDriver driver = null;
 
     // FIXME refactor - it is not a good idea to set driver using constructor
     public DriverListener(WebDriver driver) {

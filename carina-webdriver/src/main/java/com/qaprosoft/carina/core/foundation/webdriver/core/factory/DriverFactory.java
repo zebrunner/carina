@@ -16,12 +16,14 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory;
 
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.ConstructorUtils;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.events.EventFiringDecorator;
@@ -29,16 +31,16 @@ import org.openqa.selenium.support.events.WebDriverListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.zebrunner.carina.utils.Configuration;
-import com.zebrunner.carina.utils.Configuration.Parameter;
-import com.zebrunner.carina.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.DesktopFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.MacFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.MobileFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl.WindowsFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.zebrunner.agent.core.webdriver.RemoteWebDriverFactory;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration.Parameter;
+import com.zebrunner.carina.utils.R;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
 
 /**
  * DriverFactory produces driver instance with capabilities according to configuration.
@@ -113,14 +115,26 @@ public class DriverFactory {
                 try {
                     Class<?> clazz = Class.forName(listenerClass);
                     if (WebDriverListener.class.isAssignableFrom(clazz)) {
-                        WebDriverListener listener = (WebDriverListener) clazz.getDeclaredConstructor().newInstance();
+                        WebDriverListener listener = null;
+
+                        Constructor<?> constructor = ConstructorUtils.getMatchingAccessibleConstructor(clazz, WebDriver.class);
+                        if (constructor != null) {
+                            listener = (WebDriverListener) constructor.newInstance(driver);
+                        } else {
+                            constructor = ConstructorUtils.getAccessibleConstructor(clazz);
+                            if (constructor == null) {
+                                LOGGER.error("Unable to register '{}' webdriver event listener! No default constructor found", listenerClass);
+                                continue;
+                            }
+                            listener = (WebDriverListener) constructor.newInstance();
+                        }
                         listeners.add(listener);
-                        LOGGER.debug("Webdriver event listener registered: {}", clazz.getName());
+                        LOGGER.debug("WebDriver event listener registered: {}", clazz.getName());
                     }
                 } catch (ClassNotFoundException e) {
                     LOGGER.error("Unable to register '{}' webdriver event listener! Class was not found", listenerClass, e);
 
-                } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
+                } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
                     LOGGER.error("Unable to register '{}' webdriver event listener! Please, investigate stacktrace!", listenerClass, e);
                 }
             }
