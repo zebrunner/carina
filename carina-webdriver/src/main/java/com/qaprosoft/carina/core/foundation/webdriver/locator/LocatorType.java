@@ -94,7 +94,7 @@ public enum LocatorType {
             return AppiumBy.androidUIAutomator(String.format(StringUtils.remove(locator, getStartsWith()), objects));
         }
     },
-    IMAGE("By.Image: ") {
+    IMAGE("AppiumBy.image: ") {
         public By buildLocatorFromString(String locator) {
             return AppiumBy.image(StringUtils.remove(locator, getStartsWith()));
         }
@@ -112,7 +112,7 @@ public enum LocatorType {
             return AppiumBy.image(base64image);
         }
     },
-    ACCESSIBILITY_ID("AppiumBy.AccessibilityId: ") {
+    ACCESSIBILITY_ID("AppiumBy.accessibilityId: ") {
         public By buildLocatorFromString(String locator) {
             return AppiumBy.accessibilityId(StringUtils.remove(locator, getStartsWith()));
         }
