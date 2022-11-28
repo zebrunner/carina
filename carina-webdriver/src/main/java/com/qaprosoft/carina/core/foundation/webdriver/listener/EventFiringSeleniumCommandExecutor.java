@@ -18,28 +18,33 @@ package com.qaprosoft.carina.core.foundation.webdriver.listener;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
+import java.time.Duration;
 
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.Response;
+import org.openqa.selenium.remote.http.ClientConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.Configuration.Parameter;
 import com.zebrunner.carina.utils.common.CommonUtils;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
 
 /**
  * EventFiringSeleniumCommandExecutor triggers event listener before/after execution of the command.
  */
 public class EventFiringSeleniumCommandExecutor extends HttpCommandExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    
+    private static final Duration DEFAULT_READ_TIMEOUT = Duration.ofMinutes(10);
+
     public EventFiringSeleniumCommandExecutor(URL addressOfRemoteServer) {
-        super(addressOfRemoteServer);
+        super(ClientConfig.defaultConfig()
+                .baseUrl(addressOfRemoteServer)
+                .readTimeout(DEFAULT_READ_TIMEOUT));
     }
 
     @Override
