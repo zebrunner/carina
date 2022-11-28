@@ -39,16 +39,12 @@ import com.zebrunner.carina.utils.commons.SpecialKeywords;
  */
 public class EventFiringSeleniumCommandExecutor extends HttpCommandExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    /**
-     * Request timeout for Netty client (needed to increase the session start time
-     * from 3 minutes by default to 10 minutes)
-     */
-    private static final Duration REQUEST_TIMEOUT = Duration.ofMinutes(10);
+    private static final Duration DEFAULT_READ_TIMEOUT = Duration.ofMinutes(10);
 
     public EventFiringSeleniumCommandExecutor(URL addressOfRemoteServer) {
         super(ClientConfig.defaultConfig()
                 .baseUrl(addressOfRemoteServer)
-                .readTimeout(REQUEST_TIMEOUT));
+                .readTimeout(DEFAULT_READ_TIMEOUT));
     }
 
     @Override
