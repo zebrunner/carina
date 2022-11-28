@@ -15,10 +15,10 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 
+import java.io.UncheckedIOException;
 import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,20 +26,21 @@ import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.http.ClientConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.zebrunner.carina.utils.Configuration;
-import com.zebrunner.carina.utils.Configuration.Parameter;
-import com.zebrunner.carina.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.EspressoCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.UiAutomator2Capabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.XCUITestCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration.Parameter;
+import com.zebrunner.carina.utils.R;
+import com.zebrunner.carina.utils.android.recorder.exception.UnsupportedPlatformException;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
@@ -91,9 +92,9 @@ public class MobileFactory extends AbstractFactory {
             LOGGER.debug("Appended udid to capabilities: {}", capabilities);
         }
 
-        if (Objects.equals(Configuration.get(Parameter.W3C), "false")) {
-            capabilities = removeAppiumPrefix(capabilities);
-        }
+//        if (Objects.equals(Configuration.get(Parameter.W3C), "false")) {
+//            capabilities = removeAppiumPrefix(capabilities);
+//        }
 
         if (capabilities.getBrowserName() != null &&
                 (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.ANDROID) ||
@@ -105,26 +106,40 @@ public class MobileFactory extends AbstractFactory {
         }
 
         LOGGER.debug("capabilities: {}", capabilities);
+        URL seleniumURL;
+        try {
+            seleniumURL = new URL(seleniumHost);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Malformed selenium URL!", e);
+        }
+
+        /**
+         * ClientConfig:
+         * todo investigate is it need to reuse similar logic from
+         * {@link com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor}
+         */
 
         try {
-            EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
+            ClientConfig clientConfig = ClientConfig.defaultConfig()
+                    .baseUrl(seleniumURL)
+                    .readTimeout(CLIENT_REQUEST_TIMEOUT);
 
             if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
-                driver = new AndroidDriver(ce, capabilities);
+                driver = new AndroidDriver(clientConfig, capabilities);
 
             } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.IOS)
                     || mobilePlatformName.equalsIgnoreCase(SpecialKeywords.TVOS)) {
-                driver = new IOSDriver(ce, capabilities);
+                driver = new IOSDriver(clientConfig, capabilities);
 
             } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.CUSTOM)) {
                 // that's a case for custom mobile capabilities like browserstack or saucelabs
-                driver =new RemoteWebDriver(new URL(seleniumHost), capabilities);
-
+                driver = RemoteWebDriver.builder()
+                        .addAlternative(capabilities)
+                        .config(clientConfig)
+                        .build();
             } else {
-                throw new RuntimeException("Unsupported mobile platform: " + mobilePlatformName);
+                throw new UnsupportedPlatformException("Unsupported mobile platform: " + mobilePlatformName);
             }
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Malformed selenium URL!", e);
         } catch (Exception e) {
             Device device = IDriverPool.nullDevice;
             LOGGER.debug("STF is enabled. Debug info will be extracted from the exception.");

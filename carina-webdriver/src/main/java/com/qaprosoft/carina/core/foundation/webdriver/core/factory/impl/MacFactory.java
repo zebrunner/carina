@@ -22,6 +22,7 @@ import java.util.Objects;
 
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.http.ClientConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,29 +54,22 @@ public class MacFactory extends AbstractFactory {
             throw new RuntimeException(String.format("Driver type %s is not applicable for Windows driver", driverType));
         }
 
-        WebDriver driver = null;
         if (isCapabilitiesEmpty(capabilities)) {
-            capabilities = getCapabilities(name);
-        }
-
-        if (Objects.equals(Configuration.get(Configuration.Parameter.W3C), "false")) {
-            capabilities = removeAppiumPrefix(capabilities);
+            capabilities = new Mac2Capabilities().getCapability(name);
         }
 
         LOGGER.debug("capabilities: {}", capabilities);
 
-        URL url;
+        URL seleniumURL;
         try {
-            url = new URL(seleniumHost);
+            seleniumURL = new URL(seleniumHost);
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed appium URL!", e);
         }
-        driver = new Mac2Driver(url, capabilities);
 
-        return driver;
-    }
-
-    private MutableCapabilities getCapabilities(String name) {
-        return new Mac2Capabilities().getCapability(name);
+        ClientConfig clientConfig = ClientConfig.defaultConfig()
+                .baseUrl(seleniumURL)
+                .readTimeout(CLIENT_REQUEST_TIMEOUT);
+        return new Mac2Driver(clientConfig, capabilities);
     }
 }

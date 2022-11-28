@@ -16,6 +16,7 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory;
 
 import java.lang.invoke.MethodHandles;
+import java.time.Duration;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -39,6 +40,11 @@ import io.appium.java_client.internal.CapabilityHelpers;
  */
 public abstract class AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    /**
+     * request timeout for Netty client to 10 minutes (needed to increase the session start time
+     * from 3 minutes by default to 10 minutes)
+     */
+    protected static final Duration CLIENT_REQUEST_TIMEOUT = Duration.ofMinutes(10);
 
     /**
      * Creates new instance of {@link WebDriver} according to specified {@link MutableCapabilities}.

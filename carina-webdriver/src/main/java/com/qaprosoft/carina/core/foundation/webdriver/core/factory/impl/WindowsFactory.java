@@ -22,6 +22,7 @@ import java.util.Objects;
 
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.http.ClientConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +44,6 @@ public class WindowsFactory extends AbstractFactory {
 
     @Override
     public WebDriver create(String name, MutableCapabilities capabilities, String seleniumHost) {
-
         if (seleniumHost == null) {
             seleniumHost = Configuration.getSeleniumUrl();
         }
@@ -54,29 +54,22 @@ public class WindowsFactory extends AbstractFactory {
             throw new RuntimeException(String.format("Driver type %s is not applicable for Windows driver", driverType));
         }
 
-        WebDriver driver = null;
         if (isCapabilitiesEmpty(capabilities)) {
-            capabilities = getCapabilities(name);
-        }
-
-        if (Objects.equals(Configuration.get(Configuration.Parameter.W3C), "false")) {
-            capabilities = removeAppiumPrefix(capabilities);
+            capabilities = new WindowsCapabilities().getCapability(name);
         }
 
         LOGGER.debug("capabilities: {}", capabilities);
 
-        URL url;
+        URL seleniumURL;
         try {
-            url = new URL(seleniumHost);
+            seleniumURL = new URL(seleniumHost);
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed appium URL!", e);
         }
-        driver = new WindowsDriver(url, capabilities);
 
-        return driver;
-    }
-
-    private WindowsOptions getCapabilities(String name) {
-        return new WindowsCapabilities().getCapability(name);
+        ClientConfig clientConfig = ClientConfig.defaultConfig()
+                .baseUrl(seleniumURL)
+                .readTimeout(CLIENT_REQUEST_TIMEOUT);
+        return new WindowsDriver(clientConfig, capabilities);
     }
 }

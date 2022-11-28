@@ -66,10 +66,10 @@ public class DesktopFactory extends AbstractFactory {
             capabilities.merge(staticCapabilities);
         }
 
-        if (Browser.SAFARI.browserName().equalsIgnoreCase(capabilities.getBrowserName()) &&
-                "false".equalsIgnoreCase(Configuration.get(Parameter.W3C))) {
-            capabilities = removeAppiumPrefix(capabilities);
-        }
+//        if (Browser.SAFARI.browserName().equalsIgnoreCase(capabilities.getBrowserName()) &&
+//                "false".equalsIgnoreCase(Configuration.get(Parameter.W3C))) {
+//            capabilities = removeAppiumPrefix(capabilities);
+//        }
 
         LOGGER.debug("capabilities: {}", capabilities);
 
@@ -82,7 +82,7 @@ public class DesktopFactory extends AbstractFactory {
 
         /**
          * ClientConfig:
-         * todo investigate usage similar logic from
+         * todo investigate is it need to use similar logic from
          * {@link com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor}
          * in class {@link org.openqa.selenium.remote.http.RetryRequest}
          */
@@ -93,7 +93,7 @@ public class DesktopFactory extends AbstractFactory {
                 .config(ClientConfig.defaultConfig()
                         // set request timeout for Netty client to 10 minutes (needed to increase the session start time
                         // from 3 minutes by default to 10 minutes
-                        .readTimeout(Duration.ofMinutes(10)))
+                        .readTimeout(CLIENT_REQUEST_TIMEOUT))
                 .build();
         resizeBrowserWindow(driver, capabilities);
         return driver;
