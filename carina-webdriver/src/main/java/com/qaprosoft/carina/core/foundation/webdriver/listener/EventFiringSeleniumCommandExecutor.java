@@ -20,6 +20,7 @@ import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.time.Duration;
 
+import com.zebrunner.carina.utils.R;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.DriverCommand;
@@ -39,12 +40,12 @@ import com.zebrunner.carina.utils.commons.SpecialKeywords;
  */
 public class EventFiringSeleniumCommandExecutor extends HttpCommandExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final Duration DEFAULT_READ_TIMEOUT = Duration.ofMinutes(10);
 
     public EventFiringSeleniumCommandExecutor(URL addressOfRemoteServer) {
         super(ClientConfig.defaultConfig()
                 .baseUrl(addressOfRemoteServer)
-                .readTimeout(DEFAULT_READ_TIMEOUT));
+                //todo reuse parameter from Configuration.Parameter class
+                .readTimeout(Duration.ofMinutes(R.CONFIG.getLong("read_timeout"))));
     }
 
     @Override
