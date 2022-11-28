@@ -35,6 +35,7 @@ import com.zebrunner.carina.utils.common.CommonUtils;
 /**
  * EventFiringSeleniumCommandExecutor triggers event listener before/after execution of the command.
  */
+@Deprecated(forRemoval = true)
 public class EventFiringSeleniumCommandExecutor extends HttpCommandExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     

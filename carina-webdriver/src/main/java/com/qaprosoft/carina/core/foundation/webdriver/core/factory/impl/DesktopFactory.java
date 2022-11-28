@@ -29,21 +29,21 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.http.ClientConfig;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Wait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
-import com.zebrunner.carina.utils.Configuration;
-import com.zebrunner.carina.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.ChromeCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.EdgeCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.FirefoxCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.OperaCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.SafariCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration.Parameter;
 
 public class DesktopFactory extends AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -73,15 +73,29 @@ public class DesktopFactory extends AbstractFactory {
 
         LOGGER.debug("capabilities: {}", capabilities);
 
+        URL seleniumURL;
         try {
-            EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(new URL(seleniumHost));
-            driver = new RemoteWebDriver(ce, capabilities);
-
+            seleniumURL = new URL(seleniumHost);
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed selenium URL!", e);
         }
-        resizeBrowserWindow(driver, capabilities);
 
+        /**
+         * ClientConfig:
+         * todo investigate usage similar logic from
+         * {@link com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor}
+         * in class {@link org.openqa.selenium.remote.http.RetryRequest}
+         */
+
+        driver = RemoteWebDriver.builder()
+                .address(seleniumURL)
+                .addAlternative(capabilities)
+                .config(ClientConfig.defaultConfig()
+                        // set request timeout for Netty client to 10 minutes (needed to increase the session start time
+                        // from 3 minutes by default to 10 minutes
+                        .readTimeout(Duration.ofMinutes(10)))
+                .build();
+        resizeBrowserWindow(driver, capabilities);
         return driver;
     }
 
