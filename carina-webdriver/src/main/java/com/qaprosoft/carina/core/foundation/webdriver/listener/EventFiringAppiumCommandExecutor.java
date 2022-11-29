@@ -67,6 +67,8 @@ import io.appium.java_client.remote.AppiumW3CHttpCommandCodec;
 public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
     private static final String IDEMPOTENCY_KEY_HEADER = "X-Idempotency-Key";
     private final Optional<DriverService> serviceOptional;
+    private static final Duration CONNECTION_TIMEOUT = Duration.ofSeconds(100);
+
 
     private EventFiringAppiumCommandExecutor(Map<String, CommandInfo> additionalCommands, DriverService service,
             URL addressOfRemoteServer,
@@ -76,6 +78,7 @@ public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
                         .baseUrl(Require.nonNull("Server URL", ofNullable(service)
                                 .map(DriverService::getUrl)
                                 .orElse(addressOfRemoteServer)))
+                        .connectionTimeout(CONNECTION_TIMEOUT)
                         //todo reuse parameter from Configuration.Parameter class
                         .readTimeout(Duration.ofMinutes(R.CONFIG.getLong("read_timeout"))),
                 httpClientFactory);

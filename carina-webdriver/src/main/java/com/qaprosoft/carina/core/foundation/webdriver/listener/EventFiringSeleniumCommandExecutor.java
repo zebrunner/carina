@@ -40,10 +40,12 @@ import com.zebrunner.carina.utils.commons.SpecialKeywords;
  */
 public class EventFiringSeleniumCommandExecutor extends HttpCommandExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Duration CONNECTION_TIMEOUT = Duration.ofSeconds(100);
 
     public EventFiringSeleniumCommandExecutor(URL addressOfRemoteServer) {
-        super(ClientConfig.defaultConfig()
+        super( ClientConfig.defaultConfig()
                 .baseUrl(addressOfRemoteServer)
+                        .connectionTimeout(CONNECTION_TIMEOUT)
                 //todo reuse parameter from Configuration.Parameter class
                 .readTimeout(Duration.ofMinutes(R.CONFIG.getLong("read_timeout"))));
     }
