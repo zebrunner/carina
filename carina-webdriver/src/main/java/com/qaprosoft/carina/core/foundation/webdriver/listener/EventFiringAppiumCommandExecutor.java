@@ -50,6 +50,7 @@ import org.openqa.selenium.remote.service.DriverService;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
+import com.zebrunner.carina.utils.R;
 
 import io.appium.java_client.MobileCommand;
 import io.appium.java_client.remote.AppiumCommandExecutor;
@@ -65,8 +66,6 @@ import io.appium.java_client.remote.AppiumW3CHttpCommandCodec;
 @SuppressWarnings({ "unchecked" })
 public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
     private static final String IDEMPOTENCY_KEY_HEADER = "X-Idempotency-Key";
-    private static final Duration DEFAULT_READ_TIMEOUT = Duration.ofMinutes(10);
-
     private final Optional<DriverService> serviceOptional;
 
     private EventFiringAppiumCommandExecutor(Map<String, CommandInfo> additionalCommands, DriverService service,
@@ -77,7 +76,8 @@ public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
                         .baseUrl(Require.nonNull("Server URL", ofNullable(service)
                                 .map(DriverService::getUrl)
                                 .orElse(addressOfRemoteServer)))
-                        .readTimeout(DEFAULT_READ_TIMEOUT),
+                        //todo reuse parameter from Configuration.Parameter class
+                        .readTimeout(Duration.ofMinutes(R.CONFIG.getLong("read_timeout"))),
                 httpClientFactory);
         serviceOptional = ofNullable(service);
     }
