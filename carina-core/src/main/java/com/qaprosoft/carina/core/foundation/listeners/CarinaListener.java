@@ -134,6 +134,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         // Technically, this happen when the maven-surefire-plugin has not set inherited program arguments (passed to mvn process).
         // That is why it is necessary to reinit R class here when TestNG loads the CarinaListener class.
         R.reinit();
+        // Set the system property to indicate that Java 11+ Http client needs to be used. By default, selenium uses the AsyncHttpClient
+        System.setProperty("webdriver.http.factory", "jdk-http-client");
         registerDecryptAgentProperties();
         
         LOGGER.info(Configuration.asString());
