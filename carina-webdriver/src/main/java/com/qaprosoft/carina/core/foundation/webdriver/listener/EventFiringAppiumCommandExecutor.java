@@ -67,7 +67,7 @@ import io.appium.java_client.remote.AppiumW3CHttpCommandCodec;
 public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
     private static final String IDEMPOTENCY_KEY_HEADER = "X-Idempotency-Key";
     private final Optional<DriverService> serviceOptional;
-    private static final Duration CONNECTION_TIMEOUT = Duration.ofSeconds(100);
+    private static final Duration CONNECTION_TIMEOUT = Duration.ofSeconds(60);
 
 
     private EventFiringAppiumCommandExecutor(Map<String, CommandInfo> additionalCommands, DriverService service,
