@@ -354,6 +354,7 @@
                 <version>1.0-SNAPSHOT</version>
                 <exclusions>
                     <exclusion>
+                        <!-- 2.0.29.Final:compile is too old -->
                         <groupId>io.netty</groupId>
                         <artifactId>netty-tcnative-boringssl-static</artifactId>
                     </exclusion>
