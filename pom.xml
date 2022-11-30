@@ -91,6 +91,7 @@
     <modules>
         <module>carina-api</module>
         <module>carina-dataprovider</module>
+        <module>carina-proxy</module>
         <module>carina-reporting</module>
         <module>carina-webdriver</module>
         <module>carina-aws-s3</module>
