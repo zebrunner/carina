@@ -354,7 +354,7 @@
                 <version>1.0-SNAPSHOT</version>
                 <exclusions>
                     <exclusion>
-                        <!-- 2.0.29.Final:compile is too old -->
+                        <!-- 2.0.29.Final:compile is too old. remove after moving azure into independent project -->
                         <groupId>io.netty</groupId>
                         <artifactId>netty-tcnative-boringssl-static</artifactId>
                     </exclusion>
