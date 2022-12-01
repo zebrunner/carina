@@ -45,7 +45,7 @@ public class EventFiringSeleniumCommandExecutor extends HttpCommandExecutor {
         super(ClientConfig.defaultConfig()
                 .baseUrl(addressOfRemoteServer)
                 //todo reuse parameter from Configuration.Parameter class
-                .readTimeout(Duration.ofMinutes(R.CONFIG.getLong("read_timeout"))));
+                .readTimeout(Duration.ofSeconds(R.CONFIG.getLong("read_timeout"))));
     }
 
     @Override

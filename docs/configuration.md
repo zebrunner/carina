@@ -158,7 +158,7 @@ All the project configuration properties are located in a **_config.properties**
 	</tr>
 	<tr>
 		<td>read_timeout</td>
-		<td>Timeout is minutes to read response from Selenium/Appium. **Default: 10**</td>
+		<td>Timeout is seconds to read response from Selenium/Appium. **Default: 600**</td>
 		<td>Integer</td>
 	</tr>
 	<tr>
