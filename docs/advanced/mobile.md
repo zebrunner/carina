@@ -1,5 +1,3 @@
-## Mobile
-
 ### Run one test on android and ios in parallel
 
 To run tests on multiple devices, including different platforms, you can use a data provider. For example, you can create a data provider like:
