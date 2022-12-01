@@ -382,6 +382,18 @@
 
 
   <li class="md-nav__item">
+    <a href="../mobile/" title="Mobile" class="md-nav__link">
+      Mobile
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../localization/" title="Localization" class="md-nav__link">
       Localization
     </a>
@@ -616,17 +628,25 @@
 <p>Anyone may generate their own security key and encrypt the data using this key, so that the decrypted valid data may be used in the test only if the valid key is specified in the test configuration. Also, one may use the default common key located in test resources, giving access to all other users for secured data decryption.</p>
 <h2 id="secured-data-preparation">Secured data preparation</h2>
 <p>For secured data preparation, we implemented a special tool that helps to generate crypto keys and encrypt/decrypt test data files. Here is a usage tip:</p>
-<pre><code>com.qaprosoft.carina.core.foundation.crypto.CryptoConsole -generate -key_file &quot;file_path_to_save_key&quot;
-com.qaprosoft.carina.core.foundation.crypto.CryptoConsole -encrypt -string &quot;string_to_encrypt&quot; -key_file &quot;key_file_path&quot;
-com.qaprosoft.carina.core.foundation.crypto.CryptoConsole -decrypt -string &quot;string_to_decrypt&quot; -key_file &quot;key_file_path&quot;
-com.qaprosoft.carina.core.foundation.crypto.CryptoConsole -encrypt -file &quot;csv_file_to_encrypt&quot; -key_file &quot;key_file_path&quot;
-com.qaprosoft.carina.core.foundation.crypto.CryptoConsole -decrypt -file &quot;csv_file_to_decrypt&quot; -key_file &quot;key_file_path&quot;
+<pre><code>com.zebrunner.carina.crypto.CryptoConsole -help
+com.zebrunner.carina.crypto.CryptoConsole -generate -algorithm &quot;algorithm&quot; -keysize=&quot;key size&quot;
+com.zebrunner.carina.crypto.CryptoConsole -encrypt -algorithm &quot;algorithm&quot; -key=&quot;key&quot; -string=&quot;string_to_encrypt&quot;
+com.zebrunner.carina.crypto.CryptoConsole -encrypt -algorithm &quot;algorithm&quot; -key=&quot;key&quot; -string=&quot;string_to_encrypt&quot;
+com.zebrunner.carina.crypto.CryptoConsole -encrypt -algorithm &quot;algorithm&quot; -key=&quot;key&quot; -pattern=&quot;pattern&quot; -string=&quot;string_to_encrypt&quot;
+com.zebrunner.carina.crypto.CryptoConsole -encrypt -algorithm &quot;algorithm&quot; -key=&quot;key&quot; -wrapper=&quot;wrapper&quot; -string=&quot;string_to_encrypt&quot;
+com.zebrunner.carina.crypto.CryptoConsole -encrypt -algorithm &quot;algorithm&quot; -key=&quot;key&quot; -pattern=&quot;pattern&quot; -wrapper=&quot;wrapper&quot; -string=&quot;string_to_encrypt&quot;
+com.zebrunner.carina.crypto.CryptoConsole -decrypt -algorithm &quot;algorithm&quot; -key=&quot;key&quot; -string=&quot;string_to_encrypt&quot;
+com.zebrunner.carina.crypto.CryptoConsole -decrypt -algorithm &quot;algorithm&quot; -key=&quot;key&quot; -pattern=&quot;pattern&quot; -string=&quot;string_to_encrypt&quot;
+com.zebrunner.carina.crypto.CryptoConsole -decrypt -algorithm &quot;algorithm&quot; -key=&quot;key&quot; -wrapper=&quot;wrapper&quot; -string=&quot;string_to_encrypt&quot;
+com.zebrunner.carina.crypto.CryptoConsole -decrypt -algorithm &quot;algorithm&quot; -key=&quot;key&quot; -pattern=&quot;pattern&quot; -wrapper=&quot;wrapper&quot; -string=&quot;string_to_encrypt&quot;
+com.zebrunner.carina.crypto.CryptoConsole -encrypt -algorithm &quot;algorithm&quot; -key=&quot;key&quot; -file=&quot;path_to_file_to_encrypt&quot;
+com.zebrunner.carina.crypto.CryptoConsole -decrypt -algorithm &quot;algorithm&quot; -key=&quot;key&quot; -file=&quot;path_to_file_to_encrypt&quot;
 </code></pre>
 
 <p><strong>To generate an individual crypto key:</strong></p>
 <ol>
 <li>Go to "Run configuration" in Eclipse</li>
-<li>Create a new Java application configuration selecting the project and the main class <strong>com.qaprosoft.carina.core.foundation.crypto.CryptoConsole</strong>:
+<li>Create a new Java application configuration selecting the project and the main class <strong>com.zebrunner.carina.crypto.CryptoConsole</strong>:
 <img alt="Security Config 1" src="../../img/security-config-1.png" /></li>
 <li>Set arguments
 <img alt="Security Config 2" src="../../img/security-config-2.png" /></li>
@@ -639,7 +659,7 @@ com.qaprosoft.carina.core.foundation.crypto.CryptoConsole -decrypt -file &quot;c
 <li>Prepare an input file  using the pattern {crypt:str_to_encrypt} for secured values
 <img alt="Security Config 4" src="../../img/security-config4.png" /></li>
 <li>Prepare an input file  using the pattern {crypt:str_to_encrypt} for secured values.
-Go to “Run configuration”, navigate to the arguments tab and execute the encryption command specifying the key path and input file:
+Go to “Run configuration”, navigate to the arguments tab and execute the encryption command specifying the key and input file:
 <img alt="Security Config 5" src="../../img/security-config5.png" /></li>
 <li>A file with encrypted data will be generated:
 <img alt="Security Config 6" src="../../img/security-config6.png" /></li>
@@ -659,9 +679,12 @@ Go to “Run configuration”, navigate to the arguments tab and execute the enc
 To decrypt your string use it like this:</p>
 <pre><code>String value = &quot;test@gmail.com/{crypt:8O9iA4+f3nMzz85szmvKmQ==}&quot;
 
-CryptoTool cryptoTool = new CryptoTool(&quot;path_to_your_crypto_key&quot;);
-Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
-String decryptedValue = cryptoTool.decryptByPattern(value, CRYPTO_PATTERN);
+CryptoTool cryptoTool = CryptoToolBuilder.builder()
+                    .chooseAlgorithm(Algorithm.find(Configuration.get(Parameter.CRYPTO_ALGORITHM)))
+                    .setKey(Configuration.get(Parameter.CRYPTO_KEY_VALUE))
+                    .build();
+String CRYPTO_PATTERN = Configuration.get(Parameter.CRYPTO_PATTERN);
+String decryptedValue = cryptoTool.decrypt(value, CRYPTO_PATTERN);
 </code></pre>
 
 <p>As a result <code>decryptedValue</code> will be <code>test@gmail.com/EncryptMe</code>.</p>
