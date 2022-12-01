@@ -77,7 +77,7 @@ public class EventFiringAppiumCommandExecutor extends HttpCommandExecutor {
                                 .map(DriverService::getUrl)
                                 .orElse(addressOfRemoteServer)))
                         //todo reuse parameter from Configuration.Parameter class
-                        .readTimeout(Duration.ofMinutes(R.CONFIG.getLong("read_timeout"))),
+                        .readTimeout(Duration.ofSeconds(R.CONFIG.getLong("read_timeout"))),
                 httpClientFactory);
         serviceOptional = ofNullable(service);
     }

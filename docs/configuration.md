@@ -157,6 +157,11 @@ All the project configuration properties are located in a **_config.properties**
 		<td>Integer</td>
 	</tr>
 	<tr>
+		<td>read_timeout</td>
+		<td>Timeout is seconds to read response from Selenium/Appium. **Default: 600**</td>
+		<td>Integer</td>
+	</tr>
+	<tr>
 		<td>page_opening_strategy</td>
 		<td>Determines how carina detects whether the expected [page](https://zebrunner.github.io/carina/automation/web/#page-opening-strategy) is opened</td>
 		<td>BY_ELEMENT, BY_URL, BY_URL_AND_ELEMENT</td>
