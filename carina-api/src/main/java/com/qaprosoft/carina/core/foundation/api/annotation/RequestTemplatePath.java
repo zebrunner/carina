@@ -26,4 +26,9 @@ public @interface RequestTemplatePath {
 
     String path();
 
+    @Target(value = { ElementType.PARAMETER })
+    @Retention(value = RetentionPolicy.RUNTIME)
+    @RequestTemplatePath(path = "")
+    @interface Value {
+    }
 }

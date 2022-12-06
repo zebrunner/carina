@@ -28,4 +28,9 @@ public @interface SuccessfulHttpStatus {
 
     HttpResponseStatusType status();
 
+    @Target(value = { ElementType.PARAMETER })
+    @Retention(value = RetentionPolicy.RUNTIME)
+    @SuccessfulHttpStatus(status = HttpResponseStatusType.OK_200)
+    @interface Value {
+    }
 }

@@ -15,6 +15,8 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.api.annotation;
 
+import com.qaprosoft.apitools.annotation.processor.RelatedTo;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
@@ -35,6 +37,16 @@ public @interface Header {
     @interface List {
 
         Header[] value();
+
+    }
+
+    @Target(value = { ElementType.PARAMETER })
+    @Retention(value = RetentionPolicy.RUNTIME)
+    @Header(key = "", value = "")
+    @interface Value {
+
+        @RelatedTo(annotationClass = Header.class, field = "key")
+        String key();
 
     }
 }

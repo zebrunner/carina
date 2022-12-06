@@ -26,4 +26,9 @@ public @interface PropertiesPath {
 
     String path();
 
+    @Target(value = { ElementType.PARAMETER })
+    @Retention(value = RetentionPolicy.RUNTIME)
+    @PropertiesPath(path = "")
+    @interface Value {
+    }
 }

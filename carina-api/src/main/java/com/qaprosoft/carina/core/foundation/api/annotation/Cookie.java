@@ -15,6 +15,8 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.api.annotation;
 
+import com.qaprosoft.apitools.annotation.processor.RelatedTo;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
@@ -35,6 +37,16 @@ public @interface Cookie {
     @interface List {
 
         Cookie[] value();
+
+    }
+
+    @Target(value = { ElementType.PARAMETER })
+    @Retention(value = RetentionPolicy.RUNTIME)
+    @Cookie(key = "", value = "")
+    @interface Value {
+
+        @RelatedTo(annotationClass = Cookie.class, field = "key")
+        String key();
 
     }
 }
