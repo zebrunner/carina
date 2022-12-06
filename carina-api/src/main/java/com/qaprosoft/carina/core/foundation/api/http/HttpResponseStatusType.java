@@ -21,6 +21,7 @@ package com.qaprosoft.carina.core.foundation.api.http;
  * @author Alex Khursevich
  */
 public enum HttpResponseStatusType {
+
     OK_200(200, "OK"),
     CREATED_201(201, "Created"),
     ACCEPTED_202(202, "Accepted"),
@@ -35,8 +36,8 @@ public enum HttpResponseStatusType {
     EXPECTATION_FAILED_417(417, "Expectation Failed"),
     UNPROCESSABLE_ENTITY_422(422, "Unprocessable Entity");
 
-    private int code;
-    private String message;
+    private final int code;
+    private final String message;
 
     HttpResponseStatusType(int code, String message) {
         this.code = code;

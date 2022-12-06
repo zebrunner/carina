@@ -26,7 +26,7 @@ public enum JsonCompareKeywords {
 
     private String key;
 
-    private JsonCompareKeywords(String key) {
+    JsonCompareKeywords(String key) {
         this.key = key;
     }
 
