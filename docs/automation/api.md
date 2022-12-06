@@ -101,10 +101,14 @@ Approach based on initialisation of super class constructor is deprecated and mo
 2. `@Cookie` - is used to specify cookies in the request
 3. `@Endpoint` - defines the place that APIs send requests and where the resource lives
 4. `@Header` - is used to specify headers in the request
-5. `@PropertiesPath` - contains a path from source root to properties file
-6. `@RequestTemplatePath` - contains a path from source root to request template file
-7. `@ResponseTemplatePath` - contains a path from source root to response template file
-8. `@SuccessfulHttpStatus` - specifies the expected HTTP status
+5. `@HideRequestBodyPartsInLogs` - is used to hide secret parts of the request body in the logs
+6. `@HideRequestHeadersInLogs` - is used to hide secret parts of the request headers in the logs
+7. `@HideResponseBodyPartsInLogs` - is used to hide secret parts of the response body in the logs
+8. `@PropertiesPath` - contains a path from source root to properties file
+9. `@QueryParam` - is used to specify query parameters in the request
+10. `@RequestTemplatePath` - contains a path from source root to request template file
+11. `@ResponseTemplatePath` - contains a path from source root to response template file
+12. `@SuccessfulHttpStatus` - specifies the expected HTTP status
 
 In this case we don’t need to define _api.properties file and call the constructor of a super class, but if we have some properties file used in this request we should explicitly set it in test method. Insead of callAPI() and expectResponseStatus() methods we can use callAPIExpectSuccess() that will call API expecting http status in response taken from @SuccessfulHttpStatus value.
 ```java
@@ -118,10 +122,11 @@ public class DeleteUserMethod extends AbstractApiMethodV2 {
     }
 }
 ```   
-Also placeholders in URL can be automatically replaced by carina if they're specified in carina configuration properties (config.properties).
+Also, placeholders in URL can be automatically replaced by carina if they're specified in carina configuration properties (config.properties).
 To make auto-replacement happen just use next syntax in your URL:
-- when param starts with "config.\*" then R.CONFIG.get("\*") will be used as a replacement
-- when param starts with "config.env.\*" then Configuration.getEnvArg("\*") will be used as a replacement    
+- when param starts with `config.\*` then `R.CONFIG.get("\*")` will be used as a replacement
+- when param starts with `config.env.\*` then `Configuration.getEnvArg("\*")` will be used as a replacement
+
 So you may use next implementation:   
 ```java
 @Endpoint(url = "${config.env.base_url}/users/1", methodType = HttpMethodType.DELETE)
@@ -225,35 +230,33 @@ This approach only needs the description of the desired method:
 package com.qaprosoft.carina.demo.api;
 
 import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
-import com.qaprosoft.carina.core.foundation.api.annotation.Endpoint;
 import com.qaprosoft.carina.core.foundation.api.annotation.EndpointTemplate;
+import com.qaprosoft.carina.core.foundation.api.annotation.EndpointTemplateMethod;
 import com.qaprosoft.carina.core.foundation.api.annotation.PathParam;
 import com.qaprosoft.carina.core.foundation.api.annotation.PropertiesPath;
-import com.qaprosoft.carina.core.foundation.api.annotation.PropertiesPathParam;
 import com.qaprosoft.carina.core.foundation.api.annotation.RequestTemplatePath;
-import com.qaprosoft.carina.core.foundation.api.annotation.RequestTemplatePathParam;
 import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePath;
-import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePathParam;
 import com.qaprosoft.carina.core.foundation.api.annotation.SuccessfulHttpStatus;
+import com.qaprosoft.carina.core.foundation.api.annotation.method.DeleteMethod;
 import com.qaprosoft.carina.core.foundation.api.http.HttpMethodType;
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
 
 @EndpointTemplate(url = "${config.env.base_url}/users")
 public interface UserTemplate {
 
-    @Endpoint(url = "/", methodType = HttpMethodType.POST)
-    AbstractApiMethodV2 create(@RequestTemplatePathParam String rqPath, @ResponseTemplatePathParam String rsPath, @PropertiesPathParam String propsPath);
+    @EndpointTemplateMethod(url = "/", methodType = HttpMethodType.POST)
+    AbstractApiMethodV2 create(@RequestTemplatePath.Value String rqPath, @ResponseTemplatePath.Value String rsPath, @PropertiesPath.Value String propsPath);
 
-    @Endpoint(url = "/", methodType = HttpMethodType.GET)
+    @EndpointTemplateMethod(url = "/", methodType = HttpMethodType.GET)
     @ResponseTemplatePath(path = "api/users/_get/rs.json")
     @PropertiesPath(path = "api/users/user.properties")
     AbstractApiMethodV2 getAll();
 
-    @Endpoint(url = "/${id}", methodType = HttpMethodType.DELETE)
+    @DeleteMethod(url = "/${id}")
     @RequestTemplatePath(path = "api/users/_delete/rq.json")
     @ResponseTemplatePath(path = "api/users/_delete/rs.json")
     @SuccessfulHttpStatus(status = HttpResponseStatusType.OK_200)
-    AbstractApiMethodV2 deleteById(@PathVariable("id") Long id);
+    AbstractApiMethodV2 deleteById(@PathParam(key = "id") Long id);
 
 }
 ```
@@ -262,16 +265,26 @@ In this approach, it is possible to use these annotations not only on the class 
 
 In addition, you can apply the following annotations:
 
-1. `@CookieParam` - is used to specify cookies in the request (to use near parameters)
+1. `@Cookie.Value` - is used to specify cookies in the request (to use near parameters)
 2. `@EndpointTemplate` - defines the part of the request URL. This part will be associated with each method URL
-3. `@HeaderParam` - is used to specify headers in the request (to use near parameters)
-4. `@PathVariable` - is used to specify named URL placeholder value. Placeholder will be replaced automatically (to use near parameters)
-5. `@PropertiesPathParam` - contains a path from source root to properties file (to use near parameters)
-6. `@Property` - is used to specify additional properties. These properties will be automatically added to the future method instance (to use near parameters)
-7. `@QueryParam` - is used to specify URL query parameters. These query parameters will be automatically added to the URL (to use near parameters)
-8. `@RequestTemplatePathParam` - contains a path from source root to request template file (to use near parameters)
-9. `@ResponseTemplatePathParam` - contains a path from source root to response template file (to use near parameters)
-10. `@SuccessfulHttpStatusParam` -  specifies the expected HTTP status (to use near parameters)
+3. `@EndpointTemplateMethod` - defines the part of the request URL. This part will be concatenated with the EndpointTemplate path (if it exists)
+4. `@Header.Value` - is used to specify headers in the request (to use near parameters)
+5. `@PathParam` - is used to specify named URL placeholder value. Placeholder will be replaced automatically (to use near parameters)
+6. `@PropertiesPath.Value` - contains a path from source root to properties file (to use near parameters)
+7. `@Property` - is used to specify additional properties. These properties will be automatically added to the future method instance (to use near parameters)
+8. `@QueryParam.Value` - is used to specify URL query parameters. These query parameters will be automatically added to the URL (to use near parameters)
+9. `@RequestTemplatePath.Value` - contains a path from source root to request template file (to use near parameters)
+10. `@ResponseTemplatePath.Value` - contains a path from source root to response template file (to use near parameters)
+11. `@SuccessfulHttpStatus.Value` -  specifies the expected HTTP status (to use near parameters)
+
+There is also syntactic sugar to make the **EndpointTemplateMethod** annotation more readable:
+1. `@GetMethod` - endpoint template with **GET** method
+2. `@PostMethod` - endpoint template with **POST** method
+3. `@PutMethod` - endpoint template with **PUT** method
+4. `@PatchMethod` - endpoint template with **PATCH** method
+5. `@DeleteMethod` - endpoint template with **DELETE** method
+6. `@HeadMethod` - endpoint template with **HEAD** method
+7. `@OptionsMethod` - endpoint template with **OPTIONS** method
 
 Now you can invoke a `prepareTemplate` method from `TemplateFactory` to use proxy implementation in the test
 ```java
@@ -290,6 +303,7 @@ To make test class clean you can implement the interface and use the proxy class
 package com.qaprosoft.carina.demo.api.impl;
 
 import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
+import com.qaprosoft.carina.core.foundation.api.binding.TemplateFactory;
 import com.qaprosoft.carina.demo.api.UserTemplate;
 
 public class UserTemplateImpl implements UserTemplate {
@@ -297,7 +311,7 @@ public class UserTemplateImpl implements UserTemplate {
     private final UserTemplate userTemplate;
 
     public UserTemplateImpl(UserTemplate userTemplate) {
-        this.userTemplate = userTemplate;
+        this.userTemplate = TemplateFactory.prepareTemplate(UserTemplate.class);
     }
 
     @Override
@@ -323,7 +337,7 @@ public class UserTemplateImpl implements UserTemplate {
 }
 ```
 
-To perform the general logic under multiple API templates you can create interceptors.
+To perform the general logic under multiple API templates you can create *interceptors*.
 
 ### Useful features
 The framework contains a list of useful features for building requests and validation of responses. It makes the support of such tests easier and at the same time minimizes the amount of test data.
@@ -370,6 +384,11 @@ public class CustomInterceptor implements ApiMethodInterceptor<AbstractApiMethod
     public void onBeforeCall(AbstractApiMethodV2 apiMethod) {
         // do something with an API method after it has been created
     }
+
+    @Override
+    public void onAfterCall(AbstractApiMethodV2 apiMethod) {
+        // do something with an API method after it has been called
+    }
 }
 ```
 
@@ -397,7 +416,7 @@ public interface UserTemplate {
     
 }
 ```
-Also it possible to create globals interceptors.
+Also, it possible to create globals interceptors.
 Just create a file named `com.qaprosoft.carina.core.foundation.api.interceptor.ApiMethodInterceptor`
 in `/resources/META-INF/services` folder and set the path(s) of your implementation(s) into it:
 ```
