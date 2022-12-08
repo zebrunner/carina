@@ -16,11 +16,16 @@
 package com.qaprosoft.amazon;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +37,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.AmazonS3URI;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.GetObjectRequest;
@@ -43,18 +49,13 @@ import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.amazonaws.services.s3.transfer.Download;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.zebrunner.carina.utils.Configuration;
-import com.zebrunner.carina.utils.Configuration.Parameter;
 import com.zebrunner.carina.utils.common.CommonUtils;
-import com.zebrunner.carina.crypto.Algorithm;
-import com.zebrunner.carina.crypto.CryptoTool;
-import com.zebrunner.carina.crypto.CryptoToolBuilder;
-import org.testng.SkipException;
+
 
 public class AmazonS3Manager {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Pattern S3_BUCKET_PATTERN = Pattern.compile("s3:\\/\\/([a-zA-Z-0-9][^\\/]*)\\/(.*)");
     private static volatile AmazonS3Manager instance = null;
-    private static String CRYPTO_PATTERN = Configuration.get(Parameter.CRYPTO_PATTERN);
-    private CryptoTool cryptoTool = null;
     private AmazonS3 s3client = null;
 
     private AmazonS3Manager() {
@@ -65,13 +66,13 @@ public class AmazonS3Manager {
             AmazonS3Manager amazonS3Manager = new AmazonS3Manager();
 
             AmazonS3ClientBuilder builder = AmazonS3ClientBuilder.standard();
-            String s3region = Configuration.get(Parameter.S3_REGION);
+            String s3region = Configuration.get(Configuration.Parameter.S3_REGION);
             if (!s3region.isEmpty()) {
                 builder.withRegion(Regions.fromName(s3region));
             }
 
-            String accessKey = amazonS3Manager.decryptIfEncrypted(Configuration.get(Parameter.ACCESS_KEY_ID));
-            String secretKey = amazonS3Manager.decryptIfEncrypted(Configuration.get(Parameter.SECRET_KEY));
+            String accessKey = Configuration.getDecrypted(Configuration.Parameter.ACCESS_KEY_ID);
+            String secretKey = Configuration.getDecrypted(Configuration.Parameter.SECRET_KEY);
             if (!accessKey.isEmpty() && !secretKey.isEmpty()) {
                 BasicAWSCredentials creds = new BasicAWSCredentials(accessKey, secretKey);
                 builder.withCredentials(new AWSStaticCredentialsProvider(creds)).build();
@@ -83,37 +84,159 @@ public class AmazonS3Manager {
         return instance;
     }
 
-    private String decryptIfEncrypted(String text) {
-        Matcher cryptoMatcher = Pattern.compile(CRYPTO_PATTERN)
-                .matcher(text);
-        String decryptedText = text;
-        if (cryptoMatcher.find()) {
-            initCryptoTool();
-            decryptedText = this.cryptoTool.decrypt(text, CRYPTO_PATTERN);
-        }
-        return decryptedText;
-    }
-
-    private void initCryptoTool() {
-        if (this.cryptoTool == null) {
-            String cryptoKey = Configuration.get(Parameter.CRYPTO_KEY_VALUE);
-            if (cryptoKey.isEmpty()) {
-                throw new SkipException("Encrypted data detected, but the crypto key is not found!");
-            }
-            this.cryptoTool = CryptoToolBuilder.builder()
-                    .chooseAlgorithm(Algorithm.find(Configuration.get(Configuration.Parameter.CRYPTO_ALGORITHM)))
-                    .setKey(cryptoKey)
-                    .build();
-        }
-    }
-
     public AmazonS3 getClient() {
         return s3client;
     }
 
     /**
+     * see CloudManager interface
+     */
+    public boolean put(Path from, String to) throws FileNotFoundException {
+        if (!ObjectUtils.allNotNull(from, to) || to.isEmpty()) {
+            throw new IllegalArgumentException("Arguments cannot be null or empty.");
+        }
+        if (!Files.exists(from)) {
+            throw new FileNotFoundException(String.format("File '%s' does not exist!", from));
+        }
+        boolean isSuccessful = false;
+        AmazonS3URI amazonS3URI = new AmazonS3URI(to);
+        try {
+            LOGGER.debug("Uploading a new object to S3 from a file: {}", from);
+            PutObjectRequest object = new PutObjectRequest(amazonS3URI.getBucket(), amazonS3URI.getKey(), from.toFile());
+            this.s3client.putObject(object);
+            LOGGER.debug("Uploaded to S3: '{}' with key '{}'", from, amazonS3URI.getKey());
+            isSuccessful = true;
+        } catch (AmazonServiceException ase) {
+            LOGGER.error("Caught an AmazonServiceException, which "
+                    + "means your request made it "
+                    + "to Amazon S3, but was rejected with an error response for some reason.\n"
+                    + "Error Message:    " + ase.getMessage() + "\n"
+                    + "HTTP Status Code: " + ase.getStatusCode() + "\n"
+                    + "AWS Error Code:   " + ase.getErrorCode() + "\n"
+                    + "Error Type:       " + ase.getErrorType() + "\n"
+                    + "Request ID:       " + ase.getRequestId());
+        } catch (AmazonClientException ace) {
+            LOGGER.error("Caught an AmazonClientException, which "
+                    + "means the client encountered "
+                    + "an internal error while trying to "
+                    + "communicate with S3, "
+                    + "such as not being able to access the network.\n"
+                    + "Error Message: " + ace.getMessage());
+        } catch (Exception e) {
+            LOGGER.error("Something went wrong when try to put artifact to the Amazon S3.", e);
+        }
+        return isSuccessful;
+    }
+
+    /**
+     * see CloudManager interface
+     */
+    public boolean download(String from, Path to) {
+        if (!ObjectUtils.allNotNull(from, to) || from.isEmpty()) {
+            throw new IllegalArgumentException("Arguments cannot be null or empty.");
+        }
+        boolean isSuccessful = false;
+        AmazonS3URI amazonS3URI = new AmazonS3URI(from);
+        LOGGER.info("App will be downloaded from s3.");
+        LOGGER.info("[Bucket name: {}] [Key: {}] [File: {}].", amazonS3URI.getBucket(), amazonS3URI.getKey(), to.toAbsolutePath());
+
+        Download appDownload = TransferManagerBuilder.standard()
+                .withS3Client(this.s3client)
+                .build()
+                .download(amazonS3URI.getBucket(), amazonS3URI.getKey(), to.toFile());
+        try {
+            LOGGER.info("Transfer: {}", appDownload.getDescription());
+            LOGGER.info("\t State: {}", appDownload.getState());
+            LOGGER.info("\t Progress: ");
+            // You can poll your transfer's status to check its progress
+            while (!appDownload.isDone()) {
+                LOGGER.info("\t\t transferred: {}%", (int) (appDownload.getProgress().getPercentTransferred() + 0.5));
+                // fixme remove interval or add interval to method parameters
+                CommonUtils.pause(1);
+            }
+            LOGGER.info("\t State: {}", appDownload.getState());
+            isSuccessful = true;
+        } catch (AmazonClientException e) {
+            LOGGER.error("File wasn't downloaded from s3.", e);
+        } catch (Exception e) {
+            LOGGER.error("Something went wrong when try to download artifact from Amazon S3.", e);
+        }
+        return isSuccessful;
+    }
+
+    /**
+     * see CloudManager interface
+     */
+    public boolean delete(String url) {
+        if (Objects.isNull(url) || url.isEmpty()) {
+            throw new IllegalArgumentException("Argument cannot be null or empty");
+        }
+        boolean isSuccessful = false;
+        AmazonS3URI amazonS3URI = new AmazonS3URI(url);
+        try {
+            this.s3client.deleteObject(new DeleteObjectRequest(amazonS3URI.getBucket(), amazonS3URI.getKey()));
+            isSuccessful = true;
+        } catch (AmazonServiceException ase) {
+            LOGGER.error("Caught an AmazonServiceException, which "
+                    + "means your request made it "
+                    + "to Amazon S3, but was rejected with an error response for some reason.\n"
+                    + "Error Message:    " + ase.getMessage() + "\n"
+                    + "HTTP Status Code: " + ase.getStatusCode() + "\n"
+                    + "AWS Error Code:   " + ase.getErrorCode() + "\n"
+                    + "Error Type:       " + ase.getErrorType() + "\n"
+                    + "Request ID:       " + ase.getRequestId());
+        } catch (AmazonClientException ace) {
+            LOGGER.error("Caught an AmazonClientException.\nError Message: {}", ace.getMessage());
+        } catch (Exception e) {
+            LOGGER.error("Something went wrong when try to delete artifact from Amazon S3", e);
+        }
+        return isSuccessful;
+    }
+
+    /**
+     * see CloudManager interface
+     */
+    public String updateAppPath(String url) {
+        if (Objects.isNull(url) || url.isEmpty()) {
+            throw new IllegalArgumentException("Argument cannot be null or empty");
+        }
+        // get app path to be sure that we need(do not need) to download app
+        // from s3 bucket
+        Matcher matcher = S3_BUCKET_PATTERN.matcher(url);
+        if (matcher.find()) {
+            String bucketName = matcher.group(1);
+            String key = matcher.group(2);
+            Pattern pattern = Pattern.compile(key);
+
+            // analyze if we have any pattern inside mobile_app to make extra
+            // search in AWS
+            int position = key.indexOf(".*");
+            if (position > 0) {
+                // /android/develop/dfgdfg.*/Mapmyrun.apk
+                int slashPosition = key.substring(0, position).lastIndexOf("/");
+                if (slashPosition > 0) {
+                    key = key.substring(0, slashPosition);
+                    S3ObjectSummary lastBuild = getLatestBuildArtifact(bucketName, key,
+                            pattern);
+                    key = lastBuild.getKey();
+                }
+
+            } else {
+                key = get(bucketName, key).getKey();
+            }
+            LOGGER.info("next s3 app key will be used: {}", key);
+
+            // generate presign url explicitly to register link as run artifact
+            long hours = 72L * 1000 * 60 * 60; // generate presigned url for nearest 3 days
+            return AmazonS3Manager.getInstance().generatePreSignUrl(bucketName, key, hours).toString();
+        } else {
+            throw new RuntimeException(String.format("Unable to parse '%s' path using S3 pattern", url));
+        }
+    }
+
+    /**
      * Put any file to Amazon S3 storage.
-     * 
+     *
      * @param bucket
      *            - S3 bucket name
      * @param key
@@ -121,7 +244,7 @@ public class AmazonS3Manager {
      *            DEMO/TestSuiteName/TestMethodName/file.txt
      * @param filePath
      *            - local storage path. Example: C:/Temp/file.txt
-     * 
+     *
      */
     public void put(String bucket, String key, String filePath) {
         put(bucket, key, filePath, null);
@@ -129,7 +252,7 @@ public class AmazonS3Manager {
 
     /**
      * Put any file to Amazon S3 storage.
-     * 
+     *
      * @param bucket
      *            - S3 bucket name
      * @param key
@@ -139,7 +262,7 @@ public class AmazonS3Manager {
      *            - local storage path. Example: C:/Temp/file.txt
      * @param metadata
      *            - custom tags metadata like name etc
-     * 
+     *
      */
     public void put(String bucket, String key, String filePath, ObjectMetadata metadata) {
 
@@ -205,7 +328,7 @@ public class AmazonS3Manager {
 
     /**
      * Get any file from Amazon S3 storage as S3Object.
-     * 
+     *
      * @param bucket
      *            - S3 Bucket name.
      * @param key
@@ -274,7 +397,7 @@ public class AmazonS3Manager {
 
     /**
      * Delete file from Amazon S3 storage.
-     * 
+     *
      * @param bucket
      *            - S3 Bucket name.
      * @param key
@@ -308,7 +431,7 @@ public class AmazonS3Manager {
 
     /**
      * Get latest build artifact from Amazon S3 storage as S3Object.
-     * 
+     *
      * @param bucket
      *            - S3 Bucket name.
      * @param key
@@ -362,7 +485,7 @@ public class AmazonS3Manager {
 
     /**
      * Method to download file from s3 to local file system
-     * 
+     *
      * @param bucketName AWS S3 bucket name
      * @param key (example: android/apkFolder/ApkName.apk)
      * @param file (local file name)
@@ -373,7 +496,7 @@ public class AmazonS3Manager {
 
     /**
      * Method to download file from s3 to local file system
-     * 
+     *
      * @param bucketName AWS S3 bucket name
      * @param key (example: android/apkFolder/ApkName.apk)
      * @param file (local file name)
@@ -404,7 +527,7 @@ public class AmazonS3Manager {
 
     /**
      * Method to generate pre-signed object URL to s3 object
-     * 
+     *
      * @param bucketName AWS S3 bucket name
      * @param key (example: android/apkFolder/ApkName.apk)
      * @param ms espiration time in ms, i.e. 1 hour is 1000*60*60
@@ -428,14 +551,14 @@ public class AmazonS3Manager {
     /*
      * public void read(S3Object s3object) {
      * displayTextInputStream(s3object.getObjectContent()); }
-     * 
+     *
      * private void displayTextInputStream(InputStream input) { // Read one text
      * line at a time and display. LOGGER.info("File content is: ");
      * BufferedReader reader = new BufferedReader(new InputStreamReader(input));
      * while (true) { String line = null; try { line = reader.readLine(); }
      * catch (IOException e) { LOGGER.error("Failed to read file", e); } if
      * (line == null) break;
-     * 
+     *
      * System.out.println("    " + line); } }
      */
 }

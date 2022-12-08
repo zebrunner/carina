@@ -23,15 +23,18 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -53,7 +56,7 @@ import com.zebrunner.carina.utils.Configuration.Parameter;
  */
 public class AppCenterManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    
+
     protected RestTemplate restTemplate = RestTemplateBuilder.newInstance().withDisabledSslChecking().withSpecificJsonMessageConverter().build();
 
     private String ownerName;
@@ -62,13 +65,18 @@ public class AppCenterManager {
 
     private static final String HOST_URL = "api.appcenter.ms";
     private static final String API_APPS = "/v0.1/apps";
-
+    // appcenter://appName/platformName/buildType/version
+    private static final Pattern APP_CENTER_ENDPOINT_PATTERN = Pattern.compile(
+            "appcenter:\\/\\/(?<appName>[a-zA-Z-0-9][^\\/]*)\\/"
+                    + "(?<platformName>[a-zA-Z-0-9][^\\/]*)\\/"
+                    + "(?<buildType>[a-zA-Z-0-9][^\\/]*)\\/"
+                    + "(?<version>[a-zA-Z-0-9][^\\/]*)");
     private static AppCenterManager instance = null;
 
     private AppCenterManager() {
     }
 
-    public synchronized static AppCenterManager getInstance() {
+    public static synchronized AppCenterManager getInstance() {
         if (instance == null) {
             instance = new AppCenterManager();
         }
@@ -86,7 +94,53 @@ public class AppCenterManager {
     */
    public String getDownloadUrl(String appName, String platformName, String buildType, String version) {
        return scanAppForBuild(getAppId(appName, platformName), buildType, version);
-   }    
+   }
+
+    /**
+     * see CloudManager interface
+     */
+    public boolean download(String from, Path to) {
+        if (!ObjectUtils.allNotNull(from, to) || from.isEmpty()) {
+            throw new IllegalArgumentException("Arguments cannot be null or empty.");
+        }
+        boolean isSuccessful = false;
+        Matcher matcher = APP_CENTER_ENDPOINT_PATTERN.matcher(from);
+        if (!matcher.find()) {
+            throw new IllegalArgumentException(String.format("AppCenter url is not correct: %s%n It should be like: %s.",
+                    from, "appcenter://appName/platformName/buildType/version"));
+        }
+        // TODO: test if generated appcenter download url is valid
+        try {
+            getBuild(to.toFile().getAbsolutePath(),
+                    matcher.group("appName"),
+                    matcher.group("platformName"),
+                    matcher.group("buildType"),
+                    matcher.group("version"));
+            isSuccessful = true;
+        } catch (Exception e) {
+            LOGGER.error("Something went wrong when try to download application from AppCenter.", e);
+        }
+        return isSuccessful;
+    }
+
+    /**
+     * see CloudManager interface
+     */
+    public String updateAppPath(String url) {
+        if (Objects.isNull(url) || url.isEmpty()) {
+            throw new IllegalArgumentException("Argument cannot be null or empty.");
+        }
+        Matcher matcher = APP_CENTER_ENDPOINT_PATTERN.matcher(url);
+        if (!matcher.find()) {
+            throw new IllegalArgumentException(String.format("AppCenter url is not correct: %s%n It should be like: %s.",
+                    url, "appcenter://appName/platformName/buildType/version"));
+        }
+        // TODO: test if generated appcenter download url is valid
+        return getDownloadUrl(matcher.group("appName"),
+                matcher.group("platformName"),
+                matcher.group("buildType"),
+                matcher.group("version"));
+    }
 
     /**
      *
