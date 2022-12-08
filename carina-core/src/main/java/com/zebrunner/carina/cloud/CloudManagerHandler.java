@@ -23,9 +23,9 @@ import org.slf4j.LoggerFactory;
     private static final Pattern APPCENTER_ENDPOINT_PATTERN = Pattern.compile(
             "appcenter:\\/\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)\\/([a-zA-Z-0-9][^\\/]*)");
 
-    private static final String AMAZON_MANAGER_CLASS_NAME = "com.qaprosoft.amazon.AmazonS3Manager";
-    private static final String AZURE_MANAGER_CLASS_NAME = "com.qaprosoft.azure.AzureManager";
-    private static final String APPCENTER_MANAGER_CLASS_NAME = "com.qaprosoft.appcenter.AppCenterManager";
+    private static final String AMAZON_MANAGER_CLASS_NAME = "com.zebrunner.carina.amazon.AmazonS3Manager";
+    private static final String AZURE_MANAGER_CLASS_NAME = "com.zebrunner.carina.azure.AzureManager";
+    private static final String APPCENTER_MANAGER_CLASS_NAME = "com.zebrunner.carina.appcenter.AppCenterManager";
 
     private CloudManagerHandler() {
     }
