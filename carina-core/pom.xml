@@ -46,10 +46,6 @@
 			<artifactId>carina-webdriver</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.qaprosoft</groupId>
-			<artifactId>carina-appcenter</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.zebrunner</groupId>
 			<artifactId>carina-proxy</artifactId>
 			<exclusions>
