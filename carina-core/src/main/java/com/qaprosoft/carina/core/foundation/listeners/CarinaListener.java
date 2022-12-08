@@ -92,7 +92,6 @@ import com.zebrunner.agent.core.registrar.maintainer.ChainedMaintainerResolver;
 import com.zebrunner.agent.core.webdriver.RemoteWebDriverFactory;
 import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
 import com.qaprosoft.amazon.AmazonS3Manager;
-import com.qaprosoft.azure.AzureManager;
 import com.zebrunner.carina.cloud.CloudManager;
 
 /*
@@ -511,16 +510,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     @Deprecated
     protected S3Object getS3Artifact(String key) {
         return getS3Artifact(Configuration.get(Parameter.S3_BUCKET_NAME), key);
-    }
-
-    @Deprecated
-    protected void putAzureArtifact(String remotePath, String localPath) {
-        AzureManager.getInstance().put(Configuration.get(Parameter.AZURE_CONTAINER_NAME), remotePath, localPath);
-    }
-
-    @Deprecated
-    protected void getAzureArtifact(String bucket, String remotePath, File localPath) {
-        AzureManager.getInstance().download(bucket, remotePath, localPath);
     }
 
     protected void skipExecution(String message) {
