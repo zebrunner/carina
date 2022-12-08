@@ -69,7 +69,6 @@
         <!-- Zebrunner integrations -->
         <zebrunner-testng-pluggable.version>1.9.1</zebrunner-testng-pluggable.version>
         <!-- Others -->
-        <aws-java-sdk.version>1.11.923</aws-java-sdk.version>
         <rest-assured.version>4.3.0</rest-assured.version>
         <imgscalr-lib.version>4.2</imgscalr-lib.version>
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
@@ -345,11 +344,6 @@
             </dependency>
             <dependency>
                 <groupId>com.qaprosoft</groupId>
-                <artifactId>carina-aws-s3</artifactId>
-                <version>1.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>com.qaprosoft</groupId>
                 <artifactId>carina-appcenter</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>
@@ -494,35 +488,6 @@
                         <artifactId>spring-context</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-s3</artifactId>
-                <version>${aws-java-sdk.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.amazonaws</groupId>
-                        <artifactId>aws-java-sdk-kms</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.amazonaws</groupId>
-                        <artifactId>jmespath-java</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-core</artifactId>
-                <version>${aws-java-sdk.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.azure</groupId>
-                <artifactId>azure-storage-blob</artifactId>
-                <version>${azure-storage-blob.version}</version>
             </dependency>
 
             <!-- Test utilities -->

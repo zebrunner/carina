@@ -55,7 +55,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.amazonaws.services.s3.model.S3Object;
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
 import com.zebrunner.carina.utils.report.ReportContext;
 import com.zebrunner.carina.utils.report.TestResultItem;
@@ -91,7 +90,6 @@ import com.zebrunner.agent.core.registrar.label.CompositeLabelResolver;
 import com.zebrunner.agent.core.registrar.maintainer.ChainedMaintainerResolver;
 import com.zebrunner.agent.core.webdriver.RemoteWebDriverFactory;
 import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
-import com.qaprosoft.amazon.AmazonS3Manager;
 import com.zebrunner.carina.cloud.CloudManager;
 
 /*
@@ -495,21 +493,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                         reportLinks);
             }
         }
-    }
-
-    @Deprecated
-    protected void putS3Artifact(String key, String path) {
-        AmazonS3Manager.getInstance().put(Configuration.get(Parameter.S3_BUCKET_NAME), key, path);
-    }
-
-    @Deprecated
-    protected S3Object getS3Artifact(String bucket, String key) {
-        return AmazonS3Manager.getInstance().get(Configuration.get(Parameter.S3_BUCKET_NAME), key);
-    }
-
-    @Deprecated
-    protected S3Object getS3Artifact(String key) {
-        return getS3Artifact(Configuration.get(Parameter.S3_BUCKET_NAME), key);
     }
 
     protected void skipExecution(String message) {

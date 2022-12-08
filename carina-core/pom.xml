@@ -50,10 +50,6 @@
 			<artifactId>carina-appcenter</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.qaprosoft</groupId>
-			<artifactId>carina-aws-s3</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.zebrunner</groupId>
 			<artifactId>carina-proxy</artifactId>
 			<exclusions>
@@ -101,11 +97,6 @@
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-support</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.amazonaws</groupId>
-			<artifactId>aws-java-sdk-s3</artifactId>
 		</dependency>
 
 		<!-- Test utilities -->
