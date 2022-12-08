@@ -7,12 +7,13 @@ import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
+import com.zebrunner.carina.utils.cloud.CloudManager;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
- class CloudManagerHandler {
+ public class CloudManagerHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     // todo check/refactor patterns
     private static final Pattern AMAZON_S3_ENDPOINT_PATTERN = Pattern.compile("^(.+\\.)?s3[.-]([a-z0-9-]+)\\.");

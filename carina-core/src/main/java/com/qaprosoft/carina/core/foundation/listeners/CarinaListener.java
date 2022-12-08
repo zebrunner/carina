@@ -30,7 +30,9 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import com.zebrunner.carina.cloud.CloudManagerHandler;
 import com.zebrunner.carina.proxy.browserup.ProxyPool;
+import com.zebrunner.carina.utils.cloud.CloudManager;
 import com.zebrunner.carina.utils.report.TestResult;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
@@ -90,7 +92,6 @@ import com.zebrunner.agent.core.registrar.label.CompositeLabelResolver;
 import com.zebrunner.agent.core.registrar.maintainer.ChainedMaintainerResolver;
 import com.zebrunner.agent.core.webdriver.RemoteWebDriverFactory;
 import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
-import com.zebrunner.carina.cloud.CloudManager;
 
 /*
  * CarinaListener - base carina-core TestNG Listener.
@@ -178,7 +179,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
         String mobileApp = Configuration.getMobileApp();
         if (!mobileApp.isEmpty()) {
-            CloudManager cloudManager = CloudManager.getInstance();
+            CloudManager cloudManager = CloudManagerHandler.getProxyHandler();
             String updatedMobileApp = cloudManager.updateAppPath(mobileApp);
             Configuration.setMobileApp(updatedMobileApp);
             // [VD] do not move into the static block as Zebrunner reporting need registered test run!
