@@ -1339,11 +1339,11 @@ public class DriverHelper {
     }
 
     /**
-     * Get dev tools
+     * Get selenoid chrome devtools, see {@link ChromeDevToolsService}
      */
-    public ChromeDevToolsService getDevTools(WebDriver driver) throws URISyntaxException {
+    public ChromeDevToolsService getDevTools() throws URISyntaxException {
         try {
-            URI selenoidDevToolsURL = new URI(getSelenoidDevToolsUrl(driver));
+            URI selenoidDevToolsURL = new URI(getSelenoidDevToolsUrl(getDriver()));
             WebSocketService webSocketService = WebSocketServiceImpl.create(selenoidDevToolsURL);
 
             final CommandInvocationHandler invocationHandler = new CommandInvocationHandler();
