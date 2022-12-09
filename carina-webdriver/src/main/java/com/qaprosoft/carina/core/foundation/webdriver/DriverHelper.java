@@ -1357,7 +1357,7 @@ public class DriverHelper {
             invocationHandler.setChromeDevToolsService(devtools);
             return devtools;
         } catch (WebSocketServiceException e) {
-            throw new UnsupportedOperationException("Cannot connect to devtools");
+            throw new UnsupportedOperationException("Cannot connect to devtools", e);
         }
     }
 
