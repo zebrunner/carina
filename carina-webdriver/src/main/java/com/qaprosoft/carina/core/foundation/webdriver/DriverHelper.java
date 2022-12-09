@@ -15,6 +15,8 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver;
 
+import static com.github.kklisura.cdt.services.impl.WebSocketServiceImpl.WEB_SOCKET_CONTAINER_FACTORY_PROPERTY;
+
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
@@ -49,13 +51,6 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.zebrunner.carina.crypto.Algorithm;
-import com.zebrunner.carina.crypto.CryptoTool;
-import com.zebrunner.carina.crypto.CryptoToolBuilder;
-import com.zebrunner.carina.utils.LogicUtils;
-import com.zebrunner.carina.utils.common.CommonUtils;
-import com.zebrunner.carina.utils.messager.Messager;
-import com.zebrunner.carina.utils.retry.ActionPoller;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptException;
@@ -97,10 +92,15 @@ import com.github.kklisura.cdt.services.utils.ProxyUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.gui.AbstractPage;
-
-import com.zebrunner.carina.utils.Configuration.Parameter;
+import com.zebrunner.carina.crypto.Algorithm;
+import com.zebrunner.carina.crypto.CryptoTool;
+import com.zebrunner.carina.crypto.CryptoToolBuilder;
 import com.zebrunner.carina.utils.Configuration;
-
+import com.zebrunner.carina.utils.Configuration.Parameter;
+import com.zebrunner.carina.utils.LogicUtils;
+import com.zebrunner.carina.utils.common.CommonUtils;
+import com.zebrunner.carina.utils.messager.Messager;
+import com.zebrunner.carina.utils.retry.ActionPoller;
 
 /**
  * DriverHelper - WebDriver wrapper for logging and reporting features. Also it
@@ -1342,6 +1342,8 @@ public class DriverHelper {
      * Get selenoid chrome devtools, see {@link ChromeDevToolsService}
      */
     public ChromeDevToolsService getDevTools() throws URISyntaxException {
+        System.setProperty(WEB_SOCKET_CONTAINER_FACTORY_PROPERTY,
+                "com.qaprosoft.carina.core.foundation.webdriver.devtools.ZebrunnerWebSocketContainerFactory");
         try {
             URI selenoidDevToolsURL = new URI(getSelenoidDevToolsUrl(getDriver()));
             WebSocketService webSocketService = WebSocketServiceImpl.create(selenoidDevToolsURL);
@@ -1360,6 +1362,8 @@ public class DriverHelper {
             throw new UnsupportedOperationException("Cannot connect to devtools", e);
         }
     }
+
+
 
     private String getSelenoidDevToolsUrl(WebDriver driver) {
         String seleniumHost = Configuration.getSeleniumUrl().replace("wd/hub", "devtools/")
