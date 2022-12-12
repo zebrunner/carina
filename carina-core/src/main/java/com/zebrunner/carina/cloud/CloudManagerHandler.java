@@ -60,7 +60,7 @@ import org.slf4j.LoggerFactory;
                 try {
                     managerClass = ClassUtils.getClass(AMAZON_MANAGER_CLASS_NAME);
                 } catch (ClassNotFoundException e) {
-                    throw new RuntimeException("Amazon link was detected, but AmazonS3Manager class was not detected."
+                    throw new RuntimeException("Amazon link was detected, but AmazonS3Manager class was not found."
                             + "Add carina-aws-s3 dependency to your project");
                 }
             }
@@ -71,7 +71,7 @@ import org.slf4j.LoggerFactory;
                 try {
                     managerClass = ClassUtils.getClass(AZURE_MANAGER_CLASS_NAME);
                 } catch (ClassNotFoundException e) {
-                    throw new RuntimeException("Azure link was detected, but AzureManager class was not detected."
+                    throw new RuntimeException("Azure link was detected, but AzureManager class was not found."
                             + "Add carina-azure dependency to your project");
                 }
             }
@@ -82,7 +82,7 @@ import org.slf4j.LoggerFactory;
                 try {
                     managerClass = ClassUtils.getClass(APPCENTER_MANAGER_CLASS_NAME);
                 } catch (ClassNotFoundException e) {
-                    throw new RuntimeException("AppCenter link was detected, but AppCenterManager class was not detected."
+                    throw new RuntimeException("AppCenter link was detected, but AppCenterManager class was not found."
                             + "Add carina-appcenter dependency to your project");
                 }
             }
