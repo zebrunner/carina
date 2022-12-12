@@ -1347,6 +1347,7 @@ public class DriverHelper {
     public ChromeDevToolsService getDevTools() throws URISyntaxException {
         System.setProperty(WEB_SOCKET_CONTAINER_FACTORY_PROPERTY,
                 "com.qaprosoft.carina.core.foundation.webdriver.devtools.ZebrunnerWebSocketContainerFactory");
+        System.setProperty("org.glassfish.tyrus.server.tracingType", "ALL");
         try {
             URI selenoidDevToolsURL = new URI(getSelenoidDevToolsUrl(getDriver()));
             WebSocketService webSocketService = WebSocketServiceImpl.create(selenoidDevToolsURL);
