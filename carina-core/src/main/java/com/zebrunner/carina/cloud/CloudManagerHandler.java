@@ -92,15 +92,7 @@ import org.slf4j.LoggerFactory;
             }
 
             Object instance = MethodUtils.invokeStaticMethod(managerClass, "getInstance");
-            Class<?>[] argClasses = Arrays.stream(args)
-                    .map(Object::getClass)
-                    .toArray(Class[]::new);
-            Method realMethod = MethodUtils.getMatchingMethod(instance.getClass(), method.getName(), argClasses);
-            if (realMethod == null) {
-                throw new UnsupportedOperationException(
-                        String.format("Method '%s' does not supported by '%s'", method.getName(), instance.getClass()));
-            }
-            return realMethod.invoke(instance, args);
+            return method.invoke(instance, args);
         }
     }
 
