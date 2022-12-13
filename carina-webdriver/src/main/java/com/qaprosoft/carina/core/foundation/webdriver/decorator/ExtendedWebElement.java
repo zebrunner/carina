@@ -885,19 +885,28 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     /**
-     * Check that element visible within specified timeout.
+     * Check that element is visible within specified timeout.
      *
-     * @param timeout - timeout.
-     * @return element visibility status.
+     * @param timeout timeout, in seconds
+     * @return true if element is visible, false otherwise
      */
-	public boolean isVisible(long timeout) {
-		ExpectedCondition<?> waitCondition;
+    public boolean isVisible(long timeout) {
+        ExpectedCondition<?> waitCondition;
 
         if (element != null) {
-            waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(getBy()),
-                    ExpectedConditions.visibilityOf(element));
+            if (searchContext instanceof WebElement) {
+                waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by),
+                        ExpectedConditions.visibilityOf(element));
+            } else {
+                waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(by),
+                        ExpectedConditions.visibilityOf(element));
+            }
         } else {
-            waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
+            if (searchContext instanceof WebElement) {
+                waitCondition = ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by);
+            } else {
+                waitCondition = ExpectedConditions.visibilityOfElementLocated(by);
+            }
         }
 
         boolean res = false;
@@ -907,10 +916,8 @@ public class ExtendedWebElement implements IWebElement {
             // there is no sense to continue as StaleElementReferenceException captured
             LOGGER.debug("waitUntil: StaleElementReferenceException", e);
         }
-
         return res;
     }
-
 	
     /**
      * Check that element with text present.
