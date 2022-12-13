@@ -330,10 +330,11 @@ public class Screenshot {
      * @return a screenshot if it was produced successfully, or null otherwise
      */
     private static BufferedImage takeFullScreenshot(WebDriver driver) {
+        setPageLoadTimeout(driver, Configuration.getInt(Parameter.EXPLICIT_TIMEOUT));
+
         BufferedImage screenShot = null;
         // default timeout for full size screenshot is EXPLICIT_TIMEOUT /2
         long timeout = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / 2;
-        setPageLoadTimeout(driver, timeout);
 
         Wait<WebDriver> wait = new FluentWait<>(driver)
                 .pollingEvery(Duration.ofSeconds(timeout))
@@ -401,10 +402,11 @@ public class Screenshot {
      * @return a screenshot if it was produced successfully, or null otherwise
      */
     private static BufferedImage takeVisibleScreenshot(WebDriver driver) throws Exception {
+        setPageLoadTimeout(driver, Configuration.getInt(Parameter.EXPLICIT_TIMEOUT));
+
         BufferedImage screenShot = null;
         // default timeout for driver quit 1/3 of explicit
         long timeout = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / 3;
-        setPageLoadTimeout(driver, timeout);
         try {
             Wait<WebDriver> wait = new FluentWait<>(driver)
                     .pollingEvery(Duration.ofSeconds(timeout))
