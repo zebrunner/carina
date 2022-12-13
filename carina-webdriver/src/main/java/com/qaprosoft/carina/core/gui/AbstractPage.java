@@ -19,7 +19,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.util.Optional;
 
+import com.qaprosoft.carina.core.foundation.webdriver.screenshot.ExplicitFullSizeScreenshotRule;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -33,12 +35,13 @@ import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.RectangleReadOnly;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.zebrunner.carina.utils.report.ReportContext;
+import com.qaprosoft.carina.core.foundation.webdriver.ScreenshotType;
+import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.PageOpeningStrategy;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.Configuration.Parameter;
 import com.zebrunner.carina.utils.factory.ICustomTypePageFactory;
-import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.PageOpeningStrategy;
+import com.zebrunner.carina.utils.report.ReportContext;
 
 /**
  * All page POJO objects should extend this abstract page to get extra logic.
@@ -161,7 +164,13 @@ public abstract class AbstractPage extends AbstractUIObject implements ICustomTy
 
         String fullPdfPath = artifactsFolder.getAbsolutePath() + "/" + pdfName;
         // TODO: test this implementation and change back to capture if necessary
-        Image image = Image.getInstance(testRootDir.getAbsolutePath() + "/" + Screenshot.capture(getDriver(), "", true));
+
+        Optional<String> screenshot = Screenshot.capture(getDriver(), new ExplicitFullSizeScreenshotRule(), "");
+        if (screenshot.isEmpty()) {
+            return pdfName;
+        }
+
+        Image image = Image.getInstance(testRootDir.getAbsolutePath() + "/" + screenshot.get());
         Document document = null;
         if (scaled) {
             document = new Document(PageSize.A4, 10, 10, 10, 10);

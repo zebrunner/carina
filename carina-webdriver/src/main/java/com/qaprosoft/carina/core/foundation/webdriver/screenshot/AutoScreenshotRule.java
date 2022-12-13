@@ -15,10 +15,22 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.screenshot;
 
+import com.qaprosoft.carina.core.foundation.webdriver.ScreenshotType;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.Configuration.Parameter;
 
+/**
+ * @deprecated instead used {@link DefaultSuccessfulDriverActionScreenshotRule} and
+ *             {@link DefaultUnSuccessfulDriverActionScreenshotRule} rules
+ */
+@Deprecated(forRemoval = true, since = "8.0.5")
 public class AutoScreenshotRule implements IScreenshotRule {
+
+    @Override
+    public ScreenshotType getEventType() {
+        return ScreenshotType.SUCCESSFUL_DRIVER_ACTION;
+    }
+
     @Override
     public boolean isTakeScreenshot() {
         // enabled or not screenshot generation for driver action or test failure
@@ -27,7 +39,7 @@ public class AutoScreenshotRule implements IScreenshotRule {
 
     @Override
     public boolean isAllowFullSize() {
-        // enabled or not full size screenshot on failure/driver exception 
+        // enabled or not full size screenshot on failure/driver exception
         return Configuration.getBoolean(Parameter.ALLOW_FULLSIZE_SCREENSHOT);
     }
 }

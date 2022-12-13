@@ -19,7 +19,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.ScreenshotType;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.Configuration.Parameter;
 
-public class DebugLevelScreenshotRule implements IScreenshotRule {
+public class DefaultSuccessfulDriverActionScreenshotRule implements IScreenshotRule {
 
     @Override
     public ScreenshotType getEventType() {
@@ -28,12 +28,12 @@ public class DebugLevelScreenshotRule implements IScreenshotRule {
 
     @Override
     public boolean isTakeScreenshot() {
-        return Configuration.get(Parameter.CORE_LOG_LEVEL).equalsIgnoreCase("debug");
-    }
-    
-    @Override
-    public boolean isAllowFullSize() {
-        return Configuration.get(Parameter.CORE_LOG_LEVEL).equalsIgnoreCase("debug");
+        // enabled or not screenshot generation for driver action
+        return Configuration.getBoolean(Parameter.AUTO_SCREENSHOT);
     }
 
+    @Override
+    public boolean isAllowFullSize() {
+        return false;
+    }
 }
