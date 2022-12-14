@@ -21,7 +21,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.testng.Assert;
 
 import com.zebrunner.carina.utils.Configuration;
@@ -34,13 +33,17 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebEleme
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocatorFactory;
 
 public abstract class AbstractUIObject extends DriverHelper {
-    protected String name;
 
+    protected String name;
+    @Deprecated
     protected WebElement rootElement;
+    @Deprecated
     protected By rootBy;
 
     protected ExtendedWebElement uiLoadedMarker;
+    private ExtendedWebElement rootExtendedElement;
 
+    @Deprecated
     private ElementLoadingStrategy loadingStrategy = ElementLoadingStrategy.valueOf(Configuration.get(Parameter.ELEMENT_LOADING_STRATEGY));
 
     /**
@@ -66,7 +69,7 @@ public abstract class AbstractUIObject extends DriverHelper {
      */
     public AbstractUIObject(WebDriver driver, SearchContext searchContext) {
         super(driver);
-        ExtendedElementLocatorFactory factory = new ExtendedElementLocatorFactory(searchContext, (driver != searchContext) ? true : false);
+        ExtendedElementLocatorFactory factory = new ExtendedElementLocatorFactory(searchContext, driver != searchContext);
         PageFactory.initElements(new ExtendedFieldDecorator(factory, driver), this);
     }
 
@@ -84,14 +87,7 @@ public abstract class AbstractUIObject extends DriverHelper {
      *         false - otherwise
      */
     public boolean isUIObjectPresent(long timeout) {
-        switch (loadingStrategy) {
-        case BY_PRESENCE:
-            return waitUntil(ExpectedConditions.presenceOfElementLocated(rootBy), timeout);
-        case BY_VISIBILITY:
-            return waitUntil(ExpectedConditions.visibilityOfElementLocated(rootBy), timeout);
-        default:
-            return waitUntil(ExpectedConditions.presenceOfElementLocated(rootBy), timeout);
-        }
+        return this.rootExtendedElement.isPresent(timeout);
     }
 
     public boolean isUIObjectPresent() {
@@ -106,10 +102,20 @@ public abstract class AbstractUIObject extends DriverHelper {
         this.uiLoadedMarker = uiLoadedMarker;
     }
 
+    /**
+     * @deprecated to interact with the current component
+     *             (getting information about the current element) use {@link #rootExtendedElement}
+     */
+    @Deprecated(since = "8.0.4", forRemoval = true)
     public ElementLoadingStrategy getLoadingStrategy() {
         return loadingStrategy;
     }
 
+    /**
+     * @deprecated to interact with the current component
+     *             (getting information about the current element) use {@link #rootExtendedElement}
+     */
+    @Deprecated(since = "8.0.4", forRemoval = true)
     public void setLoadingStrategy(ElementLoadingStrategy loadingStrategy) {
         this.loadingStrategy = loadingStrategy;
     }
@@ -122,18 +128,51 @@ public abstract class AbstractUIObject extends DriverHelper {
         this.name = name;
     }
 
+    /**
+     * Get the {@link ExtendedWebElement} of the current component
+     * 
+     * @return see {@link ExtendedWebElement}
+     */
+    public ExtendedWebElement getRootExtendedElement() {
+        return this.rootExtendedElement;
+    }
+
+    public void setRootExtendedElement(ExtendedWebElement element) {
+        this.rootExtendedElement = element;
+    }
+
+    /**
+     * @deprecated to interact with the current component
+     *             (getting information about the current element) use {@link #rootExtendedElement}
+     */
+    @Deprecated(since = "8.0.4", forRemoval = true)
     public WebElement getRootElement() {
         return rootElement;
     }
 
+    /**
+     * @deprecated to interact with the current component
+     *             (getting information about the current element) use {@link #rootExtendedElement}
+     */
+    @Deprecated(since = "8.0.4", forRemoval = true)
     public void setRootElement(WebElement element) {
         this.rootElement = element;
     }
 
+    /**
+     * @deprecated to interact with the current component
+     *             (getting information about the current element) use {@link #rootExtendedElement}
+     */
+    @Deprecated(since = "8.0.4", forRemoval = true)
     public By getRootBy() {
         return rootBy;
     }
 
+    /**
+     * @deprecated to interact with the current component
+     *             (getting information about the current element) use {@link #rootExtendedElement}
+     */
+    @Deprecated(since = "8.0.4", forRemoval = true)
     public void setRootBy(By rootBy) {
         this.rootBy = rootBy;
     }
@@ -152,7 +191,7 @@ public abstract class AbstractUIObject extends DriverHelper {
      */
     public void assertUIObjectPresent(long timeout) {
         if (!isUIObjectPresent(timeout)) {
-            Assert.fail(Messager.UI_OBJECT_NOT_PRESENT.getMessage(getNameWithLocator()));
+            Assert.fail(Messager.UI_OBJECT_NOT_PRESENT.getMessage(this.rootExtendedElement.getNameWithLocator()));
         }
     }
 
@@ -170,12 +209,7 @@ public abstract class AbstractUIObject extends DriverHelper {
      */
     public void assertUIObjectNotPresent(long timeout) {
         if (isUIObjectPresent(timeout)) {
-            Assert.fail(Messager.UI_OBJECT_PRESENT.getMessage(getNameWithLocator()));
+            Assert.fail(Messager.UI_OBJECT_PRESENT.getMessage(this.rootExtendedElement.getNameWithLocator()));
         }
     }
-
-    private String getNameWithLocator() {
-        return rootBy != null ? name + String.format(" (%s)", rootBy) : name + " (n/a)";
-    }
-
 }

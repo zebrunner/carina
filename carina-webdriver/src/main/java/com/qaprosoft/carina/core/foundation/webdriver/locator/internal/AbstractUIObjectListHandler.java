@@ -20,6 +20,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,15 +28,19 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WrapsElement;
+import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.gui.AbstractUIObject;
 
 public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements InvocationHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    
+
+    private final ClassLoader loader;
     private Class<?> clazz;
     private WebDriver webDriver;
     private final ElementLocator locator;
@@ -43,7 +48,8 @@ public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements 
 
     private By locatorBy;
 
-    public AbstractUIObjectListHandler(Class<?> clazz, WebDriver webDriver, ElementLocator locator, String name) {
+    public AbstractUIObjectListHandler(ClassLoader loader, Class<?> clazz, WebDriver webDriver, ElementLocator locator, String name) {
+        this.loader = loader;
         this.clazz = clazz;
         this.webDriver = webDriver;
         this.locator = locator;
@@ -83,10 +89,18 @@ public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements 
                                     + e.getMessage(),
                             e);
                 }
-                uiObject.setName(String.format("%s - %d", name, index++));
+
+                InvocationHandler handler = new LocatingListsElementHandler(element, locator);
+                WebElement proxy = (WebElement) Proxy.newProxyInstance(loader, new Class[] { WebElement.class, WrapsElement.class, Locatable.class },
+                        handler);
+                ExtendedWebElement webElement = new ExtendedWebElement(proxy, String.format("%s - %d", name, index), locatorBy);
+
+                uiObject.setRootExtendedElement(webElement);
+                uiObject.setName(String.format("%s - %d", name, index));
                 uiObject.setRootElement(element);
                 uiObject.setRootBy(locatorBy);
                 uIObjects.add(uiObject);
+                index++;
             }
         }
 
