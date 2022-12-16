@@ -30,9 +30,7 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import com.zebrunner.carina.cloud.CloudManagerHandler;
 import com.zebrunner.carina.proxy.browserup.ProxyPool;
-import com.zebrunner.carina.utils.cloud.CloudManager;
 import com.zebrunner.carina.utils.report.TestResult;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
@@ -83,7 +81,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoader;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.AutoScreenshotRule;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
-import com.zebrunner.agent.core.registrar.Artifact;
 import com.zebrunner.agent.core.registrar.CurrentTest;
 import com.zebrunner.agent.core.registrar.CurrentTestRun;
 import com.zebrunner.agent.core.registrar.Label;
@@ -175,15 +172,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
         if (Configuration.getPlatform().equalsIgnoreCase(SpecialKeywords.API)) {
             CurrentTestRun.setPlatform(SpecialKeywords.API);
-        }
-
-        String mobileApp = Configuration.getMobileApp();
-        if (!mobileApp.isEmpty()) {
-            CloudManager cloudManager = CloudManagerHandler.getProxyHandler();
-            String updatedMobileApp = cloudManager.updateAppPath(mobileApp);
-            Configuration.setMobileApp(updatedMobileApp);
-            // [VD] do not move into the static block as Zebrunner reporting need registered test run!
-            Artifact.attachReferenceToTestRun("app", updatedMobileApp);
         }
 
         CurrentTestRun.setLocale(Configuration.get(Parameter.LOCALE));

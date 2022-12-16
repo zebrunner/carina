@@ -18,10 +18,15 @@ package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.zebrunner.agent.core.registrar.Artifact;
+import com.zebrunner.carina.commons.artifact.IArtifactManager;
+import com.zebrunner.carina.utils.mobile.ArtifactProvider;
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
@@ -44,6 +49,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppium
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.remote.AutomationName;
+import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.remote.options.SupportsAutomationNameOption;
 
 /**
@@ -53,6 +59,7 @@ import io.appium.java_client.remote.options.SupportsAutomationNameOption;
  */
 public class MobileFactory extends AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Map<String, String> CACHE_MOBILE_APP_LINKS = new ConcurrentHashMap<>();
 
     @Override
     public WebDriver create(String name, MutableCapabilities capabilities, String seleniumHost) {
@@ -102,6 +109,11 @@ public class MobileFactory extends AbstractFactory {
                         seleniumHost.contains("hub-cloud.browserstack.com"))) {
             // when browser tests browserstack is not understand android platformName
             capabilities.setCapability("platformName", "ANY");
+        }
+
+        Object mobileAppCapability = capabilities.getCapability(MobileCapabilityType.APP);
+        if (mobileAppCapability != null) {
+            capabilities.setCapability(MobileCapabilityType.APP, getCachedAppLink(String.valueOf(mobileAppCapability)));
         }
 
         LOGGER.debug("capabilities: {}", capabilities);
@@ -164,6 +176,27 @@ public class MobileFactory extends AbstractFactory {
 
 
         return driver;
+    }
+
+    /**
+     * Get cached link to the app
+     * 
+     * @param appLink original link
+     * @return cached (pre-signed) link
+     */
+    private String getCachedAppLink(String appLink) {
+        String updatedMobileApp;
+        if (!CACHE_MOBILE_APP_LINKS.containsKey(appLink)) {
+            IArtifactManager cloudManager = ArtifactProvider.getInstance();
+            updatedMobileApp = cloudManager.getDirectLink(appLink);
+            CACHE_MOBILE_APP_LINKS.put(appLink, updatedMobileApp);
+            LOGGER.debug("For the 'app' capability with current value '{}', will be cached link: {}", appLink, updatedMobileApp);
+            Artifact.attachReferenceToTestRun("app", updatedMobileApp);
+        } else {
+            updatedMobileApp = CACHE_MOBILE_APP_LINKS.get(appLink);
+            LOGGER.debug("Original value of capability 'app': '{}' will be replaced by cached link: {}", appLink, updatedMobileApp);
+        }
+        return updatedMobileApp;
     }
 
     private MutableCapabilities getCapabilities(String name) {

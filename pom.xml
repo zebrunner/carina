@@ -44,7 +44,8 @@
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <jacoco-maven-plugin>0.8.7</jacoco-maven-plugin>
 
-        <carina-utils.version>1.0.0.13-SNAPSHOT</carina-utils.version>
+        <!-- todo change to release version -->
+        <carina-utils.version>1.0.0.19-SNAPSHOT</carina-utils.version>
         <carina-proxy.version>1.0.0</carina-proxy.version>
 
         <!-- Testings -->
