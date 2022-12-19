@@ -187,8 +187,8 @@ public class MobileFactory extends AbstractFactory {
     private String getCachedAppLink(String appLink) {
         String updatedMobileApp;
         if (!CACHE_MOBILE_APP_LINKS.containsKey(appLink)) {
-            IArtifactManager cloudManager = ArtifactProvider.getInstance();
-            updatedMobileApp = cloudManager.getDirectLink(appLink);
+            IArtifactManager artifactProvider = ArtifactProvider.getInstance();
+            updatedMobileApp = artifactProvider.getDirectLink(appLink);
             CACHE_MOBILE_APP_LINKS.put(appLink, updatedMobileApp);
             LOGGER.debug("For the 'app' capability with current value '{}', will be cached link: {}", appLink, updatedMobileApp);
             Artifact.attachReferenceToTestRun("app", updatedMobileApp);
