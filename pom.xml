@@ -44,8 +44,9 @@
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <jacoco-maven-plugin>0.8.7</jacoco-maven-plugin>
 
+        <carina-utils.version>1.0.0</carina-utils.version>
         <!-- todo change to release version -->
-        <carina-utils.version>1.0.0.19-SNAPSHOT</carina-utils.version>
+        <carina-commons.version>1.0.0-SNAPSHOT</carina-commons.version>
         <carina-proxy.version>1.0.0</carina-proxy.version>
 
         <!-- Testings -->
@@ -345,6 +346,11 @@
                 <groupId>com.zebrunner</groupId>
                 <artifactId>carina-utils</artifactId>
                 <version>${carina-utils.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.zebrunner</groupId>
+                <artifactId>carina-commons</artifactId>
+                <version>${carina-commons.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.qaprosoft</groupId>

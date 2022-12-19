@@ -40,6 +40,11 @@
 
 		<dependency>
 			<groupId>com.zebrunner</groupId>
+			<artifactId>carina-commons</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.zebrunner</groupId>
 			<artifactId>carina-proxy</artifactId>
 			<exclusions>
 				<exclusion>
