@@ -31,7 +31,6 @@ public final class ArtifactProvider implements IArtifactManager {
     private final List<IArtifactManagerFactory> artifactManagerFactories = new ArrayList<>();
 
     public ArtifactProvider() {
-        // todo refactor
         Collection<URL> allPackagePrefixes = Arrays.stream(Package.getPackages())
                 .map(Package::getName)
                 .map(s -> s.split("\\.")[0])
@@ -72,8 +71,7 @@ public final class ArtifactProvider implements IArtifactManager {
 
     @Override
     public boolean download(String from, Path to) {
-        IArtifactManagerFactory manager = artifactManagerFactories
-                .stream()
+        IArtifactManagerFactory manager = artifactManagerFactories.stream()
                 .filter(entity -> entity.isSuitable(from))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException(String.format("Cannot find suitable artifact manager for url: %s", from)));
@@ -82,8 +80,7 @@ public final class ArtifactProvider implements IArtifactManager {
 
     @Override
     public boolean put(Path from, String to) throws FileNotFoundException {
-        IArtifactManagerFactory manager = artifactManagerFactories
-                .stream()
+        IArtifactManagerFactory manager = artifactManagerFactories.stream()
                 .filter(entity -> entity.isSuitable(to))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException(String.format("Cannot find suitable artifact manager for url: %s", to)));
@@ -92,8 +89,7 @@ public final class ArtifactProvider implements IArtifactManager {
 
     @Override
     public boolean delete(String url) {
-        IArtifactManagerFactory manager = artifactManagerFactories
-                .stream()
+        IArtifactManagerFactory manager = artifactManagerFactories.stream()
                 .filter(entity -> entity.isSuitable(url))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException(String.format("Cannot find suitable artifact manager for url: %s", url)));
