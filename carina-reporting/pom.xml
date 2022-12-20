@@ -26,12 +26,6 @@
 		</dependency>
 
 		<dependency>
-			<!-- do not remove below dependency as it generates 2 compilation failures -->
-			<groupId>com.qaprosoft</groupId>
-			<artifactId>carina-aws-s3</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
