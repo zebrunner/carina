@@ -74,45 +74,38 @@ import com.zebrunner.carina.utils.resources.L10N;
 
 public class ExtendedWebElement implements IWebElement {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
     private static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
-
     private static final long RETRY_TIME = Configuration.getLong(Parameter.RETRY_INTERVAL);
-    
+    private static final Pattern CRYPTO_PATTERN = Pattern.compile(Configuration.get(Parameter.CRYPTO_PATTERN));
+    private static final String CRYPTO_PATTERN_AS_STRING = Configuration.get(Parameter.CRYPTO_PATTERN);
+    private final ElementLoadingStrategy loadingStrategy = ElementLoadingStrategy.valueOf(Configuration.get(Parameter.ELEMENT_LOADING_STRATEGY));
+
     // we should keep both properties: driver and searchContext obligatory
     // driver is used for actions, javascripts execution etc
     // searchContext is used for searching element by default
     private WebDriver driver;
     private SearchContext searchContext;
-
-    private CryptoTool cryptoTool = null;
-
-    private static String CRYPTO_PATTERN = Configuration.get(Parameter.CRYPTO_PATTERN);
-
     private WebElement element = null;
     private String name;
     private By by;
-
-    private ElementLoadingStrategy loadingStrategy = ElementLoadingStrategy.valueOf(Configuration.get(Parameter.ELEMENT_LOADING_STRATEGY));
+    private CryptoTool cryptoTool = null;
 
     private boolean isLocalized = false;
     private boolean isSingleElement = true;
-
     // Converted array of objects to String for dynamic element locators
     private String formatValues = "";
 
     public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext) {
         if (by == null) {
-            throw new RuntimeException("By couldn't be null!");
+            throw new IllegalArgumentException("By couldn't be null!");
         }
         if (driver == null) {
-            throw new RuntimeException("driver couldn't be null!");
+            throw new IllegalArgumentException("driver couldn't be null!");
         }
 
         if (searchContext == null) {
-            throw new RuntimeException("review stacktrace to analyze why searchContext is null");
+            throw new IllegalArgumentException("review stacktrace to analyze why searchContext is null");
         }
-
         this.by = by;
         this.name = name;
         this.driver = driver;
@@ -220,7 +213,11 @@ public class ExtendedWebElement implements IWebElement {
         }
     }
 
-
+    /**
+     * Get selenium WebElement
+     * 
+     * @return see {@link WebElement}
+     */
     public WebElement getElement() {
         if (this.element == null) {
             this.element = this.findElement();
@@ -230,48 +227,36 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     /**
-     * Reinitializes the element (not applicable to list element)
+     * Reinitialize the element (not applicable if element belongs to the list).
      *
-     * @throws NoSuchElementException if the element is not found
+     * @throws NoSuchElementException if the element was not found
      */
     public void refresh() {
         if (isSingleElement) {
             // try to override element
             element = this.findElement();
         } else {
-            LOGGER.error("Cannot refresh element of the list.");
+            LOGGER.error("Cannot refresh element if it belongs to the list.");
         }
     }
     
     /**
-     * Check that element present or visible.
+     * Check that element present or visible (depends on {@link Parameter#ELEMENT_LOADING_STRATEGY}.
      *
-     * @return element presence status.
+     * @return true if element is present (visible), false otherwise
      */
     public boolean isPresent() {
     	return isPresent(EXPLICIT_TIMEOUT);
     }
     
     /**
-     * Check that element present or visible within specified timeout.
+     * Check that element present or visible (depends on {@link Parameter#ELEMENT_LOADING_STRATEGY}
+     * within specified timeout.
      *
-     * @param timeout - timeout.
-     * @return element existence status.
+     * @param timeout - timeout in seconds
+     * @return true if element is present (visible), false otherwise
      */
     public boolean isPresent(long timeout) {
-    	return isPresent(getBy(), timeout);
-    }
-    
-	/**
-	 * Check that element with By present within specified timeout.
-	 *
-	 * @param by
-	 *            - By.
-	 * @param timeout
-	 *            - timeout.
-	 * @return element existence status.
-	 */
-	public boolean isPresent(By by, long timeout) {
         boolean res = false;
         try {
             res = waitUntil(getDefaultCondition(by), timeout);
@@ -280,15 +265,36 @@ public class ExtendedWebElement implements IWebElement {
             LOGGER.debug("waitUntil: StaleElementReferenceException", e);
         }
         return res;
-	}
+    }
+    
+    /**
+     * Check that element present or visible (depends on {@link Parameter#ELEMENT_LOADING_STRATEGY}
+     * within specified timeout.
+     *
+     * @deprecated this method doesn't make sense.
+     * @param by see {@link By}
+     * @param timeout timeout in seconds
+     * @return true if element is present (visible), false otherwise
+     */
+    @Deprecated(forRemoval = true, since = "8.0.4")
+    public boolean isPresent(By by, long timeout) {
+        boolean res = false;
+        try {
+            res = waitUntil(getDefaultCondition(by), timeout);
+        } catch (StaleElementReferenceException e) {
+            // there is no sense to continue as StaleElementReferenceException captured
+            LOGGER.debug("waitUntil: StaleElementReferenceException", e);
+        }
+        return res;
+    }
 	
 	
     /**
      * Wait until any condition happens.
      *
-     * @param condition - ExpectedCondition.
-     * @param timeout - timeout.
-     * @return true if condition happen.
+     * @param condition see {@link ExpectedCondition}
+     * @param timeout how long to wait for the evaluated condition to be true, in seconds
+     * @return true if condition happen, false otherwise
      */
     private boolean waitUntil(ExpectedCondition<?> condition, long timeout) {
         if (timeout < 1) {
@@ -316,7 +322,7 @@ public class ExtendedWebElement implements IWebElement {
         // removed ".ignoring(NoSuchElementException.class);" as NotFoundException ignored by waiter itself
         // added explicit .withTimeout(Duration.ofSeconds(timeout));
 
-        LOGGER.debug("waitUntil: starting... timeout: " + timeout);
+        LOGGER.debug("waitUntil: starting... timeout: {}", timeout);
         boolean res = false;
         try {
             wait.until(condition);
@@ -357,10 +363,20 @@ public class ExtendedWebElement implements IWebElement {
         this.isSingleElement = isSingleElement;
     }
 
+    /**
+     * Get name of the element.
+     * 
+     * @return name, for example {@code element1}
+     */
     public String getName() {
         return this.name + this.formatValues;
     }
 
+    /**
+     * Get name with locator.
+     * 
+     * @return name, for example {@code element1 (By.xpath: //div[contains(text(), 'some text')])}
+     */
     public String getNameWithLocator() {
         if (this.by != null) {
             return this.name + this.formatValues + String.format(" (%s)", by);
@@ -374,9 +390,9 @@ public class ExtendedWebElement implements IWebElement {
     }
     
     /**
-     * Get element By.
+     * Get locator of element
      *
-     * @return By by
+     * @return see {@link By}
      */
     public By getBy() {
         return this.by;
@@ -397,37 +413,38 @@ public class ExtendedWebElement implements IWebElement {
 
 
     /**
-     * Get element text.
+     * Get text of the element.
      *
-     * @return String text
+     * @return text
      */
     public String getText() {
         return (String) doAction(ACTION_NAME.GET_TEXT, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
     }
 
     /**
-     * Get element location.
+     * Get location of the element.
      *
-     * @return Point location
+     * @return see {@link Point}
      */
     public Point getLocation() {
         return (Point) doAction(ACTION_NAME.GET_LOCATION, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
     }
 
     /**
-     * Get element size.
+     * Get size of the element.
      *
-     * @return Dimension size
+     * @return see {@link Dimension}
      */
     public Dimension getSize() {
         return (Dimension) doAction(ACTION_NAME.GET_SIZE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()));
     }
 
     /**
-     * Get element attribute.
+     * Get attribute of the element.
      *
      * @param name of attribute
      * @return String attribute value
+     * @see <a href="https://w3c.github.io/webdriver/#get-element-attribute">Get Element Attribute</a>
      */
     public String getAttribute(String name) {
         return (String) doAction(ACTION_NAME.GET_ATTRIBUTE, EXPLICIT_TIMEOUT, getDefaultCondition(getBy()), name);
@@ -1811,12 +1828,11 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     private String decryptIfEncrypted(String text) {
-        Matcher cryptoMatcher = Pattern.compile(CRYPTO_PATTERN)
-                .matcher(text);
+        Matcher cryptoMatcher = CRYPTO_PATTERN.matcher(text);
         String decryptedText = text;
         if (cryptoMatcher.find()) {
             initCryptoTool();
-            decryptedText = this.cryptoTool.decrypt(text, CRYPTO_PATTERN);
+            decryptedText = this.cryptoTool.decrypt(text, CRYPTO_PATTERN_AS_STRING);
         }
         return decryptedText;
     }
