@@ -96,6 +96,7 @@ public class ExtendedWebElement implements IWebElement {
     private ElementLoadingStrategy loadingStrategy = ElementLoadingStrategy.valueOf(Configuration.get(Parameter.ELEMENT_LOADING_STRATEGY));
 
     private boolean isLocalized = false;
+    private boolean isSingleElement = true;
 
     // Converted array of objects to String for dynamic element locators
     private String formatValues = "";
@@ -229,13 +230,17 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     /**
-     * Reinitializes the element
+     * Reinitializes the element (not applicable to list element)
      *
      * @throws NoSuchElementException if the element is not found
      */
     public void refresh() {
-        // try to override element
-        element = this.findElement();
+        if (isSingleElement) {
+            // try to override element
+            element = this.findElement();
+        } else {
+            LOGGER.debug("Cannot refresh element of the list.");
+        }
     }
     
     /**
@@ -341,6 +346,15 @@ public class ExtendedWebElement implements IWebElement {
     
     public void setElement(WebElement element) {
         this.element = element;
+    }
+
+    /**
+     * For internal usage only!
+     * 
+     * @param isSingleElement true if element is single, false if element is a part of list
+     */
+    public void setIsSingle(boolean isSingleElement) {
+        this.isSingleElement = isSingleElement;
     }
 
     public String getName() {
@@ -827,15 +841,29 @@ public class ExtendedWebElement implements IWebElement {
 			}
 		}
 
-    	ExpectedCondition<?> waitCondition;
-    	
         // [VD] replace presenceOfElementLocated and visibilityOf conditions by single "visibilityOfElementLocated"
         // visibilityOf: Does not check for presence of the element as the error explains it.
         // visibilityOfElementLocated: Checks to see if the element is present and also visible. To check visibility, it makes sure that the element
         // has a height and width greater than 0.
-    	
-        waitCondition = ExpectedConditions.visibilityOfElementLocated(getBy());
-    	return waitUntil(waitCondition, timeout);
+        List<ExpectedCondition<?>> conditions = new ArrayList<>();
+
+        if (element != null) {
+            conditions.add(ExpectedConditions.visibilityOf(element));
+        }
+
+        if (isSingleElement) {
+            if (searchContext instanceof WebElement) {
+                conditions.add(ExpectedConditions.presenceOfNestedElementLocatedBy((WebElement) searchContext, by));
+            } else {
+                conditions.add(ExpectedConditions.presenceOfElementLocated(by));
+            }
+        }
+
+        if(conditions.isEmpty()) {
+            throw new RuntimeException("There should be at least one ExpectedCondition!");
+        }
+
+        return waitUntil(ExpectedConditions.or(conditions.toArray(new ExpectedCondition[0])), timeout);
     }
 
     /**
@@ -864,15 +892,45 @@ public class ExtendedWebElement implements IWebElement {
      * @return element clickability status.
      */
     public boolean isClickable(long timeout) {
-    	ExpectedCondition<?> waitCondition;
-    	
-		if (element != null) {
-			waitCondition = ExpectedConditions.elementToBeClickable(element);
-		} else {
-            waitCondition = ExpectedConditions.elementToBeClickable(getBy());
-		}
-		
-    	return waitUntil(waitCondition, timeout);
+        List<ExpectedCondition<?>> conditions = new ArrayList<>();
+
+        if (element != null) {
+            conditions.add(ExpectedConditions.elementToBeClickable(element));
+        }
+
+        if (isSingleElement) {
+            if (searchContext instanceof WebElement) {
+                ExpectedCondition<?> condition = new ExpectedCondition<WebElement>() {
+                    @Override
+                    public WebElement apply(WebDriver driver) {
+                        List<WebElement> elements = ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by)
+                                .apply(driver);
+                        try {
+                            if (elements != null && !(elements.isEmpty()) && elements.get(0).isEnabled()) {
+                                return elements.get(0);
+                            }
+                            return null;
+                        } catch (StaleElementReferenceException e) {
+                            return null;
+                        }
+                    }
+
+                    @Override
+                    public String toString() {
+                        return "element to be clickable: " + by;
+                    }
+                };
+                conditions.add(condition);
+            } else {
+                conditions.add(ExpectedConditions.elementToBeClickable(by));
+            }
+        }
+
+        if(conditions.isEmpty()) {
+            throw new RuntimeException("There should be at least one ExpectedCondition!");
+        }
+
+        return waitUntil(ExpectedConditions.or(conditions.toArray(new ExpectedCondition[0])), timeout);
     }
 
     /**
@@ -891,27 +949,26 @@ public class ExtendedWebElement implements IWebElement {
      * @return true if element is visible, false otherwise
      */
     public boolean isVisible(long timeout) {
-        ExpectedCondition<?> waitCondition;
-
+        List<ExpectedCondition<?>> conditions = new ArrayList<>();
         if (element != null) {
+            conditions.add(ExpectedConditions.visibilityOf(element));
+        }
+
+        if (isSingleElement) {
             if (searchContext instanceof WebElement) {
-                waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by),
-                        ExpectedConditions.visibilityOf(element));
+                conditions.add(ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by));
             } else {
-                waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(by),
-                        ExpectedConditions.visibilityOf(element));
+                conditions.add(ExpectedConditions.visibilityOfElementLocated(by));
             }
-        } else {
-            if (searchContext instanceof WebElement) {
-                waitCondition = ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by);
-            } else {
-                waitCondition = ExpectedConditions.visibilityOfElementLocated(by);
-            }
+        }
+
+        if(conditions.isEmpty()) {
+            throw new RuntimeException("There should be at least one ExpectedCondition!");
         }
 
         boolean res = false;
         try {
-            res = waitUntil(waitCondition, timeout);
+            res = waitUntil(ExpectedConditions.or(conditions.toArray(new ExpectedCondition[0])), timeout);
         } catch (StaleElementReferenceException e) {
             // there is no sense to continue as StaleElementReferenceException captured
             LOGGER.debug("waitUntil: StaleElementReferenceException", e);
@@ -938,13 +995,42 @@ public class ExtendedWebElement implements IWebElement {
      */
     public boolean isElementWithTextPresent(final String text, long timeout) {
     	final String decryptedText = decryptIfEncrypted(text);
-		ExpectedCondition<Boolean> textCondition;
-		if (element != null) {
-			textCondition = ExpectedConditions.textToBePresentInElement(element, decryptedText);
-		} else {
-            textCondition = ExpectedConditions.textToBePresentInElementLocated(getBy(), decryptedText);
-		}
-		return waitUntil(textCondition, timeout);
+        List<ExpectedCondition<?>> conditions = new ArrayList<>();
+
+        if (element != null) {
+            conditions.add(ExpectedConditions.textToBePresentInElement(element, decryptedText));
+        }
+        if (isSingleElement) {
+            if (searchContext instanceof WebElement) {
+                ExpectedCondition<?> condition =  new ExpectedCondition<Boolean>() {
+                    @Override
+                    public Boolean apply(WebDriver driver) {
+                        try {
+                            String elementText = searchContext.findElement(by).getText();
+                            return elementText.contains(text);
+                        } catch (StaleElementReferenceException e) {
+                            return false;
+                        }
+                    }
+
+                    @Override
+                    public String toString() {
+                        return String.format("text ('%s') to be present in element found by %s",
+                                text, by);
+                    }
+                };
+
+                conditions.add(condition);
+            } else {
+                conditions.add(ExpectedConditions.textToBePresentInElementLocated(by, decryptedText));
+            }
+        }
+
+        if(conditions.isEmpty()) {
+            throw new RuntimeException("There should be at least one ExpectedCondition!");
+        }
+
+		return waitUntil(ExpectedConditions.or(conditions.toArray(new ExpectedCondition[0])), timeout);
     	//TODO: restore below code as only projects are migrated to "isElementWithContainTextPresent"
 //    	return waitUntil(ExpectedConditions.and(ExpectedConditions.presenceOfElementLocated(getBy()),
 //				ExpectedConditions.textToBe(getBy(), decryptedText)), timeout);
@@ -1020,6 +1106,7 @@ public class ExtendedWebElement implements IWebElement {
         if (!element.isPresent(timeout)) {
             throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
         }
+        element.refresh();
         return element;
     }
 
@@ -1048,6 +1135,7 @@ public class ExtendedWebElement implements IWebElement {
             String name = String.format("ExtendedWebElement - [%d]", i++);
             ExtendedWebElement tempElement = new ExtendedWebElement(by, name, getDriver(), getElement());
             tempElement.setElement(element);
+            tempElement.setIsSingle(false);
             extendedWebElements.add(tempElement);
         }
         return extendedWebElements;
@@ -1654,70 +1742,61 @@ public class ExtendedWebElement implements IWebElement {
      * Get element waiting condition depends on element loading strategy
      */
     private ExpectedCondition<?> getDefaultCondition(By by) {
+        List<ExpectedCondition<?>> conditions = new ArrayList<>();
         // generate the most popular waitCondition to check if element visible or present
-        ExpectedCondition<?> waitCondition = null;
         // need to get root element from with we will try to find element by By
         switch (loadingStrategy) {
         case BY_PRESENCE: {
             if (element != null) {
-                if (searchContext instanceof WebElement) {
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy((WebElement) searchContext, by),
-                            ExpectedConditions.visibilityOf(element));
-                } else {
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
-                            ExpectedConditions.visibilityOf(element));
-                }
-            } else {
-                if (searchContext instanceof WebElement) {
-                    waitCondition = ExpectedConditions.presenceOfNestedElementLocatedBy((WebElement) searchContext, by);
-                } else {
-                    waitCondition = ExpectedConditions.presenceOfElementLocated(by);
+                conditions.add(ExpectedConditions.visibilityOf(element));
+            }
 
+            if (isSingleElement) {
+                if (searchContext instanceof WebElement) {
+                    conditions.add(ExpectedConditions.presenceOfNestedElementLocatedBy((WebElement) searchContext, by));
+                } else {
+                    conditions.add(ExpectedConditions.presenceOfElementLocated(by));
                 }
             }
             break;
         }
         case BY_VISIBILITY: {
             if (element != null) {
+                conditions.add(ExpectedConditions.visibilityOf(element));
+            }
+
+            if (isSingleElement) {
                 if (searchContext instanceof WebElement) {
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by),
-                            ExpectedConditions.visibilityOf(element));
+                    conditions.add(ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by));
                 } else {
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.visibilityOfElementLocated(by),
-                            ExpectedConditions.visibilityOf(element));
-                }
-            } else {
-                if (searchContext instanceof WebElement) {
-                    waitCondition = ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by);
-                } else {
-                    waitCondition = ExpectedConditions.visibilityOfElementLocated(by);
+                    conditions.add(ExpectedConditions.visibilityOfElementLocated(by));
                 }
             }
             break;
         }
         case BY_PRESENCE_OR_VISIBILITY:
             if (element != null) {
+                conditions.add(ExpectedConditions.visibilityOf(element));
+            }
+
+            if (isSingleElement) {
                 if (searchContext instanceof WebElement) {
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy((WebElement) searchContext, by),
-                            ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by),
-                            ExpectedConditions.visibilityOf(element));
+                    conditions.add(ExpectedConditions.presenceOfNestedElementLocatedBy((WebElement) searchContext, by));
+                    conditions.add(ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by));
                 } else {
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
-                            ExpectedConditions.visibilityOfElementLocated(by),
-                            ExpectedConditions.visibilityOf(element));
-                }
-            } else {
-                if (searchContext instanceof WebElement) {
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfNestedElementLocatedBy((WebElement) searchContext, by),
-                            ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by));
-                } else {
-                    waitCondition = ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
-                            ExpectedConditions.visibilityOfElementLocated(by));
+                    conditions.add(ExpectedConditions.presenceOfElementLocated(by));
+                    conditions.add(ExpectedConditions.visibilityOfElementLocated(by));
+
                 }
             }
             break;
         }
-        return waitCondition;
+
+        if(conditions.isEmpty()) {
+            throw new RuntimeException("There should be at least one ExpectedCondition!");
+        }
+
+        return ExpectedConditions.or(conditions.toArray(new ExpectedCondition<?>[0]));
     }
 
     private long getRetryInterval(long timeout) {

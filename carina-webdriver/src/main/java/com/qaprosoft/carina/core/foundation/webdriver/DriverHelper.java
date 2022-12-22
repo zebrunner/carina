@@ -1251,6 +1251,7 @@ public class DriverHelper {
             String name = String.format("ExtendedWebElement - [%d]", i++);
             ExtendedWebElement tempElement = new ExtendedWebElement(by, name, getDriver(), getDriver());
             tempElement.setElement(element);
+            tempElement.setIsSingle(false);
             extendedWebElements.add(tempElement);
         }
         return extendedWebElements;
