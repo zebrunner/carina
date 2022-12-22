@@ -94,7 +94,7 @@ public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements 
                 WebElement proxy = (WebElement) Proxy.newProxyInstance(loader, new Class[] { WebElement.class, WrapsElement.class, Locatable.class },
                         handler);
                 ExtendedWebElement webElement = new ExtendedWebElement(proxy, String.format("%s - %d", name, index), locatorBy);
-
+                webElement.setIsSingle(false);
                 uiObject.setRootExtendedElement(webElement);
                 uiObject.setName(String.format("%s - %d", name, index));
                 uiObject.setRootElement(element);

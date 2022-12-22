@@ -69,6 +69,7 @@ public class LocatingListHandler implements InvocationHandler {
                 WebElement proxy = (WebElement) Proxy.newProxyInstance(loader, new Class[]{WebElement.class, WrapsElement.class, Locatable.class},
                         handler);
                 ExtendedWebElement webElement = new ExtendedWebElement(proxy, name + i, by);
+                webElement.setIsSingle(false);
 
                 Field searchContextField = locator.getClass().getDeclaredField("searchContext");
                 searchContextField.setAccessible(true);
