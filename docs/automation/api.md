@@ -99,16 +99,16 @@ Approach based on initialisation of super class constructor is deprecated and mo
 
 1. `@ContentType` - is used to define the value of Content-type header in response
 2. `@Cookie` - is used to specify cookies in the request
-3. `@Endpoint` - defines the place that APIs send requests and where the resource lives
+3. `@Endpoint` - combination of http method + url which defines any single API endpoint
 4. `@Header` - is used to specify headers in the request
-5. `@HideRequestBodyPartsInLogs` - is used to hide secret parts of the request body in the logs
-6. `@HideRequestHeadersInLogs` - is used to hide secret parts of the request headers in the logs
+5. `@HideRequestBodyPartsInLogs` - is used to hide sensitive parts of the request body in the logs
+6. `@HideRequestHeadersInLogs` - is used to hide sensitive parts of the request headers in the logs
 7. `@HideResponseBodyPartsInLogs` - is used to hide secret parts of the response body in the logs
-8. `@PropertiesPath` - contains a path from source root to properties file
+8. `@PropertiesPath` - contains a path to default properties file for endpoint templates (relative path from root of code sources)
 9. `@QueryParam` - is used to specify query parameters in the request
-10. `@RequestTemplatePath` - contains a path from source root to request template file
-11. `@ResponseTemplatePath` - contains a path from source root to response template file
-12. `@SuccessfulHttpStatus` - specifies the expected HTTP status
+10. `@RequestTemplatePath` - contains a path to default request template for mentioned endpoint (relative path from root of code sources)
+11. `@ResponseTemplatePath` - contains a path to default response template for mentioned endpoint (relative path from root of code sources)
+12. `@SuccessfulHttpStatus` - specifies the expected HTTP status for happy-path scenarios
 
 In this case we don’t need to define _api.properties file and call the constructor of a super class, but if we have some properties file used in this request we should explicitly set it in test method. Insead of callAPI() and expectResponseStatus() methods we can use callAPIExpectSuccess() that will call API expecting http status in response taken from @SuccessfulHttpStatus value.
 ```java
@@ -122,7 +122,7 @@ public class DeleteUserMethod extends AbstractApiMethodV2 {
     }
 }
 ```   
-Also, placeholders in URL can be automatically replaced by carina if they're specified in carina configuration properties (config.properties).
+Also placeholders in URL can be automatically replaced by carina if they're specified in carina configuration properties (config.properties).
 To make auto-replacement happen just use next syntax in your URL:
 - when param starts with `config.\*` then `R.CONFIG.get("\*")` will be used as a replacement
 - when param starts with `config.env.\*` then `Configuration.getEnvArg("\*")` will be used as a replacement
@@ -220,12 +220,13 @@ public class APISampleTest implements IAbstractTest {
 #### REST service call domain object (Declarative approach)
 
 Approach based on implicit instantiation of the `AbstractApiMethod`.
-This is useful for:
-- Improving the readability of the `AbstractApiMethod` description
-- The ability to better structure the description of endpoints
-- Reduction of time for the implementation of the desired `AbstractApiMethod`
+It allows to:   
+- more convenient and efficiently organize description of endpoints;
+- have all carina api methods for the same URL pattern be defined within single class;
+- reduce time for the implementation of the desired `AbstractApiMethod`;
+- flexibly configure all api methods with Java annotations.
 
-This approach only needs the description of the desired method:
+Here is example of multiple api methods definition for one url pattern. Base url template can be easily overwritten with use of `@EndpointTemplateMethod` annotation:
 ```java
 package com.qaprosoft.carina.demo.api;
 
@@ -260,24 +261,24 @@ public interface UserTemplate {
 
 }
 ```
-All the annotations of the *Annotation based approach* work here as well (except of the @Endpoint annotation).
-In this approach, it is possible to use these annotations not only on the class but also on the method.
+All the annotations of the *Annotation based approach* work here as well (**Important:** except the @Endpoint annotation).    
+In this approach it is possible to use these annotations not only on the class but also on the method level.    
 
-In addition, you can apply the following annotations:
+In addition, you can apply the following annotations:    
 
-1. `@Cookie.Value` - is used to specify cookies in the request (to use near parameters)
-2. `@EndpointTemplate` - defines the part of the request URL. This part will be associated with each method URL
-3. `@EndpointTemplateMethod` - defines the part of the request URL. This part will be concatenated with the EndpointTemplate path (if it exists)
-4. `@Header.Value` - is used to specify headers in the request (to use near parameters)
-5. `@PathParam` - is used to specify named URL placeholder value. Placeholder will be replaced automatically (to use near parameters)
-6. `@PropertiesPath.Value` - contains a path from source root to properties file (to use near parameters)
-7. `@Property` - is used to specify additional properties. These properties will be automatically added to the future method instance (to use near parameters)
-8. `@QueryParam.Value` - is used to specify URL query parameters. These query parameters will be automatically added to the URL (to use near parameters)
-9. `@RequestTemplatePath.Value` - contains a path from source root to request template file (to use near parameters)
-10. `@ResponseTemplatePath.Value` - contains a path from source root to response template file (to use near parameters)
-11. `@SuccessfulHttpStatus.Value` -  specifies the expected HTTP status (to use near parameters)
+1. `@Cookie.Value` - is used to specify cookies in the request (for use with method's parameters)
+2. `@EndpointTemplate` - defines the basic part of the request URL. This part will be a basic one for every inner method.
+3. `@EndpointTemplateMethod` - defines relative part of the request URL. This part will be concatenated with the EndpointTemplate path (if defined)
+4. `@Header.Value` - is used to specify headers in the request (for use with method's parameters)
+5. `@PathParam` - is used to specify named URL placeholder value. Placeholder will be replaced automatically (for use with method's parameters)
+6. `@PropertiesPath.Value` - contains a path to default properties file for endpoint templates (for use with method's parameters)
+7. `@Property` - is used to specify additional properties. These properties will be automatically added to the future method instance (for use with method's parameters)
+8. `@QueryParam.Value` - is used to specify URL query parameters. These query parameters will be automatically added to the URL (for use with method's parameters)
+9. `@RequestTemplatePath.Value` - contains a path to default request template for mentioned endpoint (for use with method's parameters)
+10. `@ResponseTemplatePath.Value` - contains a path to default response template for mentioned endpoint (for use with method's parameters)
+11. `@SuccessfulHttpStatus.Value` -  specifies the expected HTTP status for happy-path scenarios (for use with method's parameters) 
 
-There is also syntactic sugar to make the **EndpointTemplateMethod** annotation more readable:
+There is also "syntactic sugar" available for making the **EndpointTemplateMethod** annotation more readable:
 1. `@GetMethod` - endpoint template with **GET** method
 2. `@PostMethod` - endpoint template with **POST** method
 3. `@PutMethod` - endpoint template with **PUT** method
@@ -286,7 +287,7 @@ There is also syntactic sugar to make the **EndpointTemplateMethod** annotation 
 6. `@HeadMethod` - endpoint template with **HEAD** method
 7. `@OptionsMethod` - endpoint template with **OPTIONS** method
 
-Now you can invoke a `prepareTemplate` method from `TemplateFactory` to use proxy implementation in the test
+Now you can invoke a `prepareTemplate` method from `TemplateFactory` to use proxy implementation in the test:    
 ```java
 @Test()
 @MethodOwner(owner = "qpsdemo")
@@ -298,7 +299,7 @@ public void testCreateUser() {
     api.validateResponse();
 }
 ```
-To make test class clean you can implement the interface and use the proxy class inside
+For more customization on api method definition level you can implement the interface and use the proxy class inside:    
 ```java
 package com.qaprosoft.carina.demo.api.impl;
 
@@ -337,7 +338,7 @@ public class UserTemplateImpl implements UserTemplate {
 }
 ```
 
-To perform the general logic under multiple API templates you can create *interceptors*.
+To perform the general logic under multiple API templates you can create *interceptors*.    
 
 ### Useful features
 The framework contains a list of useful features for building requests and validation of responses. It makes the support of such tests easier and at the same time minimizes the amount of test data.
@@ -365,8 +366,7 @@ response is considered successful, action that will be executed after all api ca
     }
 ```
 #### Handling and changing AbstractApiMethod on-the-fly
-This option provides the ability to handling and changing your AbstractApiMethod - 
-create an implementation of `ApiMethodInterceptor` interface
+This option provides the ability for handling and changing of your AbstractApiMethod instances on-the-fly. For that it's needed to create an implementation of `ApiMethodInterceptor` interface:    
 ```java
 package com.qaprosoft.carina.demo.api.interceptor;
 
@@ -392,9 +392,9 @@ public class CustomInterceptor implements ApiMethodInterceptor<AbstractApiMethod
 }
 ```
 
-and add this class into `@LinkedInterceptors` annotation:
+and add this class into `@LinkedInterceptors` annotation for your api method:    
 
-- *Annotation based approach*
+- *Annotation based approach*    
 
 ```java
 @Endpoint(url = "${config.env.base_url}/users/1", methodType = HttpMethodType.DELETE)
@@ -403,7 +403,7 @@ public class DeleteUserMethod extends AbstractApiMethodV2 {
 }
 ```
 
-- *Declarative based approach*
+- *Declarative based approach*    
 
 ```java
 @EndpointTemplate(url = "${config.env.base_url}/users")
@@ -416,9 +416,9 @@ public interface UserTemplate {
     
 }
 ```
-Also, it possible to create globals interceptors.
-Just create a file named `com.qaprosoft.carina.core.foundation.api.interceptor.ApiMethodInterceptor`
-in `/resources/META-INF/services` folder and set the path(s) of your implementation(s) into it:
+Then all logic defined in interceptor methods will be called on particular events (once api method is instantiated; once request is ready for sending to endpoint; once endpoint was called).    
+Also it's possible to create global interceptors which will be applied for all api methods by default.    
+Just create a file named `com.qaprosoft.carina.core.foundation.api.interceptor.ApiMethodInterceptor` in `/resources/META-INF/services` folder and set the path(s) of your implementation(s) into it:    
 ```
 com.qaprosoft.carina.demo.CustomInterceptor
 com.qaprosoft.carina.demo.OtherCustomInterceptor
