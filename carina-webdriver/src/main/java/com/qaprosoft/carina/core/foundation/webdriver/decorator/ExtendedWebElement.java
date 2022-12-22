@@ -239,7 +239,7 @@ public class ExtendedWebElement implements IWebElement {
             // try to override element
             element = this.findElement();
         } else {
-            LOGGER.debug("Cannot refresh element of the list.");
+            LOGGER.error("Cannot refresh element of the list.");
         }
     }
     
