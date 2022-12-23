@@ -1,21 +1,18 @@
 package com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive;
 
-import org.openqa.selenium.By;
-
 interface IPlatformDependsConverter {
 
-    By idToXpath(By by);
+    String idToXpath(String by);
 
-    By nameToXpath(By by);
+    String nameToXpath(String by);
 
-    By linkTextToXpath(By by);
+    String linkTextToXpath(String by);
 
-    By xpathIdCaseInsensitive(By by);
+    String xpathIdCaseInsensitive(String by);
 
-    By xpathNameCaseInsensitive(By by);
+    String xpathNameCaseInsensitive(String by);
 
-    By xpathTextCaseInsensitive(By by);
+    String xpathTextCaseInsensitive(String by);
 
-    By xpathClassCaseInsensitive(By by);
-
+    String xpathClassCaseInsensitive(String by);
 }

@@ -38,7 +38,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedFindBy;
-import com.qaprosoft.carina.core.foundation.webdriver.locator.LocalizedAnnotations;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.internal.AbstractUIObjectListHandler;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.internal.LocatingListHandler;
 import com.qaprosoft.carina.core.gui.AbstractUIObject;
@@ -132,12 +131,7 @@ public class ExtendedFieldDecorator implements FieldDecorator {
         InvocationHandler handler = new LocatingElementHandler(locator);
         WebElement proxy = (WebElement) Proxy.newProxyInstance(loader, new Class[] { WebElement.class, WrapsElement.class, Locatable.class },
                 handler);
-        By by = null;
-        if (field.isAnnotationPresent(FindBy.class) || field.isAnnotationPresent(ExtendedFindBy.class)) {
-            by = new LocalizedAnnotations(field).buildBy();
-        }
-
-        return new ExtendedWebElement(proxy, field.getName(), by);
+        return new ExtendedWebElement(proxy, field.getName());
     }
 
     @SuppressWarnings("unchecked")

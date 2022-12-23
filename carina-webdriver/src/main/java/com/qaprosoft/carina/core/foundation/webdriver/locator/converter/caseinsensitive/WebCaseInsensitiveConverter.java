@@ -7,40 +7,40 @@ import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
 class WebCaseInsensitiveConverter extends AbstractPlatformDependsConverter implements IPlatformDependsConverter {
 
     @Override
-    public By idToXpath(By by) {
+    public String idToXpath(String by) {
         return locatorToXpath(by, LocatorType.ID,
                 value -> createXpathFromAnotherTypeOfLocator(".", "*", "@id", "'", value));
     }
 
     @Override
-    public By nameToXpath(By by) {
+    public String nameToXpath(String by) {
         return locatorToXpath(by, LocatorType.NAME,
                 value -> createXpathFromAnotherTypeOfLocator(".", "*", "@name", "'", value));
     }
 
     @Override
-    public By linkTextToXpath(By by) {
+    public String linkTextToXpath(String by) {
         return locatorToXpath(by, LocatorType.LINKTEXT,
                 value -> createXpathFromAnotherTypeOfLocator(".", "a", "text()", "'", value));
     }
 
     @Override
-    public By xpathIdCaseInsensitive(By by) {
+    public String xpathIdCaseInsensitive(String by) {
         return caseInsensitiveXpathByAttribute(by, "@id");
     }
 
     @Override
-    public By xpathNameCaseInsensitive(By by) {
+    public String xpathNameCaseInsensitive(String by) {
         return caseInsensitiveXpathByAttribute(by, "@name");
     }
 
     @Override
-    public By xpathTextCaseInsensitive(By by) {
+    public String xpathTextCaseInsensitive(String by) {
         return caseInsensitiveXpathByAttribute(by, "text\\(\\)");
     }
 
     @Override
-    public By xpathClassCaseInsensitive(By by) {
+    public String xpathClassCaseInsensitive(String by) {
         return caseInsensitiveXpathByAttribute(by, "@class");
     }
 

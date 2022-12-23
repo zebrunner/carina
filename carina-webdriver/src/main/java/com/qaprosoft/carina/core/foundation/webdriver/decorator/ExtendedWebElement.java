@@ -39,6 +39,7 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WrapsDriver;
+import org.openqa.selenium.WrapsElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.remote.LocalFileDetector;
@@ -59,6 +60,7 @@ import org.testng.SkipException;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.FormatLocatorConverter;
 import com.zebrunner.carina.crypto.Algorithm;
 import com.zebrunner.carina.crypto.CryptoTool;
 import com.zebrunner.carina.crypto.CryptoToolBuilder;
@@ -73,33 +75,27 @@ import com.zebrunner.carina.utils.performance.ACTION_NAME;
 import com.zebrunner.carina.utils.resources.L10N;
 
 public class ExtendedWebElement implements IWebElement {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
     private static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
-
     private static final long RETRY_TIME = Configuration.getLong(Parameter.RETRY_INTERVAL);
-    
+    private static final String CRYPTO_PATTERN = Configuration.get(Parameter.CRYPTO_PATTERN);
+    private static final Pattern COMPILED_CRYPTO_PATTERN = Pattern.compile(Configuration.get(Parameter.CRYPTO_PATTERN));
+    private final ElementLoadingStrategy loadingStrategy = ElementLoadingStrategy.valueOf(Configuration.get(Parameter.ELEMENT_LOADING_STRATEGY));
     // we should keep both properties: driver and searchContext obligatory
     // driver is used for actions, javascripts execution etc
     // searchContext is used for searching element by default
     private WebDriver driver;
     private SearchContext searchContext;
-
-    private CryptoTool cryptoTool = null;
-
-    private static String CRYPTO_PATTERN = Configuration.get(Parameter.CRYPTO_PATTERN);
-
     private WebElement element = null;
     private String name;
     private By by;
-
-    private ElementLoadingStrategy loadingStrategy = ElementLoadingStrategy.valueOf(Configuration.get(Parameter.ELEMENT_LOADING_STRATEGY));
-
     private boolean isLocalized = false;
     private boolean isSingleElement = true;
-
     // Converted array of objects to String for dynamic element locators
     private String formatValues = "";
+
+    private CryptoTool cryptoTool = null;
 
     public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext) {
         if (by == null) {
@@ -1179,48 +1175,49 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     /**
-     * Used to format locator
+     * Used to get element with formatted locator
      * 
-     * @return ExtendedWebElement
+     * @return {@link ExtendedWebElement} with formatted locator
      */
     public ExtendedWebElement format(Object... objects) {
-        String locator = by.toString();
-        By resultBy = null;
-
-        if(LocatorType.ID.is(locator)) {
-            resultBy = LocatorType.ID.buildLocatorFromString(locator, objects);
-        } else if(LocatorType.NAME.is(locator)) {
-            resultBy = LocatorType.NAME.buildLocatorFromString(locator, objects);
-        } else if(LocatorType.XPATH.is(locator)) {
-            resultBy = LocatorType.XPATH.buildLocatorFromString(locator, objects);
-        } else if(LocatorType.LINKTEXT.is(locator)) {
-            resultBy = LocatorType.LINKTEXT.buildLocatorFromString(locator, objects);
-        } else if(LocatorType.PARTIAL_LINK_TEXT.is(locator)) {
-            resultBy = LocatorType.PARTIAL_LINK_TEXT.buildLocatorFromString(locator, objects);
-        } else if(LocatorType.CSS.is(locator)) {
-            resultBy = LocatorType.CSS.buildLocatorFromString(locator, objects);
-        } else if(LocatorType.TAG_NAME.is(locator)) {
-            resultBy = LocatorType.TAG_NAME.buildLocatorFromString(locator, objects);
-        } else if(LocatorType.IOS_CLASS_CHAIN.is(locator)) {
-            resultBy = LocatorType.IOS_CLASS_CHAIN.buildLocatorFromString(locator, objects);
-        } else if(LocatorType.IOS_NS_PREDICATE.is(locator)) {
-            resultBy = LocatorType.IOS_NS_PREDICATE.buildLocatorFromString(locator, objects);
-        } else if(LocatorType.ACCESSIBILITY_ID.is(locator)) {
-            resultBy = LocatorType.ACCESSIBILITY_ID.buildLocatorFromString(locator, objects);
-        } else if(LocatorType.ANDROID_UI_AUTOMATOR.is(locator)) {
-            resultBy = LocatorType.ANDROID_UI_AUTOMATOR.buildLocatorFromString(locator, objects);
-        } else if(LocatorType.IMAGE.is(locator)) {
-            resultBy = LocatorType.IMAGE.buildLocatorFromString(locator, objects);
-            LOGGER.debug("Base64 image representation has benn successfully obtained after formatting.");
+        if (this.element instanceof Proxy) {
+            /*
+             * if element created using annotation (FindBy, ExtendedFindBy and so on), it will be proxy, so we get it and re-generate locator
+             * with FormatLocatorConverter
+             */
+            try {
+                InvocationHandler innerProxy = Proxy.getInvocationHandler(this.element);
+                ExtendedElementLocator innerLocator = (ExtendedElementLocator) (FieldUtils.getDeclaredField(innerProxy.getClass(),
+                        "locator", true))
+                                .get(innerProxy);
+                FormatLocatorConverter converter = new FormatLocatorConverter(objects);
+                innerLocator.getLocatorConverters()
+                        .addFirst(converter);
+                innerLocator.buildBy();
+                innerLocator.getLocatorConverters()
+                        .remove(converter);
+                WebElement proxy = (WebElement) Proxy.newProxyInstance(getClass().getClassLoader(),
+                        new Class[] { WebElement.class, WrapsElement.class, Locatable.class },
+                        innerProxy);
+                return new ExtendedWebElement(proxy, this.name);
+            } catch (Exception e) {
+                throw new RuntimeException("Something went wrong when try to format locator.", e);
+            }
+        } else {
+            String locator = this.by.toString();
+            this.by = Arrays.stream(LocatorType.values())
+                    .filter(lt -> lt.is(locator))
+                    .findFirst()
+                    .orElseThrow(
+                            () -> new RuntimeException(String.format("Locator formatting failed - no suitable locator type found for formatting. "
+                                    + "Investigate why '%s' was not formatted", locator)))
+                    .buildLocatorFromString(locator, objects);
+            LOGGER.debug("Formatted locator is : {}", this.by);
+            if (this.isSingleElement) {
+                this.element = null;
+            }
+            return this;
         }
-
-        if (resultBy == null) {
-            throw new RuntimeException(String.format("Locator formatting failed - no suitable locator type found for formatting. "
-                    + "Investigate why '%s' was not formatted", locator));
-        }
-
-        LOGGER.debug("Formatted locator is : {}", resultBy);
-        return new ExtendedWebElement(resultBy, name, this.driver, this.searchContext, objects);
     }
 
     /**
@@ -1811,8 +1808,7 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     private String decryptIfEncrypted(String text) {
-        Matcher cryptoMatcher = Pattern.compile(CRYPTO_PATTERN)
-                .matcher(text);
+        Matcher cryptoMatcher = COMPILED_CRYPTO_PATTERN.matcher(text);
         String decryptedText = text;
         if (cryptoMatcher.find()) {
             initCryptoTool();

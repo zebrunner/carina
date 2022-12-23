@@ -18,15 +18,18 @@ package com.qaprosoft.carina.core.foundation.webdriver.locator;
 import java.lang.reflect.Field;
 
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
 
 public final class ExtendedElementLocatorFactory implements ElementLocatorFactory {
     private final SearchContext searchContext;
+    private final WebDriver webDriver;
     
     private boolean isRootElementUsed;
 
-    public ExtendedElementLocatorFactory(SearchContext searchContext, boolean isRootElementUsed) {
+    public ExtendedElementLocatorFactory(WebDriver webDriver, SearchContext searchContext, boolean isRootElementUsed) {
+        this.webDriver = webDriver;
         this.searchContext = searchContext;
         this.isRootElementUsed = isRootElementUsed;
     }
@@ -36,6 +39,6 @@ public final class ExtendedElementLocatorFactory implements ElementLocatorFactor
 	}
 
     public ElementLocator createLocator(Field field) {
-        return new ExtendedElementLocator(searchContext, field);
+        return new ExtendedElementLocator(webDriver, searchContext, field);
     }
 }

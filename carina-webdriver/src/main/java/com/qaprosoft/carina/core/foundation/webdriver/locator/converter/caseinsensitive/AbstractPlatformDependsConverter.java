@@ -14,9 +14,8 @@ public abstract class AbstractPlatformDependsConverter implements IPlatformDepen
     // Can be used for any type of locator except xpath
     protected static final String ATTRIBUTE_SINGLE_PATTERN = "^.*$";
 
-    protected By caseInsensitiveXpathByAttribute(By by, String attributeRegex) {
-        String locator = by.toString();
-        String cleanXPath = StringUtils.remove(locator, LocatorType.XPATH.getStartsWith());
+    protected String caseInsensitiveXpathByAttribute(String by, String attributeRegex) {
+        String cleanXPath = StringUtils.remove(by, LocatorType.XPATH.getStartsWith());
         String attributePattern =
                 "(?<!(translate\\())((" + attributeRegex + ")\\s*(\\,|\\=)\\s*((['\"])((?:(?!\\6|\\\\).|\\\\.)*)\\6))";
 
@@ -29,11 +28,10 @@ public abstract class AbstractPlatformDependsConverter implements IPlatformDepen
             matcher.appendReplacement(sb, replacement);
         }
         matcher.appendTail(sb);
-        return By.xpath(sb.toString());
+        return By.xpath(sb.toString()).toString();
     }
 
-    protected String createXpathFromAnotherTypeOfLocator(String context, String tag, String attribute,
-            String quote, String value) {
+    protected String createXpathFromAnotherTypeOfLocator(String context, String tag, String attribute, String quote, String value) {
         return context + "//" + tag + "[" + attribute + "=" + quote + value + quote + "]";
     }
 
@@ -44,13 +42,11 @@ public abstract class AbstractPlatformDependsConverter implements IPlatformDepen
                 + quote + ", " + quote + value.toLowerCase() + quote
                 + ")")
                 // Used to escape special symbol $ to be visible in result xpath
-                .replaceAll("\\$", "\\\\\\$")
-                // Because after translating it will be upper-case
-                .replaceAll("%S", "%s");
+                        .replaceAll("\\$", "\\\\\\$");
     }
 
-    protected By locatorToXpath(By by, LocatorType locatorType, UnaryOperator<String> replacementFunc) {
-        String cleanXPath = StringUtils.remove(by.toString(), locatorType.getStartsWith());
+    protected String locatorToXpath(String by, LocatorType locatorType, UnaryOperator<String> replacementFunc) {
+        String cleanXPath = StringUtils.remove(by, locatorType.getStartsWith());
 
         Matcher matcher = Pattern.compile(ATTRIBUTE_SINGLE_PATTERN)
                 .matcher(cleanXPath);
@@ -60,6 +56,6 @@ public abstract class AbstractPlatformDependsConverter implements IPlatformDepen
             matcher.appendReplacement(sb, replacement);
         }
         matcher.appendTail(sb);
-        return By.xpath(sb.toString());
+        return By.xpath(sb.toString()).toString();
     }
 }
