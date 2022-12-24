@@ -38,7 +38,6 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.WrapsDriver;
 import org.openqa.selenium.WrapsElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Locatable;
@@ -149,17 +148,8 @@ public class ExtendedWebElement implements IWebElement {
         }
 
         try {
-            SearchContext tempSearchContext = null;
-
-            // if the element is decorated, we take its decorated context
-            if (element instanceof Decorated &&
-                    ((Decorated<?>) element).getOriginal() instanceof RemoteWebElement) {
-                tempSearchContext = (SearchContext) ((Decorated<?>) element).getDecorator().getDecoratedDriver();
-                // if the element is RemoteWebElement, we take its context as is
-            } else if (element instanceof RemoteWebElement) {
-                tempSearchContext = ((RemoteWebElement) element).getWrappedDriver();
-                // we create proxy for {{ExtendedElementLocator}}, so we can get info from it
-            } else if (element instanceof Proxy) {
+            if (element instanceof Proxy) {
+                // when element proxied by ExtendedElementLocator
                 InvocationHandler innerProxy = Proxy.getInvocationHandler(element);
                 ExtendedElementLocator locator = (ExtendedElementLocator) (FieldUtils.getDeclaredField(innerProxy.getClass(), "locator", true))
                         .get(innerProxy);
@@ -170,40 +160,19 @@ public class ExtendedWebElement implements IWebElement {
                 }
 
                 this.searchContext = locator.getSearchContext();
-                tempSearchContext = this.searchContext;
+                this.driver = locator.getDriver();
 
                 // TODO: identify if it is a child element and
                 // 1. get rootBy
                 // 2. append current "by" to the rootBy
                 // -> it should allow to search via regular driver and fluent waits - getBy()
                 this.by = locator.getBy();
-
-                while (tempSearchContext instanceof Proxy) {
-                    innerProxy = Proxy.getInvocationHandler(tempSearchContext);
-                    locator = (ExtendedElementLocator) FieldUtils.getDeclaredField(innerProxy.getClass(), "locator", true)
-                            .get(innerProxy);
-                    tempSearchContext = locator.getSearchContext();
-                }
+            } else {
+                // take context as driver
+                this.driver = element instanceof Decorated<?> ? ((RemoteWebElement) ((Decorated<?>) element).getOriginal()).getWrappedDriver()
+                        : ((RemoteWebElement) element).getWrappedDriver();
+                this.searchContext = this.driver;
             }
-
-            // initialize context if it is not initialized
-            if (this.searchContext == null) {
-                this.searchContext = tempSearchContext;
-            }
-
-            // FIXME: DefaultDecorated cannot be cast to (SearchContext, WebElement, WebDriver), so we get original element / driver and
-            // set this.driver as original driver
-            if (tempSearchContext instanceof Decorated<?>) {
-                tempSearchContext = (SearchContext) ((Decorated<?>) tempSearchContext).getOriginal();
-            }
-
-            // search driver in hierarchy
-            while (!(tempSearchContext instanceof WebDriver)) {
-                tempSearchContext = ((WrapsDriver) tempSearchContext).getWrappedDriver();
-            }
-
-            this.driver = (WebDriver) tempSearchContext;
-
         } catch (IllegalAccessException | ClassCastException e) {
             e.printStackTrace();
         } catch (Throwable thr) {
@@ -215,7 +184,6 @@ public class ExtendedWebElement implements IWebElement {
             }
         }
     }
-
 
     public WebElement getElement() {
         if (this.element == null) {

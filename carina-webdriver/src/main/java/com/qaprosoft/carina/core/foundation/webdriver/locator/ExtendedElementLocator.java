@@ -51,6 +51,7 @@ import io.appium.java_client.remote.MobileCapabilityType;
 public class ExtendedElementLocator implements ElementLocator {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final SearchContext searchContext;
+    private final WebDriver driver;
     // original locator without any transformations
     private By originalBy;
     // final locator obtained after transformations
@@ -70,6 +71,7 @@ public class ExtendedElementLocator implements ElementLocator {
      */
     public ExtendedElementLocator(WebDriver driver, SearchContext searchContext, Field field) {
         this.searchContext = searchContext;
+        this.driver = driver;
         String[] classPath = field.getDeclaringClass().toString().split("\\.");
         this.className = classPath[classPath.length-1];
 
@@ -157,6 +159,10 @@ public class ExtendedElementLocator implements ElementLocator {
         }
 
         return elements;
+    }
+
+    public WebDriver getDriver() {
+        return this.driver;
     }
 
     public SearchContext getSearchContext() {
