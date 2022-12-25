@@ -45,8 +45,7 @@
         <jacoco-maven-plugin>0.8.7</jacoco-maven-plugin>
 
         <carina-utils.version>1.0.0</carina-utils.version>
-        <!-- todo change to release version -->
-        <carina-commons.version>1.0.0-SNAPSHOT</carina-commons.version>
+        <carina-commons.version>1.0.0</carina-commons.version>
         <carina-proxy.version>1.0.0</carina-proxy.version>
 
         <!-- Testings -->
@@ -98,7 +97,7 @@
         <module>carina-core</module>
         <module>carina-azure</module>
     </modules>
-    <repositories>
+    <!--repositories>
         <repository>
             <id>zebrunner_snapshots</id>
             <name>zebrunner Snapshots</name>
@@ -110,7 +109,7 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-    </repositories>
+    </repositories-->
     <profiles>
         <profile>
             <id>default</id>
