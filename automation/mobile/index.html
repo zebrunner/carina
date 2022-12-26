@@ -888,7 +888,7 @@
 
 <p>Actual list of Appium capabilities can be found <a href="https://appium.io/docs/en/writing-running-appium/caps/">here</a>.</p>
 <h3 id="example-for-android-of-_configproperties">Example for Android of _config.properties:</h3>
-<pre><code>selenium_url=http://localhost:4723/wd/hub
+<pre><code class="properties">selenium_url=http://localhost:4723/wd/hub
 #============ Android Local Mobile ===================#
 capabilities.platformName=ANDROID
 capabilities.deviceName=Nexus_6
@@ -899,7 +899,7 @@ capabilities.autoGrantPermissions=true
 </code></pre>
 
 <h3 id="example-for-ios-of-_configproperties">Example for iOS of _config.properties:</h3>
-<pre><code>selenium_url=http://localhost:4723/wd/hub
+<pre><code class="properties">selenium_url=http://localhost:4723/wd/hub
 #======== Local Run for iOS Mobile ===============#
 capabilities.platformName=iOS
 capabilities.deviceName=iPhone X
@@ -912,7 +912,7 @@ capabilities.app=https://qaprosoft.s3-us-west-2.amazonaws.com/carinademoexample.
 <h3 id="how-to-find-locators-for-android-application">How to find locators for Android application</h3>
 <p>To obtain the locators of elements from an Android app different programs are used such as Appium itself or convenient Android SDK tool: <code>uiautomatorviewer</code>.
 Example:</p>
-<pre><code> @FindBy(xpath = &quot;//*[@resource-id='name_input']&quot;)
+<pre><code class="java"> @FindBy(xpath = &quot;//*[@resource-id='name_input']&quot;)
  private ExtendedWebElement input;
 </code></pre>
 
@@ -920,51 +920,51 @@ Example:</p>
 <p>To obtain the locators of elements from an iOS app different programs are used such as Appium itself or convenient <a href="https://macacajs.github.io/app-inspector/">Macaca App Inspector</a>.
 To speed up element detection @Predicate annotation can be used used. Complicate "xpath" can't be used with predicates. 
 Example:</p>
-<pre><code>@FindBy(xpath = &quot;name = 'DONE'&quot;)
+<pre><code class="java">@FindBy(xpath = &quot;name = 'DONE'&quot;)
 @Predicate
 protected ExtendedWebElement doneButton;
 </code></pre>
 
 <p>Another possibility to find the element is to use @ClassChain annotation.
 Example:</p>
-<pre><code>@FindBy(xpath = &quot;**/XCUIElementTypeStaticText[`name=='Developer'`]&quot;)
+<pre><code class="java">@FindBy(xpath = &quot;**/XCUIElementTypeStaticText[`name=='Developer'`]&quot;)
 @ClassChain
 protected ExtendedWebElement developerText;
 </code></pre>
 
 <p>Starting from Carina version 6.0.12, it's recommended to use @ExtendedFindBy() annotation.
 Example:</p>
-<pre><code>@ExtendedFindBy(iosClassChain = &quot;**/XCUIElementTypeStaticText[`name=='Developer'`]&quot;)
+<pre><code class="java">@ExtendedFindBy(iosClassChain = &quot;**/XCUIElementTypeStaticText[`name=='Developer'`]&quot;)
 protected ExtendedWebElement developerText;
 </code></pre>
 
 <p>or </p>
-<pre><code>@ExtendedFindBy(iosPredicate = &quot;name = 'DONE'&quot;)
+<pre><code class="java">@ExtendedFindBy(iosPredicate = &quot;name = 'DONE'&quot;)
 protected ExtendedWebElement developerText;
 </code></pre>
 
 <h3 id="implementation-of-tests">Implementation of tests</h3>
 <p>Carina framework uses TestNG for test organization. In general, test represents a manipulation with Page Objects and additional validations of UI events. Here is sample test implementation:</p>
-<pre><code>public class SampleTest implements IAbstractTest {
+<pre><code class="java">public class SampleTest implements IAbstractTest {
 
     String name = &quot;My name&quot;;
     String carName = &quot;Mercedes&quot;;
 
     @Test()
     public void sendName() {
-        FirstPage  firstPage = new FirstPage(getDriver());
+        FirstPage firstPage = new FirstPage(getDriver());
+        firstPage.clickOnGooleButton();
+
         GoogleTestPage googleTestPage = new GoogleTestPage(getDriver());
+        googleTestPage.setName(name);
+        googleTestPage.clickOnSpinner();
+        googleTestPage.selectCar(carName);
+        googleTestPage.clickOnSendYourNameButton();
+
         MyWayOfHelloPage myWayOfHelloPage = new MyWayOfHelloPage(getDriver());
-                firstPage.clickOnGooleButton();
-                googleTestPage.setName(name);
-                googleTestPage.clickOnSpinner();
-                googleTestPage.selectCar(carName);
-                googleTestPage.clickOnSendYourNameButton();
-                Assert.assertTrue(myWayOfHelloPage.isTextElementPresent(name), &quot;Assert message&quot; );
-                Assert.assertTrue(myWayOfHelloPage.isTextElementPresent(carName.toLowerCase()), &quot;Assert message&quot; );
-
+        Assert.assertTrue(myWayOfHelloPage.isTextElementPresent(name), &quot;Assert message&quot; );
+        Assert.assertTrue(myWayOfHelloPage.isTextElementPresent(carName.toLowerCase()), &quot;Assert message&quot; );
     }
-
 }
 </code></pre>
 
@@ -985,7 +985,7 @@ Every page has an abstract declaration and different implementations if needed (
 <p>Children pages should extend BasePage implementing all abstract methods. Annotation @DeviceType will provide the information about the device type and the parent (common) page.</p>
 <p><strong>Examples:</strong></p>
 <p><strong>Common (Base) Page</strong></p>
-<pre><code>public abstract class HomePageBase extends AbstractPage {
+<pre><code class="java">public abstract class HomePageBase extends AbstractPage {
 
     public HomePageBase(WebDriver driver) {
         super(driver);
@@ -998,7 +998,7 @@ Every page has an abstract declaration and different implementations if needed (
 </code></pre>
 
 <p><strong>Android Page</strong></p>
-<pre><code>@DeviceType(pageType = DeviceType.Type.ANDROID_PHONE, parentClass = HomePageBase.class)
+<pre><code class="java">@DeviceType(pageType = DeviceType.Type.ANDROID_PHONE, parentClass = HomePageBase.class)
 public class HomePage extends HomePageBase {
 
     @FindBy(xpath = &quot;//android.widget.TextView[@resource-id='itemTitle' and @text='Phone Finder']&quot;)
@@ -1025,7 +1025,7 @@ public class HomePage extends HomePageBase {
 </code></pre>
 
 <p><strong>iOS Page</strong></p>
-<pre><code>@DeviceType(pageType = Type.IOS_PHONE, parentClass = HomePageBase.class)
+<pre><code class="java">@DeviceType(pageType = Type.IOS_PHONE, parentClass = HomePageBase.class)
 public class HomePage extends HomePageBase {
 
     @FindBy(xpath = &quot;name = 'Phone Finder'&quot;)
@@ -1051,35 +1051,40 @@ public class HomePage extends HomePageBase {
         compareTextView.click();
         return CustomTypePageFactory.initPage(getDriver(), ComparePageBase.class);
     }
+}
 </code></pre>
 
 <p>Inside every test, Carina operates with an abstract base page using CustomTypePageFactory and substitutes it by the real implementation based on the desired capabilities in _config.properties etc.</p>
 <p><strong>Example:</strong></p>
-<pre><code>@Test
-    public void comparePhonesTest() {
-        HomePageBase homePage = CustomTypePageFactory.initPage(getDriver(), HomePageBase.class);
-        ComparePageBase phoneFinderPage = homePage.openCompare();
-        ...
-    }
+<pre><code class="java">@Test
+public void comparePhonesTest() {
+    HomePageBase homePage = CustomTypePageFactory.initPage(getDriver(), HomePageBase.class);
+    ComparePageBase phoneFinderPage = homePage.openCompare();
+    ...
+}
 </code></pre>
 
 <p>If there are differences in application according to OS version, just implement the pages for different versions and include the version parameter in @DeviceType for every page.</p>
 <p><strong>Example:</strong></p>
 <p>For Android 8 (either 8.0 or 8.1)</p>
-<pre><code>@DeviceType(pageType = DeviceType.Type.ANDROID_PHONE, version = &quot;8&quot;, parentClass = HomePageBase.class)
+<pre><code class="java">@DeviceType(pageType = DeviceType.Type.ANDROID_PHONE, version = &quot;8&quot;, parentClass = HomePageBase.class)
 public class HomePage extends HomePageBase {
+    ...
+}
 </code></pre>
 
 <p>Or for a specific version</p>
-<pre><code>@DeviceType(pageType = DeviceType.Type.ANDROID_PHONE, version = &quot;8.1&quot;, parentClass = HomePageBase.class)
+<pre><code class="java">@DeviceType(pageType = DeviceType.Type.ANDROID_PHONE, version = &quot;8.1&quot;, parentClass = HomePageBase.class)
 public class HomePage extends HomePageBase {
+    ...
+}
 </code></pre>
 
 <h3 id="how-to-use-find-by-image-strategy">How to use Find by Image strategy</h3>
 <p>Find by image strategy is based on <a href="https://github.com/appium/appium/blob/master/docs/en/writing-running-appium/image-comparison.md">appium implementation</a>. Be sure you have OpenCV libraries installed to <a href="https://github.com/justadudewhohacks/opencv4nodejs">your system</a>.
 Find by image logic is covered by <code>@ExtendedFindBy</code> annotation. </p>
 <p><strong>Example:</strong></p>
-<pre><code>@ExtendedFindBy(image = &quot;images/singUp6.png&quot;)
+<pre><code class="java">@ExtendedFindBy(image = &quot;images/singUp6.png&quot;)
 private ExtendedWebElement signUpBtn;
 </code></pre>
 
@@ -1089,14 +1094,14 @@ Be sure your image size is less than the real screen size. Real iOS screen sizes
 <h3 id="how-to-change-context-of-application">How to change context of application</h3>
 <p>In carina-demo there is an example of a <a href="https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/MobileContextUtils.java">tool</a>,
 that can change context of application. Just add needed context as a field in <a href="https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/MobileContextUtils.java#L51">View</a> enum.</p>
-<pre><code>// for example
+<pre><code class="java">// for example
 NATIVE(&quot;NATIVE_APP&quot;),
 WEB1(&quot;WEBVIEW_chromeapp&quot;),
 WEB2(&quot;WEBVIEW_opera&quot;);
 </code></pre>
 
 <p>Then change context in your test/page class where needed.</p>
-<pre><code>public void testWebView() {
+<pre><code class="java">public void testWebView() {
     WelcomePageBase welcomePage = initPage(getDriver(), WelcomePageBase.class);
     LoginPageBase loginPage = welcomePage.clickNextBtn();
     loginPage.login();
@@ -1110,6 +1115,7 @@ WEB2(&quot;WEBVIEW_opera&quot;);
     contactUsPage.typeEmail(&quot;some@email.com&quot;);
     contactUsPage.typeQuestion(&quot;This is a message&quot;);
     contactUsPage.submit();
+
     Assert.assertTrue(contactUsPage.isErrorMessagePresent() || contactUsPage.isRecaptchaPresent(),
         &quot;Error message or captcha was not displayed&quot;);
 }

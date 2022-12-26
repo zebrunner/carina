@@ -584,7 +584,7 @@ capabilities.app=C:/Windows/system32/win32calc.exe
 
 <p>That's all. To get access to the driver use getDriver(). Write and run tests as usual. If you want to pass specific parameters to WindowsDriver refer to Appium <a href="https://github.com/appium/appium-windows-driver#windowsdriver-specific-capabilities">documentation</a>.</p>
 <p>Code example:</p>
-<pre><code>//page.class example
+<pre><code class="java">//page.class example
 public class CalculatorHomePage extends AbstractPage {
     @FindBy(xpath = &quot;/Window/Pane/Button[10]&quot;)
     ExtendedWebElement fiveButton;
@@ -618,7 +618,7 @@ public class CalculatorHomePage extends AbstractPage {
 }
 </code></pre>
 
-<pre><code>//test.class example
+<pre><code class="java">//test.class example
 public class CalculatorTest implements IAbstractTest {
     @Test
     public void calculatorSumTest(){
