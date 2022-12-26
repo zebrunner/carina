@@ -21,7 +21,7 @@ files, source code, etc.) based on templates and changing data."
 
 ### Example of test implementation
 Let's create an automated test for the next call: POST https://jsonplaceholder.typicode.com/users request with a request body
-```
+```json
 [
     {
         "id": 1,
@@ -66,7 +66,7 @@ While user.properties contains some default value which may be replaced later:
 
 #### REST service call domain object [DEPRECATED]
 Now we are ready to create REST service domain object which will be used to interact with web service and perform additional response validations. Our domain object is located in /carina-demo/src/main/java/com/qaprosoft/carina/demo/api, make sure that it extends AbstractApiMethodV2 and triggers the base class constructor for initialization. In general cases, you will specify the path to request and response templates along with default properties files (all of them have been created in the previous step). Also, we replace the URL placeholder to set an appropriate environment.
-```
+```java
 package com.qaprosoft.carina.demo.api;
 
 import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
@@ -83,7 +83,7 @@ public class PostUserMethod extends AbstractApiMethodV2 {
 #### HTTP method and path [DEPRECATED]
 The last step before the test implementation itself is the association of the domain object class and the required HTTP method and path.
 It should be defined in /carina-demo/src/main/resources/_api.properties file, the key should be equal to domain class name, the value has the following pattern {http_method}:{http_path}. The HTTP path may contain placeholders, the HTTP method should be one of the following variants: GET, POST, PUT, UPDATE, DELETE.
-```
+```properties
 #=====================================================#
 #=================== API methods  ====================#
 #=====================================================#
@@ -97,14 +97,21 @@ PatchPostsMethod=PATCH:${base_url}/posts/1
 
 Approach based on initialisation of super class constructor is deprecated and more convenient way is to use annotations. They can be used over class declarations. For api testing we can use such annotations:
 
-1. @ContentType - is used to define the value of Content-type header in response;
-2. @Endpoint - defines the place that APIs send requests and where the resource lives
-3. @RequestTemplatePath - contains a path from source root to request template file.
-4. @ResponseTemplatePath - contains a path from source root to response template file.
-5. @SuccessfulHttpStatus - specifies the expected HTTP status
+1. `@ContentType` - is used to define the value of Content-type header in response
+2. `@Cookie` - is used to specify cookies in the request
+3. `@Endpoint` - combination of http method + url which defines any single API endpoint
+4. `@Header` - is used to specify headers in the request
+5. `@HideRequestBodyPartsInLogs` - is used to hide sensitive parts of the request body in the logs
+6. `@HideRequestHeadersInLogs` - is used to hide sensitive parts of the request headers in the logs
+7. `@HideResponseBodyPartsInLogs` - is used to hide secret parts of the response body in the logs
+8. `@PropertiesPath` - contains a path to default properties file for endpoint templates (relative path from root of code sources)
+9. `@QueryParam` - is used to specify query parameters in the request
+10. `@RequestTemplatePath` - contains a path to default request template for mentioned endpoint (relative path from root of code sources)
+11. `@ResponseTemplatePath` - contains a path to default response template for mentioned endpoint (relative path from root of code sources)
+12. `@SuccessfulHttpStatus` - specifies the expected HTTP status for happy-path scenarios
 
 In this case we don’t need to define _api.properties file and call the constructor of a super class, but if we have some properties file used in this request we should explicitly set it in test method. Insead of callAPI() and expectResponseStatus() methods we can use callAPIExpectSuccess() that will call API expecting http status in response taken from @SuccessfulHttpStatus value.
-```
+```java
 @Endpoint(url = "${base_url}/users/1", methodType = HttpMethodType.DELETE)
 @RequestTemplatePath(path = "api/users/_delete/rq.json")
 @ResponseTemplatePath(path = "api/users/_delete/rs.json")
@@ -117,20 +124,20 @@ public class DeleteUserMethod extends AbstractApiMethodV2 {
 ```   
 Also placeholders in URL can be automatically replaced by carina if they're specified in carina configuration properties (config.properties).
 To make auto-replacement happen just use next syntax in your URL:
-- when param starts with "config.\*" then R.CONFIG.get("\*") will be used as a replacement
-- when param starts with "config.env.\*" then Configuration.getEnvArg("\*") will be used as a replacement    
+- when param starts with `config.\*` then `R.CONFIG.get("\*")` will be used as a replacement
+- when param starts with `config.env.\*` then `Configuration.getEnvArg("\*")` will be used as a replacement
+
 So you may use next implementation:   
-```
+```java
 @Endpoint(url = "${config.env.base_url}/users/1", methodType = HttpMethodType.DELETE)
 public class DeleteUserMethod extends AbstractApiMethodV2 {
 }
 ```   
 And before sending of request base part of URL will be set by carina depending on used environment automatically.
 
-
 #### API test
 API test is a general TestNG test, a class should extend APITest, in our case, the test implements IAbstractTest that encapsulates some test data and login method. The test is located in /carina-demo/src/test/java/com/qaprosoft/carina/demo.
-```
+```java
 package com.qaprosoft.carina.demo;
 
 import java.lang.invoke.MethodHandles;
@@ -160,7 +167,7 @@ public class APISampleTest implements IAbstractTest {
 
     @Test()
     @MethodOwner(owner = "qpsdemo")
-    public void testCreateUser() throws Exception {
+    public void testCreateUser() {
         LOGGER.info("test");
         setCases("4555,54545");
         PostUserMethod api = new PostUserMethod();
@@ -171,7 +178,7 @@ public class APISampleTest implements IAbstractTest {
 
     @Test()
     @MethodOwner(owner = "qpsdemo")
-    public void testCreateUserMissingSomeFields() throws Exception {
+    public void testCreateUserMissingSomeFields() {
         PostUserMethod api = new PostUserMethod();
         api.setProperties("api/users/user.properties");
         api.getProperties().remove("name");
@@ -210,6 +217,129 @@ public class APISampleTest implements IAbstractTest {
 6. Validate the response by a template or parse some data by JSON path
 7. Make further calls using the data from the previous call if needed
 
+#### REST service call domain object (Declarative approach)
+
+Approach based on implicit instantiation of the `AbstractApiMethod`.
+It allows to:   
+- more convenient and efficiently organize description of endpoints;
+- have all carina api methods for the same URL pattern be defined within single class;
+- reduce time for the implementation of the desired `AbstractApiMethod`;
+- flexibly configure all api methods with Java annotations.
+
+Here is example of multiple api methods definition for one url pattern. Base url template can be easily overwritten with use of `@EndpointTemplateMethod` annotation:
+```java
+package com.qaprosoft.carina.demo.api;
+
+import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
+import com.qaprosoft.carina.core.foundation.api.annotation.EndpointTemplate;
+import com.qaprosoft.carina.core.foundation.api.annotation.EndpointTemplateMethod;
+import com.qaprosoft.carina.core.foundation.api.annotation.PathParam;
+import com.qaprosoft.carina.core.foundation.api.annotation.PropertiesPath;
+import com.qaprosoft.carina.core.foundation.api.annotation.RequestTemplatePath;
+import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePath;
+import com.qaprosoft.carina.core.foundation.api.annotation.SuccessfulHttpStatus;
+import com.qaprosoft.carina.core.foundation.api.annotation.method.DeleteMethod;
+import com.qaprosoft.carina.core.foundation.api.http.HttpMethodType;
+import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
+
+@EndpointTemplate(url = "${config.env.base_url}/users")
+public interface UserTemplate {
+
+    @EndpointTemplateMethod(url = "/", methodType = HttpMethodType.POST)
+    AbstractApiMethodV2 create(@RequestTemplatePath.Value String rqPath, @ResponseTemplatePath.Value String rsPath, @PropertiesPath.Value String propsPath);
+
+    @EndpointTemplateMethod(url = "/", methodType = HttpMethodType.GET)
+    @ResponseTemplatePath(path = "api/users/_get/rs.json")
+    @PropertiesPath(path = "api/users/user.properties")
+    AbstractApiMethodV2 getAll();
+
+    @DeleteMethod(url = "/${id}")
+    @RequestTemplatePath(path = "api/users/_delete/rq.json")
+    @ResponseTemplatePath(path = "api/users/_delete/rs.json")
+    @SuccessfulHttpStatus(status = HttpResponseStatusType.OK_200)
+    AbstractApiMethodV2 deleteById(@PathParam(key = "id") Long id);
+
+}
+```
+All the annotations of the *Annotation based approach* work here as well (**Important:** except the @Endpoint annotation).    
+In this approach it is possible to use these annotations not only on the class but also on the method level.    
+
+In addition, you can apply the following annotations:    
+
+1. `@Cookie.Value` - is used to specify cookies in the request (for use with method's parameters)
+2. `@EndpointTemplate` - defines the basic part of the request URL. This part will be a basic one for every inner method.
+3. `@EndpointTemplateMethod` - defines relative part of the request URL. This part will be concatenated with the EndpointTemplate path (if defined)
+4. `@Header.Value` - is used to specify headers in the request (for use with method's parameters)
+5. `@PathParam` - is used to specify named URL placeholder value. Placeholder will be replaced automatically (for use with method's parameters)
+6. `@PropertiesPath.Value` - contains a path to default properties file for endpoint templates (for use with method's parameters)
+7. `@Property` - is used to specify additional properties. These properties will be automatically added to the future method instance (for use with method's parameters)
+8. `@QueryParam.Value` - is used to specify URL query parameters. These query parameters will be automatically added to the URL (for use with method's parameters)
+9. `@RequestTemplatePath.Value` - contains a path to default request template for mentioned endpoint (for use with method's parameters)
+10. `@ResponseTemplatePath.Value` - contains a path to default response template for mentioned endpoint (for use with method's parameters)
+11. `@SuccessfulHttpStatus.Value` -  specifies the expected HTTP status for happy-path scenarios (for use with method's parameters) 
+
+There is also "syntactic sugar" available for making the **EndpointTemplateMethod** annotation more readable:
+1. `@GetMethod` - endpoint template with **GET** method
+2. `@PostMethod` - endpoint template with **POST** method
+3. `@PutMethod` - endpoint template with **PUT** method
+4. `@PatchMethod` - endpoint template with **PATCH** method
+5. `@DeleteMethod` - endpoint template with **DELETE** method
+6. `@HeadMethod` - endpoint template with **HEAD** method
+7. `@OptionsMethod` - endpoint template with **OPTIONS** method
+
+Now you can invoke a `prepareTemplate` method from `TemplateFactory` to use proxy implementation in the test:    
+```java
+@Test()
+@MethodOwner(owner = "qpsdemo")
+public void testCreateUser() {
+    UserTemplate userTemplate = TemplateFactory.prepareTemplate(UserTemplate.class);
+    PostUserMethod api = userTemplate.create("api/users/_post/rq.json", "api/users/_post/rs.json", "api/users/user.properties");
+    api.expectResponseStatus(HttpResponseStatusType.CREATED_201);
+    api.callAPI();
+    api.validateResponse();
+}
+```
+For more customization on api method definition level you can implement the interface and use the proxy class inside:    
+```java
+package com.qaprosoft.carina.demo.api.impl;
+
+import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
+import com.qaprosoft.carina.core.foundation.api.binding.TemplateFactory;
+import com.qaprosoft.carina.demo.api.UserTemplate;
+
+public class UserTemplateImpl implements UserTemplate {
+    
+    private final UserTemplate userTemplate;
+
+    public UserTemplateImpl(UserTemplate userTemplate) {
+        this.userTemplate = TemplateFactory.prepareTemplate(UserTemplate.class);
+    }
+
+    @Override
+    public AbstractApiMethodV2 create(String rqPath, String rsPath, String propsPath) {
+        AbstractApiMethodV2 apiMethod = userTemplate.create(rqPath, rsPath, propsPath);
+        apiMethod.addProperty("prop", "val");
+        return apiMethod;
+    }
+
+    @Override
+    public AbstractApiMethodV2 getAll() {
+        AbstractApiMethodV2 apiMethod = userTemplate.getAll();
+        apiMethod.addCookie("cookie", "val");
+        return apiMethod;
+    }
+
+    @Override
+    public AbstractApiMethodV2 deleteById(Long id) {
+        AbstractApiMethodV2 apiMethod = userTemplate.deleteById(id);
+        apiMethod.setHeader("header", "val");
+        return apiMethod;
+    }
+}
+```
+
+To perform the general logic under multiple API templates you can create *interceptors*.    
+
 ### Useful features
 The framework contains a list of useful features for building requests and validation of responses. It makes the support of such tests easier and at the same time minimizes the amount of test data.
 
@@ -221,7 +351,7 @@ timeout, logging strategy, actions that should be executed immediately after the
 response is considered successful, action that will be executed after all api callings.
 
 [Example](https://github.com/zebrunner/carina-demo/blob/98ecd27e28b323050cc9b37cb9627ae3164f47a7/src/test/java/com/qaprosoft/carina/demo/APISampleTest.java#L55) of using:
-```
+```java
     @Test
     public void testCreateUserWaitingResponseContainsAddress() {
         PostUserMethod api = new PostUserMethod();
@@ -235,9 +365,68 @@ response is considered successful, action that will be executed after all api ca
         Assert.assertFalse(response.isEmpty(), "Response should exists");
     }
 ```
+#### Handling and changing AbstractApiMethod on-the-fly
+This option provides the ability for handling and changing of your AbstractApiMethod instances on-the-fly. For that it's needed to create an implementation of `ApiMethodInterceptor` interface:    
+```java
+package com.qaprosoft.carina.demo.api.interceptor;
+
+import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
+import com.qaprosoft.carina.core.foundation.api.interceptor.ApiMethodInterceptor;
+
+public class CustomInterceptor implements ApiMethodInterceptor<AbstractApiMethodV2> {
+
+    @Override
+    public void onInstantiation(AbstractApiMethodV2 apiMethod) {
+        // do something with an API method after it has been instantiated
+    }
+
+    @Override
+    public void onBeforeCall(AbstractApiMethodV2 apiMethod) {
+        // do something with an API method after it has been created
+    }
+
+    @Override
+    public void onAfterCall(AbstractApiMethodV2 apiMethod) {
+        // do something with an API method after it has been called
+    }
+}
+```
+
+and add this class into `@LinkedInterceptors` annotation for your api method:    
+
+- *Annotation based approach*    
+
+```java
+@Endpoint(url = "${config.env.base_url}/users/1", methodType = HttpMethodType.DELETE)
+@LinkedInterceptors(classes = { CustomInterceptor.class })
+public class DeleteUserMethod extends AbstractApiMethodV2 {
+}
+```
+
+- *Declarative based approach*    
+
+```java
+@EndpointTemplate(url = "${config.env.base_url}/users")
+@LinkedInterceptors(classes = { CustomInterceptor.class })
+public interface UserTemplate {
+
+    @Endpoint(url = "/", methodType = HttpMethodType.GET)
+    @LinkedInterceptors(classes = { OtherCustomInterceptor.class })
+    AbstractApiMethodV2 getAll();
+    
+}
+```
+Then all logic defined in interceptor methods will be called on particular events (once api method is instantiated; once request is ready for sending to endpoint; once endpoint was called).    
+Also it's possible to create global interceptors which will be applied for all api methods by default.    
+Just create a file named `com.qaprosoft.carina.core.foundation.api.interceptor.ApiMethodInterceptor` in `/resources/META-INF/services` folder and set the path(s) of your implementation(s) into it:    
+```
+com.qaprosoft.carina.demo.CustomInterceptor
+com.qaprosoft.carina.demo.OtherCustomInterceptor
+```
+
 #### Wildcards
 In some cases, you may need to generate data in the request to make the request data unique. The best way to do this is to use wildcards for data generation:
-```
+```json
 {
     "username": "generate_word(10)",          // Will generate random alphanumeric string with 10 characters
     "zip": "generate_number(6)",              // Will generate random number with 6 digits
@@ -247,12 +436,12 @@ In some cases, you may need to generate data in the request to make the request 
 Another option is to specify the placeholder in the request template and then pass some generated value directly from the test method.
 
 Wildcards are also useful for response validation. In several cases, you may need to skip some values or validate by regex, type, ognl expression or predicate:
-```
+```json
 {
     "id": "skip",                                           // Will skip actual value validation and just verify id key presence
     "signup_date": "regex:\\d{4}-\\d{2}-\\d{2}",            // Will validate date value by specified regex
     "age": "type:Integer",                                  // Will validate age value by specified Java type simple name
-    "annual_income": "ognl:#val != null && #val > 10",    // Will validate annual_income value using provided OGNL expression
+    "annual_income": "ognl:#val != null && #val > 10",      // Will validate annual_income value using provided OGNL expression
     "created_date": "predicate:isDateValid",                // Will validate created_date value by specified name of Predicate which is stored in JsonComparatorContext
 }
 ```
@@ -265,7 +454,7 @@ Also you have an access to full json tree using `#root` keyword.
 *Predicate*
 
 This approach provides the ability to validate a response value programmatically. Just create a `java.util.function.Predicate` and provide it into JsonComparatorContext:
-```
+```java
     JsonComparatorContext comparatorContext = JsonComparatorContext.context()
                 .<String>withPredicate("firstNamePredicate", firstName -> firstName.startsWith("Carina"))
                 .<Integer>withPredicate("agePredicate", age -> age > 18)
@@ -274,7 +463,7 @@ This approach provides the ability to validate a response value programmatically
     myApiMethod.validateResponse(comparatorContext);
 ```
 In your json file
-```
+```json
 {
     "first_name": "predicate:firstNamePredicate",
     "age": "predicate:agePredicate",
@@ -282,10 +471,9 @@ In your json file
 }
 ```
 
-
 #### Custom wildcards
 You have a possibility to implement custom wildcard for response validation as well. All you need is JsonKeywordComparator interface implementation:
-```
+```java
 package com.qaprosoft.carina.demo;
 
 import com.qaprosoft.apitools.validation.JsonCompareResultWrapper;
@@ -334,7 +522,7 @@ public class CustomComparator implements JsonKeywordComparator {
 }
 ```
 In your json file
-```
+```json
 {
     "id": "my-wildcard:isGreaterThanZero",
     "email": "my-wildcard:hasSemicolon"
@@ -345,7 +533,7 @@ After that you need to register your custom comparator. There are two ways:
 *Using JsonComparatorContext*
 
 Using this one you will be able to specify your comparators for each validation.
-```
+```java
 JsonComparatorContext comparatorContext = JsonComparatorContext.context()
         .withComparator(new CustomComparator())
         .withComparator(new OtherCustomComparator());
@@ -365,7 +553,7 @@ com.qaprosoft.carina.demo.OtherCustomComparator
 
 #### Validation against JSON schema
 When you need to validate response structure regardless of the actual values, you may use validation by JSON schema. In this case, you need an actual response from the service, let's say we have the following:
-```
+```json
 {
     "email": "test@domain.com",
     "firstName": "SOME FIRST NAME",
@@ -377,33 +565,33 @@ IMPORTANT: For now, the schemas of version draft03 and draft04 are supported onl
 In the tool like this you need to provide the original JSON from the response, then choose some schema options (allow the additional properties in objects, mark the current object properties as required, hard-code some expected values, etc.) and then generate the schema. Copy-paste the generated schema into test resources, and you're ready to use it in the test.
 ![API flow](../img/api/schema-generator.png)
 Make sure that you change all the required flags to true. After that, create a new file in the resources and place it into an appropriate endpoint package:
-```
+```json
 {
-    "type":"object",
+    "type": "object",
     "$schema": "http://json-schema.org/draft-03/schema",
     "id": "http://jsonschema.net",
-    "required":true,
-    "properties":{
+    "required": true,
+    "properties": {
         "email": {
-            "type":"string",
+            "type": "string",
             "id": "http://jsonschema.net/email",
-            "required":true
+            "required": true
         },
         "firstName": {
-            "type":"string",
+            "type": "string",
             "id": "http://jsonschema.net/firstName",
-            "required":true
+            "required": true
         },
         "id": {
-            "type":"number",
+            "type": "number",
             "id": "http://jsonschema.net/id",
-            "required":true
+            "required": true
         }
     }
 }
 ```
 And finally, we call JSON validation from Java test as the following:
-```
+```java
 @Test
 public void testCheckJSONSchema()
 {
@@ -417,7 +605,7 @@ public void testCheckJSONSchema()
 #### Building requests with an array
 There are a couple of options for building a request with an array of items provided by the framework:
 1. The first one uses hardcoded placeholders for changeable variables.
-```
+```json
 {
    "name": "${name}",
    "description": "${description}",
@@ -447,7 +635,7 @@ For instance, you need to build JSON which contains a taskTypes array. Then the 
 It's easy to extend such a structure. You just need to add items with similar placeholders increasing their index.
 
 2. Another approach is based on using Freemarker loop. Here is the template example for the same JSON:
-```
+```json
 <#if task_name_1?exists>
     <#assign task_names = [task_name_1]>
     <#assign task_descriptions = [task_description_1]>
@@ -469,11 +657,11 @@ It's easy to extend such a structure. You just need to add items with similar pl
    "label": "${label}",
    "taskTypes": [
       <#list 0..task_names?size-1 as i>
-      {
-         "name": "${task_names[i]}",
-         "description": "${task_descriptions[i]}"
-      }
-      <#if (i + 1) < task_names?size>,</#if>
+          {
+             "name": "${task_names[i]}",
+             "description": "${task_descriptions[i]}"
+          }
+          <#sep>, </#sep>
       </#list>
    ]
 }
@@ -486,19 +674,19 @@ But note that you should specify all properties for every item, so this view can
 Sometimes you can face a situation when you need to validate the presence of only one item (or a couple of them) in a JSON array ignoring the rest of the items.
 In such case, you can use a validation option ARRAY_CONTAINS.
 Here is a code sample:
-```
+```java
 JSONAssert.assertEquals(expectedRs, actualRs, new JsonKeywordsComparator(JSONCompareMode.STRICT,
                     JsonCompareKeywords.ARRAY_CONTAINS.getKey() + "content"));
 ```
 The expected array:
-```
+```json
 {
     "totalElements": "skip",
     "pageNumber": "skip",
     "pageSize": "skip",
     "content": [
         {
-            "id": skip,
+            "id": "skip",
             "brand": "skip",
             "clientName": "CLIENT 1"
         },
@@ -511,7 +699,7 @@ The expected array:
 }
 ```
 And the actual response:
-```
+```json
 {
     "totalElements": 1017,
     "pageNumber": 0,
@@ -546,41 +734,40 @@ Sometimes you may need to transform your JSON response to POJO. It may be useful
 For this purpose, it's better to use Jackson libraries that are already included in Carina framework.
 For this, you need to prepare the domain class based on your JSON structure. Some online resources provide such opportunities, like https://timboudreau.com/blog/json/read.
 Let's say we need to deserialize an array of Clients from JSON. An example of the required domain object will be:
-```
+```java
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
-public final class Clients
-{
-    public final Client clients[];
+
+public final class Clients {
+    
+    public final Client[] clients;
+    
     @JsonCreator
-    public Clients(@JsonProperty("clients") Client[] clients)
-    {
+    public Clients(@JsonProperty("clients") Client[] clients) {
         this.clients = clients;
     }
-    public static final class Client
-    {
+    
+    public static final class Client {
         public final long id;
         public final String brand;
         public final String clientName;
-        ......
+        
         @JsonCreator
-        public Client(@JsonProperty("id") long id, @JsonProperty("brand") String brand, @JsonProperty("clientName") String clientName,.....)
-        {
+        public Client(@JsonProperty("id") long id, @JsonProperty("brand") String brand, @JsonProperty("clientName") String clientName) {
             this.id = id;
             this.brand = brand;
             this.clientName = clientName;
-            .........
         }
     }
-    public Client[] getClients()
-    {
+    
+    public Client[] getClients() {
         return clients;
     }
 }
 ```
 Pay attention that POJO field names can differ from JSON properties. In this case, @JsonProperty annotation can be used for mapping.
 An example of a deserialization code:
-```
+```java
 GetClientsMethod getClientsMethod = new GetClientsMethod("11111");
 getClientsMethod.expectResponseStatus(HttpResponseStatusType.OK_200);
 String rs = getClientsMethod.callAPI().asString();
@@ -601,7 +788,7 @@ During properties parsing process carina-api module will automatically decrypt t
 #### Hiding of API request headers
 In order to hide the value of API request header you need to annotate your API method with @HideRequestHeadersInLogs annotation.
 Usage sample:
-```
+```java
 @HideRequestHeadersInLogs(headers = "Content-Type")
 public class YourAPIMethod extends AbstractApiMethodV2 {
     public YourAPIMethod() {    
@@ -616,7 +803,7 @@ These annotations support both json and xml content type.
 As the value of annotation you need to pass array of JSON or XML paths you want to hide.  
 Once done in test logs you'll get "\*\*\*\*\*\*\*\*" mask instead of actual values.  
 Example for json:  
-```
+```java
 @HideRequestBodyPartsInLogs(paths = { "$.[*].username", "$.[*].id" })
 @HideResponseBodyPartsInLogs(paths = { "$.[*].address.zipcode", "$.[*].address.geo.lat", "$.[*].id" })
 public class YourAPIMethod extends AbstractApiMethodV2 {
@@ -625,7 +812,7 @@ public class YourAPIMethod extends AbstractApiMethodV2 {
 }
 ```  
 Example for xml:
-```
+```java
 @HideRequestBodyPartsInLogs(paths = { "//root/city/text()" })
 @HideResponseBodyPartsInLogs(paths = { "//root/state/text()" })
 @ContentType(type = "application/xml")
@@ -653,7 +840,7 @@ First of all, we need to create a request template and response template. It is 
 
 #### rq.xml
 
-```other
+```xml
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org">
     <soapenv:Header/>
     <soapenv:Body>
@@ -667,7 +854,7 @@ First of all, we need to create a request template and response template. It is 
 
 **rs.xml**
 
-```other
+```xml
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
     <SOAP-ENV:Body>
         <AddIntegerResponse xmlns="http://tempuri.org">
@@ -683,7 +870,7 @@ This templates contain some placeholders that can be later replaced from propert
 
 #### soap.properties
 
-```other
+```properties
 #=============== AddInteger properties ===========#
 firstNumber=4
 secondNumber=6
@@ -696,7 +883,7 @@ We can specify the endpoint-url, expected HttpStatus, paths to request and respo
 
 **LookupCity.java**
 
-```other
+```java
 @Endpoint(url = "${base_url}", methodType = HttpMethodType.POST)
 @SuccessfulHttpStatus(status = HttpResponseStatusType.OK_200)
 @RequestTemplatePath(path = "api/soap/lookupcity/rq.xml")
@@ -718,7 +905,7 @@ We can validate the response by Response Status. Also we can use response data a
 
 **SoapSampleTest.java**
 
-```other
+```java
 public class SoapSampleTest implements IAbstractTest {
 
     @Test
@@ -738,15 +925,14 @@ public class SoapSampleTest implements IAbstractTest {
 
 > Method ValidateResponse can be used only with JSON files. To validate the whole xml responses we can use ValidateXMLRespone method.
 
-```other
+```java
 @Test
-    public void testLookupCity() throws Exception{
-        LookupCityMethod soap = new LookupCityMethod();
-        soap.setProperties("api/soap/soap.properties");
-        soap.setHeaders(String.format("SOAPAction=%s", "http://tempuri.org/SOAP.Demo.LookupCity"));
+public void testLookupCity() throws Exception{
+    LookupCityMethod soap = new LookupCityMethod();
+    soap.setProperties("api/soap/soap.properties");
+    soap.setHeaders(String.format("SOAPAction=%s", "http://tempuri.org/SOAP.Demo.LookupCity"));
 
-        soap.callAPIExpectSuccess();
-        soap.validateXmlResponse(XmlCompareMode.STRICT);
-    }
+    soap.callAPIExpectSuccess();
+    soap.validateXmlResponse(XmlCompareMode.STRICT);
+}
 ```
- 

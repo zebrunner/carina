@@ -29,7 +29,7 @@ import com.zebrunner.carina.crypto.CryptoToolBuilder;
 
 public class CryptoProcessor implements PropertiesProcessor {
 
-    private  CryptoTool cryptoTool = null;
+    private CryptoTool cryptoTool = null;
     private final String cryptoPatternAsText = Configuration.get(Configuration.Parameter.CRYPTO_PATTERN);
     private final Pattern cryptoPattern = Pattern.compile(cryptoPatternAsText);
 

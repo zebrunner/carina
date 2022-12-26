@@ -22,10 +22,15 @@ import java.lang.annotation.Target;
 
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
 
-@Target(value = ElementType.TYPE)
+@Target(value = { ElementType.TYPE, ElementType.METHOD, ElementType.ANNOTATION_TYPE })
 @Retention(value = RetentionPolicy.RUNTIME)
 public @interface SuccessfulHttpStatus {
 
     HttpResponseStatusType status();
 
+    @Target(value = { ElementType.PARAMETER })
+    @Retention(value = RetentionPolicy.RUNTIME)
+    @SuccessfulHttpStatus(status = HttpResponseStatusType.OK_200)
+    @interface Value {
+    }
 }

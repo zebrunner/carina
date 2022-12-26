@@ -31,6 +31,7 @@ public final class JsonComparatorContext {
         this.comparators = new ArrayList<>();
     }
 
+    @SuppressWarnings("unchecked")
     public <T> JsonComparatorContext withPredicate(String name, Predicate<T> predicate) {
         if (predicate != null) {
             this.namedPredicates.put(name, (Predicate<Object>) predicate);

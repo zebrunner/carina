@@ -20,10 +20,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(value = ElementType.TYPE)
+@Target(value = { ElementType.TYPE, ElementType.METHOD, ElementType.ANNOTATION_TYPE })
 @Retention(value = RetentionPolicy.RUNTIME)
 public @interface ResponseTemplatePath {
 
     String path();
 
+    @Target(value = { ElementType.PARAMETER })
+    @Retention(value = RetentionPolicy.RUNTIME)
+    @ResponseTemplatePath(path = "")
+    @interface Value {
+    }
 }

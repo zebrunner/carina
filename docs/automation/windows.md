@@ -23,7 +23,7 @@ That's all. To get access to the driver use getDriver(). Write and run tests as 
 
 Code example:
 
-```
+```java
 //page.class example
 public class CalculatorHomePage extends AbstractPage {
     @FindBy(xpath = "/Window/Pane/Button[10]")
@@ -59,7 +59,7 @@ public class CalculatorHomePage extends AbstractPage {
 ```
 
 
-```
+```java
 //test.class example
 public class CalculatorTest implements IAbstractTest {
     @Test

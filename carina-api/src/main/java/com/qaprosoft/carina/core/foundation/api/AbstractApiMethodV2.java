@@ -18,11 +18,16 @@ package com.qaprosoft.carina.core.foundation.api;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.AnnotatedElement;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qaprosoft.apitools.builder.PropertiesProcessor;
 import com.qaprosoft.apitools.validation.JsonComparatorContext;
 import com.qaprosoft.apitools.validation.JsonKeywordsComparator;
@@ -49,6 +54,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     
     private static final String ACCEPT_ALL_HEADER = "Accept=*/*";
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private Properties properties;
     private List<Class<? extends PropertiesProcessor>> ignoredPropertiesProcessorClasses;
@@ -65,27 +71,57 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     }
 
     public AbstractApiMethodV2(String rqPath, String rsPath) {
-        this(rqPath, rsPath, new Properties());
+        this(rqPath, rsPath, (Properties) null);
     }
 
     public AbstractApiMethodV2(String rqPath, String rsPath, String propertiesPath) {
-        this(rqPath, rsPath, loadProperties(propertiesPath));
+        this(rqPath, rsPath, loadProperties(propertiesPath).orElse(null));
     }
 
     public AbstractApiMethodV2(String rqPath, String rsPath, Properties properties) {
-        super();
-        setHeaders(ACCEPT_ALL_HEADER);
-        setProperties(properties);
+        this(null, rqPath, rsPath, properties);
+    }
+
+    public AbstractApiMethodV2(AnnotatedElement anchorElement) {
+        this(anchorElement, null, null, null);
+    }
+
+    private AbstractApiMethodV2(AnnotatedElement anchorElement, String rqPath, String rsPath, Properties properties) {
+        super(anchorElement);
         initPaths(rqPath, rsPath);
+        initHeaders();
+        initProperties(properties);
+
+        getInterceptorChain().onInstantiation();
+    }
+
+    private void initProperties(Properties properties) {
+        if (properties == null) {
+            properties = loadProperties(
+                    ContextResolverChain.resolvePropertiesPath(getAnchorElement())
+                            .orElse(null)
+            ).orElse(new Properties());
+        }
+        setProperties(properties);
+    }
+
+    private void initHeaders() {
+        setHeaders(ACCEPT_ALL_HEADER);
+
+        ContextResolverChain.resolveHeaders(getAnchorElement())
+                .ifPresent(headers -> headers.forEach(this::setHeader));
+
+        ContextResolverChain.resolveCookies(getAnchorElement())
+                .ifPresent(this::addCookies);
     }
 
     private void initPaths(String rqPath, String rsPath) {
         this.rqPath = rqPath != null
                 ? rqPath
-                : ContextResolverChain.resolveRequestTemplatePath(this.getClass()).orElse(null);
+                : ContextResolverChain.resolveRequestTemplatePath(getAnchorElement()).orElse(null);
         this.rsPath = rsPath != null
                 ? rsPath
-                : ContextResolverChain.resolveResponseTemplatePath(this.getClass()).orElse(null);
+                : ContextResolverChain.resolveResponseTemplatePath(getAnchorElement()).orElse(null);
     }
 
     /**
@@ -106,6 +142,19 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
         this.rsPath = path;
     }
 
+    public void setRequestBody(Object body) {
+        setRequestBody(body, OBJECT_MAPPER);
+    }
+
+    public void setRequestBody(Object body, ObjectMapper objectMapper) {
+        try {
+            String bodyContent = objectMapper.writeValueAsString(body);
+            setBodyContent(bodyContent);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
     private void initBodyContent() {
         if (rqPath != null) {
             TemplateMessage tm = new TemplateMessage();
@@ -113,6 +162,16 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
             tm.setTemplatePath(rqPath);
             tm.setPropertiesStorage(properties);
             setBodyContent(tm.getMessageText());
+        } else {
+            ContextResolverChain.resolveRequestBody(getAnchorElement()).ifPresent(requestBodyContainer -> {
+                requestBodyContainer.getBody().ifPresent(body -> {
+                    if (requestBodyContainer.isJson()) {
+                        setBodyContent(body.toString());
+                    } else {
+                        setRequestBody(body);
+                    }
+                });
+            });
         }
     }
 
@@ -150,7 +209,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
      * @return restassured Response object
      */
     public Response callAPIExpectSuccess() {
-        HttpResponseStatusType statusType = ContextResolverChain.resolveSuccessfulHttpStatus(this.getClass())
+        HttpResponseStatusType statusType = ContextResolverChain.resolveSuccessfulHttpStatus(getAnchorElement())
                 .orElseThrow(() -> new RuntimeException("To use this method please declare @SuccessfulHttpStatus for your AbstractApiMethod class"));
         expectResponseStatus(statusType);
         return callAPI();
@@ -162,16 +221,14 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
      * @param propertiesPath String path to properties file
      */
     public void setProperties(String propertiesPath) {
-        Properties properties = loadProperties(propertiesPath);
-        setProperties(properties);
+        loadProperties(propertiesPath)
+                .ifPresent(this::setProperties);
     }
 
-    private static Properties loadProperties(String propertiesPath) {
-        Properties properties;
+    private static Optional<Properties> loadProperties(String propertiesPath) {
+        Properties properties = null;
 
-        if (propertiesPath == null) {
-            properties = new Properties();
-        } else {
+        if (propertiesPath != null) {
             URL baseResource = ClassLoader.getSystemResource(propertiesPath);
             if (baseResource != null) {
                 properties = new Properties();
@@ -185,7 +242,7 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
                 throw new RuntimeException("Properties can't be found by path: " + propertiesPath);
             }
         }
-        return properties;
+        return Optional.ofNullable(properties);
     }
 
     public void ignorePropertiesProcessor(Class<? extends PropertiesProcessor> ignoredPropertiesProcessorClass) {
@@ -203,7 +260,17 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
     public void setProperties(Properties properties) {
         if (properties != null) {
             this.properties = PropertiesProcessorMain.processProperties(properties, ignoredPropertiesProcessorClasses);
+
+            ContextResolverChain.resolveProperties(getAnchorElement())
+                    .ifPresent(this::addProperties);
         }
+    }
+
+    public void addProperties(Map<String, ?> props) {
+        if (properties == null) {
+            throw new RuntimeException("API method properties are not initialized!");
+        }
+        properties.putAll(props);
     }
 
     public void addProperty(String key, Object value) {
@@ -306,15 +373,15 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
      */
     public void validateResponse(String... validationFlags) {
         switch (contentTypeEnum) {
-        case JSON:
-            validateResponse(JSONCompareMode.NON_EXTENSIBLE, validationFlags);
-            break;
-        case XML:
-            validateXmlResponse(XmlCompareMode.STRICT);
-            break;
-        default:
-            throw new RuntimeException("Unsupported argument of content type");
-        }
+            case JSON:
+                validateResponse(JSONCompareMode.NON_EXTENSIBLE, validationFlags);
+                break;
+            case XML:
+                validateXmlResponse(XmlCompareMode.STRICT);
+                break;
+            default:
+                throw new RuntimeException("Unsupported argument of content type");
+            }
     }
 
     /**

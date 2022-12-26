@@ -1,44 +1,58 @@
+/*******************************************************************************
+ * Copyright 2020-2022 Zebrunner Inc (https://www.zebrunner.com).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.api.resolver;
 
-import com.qaprosoft.carina.core.foundation.api.AbstractApiMethod;
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
 
+import java.lang.reflect.AnnotatedElement;
+import java.util.Map;
 import java.util.Optional;
-import java.util.function.Predicate;
 
-interface ContextResolver {
+interface ContextResolver<E extends AnnotatedElement> {
 
-    Optional<RequestStartLine> resolveUrl(Class<?> clazz);
+    Optional<RequestStartLine> resolveUrl(E element);
 
-    Optional<String> resolveContentType(Class<?> clazz);
+    Optional<String> resolveContentType(E element);
 
-    Optional<String[]> resolveHiddenRequestBodyPartsInLogs(Class<?> clazz);
+    Optional<String[]> resolveHiddenRequestBodyPartsInLogs(E element);
 
-    Optional<String[]> resolveHiddenResponseBodyPartsInLogs(Class<?> clazz);
+    Optional<String[]> resolveHiddenResponseBodyPartsInLogs(E element);
 
-    Optional<String[]> resolveHiddenRequestHeadersInLogs(Class<?> clazz);
+    Optional<String[]> resolveHiddenRequestHeadersInLogs(E element);
 
-    Optional<String> resolveRequestTemplatePath(Class<?> clazz);
+    Optional<String> resolveRequestTemplatePath(E element);
 
-    Optional<String> resolveResponseTemplatePath(Class<?> clazz);
+    Optional<RequestBodyContainer> resolveRequestBody(E element);
 
-    Optional<HttpResponseStatusType> resolveSuccessfulHttpStatus(Class<?> clazz);
+    Optional<String> resolveResponseTemplatePath(E element);
 
-    default Optional<Class<?>> findParentClass(Class<?> clazz, Predicate<Class<?>> condition) {
-        return findParentClass(clazz, AbstractApiMethod.class, condition);
-    }
+    Optional<HttpResponseStatusType> resolveSuccessfulHttpStatus(E element);
 
-    default Optional<Class<?>> findParentClass(Class<?> clazz, Class<?> untilClass, Predicate<Class<?>> condition) {
-        Optional<Class<?>> result;
-        if (clazz != null && !clazz.equals(untilClass)) {
-            if (!condition.test(clazz)) {
-                return findParentClass(clazz.getSuperclass(), untilClass, condition);
-            } else {
-                result = Optional.of(clazz);
-            }
-        } else {
-            result = Optional.empty();
-        }
-        return result;
-    }
+    Optional<Map<String, ?>> resolvePathParams(E element);
+
+    Optional<Map<String, ?>> resolveQueryParams(E element);
+
+    Optional<String> resolvePropertiesPath(E element);
+
+    Optional<Map<String, ?>> resolveProperties(E element);
+
+    Optional<Map<String, ?>> resolveHeaders(E element);
+
+    Optional<Map<String, ?>> resolveCookies(E element);
+
+    boolean isSupportedType(AnnotatedElement element);
+
 }
