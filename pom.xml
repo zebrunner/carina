@@ -68,7 +68,7 @@
         <selenium.version>4.4.0</selenium.version>
         <appium.version>8.2.0</appium.version>
         <!-- Zebrunner integrations -->
-        <zebrunner-testng-pluggable.version>1.9.1</zebrunner-testng-pluggable.version>
+        <zebrunner-testng-pluggable.version>1.9.2</zebrunner-testng-pluggable.version>
         <!-- Others -->
         <rest-assured.version>4.3.0</rest-assured.version>
         <imgscalr-lib.version>4.2</imgscalr-lib.version>
