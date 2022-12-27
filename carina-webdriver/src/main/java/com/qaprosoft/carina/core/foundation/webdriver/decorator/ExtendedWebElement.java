@@ -853,9 +853,9 @@ public class ExtendedWebElement implements IWebElement {
 
         if (isSingleElement) {
             if (searchContext instanceof WebElement) {
-                conditions.add(ExpectedConditions.presenceOfNestedElementLocatedBy((WebElement) searchContext, by));
+                conditions.add(ExpectedConditions.visibilityOfNestedElementsLocatedBy((WebElement) searchContext, by));
             } else {
-                conditions.add(ExpectedConditions.presenceOfElementLocated(by));
+                conditions.add(ExpectedConditions.visibilityOfElementLocated(by));
             }
         }
 
