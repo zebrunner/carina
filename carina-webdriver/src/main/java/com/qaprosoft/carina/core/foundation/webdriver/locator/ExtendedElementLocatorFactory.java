@@ -35,6 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.AccessibilityId;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.ClassChain;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Predicate;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.zebrunner.carina.utils.factory.DeviceType;
 
@@ -71,7 +74,11 @@ public final class ExtendedElementLocatorFactory implements ElementLocatorFactor
 
         if (!DeviceType.Type.DESKTOP.equals(currentDevice.getDeviceType()) ||
                 this.castDriver instanceof AppiumDriver) {
-            if (field.isAnnotationPresent(ExtendedFindBy.class)) {
+            // todo create Annotations for every type of annotations
+            if (field.isAnnotationPresent(ExtendedFindBy.class) ||
+                    field.isAnnotationPresent(ClassChain.class) ||
+                    field.isAnnotationPresent(AccessibilityId.class) ||
+                    field.isAnnotationPresent(Predicate.class)) {
                 annotations = new ExtendedAnnotations(field, currentDevice);
             } else {
                 // todo add check if there are no FindBy or other annotations
