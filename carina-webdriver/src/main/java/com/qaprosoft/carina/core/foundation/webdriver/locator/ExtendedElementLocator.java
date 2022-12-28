@@ -78,7 +78,9 @@ public class ExtendedElementLocator implements ElementLocator {
         this.className = classPath[classPath.length-1];
         this.by = annotations.buildBy();
         this.originalBy = this.by;
-        this.locatorConverters.add(new LocalizedLocatorConverter());
+        if (LocalizedLocatorConverter.L10N_PATTERN.matcher(this.by.toString()).find()) {
+            this.locatorConverters.add(new LocalizedLocatorConverter());
+        }
 
         // todo refactor/check
             if (field.isAnnotationPresent(CaseInsensitiveXPath.class)) {
@@ -93,6 +95,10 @@ public class ExtendedElementLocator implements ElementLocator {
     }
 
     public void buildBy() {
+        // do not do converting if there are no locator converters at all
+        if (locatorConverters.isEmpty()) {
+            return;
+        }
         String byAsString = this.originalBy.toString();
         for (LocatorConverter converter : locatorConverters) {
             byAsString = converter.convert(byAsString);

@@ -96,54 +96,44 @@ public class ExtendedWebElement implements IWebElement {
 
     private CryptoTool cryptoTool = null;
 
-    public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext) {
-        if (by == null) {
-            throw new RuntimeException("By couldn't be null!");
-        }
-        if (driver == null) {
-            throw new RuntimeException("driver couldn't be null!");
-        }
-
-        if (searchContext == null) {
-            throw new RuntimeException("review stacktrace to analyze why searchContext is null");
-        }
-
-        this.by = by;
-        this.name = name;
-        this.driver = driver;
-        this.searchContext = searchContext;
-    }
 
     public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext, Object[] formatValues) {
         this(by, name, driver, searchContext);
         this.formatValues = Arrays.toString(formatValues);
     }
 
-    /**
-     * This constructor shouldn't be called explicitly. For proxied elements only
-     */
+    public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext) {
+        this(null, name, by);
+        if (driver == null) {
+            throw new IllegalArgumentException("Driver should not be null");
+        }
+        this.driver = driver;
+        if (searchContext == null) {
+            throw new IllegalArgumentException("SearchContext should not be null");
+        }
+        this.searchContext = searchContext;
+    }
+
     public ExtendedWebElement(WebElement element, String name, By by) {
         this(element, name);
+        if (by == null) {
+            throw new IllegalArgumentException("By should not be null");
+        }
         this.by = by;
     }
 
     /**
-     * This constructor shouldn't be called explicitly. For proxied elements only
+     * For internal usage only
+     * 
+     * @param element see {@link WebElement}
+     * @param name name of the element
      */
     public ExtendedWebElement(WebElement element, String name) {
         this.name = name;
         this.element = element;
 
-        // read searchContext from not null elements only
+        // read searchContext from not null elements only. It means that element was created using DriverHelper or by hands
         if (this.element == null) {
-            // it seems like we have to specify WebElement or By annotation! Add verification that By is valid in this case!
-            if (this.by == null) {
-                try {
-                    throw new RuntimeException("review stacktrace to analyze why tempBy is not populated correctly via reflection!");
-                } catch (Throwable thr) {
-                    LOGGER.warn("by is null!", thr);
-                }
-            }
             return;
         }
 
@@ -169,8 +159,7 @@ public class ExtendedWebElement implements IWebElement {
                 this.by = locator.getBy();
             } else {
                 // take context as driver
-                this.driver = element instanceof Decorated<?> ? ((RemoteWebElement) ((Decorated<?>) element).getOriginal()).getWrappedDriver()
-                        : ((RemoteWebElement) element).getWrappedDriver();
+                this.driver = unpackWebDriverFromWebElement(element);
                 this.searchContext = this.driver;
             }
         } catch (IllegalAccessException | ClassCastException e) {
@@ -183,6 +172,11 @@ public class ExtendedWebElement implements IWebElement {
                 throw new RuntimeException("review stacktrace to analyze why searchContext is not populated correctly via reflection!");
             }
         }
+    }
+
+    private WebDriver unpackWebDriverFromWebElement(WebElement element) {
+        return element instanceof Decorated<?> ? ((RemoteWebElement) ((Decorated<?>) element).getOriginal()).getWrappedDriver()
+                : ((RemoteWebElement) element).getWrappedDriver();
     }
 
     public WebElement getElement() {
