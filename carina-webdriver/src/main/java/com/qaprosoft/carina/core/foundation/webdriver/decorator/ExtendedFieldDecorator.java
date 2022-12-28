@@ -55,11 +55,9 @@ public class ExtendedFieldDecorator implements FieldDecorator {
      * @param field page element to be decorated
      */
     public Object decorate(ClassLoader loader, Field field) {
-        if (!(ExtendedWebElement.class.isAssignableFrom(field.getType()) || AbstractUIObject.class.isAssignableFrom(field.getType())
-                        || isDecoratableList(field)) /*
-                                                      * also verify that it is ExtendedWebElement or derived from AbstractUIObject or DecoratableList
-                                                      */) {
-            // returning null is ok in this method.
+        if (!(ExtendedWebElement.class.isAssignableFrom(field.getType()) ||
+                AbstractUIObject.class.isAssignableFrom(field.getType()) ||
+                isDecoratableList(field))) {
             return null;
         }
 

@@ -15,6 +15,8 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.locator;
 
+import static io.appium.java_client.pagefactory.utils.WebDriverUnpackUtility.getCurrentContentType;
+
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -40,7 +42,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinse
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
 import com.zebrunner.carina.utils.factory.DeviceType;
 
-import io.appium.java_client.pagefactory.DefaultElementByBuilder;
+import io.appium.java_client.pagefactory.bys.ContentMappedBy;
 
 /**
  * The default element locator, which will lazily locate an element or an
@@ -52,17 +54,15 @@ import io.appium.java_client.pagefactory.DefaultElementByBuilder;
 public class ExtendedElementLocator implements ElementLocator {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    private final WebDriver driver;
     private final SearchContext searchContext;
-    private By originalBy;
+    private final String className;
+    private final By originalBy;
     private By by;
-    private String className;
     private boolean caseInsensitive = false;
     private boolean localized = false;
-    private String platform;
-    private String automation;
-    private Device device;
-    private final WebDriver driver;
     private final LinkedList<LocatorConverter> locatorConverters = new LinkedList<>();
+
     /**
      * Creates a new element locator.
      *
@@ -70,29 +70,14 @@ public class ExtendedElementLocator implements ElementLocator {
      * @param field The field on the Page Object that will hold the located
      *            value
      */
-    public ExtendedElementLocator(WebDriver driver, SearchContext searchContext, Field field,
-            String platform, String automation, Device device) {
+    public ExtendedElementLocator(WebDriver driver, SearchContext searchContext, Field field, AbstractAnnotations annotations,
+            Device device) {
         this.driver = driver;
         this.searchContext = searchContext;
         String[] classPath = field.getDeclaringClass().toString().split("\\.");
         this.className = classPath[classPath.length-1];
-
-        AbstractAnnotations annotations = null;
-
-        if (DeviceType.Type.DESKTOP.equals(device.getDeviceType())) {
-            annotations = new LocalizedAnnotations(field);
-        } else {
-            if (field.isAnnotationPresent(ExtendedFindBy.class)) {
-                annotations = new LocalizedAnnotations(field);
-            } else {
-                DefaultElementByBuilder builder = new DefaultElementByBuilder(platform, automation);
-                builder.setAnnotated(field);
-                annotations = builder;
-            }
-        }
         this.by = annotations.buildBy();
         this.originalBy = this.by;
-
         this.locatorConverters.add(new LocalizedLocatorConverter());
 
         // todo refactor/check
@@ -122,6 +107,27 @@ public class ExtendedElementLocator implements ElementLocator {
     }
 
     /**
+     * From {@link io.appium.java_client.pagefactory.AppiumElementLocator}
+     * This methods makes sets some settings of the {@link By} according to
+     * the given instance of {@link SearchContext}. If there is some {@link ContentMappedBy}
+     * then it is switched to the searching for some html or native mobile element.
+     * Otherwise nothing happens there.
+     *
+     * @param currentBy is some locator strategy
+     * @param currentContent is an instance of some subclass of the {@link SearchContext}.
+     * @return the corrected {@link By} for the further searching
+     *
+     */
+    private By getBy(By currentBy, SearchContext currentContent) {
+        if (!ContentMappedBy.class.isAssignableFrom(currentBy.getClass())) {
+            return currentBy;
+        }
+
+        return ContentMappedBy.class.cast(currentBy)
+                .useContent(getCurrentContentType(currentContent));
+    }
+
+    /**
      * Find the element.
      */
     public WebElement findElement() {
@@ -132,7 +138,7 @@ public class ExtendedElementLocator implements ElementLocator {
 
         //TODO: test how findElements work for web and android
         // maybe migrate to the latest appium java driver and reuse original findElement!
-        List<WebElement> elements = searchContext.findElements(by);
+        List<WebElement> elements = searchContext.findElements(getBy(by, searchContext));
 
         WebElement element = null;
         if (elements.size() == 1) {
@@ -155,7 +161,7 @@ public class ExtendedElementLocator implements ElementLocator {
         List<WebElement> elements = null;
 
         try {
-            elements = searchContext.findElements(by);
+            elements = searchContext.findElements(getBy(by, searchContext));
         } catch (NoSuchElementException e) {
             LOGGER.debug("Unable to find elements: " + e.getMessage());
         }

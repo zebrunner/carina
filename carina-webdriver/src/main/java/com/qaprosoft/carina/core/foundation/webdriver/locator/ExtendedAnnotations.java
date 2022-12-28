@@ -33,11 +33,10 @@ import com.zebrunner.carina.utils.commons.SpecialKeywords;
 
 import io.appium.java_client.AppiumBy;
 
-public class LocalizedAnnotations extends Annotations {
+public class ExtendedAnnotations extends Annotations {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static Pattern L10N_PATTERN = Pattern.compile(SpecialKeywords.L10N_PATTERN);
 
-    public LocalizedAnnotations(Field field) {
+    public ExtendedAnnotations(Field field) {
         super(field);
     }
 

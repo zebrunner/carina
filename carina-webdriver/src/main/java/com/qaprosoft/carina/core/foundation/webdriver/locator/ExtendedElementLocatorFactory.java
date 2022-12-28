@@ -17,18 +17,24 @@ package com.qaprosoft.carina.core.foundation.webdriver.locator;
 
 import java.lang.reflect.Field;
 
-import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.support.FindAll;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.FindBys;
+import org.openqa.selenium.support.pagefactory.AbstractAnnotations;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
 
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import com.zebrunner.carina.utils.factory.DeviceType;
 
 import io.appium.java_client.internal.CapabilityHelpers;
+import io.appium.java_client.pagefactory.DefaultElementByBuilder;
 import io.appium.java_client.remote.MobileCapabilityType;
 
 public final class ExtendedElementLocatorFactory implements ElementLocatorFactory, IDriverPool {
@@ -57,6 +63,25 @@ public final class ExtendedElementLocatorFactory implements ElementLocatorFactor
     }
 
     public ElementLocator createLocator(Field field) {
-        return new ExtendedElementLocator(webDriver, searchContext, field, platform, automation, getDevice(webDriver));
+        AbstractAnnotations annotations = null;
+        Device currentDevice = getDevice(webDriver);
+        if (DeviceType.Type.DESKTOP.equals(currentDevice.getDeviceType())) {
+            if (field.getAnnotation(FindBy.class) != null ||
+                    field.getAnnotation(FindBys.class) != null ||
+                    field.getAnnotation(FindAll.class) != null) {
+                annotations = new ExtendedAnnotations(field);
+            }
+        } else if (field.isAnnotationPresent(ExtendedFindBy.class)) {
+            annotations = new ExtendedAnnotations(field);
+        } else {
+            DefaultElementByBuilder builder = new DefaultElementByBuilder(platform, automation);
+            builder.setAnnotated(field);
+            annotations = builder;
+        }
+        if (annotations == null) {
+            return null;
+        }
+
+        return new ExtendedElementLocator(webDriver, searchContext, field, annotations, currentDevice);
     }
 }
