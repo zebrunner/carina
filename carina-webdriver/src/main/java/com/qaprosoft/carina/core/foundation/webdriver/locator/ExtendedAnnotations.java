@@ -45,7 +45,7 @@ public class ExtendedAnnotations extends Annotations {
         By by = super.buildBy();
         String param = by.toString();
         if (getField().isAnnotationPresent(Predicate.class)) {
-            param = StringUtils.remove(param, LocatorType.XPATH.getStartsWith());
+            param = StringUtils.remove(param, LocatorType.BY_XPATH.getStartsWith());
             // TODO: analyze howto determine iOS or Android predicate
             // UPDATED 8.0.5: we can detect using Device class
             if (isIOS) {
@@ -54,10 +54,10 @@ public class ExtendedAnnotations extends Annotations {
                 by = AppiumBy.androidUIAutomator(param);
             }
         } else if (getField().isAnnotationPresent(ClassChain.class)) {
-            param = StringUtils.remove(param, LocatorType.XPATH.getStartsWith());
+            param = StringUtils.remove(param, LocatorType.BY_XPATH.getStartsWith());
             by = AppiumBy.iOSClassChain(param);
         } else if (getField().isAnnotationPresent(AccessibilityId.class)) {
-            param = StringUtils.remove(param, LocatorType.NAME.getStartsWith());
+            param = StringUtils.remove(param, LocatorType.BY_NAME.getStartsWith());
             by = AppiumBy.accessibilityId(param);
         } else if (getField().isAnnotationPresent(ExtendedFindBy.class) || getField().isAnnotationPresent(FindBy.class)) {
             by = buildBy(param);

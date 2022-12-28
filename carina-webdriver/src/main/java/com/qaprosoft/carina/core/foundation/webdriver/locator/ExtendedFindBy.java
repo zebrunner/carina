@@ -24,18 +24,60 @@ import java.lang.reflect.Field;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.PageFactoryFinder;
 
+import io.appium.java_client.pagefactory.AndroidFindBy;
+import io.appium.java_client.pagefactory.iOSXCUITFindBy;
+
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.FIELD, ElementType.TYPE })
 @PageFactoryFinder(ExtendedFindBy.FindByBuilder.class)
 public @interface ExtendedFindBy {
 
+    /**
+     * The NSPredicate class is used to define logical conditions used to constrain
+     * a search either for a fetch or for in-memory filtering.
+     *
+     * @return iOS NSPredicate
+     */
     String iosPredicate() default "";
 
+    /**
+     * The Class Chain locator is similar to xpath, but it's faster and can only
+     * search direct children elements. For more info see {@link iOSXCUITFindBy#iOSClassChain()}
+     *
+     * @return iOS class chain
+     */
     String iosClassChain() default "";
 
+    /**
+     * A String that can build an Android UiSelector or UiScrollable object.
+     * Refer to https://developer.android.com/training/testing/ui-automator
+     *
+     * @return an Android UIAutomator string
+     */
     String androidUIAutomator() default "";
 
+    /**
+     * It an UI automation accessibility Id which is a convenient to Android and IOS.<br>
+     * About iOS accessibility see {@link iOSXCUITFindBy#accessibility()}<br>
+     * About Android accessibility see {@link AndroidFindBy#accessibility()}
+     *
+     * @return an UI automation accessibility Id
+     */
     String accessibilityId() default "";
+
+    /**
+     * It is a desired data matcher expression.
+     *
+     * @return a desired data matcher expression
+     */
+    String androidDataMatcher() default "";
+
+    /**
+     * It is a desired view matcher expression.
+     *
+     * @return a desired view matcher expression
+     */
+    String androidViewMatcher() default "";
     
     // Images in automation:
     // https://github.com/appium/appium/blob/master/docs/en/writing-running-appium/image-comparison.md

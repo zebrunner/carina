@@ -1155,7 +1155,7 @@ public class ExtendedWebElement implements IWebElement {
                 FormatLocatorConverter converter = new FormatLocatorConverter(objects);
                 innerLocator.getLocatorConverters()
                         .addFirst(converter);
-                innerLocator.buildBy();
+                innerLocator.buildConvertedBy();
                 innerLocator.getLocatorConverters()
                         .remove(converter);
                 WebElement proxy = (WebElement) Proxy.newProxyInstance(getClass().getClassLoader(),
@@ -1667,28 +1667,28 @@ public class ExtendedWebElement implements IWebElement {
         String locator = by.toString();
         By resBy = null;
 
-        if (LocatorType.ID.is(locator)) {
-            resBy = LocatorType.ID.buildLocatorFromString(locator + "[" + index + "]");
-        } else if (LocatorType.NAME.is(locator)) {
-            resBy = LocatorType.NAME.buildLocatorFromString(locator + "[" + index + "]");
-        } else if (LocatorType.XPATH.is(locator)) {
-            resBy = LocatorType.XPATH.buildLocatorFromString(locator + "[" + index + "]");
-        } else if (LocatorType.LINKTEXT.is(locator)) {
-            resBy = LocatorType.LINKTEXT.buildLocatorFromString(locator + "[" + index + "]");
-        } else if (LocatorType.CLASSNAME.is(locator)) {
-            resBy = LocatorType.CLASSNAME.buildLocatorFromString(locator + "[" + index + "]");
-        } else if (LocatorType.PARTIAL_LINK_TEXT.is(locator)) {
-            resBy = LocatorType.PARTIAL_LINK_TEXT.buildLocatorFromString(locator + "[" + index + "]");
-        } else if (LocatorType.CSS.is(locator)) {
-            resBy = LocatorType.CSS.buildLocatorFromString(locator + ":nth-child(" + index + ")");
-        } else if (LocatorType.TAG_NAME.is(locator)) {
-            resBy = LocatorType.TAG_NAME.buildLocatorFromString(locator + "[" + index + "]");
-        } else if (LocatorType.IOS_CLASS_CHAIN.is(locator)) {
-            resBy = LocatorType.IOS_CLASS_CHAIN.buildLocatorFromString(locator + "[" + index + "]");
-        } else if (LocatorType.IOS_NS_PREDICATE.is(locator)) {
-            resBy = LocatorType.IOS_NS_PREDICATE.buildLocatorFromString(locator + "[" + index + "]");
-        } else if (LocatorType.ACCESSIBILITY_ID.is(locator)) {
-            resBy = LocatorType.ACCESSIBILITY_ID.buildLocatorFromString(locator + "[" + index + "]");
+        if (LocatorType.BY_ID.is(locator)) {
+            resBy = LocatorType.BY_ID.buildLocatorFromString(locator + "[" + index + "]");
+        } else if (LocatorType.BY_NAME.is(locator)) {
+            resBy = LocatorType.BY_NAME.buildLocatorFromString(locator + "[" + index + "]");
+        } else if (LocatorType.BY_XPATH.is(locator)) {
+            resBy = LocatorType.BY_XPATH.buildLocatorFromString(locator + "[" + index + "]");
+        } else if (LocatorType.BY_LINKTEXT.is(locator)) {
+            resBy = LocatorType.BY_LINKTEXT.buildLocatorFromString(locator + "[" + index + "]");
+        } else if (LocatorType.BY_CLASSNAME.is(locator)) {
+            resBy = LocatorType.BY_CLASSNAME.buildLocatorFromString(locator + "[" + index + "]");
+        } else if (LocatorType.BY_PARTIAL_LINK_TEXT.is(locator)) {
+            resBy = LocatorType.BY_PARTIAL_LINK_TEXT.buildLocatorFromString(locator + "[" + index + "]");
+        } else if (LocatorType.BY_CSS.is(locator)) {
+            resBy = LocatorType.BY_CSS.buildLocatorFromString(locator + ":nth-child(" + index + ")");
+        } else if (LocatorType.BY_TAG_NAME.is(locator)) {
+            resBy = LocatorType.BY_TAG_NAME.buildLocatorFromString(locator + "[" + index + "]");
+        } else if (LocatorType.APPIUM_BY_IOS_CLASS_CHAIN.is(locator)) {
+            resBy = LocatorType.APPIUM_BY_IOS_CLASS_CHAIN.buildLocatorFromString(locator + "[" + index + "]");
+        } else if (LocatorType.APPIUM_BY_IOS_NS_PREDICATE.is(locator)) {
+            resBy = LocatorType.APPIUM_BY_IOS_NS_PREDICATE.buildLocatorFromString(locator + "[" + index + "]");
+        } else if (LocatorType.APPIUM_BY_ACCESSIBILITY_ID.is(locator)) {
+            resBy = LocatorType.APPIUM_BY_ACCESSIBILITY_ID.buildLocatorFromString(locator + "[" + index + "]");
         }
         if (resBy == null) {
             throw new RuntimeException(String.format("Generate by for list failed - no suitable locator type found."

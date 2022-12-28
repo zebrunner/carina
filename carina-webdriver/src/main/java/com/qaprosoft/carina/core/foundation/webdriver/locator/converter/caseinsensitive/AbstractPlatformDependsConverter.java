@@ -15,7 +15,7 @@ public abstract class AbstractPlatformDependsConverter implements IPlatformDepen
     protected static final String ATTRIBUTE_SINGLE_PATTERN = "^.*$";
 
     protected String caseInsensitiveXpathByAttribute(String by, String attributeRegex) {
-        String cleanXPath = StringUtils.remove(by, LocatorType.XPATH.getStartsWith());
+        String cleanXPath = StringUtils.remove(by, LocatorType.BY_XPATH.getStartsWith());
         String attributePattern =
                 "(?<!(translate\\())((" + attributeRegex + ")\\s*(\\,|\\=)\\s*((['\"])((?:(?!\\6|\\\\).|\\\\.)*)\\6))";
 

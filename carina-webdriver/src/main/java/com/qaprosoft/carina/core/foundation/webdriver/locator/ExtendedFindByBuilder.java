@@ -89,6 +89,15 @@ public abstract class ExtendedFindByBuilder extends AbstractFindByBuilder {
                 throw new RuntimeException("Error while reading image file for ExtendedFindBy annotation : " + fileUrl.getPath(), e);
             }
         }
+
+        if (!"".equals(findByCarina.androidDataMatcher())) {
+            return AppiumBy.androidDataMatcher(findByCarina.androidDataMatcher());
+        }
+
+        if (!"".equals(findByCarina.androidViewMatcher())) {
+            return AppiumBy.androidViewMatcher(findByCarina.androidViewMatcher());
+        }
+
         return null;
     }
 }

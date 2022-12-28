@@ -13,8 +13,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.LocatorC
 public class CaseInsensitiveConverter implements LocatorConverter {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     // Contains type of locator as key and start part of locator as value
-    private static final List<LocatorType> LIST_OF_CONVERTIBLE_LOCATORS = List.of(LocatorType.ID, LocatorType.NAME, LocatorType.XPATH,
-            LocatorType.LINKTEXT);
+    private static final List<LocatorType> LIST_OF_CONVERTIBLE_LOCATORS = List.of(LocatorType.BY_ID, LocatorType.BY_NAME, LocatorType.BY_XPATH,
+            LocatorType.BY_LINKTEXT);
 
     private boolean isId = false;
     private boolean isName = false;
@@ -56,11 +56,11 @@ public class CaseInsensitiveConverter implements LocatorConverter {
 
     private String convertToXpath(String by) {
         String resultBy = by;
-        if (LocatorType.ID.is(by)) {
+        if (LocatorType.BY_ID.is(by)) {
             resultBy = platformDependsConverter.idToXpath(by);
-        } else if (LocatorType.NAME.is(by)) {
+        } else if (LocatorType.BY_NAME.is(by)) {
             resultBy = platformDependsConverter.nameToXpath(by);
-        } else if (LocatorType.LINKTEXT.is(by)) {
+        } else if (LocatorType.BY_LINKTEXT.is(by)) {
             resultBy = platformDependsConverter.linkTextToXpath(by);
         }
         return resultBy;

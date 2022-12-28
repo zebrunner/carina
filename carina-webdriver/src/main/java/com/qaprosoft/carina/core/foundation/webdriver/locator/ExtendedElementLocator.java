@@ -92,9 +92,11 @@ public class ExtendedElementLocator implements ElementLocator {
             if (field.isAnnotationPresent(Localized.class)) {
                 this.localized = true;
         }
+
+        buildConvertedBy();
     }
 
-    public void buildBy() {
+    public void buildConvertedBy() {
         // do not do converting if there are no locator converters at all
         if (locatorConverters.isEmpty()) {
             return;

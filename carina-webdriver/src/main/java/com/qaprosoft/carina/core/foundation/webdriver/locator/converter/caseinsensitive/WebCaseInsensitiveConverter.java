@@ -1,26 +1,24 @@
 package com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive;
 
-import org.openqa.selenium.By;
-
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
 
 class WebCaseInsensitiveConverter extends AbstractPlatformDependsConverter implements IPlatformDependsConverter {
 
     @Override
     public String idToXpath(String by) {
-        return locatorToXpath(by, LocatorType.ID,
+        return locatorToXpath(by, LocatorType.BY_ID,
                 value -> createXpathFromAnotherTypeOfLocator(".", "*", "@id", "'", value));
     }
 
     @Override
     public String nameToXpath(String by) {
-        return locatorToXpath(by, LocatorType.NAME,
+        return locatorToXpath(by, LocatorType.BY_NAME,
                 value -> createXpathFromAnotherTypeOfLocator(".", "*", "@name", "'", value));
     }
 
     @Override
     public String linkTextToXpath(String by) {
-        return locatorToXpath(by, LocatorType.LINKTEXT,
+        return locatorToXpath(by, LocatorType.BY_LINKTEXT,
                 value -> createXpathFromAnotherTypeOfLocator(".", "a", "text()", "'", value));
     }
 
