@@ -15,12 +15,16 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.gui;
 
+import io.appium.java_client.pagefactory.AppiumElementLocatorFactory;
+import io.appium.java_client.pagefactory.DefaultElementByBuilder;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.pagefactory.AbstractAnnotations;
+import org.openqa.selenium.support.pagefactory.DefaultFieldDecorator;
 import org.testng.Assert;
 
 import com.zebrunner.carina.utils.Configuration;

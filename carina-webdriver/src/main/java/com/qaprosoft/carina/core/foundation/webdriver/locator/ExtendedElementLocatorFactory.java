@@ -17,28 +17,46 @@ package com.qaprosoft.carina.core.foundation.webdriver.locator;
 
 import java.lang.reflect.Field;
 
+import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
 
-public final class ExtendedElementLocatorFactory implements ElementLocatorFactory {
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
+
+import io.appium.java_client.internal.CapabilityHelpers;
+import io.appium.java_client.remote.MobileCapabilityType;
+
+public final class ExtendedElementLocatorFactory implements ElementLocatorFactory, IDriverPool {
     private final SearchContext searchContext;
     private final WebDriver webDriver;
-    
     private boolean isRootElementUsed;
+    private String platform;
+    private String automation;
 
     public ExtendedElementLocatorFactory(WebDriver webDriver, SearchContext searchContext, boolean isRootElementUsed) {
         this.webDriver = webDriver;
         this.searchContext = searchContext;
         this.isRootElementUsed = isRootElementUsed;
+        if (this.webDriver instanceof HasCapabilities) {
+            Capabilities caps = ((HasCapabilities) this.webDriver).getCapabilities();
+            this.platform = CapabilityHelpers.getCapability(caps, CapabilityType.PLATFORM_NAME, String.class);
+            this.automation = CapabilityHelpers.getCapability(caps, MobileCapabilityType.AUTOMATION_NAME, String.class);
+        } else {
+            this.platform = null;
+            this.automation = null;
+        }
     }
-    
-	public boolean isRootElementUsed() {
-		return isRootElementUsed;
-	}
+
+    public boolean isRootElementUsed() {
+        return isRootElementUsed;
+    }
 
     public ElementLocator createLocator(Field field) {
-        return new ExtendedElementLocator(webDriver, searchContext, field);
+        return new ExtendedElementLocator(webDriver, searchContext, field, platform, automation, getDevice(webDriver));
     }
 }

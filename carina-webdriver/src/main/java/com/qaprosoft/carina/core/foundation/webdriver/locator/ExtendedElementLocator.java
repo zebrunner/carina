@@ -22,24 +22,26 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.pagefactory.AbstractAnnotations;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Localized;
-import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.LocalizedLocatorConverter;
+import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.LocatorConverter;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.SeleniumToAppiumConverter;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.CaseInsensitiveConverter;
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.factory.DeviceType;
 
-import io.appium.java_client.remote.MobileCapabilityType;
+import io.appium.java_client.pagefactory.DefaultElementByBuilder;
 
 /**
  * The default element locator, which will lazily locate an element or an
@@ -50,69 +52,74 @@ import io.appium.java_client.remote.MobileCapabilityType;
  */
 public class ExtendedElementLocator implements ElementLocator {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private final SearchContext searchContext;
-    private final WebDriver driver;
-    // original locator without any transformations
     private By originalBy;
-    // final locator obtained after transformations
     private By by;
     private String className;
+    private boolean caseInsensitive = false;
     private boolean localized = false;
-    // all converters that apply to the current element's locator
-    private final LinkedList<LocatorConverter> converters = new LinkedList<>();
-    
+    private String platform;
+    private String automation;
+    private Device device;
+    private final WebDriver driver;
+    private final LinkedList<LocatorConverter> locatorConverters = new LinkedList<>();
     /**
      * Creates a new element locator.
      *
-     * @param driver see {@link WebDriver}
      * @param searchContext The context to use when finding the element
      * @param field The field on the Page Object that will hold the located
      *            value
      */
-    public ExtendedElementLocator(WebDriver driver, SearchContext searchContext, Field field) {
-        this.searchContext = searchContext;
+    public ExtendedElementLocator(WebDriver driver, SearchContext searchContext, Field field,
+            String platform, String automation, Device device) {
         this.driver = driver;
+        this.searchContext = searchContext;
         String[] classPath = field.getDeclaringClass().toString().split("\\.");
         this.className = classPath[classPath.length-1];
 
-        if (field.isAnnotationPresent(FindBy.class) || field.isAnnotationPresent(ExtendedFindBy.class)) {
-            DefaultAnnotations annotations = new DefaultAnnotations(field);
-            this.originalBy = annotations.buildBy();
-            this.by = this.originalBy;
+        AbstractAnnotations annotations = null;
 
-            converters.add(new LocalizedLocatorConverter(field));
+        if (DeviceType.Type.DESKTOP.equals(device.getDeviceType())) {
+            annotations = new LocalizedAnnotations(field);
+        } else {
+            if (field.isAnnotationPresent(ExtendedFindBy.class)) {
+                annotations = new LocalizedAnnotations(field);
+                locatorConverters.add(new SeleniumToAppiumConverter());
+            } else {
+                DefaultElementByBuilder builder = new DefaultElementByBuilder(platform, automation);
+                builder.setAnnotated(field);
+                annotations = builder;
+            }
+        }
 
+        this.by = annotations.buildBy();
+        this.originalBy = this.by;
+
+        // todo refactor/check
             if (field.isAnnotationPresent(CaseInsensitiveXPath.class)) {
-                boolean isMobile = ((HasCapabilities) driver).getCapabilities()
-                        .getCapability(MobileCapabilityType.APP) != null;
-                converters.add(new CaseInsensitiveConverter(field.getAnnotation(CaseInsensitiveXPath.class), isMobile));
+                CaseInsensitiveXPath csx = field.getAnnotation(CaseInsensitiveXPath.class);
+                locatorConverters.add(new CaseInsensitiveConverter(csx, !DeviceType.Type.DESKTOP.equals(device.getDeviceType())));
+                caseInsensitive = true;
             }
 
             if (field.isAnnotationPresent(Localized.class)) {
                 this.localized = true;
-            }
-            buildBy();
         }
     }
 
-    /**
-     * Get locator converters
-     * 
-     * @return {@link LinkedList} of {@link LocatorConverter}
-     */
-    public LinkedList<LocatorConverter> getLocatorConverters() {
-        return this.converters;
-    }
-
-    /**
-     * Build (rebuild) current locator, applying consistently all {@link LocatorConverter}, listed in {@link #converters}
-     */
     public void buildBy() {
-        String cloneBy = this.originalBy.toString();
-        for (LocatorConverter converter : converters) {
-            cloneBy = converter.convert(cloneBy);
+        String byAsString = this.originalBy.toString();
+        for (LocatorConverter converter : locatorConverters) {
+            byAsString = converter.convert(byAsString);
         }
-        this.by = createBy(cloneBy);
+
+        String finalByAsString = byAsString;
+        this.by = Arrays.stream(LocatorType.values())
+                .filter(locatorType -> locatorType.is(finalByAsString))
+                .findFirst()
+                .orElseThrow()
+                .buildLocatorFromString(byAsString);
     }
 
     /**
@@ -161,10 +168,6 @@ public class ExtendedElementLocator implements ElementLocator {
         return elements;
     }
 
-    public WebDriver getDriver() {
-        return this.driver;
-    }
-
     public SearchContext getSearchContext() {
         return this.searchContext;
     }
@@ -173,19 +176,23 @@ public class ExtendedElementLocator implements ElementLocator {
         return this.localized;
     }
 
+    public boolean isCaseInsensitive() {
+        return this.caseInsensitive;
+    }
+
     public By getBy() {
         return this.by;
+    }
+
+    public WebDriver getDriver() {
+        return this.driver;
     }
 
     public String getClassName() {
         return className;
     }
 
-    private By createBy(String locator) {
-        return Arrays.stream(LocatorType.values())
-                .filter(lt -> lt.is(locator))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException(String.format("Unable to generate By using locator: '%s'!", locator)))
-                .buildLocatorFromString(locator);
+    public LinkedList<LocatorConverter> getLocatorConverters() {
+        return this.locatorConverters;
     }
 }
