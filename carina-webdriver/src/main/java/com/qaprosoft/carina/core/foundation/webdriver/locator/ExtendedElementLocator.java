@@ -26,7 +26,6 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.pagefactory.AbstractAnnotations;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.slf4j.Logger;
@@ -35,8 +34,8 @@ import org.slf4j.LoggerFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Localized;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.LocalizedLocatorConverter;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.LocatorConverter;
-import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.SeleniumToAppiumConverter;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.CaseInsensitiveConverter;
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
 import com.zebrunner.carina.utils.factory.DeviceType;
@@ -85,16 +84,16 @@ public class ExtendedElementLocator implements ElementLocator {
         } else {
             if (field.isAnnotationPresent(ExtendedFindBy.class)) {
                 annotations = new LocalizedAnnotations(field);
-                locatorConverters.add(new SeleniumToAppiumConverter());
             } else {
                 DefaultElementByBuilder builder = new DefaultElementByBuilder(platform, automation);
                 builder.setAnnotated(field);
                 annotations = builder;
             }
         }
-
         this.by = annotations.buildBy();
         this.originalBy = this.by;
+
+        this.locatorConverters.add(new LocalizedLocatorConverter());
 
         // todo refactor/check
             if (field.isAnnotationPresent(CaseInsensitiveXPath.class)) {

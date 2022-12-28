@@ -17,7 +17,6 @@ package com.qaprosoft.carina.core.foundation.webdriver.locator;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -31,7 +30,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Acce
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.ClassChain;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Predicate;
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.zebrunner.carina.utils.resources.L10N;
 
 import io.appium.java_client.AppiumBy;
 
@@ -47,16 +45,6 @@ public class LocalizedAnnotations extends Annotations {
     public By buildBy() {
         By by = super.buildBy();
         String param = by.toString();
-
-        // replace by using localization pattern
-        Matcher matcher = L10N_PATTERN.matcher(param);
-        while (matcher.find()) {
-            int start = param.indexOf(SpecialKeywords.L10N + ":") + 5;
-            int end = param.indexOf("}");
-            String key = param.substring(start, end);
-            param = StringUtils.replace(param, matcher.group(), L10N.getText(key));
-        }
-
         if (getField().isAnnotationPresent(Predicate.class)) {
             // TODO: analyze howto determine iOS or Android predicate
             param = StringUtils.remove(param, LocatorType.XPATH.getStartsWith());
