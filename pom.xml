@@ -88,14 +88,9 @@
     <modules>
         <module>carina-api</module>
         <module>carina-dataprovider</module>
-        <module>carina-crypto</module>
-        <module>carina-utils</module>
         <module>carina-reporting</module>
         <module>carina-webdriver</module>
-        <module>carina-aws-s3</module>
-        <module>carina-appcenter</module>
         <module>carina-core</module>
-        <module>carina-azure</module>
     </modules>
     <!--repositories>
         <repository>
