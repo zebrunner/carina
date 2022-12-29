@@ -26,18 +26,16 @@ import org.openqa.selenium.support.pagefactory.Annotations;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.AccessibilityId;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.ClassChain;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Predicate;
-import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import com.zebrunner.carina.utils.factory.DeviceType;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
 
 import io.appium.java_client.AppiumBy;
 
 public class ExtendedAnnotations extends Annotations {
     private final boolean isIOS;
 
-    public ExtendedAnnotations(Field field, Device device) {
+    public ExtendedAnnotations(Field field, String platform) {
         super(field);
-        isIOS = DeviceType.Type.IOS_PHONE.getFamily()
-                .equals(device.getDeviceType().getFamily());
+        isIOS = SpecialKeywords.IOS.equalsIgnoreCase(platform);
     }
 
     @Override

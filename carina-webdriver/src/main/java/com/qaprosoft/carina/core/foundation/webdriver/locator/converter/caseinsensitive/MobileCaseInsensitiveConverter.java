@@ -6,7 +6,9 @@ class MobileCaseInsensitiveConverter extends AbstractPlatformDependsConverter im
 
     @Override
     public String idToXpath(String by) {
-        return locatorToXpath(by, LocatorType.BY_ID,
+        LocatorType type = LocatorType.APPIUM_BY_ID.is(by) ? LocatorType.APPIUM_BY_ID : LocatorType.BY_ID;
+
+        return locatorToXpath(by, type,
                 value -> {
                     String quote = value.contains("'") ? "\"" : "'";
                     return "//*[ends-with(" + "@resource-id" + ", " + quote + ":id/" + value + quote + ")]";
@@ -15,7 +17,8 @@ class MobileCaseInsensitiveConverter extends AbstractPlatformDependsConverter im
 
     @Override
     public String nameToXpath(String by) {
-        return locatorToXpath(by, LocatorType.BY_NAME,
+        LocatorType type = LocatorType.APPIUM_BY_NAME.is(by) ? LocatorType.APPIUM_BY_NAME : LocatorType.BY_NAME;
+        return locatorToXpath(by, type,
                 value -> createXpathFromAnotherTypeOfLocator("", "*", "@name", "'", value));
     }
 

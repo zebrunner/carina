@@ -18,6 +18,7 @@ package com.qaprosoft.carina.core.foundation.webdriver.locator;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.SearchContext;
@@ -26,7 +27,6 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.support.FindAll;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
-import org.openqa.selenium.support.decorators.Decorated;
 import org.openqa.selenium.support.pagefactory.AbstractAnnotations;
 import org.openqa.selenium.support.pagefactory.Annotations;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
@@ -38,10 +38,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.AccessibilityId;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.ClassChain;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Predicate;
-import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import com.zebrunner.carina.utils.factory.DeviceType;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
 
-import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.internal.CapabilityHelpers;
 import io.appium.java_client.pagefactory.DefaultElementByBuilder;
 import io.appium.java_client.remote.MobileCapabilityType;
@@ -50,9 +48,11 @@ public final class ExtendedElementLocatorFactory implements ElementLocatorFactor
     static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final SearchContext searchContext;
     private final WebDriver webDriver;
-    private final WebDriver castDriver;
     private final String platform;
     private final String automation;
+    private final String driverType;
+    // for case insensitive. refactor/remove if can
+    private boolean isMobileApp = false;
 
     public ExtendedElementLocatorFactory(WebDriver webDriver, SearchContext searchContext) {
         this.webDriver = webDriver;
@@ -61,52 +61,58 @@ public final class ExtendedElementLocatorFactory implements ElementLocatorFactor
             Capabilities capabilities = ((HasCapabilities) this.webDriver).getCapabilities();
             this.platform = CapabilityHelpers.getCapability(capabilities, CapabilityType.PLATFORM_NAME, String.class);
             this.automation = CapabilityHelpers.getCapability(capabilities, MobileCapabilityType.AUTOMATION_NAME, String.class);
+            String browserName = CapabilityHelpers.getCapability(capabilities, CapabilityType.BROWSER_NAME, String.class);
+            isMobileApp = CapabilityHelpers.getCapability(capabilities, MobileCapabilityType.APP, String.class) != null;
+            if (SpecialKeywords.ANDROID.equalsIgnoreCase(platform) ||
+                    SpecialKeywords.IOS.equalsIgnoreCase(platform) ||
+                    SpecialKeywords.TVOS.equalsIgnoreCase(platform)) {
+                driverType = SpecialKeywords.MOBILE;
+            } else if (!StringUtils.isEmpty(browserName)) {
+                driverType = SpecialKeywords.DESKTOP;
+            } else if (SpecialKeywords.WINDOWS.equalsIgnoreCase(platform)) {
+                driverType = SpecialKeywords.WINDOWS;
+            } else if (SpecialKeywords.MAC.equalsIgnoreCase(platform)) {
+                driverType = SpecialKeywords.MAC;
+            } else {
+                driverType = SpecialKeywords.DESKTOP;
+            }
         } else {
             this.platform = null;
             this.automation = null;
+            // todo ?
+            this.driverType = SpecialKeywords.DESKTOP;
         }
-        this.castDriver = webDriver instanceof Decorated<?> ? (WebDriver) ((Decorated<?>) webDriver).getOriginal() : webDriver;
     }
 
     public ElementLocator createLocator(Field field) {
         AbstractAnnotations annotations = null;
-        Device currentDevice = getDevice(webDriver);
-
-        if (!DeviceType.Type.DESKTOP.equals(currentDevice.getDeviceType()) ||
-                this.castDriver instanceof AppiumDriver) {
+        if (!SpecialKeywords.DESKTOP.equals(driverType)) {
             // todo create Annotations for every type of annotations
             if (field.isAnnotationPresent(ExtendedFindBy.class) ||
                     field.isAnnotationPresent(ClassChain.class) ||
                     field.isAnnotationPresent(AccessibilityId.class) ||
                     field.isAnnotationPresent(Predicate.class)) {
-                annotations = new ExtendedAnnotations(field, currentDevice);
+                annotations = new ExtendedAnnotations(field, platform);
             } else {
-                // todo add check if there are no FindBy or other annotations
-                DefaultElementByBuilder builder = new DefaultElementByBuilder(platform, automation);
-                builder.setAnnotated(field);
-                annotations = builder;
+                    DefaultElementByBuilder builder = new DefaultElementByBuilder(platform, automation);
+                    builder.setAnnotated(field);
+                    annotations = builder;
             }
-        } else {
-            if (field.getAnnotation(FindBy.class) != null ||
+        } else if (field.getAnnotation(FindBy.class) != null ||
                     field.getAnnotation(FindBys.class) != null ||
                     field.getAnnotation(FindAll.class) != null) {
                 annotations = new Annotations(field);
-            }
-        }
-
-        // todo remove if all is ok
-        if (annotations == null) {
-            if (field.isAnnotationPresent(FindBy.class) || field.isAnnotationPresent(ExtendedFindBy.class)) {
-                LOGGER.warn("Cannot find correct logic of locator's creation. Use old logic. "
-                        + "Please, inform Carina Support about this problem. Device: {}\n Field: {}", currentDevice,
-                        field);
-                annotations = new ExtendedAnnotations(field, currentDevice);
-            }
         }
 
         if (annotations == null) {
             return null;
         }
-        return new ExtendedElementLocator(webDriver, searchContext, field, annotations, currentDevice);
+        ExtendedElementLocator extendedElementLocator = null;
+        try {
+            extendedElementLocator = new ExtendedElementLocator(webDriver, searchContext, field, annotations, isMobileApp);
+        } catch (Exception e) {
+            LOGGER.debug("Cannot create extended element locator", e);
+        }
+        return extendedElementLocator;
     }
 }

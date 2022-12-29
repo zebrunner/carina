@@ -35,12 +35,10 @@ import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Localized;
-import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.LocalizedLocatorConverter;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.LocatorConverter;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.CaseInsensitiveConverter;
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.zebrunner.carina.utils.factory.DeviceType;
 
 import io.appium.java_client.pagefactory.bys.ContentMappedBy;
 
@@ -70,8 +68,7 @@ public class ExtendedElementLocator implements ElementLocator {
      * @param field The field on the Page Object that will hold the located
      *            value
      */
-    public ExtendedElementLocator(WebDriver driver, SearchContext searchContext, Field field, AbstractAnnotations annotations,
-            Device device) {
+    public ExtendedElementLocator(WebDriver driver, SearchContext searchContext, Field field, AbstractAnnotations annotations, boolean isMobileApp) {
         this.driver = driver;
         this.searchContext = searchContext;
         String[] classPath = field.getDeclaringClass().toString().split("\\.");
@@ -85,7 +82,8 @@ public class ExtendedElementLocator implements ElementLocator {
         // todo refactor/check
             if (field.isAnnotationPresent(CaseInsensitiveXPath.class)) {
                 CaseInsensitiveXPath csx = field.getAnnotation(CaseInsensitiveXPath.class);
-                locatorConverters.add(new CaseInsensitiveConverter(csx, !DeviceType.Type.DESKTOP.equals(device.getDeviceType())));
+                // fixme refactor to work
+                locatorConverters.add(new CaseInsensitiveConverter(csx, isMobileApp));
                 caseInsensitive = true;
             }
 
@@ -115,7 +113,7 @@ public class ExtendedElementLocator implements ElementLocator {
     }
 
     /**
-     * From {@link io.appium.java_client.pagefactory.AppiumElementLocator}
+     * From io.appium.java_client.pagefactory.AppiumElementLocator
      * This methods makes sets some settings of the {@link By} according to
      * the given instance of {@link SearchContext}. If there is some {@link ContentMappedBy}
      * then it is switched to the searching for some html or native mobile element.
