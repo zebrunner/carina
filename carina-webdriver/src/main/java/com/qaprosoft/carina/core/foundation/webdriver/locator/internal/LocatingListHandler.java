@@ -42,6 +42,12 @@ public class LocatingListHandler implements InvocationHandler {
         this.name = field.getName();
     }
 
+    public LocatingListHandler(ClassLoader loader, ElementLocator locator, String name) {
+        this.loader = loader;
+        this.locator = locator;
+        this.name = name;
+    }
+
     public Object invoke(Object object, Method method, Object[] objects) throws Throwable {
 		// Hotfix for huge and expected regression in carina: we lost managed
 		// time delays with lists manipulations

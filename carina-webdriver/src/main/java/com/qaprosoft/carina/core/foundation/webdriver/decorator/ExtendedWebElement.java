@@ -60,6 +60,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.FormatLocatorConverter;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.internal.LocatingListHandler;
 import com.zebrunner.carina.crypto.Algorithm;
 import com.zebrunner.carina.crypto.CryptoTool;
 import com.zebrunner.carina.crypto.CryptoToolBuilder;
@@ -1180,6 +1181,59 @@ public class ExtendedWebElement implements IWebElement {
             }
             return this;
         }
+    }
+
+    /**
+     * Get list of elements with formatted locator
+     * 
+     * @param objects parameters
+     * @return {@link List} of {@link ExtendedWebElement} if found, empty list otherwise
+     */
+    public List<ExtendedWebElement> formatToList(Object... objects) {
+        List<ExtendedWebElement> extendedWebElementList = new ArrayList<>();
+        if (this.element instanceof Proxy) {
+            /*
+             * if element created using annotation (FindBy, ExtendedFindBy and so on), it will be proxy, so we get it and re-generate locator
+             * with FormatLocatorConverter
+             */
+            try {
+                InvocationHandler innerProxy = Proxy.getInvocationHandler(this.element);
+                ExtendedElementLocator innerLocator = (ExtendedElementLocator) (FieldUtils.getDeclaredField(innerProxy.getClass(),
+                        "locator", true))
+                                .get(innerProxy);
+                FormatLocatorConverter converter = new FormatLocatorConverter(objects);
+                innerLocator.getLocatorConverters()
+                        .addFirst(converter);
+                innerLocator.buildConvertedBy();
+                innerLocator.getLocatorConverters()
+                        .remove(converter);
+
+                ClassLoader classLoader = getClass().getClassLoader();
+
+                InvocationHandler handler = new LocatingListHandler(classLoader, innerLocator, this.name);
+                extendedWebElementList = (List<ExtendedWebElement>) Proxy.newProxyInstance(classLoader, new Class[] { List.class }, handler);
+            } catch (Exception e) {
+                throw new RuntimeException("Something went wrong when try to format locator.", e);
+            }
+        } else {
+            String locator = this.by.toString();
+            By by = Arrays.stream(LocatorType.values())
+                    .filter(lt -> lt.is(locator))
+                    .findFirst()
+                    .orElseThrow(
+                            () -> new RuntimeException(String.format("Locator formatting failed - no suitable locator type found for formatting. "
+                                    + "Investigate why '%s' was not formatted", locator)))
+                    .buildLocatorFromString(locator, objects);
+
+            int i = 0;
+            for (WebElement el : this.searchContext.findElements(by)) {
+                ExtendedWebElement extendedWebElement = new ExtendedWebElement(by, String.format("%s - [%s]", name, i++), driver, searchContext,
+                        objects);
+                extendedWebElement.setElement(el);
+                extendedWebElementList.add(extendedWebElement);
+            }
+        }
+        return extendedWebElementList;
     }
 
     /**
