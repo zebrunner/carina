@@ -19,6 +19,10 @@ import com.qaprosoft.carina.core.foundation.webdriver.ScreenshotType;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.Configuration.Parameter;
 
+/**
+ * Screenshot rule for capturing screenshots if debug log level enabled.
+ * Not used by default in Carina Framework
+ */
 public class DebugLevelScreenshotRule implements IScreenshotRule {
 
     @Override

@@ -19,6 +19,10 @@ import com.qaprosoft.carina.core.foundation.webdriver.ScreenshotType;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.Configuration.Parameter;
 
+/**
+ * Screenshot rule for capturing screenshots on {@link ScreenshotType#SUCCESSFUL_DRIVER_ACTION}.
+ * Used Carina Framework by default
+ */
 public class DefaultSuccessfulDriverActionScreenshotRule implements IScreenshotRule {
 
     @Override
