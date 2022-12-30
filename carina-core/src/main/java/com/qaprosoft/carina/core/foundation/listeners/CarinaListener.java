@@ -151,7 +151,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 new DefaultUnSuccessfulDriverActionScreenshotRule(),
                 new ExplicitFullSizeScreenshotRule(),
                 new ExplicitVisibleScreenshotRule());
-        Screenshot.addScreenshotRules(screenshotRules);
+        Screenshot.addRules(screenshotRules);
 
         TestNameResolverRegistry.set(new ZebrunnerNameResolver());
         CompositeLabelResolver.addResolver(new TagManager());
