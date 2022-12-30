@@ -105,7 +105,7 @@ public final class Screenshot {
     public static synchronized List<IScreenshotRule> addScreenshotRule(IScreenshotRule rule) {
         LOGGER.debug("Following rule will be added: {}", rule.getClass().getName());
         ScreenshotType screenshotType = rule.getEventType();
-        Optional<IScreenshotRule> ruleByEventType = getScreenshotRule(screenshotType);
+        Optional<IScreenshotRule> ruleByEventType = getRule(screenshotType);
         if (ruleByEventType.isPresent()) {
             LOGGER.debug("Rule with '{}' event type already exists and will be replaced by '{}'.",
                     screenshotType, rule.getClass().getName());
