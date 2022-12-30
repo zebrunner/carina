@@ -69,59 +69,96 @@ import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
 import ru.yandex.qatools.ashot.shooting.ShootingStrategy;
 
 /**
- * Screenshot manager for operation with screenshot capturing, resizing and removing of old screenshot folders.
+ * Screenshot manager.
  *
  * @author Alex Khursevich
  */
 public final class Screenshot {
-    // TODO: deprecate and later move to private all capture methods allowing to do captureByRule only.
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final List<IScreenshotRule> RULES = Collections.synchronizedList(new ArrayList<IScreenshotRule>());
+    private static final List<IScreenshotRule> RULES = Collections.synchronizedList(new ArrayList<>());
     private static final Duration DEFAULT_PAGE_LOAD_TIMEOUT = Duration.ofSeconds(300);
     private static final String ERROR_STACKTRACE = "Error stacktrace: ";
+    private static final String ACTUAL_RANGE_OF_SCREENSHOT_RULES_MESSAGE = "Actual range of screenshot rules: {}";
     
     private Screenshot() {
     	//hide default constructor
     }
 
     /**
-     * Adds screenshot rule
+     * Adds screenshot rule.
      *
-     * @param rule IScreenshotRule
-     * @return list of existing rules
+     * @param rule {@link IScreenshotRule}
+     * @return list of current rules {@link IScreenshotRule}s after adding
      */
+    public static synchronized List<IScreenshotRule> addRule(IScreenshotRule rule) {
+        return addScreenshotRule(rule);
+    }
+
+    /**
+     * Adds screenshot rule.
+     *
+     * @deprecated for simplifying name of the method, use {@link #addRule(IScreenshotRule)} instead.
+     * @param rule {@link IScreenshotRule}.
+     * @return list of current rules {@link IScreenshotRule}s after adding
+     */
+    @Deprecated(forRemoval = true, since = "8.0.5")
     public static synchronized List<IScreenshotRule> addScreenshotRule(IScreenshotRule rule) {
         LOGGER.debug("Following rule will be added: {}", rule.getClass().getName());
         ScreenshotType screenshotType = rule.getEventType();
         Optional<IScreenshotRule> ruleByEventType = getScreenshotRule(screenshotType);
         if (ruleByEventType.isPresent()) {
-            LOGGER.debug("Rule with '{}' event type already exists and will be replaced.", screenshotType);
+            LOGGER.debug("Rule with '{}' event type already exists and will be replaced by '{}'.",
+                    screenshotType, rule.getClass().getName());
             ruleByEventType.ifPresent(RULES::remove);
         }
         RULES.add(rule);
-        LOGGER.debug("Actual range of screenshot rules: {}", RULES);
+        LOGGER.debug(ACTUAL_RANGE_OF_SCREENSHOT_RULES_MESSAGE, RULES);
         return RULES;
     }
 
     /**
-     * Adds screenshot rules
+     * Adds screenshot rules.
      *
-     * @param rulesList - list of new rules
-     * @return list of existing rules
+     * @param rulesList list of {@link IScreenshotRule}s that will be added
+     * @return list of current rules {@link IScreenshotRule}s after adding
      */
+    public static synchronized List<IScreenshotRule> addRules(List<IScreenshotRule> rulesList) {
+        return addScreenshotRules(rulesList);
+    }
+
+    /**
+     * Adds screenshot rules.
+     *
+     * @deprecated for simplifying name of the method, use {@link #addRules(List)} instead.
+     * @param rulesList list of {@link IScreenshotRule}s that will be added
+     * @return list of current rules {@link IScreenshotRule}s after adding
+     */
+    @Deprecated(forRemoval = true, since = "8.0.5")
     public static synchronized List<IScreenshotRule> addScreenshotRules(List<IScreenshotRule> rulesList) {
         for (IScreenshotRule rule : rulesList) {
-            addScreenshotRule(rule);
+            addRule(rule);
         }
         return RULES;
     }
 
     /**
-     * Delete rule
+     * Remove rule if exists
      *
-     * @param rule IScreenshotRule
-     * @return list of existing rules
+     * @param rule {@link IScreenshotRule} for removing
+     * @return list of current {@link IScreenshotRule}s after removing rule
      */
+    public static synchronized List<IScreenshotRule> removeRule(IScreenshotRule rule) {
+        return removeScreenshotRule(rule);
+    }
+
+    /**
+     * Remove rule if exists
+     *
+     * @deprecated for simplifying name of the method, use {@link #removeRule(IScreenshotRule)} instead.
+     * @param rule {@link IScreenshotRule} for removing
+     * @return list of current {@link IScreenshotRule}s after removing rule
+     */
+    @Deprecated(forRemoval = true, since = "8.0.5")
     public static synchronized List<IScreenshotRule> removeScreenshotRule(IScreenshotRule rule) {
         LOGGER.debug("Following rule will be removed if it exists: {}", rule.getClass().getName());
         RULES.remove(rule);
@@ -129,17 +166,29 @@ public final class Screenshot {
         return RULES;
     }
 
-    public static synchronized Optional<IScreenshotRule> getScreenshotRule(ScreenshotType screenshotType) {
+    /**
+     * Get screenshot rule by {@link ScreenshotType}.
+     * 
+     * @param screenshotType {@link ScreenshotType}.
+     * @return {@link Optional} of {@link IScreenshotRule} if exists, {@link Optional#empty()} otherwise.
+     */
+    public static synchronized Optional<IScreenshotRule> getRule(ScreenshotType screenshotType) {
         return RULES.stream()
                 .filter(r -> r.getEventType().equals(screenshotType))
                 .findFirst();
     }
 
-    public static synchronized List<IScreenshotRule> removeScreenshotRule(ScreenshotType screenshotType) {
+    /**
+     * Remove screenshot rule by {@link ScreenshotType} if exists.
+     *
+     * @param screenshotType {@link ScreenshotType}.
+     * @return {@link List} of {@link IScreenshotRule} after removing.
+     */
+    public static synchronized List<IScreenshotRule> removeRule(ScreenshotType screenshotType) {
         LOGGER.debug("Rule with even type '{}' will be removed if it exists.", screenshotType);
-        Optional<IScreenshotRule> ruleByEventType = getScreenshotRule(screenshotType);
+        Optional<IScreenshotRule> ruleByEventType = getRule(screenshotType);
         if (ruleByEventType.isPresent()) {
-            LOGGER.debug("Detected rule '{}' with event type '{}' and it will be removed.", ruleByEventType.get().getClass(), screenshotType);
+            LOGGER.debug("Detected rule '{}' with event type '{}', it will be removed.", ruleByEventType.get().getClass(), screenshotType);
             RULES.remove(ruleByEventType.get());
         }
         LOGGER.debug("Actual range of screenshot rules: {}", RULES);
@@ -147,9 +196,9 @@ public final class Screenshot {
     }
 
     /**
-     * Clear all rules and disable all kind of screenshots even for failures!
+     * Clear all rules and disable all kind of screenshots, even for failures!
      */
-    public static void clearRules() {
+    public static synchronized void clearRules() {
         LOGGER.warn("All screenshot capture rules will be deleted. Automatic capturing disabled even for failures!");
         RULES.clear();
     }
@@ -162,6 +211,7 @@ public final class Screenshot {
      *            instance used for capturing.
      * @param comment String
      * @return screenshot name.
+     * @deprecated use {@link #capture(WebDriver, ScreenshotType, String)} instead
      */
     @Deprecated(forRemoval = true, since = "8.0.5")
     public static String captureByRule(WebDriver driver, String comment) {
@@ -177,7 +227,7 @@ public final class Screenshot {
      * @param comment String
      * @param isFullSize boolean
      * @return screenshot name.
-     * @deprecated use {@link #capture(WebDriver, ScreenshotType, String)} or {@link #capture(WebDriver, IScreenshotRule, String)}
+     * @deprecated use {@link #capture(WebDriver, ScreenshotType, String)} instead
      */
     @Deprecated(forRemoval = true, since = "8.0.5")
     public static String captureByRule(WebDriver driver, String comment, boolean isFullSize) {
@@ -199,7 +249,8 @@ public final class Screenshot {
      * @param driver instance used for capturing.
      * @param comment String
      * @return screenshot name.
-     * @deprecated use {@link #capture(WebDriver, ScreenshotType, String)} or {@link #capture(WebDriver, IScreenshotRule, String)}
+     * @deprecated use {@link #capture(WebDriver, IScreenshotRule, String)} instead, or {@link #capture(WebDriver, ScreenshotType, String)}
+     *             with {@link ScreenshotType#EXPLICIT_VISIBLE}
      */
     @Deprecated(forRemoval = true, since = "8.0.5")
     public static String capture(WebDriver driver, String comment) {
@@ -214,17 +265,37 @@ public final class Screenshot {
      * @param isFullSize
      *            Boolean
      * @return screenshot name.
-     * @deprecated use {@link #capture(WebDriver, ScreenshotType, String)} or {@link #capture(WebDriver, IScreenshotRule, String)}
+     * @deprecated use {@link #capture(WebDriver, IScreenshotRule, String)} instead, or {@link #capture(WebDriver, ScreenshotType, String)}
+     *             with {@link ScreenshotType#EXPLICIT_VISIBLE} or {@link ScreenshotType#EXPLICIT_FULL_SIZE}
      */
     @Deprecated(forRemoval = true, since = "8.0.5")
     public static String capture(WebDriver driver, String comment, boolean isFullSize) {
         return capture(driver, true, comment, isFullSize);
     }
 
+    /**
+     * Capture screenshot by rule.
+     * Search rule in pool by specified {@link ScreenshotType}, and if there is one, a screenshot is taken on it.
+     * 
+     * @param driver {@link WebDriver}.
+     * @param screenshotType {@link ScreenshotType}.
+     * @return {@link Optional} with name of screenshot file (file name with extension) if captured and successfully saved, {@link Optional#empty()}
+     *         otherwise.
+     */
     public static Optional<String> capture(WebDriver driver, ScreenshotType screenshotType) {
         return capture(driver, screenshotType, "");
     }
 
+    /**
+     * Capture screenshot by rule.
+     * Search rule in pool by specified {@link ScreenshotType}, and if there is one, a screenshot is taken on it.
+     *
+     * @param driver {@link WebDriver}.
+     * @param screenshotType {@link ScreenshotType}.
+     * @param comment screenshot comment
+     * @return {@link Optional} with name of screenshot file (file name with extension) if captured and successfully saved, {@link Optional#empty()}
+     *         otherwise.
+     */
     public static Optional<String> capture(WebDriver driver, ScreenshotType screenshotType, String comment) {
         IScreenshotRule rule = null;
         synchronized (RULES) {
@@ -232,18 +303,17 @@ public final class Screenshot {
                     .filter(r -> screenshotType.equals(r.getEventType()))
                     .findFirst()
                     .orElse(null);
-
         }
         return rule != null ? capture(driver, rule, comment) : Optional.empty();
     }
 
     /**
-     * Capture screenshot by rule, creates thumbnail and copies both images to specified screenshots location.
-     * See {@link IScreenshotRule}
+     * Capture screenshot by concrete rule (ignoring rules in pool).
      *
      * @param driver {@link WebDriver}
      * @param comment screenshot comment
-     * @return {@link Optional} with screenshot
+     * @return {@link Optional} with name of screenshot file (file name with extension) if captured and successfully saved, {@link Optional#empty()}
+     *         otherwise.
      */
     public static Optional<String> capture(WebDriver driver, IScreenshotRule rule, String comment) {
         Objects.requireNonNull(rule, "screenshot rule param must not be null");
@@ -331,6 +401,12 @@ public final class Screenshot {
         return Optional.ofNullable(screenshotFileName);
     }
 
+    /**
+     * Check is rule valid
+     * 
+     * @param rule {@link IScreenshotRule}
+     * @return true if screenshot rule valid, false otherwise
+     */
     private static boolean isRuleValid(IScreenshotRule rule) {
         boolean isValid = true;
         if (rule.getFilename() == null || rule.getFilename().isEmpty()) {
@@ -514,7 +590,7 @@ public final class Screenshot {
      * @param driver web driver without listeners (original)
      * @exception IOException see {@link ImageIO#read(File)}
      *
-     * @return a screenshot if it was produced successfully, or null otherwise
+     * @return a {@link BufferedImage} of screenshot if it was produced successfully, or null otherwise
      */
     private static BufferedImage takeFullScreenshot(WebDriver driver, Wait<WebDriver> wait) throws IOException {
         BufferedImage screenshot;
@@ -551,11 +627,11 @@ public final class Screenshot {
     }
 
     /**
-     * Take screenshot of visible part of the page
+     * Take screenshot of visible part of the page.
      *
      * @exception IOException see {@link ImageIO#read(File)}
      *
-     * @return a screenshot if it was produced successfully, or null otherwise
+     * @return a {@link BufferedImage} of screenshot if it was produced successfully, or null otherwise
      */
     private static BufferedImage takeVisibleScreenshot(Wait<WebDriver> wait) throws IOException {
             File capturedScreenshot = wait.until(drv -> ((TakesScreenshot) drv)
@@ -567,10 +643,8 @@ public final class Screenshot {
      * Analyze if screenshot can be captured using the most common reason when
      * driver is died etc.
      *
-     * @param message
-     *            - error message (stacktrace).
-     *
-     * @return boolean
+     * @param message error message (stacktrace).
+     * @return true if screenshot already captured (or cannot be captured), false otherwise
      */
 	public static boolean isCaptured(String message){
 		// [VD] do not use below line as it is too common!
@@ -637,17 +711,18 @@ public final class Screenshot {
     }
 
     /**
-     * Compares two different screenshots
+     * Compares two different screenshots.
+     * Creates an image with marked differences if the images differ.
      *
-     * @param bufferedImageExpected - old image
-     * @param bufferedImageActual   - new image
-     * @param comment               - String
-     * @param artifact              - boolean
-     * @param markupPolicy          - DiffMarkupPolicy
+     * @param bufferedImageExpected old image
+     * @param bufferedImageActual new image
+     * @param fileNameDiffImage name of the new image with marked differences
+     * @param artifact true if attach to test run as artifact, false if upload as screenshot
+     * @param markupPolicy {@link DiffMarkupPolicy}
      * @return boolean
      */
     public static boolean compare(BufferedImage bufferedImageExpected, BufferedImage bufferedImageActual,
-            String comment, boolean artifact, DiffMarkupPolicy markupPolicy) {
+            String fileNameDiffImage, boolean artifact, DiffMarkupPolicy markupPolicy) {
         String screenName;
         BufferedImage screen;
         try {
@@ -659,7 +734,7 @@ public final class Screenshot {
                 // Define test screenshot root
                 File testScreenRootDir = ReportContext.getTestDir();
 
-                screenName = comment + ".png";
+                screenName = fileNameDiffImage + ".png";
                 String screenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
 
                 if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1
@@ -674,7 +749,7 @@ public final class Screenshot {
 
                 // Uploading comparative screenshot to Amazon S3
                 if (artifact){
-                    com.zebrunner.agent.core.registrar.Artifact.attachToTest(comment + ".png", screenshot);
+                    com.zebrunner.agent.core.registrar.Artifact.attachToTest(fileNameDiffImage + ".png", screenshot);
                 } else {
                     com.zebrunner.agent.core.registrar.Screenshot.upload(Files.readAllBytes(screenshot.toPath()), Instant.now().toEpochMilli());
                 }
@@ -695,8 +770,6 @@ public final class Screenshot {
         } catch (Exception e) {
             LOGGER.warn("Unable to compare screenshots!");
             LOGGER.debug(ERROR_STACKTRACE, e);
-        } finally {
-            // do nothing
         }
         return true;
     }
@@ -732,11 +805,11 @@ public final class Screenshot {
     }
 
     /**
-     * Cast Carina driver to WebDriver removing all extra listeners (use it in problematic places where you handle all exceptions)
+     * Remove all driver extra listeners (use it in problematic places where you handle all exceptions)
      *
-     * @param driver WebDriver
+     * @param driver {@link WebDriver}
      *
-     * @return WebDriver
+     * @return {@link WebDriver} without driver listeners
      */
     private static WebDriver castDriver(WebDriver driver) {
         if (driver instanceof Decorated<?>) {
@@ -752,7 +825,6 @@ public final class Screenshot {
             //TODO: review upcoming appium 2.0 changes
             LOGGER.debug("Appium: Not implemented yet for pageLoad timeout!");
         }
-        
     }
 
     private static Duration getDefaultPageLoadTimeout() {
