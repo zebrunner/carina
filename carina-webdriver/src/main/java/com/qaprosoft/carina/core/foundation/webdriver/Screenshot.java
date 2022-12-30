@@ -172,10 +172,12 @@ public final class Screenshot {
      * @param screenshotType {@link ScreenshotType}.
      * @return {@link Optional} of {@link IScreenshotRule} if exists, {@link Optional#empty()} otherwise.
      */
-    public static synchronized Optional<IScreenshotRule> getRule(ScreenshotType screenshotType) {
-        return RULES.stream()
-                .filter(r -> r.getEventType().equals(screenshotType))
-                .findFirst();
+    public static Optional<IScreenshotRule> getRule(ScreenshotType screenshotType) {
+        synchronized (RULES) {
+            return RULES.stream()
+                    .filter(r -> r.getEventType().equals(screenshotType))
+                    .findFirst();
+        }
     }
 
     /**
