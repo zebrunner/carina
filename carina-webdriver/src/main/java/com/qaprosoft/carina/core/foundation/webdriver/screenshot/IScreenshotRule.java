@@ -27,7 +27,7 @@ import com.zebrunner.carina.utils.report.ReportContext;
 
 public interface IScreenshotRule {
 
-    public abstract ScreenshotType getEventType();
+    public abstract ScreenshotType getScreenshotType();
 
     public abstract boolean isTakeScreenshot();
 

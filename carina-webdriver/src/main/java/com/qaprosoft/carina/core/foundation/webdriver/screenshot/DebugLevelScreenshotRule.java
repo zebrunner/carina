@@ -26,7 +26,7 @@ import com.zebrunner.carina.utils.Configuration.Parameter;
 public class DebugLevelScreenshotRule implements IScreenshotRule {
 
     @Override
-    public ScreenshotType getEventType() {
+    public ScreenshotType getScreenshotType() {
         return ScreenshotType.SUCCESSFUL_DRIVER_ACTION;
     }
 

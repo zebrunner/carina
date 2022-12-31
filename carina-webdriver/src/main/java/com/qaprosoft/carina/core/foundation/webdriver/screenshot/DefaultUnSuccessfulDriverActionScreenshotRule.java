@@ -25,7 +25,7 @@ import com.zebrunner.carina.utils.Configuration;
 public class DefaultUnSuccessfulDriverActionScreenshotRule implements IScreenshotRule {
 
     @Override
-    public ScreenshotType getEventType() {
+    public ScreenshotType getScreenshotType() {
         return ScreenshotType.UNSUCCESSFUL_DRIVER_ACTION;
     }
 

@@ -24,7 +24,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.ScreenshotType;
 public class ExplicitVisibleScreenshotRule implements IScreenshotRule {
 
     @Override
-    public ScreenshotType getEventType() {
+    public ScreenshotType getScreenshotType() {
         return ScreenshotType.EXPLICIT_VISIBLE;
     }
 

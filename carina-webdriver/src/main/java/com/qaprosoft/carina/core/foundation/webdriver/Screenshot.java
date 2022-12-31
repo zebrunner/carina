@@ -104,7 +104,7 @@ public final class Screenshot {
     @Deprecated(forRemoval = true, since = "8.0.5")
     public static synchronized List<IScreenshotRule> addScreenshotRule(IScreenshotRule rule) {
         LOGGER.debug("Following rule will be added: {}", rule.getClass().getName());
-        ScreenshotType screenshotType = rule.getEventType();
+        ScreenshotType screenshotType = rule.getScreenshotType();
         Optional<IScreenshotRule> ruleByEventType = getRule(screenshotType);
         if (ruleByEventType.isPresent()) {
             LOGGER.debug("Rule with '{}' event type already exists and will be replaced by '{}'.",
@@ -175,7 +175,7 @@ public final class Screenshot {
     public static Optional<IScreenshotRule> getRule(ScreenshotType screenshotType) {
         synchronized (RULES) {
             return RULES.stream()
-                    .filter(r -> r.getEventType().equals(screenshotType))
+                    .filter(r -> r.getScreenshotType().equals(screenshotType))
                     .findFirst();
         }
     }
@@ -302,7 +302,7 @@ public final class Screenshot {
         IScreenshotRule rule = null;
         synchronized (RULES) {
             rule = RULES.stream()
-                    .filter(r -> screenshotType.equals(r.getEventType()))
+                    .filter(r -> screenshotType.equals(r.getScreenshotType()))
                     .findFirst()
                     .orElse(null);
         }
@@ -425,7 +425,7 @@ public final class Screenshot {
             isValid = false;
         }
 
-        if (rule.getEventType() == null) {
+        if (rule.getScreenshotType() == null) {
             LOGGER.error("Screenshot rule '{}' event type must not be null.", rule.getClass());
             isValid = false;
         }
