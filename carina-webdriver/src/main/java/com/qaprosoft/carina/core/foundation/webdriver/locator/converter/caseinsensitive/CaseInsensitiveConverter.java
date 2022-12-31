@@ -11,6 +11,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.LocatorConverter;
 
 public class CaseInsensitiveConverter implements LocatorConverter {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     // Contains type of locator as key and start part of locator as value
     private static final List<LocatorType> LIST_OF_CONVERTIBLE_LOCATORS = List.of(LocatorType.BY_ID, LocatorType.APPIUM_BY_ID,
@@ -23,16 +24,16 @@ public class CaseInsensitiveConverter implements LocatorConverter {
 
     private final IPlatformDependsConverter platformDependsConverter;
 
-    public CaseInsensitiveConverter(boolean isMobile) {
+    CaseInsensitiveConverter(boolean isMobile) {
         if (isMobile) {
-            platformDependsConverter = new MobileCaseInsensitiveConverter();
+            platformDependsConverter = new NativeMobileCaseInsensitiveConverter();
         } else {
             platformDependsConverter = new WebCaseInsensitiveConverter();
         }
     }
 
-    public CaseInsensitiveConverter(CaseInsensitiveXPath annotation, boolean isMobile) {
-        this(isMobile);
+    public CaseInsensitiveConverter(CaseInsensitiveXPath annotation, boolean isNativeMobile) {
+        this(isNativeMobile);
         isId = annotation.id();
         isName = annotation.name();
         isText = annotation.text();
@@ -92,7 +93,7 @@ public class CaseInsensitiveConverter implements LocatorConverter {
         return isId;
     }
 
-    public CaseInsensitiveConverter setId(boolean id) {
+    CaseInsensitiveConverter setId(boolean id) {
         isId = id;
         return this;
     }
@@ -101,7 +102,7 @@ public class CaseInsensitiveConverter implements LocatorConverter {
         return isName;
     }
 
-    public CaseInsensitiveConverter setName(boolean name) {
+    CaseInsensitiveConverter setName(boolean name) {
         isName = name;
         return this;
     }
@@ -110,7 +111,7 @@ public class CaseInsensitiveConverter implements LocatorConverter {
         return isText;
     }
 
-    public CaseInsensitiveConverter setText(boolean text) {
+    CaseInsensitiveConverter setText(boolean text) {
         isText = text;
         return this;
     }
@@ -119,7 +120,7 @@ public class CaseInsensitiveConverter implements LocatorConverter {
         return isClassAttr;
     }
 
-    public CaseInsensitiveConverter setClassAttr(boolean classAttr) {
+    CaseInsensitiveConverter setClassAttr(boolean classAttr) {
         isClassAttr = classAttr;
         return this;
     }

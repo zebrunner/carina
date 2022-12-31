@@ -44,6 +44,7 @@ public class ExtendedFieldDecorator implements FieldDecorator {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     protected ElementLocatorFactory factory;
+
     private WebDriver webDriver;
     
     public ExtendedFieldDecorator(ElementLocatorFactory factory, WebDriver webDriver) {
@@ -77,18 +78,19 @@ public class ExtendedFieldDecorator implements FieldDecorator {
         }
         if (AbstractUIObject.class.isAssignableFrom(field.getType())) {
             return proxyForAbstractUIObject(loader, field, locator);
-        } else if (List.class.isAssignableFrom(field.getType())) {
+        }
+
+        if (List.class.isAssignableFrom(field.getType())) {
             Type listType = getListType(field);
             if (ExtendedWebElement.class.isAssignableFrom((Class<?>) listType)) {
                 return proxyForListLocator(loader, field, locator);
-            } else if (AbstractUIObject.class.isAssignableFrom((Class<?>) listType)) {
-                return proxyForListUIObjects(loader, field, locator);
-            } else {
-                return null;
             }
-        } else {
-            return null;
+
+            if (AbstractUIObject.class.isAssignableFrom((Class<?>) listType)) {
+                return proxyForListUIObjects(loader, field, locator);
+            }
         }
+        return null;
     }
 
     private boolean isDecoratableList(Field field) {

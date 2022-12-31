@@ -35,12 +35,13 @@ import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Localized;
-import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.LocalizedLocatorConverter;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.LocalizeLocatorConverter;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.LocatorConverter;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.CaseInsensitiveConverter;
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
 
 import io.appium.java_client.pagefactory.bys.ContentMappedBy;
+import io.appium.java_client.pagefactory.bys.ContentType;
 
 /**
  * The default element locator, which will lazily locate an element or an
@@ -68,29 +69,24 @@ public class ExtendedElementLocator implements ElementLocator {
      * @param field The field on the Page Object that will hold the located
      *            value
      */
-    public ExtendedElementLocator(WebDriver driver, SearchContext searchContext, Field field, AbstractAnnotations annotations, boolean isMobileApp) {
+    public ExtendedElementLocator(WebDriver driver, SearchContext searchContext, Field field, AbstractAnnotations annotations) {
         this.driver = driver;
         this.searchContext = searchContext;
         String[] classPath = field.getDeclaringClass().toString().split("\\.");
-        this.className = classPath[classPath.length-1];
+        this.className = classPath[classPath.length - 1];
         this.by = annotations.buildBy();
         this.originalBy = this.by;
-        if (LocalizedLocatorConverter.L10N_PATTERN.matcher(this.by.toString()).find()) {
-            this.locatorConverters.add(new LocalizedLocatorConverter());
+        if (LocalizeLocatorConverter.getL10nPattern().matcher(this.by.toString()).find()) {
+            this.locatorConverters.add(new LocalizeLocatorConverter());
         }
-
-        // todo refactor/check
-            if (field.isAnnotationPresent(CaseInsensitiveXPath.class)) {
-                CaseInsensitiveXPath csx = field.getAnnotation(CaseInsensitiveXPath.class);
-                // fixme refactor to work
-                locatorConverters.add(new CaseInsensitiveConverter(csx, isMobileApp));
-                caseInsensitive = true;
-            }
-
-            if (field.isAnnotationPresent(Localized.class)) {
-                this.localized = true;
+        if (field.isAnnotationPresent(CaseInsensitiveXPath.class)) {
+            CaseInsensitiveXPath csx = field.getAnnotation(CaseInsensitiveXPath.class);
+            locatorConverters.add(new CaseInsensitiveConverter(csx, ContentType.NATIVE_MOBILE_SPECIFIC.equals(getCurrentContentType(searchContext))));
+            caseInsensitive = true;
         }
-
+        if (field.isAnnotationPresent(Localized.class)) {
+            this.localized = true;
+        }
         buildConvertedBy();
     }
 

@@ -2,12 +2,11 @@ package com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseins
 
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
 
-class MobileCaseInsensitiveConverter extends AbstractPlatformDependsConverter implements IPlatformDependsConverter {
+class NativeMobileCaseInsensitiveConverter extends AbstractPlatformDependsConverter implements IPlatformDependsConverter {
 
     @Override
     public String idToXpath(String by) {
         LocatorType type = LocatorType.APPIUM_BY_ID.is(by) ? LocatorType.APPIUM_BY_ID : LocatorType.BY_ID;
-
         return locatorToXpath(by, type,
                 value -> {
                     String quote = value.contains("'") ? "\"" : "'";
@@ -47,5 +46,4 @@ class MobileCaseInsensitiveConverter extends AbstractPlatformDependsConverter im
     public String xpathClassCaseInsensitive(String by) {
         return caseInsensitiveXpathByAttribute(by, "@class");
     }
-
 }

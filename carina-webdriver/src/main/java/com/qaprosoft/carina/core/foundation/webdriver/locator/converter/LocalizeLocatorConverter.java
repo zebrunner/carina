@@ -8,11 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
 import com.zebrunner.carina.utils.resources.L10N;
 
-public class LocalizedLocatorConverter implements LocatorConverter {
-    public static final Pattern L10N_PATTERN = Pattern.compile(SpecialKeywords.L10N_PATTERN);
-
-    public LocalizedLocatorConverter() {
-    }
+public class LocalizeLocatorConverter implements LocatorConverter {
+    private static final Pattern L10N_PATTERN = Pattern.compile(SpecialKeywords.L10N_PATTERN);
 
     @Override
     public String convert(String by) {
@@ -26,5 +23,14 @@ public class LocalizedLocatorConverter implements LocatorConverter {
             locator = StringUtils.replace(locator, matcher.group(), L10N.getText(key));
         }
         return locator;
+    }
+
+    /**
+     * Get compiled L10N pattern
+     * 
+     * @return {@link Pattern}
+     */
+    public static Pattern getL10nPattern() {
+        return L10N_PATTERN;
     }
 }

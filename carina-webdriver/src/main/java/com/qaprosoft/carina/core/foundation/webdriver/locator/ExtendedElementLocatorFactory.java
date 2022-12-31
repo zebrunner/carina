@@ -51,8 +51,6 @@ public final class ExtendedElementLocatorFactory implements ElementLocatorFactor
     private final String platform;
     private final String automation;
     private final String driverType;
-    // for case insensitive. refactor/remove if can
-    private boolean isMobileApp = false;
 
     public ExtendedElementLocatorFactory(WebDriver webDriver, SearchContext searchContext) {
         this.webDriver = webDriver;
@@ -62,29 +60,20 @@ public final class ExtendedElementLocatorFactory implements ElementLocatorFactor
             this.platform = CapabilityHelpers.getCapability(capabilities, CapabilityType.PLATFORM_NAME, String.class);
             this.automation = CapabilityHelpers.getCapability(capabilities, MobileCapabilityType.AUTOMATION_NAME, String.class);
             String browserName = CapabilityHelpers.getCapability(capabilities, CapabilityType.BROWSER_NAME, String.class);
-            isMobileApp = CapabilityHelpers.getCapability(capabilities, MobileCapabilityType.APP, String.class) != null;
-            if (SpecialKeywords.ANDROID.equalsIgnoreCase(platform) ||
-                    SpecialKeywords.IOS.equalsIgnoreCase(platform) ||
-                    SpecialKeywords.TVOS.equalsIgnoreCase(platform)) {
-                driverType = SpecialKeywords.MOBILE;
-            } else if (!StringUtils.isEmpty(browserName)) {
-                driverType = SpecialKeywords.DESKTOP;
-            } else if (SpecialKeywords.WINDOWS.equalsIgnoreCase(platform)) {
-                driverType = SpecialKeywords.WINDOWS;
-            } else if (SpecialKeywords.MAC.equalsIgnoreCase(platform)) {
-                driverType = SpecialKeywords.MAC;
-            } else {
-                driverType = SpecialKeywords.DESKTOP;
-            }
+            this.driverType = detectDriverType(browserName, platform);
         } else {
+            LOGGER.error("Driver should realize HasCapabilities class!");
             this.platform = null;
             this.automation = null;
-            // todo ?
-            this.driverType = SpecialKeywords.DESKTOP;
+            this.driverType = null;
         }
     }
 
     public ElementLocator createLocator(Field field) {
+        if (this.driverType == null) {
+            return null;
+        }
+
         AbstractAnnotations annotations = null;
         if (!SpecialKeywords.DESKTOP.equals(driverType)) {
             // todo create Annotations for every type of annotations
@@ -92,7 +81,7 @@ public final class ExtendedElementLocatorFactory implements ElementLocatorFactor
                     field.isAnnotationPresent(ClassChain.class) ||
                     field.isAnnotationPresent(AccessibilityId.class) ||
                     field.isAnnotationPresent(Predicate.class)) {
-                annotations = new ExtendedAnnotations(field, platform);
+                annotations = new ExtendedAnnotations(field);
             } else {
                     DefaultElementByBuilder builder = new DefaultElementByBuilder(platform, automation);
                     builder.setAnnotated(field);
@@ -109,10 +98,30 @@ public final class ExtendedElementLocatorFactory implements ElementLocatorFactor
         }
         ExtendedElementLocator extendedElementLocator = null;
         try {
-            extendedElementLocator = new ExtendedElementLocator(webDriver, searchContext, field, annotations, isMobileApp);
+            extendedElementLocator = new ExtendedElementLocator(webDriver, searchContext, field, annotations);
         } catch (Exception e) {
             LOGGER.debug("Cannot create extended element locator", e);
         }
         return extendedElementLocator;
+    }
+
+    private String detectDriverType(String browserName, String platform) {
+        String type = null;
+        if (SpecialKeywords.ANDROID.equalsIgnoreCase(platform) ||
+                SpecialKeywords.IOS.equalsIgnoreCase(platform) ||
+                SpecialKeywords.TVOS.equalsIgnoreCase(platform)) {
+            type = SpecialKeywords.MOBILE;
+        } else if (!StringUtils.isEmpty(browserName)) {
+            type = SpecialKeywords.DESKTOP;
+        } else if (SpecialKeywords.WINDOWS.equalsIgnoreCase(platform)) {
+            type = SpecialKeywords.WINDOWS;
+        } else if (SpecialKeywords.MAC.equalsIgnoreCase(platform)) {
+            type = SpecialKeywords.MAC;
+        }
+
+        if (type == null) {
+            LOGGER.error("Cannot detect driver type by capabilities");
+        }
+        return type;
     }
 }

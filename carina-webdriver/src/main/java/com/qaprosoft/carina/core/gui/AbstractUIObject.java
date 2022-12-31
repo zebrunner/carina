@@ -17,6 +17,7 @@ package com.qaprosoft.carina.core.gui;
 
 import static io.appium.java_client.pagefactory.utils.WebDriverUnpackUtility.unpackWebDriverFromSearchContext;
 
+import org.openqa.selenium.Beta;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -75,11 +76,7 @@ public abstract class AbstractUIObject extends DriverHelper {
         PageFactory.initElements(new ExtendedFieldDecorator(factory, driver), this);
     }
 
-    /**
-     * Experimental
-     *
-     * @param searchContext see {@link SearchContext}
-     */
+    @Beta
     public AbstractUIObject(SearchContext searchContext) {
         this(unpackWebDriverFromSearchContext(searchContext), searchContext);
     }

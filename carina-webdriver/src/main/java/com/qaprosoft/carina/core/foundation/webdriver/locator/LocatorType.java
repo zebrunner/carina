@@ -33,10 +33,6 @@ public enum LocatorType {
         }
     },
 
-    /**
-     * For IOS the element name.
-     * For Android it is the resource identifier. See {@link AppiumBy.ByName}
-     */
     APPIUM_BY_NAME("AppiumBy.name: ") {
         public By buildLocatorFromString(String locator) {
             return AppiumBy.name(StringUtils.remove(locator, getStartsWith()));
@@ -57,10 +53,6 @@ public enum LocatorType {
         }
     },
 
-    /**
-     * For IOS the element name.
-     * For Android it is the resource identifier. See {@link AppiumBy.ById}
-     */
     APPIUM_BY_ID("AppiumBy.id: ") {
         public By buildLocatorFromString(String locator) {
             return AppiumBy.id(StringUtils.remove(locator, getStartsWith()));
@@ -90,11 +82,6 @@ public enum LocatorType {
         }
     },
 
-    /**
-     * For IOS it is the full name of the XCUI element and begins with XCUIElementType.
-     * For Android it is the full name of the UIAutomator2 class (e.g.: android.widget.TextView)
-     * see {@link AppiumBy.ByClassName}
-     */
     APPIUM_BY_CLASSNAME("AppiumBy.className: ") {
         public By buildLocatorFromString(String locator) {
             return AppiumBy.className(StringUtils.remove(locator, getStartsWith()));

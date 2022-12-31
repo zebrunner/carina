@@ -38,13 +38,12 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WrapsDriver;
 import org.openqa.selenium.WrapsElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.remote.RemoteWebElement;
-import org.openqa.selenium.support.decorators.Decorated;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
@@ -75,28 +74,33 @@ import com.zebrunner.carina.utils.performance.ACTION_NAME;
 import com.zebrunner.carina.utils.resources.L10N;
 
 public class ExtendedWebElement implements IWebElement {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
+
     private static final long RETRY_TIME = Configuration.getLong(Parameter.RETRY_INTERVAL);
-    private static final String CRYPTO_PATTERN = Configuration.get(Parameter.CRYPTO_PATTERN);
-    private static final Pattern COMPILED_CRYPTO_PATTERN = Pattern.compile(Configuration.get(Parameter.CRYPTO_PATTERN));
-    private final ElementLoadingStrategy loadingStrategy = ElementLoadingStrategy.valueOf(Configuration.get(Parameter.ELEMENT_LOADING_STRATEGY));
+
     // we should keep both properties: driver and searchContext obligatory
     // driver is used for actions, javascripts execution etc
     // searchContext is used for searching element by default
     private WebDriver driver;
     private SearchContext searchContext;
-    private WebElement element = null;
-    private String name;
-    private By by;
-    private boolean isLocalized = false;
-    private boolean isSingleElement = true;
-    // Converted array of objects to String for dynamic element locators
-    private String formatValues = "";
 
     private CryptoTool cryptoTool = null;
 
+    private static String CRYPTO_PATTERN = Configuration.get(Parameter.CRYPTO_PATTERN);
+
+    private WebElement element = null;
+    private String name;
+    private By by;
+
+    private ElementLoadingStrategy loadingStrategy = ElementLoadingStrategy.valueOf(Configuration.get(Parameter.ELEMENT_LOADING_STRATEGY));
+
+    private boolean isLocalized = false;
+    private boolean isSingleElement = true;
+
+    // Converted array of objects to String for dynamic element locators
+    private String formatValues = "";
 
     public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext, Object[] formatValues) {
         this(by, name, driver, searchContext);
@@ -159,8 +163,7 @@ public class ExtendedWebElement implements IWebElement {
                 // -> it should allow to search via regular driver and fluent waits - getBy()
                 this.by = locator.getBy();
             } else {
-                // take context as driver
-                this.driver = unpackWebDriverFromWebElement(element);
+                this.driver = ((WrapsDriver) element).getWrappedDriver();
                 this.searchContext = this.driver;
             }
         } catch (IllegalAccessException | ClassCastException e) {
@@ -175,10 +178,6 @@ public class ExtendedWebElement implements IWebElement {
         }
     }
 
-    private WebDriver unpackWebDriverFromWebElement(WebElement element) {
-        return element instanceof Decorated<?> ? ((RemoteWebElement) ((Decorated<?>) element).getOriginal()).getWrappedDriver()
-                : ((RemoteWebElement) element).getWrappedDriver();
-    }
 
     public WebElement getElement() {
         if (this.element == null) {
@@ -1154,8 +1153,7 @@ public class ExtendedWebElement implements IWebElement {
                         "locator", true))
                                 .get(innerProxy);
                 FormatLocatorConverter converter = new FormatLocatorConverter(objects);
-                innerLocator.getLocatorConverters()
-                        .addFirst(converter);
+                innerLocator.getLocatorConverters().addFirst(converter);
                 innerLocator.buildConvertedBy();
                 innerLocator.getLocatorConverters()
                         .remove(converter);
@@ -1191,12 +1189,12 @@ public class ExtendedWebElement implements IWebElement {
      */
     public List<ExtendedWebElement> formatToList(Object... objects) {
         List<ExtendedWebElement> extendedWebElementList = new ArrayList<>();
-        if (this.element instanceof Proxy) {
-            /*
-             * if element created using annotation (FindBy, ExtendedFindBy and so on), it will be proxy, so we get it and re-generate locator
-             * with FormatLocatorConverter
-             */
-            try {
+        try {
+            if (this.element instanceof Proxy) {
+                /*
+                 * if element created using annotation (FindBy, ExtendedFindBy and so on), it will be proxy, so we get it and re-generate locator
+                 * with FormatLocatorConverter
+                 */
                 InvocationHandler innerProxy = Proxy.getInvocationHandler(this.element);
                 ExtendedElementLocator innerLocator = (ExtendedElementLocator) (FieldUtils.getDeclaredField(innerProxy.getClass(),
                         "locator", true))
@@ -1212,26 +1210,26 @@ public class ExtendedWebElement implements IWebElement {
 
                 InvocationHandler handler = new LocatingListHandler(classLoader, innerLocator, this.name);
                 extendedWebElementList = (List<ExtendedWebElement>) Proxy.newProxyInstance(classLoader, new Class[] { List.class }, handler);
-            } catch (Exception e) {
-                throw new RuntimeException("Something went wrong when try to format locator.", e);
-            }
-        } else {
-            String locator = this.by.toString();
-            By by = Arrays.stream(LocatorType.values())
-                    .filter(lt -> lt.is(locator))
-                    .findFirst()
-                    .orElseThrow(
-                            () -> new RuntimeException(String.format("Locator formatting failed - no suitable locator type found for formatting. "
-                                    + "Investigate why '%s' was not formatted", locator)))
-                    .buildLocatorFromString(locator, objects);
+            } else {
+                String locator = this.by.toString();
+                By by = Arrays.stream(LocatorType.values())
+                        .filter(lt -> lt.is(locator))
+                        .findFirst()
+                        .orElseThrow(
+                                () -> new RuntimeException(String.format("Locator formatting failed - no suitable locator type found for formatting. "
+                                        + "Investigate why '%s' was not formatted", locator)))
+                        .buildLocatorFromString(locator, objects);
 
-            int i = 0;
-            for (WebElement el : this.searchContext.findElements(by)) {
-                ExtendedWebElement extendedWebElement = new ExtendedWebElement(by, String.format("%s - [%s]", name, i++), driver, searchContext,
-                        objects);
-                extendedWebElement.setElement(el);
-                extendedWebElementList.add(extendedWebElement);
+                int i = 0;
+                for (WebElement el : this.searchContext.findElements(by)) {
+                    ExtendedWebElement extendedWebElement = new ExtendedWebElement(by, String.format("%s - [%s]", name, i++), driver, searchContext,
+                            objects);
+                    extendedWebElement.setElement(el);
+                    extendedWebElementList.add(extendedWebElement);
+                }
             }
+        } catch (Exception e) {
+            LOGGER.error("Something went wrong when try to format locator.", e);
         }
         return extendedWebElementList;
     }
@@ -1824,7 +1822,8 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     private String decryptIfEncrypted(String text) {
-        Matcher cryptoMatcher = COMPILED_CRYPTO_PATTERN.matcher(text);
+        Matcher cryptoMatcher = Pattern.compile(CRYPTO_PATTERN)
+                .matcher(text);
         String decryptedText = text;
         if (cryptoMatcher.find()) {
             initCryptoTool();

@@ -26,16 +26,13 @@ import org.openqa.selenium.support.pagefactory.Annotations;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.AccessibilityId;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.ClassChain;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Predicate;
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
 
 import io.appium.java_client.AppiumBy;
 
 public class ExtendedAnnotations extends Annotations {
-    private final boolean isIOS;
 
-    public ExtendedAnnotations(Field field, String platform) {
+    public ExtendedAnnotations(Field field) {
         super(field);
-        isIOS = SpecialKeywords.IOS.equalsIgnoreCase(platform);
     }
 
     @Override
@@ -45,12 +42,8 @@ public class ExtendedAnnotations extends Annotations {
         if (getField().isAnnotationPresent(Predicate.class)) {
             param = StringUtils.remove(param, LocatorType.BY_XPATH.getStartsWith());
             // TODO: analyze howto determine iOS or Android predicate
-            // UPDATED 8.0.5: we can detect using Device class
-            if (isIOS) {
                 by = AppiumBy.iOSNsPredicateString(param);
-            } else {
-                by = AppiumBy.androidUIAutomator(param);
-            }
+                // AppiumBy.androidUIAutomator(param);
         } else if (getField().isAnnotationPresent(ClassChain.class)) {
             param = StringUtils.remove(param, LocatorType.BY_XPATH.getStartsWith());
             by = AppiumBy.iOSClassChain(param);

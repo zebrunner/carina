@@ -98,6 +98,14 @@ public abstract class ExtendedFindByBuilder extends AbstractFindByBuilder {
             return AppiumBy.androidViewMatcher(findByCarina.androidViewMatcher());
         }
 
+        if (!"".equals(findByCarina.androidViewTag())) {
+            return AppiumBy.androidViewTag(findByCarina.androidViewMatcher());
+        }
+
+        if (!"".equals(findByCarina.custom())) {
+            return AppiumBy.custom(findByCarina.androidViewMatcher());
+        }
+
         return null;
     }
 }
