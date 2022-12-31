@@ -27,10 +27,25 @@ import com.zebrunner.carina.utils.report.ReportContext;
 
 public interface IScreenshotRule {
 
+    /**
+     * Get the type of screenshots for which the current rule will apply
+     * 
+     * @return {@link ScreenshotType}
+     */
     public abstract ScreenshotType getScreenshotType();
 
+    /**
+     * Take a screenshot or not
+     * 
+     * @return true if allow capture screenshot, false otherwise
+     */
     public abstract boolean isTakeScreenshot();
 
+    /**
+     * Allow full-size screenshot or not
+     * 
+     * @return true if allow capture of full-size screenshot, false otherwise
+     */
     public abstract boolean isAllowFullSize();
 
     /**
@@ -71,16 +86,21 @@ public interface IScreenshotRule {
         return "png";
     }
 
+    /**
+     * Get timeout for screenshot capturing
+     * 
+     * @return {@link Duration} timeout
+     */
     default Duration getTimeout() {
         int divider = isAllowFullSize() ? 2 : 3;
         return Duration.ofSeconds(Configuration.getInt(Configuration.Parameter.EXPLICIT_TIMEOUT) / divider);
     }
 
     /**
-     * If need to check rules when capture screenshot<br>
+     * Is need to check rules when capture screenshot<br>
      * Method that validate rules: com.qaprosoft.carina.core.foundation.webdriver.Screenshot#validateRule(IScreenshotRule)
      * 
-     * @return true if need, false otherwise
+     * @return true if needed, false otherwise
      */
     @Beta
     default boolean isEnableValidation() {
