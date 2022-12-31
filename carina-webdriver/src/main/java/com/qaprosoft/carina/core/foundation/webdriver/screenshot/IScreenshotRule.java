@@ -53,26 +53,26 @@ public interface IScreenshotRule {
      * 
      * @return {@link ImmutablePair}, left - width, right - height
      */
-    default ImmutablePair<Integer, Integer> getImageResizeDimensions() {
+    public default ImmutablePair<Integer, Integer> getImageResizeDimensions() {
         return new ImmutablePair<>(Configuration.getInt(Configuration.Parameter.BIG_SCREEN_WIDTH),
                 Configuration.getInt(Configuration.Parameter.BIG_SCREEN_HEIGHT));
     }
 
     /**
-     * Path where to save screenshot
+     * Get path where to save screenshot
      * 
      * @return {@link Path} to the folder
      */
-    default Path getSaveFolder() {
+    public default Path getSaveFolder() {
         return Path.of(ReportContext.getTestDir().getAbsolutePath());
     }
 
     /**
-     * Get screenshot filename. The return name must be unique for the test run
+     * Get screenshot filename. The return name must be unique for the test run!
      * 
      * @return screenshot filename
      */
-    default String getFilename() {
+    public default String getFilename() {
         return String.valueOf(System.currentTimeMillis());
     }
 
@@ -82,7 +82,7 @@ public interface IScreenshotRule {
      * @return image file extension
      */
     @Beta
-    default String getFileExtension() {
+    public default String getFileExtension() {
         return "png";
     }
 
@@ -91,7 +91,7 @@ public interface IScreenshotRule {
      * 
      * @return {@link Duration} timeout
      */
-    default Duration getTimeout() {
+    public default Duration getTimeout() {
         int divider = isAllowFullSize() ? 2 : 3;
         return Duration.ofSeconds(Configuration.getInt(Configuration.Parameter.EXPLICIT_TIMEOUT) / divider);
     }
@@ -103,7 +103,7 @@ public interface IScreenshotRule {
      * @return true if needed, false otherwise
      */
     @Beta
-    default boolean isEnableValidation() {
+    public default boolean isEnableValidation() {
         return "DEBUG".equalsIgnoreCase(Configuration.get(Configuration.Parameter.CORE_LOG_LEVEL));
     }
 }
