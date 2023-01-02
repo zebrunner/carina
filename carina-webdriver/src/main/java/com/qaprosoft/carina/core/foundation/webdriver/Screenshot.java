@@ -26,11 +26,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.imageio.ImageIO;
 
@@ -78,7 +77,7 @@ import ru.yandex.qatools.ashot.shooting.ShootingStrategy;
  */
 public final class Screenshot {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final List<IScreenshotRule> RULES = Collections.synchronizedList(new ArrayList<>());
+    private static final List<IScreenshotRule> RULES = new CopyOnWriteArrayList<>();
     private static final Duration DEFAULT_PAGE_LOAD_TIMEOUT = Duration.ofSeconds(300);
     private static final String ERROR_STACKTRACE = "Error stacktrace: ";
     private static final String ACTUAL_RANGE_OF_SCREENSHOT_RULES_MESSAGE = "Actual range of screenshot rules: {}";
@@ -93,7 +92,7 @@ public final class Screenshot {
      * @param rule {@link IScreenshotRule}
      * @return list of current rules {@link IScreenshotRule}s after adding
      */
-    public static synchronized List<IScreenshotRule> addRule(IScreenshotRule rule) {
+    public static List<IScreenshotRule> addRule(IScreenshotRule rule) {
         return addScreenshotRule(rule);
     }
 
@@ -105,7 +104,7 @@ public final class Screenshot {
      * @return list of current rules {@link IScreenshotRule}s after adding
      */
     @Deprecated(forRemoval = true, since = "8.0.5")
-    public static synchronized List<IScreenshotRule> addScreenshotRule(IScreenshotRule rule) {
+    public static List<IScreenshotRule> addScreenshotRule(IScreenshotRule rule) {
         LOGGER.debug("Following rule will be added: {}", rule.getClass().getName());
         ScreenshotType screenshotType = rule.getScreenshotType();
         Optional<IScreenshotRule> ruleByEventType = getRule(screenshotType);
@@ -125,7 +124,7 @@ public final class Screenshot {
      * @param rulesList list of {@link IScreenshotRule}s that will be added
      * @return list of current rules {@link IScreenshotRule}s after adding
      */
-    public static synchronized List<IScreenshotRule> addRules(List<IScreenshotRule> rulesList) {
+    public static List<IScreenshotRule> addRules(List<IScreenshotRule> rulesList) {
         return addScreenshotRules(rulesList);
     }
 
@@ -137,7 +136,7 @@ public final class Screenshot {
      * @return list of current rules {@link IScreenshotRule}s after adding
      */
     @Deprecated(forRemoval = true, since = "8.0.5")
-    public static synchronized List<IScreenshotRule> addScreenshotRules(List<IScreenshotRule> rulesList) {
+    public static List<IScreenshotRule> addScreenshotRules(List<IScreenshotRule> rulesList) {
         for (IScreenshotRule rule : rulesList) {
             addRule(rule);
         }
@@ -150,7 +149,7 @@ public final class Screenshot {
      * @param rule {@link IScreenshotRule} for removing
      * @return list of current {@link IScreenshotRule}s after removing rule
      */
-    public static synchronized List<IScreenshotRule> removeRule(IScreenshotRule rule) {
+    public static List<IScreenshotRule> removeRule(IScreenshotRule rule) {
         return removeScreenshotRule(rule);
     }
 
@@ -162,7 +161,7 @@ public final class Screenshot {
      * @return list of current {@link IScreenshotRule}s after removing rule
      */
     @Deprecated(forRemoval = true, since = "8.0.5")
-    public static synchronized List<IScreenshotRule> removeScreenshotRule(IScreenshotRule rule) {
+    public static List<IScreenshotRule> removeScreenshotRule(IScreenshotRule rule) {
         LOGGER.debug("Following rule will be removed if it exists: {}", rule.getClass().getName());
         RULES.remove(rule);
         LOGGER.debug("Actual range of screenshot rules: {}", RULES.toString());
@@ -176,11 +175,14 @@ public final class Screenshot {
      * @return {@link Optional} of {@link IScreenshotRule} if exists, {@link Optional#empty()} otherwise.
      */
     public static Optional<IScreenshotRule> getRule(ScreenshotType screenshotType) {
-        synchronized (RULES) {
-            return RULES.stream()
-                    .filter(r -> r.getScreenshotType().equals(screenshotType))
-                    .findFirst();
+        IScreenshotRule rule = null;
+        for (IScreenshotRule r : RULES) {
+            if (r.getScreenshotType().equals(screenshotType)) {
+                rule = r;
+                break;
+            }
         }
+        return Optional.ofNullable(rule);
     }
 
     /**
@@ -189,7 +191,7 @@ public final class Screenshot {
      * @param screenshotType {@link ScreenshotType}.
      * @return {@link List} of {@link IScreenshotRule} after removing.
      */
-    public static synchronized List<IScreenshotRule> removeRule(ScreenshotType screenshotType) {
+    public static List<IScreenshotRule> removeRule(ScreenshotType screenshotType) {
         LOGGER.debug("Rule with even type '{}' will be removed if it exists.", screenshotType);
         Optional<IScreenshotRule> ruleByEventType = getRule(screenshotType);
         if (ruleByEventType.isPresent()) {
@@ -203,7 +205,7 @@ public final class Screenshot {
     /**
      * Clear all rules and disable all kind of screenshots, even for failures!
      */
-    public static synchronized void clearRules() {
+    public static void clearRules() {
         LOGGER.warn("All screenshot capture rules will be deleted. Automatic capturing disabled even for failures!");
         RULES.clear();
     }
@@ -318,11 +320,11 @@ public final class Screenshot {
      */
     public static Optional<String> capture(WebDriver driver, ScreenshotType screenshotType, String comment) {
         IScreenshotRule rule = null;
-        synchronized (RULES) {
-            rule = RULES.stream()
-                    .filter(r -> screenshotType.equals(r.getScreenshotType()))
-                    .findFirst()
-                    .orElse(null);
+        for (IScreenshotRule r : RULES) {
+            if (r.getScreenshotType().equals(screenshotType)) {
+                rule = r;
+                break;
+            }
         }
         return rule != null ? capture(driver, driver, rule, comment) : Optional.empty();
     }
@@ -340,11 +342,11 @@ public final class Screenshot {
      */
     public static Optional<String> capture(WebElement element, ScreenshotType screenshotType, String comment) {
         IScreenshotRule rule = null;
-        synchronized (RULES) {
-            rule = RULES.stream()
-                    .filter(r -> screenshotType.equals(r.getScreenshotType()))
-                    .findFirst()
-                    .orElse(null);
+        for (IScreenshotRule r : RULES) {
+            if (r.getScreenshotType().equals(screenshotType)) {
+                rule = r;
+                break;
+            }
         }
         return rule != null ? capture(((WrapsDriver) element).getWrappedDriver(), element, rule, comment) : Optional.empty();
     }
