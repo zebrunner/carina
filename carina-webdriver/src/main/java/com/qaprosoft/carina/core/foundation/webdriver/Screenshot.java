@@ -35,8 +35,6 @@ import java.util.Optional;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.imgscalr.Scalr;
 import org.openqa.selenium.Beta;
@@ -57,7 +55,6 @@ import org.openqa.selenium.support.ui.Wait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.Configuration.Parameter;
@@ -422,11 +419,12 @@ public final class Screenshot {
             Pair<Integer, Integer> dimensions = rule.getImageResizeDimensions();
             screenshot = resizeImg(screenshot, dimensions.getLeft(), dimensions.getRight());
 
-            String fileName = rule.getFilename() + "." + rule.getFileExtension();
+            String fileExtension = "png"; // https://w3c.github.io/webdriver/#screen-capture
+            String fileName = rule.getFilename() + "." + fileExtension;
             Path file = Path.of(rule.getSaveFolder().toString(), fileName)
                     .toAbsolutePath();
 
-            ImageIO.write(screenshot, rule.getFileExtension(), file.toFile());
+            ImageIO.write(screenshot, fileExtension, file.toFile());
 
             screenshotFileName = fileName;
 
@@ -465,10 +463,6 @@ public final class Screenshot {
         boolean isValid = true;
         if (rule.getFilename() == null || rule.getFilename().isEmpty()) {
             LOGGER.error("Screenshot rule '{}' filename must not be null or empty.", rule.getClass());
-            isValid = false;
-        }
-        if (StringUtils.isBlank(rule.getFileExtension())) {
-            LOGGER.error("Screenshot rule '{}' file extension must not be null or empty.", rule.getClass());
             isValid = false;
         }
 

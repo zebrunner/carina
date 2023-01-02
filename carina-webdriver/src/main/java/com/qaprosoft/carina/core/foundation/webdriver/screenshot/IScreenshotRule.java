@@ -77,16 +77,6 @@ public interface IScreenshotRule {
     }
 
     /**
-     * Get screenshot file extension
-     * 
-     * @return image file extension
-     */
-    @Beta
-    public default String getFileExtension() {
-        return "png";
-    }
-
-    /**
      * Get timeout for screenshot capturing
      * 
      * @return {@link Duration} timeout
