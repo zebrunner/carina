@@ -25,8 +25,10 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WrapsDriver;
 import org.openqa.selenium.WrapsElement;
 import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.support.FindBy;
@@ -130,7 +132,8 @@ public class ExtendedFieldDecorator implements FieldDecorator {
      */
     protected ExtendedWebElement proxyForLocator(ClassLoader loader, Field field, ElementLocator locator) {
         InvocationHandler handler = new LocatingElementHandler(locator);
-        WebElement proxy = (WebElement) Proxy.newProxyInstance(loader, new Class[] { WebElement.class, WrapsElement.class, Locatable.class },
+        WebElement proxy = (WebElement) Proxy.newProxyInstance(loader, new Class[] { WebElement.class, WrapsElement.class, WrapsDriver.class,
+                Locatable.class, TakesScreenshot.class },
                 handler);
         By by = null;
         if (field.isAnnotationPresent(FindBy.class) || field.isAnnotationPresent(ExtendedFindBy.class)) {
@@ -144,7 +147,8 @@ public class ExtendedFieldDecorator implements FieldDecorator {
     protected <T extends AbstractUIObject> T proxyForAbstractUIObject(ClassLoader loader, Field field,
             ElementLocator locator) {
         InvocationHandler handler = new LocatingElementHandler(locator);
-        WebElement proxy = (WebElement) Proxy.newProxyInstance(loader, new Class[] { WebElement.class, WrapsElement.class, Locatable.class },
+        WebElement proxy = (WebElement) Proxy.newProxyInstance(loader,
+                new Class[] { WebElement.class, WrapsElement.class, WrapsDriver.class, Locatable.class, TakesScreenshot.class },
                 handler);
         Class<? extends AbstractUIObject> clazz = (Class<? extends AbstractUIObject>) field.getType();
         T uiObject;
