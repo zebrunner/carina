@@ -157,18 +157,16 @@ public abstract class AbstractPage extends AbstractUIObject implements ICustomTy
 
         File artifactsFolder = ReportContext.getArtifactsFolder();
 
-        String fileID = fileName.replaceAll("\\W+", "_") + "-" + System.currentTimeMillis();
-        pdfName = fileID + ".pdf";
 
         ExplicitFullSizeScreenshotRule screenshotRule = new ExplicitFullSizeScreenshotRule();
-
-        String fullPdfPath = artifactsFolder.getAbsolutePath() + "/" + pdfName;
-        // TODO: test this implementation and change back to capture if necessary
-
-        Optional<String> screenshot = Screenshot.capture(getDriver(), screenshotRule, "");
+        Optional<String> screenshot = Screenshot.capture(getDriver(), getDriver(), screenshotRule, "");
         if (screenshot.isEmpty()) {
             return pdfName;
         }
+
+        String fileID = fileName.replaceAll("\\W+", "_") + "-" + System.currentTimeMillis();
+        pdfName = fileID + ".pdf";
+        String fullPdfPath = artifactsFolder.getAbsolutePath() + "/" + pdfName;
 
         Image image = Image.getInstance(screenshotRule.getSaveFolder().toFile().getAbsolutePath() + "/" + screenshot.get());
         Document document = null;

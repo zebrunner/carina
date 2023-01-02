@@ -38,14 +38,18 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.imgscalr.Scalr;
+import org.openqa.selenium.Beta;
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.OutputType;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WrapsDriver;
 import org.openqa.selenium.support.decorators.Decorated;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Wait;
@@ -251,8 +255,8 @@ public final class Screenshot {
      * @param driver instance used for capturing.
      * @param comment String
      * @return screenshot name.
-     * @deprecated use {@link #capture(WebDriver, IScreenshotRule, String)} instead, or {@link #capture(WebDriver, ScreenshotType, String)}
-     *             with {@link ScreenshotType#EXPLICIT_VISIBLE}
+     * @deprecated use {@link #capture(WebDriver, SearchContext, IScreenshotRule, String)} instead, or
+     *             {@link #capture(WebDriver, ScreenshotType, String)} with {@link ScreenshotType#EXPLICIT_VISIBLE}
      */
     @Deprecated(forRemoval = true, since = "8.0.5")
     public static String capture(WebDriver driver, String comment) {
@@ -267,8 +271,9 @@ public final class Screenshot {
      * @param isFullSize
      *            Boolean
      * @return screenshot name.
-     * @deprecated use {@link #capture(WebDriver, IScreenshotRule, String)} instead, or {@link #capture(WebDriver, ScreenshotType, String)}
-     *             with {@link ScreenshotType#EXPLICIT_VISIBLE} or {@link ScreenshotType#EXPLICIT_FULL_SIZE}
+     * @deprecated use {@link #capture(WebDriver, SearchContext, IScreenshotRule, String)} instead, or
+     *             {@link #capture(WebDriver, ScreenshotType, String)} with {@link ScreenshotType#EXPLICIT_VISIBLE} or
+     *             {@link ScreenshotType#EXPLICIT_FULL_SIZE}
      */
     @Deprecated(forRemoval = true, since = "8.0.5")
     public static String capture(WebDriver driver, String comment, boolean isFullSize) {
@@ -290,6 +295,20 @@ public final class Screenshot {
 
     /**
      * Capture screenshot by rule.
+     * Search rule in pool by specified {@link ScreenshotType}, and if there is one, a screenshot is taken on it.<br>
+     * If the rule specifies a screenshot of only the visible area, then the screenshot will be of the element
+     *
+     * @param element {@link WebElement}.
+     * @param screenshotType {@link ScreenshotType}.
+     * @return {@link Optional} with name of screenshot file (file name with extension) if captured and successfully saved, {@link Optional#empty()}
+     *         otherwise.
+     */
+    public static Optional<String> capture(WebElement element, ScreenshotType screenshotType) {
+        return capture(element, screenshotType, "");
+    }
+
+    /**
+     * Capture screenshot by rule.
      * Search rule in pool by specified {@link ScreenshotType}, and if there is one, a screenshot is taken on it.
      *
      * @param driver {@link WebDriver}.
@@ -306,18 +325,44 @@ public final class Screenshot {
                     .findFirst()
                     .orElse(null);
         }
-        return rule != null ? capture(driver, rule, comment) : Optional.empty();
+        return rule != null ? capture(driver, driver, rule, comment) : Optional.empty();
+    }
+
+    /**
+     * Capture screenshot by rule.
+     * Search rule in pool by specified {@link ScreenshotType}, and if there is one, a screenshot is taken on it.<br>
+     * If the rule specifies a screenshot of only the visible area, then the screenshot will be of the element
+     * 
+     * @param element {@link WebElement}.
+     * @param screenshotType {@link ScreenshotType}.
+     * @param comment screenshot comment
+     * @return {@link Optional} with name of screenshot file (file name with extension) if captured and successfully saved, {@link Optional#empty()}
+     *         otherwise.
+     */
+    public static Optional<String> capture(WebElement element, ScreenshotType screenshotType, String comment) {
+        IScreenshotRule rule = null;
+        synchronized (RULES) {
+            rule = RULES.stream()
+                    .filter(r -> screenshotType.equals(r.getScreenshotType()))
+                    .findFirst()
+                    .orElse(null);
+        }
+        return rule != null ? capture(((WrapsDriver) element).getWrappedDriver(), element, rule, comment) : Optional.empty();
     }
 
     /**
      * Capture screenshot by concrete rule (ignoring rules in pool).
      *
      * @param driver {@link WebDriver}
+     * @param screenshotContext may be {@link WebDriver} or {@link WebElement}.
+     *            If the rule specifies a screenshot of only the visible area and an {@link WebElement} will be passed to this parameter,
+     *            then the screenshot will be of the element
      * @param comment screenshot comment
      * @return {@link Optional} with name of screenshot file (file name with extension) if captured and successfully saved, {@link Optional#empty()}
      *         otherwise.
      */
-    public static Optional<String> capture(WebDriver driver, IScreenshotRule rule, String comment) {
+    @Beta
+    public static Optional<String> capture(WebDriver driver, SearchContext screenshotContext, IScreenshotRule rule, String comment) {
         Objects.requireNonNull(rule, "screenshot rule param must not be null");
         Objects.requireNonNull(rule, "comment to screenshot must not be null");
 
@@ -341,14 +386,19 @@ public final class Screenshot {
         LOGGER.debug("Screenshot->capture starting...");
         try {
             setPageLoadTimeout(originalDriver, rule.getTimeout());
-            Wait<WebDriver> wait = new FluentWait<>(driver)
-                    .pollingEvery(rule.getTimeout())
-                    .withTimeout(rule.getTimeout());
+
             if (rule.isAllowFullSize()) {
                 LOGGER.debug("starting full size screenshot capturing...");
+                Wait<WebDriver> wait = new FluentWait<>(driver)
+                        .pollingEvery(rule.getTimeout())
+                        .withTimeout(rule.getTimeout());
                 screenshot = takeFullScreenshot(driver, wait);
             } else {
                 LOGGER.debug("starting visible screenshot capturing...");
+                SearchContext originalSearchContext = castSearchContext(screenshotContext);
+                Wait<TakesScreenshot> wait = new FluentWait<>((TakesScreenshot) originalSearchContext)
+                        .pollingEvery(rule.getTimeout())
+                        .withTimeout(rule.getTimeout());
                 screenshot = takeVisibleScreenshot(wait);
             }
         } catch (TimeoutException e) {
@@ -451,7 +501,7 @@ public final class Screenshot {
      * @param comment String
      * @param fullSize boolean
      * @return screenshot name.
-     * @deprecated use {@link #capture(WebDriver, ScreenshotType, String)} or {@link #capture(WebDriver, IScreenshotRule, String)}
+     * @deprecated use {@link #capture(WebDriver, ScreenshotType, String)} or {@link #capture(WebDriver, SearchContext, IScreenshotRule, String)}
      */
     @Deprecated(forRemoval = true, since = "8.0.5")
     private static String capture(WebDriver driver, boolean isTakeScreenshot, String comment, boolean fullSize) {
@@ -498,13 +548,16 @@ public final class Screenshot {
                 BufferedImage screen = null;
                 try {
                     setPageLoadTimeout(driver, timeout);
-                    Wait<WebDriver> wait = new FluentWait<>(driver)
-                            .pollingEvery(timeout)
-                            .withTimeout(timeout);
                     // Create screenshot
                     if (fullSize) {
+                        Wait<WebDriver> wait = new FluentWait<>(driver)
+                                .pollingEvery(timeout)
+                                .withTimeout(timeout);
                         screen = takeFullScreenshot(driver, wait);
                     } else {
+                        Wait<TakesScreenshot> wait = new FluentWait<>((TakesScreenshot) driver)
+                                .pollingEvery(timeout)
+                                .withTimeout(timeout);
                         screen = takeVisibleScreenshot(wait);
                     }
                 } catch (TimeoutException e) {
@@ -635,9 +688,8 @@ public final class Screenshot {
      *
      * @return a {@link BufferedImage} of screenshot if it was produced successfully, or null otherwise
      */
-    private static BufferedImage takeVisibleScreenshot(Wait<WebDriver> wait) throws IOException {
-            File capturedScreenshot = wait.until(drv -> ((TakesScreenshot) drv)
-                    .getScreenshotAs(OutputType.FILE));
+    private static BufferedImage takeVisibleScreenshot(Wait<TakesScreenshot> wait) throws IOException {
+        File capturedScreenshot = wait.until(screenshotContext -> screenshotContext.getScreenshotAs(OutputType.FILE));
             return ImageIO.read(capturedScreenshot);
     }
 
@@ -818,6 +870,20 @@ public final class Screenshot {
             return (WebDriver) ((Decorated<?>) driver).getOriginal();
         }
         return driver;
+    }
+
+    /**
+     * Remove all search context extra listeners (use it in problematic places where you handle all exceptions)
+     *
+     * @param context {@link SearchContext}
+     *
+     * @return {@link SearchContext} without listeners
+     */
+    private static SearchContext castSearchContext(SearchContext context) {
+        if (context instanceof Decorated<?>) {
+            return (SearchContext) ((Decorated<?>) context).getOriginal();
+        }
+        return context;
     }
 
     private static void setPageLoadTimeout(WebDriver drv, Duration timeout) {
