@@ -75,7 +75,7 @@ import ru.yandex.qatools.ashot.shooting.ShootingStrategy;
  *
  * @author Alex Khursevich
  */
-public final class Screenshot {
+public class Screenshot {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final List<IScreenshotRule> RULES = new CopyOnWriteArrayList<>();
     private static final Duration DEFAULT_PAGE_LOAD_TIMEOUT = Duration.ofSeconds(300);
