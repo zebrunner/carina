@@ -123,8 +123,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         LOGGER.info(Configuration.asString());
         // Configuration.validateConfiguration();
 
-        // if we initialize the logger in beforeSuite, all classes we access up to that point are initialized with INFO level
-        // however we still lose the debug logs for this class
+        // if we initialize the logger in onStart(suite), all classes we access up to that point are initialized with INFO level
+        // if me init logger here, we still lose the debug logs for this class only
         if (!"INFO".equalsIgnoreCase(Configuration.get(Parameter.CORE_LOG_LEVEL))) {
             LoggerContext ctx = (LoggerContext) LogManager.getContext(this.getClass().getClassLoader(), false);
             org.apache.logging.log4j.core.config.Configuration config = ctx.getConfiguration();
