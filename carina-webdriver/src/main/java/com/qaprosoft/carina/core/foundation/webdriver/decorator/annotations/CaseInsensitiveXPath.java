@@ -26,7 +26,6 @@ import org.openqa.selenium.support.FindBy;
  * Convert specific parts of the locator to case-insensitive
  *
  * Support following types of locators: {@link FindBy#id()}, {@link FindBy#name()}, {@link FindBy#xpath()}, {@link FindBy#linkText()}.
- * <b>Do not use this annotation on another type of locators</b>.
  * For all types of locators (except xpath), before converting to case-insensitive, locator converted to xpath
  *
  * You can choose, which part of the locator will be transformed (id, name, text, class).

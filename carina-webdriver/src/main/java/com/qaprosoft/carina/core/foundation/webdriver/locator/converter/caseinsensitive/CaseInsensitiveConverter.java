@@ -24,8 +24,8 @@ public class CaseInsensitiveConverter implements LocatorConverter {
 
     private final IPlatformDependsConverter platformDependsConverter;
 
-    CaseInsensitiveConverter(boolean isMobile) {
-        if (isMobile) {
+    CaseInsensitiveConverter(boolean isNativeMobile) {
+        if (isNativeMobile) {
             platformDependsConverter = new NativeMobileCaseInsensitiveConverter();
         } else {
             platformDependsConverter = new WebCaseInsensitiveConverter();
@@ -45,7 +45,8 @@ public class CaseInsensitiveConverter implements LocatorConverter {
         LOGGER.debug("Locator before converting to be case-insensitive: {}", by);
 
         if (!isConvertibleToXpath(by)) {
-            throw new IllegalArgumentException("Cannot convert locator: " + by + " to case-insensitive because it doesn't supported");
+            LOGGER.error("The locator '{}' is not supported for case-insensitive conversion, so will be returned as is", by);
+            return by;
         }
 
         String xpath = convertToXpath(by);
@@ -59,7 +60,7 @@ public class CaseInsensitiveConverter implements LocatorConverter {
         String resultBy = by;
         if (LocatorType.BY_ID.is(by) || LocatorType.APPIUM_BY_ID.is(by)) {
             resultBy = platformDependsConverter.idToXpath(by);
-        } else if (LocatorType.BY_NAME.is(by) || LocatorType.APPIUM_BY_ID.is(by)) {
+        } else if (LocatorType.BY_NAME.is(by) || LocatorType.APPIUM_BY_NAME.is(by)) {
             resultBy = platformDependsConverter.nameToXpath(by);
         } else if (LocatorType.BY_LINKTEXT.is(by)) {
             resultBy = platformDependsConverter.linkTextToXpath(by);
