@@ -21,6 +21,9 @@ public final class LocatorUtils {
 
     /**
      * Generate locator with index
+     * 
+     * @param by {@link By}
+     * @param index index of an element starts from 0 (first element will have 0 index)
      */
     public static By generateByForList(By by, int index) {
         String locator = by.toString();

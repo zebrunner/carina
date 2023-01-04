@@ -23,7 +23,8 @@ public enum LocatorType {
         }
 
         public By buildLocatorWithIndex(String locator, int index) {
-            return By.xpath(String.format("(%s)[%s]", StringUtils.remove(locator, getStartsWith()), index));
+            // xpath index starts from 1
+            return By.xpath(String.format("(%s)[%s]", StringUtils.remove(locator, getStartsWith()), index + 1));
         }
     },
     NAME("By.name: ", false) {
@@ -235,7 +236,7 @@ public enum LocatorType {
      * Build locator with index. Before usage, check if locator type is current
      * 
      * @param locator locator as string.
-     * @param index index
+     * @param index index of an element. Starts from 0 (first element will have 0 index)
      * @return {@link By} or {@link AppiumBy}
      */
     public abstract By buildLocatorWithIndex(String locator, int index);
