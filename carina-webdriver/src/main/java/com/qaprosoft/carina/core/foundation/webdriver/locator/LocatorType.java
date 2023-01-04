@@ -92,7 +92,7 @@ public enum LocatorType {
             throw new UnsupportedOperationException("Building locator 'By.partialLinkText' with index is not supported");
         }
     },
-    CSS("By.cssSelector: ", false) {
+    CSS("By.cssSelector: ", true) {
         public By buildLocatorFromString(String locator) {
             return By.cssSelector(StringUtils.remove(locator, getStartsWith()));
         }
@@ -102,7 +102,8 @@ public enum LocatorType {
         }
 
         public By buildLocatorWithIndex(String locator, int index) {
-            throw new UnsupportedOperationException("Building locator 'By.cssSelector' with index is not supported");
+            // index starts from 1
+            return By.cssSelector(String.format("%s:nth-child(%s)", StringUtils.remove(locator, getStartsWith()), index + 1));
         }
     },
     TAG_NAME("By.tagName: ", false) {
