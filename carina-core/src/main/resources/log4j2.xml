@@ -16,6 +16,12 @@
       </ReportingAppender>
    </appenders>
    <loggers>
+      <!-- there are a lot of useless warnings from Reflections -->
+      <logger name="org.reflections" level="WARN" additivity="false">
+         <appender-ref ref="Console"/>
+         <appender-ref ref="ThreadLogAppender"/>
+         <appender-ref ref="ReportingAppender"/>
+      </logger>
       <root level="info">
          <appender-ref ref="Console"/>
          <appender-ref ref="ThreadLogAppender"/>

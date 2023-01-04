@@ -15,27 +15,113 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.locator;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 
+import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.support.FindAll;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.FindBys;
+import org.openqa.selenium.support.pagefactory.AbstractAnnotations;
+import org.openqa.selenium.support.pagefactory.Annotations;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public final class ExtendedElementLocatorFactory implements ElementLocatorFactory {
+import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.AccessibilityId;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.ClassChain;
+import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Predicate;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
+
+import io.appium.java_client.internal.CapabilityHelpers;
+import io.appium.java_client.pagefactory.DefaultElementByBuilder;
+import io.appium.java_client.remote.MobileCapabilityType;
+
+public final class ExtendedElementLocatorFactory implements ElementLocatorFactory, IDriverPool {
+    static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final SearchContext searchContext;
-    
-    private boolean isRootElementUsed;
+    private final WebDriver webDriver;
+    private final String platform;
+    private final String automation;
+    private final String driverType;
 
-    public ExtendedElementLocatorFactory(SearchContext searchContext, boolean isRootElementUsed) {
+    public ExtendedElementLocatorFactory(WebDriver webDriver, SearchContext searchContext) {
+        this.webDriver = webDriver;
         this.searchContext = searchContext;
-        this.isRootElementUsed = isRootElementUsed;
+        if (this.webDriver instanceof HasCapabilities) {
+            Capabilities capabilities = ((HasCapabilities) this.webDriver).getCapabilities();
+            this.platform = CapabilityHelpers.getCapability(capabilities, CapabilityType.PLATFORM_NAME, String.class);
+            this.automation = CapabilityHelpers.getCapability(capabilities, MobileCapabilityType.AUTOMATION_NAME, String.class);
+            String browserName = CapabilityHelpers.getCapability(capabilities, CapabilityType.BROWSER_NAME, String.class);
+            this.driverType = detectDriverType(browserName, platform);
+        } else {
+            LOGGER.error("Driver should realize HasCapabilities class!");
+            this.platform = null;
+            this.automation = null;
+            this.driverType = null;
+        }
     }
-    
-	public boolean isRootElementUsed() {
-		return isRootElementUsed;
-	}
 
     public ElementLocator createLocator(Field field) {
-        return new ExtendedElementLocator(searchContext, field);
+        if (this.driverType == null) {
+            return null;
+        }
+
+        AbstractAnnotations annotations = null;
+        if (!SpecialKeywords.DESKTOP.equals(driverType)) {
+            // todo create Annotations for every type of annotations
+            if (field.isAnnotationPresent(ExtendedFindBy.class) ||
+                    field.isAnnotationPresent(ClassChain.class) ||
+                    field.isAnnotationPresent(AccessibilityId.class) ||
+                    field.isAnnotationPresent(Predicate.class)) {
+                annotations = new ExtendedAnnotations(field);
+            } else {
+                    DefaultElementByBuilder builder = new DefaultElementByBuilder(platform, automation);
+                    builder.setAnnotated(field);
+                    annotations = builder;
+            }
+        } else if (field.getAnnotation(FindBy.class) != null ||
+                    field.getAnnotation(FindBys.class) != null ||
+                    field.getAnnotation(FindAll.class) != null) {
+                annotations = new Annotations(field);
+        }
+
+        if (annotations == null) {
+            return null;
+        }
+        ExtendedElementLocator extendedElementLocator = null;
+        try {
+            extendedElementLocator = new ExtendedElementLocator(webDriver, searchContext, field, annotations);
+        } catch (Exception e) {
+            LOGGER.debug("Cannot create extended element locator", e);
+        }
+        return extendedElementLocator;
+    }
+
+    private String detectDriverType(String browserName, String platform) {
+        String type = null;
+        if (SpecialKeywords.ANDROID.equalsIgnoreCase(platform) ||
+                SpecialKeywords.IOS.equalsIgnoreCase(platform) ||
+                SpecialKeywords.TVOS.equalsIgnoreCase(platform)) {
+            type = SpecialKeywords.MOBILE;
+        } else if (!StringUtils.isEmpty(browserName)) {
+            type = SpecialKeywords.DESKTOP;
+        } else if (SpecialKeywords.WINDOWS.equalsIgnoreCase(platform)) {
+            type = SpecialKeywords.WINDOWS;
+        } else if (SpecialKeywords.MAC.equalsIgnoreCase(platform)) {
+            type = SpecialKeywords.MAC;
+        }
+
+        if (type == null) {
+            LOGGER.error("Cannot detect driver type by capabilities");
+        }
+        return type;
     }
 }

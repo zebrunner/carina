@@ -47,6 +47,26 @@ public @interface ExtendedFindBy {
     
     String text() default "";
 
+    /**
+     * see {@link io.appium.java_client.AppiumBy#androidDataMatcher(String)}
+     */
+    String androidDataMatcher() default "";
+
+    /**
+     * see {@link io.appium.java_client.AppiumBy#androidViewMatcher(String)}}
+     */
+    String androidViewMatcher() default "";
+
+    /**
+     * see {@link io.appium.java_client.AppiumBy#androidViewTag(String)}
+     */
+    String androidViewTag() default "";
+
+    /**
+     * see {@link io.appium.java_client.AppiumBy#custom(String)}
+     */
+    String custom() default "";
+
     public static class FindByBuilder extends ExtendedFindByBuilder {
         public By buildIt(Object annotation, Field field) {
             ExtendedFindBy findBy = (ExtendedFindBy) annotation;

@@ -13,7 +13,7 @@ import com.sun.jersey.core.util.Base64;
 import io.appium.java_client.AppiumBy;
 
 public enum LocatorType {
-    XPATH("By.xpath: ") {
+    BY_XPATH("By.xpath: ") {
         public By buildLocatorFromString(String locator) {
             return By.xpath(StringUtils.remove(locator, getStartsWith()));
         }
@@ -22,7 +22,8 @@ public enum LocatorType {
             return By.xpath(String.format(StringUtils.remove(locator, getStartsWith()), objects));
         }
     },
-    NAME("By.name: ") {
+
+    BY_NAME("By.name: ") {
         public By buildLocatorFromString(String locator) {
             return By.name(StringUtils.remove(locator, getStartsWith()));
         }
@@ -31,7 +32,18 @@ public enum LocatorType {
             return By.name(String.format(StringUtils.remove(locator, getStartsWith()), objects));
         }
     },
-    ID("By.id: ") {
+
+    APPIUM_BY_NAME("AppiumBy.name: ") {
+        public By buildLocatorFromString(String locator) {
+            return AppiumBy.name(StringUtils.remove(locator, getStartsWith()));
+        }
+
+        public By buildLocatorFromString(String locator, Object... objects) {
+            return AppiumBy.name(String.format(StringUtils.remove(locator, getStartsWith()), objects));
+        }
+    },
+
+    BY_ID("By.id: ") {
         public By buildLocatorFromString(String locator) {
             return By.id(StringUtils.remove(locator, getStartsWith()));
         }
@@ -40,7 +52,18 @@ public enum LocatorType {
             return By.id(String.format(StringUtils.remove(locator, getStartsWith()), objects));
         }
     },
-    LINKTEXT("By.linkText: ") {
+
+    APPIUM_BY_ID("AppiumBy.id: ") {
+        public By buildLocatorFromString(String locator) {
+            return AppiumBy.id(StringUtils.remove(locator, getStartsWith()));
+        }
+
+        public By buildLocatorFromString(String locator, Object... objects) {
+            return AppiumBy.id(String.format(StringUtils.remove(locator, getStartsWith()), objects));
+        }
+    },
+
+    BY_LINKTEXT("By.linkText: ") {
         public By buildLocatorFromString(String locator) {
             return By.linkText(StringUtils.remove(locator, getStartsWith()));
         }
@@ -49,7 +72,7 @@ public enum LocatorType {
             return By.linkText(String.format(StringUtils.remove(locator, getStartsWith()), objects));
         }
     },
-    CLASSNAME("By.className: ") {
+    BY_CLASSNAME("By.className: ") {
         public By buildLocatorFromString(String locator) {
             return By.className(StringUtils.remove(locator, getStartsWith()));
         }
@@ -58,7 +81,18 @@ public enum LocatorType {
             return By.className(String.format(StringUtils.remove(locator, getStartsWith()), objects));
         }
     },
-    PARTIAL_LINK_TEXT("By.partialLinkText: ") {
+
+    APPIUM_BY_CLASSNAME("AppiumBy.className: ") {
+        public By buildLocatorFromString(String locator) {
+            return AppiumBy.className(StringUtils.remove(locator, getStartsWith()));
+        }
+
+        public By buildLocatorFromString(String locator, Object... objects) {
+            return AppiumBy.className(String.format(StringUtils.remove(locator, getStartsWith()), objects));
+        }
+    },
+
+    BY_PARTIAL_LINK_TEXT("By.partialLinkText: ") {
         public By buildLocatorFromString(String locator) {
             return By.partialLinkText(StringUtils.remove(locator, getStartsWith()));
         }
@@ -67,7 +101,7 @@ public enum LocatorType {
             return By.partialLinkText(String.format(StringUtils.remove(locator, getStartsWith()), objects));
         }
     },
-    CSS("By.cssSelector: ") {
+    BY_CSS("By.cssSelector: ") {
         public By buildLocatorFromString(String locator) {
             return By.cssSelector(StringUtils.remove(locator, getStartsWith()));
         }
@@ -76,7 +110,7 @@ public enum LocatorType {
             return By.cssSelector(String.format(StringUtils.remove(locator, getStartsWith()), objects));
         }
     },
-    TAG_NAME("By.tagName: ") {
+    BY_TAG_NAME("By.tagName: ") {
         public By buildLocatorFromString(String locator) {
             return By.tagName(StringUtils.remove(locator, getStartsWith()));
         }
@@ -85,7 +119,7 @@ public enum LocatorType {
             return By.tagName(String.format(StringUtils.remove(locator, getStartsWith()), objects));
         }
     },
-    ANDROID_UI_AUTOMATOR("AppiumBy.androidUIAutomator: ") {
+    APPIUM_BY_ANDROID_UI_AUTOMATOR("AppiumBy.androidUIAutomator: ") {
         public By buildLocatorFromString(String locator) {
             return AppiumBy.androidUIAutomator(StringUtils.remove(locator, getStartsWith()));
         }
@@ -94,7 +128,7 @@ public enum LocatorType {
             return AppiumBy.androidUIAutomator(String.format(StringUtils.remove(locator, getStartsWith()), objects));
         }
     },
-    IMAGE("AppiumBy.image: ") {
+    APPIUM_BY_IMAGE("AppiumBy.image: ") {
         public By buildLocatorFromString(String locator) {
             return AppiumBy.image(StringUtils.remove(locator, getStartsWith()));
         }
@@ -112,7 +146,7 @@ public enum LocatorType {
             return AppiumBy.image(base64image);
         }
     },
-    ACCESSIBILITY_ID("AppiumBy.accessibilityId: ") {
+    APPIUM_BY_ACCESSIBILITY_ID("AppiumBy.accessibilityId: ") {
         public By buildLocatorFromString(String locator) {
             return AppiumBy.accessibilityId(StringUtils.remove(locator, getStartsWith()));
         }
@@ -121,7 +155,7 @@ public enum LocatorType {
             return AppiumBy.accessibilityId(String.format(StringUtils.remove(locator, getStartsWith()), objects));
         }
     },
-    IOS_CLASS_CHAIN("AppiumBy.iOSClassChain: ") {
+    APPIUM_BY_IOS_CLASS_CHAIN("AppiumBy.iOSClassChain: ") {
         public By buildLocatorFromString(String locator) {
             return AppiumBy.iOSClassChain(StringUtils.remove(locator, getStartsWith()));
         }
@@ -130,13 +164,49 @@ public enum LocatorType {
             return AppiumBy.iOSClassChain(String.format(StringUtils.remove(locator, getStartsWith()), objects));
         }
     },
-    IOS_NS_PREDICATE("AppiumBy.iOSNsPredicate: ") {
+    APPIUM_BY_IOS_NS_PREDICATE("AppiumBy.iOSNsPredicate: ") {
         public By buildLocatorFromString(String locator) {
             return AppiumBy.iOSNsPredicateString(StringUtils.remove(locator, getStartsWith()));
         }
 
         public By buildLocatorFromString(String locator, Object... objects) {
             return AppiumBy.iOSNsPredicateString(String.format(StringUtils.remove(locator, getStartsWith()), objects));
+        }
+    },
+    APPIUM_BY_CUSTOM("AppiumBy.custom: ") {
+        public By buildLocatorFromString(String locator) {
+            return AppiumBy.custom(StringUtils.remove(locator, getStartsWith()));
+        }
+
+        public By buildLocatorFromString(String locator, Object... objects) {
+            return AppiumBy.custom(String.format(StringUtils.remove(locator, getStartsWith()), objects));
+        }
+    },
+    APPIUM_BY_ANDROID_VIEW_TAG("AppiumBy.androidViewTag: ") {
+        public By buildLocatorFromString(String locator) {
+            return AppiumBy.androidViewTag(StringUtils.remove(locator, getStartsWith()));
+        }
+
+        public By buildLocatorFromString(String locator, Object... objects) {
+            return AppiumBy.androidViewTag(String.format(StringUtils.remove(locator, getStartsWith()), objects));
+        }
+    },
+    APPIUM_BY_ANDROID_VIEW_MATCHER("AppiumBy.androidViewMatcher: ") {
+        public By buildLocatorFromString(String locator) {
+            return AppiumBy.androidViewMatcher(StringUtils.remove(locator, getStartsWith()));
+        }
+
+        public By buildLocatorFromString(String locator, Object... objects) {
+            return AppiumBy.androidViewMatcher(String.format(StringUtils.remove(locator, getStartsWith()), objects));
+        }
+    },
+    APPIUM_BY_ANDROID_DATA_MATCHER("AppiumBy.androidDataMatcher: ") {
+        public By buildLocatorFromString(String locator) {
+            return AppiumBy.androidDataMatcher(StringUtils.remove(locator, getStartsWith()));
+        }
+
+        public By buildLocatorFromString(String locator, Object... objects) {
+            return AppiumBy.androidDataMatcher(String.format(StringUtils.remove(locator, getStartsWith()), objects));
         }
     };
 

@@ -31,7 +31,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WrapsDriver;
 import org.openqa.selenium.WrapsElement;
 import org.openqa.selenium.interactions.Locatable;
-import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
 import org.openqa.selenium.support.pagefactory.FieldDecorator;
@@ -39,8 +38,6 @@ import org.openqa.selenium.support.pagefactory.internal.LocatingElementHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedFindBy;
-import com.qaprosoft.carina.core.foundation.webdriver.locator.LocalizedAnnotations;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.internal.AbstractUIObjectListHandler;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.internal.LocatingListHandler;
 import com.qaprosoft.carina.core.gui.AbstractUIObject;
@@ -61,17 +58,9 @@ public class ExtendedFieldDecorator implements FieldDecorator {
      * @param field page element to be decorated
      */
     public Object decorate(ClassLoader loader, Field field) {
-        if ((!field.isAnnotationPresent(FindBy.class) && !field.isAnnotationPresent(ExtendedFindBy.class))
-                /*
-                 * Enable field decorator logic only in case of
-                 * presence the FindBy/FindByCarina/FindByAI annotation in the
-                 * field
-                 */ ||
-                !(ExtendedWebElement.class.isAssignableFrom(field.getType()) || AbstractUIObject.class.isAssignableFrom(field.getType())
-                        || isDecoratableList(field)) /*
-                                                      * also verify that it is ExtendedWebElement or derived from AbstractUIObject or DecoratableList
-                                                      */) {
-            // returning null is ok in this method.
+        if (!(ExtendedWebElement.class.isAssignableFrom(field.getType()) ||
+                AbstractUIObject.class.isAssignableFrom(field.getType()) ||
+                isDecoratableList(field))) {
             return null;
         }
 
@@ -91,18 +80,19 @@ public class ExtendedFieldDecorator implements FieldDecorator {
         }
         if (AbstractUIObject.class.isAssignableFrom(field.getType())) {
             return proxyForAbstractUIObject(loader, field, locator);
-        } else if (List.class.isAssignableFrom(field.getType())) {
+        }
+
+        if (List.class.isAssignableFrom(field.getType())) {
             Type listType = getListType(field);
             if (ExtendedWebElement.class.isAssignableFrom((Class<?>) listType)) {
                 return proxyForListLocator(loader, field, locator);
-            } else if (AbstractUIObject.class.isAssignableFrom((Class<?>) listType)) {
-                return proxyForListUIObjects(loader, field, locator);
-            } else {
-                return null;
             }
-        } else {
-            return null;
+
+            if (AbstractUIObject.class.isAssignableFrom((Class<?>) listType)) {
+                return proxyForListUIObjects(loader, field, locator);
+            }
         }
+        return null;
     }
 
     private boolean isDecoratableList(Field field) {
@@ -135,12 +125,7 @@ public class ExtendedFieldDecorator implements FieldDecorator {
         WebElement proxy = (WebElement) Proxy.newProxyInstance(loader, new Class[] { WebElement.class, WrapsElement.class, WrapsDriver.class,
                 Locatable.class, TakesScreenshot.class },
                 handler);
-        By by = null;
-        if (field.isAnnotationPresent(FindBy.class) || field.isAnnotationPresent(ExtendedFindBy.class)) {
-            by = new LocalizedAnnotations(field).buildBy();
-        }
-
-        return new ExtendedWebElement(proxy, field.getName(), by);
+        return new ExtendedWebElement(proxy, field.getName());
     }
 
     @SuppressWarnings("unchecked")

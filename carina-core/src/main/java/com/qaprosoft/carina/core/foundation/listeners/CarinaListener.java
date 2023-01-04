@@ -126,6 +126,16 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         LOGGER.info(Configuration.asString());
         // Configuration.validateConfiguration();
 
+        // if we initialize the logger in onStart(suite), all classes we access up to that point are initialized with INFO level
+        // if me init logger here, we still lose the debug logs for this class only
+        if (!"INFO".equalsIgnoreCase(Configuration.get(Parameter.CORE_LOG_LEVEL))) {
+            LoggerContext ctx = (LoggerContext) LogManager.getContext(this.getClass().getClassLoader(), false);
+            org.apache.logging.log4j.core.config.Configuration config = ctx.getConfiguration();
+            // make sure to update after moving to "com.zebrunner"
+            LoggerConfig logger = config.getLoggerConfig("com.qaprosoft.carina.core");
+            logger.setLevel(Level.getLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
+        }
+
         try {
             L10N.load();
         } catch (Exception e) {
@@ -166,14 +176,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         ChainedMaintainerResolver.addLast(new SuiteOwnerResolver(suite));
         // first means that ownership/maintainer resolver from carina has higher priority
         ChainedMaintainerResolver.addFirst(new Ownership());
-
-        if (!"INFO".equalsIgnoreCase(Configuration.get(Parameter.CORE_LOG_LEVEL))) {
-            LoggerContext ctx = (LoggerContext) LogManager.getContext(this.getClass().getClassLoader(), false);
-            org.apache.logging.log4j.core.config.Configuration config = ctx.getConfiguration();
-            // make sure to update after moving to "com.zebrunner"
-            LoggerConfig logger = config.getLoggerConfig("com.qaprosoft.carina.core");
-            logger.setLevel(Level.getLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
-        }
 
         setThreadCount(suite);
 
