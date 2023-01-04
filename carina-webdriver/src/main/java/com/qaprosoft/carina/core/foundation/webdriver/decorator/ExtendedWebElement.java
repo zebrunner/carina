@@ -41,6 +41,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WrapsDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Locatable;
+import org.openqa.selenium.interactions.MoveTargetOutOfBoundsException;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
@@ -448,7 +449,7 @@ public class ExtendedWebElement implements IWebElement {
     public void click(long timeout) {
         click(timeout, getDefaultCondition(getBy()));
     }
-    
+
 	/**
 	 * Click on element.
 	 *
@@ -459,7 +460,7 @@ public class ExtendedWebElement implements IWebElement {
     public void click(long timeout, ExpectedCondition<?> waitCondition) {
         doAction(ACTION_NAME.CLICK, timeout, waitCondition);
     }
-    
+
     /**
      * Click on element by javascript.
      */
@@ -502,18 +503,30 @@ public class ExtendedWebElement implements IWebElement {
     public void clickByActions(long timeout) {
         clickByActions(timeout, getDefaultCondition(getBy()));
     }
-    
+
     /**
-     * Click on element by Actions.
+     * Click on an element by {@link Actions}.
+     * Before clicking, the cursor will be moved to the middle of the element (if the element is not in the visible area, a scroll will be
+     * performed).<br>
+     * If an {@link MoveTargetOutOfBoundsException} error is received, a second attempt will be made with the execution of the
+     * {@code arguments[0].scrollIntoView(true)} script before action.
      *
-     * @param timeout to wait
-     * @param waitCondition
-     *            to check element conditions before action
+     * @param timeout waiting time for the condition, in seconds
+     * @param waitCondition to check element conditions before action
      */
     public void clickByActions(long timeout, ExpectedCondition<?> waitCondition) {
-        doAction(ACTION_NAME.CLICK_BY_ACTIONS, timeout, waitCondition);
+        try {
+            doAction(ACTION_NAME.CLICK_BY_ACTIONS, timeout, waitCondition);
+        } catch (MoveTargetOutOfBoundsException e) {
+            LOGGER.warn(
+                    "Caught MoveTargetOutOfBoundsException when try to click element with name '{}' and locator '{}'.\n"
+                            + "The click will be re-attempted with arguments[0].scrollIntoView(true) js script.",
+                    this.name, this.by);
+            ((JavascriptExecutor) getDriver()).executeScript("arguments[0].scrollIntoView(true);", this.element);
+            doAction(ACTION_NAME.CLICK_BY_ACTIONS, timeout, waitCondition);
+        }
     }
-    
+
     /**
      * Double Click on element.
      */
