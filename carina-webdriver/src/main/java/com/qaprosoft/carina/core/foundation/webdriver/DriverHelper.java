@@ -76,6 +76,7 @@ import org.testng.SkipException;
 
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorUtils;
 import com.qaprosoft.carina.core.gui.AbstractPage;
 import com.zebrunner.carina.crypto.Algorithm;
@@ -1238,12 +1239,14 @@ public class DriverHelper {
      */
     public List<ExtendedWebElement> findExtendedWebElements(final By by, long timeout) {
         List<ExtendedWebElement> extendedWebElements = new ArrayList<>();
-
         if (!waitUntil(ExpectedConditions.presenceOfElementLocated(by), timeout)) {
             Messager.ELEMENT_NOT_FOUND.info(by.toString());
     		return extendedWebElements;
     	}
 
+        Optional<LocatorType> locatorType = LocatorUtils.getLocatorType(by);
+        boolean isByForListSupported = locatorType.isPresent() && locatorType.get().isIndexSupport();
+        String locatorAsString = by.toString();
         List<WebElement> webElements = getDriver().findElements(by);
         int i = 0;
         for (WebElement element : webElements) {
@@ -1251,9 +1254,9 @@ public class DriverHelper {
             ExtendedWebElement tempElement = new ExtendedWebElement(by, name, getDriver(), getDriver());
             tempElement.setElement(element);
             tempElement.setIsSingle(false);
-            if (LocatorUtils.isGenerateByForListSupported(by)) {
+            if (isByForListSupported) {
                 tempElement.setIsRefreshSupport(true);
-                tempElement.setBy(LocatorUtils.generateByForList(by, i));
+                tempElement.setBy(locatorType.get().buildLocatorWithIndex(locatorAsString, i));
             } else {
                 tempElement.setIsRefreshSupport(false);
             }

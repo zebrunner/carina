@@ -22,6 +22,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1149,6 +1150,9 @@ public class ExtendedWebElement implements IWebElement {
             return extendedWebElements;
         }
 
+        Optional<LocatorType> locatorType = LocatorUtils.getLocatorType(by);
+        boolean isByForListSupported = locatorType.isPresent() && locatorType.get().isIndexSupport();
+        String locatorAsString = by.toString();
         List<WebElement> webElements = getElement().findElements(by);
         int i = 0;
         for (WebElement element : webElements) {
@@ -1156,9 +1160,9 @@ public class ExtendedWebElement implements IWebElement {
             ExtendedWebElement tempElement = new ExtendedWebElement(by, name, getDriver(), getElement());
             tempElement.setElement(element);
             tempElement.setIsSingle(false);
-            if (LocatorUtils.isGenerateByForListSupported(by)) {
+            if (isByForListSupported) {
                 tempElement.setIsRefreshSupport(true);
-                tempElement.setBy(LocatorUtils.generateByForList(by, i));
+                tempElement.setBy(locatorType.get().buildLocatorWithIndex(locatorAsString, i));
             } else {
                 tempElement.setIsRefreshSupport(false);
             }

@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -35,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorUtils;
 import com.qaprosoft.carina.core.gui.AbstractUIObject;
 
@@ -73,6 +75,9 @@ public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements 
 //    			ExpectedConditions.visibilityOfElementLocated(locatorBy)));
 
     	List<WebElement> elements = locator.findElements();
+        Optional<LocatorType> locatorType = LocatorUtils.getLocatorType(locatorBy);
+        boolean isByForListSupported = locatorType.isPresent() && locatorType.get().isIndexSupport();
+        String locatorAsString = locatorBy.toString();
         List<T> uIObjects = new ArrayList<T>();
         int index = 0;
         if (elements != null) {
@@ -96,9 +101,9 @@ public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements 
                         handler);
                 ExtendedWebElement webElement = new ExtendedWebElement(proxy, String.format("%s - %d", name, index), locatorBy);
                 webElement.setIsSingle(false);
-                if (LocatorUtils.isGenerateByForListSupported(locatorBy)) {
+                if (isByForListSupported) {
                     webElement.setIsRefreshSupport(true);
-                    webElement.setBy(LocatorUtils.generateByForList(locatorBy, index));
+                    webElement.setBy(locatorType.get().buildLocatorWithIndex(locatorAsString, index));
                 } else {
                     webElement.setIsRefreshSupport(false);
                 }
