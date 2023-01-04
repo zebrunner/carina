@@ -233,7 +233,8 @@ public class ExtendedWebElement implements IWebElement {
 
     /**
      * Reinitialize the element.
-     * If it is an element from list, it might be unsafe if the number of elements changes
+     * If it is an element from list, it might be unsafe if the number of elements changes.
+     * If it is an element from list, supported xpath and css only
      *
      * @throws NoSuchElementException if the element is not found
      */
