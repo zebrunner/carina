@@ -26,12 +26,13 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.WrapsElement;
+import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocalizedAnnotations;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorUtils;
 
 public class LocatingListHandler implements InvocationHandler {
     private final ElementLocator locator;
@@ -66,11 +67,16 @@ public class LocatingListHandler implements InvocationHandler {
             extendedWebElements = new ArrayList<ExtendedWebElement>();
             for (WebElement element : elements) {
                 InvocationHandler handler = new LocatingListsElementHandler(element, locator);
-                WebElement proxy = (WebElement) Proxy.newProxyInstance(loader, new Class[]{WebElement.class, WrapsElement.class, Locatable.class},
+                WebElement proxy = (WebElement) Proxy.newProxyInstance(loader, new Class[] { WebElement.class, WrapsElement.class, Locatable.class },
                         handler);
                 ExtendedWebElement webElement = new ExtendedWebElement(proxy, name + i, by);
                 webElement.setIsSingle(false);
-
+                if (LocatorUtils.isGenerateByForListSupported(by)) {
+                    webElement.setIsRefreshSupport(true);
+                    webElement.setBy(LocatorUtils.generateByForList(by, i));
+                } else {
+                    webElement.setIsRefreshSupport(false);
+                }
                 Field searchContextField = locator.getClass().getDeclaredField("searchContext");
                 searchContextField.setAccessible(true);
                 webElement.setSearchContext((SearchContext) searchContextField.get(locator));

@@ -13,7 +13,7 @@ import com.sun.jersey.core.util.Base64;
 import io.appium.java_client.AppiumBy;
 
 public enum LocatorType {
-    XPATH("By.xpath: ") {
+    XPATH("By.xpath: ", true) {
         public By buildLocatorFromString(String locator) {
             return By.xpath(StringUtils.remove(locator, getStartsWith()));
         }
@@ -21,8 +21,12 @@ public enum LocatorType {
         public By buildLocatorFromString(String locator, Object... objects) {
             return By.xpath(String.format(StringUtils.remove(locator, getStartsWith()), objects));
         }
+
+        public By buildLocatorWithIndex(String locator, int index) {
+            return By.xpath(String.format("(%s)[%s]", StringUtils.remove(locator, getStartsWith()), index));
+        }
     },
-    NAME("By.name: ") {
+    NAME("By.name: ", false) {
         public By buildLocatorFromString(String locator) {
             return By.name(StringUtils.remove(locator, getStartsWith()));
         }
@@ -30,8 +34,12 @@ public enum LocatorType {
         public By buildLocatorFromString(String locator, Object... objects) {
             return By.name(String.format(StringUtils.remove(locator, getStartsWith()), objects));
         }
+
+        public By buildLocatorWithIndex(String locator, int index) {
+            throw new UnsupportedOperationException("Building locator 'By.name' with index is not supported");
+        }
     },
-    ID("By.id: ") {
+    ID("By.id: ", false) {
         public By buildLocatorFromString(String locator) {
             return By.id(StringUtils.remove(locator, getStartsWith()));
         }
@@ -39,8 +47,12 @@ public enum LocatorType {
         public By buildLocatorFromString(String locator, Object... objects) {
             return By.id(String.format(StringUtils.remove(locator, getStartsWith()), objects));
         }
+
+        public By buildLocatorWithIndex(String locator, int index) {
+            throw new UnsupportedOperationException("Building locator 'By.id' with index is not supported");
+        }
     },
-    LINKTEXT("By.linkText: ") {
+    LINKTEXT("By.linkText: ", false) {
         public By buildLocatorFromString(String locator) {
             return By.linkText(StringUtils.remove(locator, getStartsWith()));
         }
@@ -48,8 +60,12 @@ public enum LocatorType {
         public By buildLocatorFromString(String locator, Object... objects) {
             return By.linkText(String.format(StringUtils.remove(locator, getStartsWith()), objects));
         }
+
+        public By buildLocatorWithIndex(String locator, int index) {
+            throw new UnsupportedOperationException("Building locator 'By.linkText' with index is not supported");
+        }
     },
-    CLASSNAME("By.className: ") {
+    CLASSNAME("By.className: ", false) {
         public By buildLocatorFromString(String locator) {
             return By.className(StringUtils.remove(locator, getStartsWith()));
         }
@@ -57,8 +73,12 @@ public enum LocatorType {
         public By buildLocatorFromString(String locator, Object... objects) {
             return By.className(String.format(StringUtils.remove(locator, getStartsWith()), objects));
         }
+
+        public By buildLocatorWithIndex(String locator, int index) {
+            throw new UnsupportedOperationException("Building locator 'By.className' with index is not supported");
+        }
     },
-    PARTIAL_LINK_TEXT("By.partialLinkText: ") {
+    PARTIAL_LINK_TEXT("By.partialLinkText: ", false) {
         public By buildLocatorFromString(String locator) {
             return By.partialLinkText(StringUtils.remove(locator, getStartsWith()));
         }
@@ -66,8 +86,12 @@ public enum LocatorType {
         public By buildLocatorFromString(String locator, Object... objects) {
             return By.partialLinkText(String.format(StringUtils.remove(locator, getStartsWith()), objects));
         }
+
+        public By buildLocatorWithIndex(String locator, int index) {
+            throw new UnsupportedOperationException("Building locator 'By.partialLinkText' with index is not supported");
+        }
     },
-    CSS("By.cssSelector: ") {
+    CSS("By.cssSelector: ", false) {
         public By buildLocatorFromString(String locator) {
             return By.cssSelector(StringUtils.remove(locator, getStartsWith()));
         }
@@ -75,8 +99,12 @@ public enum LocatorType {
         public By buildLocatorFromString(String locator, Object... objects) {
             return By.cssSelector(String.format(StringUtils.remove(locator, getStartsWith()), objects));
         }
+
+        public By buildLocatorWithIndex(String locator, int index) {
+            throw new UnsupportedOperationException("Building locator 'By.cssSelector' with index is not supported");
+        }
     },
-    TAG_NAME("By.tagName: ") {
+    TAG_NAME("By.tagName: ", false) {
         public By buildLocatorFromString(String locator) {
             return By.tagName(StringUtils.remove(locator, getStartsWith()));
         }
@@ -84,8 +112,12 @@ public enum LocatorType {
         public By buildLocatorFromString(String locator, Object... objects) {
             return By.tagName(String.format(StringUtils.remove(locator, getStartsWith()), objects));
         }
+
+        public By buildLocatorWithIndex(String locator, int index) {
+            throw new UnsupportedOperationException("Building locator 'By.tagName' with index is not supported");
+        }
     },
-    ANDROID_UI_AUTOMATOR("AppiumBy.androidUIAutomator: ") {
+    ANDROID_UI_AUTOMATOR("AppiumBy.androidUIAutomator: ", false) {
         public By buildLocatorFromString(String locator) {
             return AppiumBy.androidUIAutomator(StringUtils.remove(locator, getStartsWith()));
         }
@@ -93,8 +125,12 @@ public enum LocatorType {
         public By buildLocatorFromString(String locator, Object... objects) {
             return AppiumBy.androidUIAutomator(String.format(StringUtils.remove(locator, getStartsWith()), objects));
         }
+
+        public By buildLocatorWithIndex(String locator, int index) {
+            throw new UnsupportedOperationException("Building locator 'AppiumBy.androidUIAutomator' with index is not supported");
+        }
     },
-    IMAGE("AppiumBy.image: ") {
+    IMAGE("AppiumBy.image: ", false) {
         public By buildLocatorFromString(String locator) {
             return AppiumBy.image(StringUtils.remove(locator, getStartsWith()));
         }
@@ -111,8 +147,12 @@ public enum LocatorType {
             }
             return AppiumBy.image(base64image);
         }
+
+        public By buildLocatorWithIndex(String locator, int index) {
+            throw new UnsupportedOperationException("Building locator 'AppiumBy.image' with index is not supported");
+        }
     },
-    ACCESSIBILITY_ID("AppiumBy.accessibilityId: ") {
+    ACCESSIBILITY_ID("AppiumBy.accessibilityId: ", false) {
         public By buildLocatorFromString(String locator) {
             return AppiumBy.accessibilityId(StringUtils.remove(locator, getStartsWith()));
         }
@@ -120,8 +160,12 @@ public enum LocatorType {
         public By buildLocatorFromString(String locator, Object... objects) {
             return AppiumBy.accessibilityId(String.format(StringUtils.remove(locator, getStartsWith()), objects));
         }
+
+        public By buildLocatorWithIndex(String locator, int index) {
+            throw new UnsupportedOperationException("Building locator 'AppiumBy.accessibilityId' with index is not supported");
+        }
     },
-    IOS_CLASS_CHAIN("AppiumBy.iOSClassChain: ") {
+    IOS_CLASS_CHAIN("AppiumBy.iOSClassChain: ", false) {
         public By buildLocatorFromString(String locator) {
             return AppiumBy.iOSClassChain(StringUtils.remove(locator, getStartsWith()));
         }
@@ -129,8 +173,12 @@ public enum LocatorType {
         public By buildLocatorFromString(String locator, Object... objects) {
             return AppiumBy.iOSClassChain(String.format(StringUtils.remove(locator, getStartsWith()), objects));
         }
+
+        public By buildLocatorWithIndex(String locator, int index) {
+            throw new UnsupportedOperationException("Building locator 'AppiumBy.iOSClassChain' with index is not supported");
+        }
     },
-    IOS_NS_PREDICATE("AppiumBy.iOSNsPredicate: ") {
+    IOS_NS_PREDICATE("AppiumBy.iOSNsPredicate: ", false) {
         public By buildLocatorFromString(String locator) {
             return AppiumBy.iOSNsPredicateString(StringUtils.remove(locator, getStartsWith()));
         }
@@ -138,13 +186,19 @@ public enum LocatorType {
         public By buildLocatorFromString(String locator, Object... objects) {
             return AppiumBy.iOSNsPredicateString(String.format(StringUtils.remove(locator, getStartsWith()), objects));
         }
+
+        public By buildLocatorWithIndex(String locator, int index) {
+            throw new UnsupportedOperationException("Building locator 'AppiumBy.iOSNsPredicate' with index is not supported");
+        }
     };
 
-    LocatorType(String startsWith) {
+    LocatorType(String startsWith, boolean isIndexSupport) {
         this.startsWith = startsWith;
+        this.isIndexSupport = isIndexSupport;
     }
 
     private final String startsWith;
+    private final boolean isIndexSupport;
 
     public String getStartsWith() {
         return startsWith;
@@ -176,4 +230,22 @@ public enum LocatorType {
      * @return {@link By} or {@link AppiumBy}
      */
     public abstract By buildLocatorFromString(String locator, Object... objects);
+
+    /**
+     * Build locator with index. Before usage, check if locator type is current
+     * 
+     * @param locator locator as string.
+     * @param index index
+     * @return {@link By} or {@link AppiumBy}
+     */
+    public abstract By buildLocatorWithIndex(String locator, int index);
+
+    /**
+     * Is support generation of locator with index of element in list
+     * 
+     * @return true if support, false otherwise
+     */
+    public boolean isIndexSupport() {
+        return this.isIndexSupport;
+    }
 }

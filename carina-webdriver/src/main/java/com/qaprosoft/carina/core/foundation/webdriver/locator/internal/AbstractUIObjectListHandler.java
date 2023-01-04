@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorUtils;
 import com.qaprosoft.carina.core.gui.AbstractUIObject;
 
 public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements InvocationHandler {
@@ -95,6 +96,12 @@ public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements 
                         handler);
                 ExtendedWebElement webElement = new ExtendedWebElement(proxy, String.format("%s - %d", name, index), locatorBy);
                 webElement.setIsSingle(false);
+                if (LocatorUtils.isGenerateByForListSupported(locatorBy)) {
+                    webElement.setIsRefreshSupport(true);
+                    webElement.setBy(LocatorUtils.generateByForList(locatorBy, index));
+                } else {
+                    webElement.setIsRefreshSupport(false);
+                }
                 uiObject.setRootExtendedElement(webElement);
                 uiObject.setName(String.format("%s - %d", name, index));
                 uiObject.setRootElement(element);

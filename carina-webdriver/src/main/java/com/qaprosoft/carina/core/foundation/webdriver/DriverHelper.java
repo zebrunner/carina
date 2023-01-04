@@ -74,20 +74,19 @@ import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.SkipException;
 
-
-import com.zebrunner.carina.utils.retry.ActionPoller;
-import com.zebrunner.carina.utils.Configuration;
-import com.zebrunner.carina.utils.Configuration.Parameter;
-import com.zebrunner.carina.utils.LogicUtils;
-import com.zebrunner.carina.utils.messager.Messager;
-import com.zebrunner.carina.utils.common.CommonUtils;
-
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorUtils;
 import com.qaprosoft.carina.core.gui.AbstractPage;
 import com.zebrunner.carina.crypto.Algorithm;
 import com.zebrunner.carina.crypto.CryptoTool;
 import com.zebrunner.carina.crypto.CryptoToolBuilder;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration.Parameter;
+import com.zebrunner.carina.utils.LogicUtils;
+import com.zebrunner.carina.utils.common.CommonUtils;
+import com.zebrunner.carina.utils.messager.Messager;
+import com.zebrunner.carina.utils.retry.ActionPoller;
 
 /**
  * DriverHelper - WebDriver wrapper for logging and reporting features. Also it
@@ -1246,13 +1245,20 @@ public class DriverHelper {
     	}
 
         List<WebElement> webElements = getDriver().findElements(by);
-        int i = 1;
+        int i = 0;
         for (WebElement element : webElements) {
-            String name = String.format("ExtendedWebElement - [%d]", i++);
+            String name = String.format("ExtendedWebElement - [%d]", i);
             ExtendedWebElement tempElement = new ExtendedWebElement(by, name, getDriver(), getDriver());
             tempElement.setElement(element);
             tempElement.setIsSingle(false);
+            if (LocatorUtils.isGenerateByForListSupported(by)) {
+                tempElement.setIsRefreshSupport(true);
+                tempElement.setBy(LocatorUtils.generateByForList(by, i));
+            } else {
+                tempElement.setIsRefreshSupport(false);
+            }
             extendedWebElements.add(tempElement);
+            i++;
         }
         return extendedWebElements;
     }

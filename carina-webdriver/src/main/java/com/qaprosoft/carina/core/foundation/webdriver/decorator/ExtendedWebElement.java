@@ -59,6 +59,7 @@ import org.testng.SkipException;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorUtils;
 import com.zebrunner.carina.crypto.Algorithm;
 import com.zebrunner.carina.crypto.CryptoTool;
 import com.zebrunner.carina.crypto.CryptoToolBuilder;
@@ -97,6 +98,7 @@ public class ExtendedWebElement implements IWebElement {
 
     private boolean isLocalized = false;
     private boolean isSingleElement = true;
+    private boolean isRefreshSupport = true;
 
     // Converted array of objects to String for dynamic element locators
     private String formatValues = "";
@@ -230,17 +232,21 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     /**
-     * Reinitializes the element (not applicable to list element)
+     * Reinitialize the element.
+     * If it is an element from list, it might be unsafe if the number of elements changes
      *
      * @throws NoSuchElementException if the element is not found
      */
     public void refresh() {
-        if (isSingleElement) {
-            // try to override element
-            element = this.findElement();
-        } else {
-            LOGGER.error("Cannot refresh element of the list.");
+        if (!isRefreshSupport) {
+            LOGGER.error("Refresh is not supported by element with name '{}' and locator: {}", this.name, this.by);
+            return;
         }
+        LOGGER.debug("Performing refresh of the element with locator: {}", this.by);
+        if (!isSingleElement) {
+            LOGGER.debug("Refreshing a list element is not a safe operation in case of changing the number of the element after initialization");
+        }
+        this.element = this.findElement();
     }
     
     /**
@@ -355,6 +361,15 @@ public class ExtendedWebElement implements IWebElement {
      */
     public void setIsSingle(boolean isSingleElement) {
         this.isSingleElement = isSingleElement;
+    }
+
+    /**
+     * For internal usage only!
+     *
+     * @param isRefreshSupport true if element is support refresh, false otherwise
+     */
+    public void setIsRefreshSupport(boolean isRefreshSupport) {
+        this.isRefreshSupport = isRefreshSupport;
     }
 
     public String getName() {
@@ -1130,13 +1145,20 @@ public class ExtendedWebElement implements IWebElement {
         }
 
         List<WebElement> webElements = getElement().findElements(by);
-        int i = 1;
+        int i = 0;
         for (WebElement element : webElements) {
-            String name = String.format("ExtendedWebElement - [%d]", i++);
+            String name = String.format("ExtendedWebElement - [%d]", i);
             ExtendedWebElement tempElement = new ExtendedWebElement(by, name, getDriver(), getElement());
             tempElement.setElement(element);
             tempElement.setIsSingle(false);
+            if (LocatorUtils.isGenerateByForListSupported(by)) {
+                tempElement.setIsRefreshSupport(true);
+                tempElement.setBy(LocatorUtils.generateByForList(by, i));
+            } else {
+                tempElement.setIsRefreshSupport(false);
+            }
             extendedWebElements.add(tempElement);
+            i++;
         }
         return extendedWebElements;
     }
@@ -1410,10 +1432,15 @@ public class ExtendedWebElement implements IWebElement {
             // com.google.common.collect.Maps$TransformedEntriesMap cannot be cast to java.lang.String
             LOGGER.debug("catched StaleElementReferenceException: ", e);
             // try to find again using driver context and do action
-            element = this.findElement();
-            output = overrideAction(actionName, inputArgs);
+            // [AS] do not try to refresh element if it created as part of list,
+            // because it can find first element or different (not original) element - unexpected behaviour
+            if (isSingleElement) {
+                this.element = this.findElement();
+                output = overrideAction(actionName, inputArgs);
+            } else {
+                throw e;
+            }
         }
-
         return output;
 	}
 
