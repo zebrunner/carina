@@ -232,20 +232,24 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     /**
-     * Reinitialize the element.
-     * If it is an element from list, it might be unsafe if the number of elements changes.
-     * If it is an element from list, supported xpath only
-     *
-     * @throws NoSuchElementException if the element is not found
+     * Reinitialize the element according to its locator.
+     * If the element is part of the list, then its update will be performed only if the locator is XPath.
+     * (if the locator is not XPath in this case, an {@link UnsupportedOperationException} will be thrown in this case.
+     * Also, if the current element is part of a list, it is not recommended to use it, since it can lead to
+     * undefined behavior if the number of items to which the current item belongs changes.
+     * 
+     * @throws NoSuchElementException if the element was not found
+     * @throws UnsupportedOperationException if refreshing of the element is not supported
      */
     public void refresh() {
         if (!isRefreshSupport) {
-            LOGGER.error("Refresh is not supported by element with name '{}' and locator: {}", this.name, this.by);
-            return;
+            throw new UnsupportedOperationException(
+                    String.format("Refresh is not supported for this element:%n name: %s%n locator: %s", this.name, this.by));
         }
-        LOGGER.debug("Performing refresh of the element with locator: {}", this.by);
+        LOGGER.debug("Performing refresh of the element with name '{}' and locator: {}", this.name, this.by);
         if (!isSingleElement) {
-            LOGGER.debug("Refreshing a list element is not a safe operation in case of changing the number of the element after initialization");
+            LOGGER.debug("Refreshing an element that is part of the list is not a safe operation "
+                    + "in case of changing the number of the element after initialization");
         }
         this.element = this.findElement();
     }
