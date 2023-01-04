@@ -20,44 +20,43 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.openqa.selenium.support.FindBy;
+
 /**
- * This annotation allows converting specific parts of the xpath locator to case-insensitive.
- * Applies to the following types of locators: id, name, xpath, linkText.
- * For all types of locators, except for xpath, before converting to case-insensitive, there is
- * a conversion to xpath.
- * The logic of work for web and mobile is different (the presence or absence of a link to the mobile application in
- * Carina's configuration file depends on what logic is performed).
+ * Convert specific parts of the locator to case-insensitive
+ *
+ * Support following types of locators: {@link FindBy#id()}, {@link FindBy#name()}, {@link FindBy#xpath()}, {@link FindBy#linkText()}.
+ * For all types of locators (except xpath), before converting to case-insensitive, locator converted to xpath
  *
  * You can choose, which part of the locator will be transformed (id, name, text, class).
  *
- * When you convert linkText, there are text() attribute appear, so if you want to convert linkText, you should
- * set text as true
+ * When you convert linkText, there are text() attribute appear, so if you want to convert linkText, you should set text as true
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.FIELD, ElementType.TYPE })
 public @interface CaseInsensitiveXPath {
 
     /**
-     * web: @id
-     * mobile: @resource-id
+     * web, mobile-web: @id
+     * mobile-native: @resource-id
      */
     boolean id() default false;
 
     /**
-     * web: @name
-     * mobile: @name
+     * web, mobile-web: @name
+     * mobile-native: @name
      */
     boolean name() default false;
 
     /**
-     * web: text()
-     * mobile: @text, text(), @content-desc
+     * web, mobile-web: text()
+     * mobile-native: @text, text(), @content-desc
      */
     boolean text() default true;
 
     /**
-     * web: @class
-     * mobile: @class
+     * web, mobile-web: @class
+     * mobile-native: @class
      */
     boolean classAttr() default false;
 }

@@ -1,14 +1,13 @@
 package com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive;
 
-import org.openqa.selenium.By;
-
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
 
-class MobileCaseInsensitiveConverter extends AbstractPlatformDependsConverter implements IPlatformDependsConverter {
+class NativeMobileCaseInsensitiveConverter extends AbstractPlatformDependsConverter implements IPlatformDependsConverter {
 
     @Override
-    public By idToXpath(By by) {
-        return locatorToXpath(by, LocatorType.ID,
+    public String idToXpath(String by) {
+        LocatorType type = LocatorType.APPIUM_BY_ID.is(by) ? LocatorType.APPIUM_BY_ID : LocatorType.BY_ID;
+        return locatorToXpath(by, type,
                 value -> {
                     String quote = value.contains("'") ? "\"" : "'";
                     return "//*[ends-with(" + "@resource-id" + ", " + quote + ":id/" + value + quote + ")]";
@@ -16,35 +15,35 @@ class MobileCaseInsensitiveConverter extends AbstractPlatformDependsConverter im
     }
 
     @Override
-    public By nameToXpath(By by) {
-        return locatorToXpath(by, LocatorType.NAME,
+    public String nameToXpath(String by) {
+        LocatorType type = LocatorType.APPIUM_BY_NAME.is(by) ? LocatorType.APPIUM_BY_NAME : LocatorType.BY_NAME;
+        return locatorToXpath(by, type,
                 value -> createXpathFromAnotherTypeOfLocator("", "*", "@name", "'", value));
     }
 
     @Override
-    public By linkTextToXpath(By by) {
-        return locatorToXpath(by, LocatorType.LINKTEXT,
+    public String linkTextToXpath(String by) {
+        return locatorToXpath(by, LocatorType.BY_LINKTEXT,
                 value -> createXpathFromAnotherTypeOfLocator("", "a", "text()", "'", value));
     }
 
     @Override
-    public By xpathIdCaseInsensitive(By by) {
+    public String xpathIdCaseInsensitive(String by) {
         return caseInsensitiveXpathByAttribute(by, "@resource-id");
     }
 
     @Override
-    public By xpathNameCaseInsensitive(By by) {
+    public String xpathNameCaseInsensitive(String by) {
         return caseInsensitiveXpathByAttribute(by, "@name");
     }
 
     @Override
-    public By xpathTextCaseInsensitive(By by) {
+    public String xpathTextCaseInsensitive(String by) {
         return caseInsensitiveXpathByAttribute(by, "text\\(\\)|@text|@content-desc");
     }
 
     @Override
-    public By xpathClassCaseInsensitive(By by) {
+    public String xpathClassCaseInsensitive(String by) {
         return caseInsensitiveXpathByAttribute(by, "@class");
     }
-
 }

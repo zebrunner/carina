@@ -15,6 +15,9 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.gui;
 
+import static io.appium.java_client.pagefactory.utils.WebDriverUnpackUtility.unpackWebDriverFromSearchContext;
+
+import org.openqa.selenium.Beta;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -23,14 +26,14 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.testng.Assert;
 
-import com.zebrunner.carina.utils.Configuration;
-import com.zebrunner.carina.utils.Configuration.Parameter;
-import com.zebrunner.carina.utils.messager.Messager;
 import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ElementLoadingStrategy;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedFieldDecorator;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocatorFactory;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration.Parameter;
+import com.zebrunner.carina.utils.messager.Messager;
 
 public abstract class AbstractUIObject extends DriverHelper {
 
@@ -69,8 +72,13 @@ public abstract class AbstractUIObject extends DriverHelper {
      */
     public AbstractUIObject(WebDriver driver, SearchContext searchContext) {
         super(driver);
-        ExtendedElementLocatorFactory factory = new ExtendedElementLocatorFactory(searchContext, driver != searchContext);
+        ExtendedElementLocatorFactory factory = new ExtendedElementLocatorFactory(driver, searchContext);
         PageFactory.initElements(new ExtendedFieldDecorator(factory, driver), this);
+    }
+
+    @Beta
+    public AbstractUIObject(SearchContext searchContext) {
+        this(unpackWebDriverFromSearchContext(searchContext), searchContext);
     }
 
     /**
