@@ -30,8 +30,6 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import com.zebrunner.carina.proxy.browserup.ProxyPool;
-import com.zebrunner.carina.utils.report.TestResult;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -55,25 +53,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.zebrunner.carina.utils.report.ReportContext;
-import com.zebrunner.carina.utils.report.TestResultItem;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
 import com.qaprosoft.carina.core.foundation.report.qtest.IQTestManager;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestRailManager;
 import com.qaprosoft.carina.core.foundation.skip.ExpectedSkipManager;
-import com.zebrunner.carina.utils.Configuration;
-import com.zebrunner.carina.utils.Configuration.Parameter;
-import com.zebrunner.carina.utils.DateUtils;
-import com.zebrunner.carina.utils.messager.Messager;
-import com.zebrunner.carina.utils.R;
-import com.zebrunner.carina.core.testng.ZebrunnerNameResolver;
-import com.zebrunner.carina.core.registrar.ownership.Ownership;
-import com.zebrunner.carina.core.registrar.ownership.SuiteOwnerResolver;
-import com.zebrunner.carina.utils.resources.L10N;
-import com.zebrunner.carina.core.registrar.tag.PriorityManager;
-import com.zebrunner.carina.core.registrar.tag.TagManager;
 import com.qaprosoft.carina.core.foundation.webdriver.CarinaDriver;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase;
@@ -89,6 +73,22 @@ import com.zebrunner.agent.core.registrar.label.CompositeLabelResolver;
 import com.zebrunner.agent.core.registrar.maintainer.ChainedMaintainerResolver;
 import com.zebrunner.agent.core.webdriver.RemoteWebDriverFactory;
 import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
+import com.zebrunner.carina.core.registrar.ownership.Ownership;
+import com.zebrunner.carina.core.registrar.ownership.SuiteOwnerResolver;
+import com.zebrunner.carina.core.registrar.tag.PriorityManager;
+import com.zebrunner.carina.core.registrar.tag.TagManager;
+import com.zebrunner.carina.core.testng.ZebrunnerNameResolver;
+import com.zebrunner.carina.proxy.browserup.ProxyPool;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration.Parameter;
+import com.zebrunner.carina.utils.DateUtils;
+import com.zebrunner.carina.utils.R;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.messager.Messager;
+import com.zebrunner.carina.utils.report.ReportContext;
+import com.zebrunner.carina.utils.report.TestResult;
+import com.zebrunner.carina.utils.report.TestResultItem;
+import com.zebrunner.carina.utils.resources.L10N;
 
 /*
  * CarinaListener - base carina-core TestNG Listener.
@@ -122,6 +122,16 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         
         LOGGER.info(Configuration.asString());
         // Configuration.validateConfiguration();
+
+        // if we initialize the logger in onStart(suite), all classes we access up to that point are initialized with INFO level
+        // if me init logger here, we still lose the debug logs for this class only
+        if (!"INFO".equalsIgnoreCase(Configuration.get(Parameter.CORE_LOG_LEVEL))) {
+            LoggerContext ctx = (LoggerContext) LogManager.getContext(this.getClass().getClassLoader(), false);
+            org.apache.logging.log4j.core.config.Configuration config = ctx.getConfiguration();
+            // make sure to update after moving to "com.zebrunner"
+            LoggerConfig logger = config.getLoggerConfig("com.qaprosoft.carina.core");
+            logger.setLevel(Level.getLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
+        }
 
         try {
             L10N.load();
@@ -159,14 +169,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         ChainedMaintainerResolver.addLast(new SuiteOwnerResolver(suite));
         // first means that ownership/maintainer resolver from carina has higher priority
         ChainedMaintainerResolver.addFirst(new Ownership());
-
-        if (!"INFO".equalsIgnoreCase(Configuration.get(Parameter.CORE_LOG_LEVEL))) {
-            LoggerContext ctx = (LoggerContext) LogManager.getContext(this.getClass().getClassLoader(), false);
-            org.apache.logging.log4j.core.config.Configuration config = ctx.getConfiguration();
-            // make sure to update after moving to "com.zebrunner"
-            LoggerConfig logger = config.getLoggerConfig("com.qaprosoft.carina.core");
-            logger.setLevel(Level.getLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
-        }
 
         setThreadCount(suite);
 
