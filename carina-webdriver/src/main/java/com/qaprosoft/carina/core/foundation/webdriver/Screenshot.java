@@ -369,10 +369,10 @@ public class Screenshot {
 
             if (rule.isAllowFullSize()) {
                 LOGGER.debug("starting full size screenshot capturing...");
-                Wait<WebDriver> wait = new FluentWait<>(driver)
+                Wait<WebDriver> wait = new FluentWait<>(originalDriver)
                         .pollingEvery(rule.getTimeout())
                         .withTimeout(rule.getTimeout());
-                screenshot = takeFullScreenshot(driver, wait);
+                screenshot = takeFullScreenshot(originalDriver, wait);
             } else {
                 LOGGER.debug("starting visible screenshot capturing...");
                 SearchContext originalSearchContext = castSearchContext(screenshotContext);
