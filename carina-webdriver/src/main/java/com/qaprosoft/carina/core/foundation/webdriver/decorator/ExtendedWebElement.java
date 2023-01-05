@@ -1225,11 +1225,12 @@ public class ExtendedWebElement implements IWebElement {
                     ExtendedWebElement extendedWebElement = new ExtendedWebElement(by, String.format("%s - [%s]", name, i++), driver, searchContext,
                             objects);
                     extendedWebElement.setElement(el);
+                    extendedWebElement.setIsSingle(false);
                     extendedWebElementList.add(extendedWebElement);
                 }
             }
         } catch (Exception e) {
-            LOGGER.error("Something went wrong when try to format locator.", e);
+            throw new RuntimeException("Something went wrong when try to format locator to list", e);
         }
         return extendedWebElementList;
     }
