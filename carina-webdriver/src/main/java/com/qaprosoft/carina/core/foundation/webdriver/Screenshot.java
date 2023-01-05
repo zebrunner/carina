@@ -447,32 +447,35 @@ public class Screenshot {
      * @return true if screenshot rule valid, false otherwise
      */
     private static boolean isRuleValid(IScreenshotRule rule) {
-        boolean isValid = true;
+        StringBuilder errMsgBuilder = new StringBuilder();
         if (rule.getFilename() == null || rule.getFilename().isEmpty()) {
-            LOGGER.error("Screenshot rule '{}' filename must not be null or empty.", rule.getClass());
-            isValid = false;
+            errMsgBuilder.append("Filename must not be null or empty.\n");
         }
 
         if (rule.getTimeout() == null || rule.getTimeout().toSeconds() < 0) {
-            LOGGER.error("Screenshot rule '{}' timeout must not be null or less than 0 seconds.", rule.getClass());
-            isValid = false;
+            errMsgBuilder.append("Timeout must not be null or less than 0 seconds.\n");
         }
 
         if (rule.getScreenshotType() == null) {
-            LOGGER.error("Screenshot rule '{}' event type must not be null.", rule.getClass());
-            isValid = false;
+            errMsgBuilder.append("Event type must not be null.\n");
         }
 
         if (rule.getImageResizeDimensions() == null ||
                 rule.getImageResizeDimensions().getLeft() == null ||
                 rule.getImageResizeDimensions().getRight() == null) {
-            LOGGER.error("Screenshot rule '{}' event type must not be null.", rule.getClass());
+            errMsgBuilder.append("Image resize dimensions must not be null.\n");
         }
 
         if (rule.getSaveFolder() == null || !Files.isDirectory(rule.getSaveFolder())) {
-            LOGGER.error("Screenshot rule '{}' save folder is null or is not a folder", rule.getClass());
+            errMsgBuilder.append("Save folder is null or is not a folder.\n");
         }
 
+        boolean isValid = errMsgBuilder.length() <= 0;
+        if (!isValid) {
+            errMsgBuilder.append("Rule class: ")
+                    .append(rule.getClass());
+            LOGGER.error("{}", errMsgBuilder);
+        }
         return isValid;
     }
 
