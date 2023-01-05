@@ -20,11 +20,10 @@ import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.Configuration.Parameter;
 
 /**
- * @deprecated instead used {@link DefaultSuccessfulDriverActionScreenshotRule} and
- *             {@link DefaultUnSuccessfulDriverActionScreenshotRule} rules
+ * Screenshot rule for capturing screenshots on {@link ScreenshotType#SUCCESSFUL_DRIVER_ACTION}.
+ * Used Carina Framework by default
  */
-@Deprecated(forRemoval = true, since = "8.0.5")
-public class AutoScreenshotRule implements IScreenshotRule {
+public class DefaultSuccessfulDriverActionScreenshotRule implements IScreenshotRule {
 
     @Override
     public ScreenshotType getScreenshotType() {
@@ -33,13 +32,12 @@ public class AutoScreenshotRule implements IScreenshotRule {
 
     @Override
     public boolean isTakeScreenshot() {
-        // enabled or not screenshot generation for driver action or test failure
-        return Configuration.getBoolean(Parameter.AUTO_SCREENSHOT) || Configuration.getBoolean(Parameter.ERROR_SCREENSHOT);
+        // enabled or not screenshot generation for driver action
+        return Configuration.getBoolean(Parameter.AUTO_SCREENSHOT);
     }
 
     @Override
     public boolean isAllowFullSize() {
-        // enabled or not full size screenshot on failure/driver exception
-        return Configuration.getBoolean(Parameter.ALLOW_FULLSIZE_SCREENSHOT);
+        return false;
     }
 }

@@ -37,7 +37,6 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.decorators.Decorated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.IClassListener;
@@ -59,11 +58,15 @@ import com.qaprosoft.carina.core.foundation.report.qtest.IQTestManager;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestRailManager;
 import com.qaprosoft.carina.core.foundation.skip.ExpectedSkipManager;
 import com.qaprosoft.carina.core.foundation.webdriver.CarinaDriver;
+import com.qaprosoft.carina.core.foundation.webdriver.ScreenshotType;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoader;
-import com.qaprosoft.carina.core.foundation.webdriver.screenshot.AutoScreenshotRule;
+import com.qaprosoft.carina.core.foundation.webdriver.screenshot.DefaultSuccessfulDriverActionScreenshotRule;
+import com.qaprosoft.carina.core.foundation.webdriver.screenshot.DefaultUnSuccessfulDriverActionScreenshotRule;
+import com.qaprosoft.carina.core.foundation.webdriver.screenshot.ExplicitFullSizeScreenshotRule;
+import com.qaprosoft.carina.core.foundation.webdriver.screenshot.ExplicitVisibleScreenshotRule;
 import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
 import com.zebrunner.agent.core.registrar.CurrentTest;
 import com.zebrunner.agent.core.registrar.CurrentTestRun;
@@ -153,8 +156,12 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             new CapabilitiesLoader().loadCapabilities(zebrunnerCapabilities);
         }
 
-        IScreenshotRule autoScreenshotsRule = (IScreenshotRule) new AutoScreenshotRule();
-        Screenshot.addScreenshotRule(autoScreenshotsRule);
+        List<IScreenshotRule> screenshotRules = List.of(
+                new DefaultSuccessfulDriverActionScreenshotRule(),
+                new DefaultUnSuccessfulDriverActionScreenshotRule(),
+                new ExplicitFullSizeScreenshotRule(),
+                new ExplicitVisibleScreenshotRule());
+        Screenshot.addRules(screenshotRules);
 
         TestNameResolverRegistry.set(new ZebrunnerNameResolver());
         CompositeLabelResolver.addResolver(new TagManager());
@@ -685,22 +692,13 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
      */
     private void takeScreenshot() {
         ConcurrentHashMap<String, CarinaDriver> drivers = getDrivers();
-
         try {
             for (Map.Entry<String, CarinaDriver> entry : drivers.entrySet()) {
                 WebDriver drv = entry.getValue().getDriver();
-
-                if (drv instanceof Decorated<?>) {
-                    drv = (WebDriver) ((Decorated<?>) drv).getOriginal();
-                }
-
-                R.CONFIG.put(Parameter.ERROR_SCREENSHOT.getKey(), "true", true);
-                Screenshot.captureByRule(drv, "", true);
+                Screenshot.capture(drv, ScreenshotType.UNSUCCESSFUL_DRIVER_ACTION);
             }
         } catch (Throwable thr) {
             LOGGER.error("Failure detected on screenshot generation after failure: ", thr);
-        } finally {
-            R.CONFIG.put(Parameter.ERROR_SCREENSHOT.getKey(), "false", true);
         }
     }    
 

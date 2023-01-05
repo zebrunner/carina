@@ -32,10 +32,9 @@ import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
+import com.qaprosoft.carina.core.foundation.webdriver.ScreenshotType;
 import com.zebrunner.agent.core.registrar.Artifact;
-import com.zebrunner.carina.utils.Configuration.Parameter;
 import com.zebrunner.carina.utils.FileManager;
-import com.zebrunner.carina.utils.R;
 import com.zebrunner.carina.utils.report.ReportContext;
 
 /**
@@ -211,20 +210,17 @@ public class DriverListener implements WebDriverListener, IDriverPool {
         try {
             if (errorMessage) {
                 LOGGER.error(comment);
-                R.CONFIG.put(Parameter.ERROR_SCREENSHOT.getKey(), "true", true);
-                String screenName = Screenshot.captureByRule(driver, "", true); // in case of failure try full size if allowed
+                // in case of failure try full size if allowed
                 // do not generate UI dump if no screenshot
-                if (!screenName.isEmpty()) {
-                    generateDump(driver, screenName);
-                }
+                Screenshot.capture(driver, ScreenshotType.UNSUCCESSFUL_DRIVER_ACTION)
+                        .ifPresent(s -> generateDump(driver, s));
             } else {
                 LOGGER.info(comment);
-                Screenshot.captureByRule(driver, "");
+                Screenshot.capture(driver, ScreenshotType.SUCCESSFUL_DRIVER_ACTION);
             }
         } catch (Exception e) {
             LOGGER.debug("Unrecognized failure detected in DriverListener->captureScreenshot!", e);
         } finally {
-            R.CONFIG.put(Parameter.ERROR_SCREENSHOT.getKey(), "false", true);
             resetMessages();
         }
     }

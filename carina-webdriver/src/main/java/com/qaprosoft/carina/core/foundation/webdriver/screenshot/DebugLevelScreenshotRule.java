@@ -15,10 +15,21 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.screenshot;
 
+import com.qaprosoft.carina.core.foundation.webdriver.ScreenshotType;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.Configuration.Parameter;
 
+/**
+ * Screenshot rule for capturing screenshots if debug log level enabled.
+ * Not used by default in Carina Framework
+ */
 public class DebugLevelScreenshotRule implements IScreenshotRule {
+
+    @Override
+    public ScreenshotType getScreenshotType() {
+        return ScreenshotType.SUCCESSFUL_DRIVER_ACTION;
+    }
+
     @Override
     public boolean isTakeScreenshot() {
         return Configuration.get(Parameter.CORE_LOG_LEVEL).equalsIgnoreCase("debug");

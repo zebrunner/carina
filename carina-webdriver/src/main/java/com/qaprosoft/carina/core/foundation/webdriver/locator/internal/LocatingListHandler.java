@@ -24,7 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebElement;
+
+import org.openqa.selenium.WrapsDriver;
+
 import org.openqa.selenium.WrapsElement;
 import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
@@ -68,7 +72,8 @@ public class LocatingListHandler implements InvocationHandler {
             extendedWebElements = new ArrayList<ExtendedWebElement>();
             for (WebElement element : elements) {
                 InvocationHandler handler = new LocatingListsElementHandler(element, locator);
-                WebElement proxy = (WebElement) Proxy.newProxyInstance(loader, new Class[]{WebElement.class, WrapsElement.class, Locatable.class},
+                WebElement proxy = (WebElement) Proxy.newProxyInstance(loader,
+                        new Class[] { WebElement.class, WrapsElement.class, WrapsDriver.class, Locatable.class, TakesScreenshot.class },
                         handler);
                 ExtendedWebElement webElement = new ExtendedWebElement(proxy, name + i);
                 webElement.setIsSingle(false);
