@@ -137,9 +137,7 @@ public class Screenshot {
      */
     @Deprecated(forRemoval = true, since = "8.0.5")
     public static List<IScreenshotRule> addScreenshotRules(List<IScreenshotRule> rulesList) {
-        for (IScreenshotRule rule : rulesList) {
-            addRule(rule);
-        }
+        rulesList.forEach(Screenshot::addRule);
         return RULES;
     }
 
@@ -175,14 +173,9 @@ public class Screenshot {
      * @return {@link Optional} of {@link IScreenshotRule} if exists, {@link Optional#empty()} otherwise.
      */
     public static Optional<IScreenshotRule> getRule(ScreenshotType screenshotType) {
-        IScreenshotRule rule = null;
-        for (IScreenshotRule r : RULES) {
-            if (r.getScreenshotType().equals(screenshotType)) {
-                rule = r;
-                break;
-            }
-        }
-        return Optional.ofNullable(rule);
+        return RULES.stream()
+                .filter(rule -> rule.getScreenshotType().equals(screenshotType))
+                .findFirst();
     }
 
     /**
@@ -319,14 +312,10 @@ public class Screenshot {
      *         otherwise.
      */
     public static Optional<String> capture(WebDriver driver, ScreenshotType screenshotType, String comment) {
-        IScreenshotRule rule = null;
-        for (IScreenshotRule r : RULES) {
-            if (r.getScreenshotType().equals(screenshotType)) {
-                rule = r;
-                break;
-            }
-        }
-        return rule != null ? capture(driver, driver, rule, comment) : Optional.empty();
+        return RULES.stream()
+                .filter(rule -> rule.getScreenshotType().equals(screenshotType))
+                .findFirst()
+                .flatMap(rule -> capture(driver, driver, rule, comment));
     }
 
     /**
@@ -341,14 +330,10 @@ public class Screenshot {
      *         otherwise.
      */
     public static Optional<String> capture(WebElement element, ScreenshotType screenshotType, String comment) {
-        IScreenshotRule rule = null;
-        for (IScreenshotRule r : RULES) {
-            if (r.getScreenshotType().equals(screenshotType)) {
-                rule = r;
-                break;
-            }
-        }
-        return rule != null ? capture(((WrapsDriver) element).getWrappedDriver(), element, rule, comment) : Optional.empty();
+        return RULES.stream()
+                .filter(rule -> rule.getScreenshotType().equals(screenshotType))
+                .findFirst()
+                .flatMap(rule -> capture(((WrapsDriver) element).getWrappedDriver(), element, rule, comment));
     }
 
     /**
