@@ -352,17 +352,11 @@ public class Screenshot {
         Objects.requireNonNull(rule, "screenshot rule param must not be null");
         Objects.requireNonNull(rule, "comment to screenshot must not be null");
 
-        if (!rule.isTakeScreenshot()) {
-            return Optional.empty();
-        }
-
-        if (rule.isEnableValidation() && !isRuleValid(rule)) {
-            return Optional.empty();
-        }
-
-        if (!isCaptured(comment)) {
-            // [VD] do not write something to log as this original exception is used as original exception for failure
-            // invalid driver for screenshot capture
+        if (!rule.isTakeScreenshot() ||
+                (rule.isEnableValidation() && !isRuleValid(rule)) ||
+                // [VD] do not write something to log as this original exception is used as original exception for failure
+                // invalid driver for screenshot capture
+                !isCaptured(comment)) {
             return Optional.empty();
         }
 
