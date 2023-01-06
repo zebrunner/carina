@@ -38,7 +38,6 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.WrapsDriver;
 import org.openqa.selenium.WrapsElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Locatable;
@@ -73,11 +72,14 @@ import com.zebrunner.carina.utils.messager.Messager;
 import com.zebrunner.carina.utils.performance.ACTION_NAME;
 import com.zebrunner.carina.utils.resources.L10N;
 
+/**
+ * If you want to inherit this element and extend the functionality (by adding new methods),
+ * add all constructors listed in the your inherited class with the same set of parameters.
+ * The number of constructors and their order may change in future versions.
+ */
 public class ExtendedWebElement implements IWebElement {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
     private static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
-
     private static final long RETRY_TIME = Configuration.getLong(Parameter.RETRY_INTERVAL);
 
     // we should keep both properties: driver and searchContext obligatory
@@ -102,69 +104,81 @@ public class ExtendedWebElement implements IWebElement {
     // Converted array of objects to String for dynamic element locators
     private String formatValues = "";
 
+    /**
+     * Create ExtendedWebElement explicitly
+     *
+     * @param by {@link By}
+     * @param name element's name
+     * @param driver {@link WebDriver}
+     * @param searchContext The context from which the element will be searched (can be both a {@link WebDriver} or an {@link WebElement})
+     * @param formatValues format parameters
+     */
     public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext, Object[] formatValues) {
         this(by, name, driver, searchContext);
         this.formatValues = Arrays.toString(formatValues);
     }
 
+    /**
+     * Create ExtendedWebElement explicitly
+     *
+     * @param by {@link By}
+     * @param name element's name
+     * @param driver {@link WebDriver}
+     * @param searchContext The context from which the element will be searched (can be both a {@link WebDriver} or an {@link WebElement})
+     */
     public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext) {
-        this(null, name, by);
+        if (by == null) {
+            throw new IllegalArgumentException("By must not be null");
+        }
+        if (name == null) {
+            throw new IllegalArgumentException("Name must not be null");
+        }
         if (driver == null) {
-            throw new IllegalArgumentException("Driver should not be null");
+            throw new IllegalArgumentException("Driver must not be null");
         }
-        this.driver = driver;
         if (searchContext == null) {
-            throw new IllegalArgumentException("SearchContext should not be null");
+            throw new IllegalArgumentException("SearchContext must not be null");
         }
+        this.by = by;
+        this.name = name;
+        this.driver = driver;
         this.searchContext = searchContext;
     }
 
-    public ExtendedWebElement(WebElement element, String name, By by) {
-        this(element, name);
-        if (by == null) {
-            throw new IllegalArgumentException("By should not be null");
-        }
-        this.by = by;
-    }
-
     /**
-     * For internal usage only
+     * Constructor for auto-initialization.
+     * Must not be called explicitly, for Carina Framework only.
+     * Must be overridden in a derived class and called via super.
+     * 
+     * Format of the name for single element: className + nameOfField + index (starts from 0) - for localization
      * 
      * @param element see {@link WebElement}
      * @param name name of the element
      */
     public ExtendedWebElement(WebElement element, String name) {
+        if (element == null) {
+            throw new IllegalArgumentException("WebElement must not be null");
+        }
+        if (!(element instanceof Proxy)) {
+            throw new IllegalArgumentException("WebElement must be Proxy! Possible cause: the constructor was called, "
+                    + "intended only for auto-initialization of the framework! Use another constructor(s)");
+        }
+        if (name == null) {
+            throw new IllegalArgumentException("Name must not be null.");
+        }
         this.name = name;
         this.element = element;
 
-        // read searchContext from not null elements only. It means that element was created using DriverHelper or by hands
-        if (this.element == null) {
-            return;
-        }
-
         try {
-            if (element instanceof Proxy) {
-                // when element proxied by ExtendedElementLocator
-                InvocationHandler innerProxy = Proxy.getInvocationHandler(element);
-                ExtendedElementLocator locator = (ExtendedElementLocator) (FieldUtils.getDeclaredField(innerProxy.getClass(), "locator", true))
-                        .get(innerProxy);
-
-                this.isLocalized = locator.isLocalized();
-                if (isLocalized) {
-                    this.name = locator.getClassName() + "." + name;
-                }
-
-                this.searchContext = locator.getSearchContext();
-                this.driver = locator.getDriver();
-
-                // TODO: identify if it is a child element and
-                // 1. get rootBy
-                // 2. append current "by" to the rootBy
-                // -> it should allow to search via regular driver and fluent waits - getBy()
-                this.by = locator.getBy();
-            } else {
-                this.driver = ((WrapsDriver) element).getWrappedDriver();
-                this.searchContext = this.driver;
+            InvocationHandler innerProxy = Proxy.getInvocationHandler(element);
+            ExtendedElementLocator locator = (ExtendedElementLocator) (FieldUtils.getDeclaredField(innerProxy.getClass(), "locator", true))
+                    .get(innerProxy);
+            this.by = locator.getBy();
+            this.searchContext = locator.getSearchContext();
+            this.driver = locator.getDriver();
+            this.isLocalized = locator.isLocalized();
+            if (isLocalized) {
+                this.name = locator.getClassName() + "." + name;
             }
         } catch (IllegalAccessException | ClassCastException e) {
             e.printStackTrace();
@@ -178,12 +192,10 @@ public class ExtendedWebElement implements IWebElement {
         }
     }
 
-
     public WebElement getElement() {
         if (this.element == null) {
             this.element = this.findElement();
         }
-        
         return this.element;
     }
 
@@ -1020,7 +1032,7 @@ public class ExtendedWebElement implements IWebElement {
      * object.
      *
      * @param by Selenium By locator
-     * @return ExtendedWebElement if exists otherwise null.
+     * @return {@link ExtendedWebElement} if exists otherwise null.
      */
     public ExtendedWebElement findExtendedWebElement(By by) {
         return findExtendedWebElement(by, by.toString(), EXPLICIT_TIMEOUT);
@@ -1032,7 +1044,7 @@ public class ExtendedWebElement implements IWebElement {
      *
      * @param by Selenium By locator
      * @param timeout to wait
-     * @return ExtendedWebElement if exists otherwise null.
+     * @return {@link ExtendedWebElement} if exists otherwise null.
      */
     public ExtendedWebElement findExtendedWebElement(By by, long timeout) {
         return findExtendedWebElement(by, by.toString(), timeout);
@@ -1044,7 +1056,7 @@ public class ExtendedWebElement implements IWebElement {
      *
      * @param by Selenium By locator
      * @param name Element name
-     * @return ExtendedWebElement if exists otherwise null.
+     * @return {@link ExtendedWebElement} if exists otherwise null.
      */
     public ExtendedWebElement findExtendedWebElement(final By by, String name) {
         return findExtendedWebElement(by, name, EXPLICIT_TIMEOUT);
@@ -1061,6 +1073,7 @@ public class ExtendedWebElement implements IWebElement {
      */
     public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
         ExtendedWebElement element = new ExtendedWebElement(by, name, this.driver, getElement());
+
         if (!element.isPresent(timeout)) {
             throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
         }
@@ -1208,7 +1221,7 @@ public class ExtendedWebElement implements IWebElement {
 
                 ClassLoader classLoader = getClass().getClassLoader();
 
-                InvocationHandler handler = new LocatingListHandler(classLoader, innerLocator, this.name);
+                InvocationHandler handler = new LocatingListHandler(classLoader, this.getClass(), innerLocator, this.name);
                 extendedWebElementList = (List<ExtendedWebElement>) Proxy.newProxyInstance(classLoader, new Class[] { List.class }, handler);
             } else {
                 String locator = this.by.toString();

@@ -133,7 +133,6 @@ public class ExtendedElementLocator implements ElementLocator {
      * Find the element.
      */
     public WebElement findElement() {
-
         if (by == null) {
             throw new NullPointerException("By cannot be null");
         }

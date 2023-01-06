@@ -24,6 +24,7 @@ import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.reflect.ConstructorUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TakesScreenshot;
@@ -39,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.gui.AbstractUIObject;
 
+// todo add opportunity to create inherited ExtendedWebElement
 public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements InvocationHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -81,8 +83,7 @@ public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements 
                 T uiObject;
                 try {
                     uiObject = (T) clazz.getConstructor(WebDriver.class, SearchContext.class)
-                            .newInstance(
-                                    webDriver, element);
+                            .newInstance(webDriver, element);
                 } catch (NoSuchMethodException e) {
                     LOGGER.error("Implement appropriate AbstractUIObject constructor for auto-initialization: "
                             + e.getMessage());
@@ -96,10 +97,10 @@ public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements 
                 WebElement proxy = (WebElement) Proxy.newProxyInstance(loader,
                         new Class[] { WebElement.class, WrapsElement.class, WrapsDriver.class, Locatable.class, TakesScreenshot.class },
                         handler);
-                ExtendedWebElement webElement = new ExtendedWebElement(proxy, String.format("%s - %d", name, index), locatorBy);
+                ExtendedWebElement webElement = new ExtendedWebElement(proxy, name + index);
                 webElement.setIsSingle(false);
                 uiObject.setRootExtendedElement(webElement);
-                uiObject.setName(String.format("%s - %d", name, index));
+                uiObject.setName(name + index);
                 uiObject.setRootElement(element);
                 uiObject.setRootBy(locatorBy);
                 uIObjects.add(uiObject);

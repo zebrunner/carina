@@ -35,7 +35,7 @@ import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.Configuration.Parameter;
 import com.zebrunner.carina.utils.messager.Messager;
 
-public abstract class AbstractUIObject extends DriverHelper {
+public abstract class AbstractUIObject<E extends ExtendedWebElement> extends DriverHelper {
 
     protected String name;
     @Deprecated
@@ -44,7 +44,7 @@ public abstract class AbstractUIObject extends DriverHelper {
     protected By rootBy;
 
     protected ExtendedWebElement uiLoadedMarker;
-    private ExtendedWebElement rootExtendedElement;
+    private E rootExtendedElement;
 
     @Deprecated
     private ElementLoadingStrategy loadingStrategy = ElementLoadingStrategy.valueOf(Configuration.get(Parameter.ELEMENT_LOADING_STRATEGY));
@@ -141,11 +141,11 @@ public abstract class AbstractUIObject extends DriverHelper {
      * 
      * @return see {@link ExtendedWebElement}
      */
-    public ExtendedWebElement getRootExtendedElement() {
+    public E getRootExtendedElement() {
         return this.rootExtendedElement;
     }
 
-    public void setRootExtendedElement(ExtendedWebElement element) {
+    public void setRootExtendedElement(E element) {
         this.rootExtendedElement = element;
     }
 
