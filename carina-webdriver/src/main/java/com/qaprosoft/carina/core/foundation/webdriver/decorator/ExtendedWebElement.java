@@ -79,7 +79,9 @@ import com.zebrunner.carina.utils.resources.L10N;
  */
 public class ExtendedWebElement implements IWebElement {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
+
     private static final long RETRY_TIME = Configuration.getLong(Parameter.RETRY_INTERVAL);
 
     // we should keep both properties: driver and searchContext obligatory
@@ -1032,7 +1034,7 @@ public class ExtendedWebElement implements IWebElement {
      * object.
      *
      * @param by Selenium By locator
-     * @return {@link ExtendedWebElement} if exists otherwise null.
+     * @return ExtendedWebElement if exists otherwise null.
      */
     public ExtendedWebElement findExtendedWebElement(By by) {
         return findExtendedWebElement(by, by.toString(), EXPLICIT_TIMEOUT);
@@ -1044,7 +1046,7 @@ public class ExtendedWebElement implements IWebElement {
      *
      * @param by Selenium By locator
      * @param timeout to wait
-     * @return {@link ExtendedWebElement} if exists otherwise null.
+     * @return ExtendedWebElement if exists otherwise null.
      */
     public ExtendedWebElement findExtendedWebElement(By by, long timeout) {
         return findExtendedWebElement(by, by.toString(), timeout);
@@ -1073,7 +1075,6 @@ public class ExtendedWebElement implements IWebElement {
      */
     public ExtendedWebElement findExtendedWebElement(final By by, String name, long timeout) {
         ExtendedWebElement element = new ExtendedWebElement(by, name, this.driver, getElement());
-
         if (!element.isPresent(timeout)) {
             throw new NoSuchElementException(SpecialKeywords.NO_SUCH_ELEMENT_ERROR + by.toString());
         }

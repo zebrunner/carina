@@ -41,7 +41,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebEleme
 import com.qaprosoft.carina.core.gui.AbstractUIObject;
 
 // todo add opportunity to create inherited ExtendedWebElement
-public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements InvocationHandler {
+public class AbstractUIObjectListHandler<T extends AbstractUIObject, E extends ExtendedWebElement> implements InvocationHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final ClassLoader loader;
@@ -83,7 +83,8 @@ public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements 
                 T uiObject;
                 try {
                     uiObject = (T) clazz.getConstructor(WebDriver.class, SearchContext.class)
-                            .newInstance(webDriver, element);
+                            .newInstance(
+                                    webDriver, element);
                 } catch (NoSuchMethodException e) {
                     LOGGER.error("Implement appropriate AbstractUIObject constructor for auto-initialization: "
                             + e.getMessage());
@@ -97,9 +98,28 @@ public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements 
                 WebElement proxy = (WebElement) Proxy.newProxyInstance(loader,
                         new Class[] { WebElement.class, WrapsElement.class, WrapsDriver.class, Locatable.class, TakesScreenshot.class },
                         handler);
-                ExtendedWebElement webElement = new ExtendedWebElement(proxy, name + index);
-                webElement.setIsSingle(false);
-                uiObject.setRootExtendedElement(webElement);
+
+
+                Class<?> rootExtendedWebElementClazz;
+                try {
+                    // todo refactor -  what if the user has not parameterized the class
+                    rootExtendedWebElementClazz=  ExtendedFieldDecoratorUtils.getParameterType(uiObject, AbstractUIObject.class, 0);
+                } catch (Exception e) {
+                    rootExtendedWebElementClazz = ExtendedWebElement.class;
+                }
+
+                E extendedWebElement;
+                try {
+                    extendedWebElement = (E) ConstructorUtils.invokeConstructor(rootExtendedWebElementClazz, proxy, name + index);
+                    extendedWebElement.setIsSingle(false);
+                    uiObject.setRootExtendedElement(extendedWebElement);
+                } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException | InstantiationException e) {
+                    LOGGER.error("Implement appropriate ExtendedWebElement constructor for auto-initialization: {}", e.getMessage());
+                    throw new RuntimeException("Implement appropriate ExtendedWebElement constructor for auto-initialization: " + e.getMessage(), e);
+                } catch (Exception e) {
+                    throw new RuntimeException("Error creating ExtendedWebElement or element that inherit it!", e);
+                }
+
                 uiObject.setName(name + index);
                 uiObject.setRootElement(element);
                 uiObject.setRootBy(locatorBy);
@@ -114,7 +134,8 @@ public class AbstractUIObjectListHandler<T extends AbstractUIObject> implements 
             throw e.getCause();
         }
     }
-    
+
+    @Deprecated(forRemoval = true, since = "8.0.6")
     private By getLocatorBy(ElementLocator locator) {
     	By rootBy = null;
     	

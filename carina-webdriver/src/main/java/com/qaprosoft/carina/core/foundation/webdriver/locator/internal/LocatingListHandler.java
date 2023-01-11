@@ -26,7 +26,9 @@ import java.util.List;
 import org.apache.commons.lang3.reflect.ConstructorUtils;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebElement;
+
 import org.openqa.selenium.WrapsDriver;
+
 import org.openqa.selenium.WrapsElement;
 import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
@@ -50,21 +52,23 @@ public class LocatingListHandler<E extends ExtendedWebElement> implements Invoca
     }
 
     public Object invoke(Object object, Method method, Object[] objects) throws Throwable {
-        // Hotfix for huge and expected regression in carina: we lost managed
-        // time delays with lists manipulations
-        // Temporary we are going to restore explicit waiter here with hardcoded
-        // timeout before we find better solution
-        // Pros: super fast regression issue which block UI execution
-        // Cons: there is no way to manage timeouts in this places
-        // if (!waitUntil(ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
-        // ExpectedConditions.visibilityOfElementLocated(by)))) {
-        // LOGGER.error("List is not present: " + by);
-        // }
-        List<E> extendedWebElements = new ArrayList<>();
-        List<WebElement> elements = locator.findElements();
-        int index = 0;
+		// Hotfix for huge and expected regression in carina: we lost managed
+		// time delays with lists manipulations
+		// Temporary we are going to restore explicit waiter here with hardcoded
+		// timeout before we find better solution
+		// Pros: super fast regression issue which block UI execution
+		// Cons: there is no way to manage timeouts in this places
+//    	if (!waitUntil(ExpectedConditions.or(ExpectedConditions.presenceOfElementLocated(by),
+//    			ExpectedConditions.visibilityOfElementLocated(by)))) {
+//    		LOGGER.error("List is not present: " + by);
+//    	}
+
+
+    	List<WebElement> elements = locator.findElements();
+        List<ExtendedWebElement> extendedWebElements = null;
+        int i = 0;
         if (elements != null) {
-            // todo maybe move to 63?
+            extendedWebElements = new ArrayList<ExtendedWebElement>();
             for (WebElement element : elements) {
                 InvocationHandler handler = new LocatingListsElementHandler(element, locator);
                 WebElement proxy = (WebElement) Proxy.newProxyInstance(loader,
@@ -73,14 +77,14 @@ public class LocatingListHandler<E extends ExtendedWebElement> implements Invoca
 
                 E extendedWebElement;
                 try {
-                    extendedWebElement = (E) ConstructorUtils.invokeConstructor(clazz, proxy, name + index);
+                    extendedWebElement = (E) ConstructorUtils.invokeConstructor(clazz, proxy, name + i);
                 } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException | InstantiationException e) {
                     LOGGER.error("Implement appropriate ExtendedWebElement constructor for auto-initialization: {}", e.getMessage());
                     throw new RuntimeException("Implement appropriate ExtendedWebElement constructor for auto-initialization: " + e.getMessage(), e);
                 }
                 extendedWebElement.setIsSingle(false);
                 extendedWebElements.add(extendedWebElement);
-                index++;
+                i++;
             }
         }
 
@@ -90,4 +94,5 @@ public class LocatingListHandler<E extends ExtendedWebElement> implements Invoca
             throw e.getCause();
         }
     }
+
 }

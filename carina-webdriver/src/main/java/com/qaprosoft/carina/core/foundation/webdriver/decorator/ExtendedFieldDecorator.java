@@ -42,12 +42,15 @@ import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.webdriver.locator.internal.AbstractUIObjectListHandler;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.internal.LocatingListHandler;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.internal.ExtendedFieldDecoratorUtils;
 import com.qaprosoft.carina.core.gui.AbstractUIObject;
 
 public class ExtendedFieldDecorator implements FieldDecorator {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private final ElementLocatorFactory factory;
-    private final WebDriver webDriver;
+
+    protected ElementLocatorFactory factory;
+
+    private WebDriver webDriver;
     
     public ExtendedFieldDecorator(ElementLocatorFactory factory, WebDriver webDriver) {
         this.factory = factory;
@@ -120,14 +123,14 @@ public class ExtendedFieldDecorator implements FieldDecorator {
      * @param field page element to be proxied
      * @param locator {{{@link com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator}}}
      */
-    private <E extends ExtendedWebElement> E proxyForLocator(ClassLoader loader, Field field, ElementLocator locator) {
+    protected  <E extends ExtendedWebElement> E proxyForLocator(ClassLoader loader, Field field, ElementLocator locator) {
         InvocationHandler handler = new LocatingElementHandler(locator);
         WebElement proxy = (WebElement) Proxy.newProxyInstance(loader, new Class[] { WebElement.class, WrapsElement.class, WrapsDriver.class,
                 Locatable.class, TakesScreenshot.class },
                 handler);
         E extendedWebElement;
-        Class<? extends ExtendedWebElement> clazz = (Class<? extends ExtendedWebElement>) field.getType();
         try {
+            Class<?> clazz = field.getType();
             extendedWebElement = (E) ConstructorUtils.invokeConstructor(clazz, proxy, field.getName());
         } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException | InstantiationException e) {
             LOGGER.error("Implement appropriate ExtendedWebElement constructor for auto-initialization: {}", e.getMessage());
@@ -145,21 +148,29 @@ public class ExtendedFieldDecorator implements FieldDecorator {
         WebElement proxy = (WebElement) Proxy.newProxyInstance(loader,
                 new Class[] { WebElement.class, WrapsElement.class, WrapsDriver.class, Locatable.class, TakesScreenshot.class },
                 handler);
-        Class<? extends AbstractUIObject> clazz = (Class<? extends AbstractUIObject>) field.getType();
         T uiObject;
         try {
-            uiObject = (T) clazz.getConstructor(WebDriver.class, SearchContext.class).newInstance(
-                    webDriver, proxy);
+            Class<? extends AbstractUIObject<?>> clazz = (Class<? extends AbstractUIObject<?>>) field.getType();
+            uiObject = (T) clazz.getConstructor(WebDriver.class, SearchContext.class).newInstance(webDriver, proxy);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException("Implement appropriate AbstractUIObject constructor for auto-initialization!", e);
         } catch (Exception e) {
             throw new RuntimeException("Error creating UIObject!", e);
         }
 
+        Class<?> extendedElementClazz;
+
+        try {
+            // todo refactor -  what if the user has not parameterized the class
+            extendedElementClazz=  ExtendedFieldDecoratorUtils.getParameterType(uiObject, AbstractUIObject.class, 0);
+        } catch (Exception e) {
+            extendedElementClazz = ExtendedWebElement.class;
+        }
+
         E extendedWebElement;
-        Class<? extends ExtendedWebElement> extendedElementClazz = (Class<? extends ExtendedWebElement>) getAbstractUIObjectType(field);
         try {
             extendedWebElement = (E) ConstructorUtils.invokeConstructor(extendedElementClazz, proxy, field.getName());
+            uiObject.setRootExtendedElement(extendedWebElement);
         } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException | InstantiationException e) {
             LOGGER.error("Implement appropriate ExtendedWebElement constructor for auto-initialization: {}", e.getMessage());
             throw new RuntimeException("Implement appropriate ExtendedWebElement constructor for auto-initialization: " + e.getMessage(), e);
@@ -167,7 +178,6 @@ public class ExtendedFieldDecorator implements FieldDecorator {
             throw new RuntimeException("Error creating ExtendedWebElement or element that inherit it!", e);
         }
 
-        uiObject.setRootExtendedElement(extendedWebElement);
         uiObject.setName(field.getName());
         uiObject.setRootElement(proxy);
         uiObject.setRootBy(getLocatorBy(locator));
@@ -181,8 +191,9 @@ public class ExtendedFieldDecorator implements FieldDecorator {
     }
 
     @SuppressWarnings("unchecked")
-    protected <T extends AbstractUIObject> List<T> proxyForListUIObjects(ClassLoader loader, Field field, ElementLocator locator) {
-        InvocationHandler handler = new AbstractUIObjectListHandler<T>(loader, (Class<?>) getListType(field), webDriver,
+    protected <T extends AbstractUIObject<E>, E extends ExtendedWebElement> List<T> proxyForListUIObjects(ClassLoader loader, Field field,
+            ElementLocator locator) {
+        InvocationHandler handler = new AbstractUIObjectListHandler<T, E>(loader, (Class<?>) getListType(field), webDriver,
                 locator, field.getName());
         return (List<T>) Proxy.newProxyInstance(loader, new Class[] { List.class }, handler);
     }
@@ -194,19 +205,8 @@ public class ExtendedFieldDecorator implements FieldDecorator {
         if (!(genericType instanceof ParameterizedType)) {
             return null;
         }
-        return ((ParameterizedType) genericType).getActualTypeArguments()[0];
-    }
 
-    private Type getAbstractUIObjectType(Field field) {
-        Type type = field.getType();
-        while (!(type instanceof ParameterizedType)) {
-            if (type instanceof ParameterizedType) {
-                type = ((Class<?>) ((ParameterizedType) type).getRawType()).getGenericSuperclass();
-            } else {
-                type = ((Class<?>) type).getGenericSuperclass();
-            }
-        }
-        return ((ParameterizedType) type).getActualTypeArguments()[0];
+        return ((ParameterizedType) genericType).getActualTypeArguments()[0];
     }
 
     @Deprecated(forRemoval = true, since = "8.0.5")
