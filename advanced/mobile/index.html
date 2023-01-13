@@ -420,6 +420,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#recommended-capability-to-minimize-install_failed_insufficient_storage-exception" class="md-nav__link">
+    Recommended capability to minimize INSTALL_FAILED_INSUFFICIENT_STORAGE exception
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#run-tests-on-tvos-androidtv" class="md-nav__link">
     Run tests on tvOS, AndroidTV
   </a>
@@ -615,6 +622,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#recommended-capability-to-minimize-install_failed_insufficient_storage-exception" class="md-nav__link">
+    Recommended capability to minimize INSTALL_FAILED_INSUFFICIENT_STORAGE exception
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#run-tests-on-tvos-androidtv" class="md-nav__link">
     Run tests on tvOS, AndroidTV
   </a>
@@ -694,6 +708,11 @@ for example:</p>
 
 </code></pre>
 
+<h3 id="recommended-capability-to-minimize-install_failed_insufficient_storage-exception">Recommended capability to minimize INSTALL_FAILED_INSUFFICIENT_STORAGE exception</h3>
+<p>This exception may appear due to multiple app reinstalls on the Android device.
+You need to add <code>remoteAppsCacheLimit</code> capability with value <code>0</code> for all Android testing to disable caching mechanism.
+This capability was delivered as part of original CE <a href="https://github.com/zebrunner/pipeline-ce/commit/b8732cafa30c93d7d9d56e73da73e491b1f22b2c">codeline</a>.</p>
+<p>Explanation and original google feedback about <code>INSTALL_FAILED_INSUFFICIENT_STORAGE</code> exception might be found <a href="https://issuetracker.google.com/issues/170867658?pli=1">here</a>.</p>
 <h3 id="run-tests-on-tvos-androidtv">Run tests on tvOS, AndroidTV</h3>
 <h4 id="run-tests-on-tvos">Run tests on tvOS</h4>
 <p>To run tests for <a href="https://developer.apple.com/tvos/">tvOS</a>, set the capability value of <code>platformName</code> to <code>tvOS</code> in <code>_config.properties</code>, for example:</p>
