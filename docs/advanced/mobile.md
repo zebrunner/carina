@@ -37,6 +37,14 @@ for example:
 
 ```
 
+### Recommended capability to minimize INSTALL_FAILED_INSUFFICIENT_STORAGE exception
+
+This exception may appear due to multiple app reinstalls on the Android device.
+You need to add `remoteAppsCacheLimit` capability with value `0` for all Android testing to disable caching mechanism.
+This capability was delivered as part of original CE [codeline](https://github.com/zebrunner/pipeline-ce/commit/b8732cafa30c93d7d9d56e73da73e491b1f22b2c).
+
+Explanation and original google feedback about `INSTALL_FAILED_INSUFFICIENT_STORAGE` exception might be found [here](https://issuetracker.google.com/issues/170867658?pli=1).
+
 ### Run tests on tvOS, AndroidTV
 
 #### Run tests on tvOS
