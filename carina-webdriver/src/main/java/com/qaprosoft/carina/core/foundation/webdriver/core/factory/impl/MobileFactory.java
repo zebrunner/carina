@@ -24,20 +24,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.zebrunner.agent.core.registrar.Artifact;
-import com.zebrunner.carina.commons.artifact.IArtifactManager;
-import com.zebrunner.carina.utils.mobile.ArtifactProvider;
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.zebrunner.carina.utils.Configuration;
-import com.zebrunner.carina.utils.Configuration.Parameter;
-import com.zebrunner.carina.utils.R;
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.EspressoCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobile.UiAutomator2Capabilities;
@@ -45,12 +39,20 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mobil
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
 import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
+import com.zebrunner.agent.core.registrar.Artifact;
+import com.zebrunner.carina.commons.artifact.IArtifactManager;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration.Parameter;
+import com.zebrunner.carina.utils.R;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.mobile.ArtifactProvider;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.remote.AutomationName;
 import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.remote.options.SupportsAutomationNameOption;
+import io.appium.java_client.safari.SafariDriver;
 
 /**
  * MobileFactory creates instance {@link WebDriver} for mobile testing.
@@ -124,10 +126,14 @@ public class MobileFactory extends AbstractFactory {
             if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.ANDROID)) {
                 driver = new AndroidDriver(ce, capabilities);
 
-            } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.IOS)
-                    || mobilePlatformName.equalsIgnoreCase(SpecialKeywords.TVOS)) {
-                driver = new IOSDriver(ce, capabilities);
-
+            } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.IOS) ||
+                    mobilePlatformName.equalsIgnoreCase(SpecialKeywords.TVOS)) {
+                if (!capabilities.getBrowserName().isEmpty() &&
+                        Browser.SAFARI.browserName().equalsIgnoreCase(capabilities.getBrowserName())) {
+                    driver = new SafariDriver(ce, capabilities);
+                } else {
+                    driver = new IOSDriver(ce, capabilities);
+                }
             } else if (mobilePlatformName.equalsIgnoreCase(SpecialKeywords.CUSTOM)) {
                 // that's a case for custom mobile capabilities like browserstack or saucelabs
                 driver =new RemoteWebDriver(new URL(seleniumHost), capabilities);
