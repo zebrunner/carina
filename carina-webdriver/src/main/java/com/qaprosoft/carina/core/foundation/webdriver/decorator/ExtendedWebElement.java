@@ -283,18 +283,10 @@ public class ExtendedWebElement implements IWebElement {
 	 *            - timeout.
 	 * @return element existence status.
 	 */
-	public boolean isPresent(By by, long timeout) {
-        boolean res = false;
-        try {
-            res = waitUntil(getDefaultCondition(by), timeout);
-        } catch (StaleElementReferenceException e) {
-            // there is no sense to continue as StaleElementReferenceException captured
-            LOGGER.debug("waitUntil: StaleElementReferenceException", e);
-        }
-        return res;
-	}
-	
-	
+    public boolean isPresent(By by, long timeout) {
+        return waitUntil(getDefaultCondition(by), timeout);
+    }
+
     /**
      * Wait until any condition happens.
      *
@@ -869,7 +861,7 @@ public class ExtendedWebElement implements IWebElement {
         List<ExpectedCondition<?>> conditions = new ArrayList<>();
 
         if (element != null) {
-            conditions.add(ExpectedConditions.visibilityOf(element));
+            conditions.add(ExpectedConditions.not(ExpectedConditions.invisibilityOf(element)));
         }
 
         if (isSingleElement) {
@@ -972,7 +964,7 @@ public class ExtendedWebElement implements IWebElement {
     public boolean isVisible(long timeout) {
         List<ExpectedCondition<?>> conditions = new ArrayList<>();
         if (element != null) {
-            conditions.add(ExpectedConditions.visibilityOf(element));
+            conditions.add(ExpectedConditions.not(ExpectedConditions.invisibilityOf(element)));
         }
 
         if (isSingleElement) {
@@ -1784,7 +1776,7 @@ public class ExtendedWebElement implements IWebElement {
         switch (loadingStrategy) {
         case BY_PRESENCE: {
             if (element != null) {
-                conditions.add(ExpectedConditions.visibilityOf(element));
+                conditions.add(ExpectedConditions.not(ExpectedConditions.invisibilityOf(element)));
             }
 
             if (isSingleElement) {
@@ -1798,7 +1790,7 @@ public class ExtendedWebElement implements IWebElement {
         }
         case BY_VISIBILITY: {
             if (element != null) {
-                conditions.add(ExpectedConditions.visibilityOf(element));
+                conditions.add(ExpectedConditions.not(ExpectedConditions.invisibilityOf(element)));
             }
 
             if (isSingleElement) {
@@ -1812,7 +1804,7 @@ public class ExtendedWebElement implements IWebElement {
         }
         case BY_PRESENCE_OR_VISIBILITY:
             if (element != null) {
-                conditions.add(ExpectedConditions.visibilityOf(element));
+                conditions.add(ExpectedConditions.not(ExpectedConditions.invisibilityOf(element)));
             }
 
             if (isSingleElement) {
