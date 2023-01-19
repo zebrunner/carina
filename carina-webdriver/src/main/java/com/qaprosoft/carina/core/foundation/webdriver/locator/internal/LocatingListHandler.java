@@ -22,18 +22,21 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebElement;
-
 import org.openqa.selenium.WrapsDriver;
-
 import org.openqa.selenium.WrapsElement;
 import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorUtils;
 
 public class LocatingListHandler implements InvocationHandler {
     private final ElementLocator locator;
@@ -66,6 +69,10 @@ public class LocatingListHandler implements InvocationHandler {
 
     	
     	List<WebElement> elements = locator.findElements();
+        By by = getLocatorBy(locator);
+        Optional<LocatorType> locatorType = LocatorUtils.getLocatorType(by);
+        boolean isByForListSupported = locatorType.isPresent() && locatorType.get().isIndexSupport();
+        String locatorAsString = by.toString();
         List<ExtendedWebElement> extendedWebElements = null;
         int i = 0;
         if (elements != null) {
@@ -77,7 +84,12 @@ public class LocatingListHandler implements InvocationHandler {
                         handler);
                 ExtendedWebElement webElement = new ExtendedWebElement(proxy, name + i);
                 webElement.setIsSingle(false);
-
+                if (isByForListSupported) {
+                    webElement.setIsRefreshSupport(true);
+                    webElement.setBy(locatorType.get().buildLocatorWithIndex(locatorAsString, i));
+                } else {
+                    webElement.setIsRefreshSupport(false);
+                }
                 Field searchContextField = locator.getClass().getDeclaredField("searchContext");
                 searchContextField.setAccessible(true);
                 webElement.setSearchContext((SearchContext) searchContextField.get(locator));
@@ -90,6 +102,15 @@ public class LocatingListHandler implements InvocationHandler {
             return method.invoke(extendedWebElements, objects);
         } catch (InvocationTargetException e) {
             throw e.getCause();
+        }
+    }
+
+    private By getLocatorBy(ElementLocator locator) {
+        try {
+            ExtendedElementLocator extendedElementLocator = (ExtendedElementLocator) locator;
+            return extendedElementLocator.getBy();
+        } catch (ClassCastException e) {
+            throw new RuntimeException("Cannot get by from locator", e);
         }
     }
 

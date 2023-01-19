@@ -22,6 +22,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,6 +59,7 @@ import org.testng.SkipException;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.FormatLocatorConverter;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.internal.LocatingListHandler;
 import com.zebrunner.carina.crypto.Algorithm;
@@ -98,6 +100,7 @@ public class ExtendedWebElement implements IWebElement {
 
     private boolean isLocalized = false;
     private boolean isSingleElement = true;
+    private boolean isRefreshSupport = true;
 
     // Converted array of objects to String for dynamic element locators
     private String formatValues = "";
@@ -188,17 +191,26 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     /**
-     * Reinitializes the element (not applicable to list element)
-     *
-     * @throws NoSuchElementException if the element is not found
+     * Reinitialize the element according to its locator.
+     * If the element is part of the list, then its update will be performed only if the locator is XPath.
+     * (if the locator is not XPath in this case, an {@link UnsupportedOperationException} will be thrown in this case.
+     * Also, if the current element is part of a list, it is not recommended to use it, since it can lead to
+     * undefined behavior if the number of items to which the current item belongs changes.
+     * 
+     * @throws NoSuchElementException if the element was not found
+     * @throws UnsupportedOperationException if refreshing of the element is not supported
      */
     public void refresh() {
-        if (isSingleElement) {
-            // try to override element
-            element = this.findElement();
-        } else {
-            LOGGER.error("Cannot refresh element of the list.");
+        if (!isRefreshSupport) {
+            throw new UnsupportedOperationException(
+                    String.format("Refresh is not supported for this element:%n name: %s%n locator: %s", this.name, this.by));
         }
+        LOGGER.debug("Performing refresh of the element with name '{}' and locator: {}", this.name, this.by);
+        if (!isSingleElement) {
+            LOGGER.debug("Refreshing an element that is part of the list is not a safe operation "
+                    + "in case of changing the number of the element after initialization");
+        }
+        this.element = this.findElement();
     }
     
     /**
@@ -313,6 +325,15 @@ public class ExtendedWebElement implements IWebElement {
      */
     public void setIsSingle(boolean isSingleElement) {
         this.isSingleElement = isSingleElement;
+    }
+
+    /**
+     * For internal usage only!
+     *
+     * @param isRefreshSupport true if element is support refresh, false otherwise
+     */
+    public void setIsRefreshSupport(boolean isRefreshSupport) {
+        this.isRefreshSupport = isRefreshSupport;
     }
 
     public String getName() {
@@ -1087,14 +1108,24 @@ public class ExtendedWebElement implements IWebElement {
             return extendedWebElements;
         }
 
+        Optional<LocatorType> locatorType = LocatorUtils.getLocatorType(by);
+        boolean isByForListSupported = locatorType.isPresent() && locatorType.get().isIndexSupport();
+        String locatorAsString = by.toString();
         List<WebElement> webElements = getElement().findElements(by);
-        int i = 1;
+        int i = 0;
         for (WebElement element : webElements) {
-            String name = String.format("ExtendedWebElement - [%d]", i++);
+            String name = String.format("ExtendedWebElement - [%d]", i);
             ExtendedWebElement tempElement = new ExtendedWebElement(by, name, getDriver(), getElement());
             tempElement.setElement(element);
             tempElement.setIsSingle(false);
+            if (isByForListSupported) {
+                tempElement.setIsRefreshSupport(true);
+                tempElement.setBy(locatorType.get().buildLocatorWithIndex(locatorAsString, i));
+            } else {
+                tempElement.setIsRefreshSupport(false);
+            }
             extendedWebElements.add(tempElement);
+            i++;
         }
         return extendedWebElements;
     }
@@ -1422,10 +1453,15 @@ public class ExtendedWebElement implements IWebElement {
             // com.google.common.collect.Maps$TransformedEntriesMap cannot be cast to java.lang.String
             LOGGER.debug("catched StaleElementReferenceException: ", e);
             // try to find again using driver context and do action
-            element = this.findElement();
-            output = overrideAction(actionName, inputArgs);
+            // [AS] do not try to refresh element if it created as part of list,
+            // because it can find first element or different (not original) element - unexpected behaviour
+            if (isSingleElement) {
+                this.element = this.findElement();
+                output = overrideAction(actionName, inputArgs);
+            } else {
+                throw e;
+            }
         }
-
         return output;
 	}
 
