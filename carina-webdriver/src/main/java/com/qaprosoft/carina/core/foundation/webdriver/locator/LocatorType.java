@@ -13,6 +13,7 @@ import com.sun.jersey.core.util.Base64;
 import io.appium.java_client.AppiumBy;
 
 public enum LocatorType {
+
     BY_XPATH("By.xpath: ", true) {
         public By buildLocatorFromString(String locator) {
             return By.xpath(StringUtils.remove(locator, getStartsWith()));
@@ -27,6 +28,7 @@ public enum LocatorType {
             return By.xpath(String.format("(%s)[%s]", StringUtils.remove(locator, getStartsWith()), index + 1));
         }
     },
+
     BY_NAME("By.name: ", false) {
         public By buildLocatorFromString(String locator) {
             return By.name(StringUtils.remove(locator, getStartsWith()));
@@ -56,6 +58,7 @@ public enum LocatorType {
     },
 
     BY_ID("By.id: ", false) {
+
         public By buildLocatorFromString(String locator) {
             return By.id(StringUtils.remove(locator, getStartsWith()));
         }
@@ -96,6 +99,7 @@ public enum LocatorType {
             throw new UnsupportedOperationException("Building locator 'By.linkText' with index is not supported");
         }
     },
+
     BY_CLASSNAME("By.className: ", false) {
         public By buildLocatorFromString(String locator) {
             return By.className(StringUtils.remove(locator, getStartsWith()));
@@ -137,6 +141,7 @@ public enum LocatorType {
             throw new UnsupportedOperationException("Building locator 'By.partialLinkText' with index is not supported");
         }
     },
+
     BY_CSS("By.cssSelector: ", false) {
         public By buildLocatorFromString(String locator) {
             return By.cssSelector(StringUtils.remove(locator, getStartsWith()));
@@ -151,6 +156,7 @@ public enum LocatorType {
             throw new UnsupportedOperationException("Building locator 'By.cssSelector' with index is not supported");
         }
     },
+
     BY_TAG_NAME("By.tagName: ", false) {
         public By buildLocatorFromString(String locator) {
             return By.tagName(StringUtils.remove(locator, getStartsWith()));
@@ -217,7 +223,6 @@ public enum LocatorType {
     },
 
     APPIUM_BY_IOS_CLASS_CHAIN("AppiumBy.iOSClassChain: ", false) {
-
         public By buildLocatorFromString(String locator) {
             return AppiumBy.iOSClassChain(StringUtils.remove(locator, getStartsWith()));
         }
@@ -244,6 +249,7 @@ public enum LocatorType {
             throw new UnsupportedOperationException("Building locator 'AppiumBy.iOSNsPredicate' with index is not supported");
         }
     },
+    
     APPIUM_BY_CUSTOM("AppiumBy.custom: ", false) {
         public By buildLocatorFromString(String locator) {
             return AppiumBy.custom(StringUtils.remove(locator, getStartsWith()));
@@ -257,6 +263,7 @@ public enum LocatorType {
             throw new UnsupportedOperationException("Building locator 'AppiumBy.custom' with index is not supported");
         }
     },
+    
     APPIUM_BY_ANDROID_VIEW_TAG("AppiumBy.androidViewTag: ", false) {
         public By buildLocatorFromString(String locator) {
             return AppiumBy.androidViewTag(StringUtils.remove(locator, getStartsWith()));
@@ -270,6 +277,7 @@ public enum LocatorType {
             throw new UnsupportedOperationException("Building locator 'AppiumBy.androidViewTag' with index is not supported");
         }
     },
+    
     APPIUM_BY_ANDROID_VIEW_MATCHER("AppiumBy.androidViewMatcher: ", false) {
         public By buildLocatorFromString(String locator) {
             return AppiumBy.androidViewMatcher(StringUtils.remove(locator, getStartsWith()));
@@ -283,6 +291,7 @@ public enum LocatorType {
             throw new UnsupportedOperationException("Building locator 'AppiumBy.androidViewMatcher' with index is not supported");
         }
     },
+    
     APPIUM_BY_ANDROID_DATA_MATCHER("AppiumBy.androidDataMatcher: ", false) {
         public By buildLocatorFromString(String locator) {
             return AppiumBy.androidDataMatcher(StringUtils.remove(locator, getStartsWith()));
