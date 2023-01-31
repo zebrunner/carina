@@ -34,7 +34,7 @@ import com.qaprosoft.apitools.validation.JsonKeywordsComparator;
 import com.qaprosoft.apitools.validation.JsonValidator;
 import com.qaprosoft.apitools.validation.XmlCompareMode;
 import com.qaprosoft.apitools.validation.XmlValidator;
-import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
+import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatus;
 import com.qaprosoft.carina.core.foundation.api.log.LoggingOutputStream;
 import com.qaprosoft.carina.core.foundation.api.resolver.ContextResolverChain;
 import org.json.JSONException;
@@ -209,9 +209,9 @@ public abstract class AbstractApiMethodV2 extends AbstractApiMethod {
      * @return restassured Response object
      */
     public Response callAPIExpectSuccess() {
-        HttpResponseStatusType statusType = ContextResolverChain.resolveSuccessfulHttpStatus(getAnchorElement())
+        HttpResponseStatus status = ContextResolverChain.resolveSuccessfulHttpStatus(getAnchorElement())
                 .orElseThrow(() -> new RuntimeException("To use this method please declare @SuccessfulHttpStatus for your AbstractApiMethod class"));
-        expectResponseStatus(statusType);
+        expectResponseStatus(status);
         return callAPI();
     }
 

@@ -28,7 +28,7 @@ import com.qaprosoft.carina.core.foundation.api.annotation.PropertiesPath;
 import com.qaprosoft.carina.core.foundation.api.annotation.RequestTemplatePath;
 import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePath;
 import com.qaprosoft.carina.core.foundation.api.annotation.SuccessfulHttpStatus;
-import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
+import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatus;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.Arrays;
@@ -96,10 +96,10 @@ class AnnotationContextResolver implements ContextResolver<Class<?>> {
     }
 
     @Override
-    public Optional<HttpResponseStatusType> resolveSuccessfulHttpStatus(Class<?> element) {
+    public Optional<HttpResponseStatus> resolveSuccessfulHttpStatus(Class<?> element) {
         return AnnotationUtils.findFirstAnnotationContextByChain(element, SuccessfulHttpStatus.class)
                 .map(AnnotationContext::getAnnotation)
-                .map(SuccessfulHttpStatus::status);
+                .map(annotation -> annotation.status().getResponseStatus().withMessageOverride(annotation.messageOverride()));
     }
 
     @Override

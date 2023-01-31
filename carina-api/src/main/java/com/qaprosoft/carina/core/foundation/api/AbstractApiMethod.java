@@ -32,6 +32,8 @@ import java.util.Set;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 
+import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatus;
+import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
 import com.qaprosoft.carina.core.foundation.api.interceptor.InterceptorChain;
 import com.qaprosoft.carina.core.foundation.api.resolver.ContextResolverChain;
 import com.qaprosoft.carina.core.foundation.api.resolver.RequestStartLine;
@@ -48,7 +50,6 @@ import org.slf4j.event.Level;
 import com.qaprosoft.carina.core.foundation.api.http.ContentTypeEnum;
 import com.qaprosoft.carina.core.foundation.api.http.HttpClient;
 import com.qaprosoft.carina.core.foundation.api.http.HttpMethodType;
-import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
 import com.qaprosoft.carina.core.foundation.api.log.CarinaRequestBodyLoggingFilter;
 import com.qaprosoft.carina.core.foundation.api.log.CarinaResponseBodyLoggingFilter;
 import com.qaprosoft.carina.core.foundation.api.log.LoggingOutputStream;
@@ -212,6 +213,10 @@ public abstract class AbstractApiMethod extends HttpClient {
     }
 
     public void expectResponseStatus(HttpResponseStatusType status) {
+        expectResponseStatus(status.getResponseStatus());
+    }
+
+    public void expectResponseStatus(HttpResponseStatus status) {
         request.expect().statusCode(status.getCode());
         request.expect().statusLine(Matchers.containsString(status.getMessage()));
     }

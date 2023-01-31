@@ -35,6 +35,7 @@ import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePath;
 import com.qaprosoft.carina.core.foundation.api.annotation.SuccessfulHttpStatus;
 import com.qaprosoft.carina.core.foundation.api.binding.RuntimeMethod;
 import com.qaprosoft.carina.core.foundation.api.http.HttpMethodType;
+import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatus;
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
 
 import java.lang.reflect.AnnotatedElement;
@@ -133,9 +134,9 @@ public class MethodBasedContextResolver implements ContextResolver<RuntimeMethod
     }
 
     @Override
-    public Optional<HttpResponseStatusType> resolveSuccessfulHttpStatus(RuntimeMethod element) {
+    public Optional<HttpResponseStatus> resolveSuccessfulHttpStatus(RuntimeMethod element) {
         return AnnotationUtils.findFirstAnnotationContextByChain(element, SuccessfulHttpStatus.class)
-                .map(context -> context.getValue(SuccessfulHttpStatus::status, o -> HttpResponseStatusType.valueOf(o.toString()), null));
+                .map(context -> context.getValue(annotation -> annotation.status().getResponseStatus().withMessageOverride(annotation.messageOverride()), HttpResponseStatus.class::cast, null));
     }
 
     @Override
