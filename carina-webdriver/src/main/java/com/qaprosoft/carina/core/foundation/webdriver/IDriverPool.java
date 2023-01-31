@@ -348,6 +348,9 @@ public interface IDriverPool {
             POOL_LOGGER.debug("finished driver quit: " + carinaDriver.getName());
             if (!keepProxyDuring) {
                 ProxyPool.stopProxy();
+                if(com.zebrunner.carina.proxy.ProxyPool.isProxyRegistered()) {
+                    com.zebrunner.carina.proxy.ProxyPool.stopProxy();
+                }
             }
         }
     }
