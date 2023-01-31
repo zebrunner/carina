@@ -713,7 +713,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 String name = carinaDriver.getName();
                 LOGGER.warn("Trying to quit driver '" + name + "' on shutdown hook action!");
                 carinaDriver.getDevice().disconnectRemote();
-                ProxyPool.stopProxy();
                 try {
                     LOGGER.debug("Driver closing..." + name);
                     carinaDriver.getDriver().close();
@@ -724,6 +723,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                     // do nothing
                 }
             }
+            // stop proxies in legacy and new proxy pools
+            ProxyPool.stopAllProxies();
+            com.zebrunner.carina.proxy.browserup.ProxyPool.stopAllProxies();
         }
 
         @Override
