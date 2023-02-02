@@ -20,7 +20,7 @@ public class LocalizeLocatorConverter implements LocatorConverter {
             int start = locator.indexOf(SpecialKeywords.L10N + ":") + 5;
             int end = locator.indexOf("}");
             String key = locator.substring(start, end);
-            locator = StringUtils.replace(locator, matcher.group(), L10N.getText(key));
+            locator = StringUtils.replaceOnce(locator, matcher.group(), L10N.getText(key));
         }
         return locator;
     }
