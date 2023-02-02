@@ -884,7 +884,16 @@ public class ExtendedWebElement implements IWebElement {
             throw new RuntimeException("There should be at least one ExpectedCondition!");
         }
 
-        return waitUntil(ExpectedConditions.or(conditions.toArray(new ExpectedCondition[0])), timeout);
+        try {
+            return waitUntil(ExpectedConditions.or(conditions.toArray(new ExpectedCondition[0])), timeout);
+        } catch (StaleElementReferenceException ignore) {
+            // If this ExtendedWebElement's element object is non-null and is stale or if the
+            // search context is a web element (e.g. it's a nested element) that
+            // is stale, then the various expected conditions can throw a stale element reference
+            // exception when checking the visibility or when finding child elements.
+            // In those cases we should catch the exception and return false.
+            return false;
+        }
     }
 
     /**
