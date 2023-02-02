@@ -36,7 +36,6 @@ import com.qaprosoft.carina.core.foundation.api.annotation.SuccessfulHttpStatus;
 import com.qaprosoft.carina.core.foundation.api.binding.RuntimeMethod;
 import com.qaprosoft.carina.core.foundation.api.http.HttpMethodType;
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatus;
-import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
