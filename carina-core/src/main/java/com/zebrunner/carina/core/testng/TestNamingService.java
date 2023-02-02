@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.zebrunner.agent.testng.listener.RunContextService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +29,8 @@ import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 
+import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactory;
+import com.zebrunner.agent.testng.listener.RunContextService;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
 
@@ -94,12 +95,10 @@ public class TestNamingService {
         ITestNGMethod method = result.getMethod();
 
         name = Configuration.get(Configuration.Parameter.TEST_NAMING_PATTERN);
-        String testNameMapName = getTestNameMapName(result);
-        name = name.replace(SpecialKeywords.TEST_NAME_MAP, testNameMapName)
-                .replace(SpecialKeywords.TEST_NAME,
-                        testNameMapName.isEmpty() ? result.getTestContext().getCurrentXmlTest().getName() : "")
-                .replace(SpecialKeywords.TEST_NAME_TUID, getMethodUID(result))
+        name = name.replace(SpecialKeywords.TEST_NAME, getTestNameMapName(result))
+                .replace(SpecialKeywords.TEST_NAME_TUID, getMethodTUID(result))
                 .replace(SpecialKeywords.METHOD_NAME, method.getMethodName())
+                .replace(DataProviderFactory.DATA_SOURCE_UID_ARG_PATTERN, getDataSourceUid(result))
                 .replace(SpecialKeywords.METHOD_PRIORITY, String.valueOf(method.getPriority()))
                 .replace(SpecialKeywords.METHOD_THREAD_POOL_SIZE, String.valueOf(method.getThreadPoolSize()))
                 .replace(SpecialKeywords.METHOD_GROUP_NAMES, String.join(", ", method.getGroups()))
@@ -118,48 +117,86 @@ public class TestNamingService {
         return testName.get();
     }
 
-    private static String getTestNameMapName(ITestResult result) {
-        String testNameMapName = StringUtils.EMPTY;
-        @SuppressWarnings("unchecked")
-        Map<Object[], String> testNameMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP);
+    private static String getDataSourceUid(ITestResult result) {
+        String uid = StringUtils.EMPTY;
 
-        if (testNameMap != null) {
+        @SuppressWarnings("unchecked")
+        Map<String, String> uidMap = (Map<String, String>) result.getTestContext()
+                .getAttribute(
+                        DataProviderFactory.constructCustomDPAttributeUUID(DataProviderFactory.DATA_SOURCE_UID_ARG_ATTRIBUTE, result.getMethod()));
+
+        if (uidMap != null) {
+            // get uid of custom dataprovider
             String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));
-            if (testNameMap.containsKey(testHash)) {
-                testNameMapName = testNameMap.get(testHash);
+            if (uidMap.containsKey(testHash)) {
+                uid = uidMap.get(testHash);
             }
         }
-        return testNameMapName;
+
+        return !uid.isEmpty() ? "[" + uid + "]" : uid;
     }
 
-    private static String getMethodUID(ITestResult result) {
+    private static String getTestNameMapName(ITestResult result) {
+        String testName = StringUtils.EMPTY;
+
+        @SuppressWarnings("unchecked")
+        Map<String, String> testNameMap = (Map<String, String>) result.getTestContext()
+                .getAttribute(DataProviderFactory.constructCustomDPAttributeUUID(SpecialKeywords.TEST_NAME_ARGS_MAP, result.getMethod()));
+
+        if (testNameMap != null) {
+            // get test name of custom dataprovider
+            String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));
+            if (testNameMap.containsKey(testHash)) {
+                testName = testNameMap.get(testHash);
+            }
+        } else {
+            testName = result.getTestContext().getCurrentXmlTest().getName();
+        }
+
+        return testName;
+    }
+
+    private static String getMethodTUID(ITestResult result) {
         String methodUID = StringUtils.EMPTY;
 
-        try {
-            ITestNGMethod testNGMethod = result.getMethod();
+        @SuppressWarnings("unchecked")
+        Map<String, String> tuidMap = (Map<String, String>) result.getTestContext()
+                .getAttribute(
+                        DataProviderFactory.constructCustomDPAttributeUUID(DataProviderFactory.TUID_ARGS_MAP_CONTEXT_ATTRIBUTE, result.getMethod()));
 
-            Parameter[] parameters = result.getTestClass()
-                    .getRealClass()
-                    .getMethod(testNGMethod.getMethodName(),
-                            testNGMethod.getParameterTypes())
-                    .getParameters();
+        if (tuidMap != null) {
+            // get test name of custom dataprovider
+            String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));
+            if (tuidMap.containsKey(testHash)) {
+                methodUID = tuidMap.get(testHash);
+            }
+        } else {
+            try {
+                ITestNGMethod testNGMethod = result.getMethod();
 
-            for (int i = 0; i < parameters.length; i++) {
-                if (parameters[i].getName().equalsIgnoreCase(SpecialKeywords.TUID)) {
-                    // AUTO-274 "Pass"ing status set on emailable report when a test step fails
-                    if (result.getParameters()[i] == null) {
+                Parameter[] parameters = result.getTestClass()
+                        .getRealClass()
+                        .getMethod(testNGMethod.getMethodName(),
+                                testNGMethod.getParameterTypes())
+                        .getParameters();
+
+                for (int i = 0; i < parameters.length; i++) {
+                    if (parameters[i].getName().equalsIgnoreCase(SpecialKeywords.TUID)) {
+                        // AUTO-274 "Pass"ing status set on emailable report when a test step fails
+                        if (result.getParameters()[i] == null) {
+                            break;
+                        }
+
+                        methodUID = result.getParameters()[i].toString();
+                        if (methodUID.contains(SpecialKeywords.TUID + ":")) {
+                            methodUID = methodUID.replace(SpecialKeywords.TUID + ":", "");
+                        }
                         break;
                     }
-
-                    methodUID = result.getParameters()[i].toString();
-                    if (methodUID.contains(SpecialKeywords.TUID + ":")) {
-                        methodUID = methodUID.replace(SpecialKeywords.TUID + ":", "");
-                    }
-                    break;
                 }
+            } catch (NoSuchMethodException e) {
+                LOGGER.error("For some reason test method not found using reflection: {}", result.getMethod().getMethodName());
             }
-        } catch (NoSuchMethodException e) {
-            LOGGER.error("For some reason test method not found using reflection: {}", result.getMethod().getMethodName());
         }
         return methodUID;
     }

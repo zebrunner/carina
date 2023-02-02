@@ -54,8 +54,8 @@ public class XlsDataProvider extends BaseDataProvider {
 
         String groupByParameter = parameters.groupColumn();
         if (!groupByParameter.isEmpty()) {
-            GroupByMapper.getInstanceInt().add(argsList.indexOf(groupByParameter));
-            GroupByMapper.getInstanceStrings().add(groupByParameter);
+            GroupByMapper.setNumberOfColumnForGrouping(argsList.indexOf(groupByParameter));
+            GroupByMapper.setNameOfColumnForGrouping(groupByParameter);
         }
 
         String testRailColumn = "";
@@ -64,10 +64,6 @@ public class XlsDataProvider extends BaseDataProvider {
 
         if (!parameters.qTestColumn().isEmpty() && testRailColumn.isEmpty())
             testRailColumn = parameters.qTestColumn();
-
-        String testMethodColumn = "";
-        if (!parameters.testMethodColumn().isEmpty())
-            testMethodColumn = parameters.testMethodColumn();
 
         String testMethodOwnerColumn = "";
         if (!parameters.testMethodOwnerColumn().isEmpty())
@@ -123,10 +119,12 @@ public class XlsDataProvider extends BaseDataProvider {
                     args[rowIndex][i + j] = getStaticParam(staticArgsList.get(j), context, dsBean);
                 }
             }
-            // update testName adding UID values from DataSource arguments if any
-            testName = dsBean.setDataSorceUUID(testName, xlsRow);
-
+            // adding UID values from DataSource arguments if any
+            tuidArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), dsBean.getDataSourceTUID(xlsRow));
             testNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), testName);
+            uidArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), dsBean.getDataSourceUUID(xlsRow));
+
+            String testMethodColumn = parameters.testMethodColumn();
             if (!testMethodColumn.isEmpty()) {
                 // override testName value from xls datasource to special hashMap
                 addValueToSpecialMap(testNameArgsMap, testMethodColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);

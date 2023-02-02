@@ -19,23 +19,24 @@ import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
+import org.testng.internal.ConstructorOrMethod;
 
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByImpl;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByMapper;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.exceptions.GroupByException;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.impl.BaseDataProvider;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
 
 /**
  * Created by Patotsky on 16.12.2014.
@@ -43,16 +44,18 @@ import com.qaprosoft.carina.core.foundation.dataprovider.core.impl.BaseDataProvi
 public class DataProviderFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    public static final String TUID_ARGS_MAP_CONTEXT_ATTRIBUTE = "tuidArgsMap";
+    public static final String DATA_SOURCE_UID_ARG_ATTRIBUTE = "uidArgsMap";
+    public static final String DATA_SOURCE_UID_ARG_PATTERN = "{data_source_uid_arg}";
 
     private DataProviderFactory() {
+        // hide
     }
 
     public static Object[][] getDataProvider(Annotation[] annotations, ITestContext context, ITestNGMethod m) {
-
+        Map<String, String> tuidArgsMap = Collections.synchronizedMap(new HashMap<>());
         Map<String, String> testNameArgsMap = Collections.synchronizedMap(new HashMap<>());
-        Map<String, String> testMethodOwnerArgsMap = Collections.synchronizedMap(new HashMap<>());
-        Map<String, String> testRailsArgsMap = Collections.synchronizedMap(new HashMap<>());
-        List<String> doNotRunTests = Collections.synchronizedList(new ArrayList<>());
+        Map<String, String> uidArgsMap = Collections.synchronizedMap(new HashMap<>());
 
         Object[][] provider = new Object[][] {};
 
@@ -85,10 +88,9 @@ public class DataProviderFactory {
                 if (object instanceof com.qaprosoft.carina.core.foundation.dataprovider.core.impl.BaseDataProvider) {
                     BaseDataProvider activeProvider = (BaseDataProvider) object;
                     provider = ArrayUtils.addAll(provider, activeProvider.getDataProvider(annotation, context, m));
+                    tuidArgsMap.putAll(activeProvider.getTUIDArgsMap());
                     testNameArgsMap.putAll(activeProvider.getTestNameArgsMap());
-                    testMethodOwnerArgsMap.putAll(activeProvider.getTestMethodOwnerArgsMap());
-                    testRailsArgsMap.putAll(activeProvider.getTestRailsArgsMap());
-                    doNotRunTests.addAll(activeProvider.getDoNotRunRowsIDs());
+                    uidArgsMap.putAll(activeProvider.getUidArgsMap());
                 }
 
             } catch (Exception e) {
@@ -96,31 +98,51 @@ public class DataProviderFactory {
             }
         }
 
-        if (!GroupByMapper.getInstanceInt().isEmpty() || !GroupByMapper.getInstanceStrings().isEmpty()) {
+        if (GroupByMapper.getNumberOfColumnForGrouping().isPresent() ||
+                GroupByMapper.getNameOfColumnForGrouping().isPresent()) {
             provider = getGroupedList(provider);
         }
 
-        context.setAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP, testNameArgsMap);
+        context.setAttribute(constructCustomDPAttributeUUID(TUID_ARGS_MAP_CONTEXT_ATTRIBUTE, m), tuidArgsMap);
+        context.setAttribute(constructCustomDPAttributeUUID(SpecialKeywords.TEST_NAME_ARGS_MAP, m), testNameArgsMap);
+        context.setAttribute(constructCustomDPAttributeUUID(DATA_SOURCE_UID_ARG_ATTRIBUTE, m), uidArgsMap);
 
-        // clear group by settings
-        GroupByMapper.getInstanceInt().clear();
-        GroupByMapper.getInstanceStrings().clear();
-
+        GroupByMapper.clear();
         return provider;
+    }
+
+    /**
+     * Create unique id for attrubute for dataprovider.<br>
+     * <b>For internal usage only</b>
+     *
+     * @param method see {@link ITestNGMethod}
+     * @return id
+     */
+    public static String constructCustomDPAttributeUUID(String attributeName, ITestNGMethod method) {
+        String pattern = "%s.%s(%s)-%s";
+        ConstructorOrMethod constructorOrMethod = method.getConstructorOrMethod();
+
+        String className = method.getTestClass().getName();
+        String methodName = constructorOrMethod.getName();
+        String argumentTypes = Arrays.stream(constructorOrMethod.getParameterTypes())
+                .map(Class::getName)
+                .collect(Collectors.joining(","));
+
+        return String.format(pattern, className, methodName, argumentTypes, attributeName);
     }
 
     private static Object[][] getGroupedList(Object[][] provider) {
         Object[][] finalProvider;
         if (GroupByMapper.isHashMapped()) {
-            if (GroupByMapper.getInstanceStrings().size() == 1) {
-                finalProvider = GroupByImpl.getGroupedDataProviderMap(provider, GroupByMapper.getInstanceStrings().iterator().next());
+            if (GroupByMapper.getNameOfColumnForGrouping().isPresent()) {
+                finalProvider = GroupByImpl.getGroupedDataProviderMap(provider, GroupByMapper.getNameOfColumnForGrouping().get());
             } else {
                 throw new GroupByException("Incorrect groupColumn annotation parameter!");
             }
         } else {
-            if (GroupByMapper.getInstanceInt().size() == 1 && !GroupByMapper.getInstanceInt().contains(-1)) {
-
-                finalProvider = GroupByImpl.getGroupedDataProviderArgs(provider, GroupByMapper.getInstanceInt().iterator().next());
+            if (GroupByMapper.getNumberOfColumnForGrouping().isPresent() &&
+                    !GroupByMapper.getNumberOfColumnForGrouping().get().equals(-1)) {
+                finalProvider = GroupByImpl.getGroupedDataProviderArgs(provider, GroupByMapper.getNumberOfColumnForGrouping().get());
             } else {
                 throw new GroupByException("Incorrect groupColumn annotation  parameter!");
             }

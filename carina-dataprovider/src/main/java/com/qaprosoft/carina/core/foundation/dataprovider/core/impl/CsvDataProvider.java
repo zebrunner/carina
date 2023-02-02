@@ -83,8 +83,8 @@ public class CsvDataProvider extends BaseDataProvider {
 
         String groupByParameter = parameters.groupColumn();
         if (!groupByParameter.isEmpty()) {
-            GroupByMapper.getInstanceInt().add(argsList.indexOf(groupByParameter));
-            GroupByMapper.getInstanceStrings().add(groupByParameter);
+            GroupByMapper.setNumberOfColumnForGrouping(argsList.indexOf(groupByParameter));
+            GroupByMapper.setNameOfColumnForGrouping(groupByParameter);
         }
 
         if (parameters.dsArgs().isEmpty()) {
@@ -134,7 +134,6 @@ public class CsvDataProvider extends BaseDataProvider {
         Object[][] args = new Object[listSize][width];
         int rowIndex = 0;
         for (String[] strings : list) {
-            String testName = context.getName();
 
             int i = 0;
             if (argsList.size() == 0) {
@@ -169,12 +168,13 @@ public class CsvDataProvider extends BaseDataProvider {
                 args[rowIndex][i + j] = getStaticParam(staticArgsList.get(j), context, dsBean);
             }
 
-            // update testName adding UID values from DataSource arguments if any
-            testName = dsBean.setDataSorceUUID(testName, strings, mapper); // provide whole line from data provider for UUID generation
-
             HashMap<String, String> csvRow = (HashMap<String, String>) args[rowIndex][0];
-            
-            testNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), testName);
+
+            // adding TUID values from DataSource arguments if any
+            tuidArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), dsBean.getDataSourceTUID(strings, mapper));
+            testNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), context.getName());
+            uidArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), dsBean.getDataSourceUUID(strings, mapper));
+
             if (!testMethodColumn.isEmpty()) {
                 // override testName value from xls datasource to special hashMap
                 addValueToSpecialMap(testNameArgsMap, testMethodColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
