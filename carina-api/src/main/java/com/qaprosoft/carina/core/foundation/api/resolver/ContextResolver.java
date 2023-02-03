@@ -15,7 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.api.resolver;
 
-import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
+import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatus;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.Map;
@@ -39,7 +39,7 @@ interface ContextResolver<E extends AnnotatedElement> {
 
     Optional<String> resolveResponseTemplatePath(E element);
 
-    Optional<HttpResponseStatusType> resolveSuccessfulHttpStatus(E element);
+    Optional<HttpResponseStatus> resolveSuccessfulHttpStatus(E element);
 
     Optional<Map<String, ?>> resolvePathParams(E element);
 

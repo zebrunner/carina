@@ -17,7 +17,7 @@ package com.qaprosoft.carina.core.foundation.api.resolver;
 
 import com.qaprosoft.apitools.annotation.AnnotationUtils;
 import com.qaprosoft.carina.core.foundation.api.http.HttpMethodType;
-import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
+import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatus;
 import com.zebrunner.carina.utils.R;
 import org.apache.commons.lang3.StringUtils;
 
@@ -87,7 +87,7 @@ class PropertiesContextResolver implements ContextResolver<Class<?>> {
     }
 
     @Override
-    public Optional<HttpResponseStatusType> resolveSuccessfulHttpStatus(Class<?> element) {
+    public Optional<HttpResponseStatus> resolveSuccessfulHttpStatus(Class<?> element) {
         return Optional.empty();
     }
 
