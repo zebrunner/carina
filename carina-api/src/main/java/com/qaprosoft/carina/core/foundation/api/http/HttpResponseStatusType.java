@@ -36,19 +36,13 @@ public enum HttpResponseStatusType {
     EXPECTATION_FAILED_417(417, "Expectation Failed"),
     UNPROCESSABLE_ENTITY_422(422, "Unprocessable Entity");
 
-    private final int code;
-    private final String message;
+    private final HttpResponseStatus responseStatus;
 
     HttpResponseStatusType(int code, String message) {
-        this.code = code;
-        this.message = message;
+        this.responseStatus = new HttpResponseStatus(code, message);
     }
 
-    public int getCode() {
-        return code;
-    }
-
-    public String getMessage() {
-        return message;
+    public HttpResponseStatus getResponseStatus() {
+        return responseStatus;
     }
 }

@@ -13,26 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.api.annotation;
+package com.qaprosoft.carina.core.foundation.api.http;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+/*
+ * HTTP Response status.
+ *
+ * @author Aaron Davis
+ */
+public final class HttpResponseStatus {
 
-import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
+    private final int code;
+    private final String message;
 
-@Target(value = { ElementType.TYPE, ElementType.METHOD, ElementType.ANNOTATION_TYPE })
-@Retention(value = RetentionPolicy.RUNTIME)
-public @interface SuccessfulHttpStatus {
+    public HttpResponseStatus(int code, String message) {
+        this.code = code;
+        this.message = message;
+    }
 
-    HttpResponseStatusType status();
+    public int getCode() {
+        return code;
+    }
 
-    String messageOverride() default "";
+    public String getMessage() {
+        return message;
+    }
 
-    @Target(value = { ElementType.PARAMETER })
-    @Retention(value = RetentionPolicy.RUNTIME)
-    @SuccessfulHttpStatus(status = HttpResponseStatusType.OK_200)
-    @interface Value {
+    public HttpResponseStatus withMessageOverride(String messageOverride) {
+        if (null == messageOverride || messageOverride.isEmpty() || messageOverride.equals(message)) {
+            return this;
+        } else {
+            return new HttpResponseStatus(code, messageOverride);
+        }
     }
 }
