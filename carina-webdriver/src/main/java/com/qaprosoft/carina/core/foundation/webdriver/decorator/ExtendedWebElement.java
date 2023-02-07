@@ -1177,11 +1177,28 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     /**
-     * Used to get element with formatted locator
-     * 
-     * @return {@link ExtendedWebElement} with formatted locator
+     * Get element with formatted locator.<br>
+     * <p>
+     * 1. If element created using {@link org.openqa.selenium.support.FindBy} or same annotations:<br>
+     * If parameters were passed to the method, the element will be recreated with a new locator,
+     * and if the format method with parameters was already called for this element, the element locator
+     * will be recreated based on the original.<br>
+     * <b>All original element statuses {@link com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath},
+     * {@link com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Localized} are saved for new element</b>
+     *
+     * <p>
+     * 2. If element created using constructor (it is not recommended to create element by hands):<br>
+     * If parameters were passed to the method, the element will be recreated with a new locator.
+     *
+     * <p>
+     * For all cases: if the method is called with no parameters, no locator formatting is applied, but the element will be "recreated".<br>
+     *
+     * <b>This method does not change the object on which it is called</b>.
+     *
+     * @return new {@link ExtendedWebElement} with formatted locator
      */
     public ExtendedWebElement format(Object... objects) {
+        // todo add support FindBys, FindAll and same annotations
         if (this.element instanceof Proxy) {
             /*
              * if element created using annotation (FindBy, ExtendedFindBy and so on), it will be proxy, so we get it and re-generate locator
@@ -1192,11 +1209,20 @@ public class ExtendedWebElement implements IWebElement {
                 ExtendedElementLocator innerLocator = (ExtendedElementLocator) (FieldUtils.getDeclaredField(innerProxy.getClass(),
                         "locator", true))
                                 .get(innerProxy);
-                FormatLocatorConverter converter = new FormatLocatorConverter(objects);
-                innerLocator.getLocatorConverters().addFirst(converter);
-                innerLocator.buildConvertedBy();
-                innerLocator.getLocatorConverters()
-                        .remove(converter);
+
+                if (Arrays.stream(objects).findAny().isPresent()) {
+                    if (innerLocator.getLocatorConverters().stream()
+                            .anyMatch(FormatLocatorConverter.class::isInstance)) {
+                        LOGGER.warn("Called format method of ExtendedWebElement class with parameters, but FormatLocatorConverter already exists "
+                                + "for element: '{}', so locator will be recreated from original locator with new format parameters.", this.name);
+                        innerLocator.getLocatorConverters()
+                                .removeIf(FormatLocatorConverter.class::isInstance);
+                    }
+
+                    FormatLocatorConverter converter = new FormatLocatorConverter(objects);
+                    innerLocator.getLocatorConverters().addFirst(converter);
+                    innerLocator.buildConvertedBy();
+                }
                 WebElement proxy = (WebElement) Proxy.newProxyInstance(getClass().getClassLoader(),
                         new Class[] { WebElement.class, WrapsElement.class, Locatable.class },
                         innerProxy);
@@ -1205,24 +1231,43 @@ public class ExtendedWebElement implements IWebElement {
                 throw new RuntimeException("Something went wrong when try to format locator.", e);
             }
         } else {
-            String locator = this.by.toString();
-            this.by = Arrays.stream(LocatorType.values())
-                    .filter(lt -> lt.is(locator))
-                    .findFirst()
-                    .orElseThrow(
-                            () -> new RuntimeException(String.format("Locator formatting failed - no suitable locator type found for formatting. "
-                                    + "Investigate why '%s' was not formatted", locator)))
-                    .buildLocatorFromString(locator, objects);
-            LOGGER.debug("Formatted locator is : {}", this.by);
-            if (this.isSingleElement) {
-                this.element = null;
+            By by = this.by;
+
+            if (Arrays.stream(objects).findAny().isPresent()) {
+                String locator = by.toString();
+                by = Arrays.stream(LocatorType.values())
+                        .filter(lt -> lt.is(locator))
+                        .findFirst()
+                        .orElseThrow(
+                                () -> new RuntimeException(String.format("Locator formatting failed - no suitable locator type found for formatting. "
+                                        + "Investigate why '%s' was not formatted", locator)))
+                        .buildLocatorFromString(locator, objects);
+                LOGGER.debug("Formatted locator is : {}", by);
             }
-            return this;
+            return new ExtendedWebElement(by, name, this.driver, this.searchContext, objects);
         }
     }
 
     /**
-     * Get list of elements with formatted locator
+     * Get list of elements with formatted locator.<br>
+     *
+     * <p>
+     * 1. If element created using {@link org.openqa.selenium.support.FindBy} or same annotations:<br>
+     * If parameters were passed to the method, the result elements will be created with a new locator,
+     * and if the format method with parameters was already called for this element, the element locator
+     * will be recreated based on the original.<br>
+     * <br>
+     * <b>All original element statuses {@link com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath},
+     * {@link com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Localized} are saved for new elements</b>
+     * 
+     * <p>
+     * 2. If element created using constructor (it is not recommended to create element by hands):<br>
+     * If parameters were passed to the method, the result elements will be created with a new locator.
+     *
+     * For all cases: if the method is called with no parameters, no locator formatting is applied, but elements will be created using original
+     * locator.<br>
+     * 
+     * <b>This method does not change the object on which it is called</b>.
      * 
      * @param objects parameters
      * @return {@link List} of {@link ExtendedWebElement} if found, empty list otherwise
@@ -1239,27 +1284,41 @@ public class ExtendedWebElement implements IWebElement {
                 ExtendedElementLocator innerLocator = (ExtendedElementLocator) (FieldUtils.getDeclaredField(innerProxy.getClass(),
                         "locator", true))
                                 .get(innerProxy);
-                FormatLocatorConverter converter = new FormatLocatorConverter(objects);
-                innerLocator.getLocatorConverters()
-                        .addFirst(converter);
-                innerLocator.buildConvertedBy();
-                innerLocator.getLocatorConverters()
-                        .remove(converter);
+                if (Arrays.stream(objects).findAny().isPresent()) {
+                    if (innerLocator.getLocatorConverters().stream()
+                            .anyMatch(FormatLocatorConverter.class::isInstance)) {
+                        LOGGER.warn(
+                                "Called formatToList method of ExtendedWebElement class with parameters, but FormatLocatorConverter already exists "
+                                        + "for element: '{}', so locator will be recreated from original locator with new format parameters.",
+                                this.name);
+                        innerLocator.getLocatorConverters()
+                                .removeIf(FormatLocatorConverter.class::isInstance);
+                    }
 
+                    FormatLocatorConverter converter = new FormatLocatorConverter(objects);
+                    innerLocator.getLocatorConverters()
+                            .addFirst(converter);
+                    innerLocator.buildConvertedBy();
+                    innerLocator.getLocatorConverters()
+                            .remove(converter);
+                }
                 ClassLoader classLoader = getClass().getClassLoader();
 
                 InvocationHandler handler = new LocatingListHandler(classLoader, innerLocator, this.name);
                 extendedWebElementList = (List<ExtendedWebElement>) Proxy.newProxyInstance(classLoader, new Class[] { List.class }, handler);
             } else {
-                String locator = this.by.toString();
-                By by = Arrays.stream(LocatorType.values())
-                        .filter(lt -> lt.is(locator))
-                        .findFirst()
-                        .orElseThrow(
-                                () -> new RuntimeException(String.format("Locator formatting failed - no suitable locator type found for formatting. "
-                                        + "Investigate why '%s' was not formatted", locator)))
-                        .buildLocatorFromString(locator, objects);
-
+                By by = this.by;
+                if (Arrays.stream(objects).findAny().isPresent()) {
+                    String locator = this.by.toString();
+                    by = Arrays.stream(LocatorType.values())
+                            .filter(lt -> lt.is(locator))
+                            .findFirst()
+                            .orElseThrow(
+                                    () -> new RuntimeException(
+                                            String.format("Locator formatting failed - no suitable locator type found for formatting. "
+                                                    + "Investigate why '%s' was not formatted", locator)))
+                            .buildLocatorFromString(locator, objects);
+                }
                 int i = 0;
                 for (WebElement el : this.searchContext.findElements(by)) {
                     ExtendedWebElement extendedWebElement = new ExtendedWebElement(by, String.format("%s - [%s]", name, i++), driver, searchContext,
