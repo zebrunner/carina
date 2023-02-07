@@ -81,7 +81,10 @@ public class ExtendedElementLocator implements ElementLocator {
         }
         if (field.isAnnotationPresent(CaseInsensitiveXPath.class)) {
             CaseInsensitiveXPath csx = field.getAnnotation(CaseInsensitiveXPath.class);
-            locatorConverters.add(new CaseInsensitiveConverter(csx, ContentType.NATIVE_MOBILE_SPECIFIC.equals(getCurrentContentType(searchContext))));
+            // [AS] do not try to use searchContext for getCurrentContentType method, because it may be a proxy and when we try to
+            // get driver from it, there will be 'org.openqa.selenium.NoSuchElementException' because on this moment page is not opened,
+            // so we just use driver instead
+            locatorConverters.add(new CaseInsensitiveConverter(csx, ContentType.NATIVE_MOBILE_SPECIFIC.equals(getCurrentContentType(driver))));
             caseInsensitive = true;
         }
         if (field.isAnnotationPresent(Localized.class)) {
