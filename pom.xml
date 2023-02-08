@@ -46,7 +46,7 @@
 
         <carina-utils.version>1.0.1-SNAPSHOT</carina-utils.version>
         <carina-commons.version>1.0.1-SNAPSHOT</carina-commons.version>
-        <carina-proxy.version>1.0.1-SINGLE-INTERFACE-SNAPSHOT</carina-proxy.version>
+        <carina-proxy.version>1.0.1-18-SNAPSHOT</carina-proxy.version>
 
         <!-- Testings -->
         <testng.version>7.6.1</testng.version>
