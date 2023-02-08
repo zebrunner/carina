@@ -1864,7 +1864,7 @@ public class ExtendedWebElement implements IWebElement {
         switch (loadingStrategy) {
         case BY_PRESENCE: {
             if (element != null) {
-                conditions.add(ExpectedConditions.visibilityOf(element));
+                conditions.add(ExpectedConditions.not(ExpectedConditions.stalenessOf(element)));
             }
 
             if (isSingleElement) {
@@ -1878,7 +1878,7 @@ public class ExtendedWebElement implements IWebElement {
         }
         case BY_VISIBILITY: {
             if (element != null) {
-                conditions.add(ExpectedConditions.visibilityOf(element));
+                conditions.add(ExpectedConditions.not(ExpectedConditions.invisibilityOf(element)));
             }
 
             if (isSingleElement) {
@@ -1892,7 +1892,8 @@ public class ExtendedWebElement implements IWebElement {
         }
         case BY_PRESENCE_OR_VISIBILITY:
             if (element != null) {
-                conditions.add(ExpectedConditions.visibilityOf(element));
+                conditions.add(ExpectedConditions.not(ExpectedConditions.stalenessOf(element)));
+                conditions.add(ExpectedConditions.not(ExpectedConditions.invisibilityOf(element)));
             }
 
             if (isSingleElement) {
