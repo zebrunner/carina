@@ -326,6 +326,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             R.EMAIL.clearTestProperties();
             R.REPORT.clearTestProperties();
             R.ZAFIRA.clearTestProperties();
+            //remove thread proxy rule
+            com.zebrunner.carina.proxy.ProxyPool.clearThreadRule();
 
             LOGGER.debug("Test result is : " + result.getStatus());
             // result status == 2 means failure, status == 3 means skip. We need to quit driver anyway for failure and skip
@@ -713,7 +715,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 String name = carinaDriver.getName();
                 LOGGER.warn("Trying to quit driver '" + name + "' on shutdown hook action!");
                 carinaDriver.getDevice().disconnectRemote();
-                ProxyPool.stopProxy();
                 try {
                     LOGGER.debug("Driver closing..." + name);
                     carinaDriver.getDriver().close();
@@ -724,6 +725,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                     // do nothing
                 }
             }
+            // stop proxies in legacy and new proxy pools
+            ProxyPool.stopAllProxies();
+            com.zebrunner.carina.proxy.browserup.ProxyPool.stopAllProxies();
         }
 
         @Override
