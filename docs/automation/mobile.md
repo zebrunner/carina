@@ -357,6 +357,22 @@ public void testWebView() {
 }
 ```
 
+### What if the mobile app link points to Amazon/Azure/AppCenter/other
+
+When the driver starts, a link to the application is taken from the capabilities. The type of link determines how to process it 
+and get the final (for example, pre-assign) link which will be used when starting the driver instead of the original.
+If you provide a link to an application located on Amazon, then add the dependency `com.zebrunner.carina-aws-s3`, 
+Azure - `com.zebrunner.carina-azure`, AppCenter - `com.zebrunner.carina-appcenter`.
+
+You can also create your own implementation of getting the final link to the mobile application:
+
+1. Create a class that implements the `com.zebrunner.carina.commons.artifact.IArtifactManager` interface (from `com.zebrunner.carina-commons` dependency).
+The `getDirectLink` method just transforms the link to the final.
+2. Create a class that implements the `com.zebrunner.carina.commons.artifact.IArtifactManagerFactory` interface and annotate it
+by `com.zebrunner.carina.commons.artifact.ArtifactManagerFactory`. So this class will be discovered by Carina Framework at runtime.
+
+If Carina Framework does not find a suitable artifact manager to generate final link, then the link will be passed to the driver as is.
+
 ## FAQ
 
 **Where can I find mobile-specific methods?**

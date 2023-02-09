@@ -266,6 +266,21 @@ All the project configuration properties are located in a **_config.properties**
 		<td>Enable capabilities processing according to w3c.**Default: false**</td>
 		<td>false</td>
 	</tr>
+    <tr>
+		<td>db.url</td>
+		<td>Database url</td>
+		<td>jdbc:mysql://localhost/test</td>
+	</tr>
+    <tr>
+		<td>db.username</td>
+		<td>Database username</td>
+		<td>username</td>
+	</tr>
+    <tr>
+		<td>db.password</td>
+		<td>Database password</td>
+		<td>password</td>
+	</tr>
 </table>
 Most of the properties may be read in the following way:
 
@@ -277,7 +292,9 @@ Configuration.getDouble(Parameter.MAX_DRIVER_COUNT) // returns double value
 ```
 
 ### Environment specific configuration
-In some cases, it is required to support multiple environments for testing. Let's assume we have STAG and PROD environments which have different application URLs. In this case, we need to specify the following properties in **_config.properties**:
+In some cases, it is required to support multiple environments for testing. Let's assume we have STAG and PROD environments which have different 
+application URLs. In this case, we need to specify the following properties in **_config.properties**:
+
 ```
 env=PROD
 STAG.url=http://stag-app-server.com
@@ -285,10 +302,30 @@ PROD.url=http://prod-app-server.com
 ```
 
 And get an env-specific argument in the test in the following way:
+
 ```
 Configuration.getEnvArg("url")
+Configuration.getEnvArg(Configuration.Parameter.URL)
 ```
+
 As a result, you switch between the environments just changing the env argument in the **_config.properties** file.
+
+In some cases, it is necessary to store multiple parameter sets for the same env (for example, if multiple databases are used).
+For this, the concept of an alias is added. The parameter with env and alias will be stored in the following way:
+
+```
+STAG.mongo.db.url=mongodb://stag.example.com:27017
+STAG.mysql.db.url=jdbc:mysql://localhost/stag_test
+PROD.mongo.db.url=mongodb://prod.example.com:27017
+PROD.mysql.db.url=jdbc:mysql://localhost/prod_db
+```
+
+Get an env-alias-specific argument in the test in the following way:
+
+```
+Configuration.getEnvArg(Configuration.Parameter.DB_URL, "mongo") // mongodb://prod.example.com:27017
+Configuration.getEnvArg(Configuration.Parameter.DB_URL, "mysql") // jdbc:mysql://localhost/prod_db
+```
 
 ### Tests execution filter configuration
 The `test_run_rules` parameter is responsible for filtering tests.
