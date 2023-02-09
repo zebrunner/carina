@@ -15,27 +15,33 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.locator;
 
+import static io.appium.java_client.pagefactory.utils.WebDriverUnpackUtility.getCurrentContentType;
+
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.pagefactory.AbstractAnnotations;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.zebrunner.carina.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Localized;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.LocalizeLocatorConverter;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.LocatorConverter;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.CaseInsensitiveConverter;
-import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.ParamsToConvert;
-import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinsensitive.Platform;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
+
+import io.appium.java_client.pagefactory.bys.ContentMappedBy;
+import io.appium.java_client.pagefactory.bys.ContentType;
 
 /**
  * The default element locator, which will lazily locate an element or an
@@ -47,41 +53,83 @@ import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.caseinse
 public class ExtendedElementLocator implements ElementLocator {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    private final WebDriver driver;
     private final SearchContext searchContext;
+    private final String className;
+    private final By originalBy;
     private By by;
-    private String className;
     private boolean caseInsensitive = false;
     private boolean localized = false;
-    
+    private final LinkedList<LocatorConverter> locatorConverters = new LinkedList<>();
+
     /**
      * Creates a new element locator.
-     * 
+     *
      * @param searchContext The context to use when finding the element
      * @param field The field on the Page Object that will hold the located
      *            value
      */
-    public ExtendedElementLocator(SearchContext searchContext, Field field) {
+    public ExtendedElementLocator(WebDriver driver, SearchContext searchContext, Field field, AbstractAnnotations annotations) {
+        this.driver = driver;
         this.searchContext = searchContext;
         String[] classPath = field.getDeclaringClass().toString().split("\\.");
-        this.className = classPath[classPath.length-1];
-
-        if (field.isAnnotationPresent(FindBy.class) || field.isAnnotationPresent(ExtendedFindBy.class)) {
-            LocalizedAnnotations annotations = new LocalizedAnnotations(field);
-            this.by = annotations.buildBy();
-            if (field.isAnnotationPresent(CaseInsensitiveXPath.class)) {
-                CaseInsensitiveXPath csx = field.getAnnotation(CaseInsensitiveXPath.class);
-                Platform platform = Objects.equals(Configuration.getMobileApp(), "") ? Platform.WEB : Platform.MOBILE;
-
-                this.by = new CaseInsensitiveConverter(new ParamsToConvert(csx.id(), csx.name(),
-                        csx.text(), csx.classAttr()), platform)
-                        .convert(this.by);
-                caseInsensitive = true;
-            }
-
-            if (field.isAnnotationPresent(Localized.class)) {
-                this.localized = true;
-            }
+        this.className = classPath[classPath.length - 1];
+        this.by = annotations.buildBy();
+        this.originalBy = this.by;
+        if (LocalizeLocatorConverter.getL10nPattern().matcher(this.by.toString()).find()) {
+            this.locatorConverters.add(new LocalizeLocatorConverter());
         }
+        if (field.isAnnotationPresent(CaseInsensitiveXPath.class)) {
+            CaseInsensitiveXPath csx = field.getAnnotation(CaseInsensitiveXPath.class);
+            // [AS] do not try to use searchContext for getCurrentContentType method, because it may be a proxy and when we try to
+            // get driver from it, there will be 'org.openqa.selenium.NoSuchElementException' because on this moment page is not opened,
+            // so we just use driver instead
+            locatorConverters.add(new CaseInsensitiveConverter(csx, ContentType.NATIVE_MOBILE_SPECIFIC.equals(getCurrentContentType(driver))));
+            caseInsensitive = true;
+        }
+        if (field.isAnnotationPresent(Localized.class)) {
+            this.localized = true;
+        }
+        buildConvertedBy();
+    }
+
+    public void buildConvertedBy() {
+        // do not do converting if there are no locator converters at all
+        if (locatorConverters.isEmpty()) {
+            return;
+        }
+        String byAsString = this.originalBy.toString();
+        for (LocatorConverter converter : locatorConverters) {
+            byAsString = converter.convert(byAsString);
+        }
+
+        String finalByAsString = byAsString;
+        this.by = Arrays.stream(LocatorType.values())
+                .filter(locatorType -> locatorType.is(finalByAsString))
+                .findFirst()
+                .orElseThrow()
+                .buildLocatorFromString(byAsString);
+    }
+
+    /**
+     * From io.appium.java_client.pagefactory.AppiumElementLocator
+     * This methods makes sets some settings of the {@link By} according to
+     * the given instance of {@link SearchContext}. If there is some {@link ContentMappedBy}
+     * then it is switched to the searching for some html or native mobile element.
+     * Otherwise nothing happens there.
+     *
+     * @param currentBy is some locator strategy
+     * @param currentContent is an instance of some subclass of the {@link SearchContext}.
+     * @return the corrected {@link By} for the further searching
+     *
+     */
+    private By getBy(By currentBy, SearchContext currentContent) {
+        if (!ContentMappedBy.class.isAssignableFrom(currentBy.getClass())) {
+            return currentBy;
+        }
+
+        return ContentMappedBy.class.cast(currentBy)
+                .useContent(getCurrentContentType(currentContent));
     }
 
     /**
@@ -95,7 +143,7 @@ public class ExtendedElementLocator implements ElementLocator {
 
         //TODO: test how findElements work for web and android
         // maybe migrate to the latest appium java driver and reuse original findElement!
-        List<WebElement> elements = searchContext.findElements(by);
+        List<WebElement> elements = searchContext.findElements(getBy(by, searchContext));
 
         WebElement element = null;
         if (elements.size() == 1) {
@@ -118,7 +166,7 @@ public class ExtendedElementLocator implements ElementLocator {
         List<WebElement> elements = null;
 
         try {
-            elements = searchContext.findElements(by);
+            elements = searchContext.findElements(getBy(by, searchContext));
         } catch (NoSuchElementException e) {
             LOGGER.debug("Unable to find elements: " + e.getMessage());
         }
@@ -146,7 +194,15 @@ public class ExtendedElementLocator implements ElementLocator {
         return this.by;
     }
 
+    public WebDriver getDriver() {
+        return this.driver;
+    }
+
     public String getClassName() {
         return className;
+    }
+
+    public LinkedList<LocatorConverter> getLocatorConverters() {
+        return this.locatorConverters;
     }
 }

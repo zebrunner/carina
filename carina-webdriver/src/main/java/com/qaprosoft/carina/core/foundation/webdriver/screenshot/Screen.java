@@ -37,7 +37,9 @@ import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
  * Captures web screenshots.
  * 
  * @author Alex Khursevich (alex@qaprosoft.com)
+ * @deprecated use {@link com.qaprosoft.carina.core.foundation.webdriver.Screenshot} instead
  */
+@Deprecated(forRemoval = true, since = "8.0.5")
 public class Screen implements ICapturable {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 

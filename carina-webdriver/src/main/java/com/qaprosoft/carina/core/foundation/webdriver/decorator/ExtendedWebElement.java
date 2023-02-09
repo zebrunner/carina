@@ -40,12 +40,11 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WrapsDriver;
+import org.openqa.selenium.WrapsElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.remote.RemoteWebElement;
-import org.openqa.selenium.support.decorators.Decorated;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
@@ -61,6 +60,8 @@ import com.qaprosoft.carina.core.foundation.webdriver.listener.DriverListener;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorUtils;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.FormatLocatorConverter;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.internal.LocatingListHandler;
 import com.zebrunner.carina.crypto.Algorithm;
 import com.zebrunner.carina.crypto.CryptoTool;
 import com.zebrunner.carina.crypto.CryptoToolBuilder;
@@ -80,7 +81,7 @@ public class ExtendedWebElement implements IWebElement {
     private static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
     private static final long RETRY_TIME = Configuration.getLong(Parameter.RETRY_INTERVAL);
-    
+
     // we should keep both properties: driver and searchContext obligatory
     // driver is used for actions, javascripts execution etc
     // searchContext is used for searching element by default
@@ -104,69 +105,49 @@ public class ExtendedWebElement implements IWebElement {
     // Converted array of objects to String for dynamic element locators
     private String formatValues = "";
 
-    public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext) {
-        if (by == null) {
-            throw new RuntimeException("By couldn't be null!");
-        }
-        if (driver == null) {
-            throw new RuntimeException("driver couldn't be null!");
-        }
-
-        if (searchContext == null) {
-            throw new RuntimeException("review stacktrace to analyze why searchContext is null");
-        }
-
-        this.by = by;
-        this.name = name;
-        this.driver = driver;
-        this.searchContext = searchContext;
-    }
-
     public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext, Object[] formatValues) {
         this(by, name, driver, searchContext);
         this.formatValues = Arrays.toString(formatValues);
     }
 
-    /**
-     * This constructor shouldn't be called explicitly. For proxied elements only
-     */
+    public ExtendedWebElement(By by, String name, WebDriver driver, SearchContext searchContext) {
+        this(null, name, by);
+        if (driver == null) {
+            throw new IllegalArgumentException("Driver should not be null");
+        }
+        this.driver = driver;
+        if (searchContext == null) {
+            throw new IllegalArgumentException("SearchContext should not be null");
+        }
+        this.searchContext = searchContext;
+    }
+
     public ExtendedWebElement(WebElement element, String name, By by) {
         this(element, name);
+        if (by == null) {
+            throw new IllegalArgumentException("By should not be null");
+        }
         this.by = by;
     }
 
     /**
-     * This constructor shouldn't be called explicitly. For proxied elements only
+     * For internal usage only
+     * 
+     * @param element see {@link WebElement}
+     * @param name name of the element
      */
     public ExtendedWebElement(WebElement element, String name) {
         this.name = name;
         this.element = element;
 
-        // read searchContext from not null elements only
+        // read searchContext from not null elements only. It means that element was created using DriverHelper or by hands
         if (this.element == null) {
-            // it seems like we have to specify WebElement or By annotation! Add verification that By is valid in this case!
-            if (this.by == null) {
-                try {
-                    throw new RuntimeException("review stacktrace to analyze why tempBy is not populated correctly via reflection!");
-                } catch (Throwable thr) {
-                    LOGGER.warn("by is null!", thr);
-                }
-            }
             return;
         }
 
         try {
-            SearchContext tempSearchContext = null;
-
-            // if the element is decorated, we take its decorated context
-            if (element instanceof Decorated &&
-                    ((Decorated<?>) element).getOriginal() instanceof RemoteWebElement) {
-                tempSearchContext = (SearchContext) ((Decorated<?>) element).getDecorator().getDecoratedDriver();
-                // if the element is RemoteWebElement, we take its context as is
-            } else if (element instanceof RemoteWebElement) {
-                tempSearchContext = ((RemoteWebElement) element).getWrappedDriver();
-                // we create proxy for {{ExtendedElementLocator}}, so we can get info from it
-            } else if (element instanceof Proxy) {
+            if (element instanceof Proxy) {
+                // when element proxied by ExtendedElementLocator
                 InvocationHandler innerProxy = Proxy.getInvocationHandler(element);
                 ExtendedElementLocator locator = (ExtendedElementLocator) (FieldUtils.getDeclaredField(innerProxy.getClass(), "locator", true))
                         .get(innerProxy);
@@ -177,40 +158,17 @@ public class ExtendedWebElement implements IWebElement {
                 }
 
                 this.searchContext = locator.getSearchContext();
-                tempSearchContext = this.searchContext;
+                this.driver = locator.getDriver();
 
                 // TODO: identify if it is a child element and
                 // 1. get rootBy
                 // 2. append current "by" to the rootBy
                 // -> it should allow to search via regular driver and fluent waits - getBy()
                 this.by = locator.getBy();
-
-                while (tempSearchContext instanceof Proxy) {
-                    innerProxy = Proxy.getInvocationHandler(tempSearchContext);
-                    locator = (ExtendedElementLocator) FieldUtils.getDeclaredField(innerProxy.getClass(), "locator", true)
-                            .get(innerProxy);
-                    tempSearchContext = locator.getSearchContext();
-                }
+            } else {
+                this.driver = ((WrapsDriver) element).getWrappedDriver();
+                this.searchContext = this.driver;
             }
-
-            // initialize context if it is not initialized
-            if (this.searchContext == null) {
-                this.searchContext = tempSearchContext;
-            }
-
-            // FIXME: DefaultDecorated cannot be cast to (SearchContext, WebElement, WebDriver), so we get original element / driver and
-            // set this.driver as original driver
-            if (tempSearchContext instanceof Decorated<?>) {
-                tempSearchContext = (SearchContext) ((Decorated<?>) tempSearchContext).getOriginal();
-            }
-
-            // search driver in hierarchy
-            while (!(tempSearchContext instanceof WebDriver)) {
-                tempSearchContext = ((WrapsDriver) tempSearchContext).getWrappedDriver();
-            }
-
-            this.driver = (WebDriver) tempSearchContext;
-
         } catch (IllegalAccessException | ClassCastException e) {
             e.printStackTrace();
         } catch (Throwable thr) {
@@ -1219,48 +1177,161 @@ public class ExtendedWebElement implements IWebElement {
     }
 
     /**
-     * Used to format locator
-     * 
-     * @return ExtendedWebElement
+     * Get element with formatted locator.<br>
+     * <p>
+     * 1. If element created using {@link org.openqa.selenium.support.FindBy} or same annotations:<br>
+     * If parameters were passed to the method, the element will be recreated with a new locator,
+     * and if the format method with parameters was already called for this element, the element locator
+     * will be recreated based on the original.<br>
+     * <b>All original element statuses {@link com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath},
+     * {@link com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Localized} are saved for new element</b>
+     *
+     * <p>
+     * 2. If element created using constructor (it is not recommended to create element by hands):<br>
+     * If parameters were passed to the method, the element will be recreated with a new locator.
+     *
+     * <p>
+     * For all cases: if the method is called with no parameters, no locator formatting is applied, but the element will be "recreated".<br>
+     *
+     * <b>This method does not change the object on which it is called</b>.
+     *
+     * @return new {@link ExtendedWebElement} with formatted locator
      */
     public ExtendedWebElement format(Object... objects) {
-        String locator = by.toString();
-        By resultBy = null;
+        // todo add support FindBys, FindAll and same annotations
+        if (this.element instanceof Proxy) {
+            /*
+             * if element created using annotation (FindBy, ExtendedFindBy and so on), it will be proxy, so we get it and re-generate locator
+             * with FormatLocatorConverter
+             */
+            try {
+                InvocationHandler innerProxy = Proxy.getInvocationHandler(this.element);
+                ExtendedElementLocator innerLocator = (ExtendedElementLocator) (FieldUtils.getDeclaredField(innerProxy.getClass(),
+                        "locator", true))
+                                .get(innerProxy);
 
-        if(LocatorType.ID.is(locator)) {
-            resultBy = LocatorType.ID.buildLocatorFromString(locator, objects);
-        } else if(LocatorType.NAME.is(locator)) {
-            resultBy = LocatorType.NAME.buildLocatorFromString(locator, objects);
-        } else if(LocatorType.XPATH.is(locator)) {
-            resultBy = LocatorType.XPATH.buildLocatorFromString(locator, objects);
-        } else if(LocatorType.LINKTEXT.is(locator)) {
-            resultBy = LocatorType.LINKTEXT.buildLocatorFromString(locator, objects);
-        } else if(LocatorType.PARTIAL_LINK_TEXT.is(locator)) {
-            resultBy = LocatorType.PARTIAL_LINK_TEXT.buildLocatorFromString(locator, objects);
-        } else if(LocatorType.CSS.is(locator)) {
-            resultBy = LocatorType.CSS.buildLocatorFromString(locator, objects);
-        } else if(LocatorType.TAG_NAME.is(locator)) {
-            resultBy = LocatorType.TAG_NAME.buildLocatorFromString(locator, objects);
-        } else if(LocatorType.IOS_CLASS_CHAIN.is(locator)) {
-            resultBy = LocatorType.IOS_CLASS_CHAIN.buildLocatorFromString(locator, objects);
-        } else if(LocatorType.IOS_NS_PREDICATE.is(locator)) {
-            resultBy = LocatorType.IOS_NS_PREDICATE.buildLocatorFromString(locator, objects);
-        } else if(LocatorType.ACCESSIBILITY_ID.is(locator)) {
-            resultBy = LocatorType.ACCESSIBILITY_ID.buildLocatorFromString(locator, objects);
-        } else if(LocatorType.ANDROID_UI_AUTOMATOR.is(locator)) {
-            resultBy = LocatorType.ANDROID_UI_AUTOMATOR.buildLocatorFromString(locator, objects);
-        } else if(LocatorType.IMAGE.is(locator)) {
-            resultBy = LocatorType.IMAGE.buildLocatorFromString(locator, objects);
-            LOGGER.debug("Base64 image representation has benn successfully obtained after formatting.");
+                if (Arrays.stream(objects).findAny().isPresent()) {
+                    if (innerLocator.getLocatorConverters().stream()
+                            .anyMatch(FormatLocatorConverter.class::isInstance)) {
+                        LOGGER.warn("Called format method of ExtendedWebElement class with parameters, but FormatLocatorConverter already exists "
+                                + "for element: '{}', so locator will be recreated from original locator with new format parameters.", this.name);
+                        innerLocator.getLocatorConverters()
+                                .removeIf(FormatLocatorConverter.class::isInstance);
+                    }
+
+                    FormatLocatorConverter converter = new FormatLocatorConverter(objects);
+                    innerLocator.getLocatorConverters().addFirst(converter);
+                    innerLocator.buildConvertedBy();
+                }
+                WebElement proxy = (WebElement) Proxy.newProxyInstance(getClass().getClassLoader(),
+                        new Class[] { WebElement.class, WrapsElement.class, Locatable.class },
+                        innerProxy);
+                return new ExtendedWebElement(proxy, this.name);
+            } catch (Exception e) {
+                throw new RuntimeException("Something went wrong when try to format locator.", e);
+            }
+        } else {
+            By by = this.by;
+
+            if (Arrays.stream(objects).findAny().isPresent()) {
+                String locator = by.toString();
+                by = Arrays.stream(LocatorType.values())
+                        .filter(lt -> lt.is(locator))
+                        .findFirst()
+                        .orElseThrow(
+                                () -> new RuntimeException(String.format("Locator formatting failed - no suitable locator type found for formatting. "
+                                        + "Investigate why '%s' was not formatted", locator)))
+                        .buildLocatorFromString(locator, objects);
+                LOGGER.debug("Formatted locator is : {}", by);
+            }
+            return new ExtendedWebElement(by, name, this.driver, this.searchContext, objects);
         }
+    }
 
-        if (resultBy == null) {
-            throw new RuntimeException(String.format("Locator formatting failed - no suitable locator type found for formatting. "
-                    + "Investigate why '%s' was not formatted", locator));
+    /**
+     * Get list of elements with formatted locator.<br>
+     *
+     * <p>
+     * 1. If element created using {@link org.openqa.selenium.support.FindBy} or same annotations:<br>
+     * If parameters were passed to the method, the result elements will be created with a new locator,
+     * and if the format method with parameters was already called for this element, the element locator
+     * will be recreated based on the original.<br>
+     * <br>
+     * <b>All original element statuses {@link com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.CaseInsensitiveXPath},
+     * {@link com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Localized} are saved for new elements</b>
+     * 
+     * <p>
+     * 2. If element created using constructor (it is not recommended to create element by hands):<br>
+     * If parameters were passed to the method, the result elements will be created with a new locator.
+     *
+     * For all cases: if the method is called with no parameters, no locator formatting is applied, but elements will be created using original
+     * locator.<br>
+     * 
+     * <b>This method does not change the object on which it is called</b>.
+     * 
+     * @param objects parameters
+     * @return {@link List} of {@link ExtendedWebElement} if found, empty list otherwise
+     */
+    public List<ExtendedWebElement> formatToList(Object... objects) {
+        List<ExtendedWebElement> extendedWebElementList = new ArrayList<>();
+        try {
+            if (this.element instanceof Proxy) {
+                /*
+                 * if element created using annotation (FindBy, ExtendedFindBy and so on), it will be proxy, so we get it and re-generate locator
+                 * with FormatLocatorConverter
+                 */
+                InvocationHandler innerProxy = Proxy.getInvocationHandler(this.element);
+                ExtendedElementLocator innerLocator = (ExtendedElementLocator) (FieldUtils.getDeclaredField(innerProxy.getClass(),
+                        "locator", true))
+                                .get(innerProxy);
+                if (Arrays.stream(objects).findAny().isPresent()) {
+                    if (innerLocator.getLocatorConverters().stream()
+                            .anyMatch(FormatLocatorConverter.class::isInstance)) {
+                        LOGGER.warn(
+                                "Called formatToList method of ExtendedWebElement class with parameters, but FormatLocatorConverter already exists "
+                                        + "for element: '{}', so locator will be recreated from original locator with new format parameters.",
+                                this.name);
+                        innerLocator.getLocatorConverters()
+                                .removeIf(FormatLocatorConverter.class::isInstance);
+                    }
+
+                    FormatLocatorConverter converter = new FormatLocatorConverter(objects);
+                    innerLocator.getLocatorConverters()
+                            .addFirst(converter);
+                    innerLocator.buildConvertedBy();
+                    innerLocator.getLocatorConverters()
+                            .remove(converter);
+                }
+                ClassLoader classLoader = getClass().getClassLoader();
+
+                InvocationHandler handler = new LocatingListHandler(classLoader, innerLocator, this.name);
+                extendedWebElementList = (List<ExtendedWebElement>) Proxy.newProxyInstance(classLoader, new Class[] { List.class }, handler);
+            } else {
+                By by = this.by;
+                if (Arrays.stream(objects).findAny().isPresent()) {
+                    String locator = this.by.toString();
+                    by = Arrays.stream(LocatorType.values())
+                            .filter(lt -> lt.is(locator))
+                            .findFirst()
+                            .orElseThrow(
+                                    () -> new RuntimeException(
+                                            String.format("Locator formatting failed - no suitable locator type found for formatting. "
+                                                    + "Investigate why '%s' was not formatted", locator)))
+                            .buildLocatorFromString(locator, objects);
+                }
+                int i = 0;
+                for (WebElement el : this.searchContext.findElements(by)) {
+                    ExtendedWebElement extendedWebElement = new ExtendedWebElement(by, String.format("%s - [%s]", name, i++), driver, searchContext,
+                            objects);
+                    extendedWebElement.setElement(el);
+                    extendedWebElement.setIsSingle(false);
+                    extendedWebElementList.add(extendedWebElement);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Something went wrong when try to format locator to list", e);
         }
-
-        LOGGER.debug("Formatted locator is : {}", resultBy);
-        return new ExtendedWebElement(resultBy, name, this.driver, this.searchContext, objects);
+        return extendedWebElementList;
     }
 
     /**
@@ -1753,28 +1824,28 @@ public class ExtendedWebElement implements IWebElement {
         String locator = by.toString();
         By resBy = null;
 
-        if (LocatorType.ID.is(locator)) {
-            resBy = LocatorType.ID.buildLocatorFromString(locator + "[" + index + "]");
-        } else if (LocatorType.NAME.is(locator)) {
-            resBy = LocatorType.NAME.buildLocatorFromString(locator + "[" + index + "]");
-        } else if (LocatorType.XPATH.is(locator)) {
-            resBy = LocatorType.XPATH.buildLocatorFromString(locator + "[" + index + "]");
-        } else if (LocatorType.LINKTEXT.is(locator)) {
-            resBy = LocatorType.LINKTEXT.buildLocatorFromString(locator + "[" + index + "]");
-        } else if (LocatorType.CLASSNAME.is(locator)) {
-            resBy = LocatorType.CLASSNAME.buildLocatorFromString(locator + "[" + index + "]");
-        } else if (LocatorType.PARTIAL_LINK_TEXT.is(locator)) {
-            resBy = LocatorType.PARTIAL_LINK_TEXT.buildLocatorFromString(locator + "[" + index + "]");
-        } else if (LocatorType.CSS.is(locator)) {
-            resBy = LocatorType.CSS.buildLocatorFromString(locator + ":nth-child(" + index + ")");
-        } else if (LocatorType.TAG_NAME.is(locator)) {
-            resBy = LocatorType.TAG_NAME.buildLocatorFromString(locator + "[" + index + "]");
-        } else if (LocatorType.IOS_CLASS_CHAIN.is(locator)) {
-            resBy = LocatorType.IOS_CLASS_CHAIN.buildLocatorFromString(locator + "[" + index + "]");
-        } else if (LocatorType.IOS_NS_PREDICATE.is(locator)) {
-            resBy = LocatorType.IOS_NS_PREDICATE.buildLocatorFromString(locator + "[" + index + "]");
-        } else if (LocatorType.ACCESSIBILITY_ID.is(locator)) {
-            resBy = LocatorType.ACCESSIBILITY_ID.buildLocatorFromString(locator + "[" + index + "]");
+        if (LocatorType.BY_ID.is(locator)) {
+            resBy = LocatorType.BY_ID.buildLocatorFromString(locator + "[" + index + "]");
+        } else if (LocatorType.BY_NAME.is(locator)) {
+            resBy = LocatorType.BY_NAME.buildLocatorFromString(locator + "[" + index + "]");
+        } else if (LocatorType.BY_XPATH.is(locator)) {
+            resBy = LocatorType.BY_XPATH.buildLocatorFromString(locator + "[" + index + "]");
+        } else if (LocatorType.BY_LINKTEXT.is(locator)) {
+            resBy = LocatorType.BY_LINKTEXT.buildLocatorFromString(locator + "[" + index + "]");
+        } else if (LocatorType.BY_CLASSNAME.is(locator)) {
+            resBy = LocatorType.BY_CLASSNAME.buildLocatorFromString(locator + "[" + index + "]");
+        } else if (LocatorType.BY_PARTIAL_LINK_TEXT.is(locator)) {
+            resBy = LocatorType.BY_PARTIAL_LINK_TEXT.buildLocatorFromString(locator + "[" + index + "]");
+        } else if (LocatorType.BY_CSS.is(locator)) {
+            resBy = LocatorType.BY_CSS.buildLocatorFromString(locator + ":nth-child(" + index + ")");
+        } else if (LocatorType.BY_TAG_NAME.is(locator)) {
+            resBy = LocatorType.BY_TAG_NAME.buildLocatorFromString(locator + "[" + index + "]");
+        } else if (LocatorType.APPIUM_BY_IOS_CLASS_CHAIN.is(locator)) {
+            resBy = LocatorType.APPIUM_BY_IOS_CLASS_CHAIN.buildLocatorFromString(locator + "[" + index + "]");
+        } else if (LocatorType.APPIUM_BY_IOS_NS_PREDICATE.is(locator)) {
+            resBy = LocatorType.APPIUM_BY_IOS_NS_PREDICATE.buildLocatorFromString(locator + "[" + index + "]");
+        } else if (LocatorType.APPIUM_BY_ACCESSIBILITY_ID.is(locator)) {
+            resBy = LocatorType.APPIUM_BY_ACCESSIBILITY_ID.buildLocatorFromString(locator + "[" + index + "]");
         }
         if (resBy == null) {
             throw new RuntimeException(String.format("Generate by for list failed - no suitable locator type found."
@@ -1793,7 +1864,7 @@ public class ExtendedWebElement implements IWebElement {
         switch (loadingStrategy) {
         case BY_PRESENCE: {
             if (element != null) {
-                conditions.add(ExpectedConditions.visibilityOf(element));
+                conditions.add(ExpectedConditions.not(ExpectedConditions.stalenessOf(element)));
             }
 
             if (isSingleElement) {
@@ -1807,7 +1878,7 @@ public class ExtendedWebElement implements IWebElement {
         }
         case BY_VISIBILITY: {
             if (element != null) {
-                conditions.add(ExpectedConditions.visibilityOf(element));
+                conditions.add(ExpectedConditions.not(ExpectedConditions.invisibilityOf(element)));
             }
 
             if (isSingleElement) {
@@ -1821,7 +1892,8 @@ public class ExtendedWebElement implements IWebElement {
         }
         case BY_PRESENCE_OR_VISIBILITY:
             if (element != null) {
-                conditions.add(ExpectedConditions.visibilityOf(element));
+                conditions.add(ExpectedConditions.not(ExpectedConditions.stalenessOf(element)));
+                conditions.add(ExpectedConditions.not(ExpectedConditions.invisibilityOf(element)));
             }
 
             if (isSingleElement) {

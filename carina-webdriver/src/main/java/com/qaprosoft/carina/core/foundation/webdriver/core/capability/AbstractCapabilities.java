@@ -23,15 +23,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.Proxy;
 import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.CapabilityType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
-import com.zebrunner.carina.proxy.SystemProxy;
-import com.zebrunner.carina.proxy.browserup.ProxyPool;
+import com.zebrunner.carina.proxy.ProxyUtils;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.Configuration.Parameter;
 import com.zebrunner.carina.utils.R;
@@ -59,10 +57,8 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
             R.CONFIG.put(SpecialKeywords.CAPABILITIES + ".name", testName, true);
         }
 
-        Proxy proxy = setupProxy();
-        if (proxy != null) {
-            capabilities.setCapability(CapabilityType.PROXY, proxy);
-        }
+        ProxyUtils.getSeleniumProxy()
+                .ifPresent(proxy -> capabilities.setCapability(CapabilityType.PROXY, proxy));
 
         // add capabilities based on dynamic _config.properties variables
         return initCapabilities(capabilities);
@@ -162,55 +158,6 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
         }
         return capabilities;
     }
-
-    protected Proxy setupProxy() {
-        ProxyPool.setupBrowserUpProxy();
-        SystemProxy.setupProxy();
-
-        String proxyHost = Configuration.get(Parameter.PROXY_HOST);
-        String proxyPort = Configuration.get(Parameter.PROXY_PORT);
-        String noProxy = Configuration.get(Parameter.NO_PROXY);
-        
-        if (Configuration.get(Parameter.BROWSERUP_PROXY).equals("true")) {
-            proxyPort = Integer.toString(ProxyPool.getProxyPortFromThread());
-        }
-        List<String> protocols = Arrays.asList(Configuration.get(Parameter.PROXY_PROTOCOLS).split("[\\s,]+"));
-
-        if (!proxyHost.isEmpty() && !proxyPort.isEmpty()) {
-
-            org.openqa.selenium.Proxy proxy = new org.openqa.selenium.Proxy();
-            String proxyAddress = String.format("%s:%s", proxyHost, proxyPort);
-
-            if (protocols.contains("http")) {
-                LOGGER.info("Http proxy will be set: {}:{}", proxyHost, proxyPort);
-                proxy.setHttpProxy(proxyAddress);
-            }
-
-            if (protocols.contains("https")) {
-                LOGGER.info("Https proxy will be set: {}:{}", proxyHost, proxyPort);
-                proxy.setSslProxy(proxyAddress);
-            }
-
-            if (protocols.contains("ftp")) {
-                LOGGER.info("FTP proxy will be set: {}:{}", proxyHost, proxyPort);
-                proxy.setFtpProxy(proxyAddress);
-            }
-
-            if (protocols.contains("socks")) {
-                LOGGER.info("Socks proxy will be set: {}:{}", proxyHost, proxyPort);
-                proxy.setSocksProxy(proxyAddress);
-            }
-            
-            if (!noProxy.isEmpty()) {
-                proxy.setNoProxy(noProxy);
-            }
-
-            return proxy;
-        }
-
-        return null;
-    }
-    
 
     protected boolean isNumber(String value) {
         if (value == null || value.isEmpty()){

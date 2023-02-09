@@ -26,27 +26,33 @@ import java.util.Optional;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WrapsDriver;
 import org.openqa.selenium.WrapsElement;
 import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
-import com.qaprosoft.carina.core.foundation.webdriver.locator.LocalizedAnnotations;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLocator;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorUtils;
 
 public class LocatingListHandler implements InvocationHandler {
     private final ElementLocator locator;
     private String name;
-    private By by;
     private final ClassLoader loader;
 
     public LocatingListHandler(ClassLoader loader, ElementLocator locator, Field field){
         this.loader = loader;
         this.locator = locator;
         this.name = field.getName();
-        this.by = new LocalizedAnnotations(field).buildBy();
+    }
+
+    public LocatingListHandler(ClassLoader loader, ElementLocator locator, String name) {
+        this.loader = loader;
+        this.locator = locator;
+        this.name = name;
     }
 
     public Object invoke(Object object, Method method, Object[] objects) throws Throwable {
@@ -63,6 +69,7 @@ public class LocatingListHandler implements InvocationHandler {
 
     	
     	List<WebElement> elements = locator.findElements();
+        By by = getLocatorBy(locator);
         Optional<LocatorType> locatorType = LocatorUtils.getLocatorType(by);
         boolean isByForListSupported = locatorType.isPresent() && locatorType.get().isIndexSupport();
         String locatorAsString = by.toString();
@@ -72,9 +79,10 @@ public class LocatingListHandler implements InvocationHandler {
             extendedWebElements = new ArrayList<ExtendedWebElement>();
             for (WebElement element : elements) {
                 InvocationHandler handler = new LocatingListsElementHandler(element, locator);
-                WebElement proxy = (WebElement) Proxy.newProxyInstance(loader, new Class[] { WebElement.class, WrapsElement.class, Locatable.class },
+                WebElement proxy = (WebElement) Proxy.newProxyInstance(loader,
+                        new Class[] { WebElement.class, WrapsElement.class, WrapsDriver.class, Locatable.class, TakesScreenshot.class },
                         handler);
-                ExtendedWebElement webElement = new ExtendedWebElement(proxy, name + i, by);
+                ExtendedWebElement webElement = new ExtendedWebElement(proxy, name + i);
                 webElement.setIsSingle(false);
                 if (isByForListSupported) {
                     webElement.setIsRefreshSupport(true);
@@ -94,6 +102,15 @@ public class LocatingListHandler implements InvocationHandler {
             return method.invoke(extendedWebElements, objects);
         } catch (InvocationTargetException e) {
             throw e.getCause();
+        }
+    }
+
+    private By getLocatorBy(ElementLocator locator) {
+        try {
+            ExtendedElementLocator extendedElementLocator = (ExtendedElementLocator) locator;
+            return extendedElementLocator.getBy();
+        } catch (ClassCastException e) {
+            throw new RuntimeException("Cannot get by from locator", e);
         }
     }
 

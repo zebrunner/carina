@@ -24,7 +24,9 @@ import org.openqa.selenium.Rectangle;
  * Interface represents base actions for screenshots capturing.
  * 
  * @author Alex Khursevich (alex@qaprosoft.com)
+ * @deprecated use {@link com.qaprosoft.carina.core.foundation.webdriver.Screenshot} instead
  */
+@Deprecated(forRemoval = true, since = "8.0.5")
 public interface ICapturable {
     enum ScreenArea {
         FULL_SCREEN,

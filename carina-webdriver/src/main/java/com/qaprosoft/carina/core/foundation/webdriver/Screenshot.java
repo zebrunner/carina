@@ -23,39 +23,45 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.imgscalr.Scalr;
+import org.openqa.selenium.Beta;
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.OutputType;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WrapsDriver;
 import org.openqa.selenium.support.decorators.Decorated;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Wait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.zebrunner.carina.utils.report.ReportContext;
+import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.Configuration.Parameter;
-import com.qaprosoft.carina.core.foundation.webdriver.screenshot.IScreenshotRule;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.report.ReportContext;
 
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.remote.MobileCapabilityType;
-import io.appium.java_client.windows.WindowsDriver;
 import ru.yandex.qatools.ashot.AShot;
 import ru.yandex.qatools.ashot.comparison.DiffMarkupPolicy;
 import ru.yandex.qatools.ashot.comparison.ImageDiff;
@@ -65,69 +71,136 @@ import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
 import ru.yandex.qatools.ashot.shooting.ShootingStrategy;
 
 /**
- * Screenshot manager for operation with screenshot capturing, resizing and removing of old screenshot folders.
+ * Screenshot manager.
  *
  * @author Alex Khursevich
  */
 public class Screenshot {
-    //TODO: deprecate and later move to provate all capture methods allowing to do captureByRule only.
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
-    private static List<IScreenshotRule> rules = Collections.synchronizedList(new ArrayList<IScreenshotRule>());
-    
+    private static final List<IScreenshotRule> RULES = new CopyOnWriteArrayList<>();
+    private static final Duration DEFAULT_PAGE_LOAD_TIMEOUT = Duration.ofSeconds(300);
     private static final String ERROR_STACKTRACE = "Error stacktrace: ";
+    private static final String ACTUAL_RANGE_OF_SCREENSHOT_RULES_MESSAGE = "Actual range of screenshot rules: {}";
     
     private Screenshot() {
     	//hide default constructor
     }
 
     /**
-     * Adds screenshot rule
+     * Adds screenshot rule.
      *
-     * @param rule IScreenshotRule
-     * @return list of existing rules
+     * @param rule {@link IScreenshotRule}
+     * @return list of current rules {@link IScreenshotRule}s after adding
      */
+    public static List<IScreenshotRule> addRule(IScreenshotRule rule) {
+        return addScreenshotRule(rule);
+    }
+
+    /**
+     * Adds screenshot rule.
+     *
+     * @deprecated for simplifying name of the method, use {@link #addRule(IScreenshotRule)} instead.
+     * @param rule {@link IScreenshotRule}.
+     * @return list of current rules {@link IScreenshotRule}s after adding
+     */
+    @Deprecated(forRemoval = true, since = "8.0.5")
     public static List<IScreenshotRule> addScreenshotRule(IScreenshotRule rule) {
-        LOGGER.debug("Following rule will be added: ".concat(rule.getClass().getName()));
-        rules.add(rule);
-        LOGGER.debug("Actual range of screenshot rules: ".concat(rules.toString()));
-        return rules;
-    }
-
-    /**
-     * Adds screenshot rules
-     *
-     * @param rulesList - list of new rules
-     * @return list of existing rules
-     */
-    public static List<IScreenshotRule> addScreenshotRules(List<IScreenshotRule> rulesList) {
-        for (IScreenshotRule iScreenshotRule : rulesList) {
-            LOGGER.debug("Following rule will be added: ".concat(iScreenshotRule.getClass().getName()));
+        LOGGER.debug("Following rule will be added: {}", rule.getClass().getName());
+        ScreenshotType screenshotType = rule.getScreenshotType();
+        Optional<IScreenshotRule> ruleByEventType = getRule(screenshotType);
+        if (ruleByEventType.isPresent()) {
+            LOGGER.debug("Rule with '{}' event type already exists and will be replaced by '{}'.",
+                    screenshotType, rule.getClass().getName());
+            ruleByEventType.ifPresent(RULES::remove);
         }
-        rules.addAll(rulesList);
-        LOGGER.debug("Actual range of screenshot rules: ".concat(rules.toString()));
-        return rules;
+        RULES.add(rule);
+        LOGGER.debug(ACTUAL_RANGE_OF_SCREENSHOT_RULES_MESSAGE, RULES);
+        return RULES;
     }
 
     /**
-     * Delete rule
+     * Adds screenshot rules.
      *
-     * @param rule IScreenshotRule
-     * @return list of existing rules
+     * @param rulesList list of {@link IScreenshotRule}s that will be added
+     * @return list of current rules {@link IScreenshotRule}s after adding
      */
-    public static List<IScreenshotRule> removeScreenshotRule(IScreenshotRule rule) {
-        LOGGER.debug("Following rule will be removed if it exists: ".concat(rule.getClass().getName()));
-        rules.remove(rule);
-        LOGGER.debug("Actual range of screenshot rules: ".concat(rules.toString()));
-        return rules;
+    public static List<IScreenshotRule> addRules(List<IScreenshotRule> rulesList) {
+        return addScreenshotRules(rulesList);
     }
 
     /**
-     * Clear all rules and disable all kind of screenshots even for failures!
+     * Adds screenshot rules.
+     *
+     * @deprecated for simplifying name of the method, use {@link #addRules(List)} instead.
+     * @param rulesList list of {@link IScreenshotRule}s that will be added
+     * @return list of current rules {@link IScreenshotRule}s after adding
+     */
+    @Deprecated(forRemoval = true, since = "8.0.5")
+    public static List<IScreenshotRule> addScreenshotRules(List<IScreenshotRule> rulesList) {
+        rulesList.forEach(Screenshot::addRule);
+        return RULES;
+    }
+
+    /**
+     * Remove rule if exists
+     *
+     * @param rule {@link IScreenshotRule} for removing
+     * @return list of current {@link IScreenshotRule}s after removing rule
+     */
+    public static List<IScreenshotRule> removeRule(IScreenshotRule rule) {
+        return removeScreenshotRule(rule);
+    }
+
+    /**
+     * Remove rule if exists
+     *
+     * @deprecated for simplifying name of the method, use {@link #removeRule(IScreenshotRule)} instead.
+     * @param rule {@link IScreenshotRule} for removing
+     * @return list of current {@link IScreenshotRule}s after removing rule
+     */
+    @Deprecated(forRemoval = true, since = "8.0.5")
+    public static List<IScreenshotRule> removeScreenshotRule(IScreenshotRule rule) {
+        LOGGER.debug("Following rule will be removed if it exists: {}", rule.getClass().getName());
+        RULES.remove(rule);
+        LOGGER.debug("Actual range of screenshot rules: {}", RULES.toString());
+        return RULES;
+    }
+
+    /**
+     * Get screenshot rule by {@link ScreenshotType}.
+     * 
+     * @param screenshotType {@link ScreenshotType}.
+     * @return {@link Optional} of {@link IScreenshotRule} if exists, {@link Optional#empty()} otherwise.
+     */
+    public static Optional<IScreenshotRule> getRule(ScreenshotType screenshotType) {
+        return RULES.stream()
+                .filter(rule -> rule.getScreenshotType().equals(screenshotType))
+                .findFirst();
+    }
+
+    /**
+     * Remove screenshot rule by {@link ScreenshotType} if exists.
+     *
+     * @param screenshotType {@link ScreenshotType}.
+     * @return {@link List} of {@link IScreenshotRule} after removing.
+     */
+    public static List<IScreenshotRule> removeRule(ScreenshotType screenshotType) {
+        LOGGER.debug("Rule with even type '{}' will be removed if it exists.", screenshotType);
+        Optional<IScreenshotRule> ruleByEventType = getRule(screenshotType);
+        if (ruleByEventType.isPresent()) {
+            LOGGER.debug("Detected rule '{}' with event type '{}', it will be removed.", ruleByEventType.get().getClass(), screenshotType);
+            RULES.remove(ruleByEventType.get());
+        }
+        LOGGER.debug("Actual range of screenshot rules: {}", RULES);
+        return RULES;
+    }
+
+    /**
+     * Clear all rules and disable all kind of screenshots, even for failures!
      */
     public static void clearRules() {
         LOGGER.warn("All screenshot capture rules will be deleted. Automatic capturing disabled even for failures!");
-        rules.clear();
+        RULES.clear();
     }
 
     /**
@@ -138,7 +211,9 @@ public class Screenshot {
      *            instance used for capturing.
      * @param comment String
      * @return screenshot name.
+     * @deprecated use {@link #capture(WebDriver, ScreenshotType, String)} instead
      */
+    @Deprecated(forRemoval = true, since = "8.0.5")
     public static String captureByRule(WebDriver driver, String comment) {
         return captureByRule(driver, comment, false);
     }
@@ -152,10 +227,12 @@ public class Screenshot {
      * @param comment String
      * @param isFullSize boolean
      * @return screenshot name.
+     * @deprecated use {@link #capture(WebDriver, ScreenshotType, String)} instead
      */
+    @Deprecated(forRemoval = true, since = "8.0.5")
     public static String captureByRule(WebDriver driver, String comment, boolean isFullSize) {
         boolean isTakeScreenshotRules = false;
-        for (IScreenshotRule iScreenshotRule : rules) {
+        for (IScreenshotRule iScreenshotRule : RULES) {
             isTakeScreenshotRules = iScreenshotRule.isTakeScreenshot();
             if (isTakeScreenshotRules) {
                 isFullSize = isFullSize && iScreenshotRule.isAllowFullSize(); 
@@ -169,58 +246,260 @@ public class Screenshot {
      * Captures visible screenshot explicitly ignoring any rules, creates thumbnail and copies both images to specified screenshots
      * location.
      *
-     * @param driver
-     *            instance used for capturing.
+     * @param driver instance used for capturing.
      * @param comment String
      * @return screenshot name.
+     * @deprecated use {@link #capture(WebDriver, SearchContext, IScreenshotRule, String)} instead, or
+     *             {@link #capture(WebDriver, ScreenshotType, String)} with {@link ScreenshotType#EXPLICIT_VISIBLE}
      */
+    @Deprecated(forRemoval = true, since = "8.0.5")
     public static String capture(WebDriver driver, String comment) {
         return capture(driver, comment, false);
     }
-    
+
+    /**
+     * Captures application screenshot, creates thumbnail and copies both images to specified screenshots location.
+     *
+     * @param driver {@link WebDriver}
+     * @param comment screenshot comment
+     * @param isFullSize
+     *            Boolean
+     * @return screenshot name.
+     * @deprecated use {@link #capture(WebDriver, SearchContext, IScreenshotRule, String)} instead, or
+     *             {@link #capture(WebDriver, ScreenshotType, String)} with {@link ScreenshotType#EXPLICIT_VISIBLE} or
+     *             {@link ScreenshotType#EXPLICIT_FULL_SIZE}
+     */
+    @Deprecated(forRemoval = true, since = "8.0.5")
+    public static String capture(WebDriver driver, String comment, boolean isFullSize) {
+        return capture(driver, true, comment, isFullSize);
+    }
+
+    /**
+     * Capture screenshot by rule.
+     * Search rule in pool by specified {@link ScreenshotType}, and if there is one, a screenshot is taken on it.
+     * 
+     * @param driver {@link WebDriver}.
+     * @param screenshotType {@link ScreenshotType}.
+     * @return {@link Optional} with name of screenshot file (file name with extension) if captured and successfully saved, {@link Optional#empty()}
+     *         otherwise.
+     */
+    public static Optional<String> capture(WebDriver driver, ScreenshotType screenshotType) {
+        return capture(driver, screenshotType, "");
+    }
+
+    /**
+     * Capture screenshot by rule.
+     * Search rule in pool by specified {@link ScreenshotType}, and if there is one, a screenshot is taken on it.<br>
+     * If the rule specifies a screenshot of only the visible area, then the screenshot will be of the element
+     *
+     * @param element {@link WebElement}.
+     * @param screenshotType {@link ScreenshotType}.
+     * @return {@link Optional} with name of screenshot file (file name with extension) if captured and successfully saved, {@link Optional#empty()}
+     *         otherwise.
+     */
+    public static Optional<String> capture(WebElement element, ScreenshotType screenshotType) {
+        return capture(element, screenshotType, "");
+    }
+
+    /**
+     * Capture screenshot by rule.
+     * Search rule in pool by specified {@link ScreenshotType}, and if there is one, a screenshot is taken on it.
+     *
+     * @param driver {@link WebDriver}.
+     * @param screenshotType {@link ScreenshotType}.
+     * @param comment screenshot comment
+     * @return {@link Optional} with name of screenshot file (file name with extension) if captured and successfully saved, {@link Optional#empty()}
+     *         otherwise.
+     */
+    public static Optional<String> capture(WebDriver driver, ScreenshotType screenshotType, String comment) {
+        return RULES.stream()
+                .filter(rule -> rule.getScreenshotType().equals(screenshotType))
+                .findFirst()
+                .flatMap(rule -> capture(driver, driver, rule, comment));
+    }
+
+    /**
+     * Capture screenshot by rule.
+     * Search rule in pool by specified {@link ScreenshotType}, and if there is one, a screenshot is taken on it.<br>
+     * If the rule specifies a screenshot of only the visible area, then the screenshot will be of the element
+     * 
+     * @param element {@link WebElement}.
+     * @param screenshotType {@link ScreenshotType}.
+     * @param comment screenshot comment
+     * @return {@link Optional} with name of screenshot file (file name with extension) if captured and successfully saved, {@link Optional#empty()}
+     *         otherwise.
+     */
+    public static Optional<String> capture(WebElement element, ScreenshotType screenshotType, String comment) {
+        return RULES.stream()
+                .filter(rule -> rule.getScreenshotType().equals(screenshotType))
+                .findFirst()
+                .flatMap(rule -> capture(((WrapsDriver) element).getWrappedDriver(), element, rule, comment));
+    }
+
+    /**
+     * Capture screenshot by concrete rule (ignoring rules in pool).
+     *
+     * @param driver {@link WebDriver}
+     * @param screenshotContext may be {@link WebDriver} or {@link WebElement}.
+     *            If the rule specifies a screenshot of only the visible area and an {@link WebElement} will be passed to this parameter,
+     *            then the screenshot will be of the element
+     * @param comment screenshot comment
+     * @return {@link Optional} with name of screenshot file (file name with extension) if captured and successfully saved, {@link Optional#empty()}
+     *         otherwise.
+     */
+    @Beta
+    public static Optional<String> capture(WebDriver driver, SearchContext screenshotContext, IScreenshotRule rule, String comment) {
+        Objects.requireNonNull(rule, "screenshot rule param must not be null");
+        Objects.requireNonNull(rule, "comment to screenshot must not be null");
+
+        if (!rule.isTakeScreenshot() ||
+                (rule.isEnableValidation() && !isRuleValid(rule)) ||
+                // [VD] do not write something to log as this original exception is used as original exception for failure
+                // invalid driver for screenshot capture
+                !isCaptured(comment)) {
+            return Optional.empty();
+        }
+
+        WebDriver originalDriver = castDriver(driver);
+
+        BufferedImage screenshot = null;
+        LOGGER.debug("Screenshot->capture starting...");
+        try {
+            setPageLoadTimeout(originalDriver, rule.getTimeout());
+
+            if (rule.isAllowFullSize()) {
+                LOGGER.debug("starting full size screenshot capturing...");
+                Wait<WebDriver> wait = new FluentWait<>(originalDriver)
+                        .pollingEvery(rule.getTimeout())
+                        .withTimeout(rule.getTimeout());
+                screenshot = takeFullScreenshot(originalDriver, wait);
+            } else {
+                LOGGER.debug("starting visible screenshot capturing...");
+                SearchContext originalSearchContext = castSearchContext(screenshotContext);
+                Wait<TakesScreenshot> wait = new FluentWait<>((TakesScreenshot) originalSearchContext)
+                        .pollingEvery(rule.getTimeout())
+                        .withTimeout(rule.getTimeout());
+                screenshot = takeVisibleScreenshot(wait);
+            }
+        } catch (TimeoutException e) {
+            LOGGER.warn("Unable to capture screenshot during {} sec!", rule.getTimeout().toSeconds());
+        } catch (Exception e) {
+            // for undefined failure keep full stacktrace to handle later correctly!
+            LOGGER.error("Undefined error on capture screenshot detected!", e);
+        } finally {
+            setPageLoadTimeout(originalDriver, getDefaultPageLoadTimeout());
+            LOGGER.debug("finished screenshot call.");
+        }
+
+        if (screenshot == null) {
+            return Optional.empty();
+        }
+
+        String screenshotFileName = null;
+        try {
+            Pair<Integer, Integer> dimensions = rule.getImageResizeDimensions();
+            screenshot = resizeImg(screenshot, dimensions.getLeft(), dimensions.getRight());
+
+            String fileExtension = "png"; // https://w3c.github.io/webdriver/#screen-capture
+            String fileName = rule.getFilename() + "." + fileExtension;
+            Path file = Path.of(rule.getSaveFolder().toString(), fileName)
+                    .toAbsolutePath();
+
+            ImageIO.write(screenshot, fileExtension, file.toFile());
+
+            screenshotFileName = fileName;
+
+            if (!comment.isEmpty()) {
+                LOGGER.info(comment);
+                // add screenshot comment to collector
+                ReportContext.addScreenshotComment(screenshotFileName, comment);
+            }
+            // upload screenshot to Zebrunner Reporting
+            com.zebrunner.agent.core.registrar.Screenshot.upload(Files.readAllBytes(file), Instant.now().toEpochMilli());
+        } catch (NoSuchWindowException e) {
+            LOGGER.warn("Unable to capture screenshot due to NoSuchWindowException!");
+            LOGGER.debug(ERROR_STACKTRACE, e);
+        } catch (IOException e) {
+            LOGGER.warn("Unable to capture screenshot due to the I/O issues!");
+            LOGGER.debug(ERROR_STACKTRACE, e);
+        } catch (WebDriverException e) {
+            LOGGER.warn("Unable to capture screenshot due to the WebDriverException!");
+            LOGGER.debug(ERROR_STACKTRACE, e);
+        } catch (Exception e) {
+            LOGGER.warn("Unable to capture screenshot due to the Exception!");
+            LOGGER.debug(ERROR_STACKTRACE, e);
+        } finally {
+            LOGGER.debug("Screenshot->capture finished.");
+        }
+        return Optional.ofNullable(screenshotFileName);
+    }
+
+    /**
+     * Check is rule valid
+     * 
+     * @param rule {@link IScreenshotRule}
+     * @return true if screenshot rule valid, false otherwise
+     */
+    private static boolean isRuleValid(IScreenshotRule rule) {
+        StringBuilder errMsgBuilder = new StringBuilder();
+        if (rule.getFilename() == null || rule.getFilename().isEmpty()) {
+            errMsgBuilder.append("Filename must not be null or empty.\n");
+        }
+
+        if (rule.getTimeout() == null || rule.getTimeout().toSeconds() < 0) {
+            errMsgBuilder.append("Timeout must not be null or less than 0 seconds.\n");
+        }
+
+        if (rule.getScreenshotType() == null) {
+            errMsgBuilder.append("Event type must not be null.\n");
+        }
+
+        if (rule.getImageResizeDimensions() == null ||
+                rule.getImageResizeDimensions().getLeft() == null ||
+                rule.getImageResizeDimensions().getRight() == null) {
+            errMsgBuilder.append("Image resize dimensions must not be null.\n");
+        }
+
+        if (rule.getSaveFolder() == null || !Files.isDirectory(rule.getSaveFolder())) {
+            errMsgBuilder.append("Save folder is null or is not a folder.\n");
+        }
+
+        boolean isValid = errMsgBuilder.length() <= 0;
+        if (!isValid) {
+            errMsgBuilder.append("Rule class: ")
+                    .append(rule.getClass());
+            LOGGER.error("{}", errMsgBuilder);
+        }
+        return isValid;
+    }
+
     /**
      * Captures screenshot explicitly ignoring any rules, creates thumbnail and copies both images to specified screenshots
      * location.
      *
-     * @param driver
-     *            instance used for capturing.
+     * @param driver instance used for capturing.
      * @param comment String
-     * @param isFullSize boolean
+     * @param fullSize boolean
      * @return screenshot name.
+     * @deprecated use {@link #capture(WebDriver, ScreenshotType, String)} or {@link #capture(WebDriver, SearchContext, IScreenshotRule, String)}
      */
-    public static String capture(WebDriver driver, String comment, boolean isFullSize) {
-        return capture(driver, true, comment, isFullSize);
-    }
-    
-    /**
-     * Captures application screenshot, creates thumbnail and copies both images to specified screenshots location.
-     *
-     * @param driver
-     *            instance used for capturing.
-     * @param isTakeScreenshot
-     *            perform actual capture or not
-     * @param comment
-     *            String
-     * @param fullSize
-     *            Boolean
-     * @return screenshot name.
-     */
+    @Deprecated(forRemoval = true, since = "8.0.5")
     private static String capture(WebDriver driver, boolean isTakeScreenshot, String comment, boolean fullSize) {
         String screenName = "";
-        
+
         // TODO: AUTO-2883 make full size screenshot generation only when fullSize == true
         // For the rest of cases returned previous implementation
 
         if (isTakeScreenshot) {
             LOGGER.debug("Screenshot->capture starting...");
-            
+
             driver = castDriver(driver); // remove all DriverListener casting to WebDriver
             try {
-            	if (!isCaptured(comment)) {
+                if (!isCaptured(comment)) {
                     // [VD] do not write something to log as this original exception is used as original exception for failure
-            		//LOGGER.debug("Unable to capture screenshot as driver seems invalid: " + comment);
-            		return screenName;
-            	}
+                    // LOGGER.debug("Unable to capture screenshot as driver seems invalid: " + comment);
+                    return screenName;
+                }
                 // Define test screenshot root
                 File testScreenRootDir = ReportContext.getTestDir();
 
@@ -228,40 +507,58 @@ public class Screenshot {
                 screenName = System.currentTimeMillis() + ".png";
                 String screenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
 
-                //hotfix to converting proxy into the valid driver
+                // hotfix to converting proxy into the valid driver
                 if (driver instanceof Proxy) {
-    				try {
-        				InvocationHandler innerProxy = Proxy.getInvocationHandler((Proxy) driver);
-        				// "arg$2" is by default RemoteWebDriver;
-        				// "arg$1" is EventFiringWebDriver
-        				// wrap into try/catch to make sure we don't affect test execution
-        				Field locatorField = innerProxy.getClass().getDeclaredField("arg$2");
-        				locatorField.setAccessible(true);
+                    try {
+                        InvocationHandler innerProxy = Proxy.getInvocationHandler((Proxy) driver);
+                        // "arg$2" is by default RemoteWebDriver;
+                        // "arg$1" is EventFiringWebDriver
+                        // wrap into try/catch to make sure we don't affect test execution
+                        Field locatorField = innerProxy.getClass().getDeclaredField("arg$2");
+                        locatorField.setAccessible(true);
 
-        				driver = (WebDriver) locatorField.get(innerProxy);
-    				} catch (Exception e) {
-    					//do nothing and receive augmenting warning in the logs
-    				}
+                        driver = (WebDriver) locatorField.get(innerProxy);
+                    } catch (Exception e) {
+                        // do nothing and receive augmenting warning in the logs
+                    }
                 }
 
-                BufferedImage screen;
-
-                // Create screenshot
-                if (fullSize) {
-                    screen = takeFullScreenshot(driver);
-                } else {
-                    screen = takeVisibleScreenshot(driver);
+                int divider = fullSize ? 2 : 3;
+                Duration timeout = Duration.ofSeconds(Configuration.getInt(Configuration.Parameter.EXPLICIT_TIMEOUT) / divider);
+                BufferedImage screen = null;
+                try {
+                    setPageLoadTimeout(driver, timeout);
+                    // Create screenshot
+                    if (fullSize) {
+                        Wait<WebDriver> wait = new FluentWait<>(driver)
+                                .pollingEvery(timeout)
+                                .withTimeout(timeout);
+                        screen = takeFullScreenshot(driver, wait);
+                    } else {
+                        Wait<TakesScreenshot> wait = new FluentWait<>((TakesScreenshot) driver)
+                                .pollingEvery(timeout)
+                                .withTimeout(timeout);
+                        screen = takeVisibleScreenshot(wait);
+                    }
+                } catch (TimeoutException e) {
+                    LOGGER.warn("Unable to capture screenshot during {} sec!", timeout.toSeconds());
+                } catch (Exception e) {
+                    // for undefined failure keep full stacktrace to handle later correctly!
+                    LOGGER.error("Undefined error on capture screenshot detected!", e);
+                } finally {
+                    setPageLoadTimeout(driver, getDefaultPageLoadTimeout());
+                    LOGGER.debug("finished screenshot call.");
                 }
 
                 if (screen == null) {
-                	//do nothing and return empty
-                	return "";
+                    // do nothing and return empty
+                    return "";
                 }
 
                 if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1
                         && Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) {
-                    resizeImg(screen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH),
-                            Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT), screenPath);
+                    screen = resizeImg(screen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH),
+                            Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT));
                 }
 
                 File screenshot = new File(screenPath);
@@ -273,7 +570,7 @@ public class Screenshot {
                     // add screenshot comment to collector
                     ReportContext.addScreenshotComment(screenName, comment);
                 }
-                //upload screenshot to Zebrunner Reporting
+                // upload screenshot to Zebrunner Reporting
                 com.zebrunner.agent.core.registrar.Screenshot.upload(Files.readAllBytes(screenshot.toPath()), Instant.now().toEpochMilli());
             } catch (NoSuchWindowException e) {
                 LOGGER.warn("Unable to capture screenshot due to NoSuchWindowException!");
@@ -291,33 +588,34 @@ public class Screenshot {
                 LOGGER.debug("Screenshot->capture finished.");
             }
         }
-        
         return screenName;
     }
 
     /**
      * Resizes image according to specified dimensions.
      *
-     * @param bufferedImage
-     *            - image to resize.
-     * @param width
-     *            - new image width.
-     * @param height
-     *            - new image height.
-     * @param path
-     *            - path to screenshot file.
+     * @param bufferedImage image to resize.
+     * @param width the target width that you wish the image to have.
+     * @param height the target height that you wish the image to have.
      */
-    private static void resizeImg(BufferedImage bufferedImage, int width, int height, String path) {
+    private static BufferedImage resizeImg(BufferedImage bufferedImage, Integer width, Integer height) {
+        Objects.requireNonNull(bufferedImage, "bufferedImage parameter must not be null");
+        if (width == null || width < 0 || height == null || height < 0) {
+            return bufferedImage;
+        }
+
+        BufferedImage resizedImage = null;
         try {
-            BufferedImage bufImage = Scalr.resize(bufferedImage, Scalr.Method.BALANCED, Scalr.Mode.FIT_TO_WIDTH, width, height,
+            resizedImage = Scalr.resize(bufferedImage, Scalr.Method.BALANCED, Scalr.Mode.FIT_TO_WIDTH, width, height,
                     Scalr.OP_ANTIALIAS);
-            if (bufImage.getHeight() > height) {
-                bufImage = Scalr.crop(bufImage, bufImage.getWidth(), height);
+            if (resizedImage.getHeight() > height) {
+                resizedImage = Scalr.crop(resizedImage, resizedImage.getWidth(), height);
             }
-            ImageIO.write(bufImage, "png", new File(path));
         } catch (Exception e) {
             LOGGER.error("Image scaling problem!", e);
+            resizedImage = bufferedImage;
         }
+        return resizedImage;
     }
 
     /**
@@ -325,115 +623,62 @@ public class Screenshot {
      * popups and active js-elements on the page)
      *
      * @param driver web driver without listeners (original)
-     * @exception Exception can be caused by read() or getScreenshotAs() methods
+     * @exception IOException see {@link ImageIO#read(File)}
      *
-     * @return a screenshot if it was produced successfully, or null otherwise
+     * @return a {@link BufferedImage} of screenshot if it was produced successfully, or null otherwise
      */
-    private static BufferedImage takeFullScreenshot(WebDriver driver) {
-        BufferedImage screenShot = null;
-        // default timeout for full size screenshot is EXPLICIT_TIMEOUT /2
-        long timeout = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / 2;
-        setPageLoadTimeout(driver, timeout);
+    private static BufferedImage takeFullScreenshot(WebDriver driver, Wait<WebDriver> wait) throws IOException {
+        BufferedImage screenshot;
 
-        Wait<WebDriver> wait = new FluentWait<>(driver)
-                .pollingEvery(Duration.ofSeconds(timeout))
-                .withTimeout(Duration.ofSeconds(timeout));
-
-        try {
-            LOGGER.debug("starting full size screenshot capturing...");
-            if (driver.getClass().toString().contains("windows")) {
-                File capturedScreenshot = wait.until(drv -> ((WindowsDriver) drv)
-                        .getScreenshotAs(OutputType.FILE));
-                screenShot = ImageIO.read(capturedScreenshot);
-                // Appium driver and it's descendant classes contains 'java_client' in classname
-            } else if (driver.getClass().toString().contains("java_client")) {
-                // Mobile Native app
-                File capturedScreenshot = wait.until(drv -> ((AppiumDriver) drv)
-                        .getScreenshotAs(OutputType.FILE));
-                screenShot = ImageIO.read(capturedScreenshot);
-            } else if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
-
+        if (driver instanceof AppiumDriver) {
+            File capturedScreenshot = wait.until(drv -> ((TakesScreenshot) drv)
+                    .getScreenshotAs(OutputType.FILE));
+            screenshot = ImageIO.read(capturedScreenshot);
+        } else {
+            final AShot ashot;
+            // if for mobile we use RemoteWebDriver
+            if (Configuration.getDriverType().equals(SpecialKeywords.MOBILE)) {
                 if (Configuration.getPlatform().equals("ANDROID")) {
                     String pixelRatio = String.valueOf(((HasCapabilities) driver).getCapabilities().getCapability("pixelRatio"));
                     float dpr = !pixelRatio.equals("null") ? Float.parseFloat(pixelRatio) : SpecialKeywords.DEFAULT_DPR;
-                    screenShot = wait.until(drv -> (new AShot()).shootingStrategy(ShootingStrategies
+                    ashot = new AShot().shootingStrategy(ShootingStrategies
                             .viewportRetina(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT, SpecialKeywords.DEFAULT_BLOCK, SpecialKeywords.DEFAULT_BLOCK,
-                                    dpr))
-                            .takeScreenshot(drv))
-                            .getImage();
+                                    dpr));
                 } else {
                     int deviceWidth = driver.manage().window().getSize().getWidth();
-                    String deviceName = String.valueOf(((HasCapabilities) driver)
-                            .getCapabilities()
+                    String deviceName = String.valueOf(((HasCapabilities) driver).getCapabilities()
                             .getCapability(MobileCapabilityType.DEVICE_NAME));
-
-                    screenShot = wait.until(drv -> new AShot()
-                            .shootingStrategy(getScreenshotShuttingStrategy(deviceWidth, deviceName))
-                            .takeScreenshot(driver))
-                            .getImage();
+                    ashot = new AShot().shootingStrategy(getScreenshotShuttingStrategy(deviceWidth, deviceName));
                 }
             } else {
                 // regular web
-                screenShot = wait.until(drv -> new AShot()
-                        .shootingStrategy(ShootingStrategies.viewportPasting(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT))
-                        .takeScreenshot(drv))
-                        .getImage();
+                ashot = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(SpecialKeywords.DEFAULT_SCROLL_TIMEOUT));
             }
-        } catch (TimeoutException e) {
-            LOGGER.warn("Unable to capture screenshot during {} sec!", timeout);
-        } catch (Exception e) {
-            // for undefined failure keep full stacktrace to handle later correctly!
-            LOGGER.error("Undefined error on capture full screenshot detected!", e);
-        } finally {
-            // restore default pageLoadTimeout driver timeout
-            setPageLoadTimeout(driver, getPageLoadTimeout());
-            LOGGER.debug("finished full size screenshot call.");
+            screenshot = wait.until(
+                    ashot::takeScreenshot)
+                    .getImage();
         }
-        return screenShot;
+        return screenshot;
     }
 
     /**
-     * Take screenshot of visible part of the page
+     * Take screenshot of visible part of the page.
      *
-     * @param driver web driver without listeners (original)
-     * @exception Exception can be caused by read() or getScreenshotAs() methods
+     * @exception IOException see {@link ImageIO#read(File)}
      *
-     * @return a screenshot if it was produced successfully, or null otherwise
+     * @return a {@link BufferedImage} of screenshot if it was produced successfully, or null otherwise
      */
-    private static BufferedImage takeVisibleScreenshot(WebDriver driver) throws Exception {
-        BufferedImage screenShot = null;
-        // default timeout for driver quit 1/3 of explicit
-        long timeout = Configuration.getInt(Parameter.EXPLICIT_TIMEOUT) / 3;
-        setPageLoadTimeout(driver, timeout);
-        try {
-            Wait<WebDriver> wait = new FluentWait<>(driver)
-                    .pollingEvery(Duration.ofSeconds(timeout))
-                    .withTimeout(Duration.ofSeconds(timeout));
-
-            LOGGER.debug("starting screenshot capturing...");
-            File capturedScreenshot = wait.until(drv -> ((TakesScreenshot) drv)
-                    .getScreenshotAs(OutputType.FILE));
-            screenShot = ImageIO.read(capturedScreenshot);
-        } catch (TimeoutException e) {
-            LOGGER.warn("Unable to capture screenshot during {} sec!", timeout);
-        } catch (Exception e) {
-            LOGGER.error("Undefined error on capture screenshot detected: {}", e.getMessage());
-        } finally {
-            // restore default pageLoadTimeout driver timeout
-            setPageLoadTimeout(driver, getPageLoadTimeout());
-            LOGGER.debug("finished screenshot call.");
-        }
-        return screenShot;
+    private static BufferedImage takeVisibleScreenshot(Wait<TakesScreenshot> wait) throws IOException {
+        File capturedScreenshot = wait.until(screenshotContext -> screenshotContext.getScreenshotAs(OutputType.FILE));
+            return ImageIO.read(capturedScreenshot);
     }
 
     /**
      * Analyze if screenshot can be captured using the most common reason when
      * driver is died etc.
      *
-     * @param message
-     *            - error message (stacktrace).
-     *
-     * @return boolean
+     * @param message error message (stacktrace).
+     * @return true if screenshot already captured (or cannot be captured), false otherwise
      */
 	public static boolean isCaptured(String message){
 		// [VD] do not use below line as it is too common!
@@ -500,16 +745,18 @@ public class Screenshot {
     }
 
     /**
-     * Compares two different screenshots
+     * Compares two different screenshots.
+     * Creates an image with marked differences if the images differ.
      *
-     * @param bufferedImageExpected - old image
-     * @param bufferedImageActual   - new image
-     * @param comment               - String
-     * @param artifact              - boolean
-     * @param markupPolicy          - DiffMarkupPolicy
+     * @param bufferedImageExpected old image
+     * @param bufferedImageActual new image
+     * @param fileNameDiffImage name of the new image with marked differences
+     * @param artifact true if attach to test run as artifact, false if upload as screenshot
+     * @param markupPolicy {@link DiffMarkupPolicy}
      * @return boolean
      */
-    public static boolean compare(BufferedImage bufferedImageExpected, BufferedImage bufferedImageActual, String comment, boolean artifact, DiffMarkupPolicy markupPolicy) {
+    public static boolean compare(BufferedImage bufferedImageExpected, BufferedImage bufferedImageActual,
+            String fileNameDiffImage, boolean artifact, DiffMarkupPolicy markupPolicy) {
         String screenName;
         BufferedImage screen;
         try {
@@ -521,13 +768,13 @@ public class Screenshot {
                 // Define test screenshot root
                 File testScreenRootDir = ReportContext.getTestDir();
 
-                screenName = comment + ".png";
+                screenName = fileNameDiffImage + ".png";
                 String screenPath = testScreenRootDir.getAbsolutePath() + "/" + screenName;
 
                 if (Configuration.getInt(Parameter.BIG_SCREEN_WIDTH) != -1
                         && Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT) != -1) {
-                    resizeImg(screen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH),
-                            Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT), screenPath);
+                    screen = resizeImg(screen, Configuration.getInt(Parameter.BIG_SCREEN_WIDTH),
+                            Configuration.getInt(Parameter.BIG_SCREEN_HEIGHT));
                 }
 
                 File screenshot = new File(screenPath);
@@ -536,7 +783,7 @@ public class Screenshot {
 
                 // Uploading comparative screenshot to Amazon S3
                 if (artifact){
-                    com.zebrunner.agent.core.registrar.Artifact.attachToTest(comment + ".png", screenshot);
+                    com.zebrunner.agent.core.registrar.Artifact.attachToTest(fileNameDiffImage + ".png", screenshot);
                 } else {
                     com.zebrunner.agent.core.registrar.Screenshot.upload(Files.readAllBytes(screenshot.toPath()), Instant.now().toEpochMilli());
                 }
@@ -557,8 +804,6 @@ public class Screenshot {
         } catch (Exception e) {
             LOGGER.warn("Unable to compare screenshots!");
             LOGGER.debug(ERROR_STACKTRACE, e);
-        } finally {
-            // do nothing
         }
         return true;
     }
@@ -594,31 +839,44 @@ public class Screenshot {
     }
 
     /**
-     * Cast Carina driver to WebDriver removing all extra listeners (use it in problematic places where you handle all exceptions)
+     * Remove all driver extra listeners (use it in problematic places where you handle all exceptions)
      *
-     * @param drv WebDriver
+     * @param driver {@link WebDriver}
      *
-     * @return WebDriver
+     * @return {@link WebDriver} without driver listeners
      */
-    private static WebDriver castDriver(WebDriver drv) {
-        if (drv instanceof Decorated<?>) {
-            drv = ((Decorated<WebDriver>) drv).getOriginal();
+    private static WebDriver castDriver(WebDriver driver) {
+        if (driver instanceof Decorated<?>) {
+            return (WebDriver) ((Decorated<?>) driver).getOriginal();
         }
-        return drv;
+        return driver;
     }
 
-    private static void setPageLoadTimeout(WebDriver drv, long timeout) {
+    /**
+     * Remove all search context extra listeners (use it in problematic places where you handle all exceptions)
+     *
+     * @param context {@link SearchContext}
+     *
+     * @return {@link SearchContext} without listeners
+     */
+    private static SearchContext castSearchContext(SearchContext context) {
+        if (context instanceof Decorated<?>) {
+            return (SearchContext) ((Decorated<?>) context).getOriginal();
+        }
+        return context;
+    }
+
+    private static void setPageLoadTimeout(WebDriver drv, Duration timeout) {
         try {
-            drv.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(timeout));
+            drv.manage().timeouts().pageLoadTimeout(timeout);
         } catch (UnsupportedCommandException e) {
             //TODO: review upcoming appium 2.0 changes
             LOGGER.debug("Appium: Not implemented yet for pageLoad timeout!");
         }
-        
     }
 
-    private static long getPageLoadTimeout() {
-        long timeout = 300;
+    private static Duration getDefaultPageLoadTimeout() {
+        return DEFAULT_PAGE_LOAD_TIMEOUT;
         // #1705: limit pageLoadTimeout driver timeout by idleTimeout
 //      if (!R.CONFIG.get("capabilities.idleTimeout").isEmpty()) {
 //          long idleTimeout = R.CONFIG.getLong("capabilities.idleTimeout");
@@ -626,6 +884,5 @@ public class Screenshot {
 //              timeout = idleTimeout;
 //          }
 //      }
-        return timeout;
     }
 }

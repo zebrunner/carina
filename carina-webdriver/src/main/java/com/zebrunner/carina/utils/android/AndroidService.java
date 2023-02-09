@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.qaprosoft.carina.core.foundation.webdriver.ScreenshotType;
 import com.zebrunner.carina.utils.mobile.IMobileUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.decorators.Decorated;
@@ -513,7 +514,8 @@ public class AndroidService implements IDriverPool, IAndroidUtils {
                 expandStatusBar();
             }
             LOGGER.debug("Page source [expand status bar]: ".concat(getDriver().getPageSource()));
-            Screenshot.captureByRule(getDriver(), "Clear notification - screenshot. Status bar should be opened. Attempt: " + i);
+            Screenshot.capture(getDriver(), ScreenshotType.SUCCESSFUL_DRIVER_ACTION,
+                    "Clear notification - screenshot. Status bar should be opened. Attempt: " + i);
             try {
                 notificationPage.clearNotifications();
             } catch (Exception e) {
