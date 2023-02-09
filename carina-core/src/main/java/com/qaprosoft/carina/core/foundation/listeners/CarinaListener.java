@@ -326,6 +326,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             R.EMAIL.clearTestProperties();
             R.REPORT.clearTestProperties();
             R.ZAFIRA.clearTestProperties();
+            //remove thread proxy rule
+            com.zebrunner.carina.proxy.ProxyPool.clearThreadRule();
 
             LOGGER.debug("Test result is : " + result.getStatus());
             // result status == 2 means failure, status == 3 means skip. We need to quit driver anyway for failure and skip
