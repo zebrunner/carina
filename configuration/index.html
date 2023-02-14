@@ -902,6 +902,21 @@ R.TESTDATA.get(&quot;user.email&quot;)
         <td>Enable capabilities processing according to w3c.<strong>Default: false</strong></td>
         <td>false</td>
     </tr>
+    <tr>
+        <td>db.url</td>
+        <td>Database url</td>
+        <td>jdbc:mysql://localhost/test</td>
+    </tr>
+    <tr>
+        <td>db.username</td>
+        <td>Database username</td>
+        <td>username</td>
+    </tr>
+    <tr>
+        <td>db.password</td>
+        <td>Database password</td>
+        <td>password</td>
+    </tr>
 </table>
 Most of the properties may be read in the following way:</p>
 <pre><code>Configuration.get(Parameter.URL) // returns string value
@@ -911,7 +926,8 @@ Configuration.getDouble(Parameter.MAX_DRIVER_COUNT) // returns double value
 </code></pre>
 
 <h3 id="environment-specific-configuration">Environment specific configuration</h3>
-<p>In some cases, it is required to support multiple environments for testing. Let's assume we have STAG and PROD environments which have different application URLs. In this case, we need to specify the following properties in <strong>_config.properties</strong>:</p>
+<p>In some cases, it is required to support multiple environments for testing. Let's assume we have STAG and PROD environments which have different 
+application URLs. In this case, we need to specify the following properties in <strong>_config.properties</strong>:</p>
 <pre><code>env=PROD
 STAG.url=http://stag-app-server.com
 PROD.url=http://prod-app-server.com
@@ -919,9 +935,23 @@ PROD.url=http://prod-app-server.com
 
 <p>And get an env-specific argument in the test in the following way:</p>
 <pre><code>Configuration.getEnvArg(&quot;url&quot;)
+Configuration.getEnvArg(Configuration.Parameter.URL)
 </code></pre>
 
 <p>As a result, you switch between the environments just changing the env argument in the <strong>_config.properties</strong> file.</p>
+<p>In some cases, it is necessary to store multiple parameter sets for the same env (for example, if multiple databases are used).
+For this, the concept of an alias is added. The parameter with env and alias will be stored in the following way:</p>
+<pre><code>STAG.mongo.db.url=mongodb://stag.example.com:27017
+STAG.mysql.db.url=jdbc:mysql://localhost/stag_test
+PROD.mongo.db.url=mongodb://prod.example.com:27017
+PROD.mysql.db.url=jdbc:mysql://localhost/prod_db
+</code></pre>
+
+<p>Get an env-alias-specific argument in the test in the following way:</p>
+<pre><code>Configuration.getEnvArg(Configuration.Parameter.DB_URL, &quot;mongo&quot;) // mongodb://prod.example.com:27017
+Configuration.getEnvArg(Configuration.Parameter.DB_URL, &quot;mysql&quot;) // jdbc:mysql://localhost/prod_db
+</code></pre>
+
 <h3 id="tests-execution-filter-configuration">Tests execution filter configuration</h3>
 <p>The <code>test_run_rules</code> parameter is responsible for filtering tests.
 There are 3 filter types:<br>

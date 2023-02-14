@@ -55,7 +55,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#raising-inbuilt-proxy-server-browserup" class="md-skip">
+        <a href="#direct-proxy-mode" class="md-skip">
           Skip to content
         </a>
       
@@ -449,19 +449,75 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#raising-inbuilt-proxy-server-browserup" class="md-nav__link">
-    Raising inbuilt proxy-server (BrowserUp)
-  </a>
-  
-    <nav class="md-nav" aria-label="Raising inbuilt proxy-server (BrowserUp)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#using-proxy-server-in-java-code" class="md-nav__link">
-    Using proxy-server in Java code:
+  <a href="#direct-proxy-mode" class="md-nav__link">
+    DIRECT proxy mode
   </a>
   
 </li>
+      
+        <li class="md-nav__item">
+  <a href="#pac-proxy-mode" class="md-nav__link">
+    PAC proxy mode
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#autodetect-proxy-mode" class="md-nav__link">
+    AUTODETECT proxy mode
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#system-proxy-mode" class="md-nav__link">
+    SYSTEM proxy mode
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#unspecified-proxy-mode-not-recommended-to-use" class="md-nav__link">
+    UNSPECIFIED proxy mode [NOT RECOMMENDED TO USE]
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#unused-proxy-mode" class="md-nav__link">
+    UNUSED proxy mode
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#manual-proxy-mode" class="md-nav__link">
+    MANUAL proxy mode
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dynamic-proxy-mode" class="md-nav__link">
+    DYNAMIC proxy mode
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#legacy-proxy-mode-default-will-be-deprecated-in-future-releases" class="md-nav__link">
+    LEGACY proxy mode [DEFAULT, WILL BE DEPRECATED IN FUTURE RELEASES]
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-the-default-dynamic-proxy-implementation-carinabrowserupproxy-in-dynamic-mode-in-java-code" class="md-nav__link">
+    Using the default dynamic proxy implementation (CarinaBrowserUpProxy) in DYNAMIC mode in Java code
+  </a>
+  
+    <nav class="md-nav" aria-label="Using the default dynamic proxy implementation (CarinaBrowserUpProxy) in DYNAMIC mode in Java code">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#dealing-with-mitm-and-installing-ssl-certificate-into-your-system" class="md-nav__link">
@@ -634,19 +690,75 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#raising-inbuilt-proxy-server-browserup" class="md-nav__link">
-    Raising inbuilt proxy-server (BrowserUp)
-  </a>
-  
-    <nav class="md-nav" aria-label="Raising inbuilt proxy-server (BrowserUp)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#using-proxy-server-in-java-code" class="md-nav__link">
-    Using proxy-server in Java code:
+  <a href="#direct-proxy-mode" class="md-nav__link">
+    DIRECT proxy mode
   </a>
   
 </li>
+      
+        <li class="md-nav__item">
+  <a href="#pac-proxy-mode" class="md-nav__link">
+    PAC proxy mode
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#autodetect-proxy-mode" class="md-nav__link">
+    AUTODETECT proxy mode
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#system-proxy-mode" class="md-nav__link">
+    SYSTEM proxy mode
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#unspecified-proxy-mode-not-recommended-to-use" class="md-nav__link">
+    UNSPECIFIED proxy mode [NOT RECOMMENDED TO USE]
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#unused-proxy-mode" class="md-nav__link">
+    UNUSED proxy mode
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#manual-proxy-mode" class="md-nav__link">
+    MANUAL proxy mode
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dynamic-proxy-mode" class="md-nav__link">
+    DYNAMIC proxy mode
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#legacy-proxy-mode-default-will-be-deprecated-in-future-releases" class="md-nav__link">
+    LEGACY proxy mode [DEFAULT, WILL BE DEPRECATED IN FUTURE RELEASES]
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-the-default-dynamic-proxy-implementation-carinabrowserupproxy-in-dynamic-mode-in-java-code" class="md-nav__link">
+    Using the default dynamic proxy implementation (CarinaBrowserUpProxy) in DYNAMIC mode in Java code
+  </a>
+  
+    <nav class="md-nav" aria-label="Using the default dynamic proxy implementation (CarinaBrowserUpProxy) in DYNAMIC mode in Java code">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#dealing-with-mitm-and-installing-ssl-certificate-into-your-system" class="md-nav__link">
@@ -715,7 +827,98 @@
                 
                   <h1>Proxy</h1>
                 
-                <p>There is a possibility to send all test traffic via proxy including the embedded light-weight BrowserUp proxy server.
+                <p>Selenium provides the ability to set various proxy settings for the browser session.
+This possibility is implemented and supplemented in Carina Framework through the usage of various configurations.</p>
+<p>First, the type of proxying is controlled by the configuration parameter
+<code>proxy_type</code>. The value of this parameter can be <code>DIRECT</code>, <code>MANUAL</code>, <code>DYNAMIC</code>, <code>PAC</code>, <code>AUTODETECT</code>, 
+<code>SYSTEM</code>, <code>UNSPECIFIED</code>, <code>UNUSED</code>, <code>LEGACY</code>. Let's consider them in more detail.</p>
+<h3 id="direct-proxy-mode">DIRECT proxy mode</h3>
+<p>Specifies that the session will not use a proxy.</p>
+<p>Set by changing the value of the <code>proxy_type</code> parameter in the configuration to <code>DIRECT</code>.</p>
+<p>An example of using a proxy can be viewed <a href="https://github.com/zebrunner/carina-demo/blob/c73f1a3c03dd9065c9256f930427a15639475763/src/test/java/com/qaprosoft/carina/demo/ProxySampleTest.java#L91">here</a>.</p>
+<h3 id="pac-proxy-mode">PAC proxy mode</h3>
+<p>A Proxy Auto-Configuration (PAC) file is a JavaScript function that determines whether 
+web browser requests (HTTP, HTTPS, and FTP) go directly to the destination or are 
+forwarded to a web proxy server. More information about the structure of the pac file can be found <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Proxy_servers_and_tunneling/Proxy_Auto-Configuration_PAC_file">here</a>.</p>
+<p>Set by changing the value of the <code>proxy_type</code> parameter in the configuration to <code>PAC</code>.</p>
+<p>This mode depends on the following configuration parameters:</p>
+<p><code>proxy_autoconfig_url</code> - specifies the URL to be used for proxy auto-configuration.
+Expected format is <code>http://hostname.com:1234/pacfile</code>. However, the value of this parameter
+may be local path with pac file.</p>
+<p><code>proxy_pac_local</code> - specifies, how the value provided in the <code>proxy_autoconfig_url</code> parameter.
+If the parameter value is <code>true</code> then it is assumed
+that <code>proxy_autoconfig_url</code> contains the path to the file on the local machine. It will be sent
+browser to set up a proxy. If the value of the parameter is <code>false</code>, then it is assumed that
+that <code>proxy_autoconfig_url</code> contains the URL to the pac file.</p>
+<p>An example of using a proxy can be viewed <a href="https://github.com/zebrunner/carina-demo/blob/c73f1a3c03dd9065c9256f930427a15639475763/src/test/java/com/qaprosoft/carina/demo/ProxySampleTest.java#L110">here</a>.</p>
+<h3 id="autodetect-proxy-mode">AUTODETECT proxy mode</h3>
+<p>Specifies whether to autodetect proxy settings. Presumably with <a href="https://en.wikipedia.org/wiki/Web_Proxy_Auto-Discovery_Protocol">WPAD</a>.</p>
+<p>Set by changing the value of the <code>proxy_type</code> parameter in the configuration to <code>AUTODETECT</code>.</p>
+<p>An example of using a proxy can be viewed <a href="https://github.com/zebrunner/carina-demo/blob/c73f1a3c03dd9065c9256f930427a15639475763/src/test/java/com/qaprosoft/carina/demo/ProxySampleTest.java#L150">here</a>.</p>
+<h3 id="system-proxy-mode">SYSTEM proxy mode</h3>
+<p>Use system proxy settings. Default Mode on Linux.</p>
+<p>Set by changing the value of the <code>proxy_type</code> parameter in the configuration to <code>SYSTEM</code>.</p>
+<p>An example of using a proxy can be viewed <a href="https://github.com/zebrunner/carina-demo/blob/c73f1a3c03dd9065c9256f930427a15639475763/src/test/java/com/qaprosoft/carina/demo/ProxySampleTest.java#L169">here</a>.</p>
+<h3 id="unspecified-proxy-mode-not-recommended-to-use">UNSPECIFIED proxy mode [NOT RECOMMENDED TO USE]</h3>
+<p>The mode set in the Selenium proxy by default and indicates that they should
+use the following settings (for Windows - DIRECT mode, for linux - SYSTEM).</p>
+<p>Set by changing the value of the <code>proxy_type</code> parameter in the configuration to <code>UNSPECIFIED</code>.</p>
+<p>It is not recommended to use, if you want to specify that the proxy object is not added to
+session, then use <code>UNUSED</code> mode. Only added because Selenium provides
+the ability to explicitly specify the <code>UNSPECIFIED</code> proxy type.</p>
+<h3 id="unused-proxy-mode">UNUSED proxy mode</h3>
+<p>Specifies that the proxy object should not be added to the capability to start the driver.
+However, as practice shows, the proxy object will still be present in the session with the <code>UNSPECIFIED</code> type.</p>
+<p>Set by changing the value of the <code>proxy_type</code> parameter in the configuration to <code>UNUSED</code>.</p>
+<h3 id="manual-proxy-mode">MANUAL proxy mode</h3>
+<p>Proxy mode, in which the host and port of the proxy are explicitly specified.</p>
+<p>Set by changing the value of the <code>proxy_type</code> parameter in the configuration to <code>MANUAL</code>.</p>
+<p>Depends on the following configuration parameters:</p>
+<p><code>proxy_host</code> - contains a proxy host, for example <code>127.0.0.1</code><br />
+<code>proxy_port</code> - contains a proxy port, for example <code>8080</code><br />
+<code>proxy_protocols</code> - contains a list of protocol types to which should be applied
+the above options. May contain a set of the following values: <code>http</code>, <code>https</code>, <code>ftp</code>, <code>socks</code>.
+Values are separated by a comma, such as <code>http,https,ftp</code>.<br />
+<code>no_proxy</code> - contains comma-separated addresses to which the proxy should not be applied.</p>
+<p>If this mode applies to the entire application, you can use the following setting:</p>
+<p><code>proxy_set_to_system</code> - if <code>true</code>, then sets proxy values to system properties, i.e.
+the proxy will be applied to all http/https/ftp requests from the application as well (depends on the values listed in <code>proxy_protocols</code>).
+However, this approach is not thread-safe and is therefore not recommended for use in all other modes. Disabled by default.</p>
+<p>An example of using a proxy can be viewed <a href="https://github.com/zebrunner/carina-demo/blob/c73f1a3c03dd9065c9256f930427a15639475763/src/test/java/com/qaprosoft/carina/demo/ProxySampleTest.java#L67">here</a>.</p>
+<h3 id="dynamic-proxy-mode">DYNAMIC proxy mode</h3>
+<p>Advanced proxy mode.</p>
+<p>Starts with rules. The rule defines which 'dynamic' proxy should be started
+when forming capabilities before starting the driver. The rule must implement the interface
+<a href="https://github.com/zebrunner/carina-proxy/blob/master/src/main/java/com/zebrunner/carina/proxy/IProxyRule.java">IProxyRule</a>.</p>
+<p>The default rule is <a href="https://github.com/zebrunner/carina-proxy/blob/master/src/main/java/com/zebrunner/carina/proxy/DefaultProxyRule.java">DefaultProxyRule</a>,
+which depends on the value of the <code>browserup_proxy</code> parameter (if true, then the proxy should be started, if false, then not),
+and uses the dynamic proxy implementation, which in turn uses <a href="https://github.com/browserup/browserup-proxy">BrowserUpProxy</a>.</p>
+<p>The rule can be either global or set for a separate test. Setting the rules globally/for the test is done using the methods of the
+class <a href="https://github.com/zebrunner/carina-proxy/blob/master/src/main/java/com/zebrunner/carina/proxy/ProxyPool.java">ProxyPool</a>.
+Also all dynamic proxies are controlled by this class. This class manages the state of the proxy (starting, stopping, getting information about
+running proxy, controlling the use of the specified ports).</p>
+<p>All dynamic proxies depend on the following configuration parameters:</p>
+<p><code>proxy_port</code> - priority parameter when obtaining the port for the proxy to be started.
+The default value is <code>0</code> (dynamic port), but this value is relevant
+for the default dynamic proxy implementation, may not be relevant for other implementations.</p>
+<p><code>proxy_ports</code> - defines the range of ports that can be used for running proxies.
+Example: <code>4000:5000</code> - ports 4000 to 5000 will be used. Only used
+if the value of <code>proxy_ports</code> is <code>NULL</code>.</p>
+<p>There are also parameters on which the default dynamic proxy implementation depends:</p>
+<p><code>browserup_disabled_mitm</code> - when true, MITM capture will be disabled, false otherwise</p>
+<p>The default dynamic proxy implementation is represented by the <a href="https://github.com/zebrunner/carina-proxy/blob/master/src/main/java/com/zebrunner/carina/proxy/browserup/CarinaBrowserUpProxy.java">CarinaBrowserUpProxy</a> class.</p>
+<p>An example of using a default dynamic proxy can be viewed <a href="https://github.com/zebrunner/carina-demo/blob/c73f1a3c03dd9065c9256f930427a15639475763/src/test/java/com/qaprosoft/carina/demo/ProxySampleTest.java#L207">here</a>.</p>
+<p>If you want to use a proxy that is not use BrowserUp or use BrowserUp with custom configuration,
+then you can create your own implementation. For this you have to create a class,
+implementing the <a href="https://github.com/zebrunner/carina-proxy/blob/master/src/main/java/com/zebrunner/carina/proxy/IProxy.java">IProxy</a> interface.
+In your implementation, you manage the state of the proxy yourself, however, you must follow the rules described by the interface,
+so that the proxy pool correctly manages your implementation. You also need to implement your rule.
+To do this, you need to create a class that implements the <a href="https://github.com/zebrunner/carina-proxy/blob/master/src/main/java/com/zebrunner/carina/proxy/IProxyRule.java">IProxyRule</a> interface,
+and then register it using the <a href="https://github.com/zebrunner/carina-proxy/blob/master/src/main/java/com/zebrunner/carina/proxy/ProxyPool.java">ProxyPool</a> class methods.
+This rule will be used instead of the default rule (can be set globally or per test).</p>
+<h3 id="legacy-proxy-mode-default-will-be-deprecated-in-future-releases">LEGACY proxy mode [DEFAULT, WILL BE DEPRECATED IN FUTURE RELEASES]</h3>
+<p>Set by changing the value of the <code>proxy_type</code> parameter in the configuration to <code>LEGACY</code>.</p>
+<p>There is a possibility to send all test traffic via proxy including the embedded light-weight BrowserUp proxy server.
 There are several properties available to manage all kinds of proxy usage:</p>
 <pre><code>proxy_host=NULL
 proxy_port=NULL
@@ -726,39 +929,42 @@ browserup_disabled_mitm=false
 browserup_port=0
 </code></pre>
 
-<p>Declare proxy_host, proxy_port and proxy_protocols to send all Web and API test traffic via your static network proxy.
-Also, to enable proxy for TestNG Java process, <strong>proxy_set_to_system</strong> must be specified to <strong>true</strong>, otherwise only WebDrivers and API clients will be proxied.</p>
-<p>Note: The above settings are mostly required to get public internet access through corporate proxies.</p>
-<h2 id="raising-inbuilt-proxy-server-browserup">Raising inbuilt proxy-server (BrowserUp)</h2>
-<p>Also, Carina can start an embedded proxy to proxy/view/filter requests/responses. There is an inbuilt library BrowserUpProxy in Carina-proxy module. Below you can find BrowserUp proxy related parameters in your <strong>config.properties</strong> file:</p>
-<pre><code>browserup_proxy=true
-browserup_disabled_mitm=false
-browserup_port=0
-browserup_ports_range=NULL
-</code></pre>
-
-<p>With the enabled <strong>browserup_proxy</strong>, Carina will start the dedicated proxy instance on every test method. </p>
+<p>With the enabled <strong>browserup_proxy</strong>, Carina will start the dedicated proxy instance on every test method.</p>
 <p>Carina automatically detects an IP address for your local browserup proxy and puts it into the capabilities in case if <strong>proxy_host=NULL</strong>. If you want to map some publicly available IP address for your browserup proxy instance then you'll need to override it via <strong>proxy_host</strong> property.
 E.g. <strong>proxy_host=myhostname</strong> is useful in case of running maven process inside a docker container. Override the hostname, and it will be available from Selenium instance.</p>
 <p><strong>browserup_port=0</strong> means that Carina dynamically identifies a free port for a proxy session.</p>
 <p><strong>browserup_ports_range=8001:8003</strong> means that Carina will use only ports from given range for starting of browserup sessions. That's reasonable for cases when only several ports are shared at environment and can be accessed from other machines within the network. If all ports are used then test will wait for the first freed port.</p>
-<p><strong>browserup_disabled_mitm</strong> is disabled by default. </p>
+<p><strong>browserup_disabled_mitm</strong> is disabled by default.</p>
 <p><strong>Important!</strong> If you have troubles with  SSL traffic sniffing, the first thing you should do is to change <strong>browserup_disabled_mitm</strong> property value!</p>
-<h3 id="using-proxy-server-in-java-code">Using proxy-server in Java code:</h3>
+<p>Declare proxy_host, proxy_port and proxy_protocols to send all Web and API test traffic via your static network proxy.
+Also, to enable proxy for TestNG Java process, <strong>proxy_set_to_system</strong> must be specified to <strong>true</strong>, otherwise only WebDrivers and API clients will be proxied.</p>
+<p>Note: The above settings are mostly required to get public internet access through corporate proxies.</p>
+<h2 id="using-the-default-dynamic-proxy-implementation-carinabrowserupproxy-in-dynamic-mode-in-java-code">Using the default dynamic proxy implementation (CarinaBrowserUpProxy) in DYNAMIC mode in Java code</h2>
+<p><strong>IMPORTANT</strong>: All of the following examples of using ProxyPool in the current section use the class
+<a href="https://github.com/zebrunner/carina-proxy/blob/master/src/main/java/com/zebrunner/carina/proxy/ProxyPool.java">ProxyPool</a>.</p>
 <ol>
 <li>Make sure the driver instance is already started:</li>
 </ol>
 <pre><code>getDriver();
 </code></pre>
 
-<p>Note: During the driver startup, Carina automatically starts proxy and adjusts browser capabilities to track the desired protocols. To get proxy instance for the current test/thread, you can call:</p>
-<pre><code>BrowserUpProxy proxy = ProxyPool.getProxy();
+<p>Note: During the driver startup, Carina automatically starts proxy (depends on rule) and adjusts browser capabilities to track the desired protocols. 
+To get proxy instance for the current test/thread, you can call:</p>
+<pre><code>Optional&lt;IProxy&gt; proxy = ProxyPool.getProxy();
+</code></pre>
+
+<p>You can get a specific implementation of a dynamic proxy as follows
+(but you need to be sure which implementation will be in the pool):</p>
+<pre><code>Optional&lt;CarinaBrowserUpProxy&gt; proxy = ProxyPool.getOriginal(CarinaBrowserUpProxy.class);
 </code></pre>
 
 <ol>
 <li>Enable the required Har capture type using:</li>
 </ol>
-<pre><code>proxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT);
+<pre><code>CarinaBrowserUpProxy proxy = ProxyPool.getOriginal(CarinaBrowserUpProxy.class)
+.orElseThrow();
+BrowserUpProxy browserUpProxy = proxy.getProxy();
+browserUpProxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT);
 </code></pre>
 
 <p>There are a lot of possible content types:</p>
@@ -802,6 +1008,7 @@ try {
 <li>addLastHttpFilterFactory</li>
 </ol>
 <p>To add and configure content filters, look <a href="https://github.com/browserup/browserup-proxy#littleproxy-interceptors">here</a>.</p>
+<p>An example of using response filtering can be viewed <a href="https://github.com/zebrunner/carina-demo/blob/c73f1a3c03dd9065c9256f930427a15639475763/src/test/java/com/qaprosoft/carina/demo/ProxySampleTest.java#L304">here</a>.</p>
 <h3 id="dealing-with-mitm-and-installing-ssl-certificate-into-your-system">Dealing with MITM and installing SSL certificate into your system:</h3>
 <h4 id="for-mac-users">For Mac users:</h4>
 <ol>

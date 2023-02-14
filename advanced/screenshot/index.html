@@ -55,7 +55,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#faq" class="md-skip">
+        <a href="#successful-driver-action" class="md-skip">
           Skip to content
         </a>
       
@@ -461,9 +461,50 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#successful-driver-action" class="md-nav__link">
+    Successful driver action
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-while-executing-driver-action" class="md-nav__link">
+    Error while executing driver action
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#explicitly-creating-a-full-page-screenshot" class="md-nav__link">
+    Explicitly creating a full-page screenshot
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#explicit-creation-of-a-screenshot-of-the-visible-part-of-the-pageapplication" class="md-nav__link">
+    Explicit creation of a screenshot of the visible part of the page/application
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-your-own-rule" class="md-nav__link">
+    Create your own rule
+  </a>
+  
+    <nav class="md-nav" aria-label="Create your own rule">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#faq" class="md-nav__link">
     FAQ
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -581,9 +622,50 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#successful-driver-action" class="md-nav__link">
+    Successful driver action
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-while-executing-driver-action" class="md-nav__link">
+    Error while executing driver action
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#explicitly-creating-a-full-page-screenshot" class="md-nav__link">
+    Explicitly creating a full-page screenshot
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#explicit-creation-of-a-screenshot-of-the-visible-part-of-the-pageapplication" class="md-nav__link">
+    Explicit creation of a screenshot of the visible part of the page/application
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-your-own-rule" class="md-nav__link">
+    Create your own rule
+  </a>
+  
+    <nav class="md-nav" aria-label="Create your own rule">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#faq" class="md-nav__link">
     FAQ
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -609,25 +691,84 @@
                 
                   <h1>Screenshot</h1>
                 
-                <p>Screenshots generation is organized automatically for selenium tests via <a href="https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/webdriver/screenshot/IScreenshotRule.java">IScreenshotRule.java</a> implementation(s).
-You can implement and register any custom rules based on your requirements.</p>
-<p>Default <a href="https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/webdriver/screenshot/AutoScreenshotRule.java">AutoScreenshotRule.java</a> depends on 2 configuration parameters:</p>
-<pre><code>auto_screenshot=true
-allow_fullsize_screenshot=false
+                <p>The screenshot creation logic is provided in the <a href="https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/webdriver/Screenshot.java">Screenshot</a> class.</p>
+<p>Taking screenshots is controlled by rules. Rules are divided into four types - successful driver action, unsuccessful driver action, 
+explicit full-size and explicit visible (page or element, depends on the method used).</p>
+<h3 id="successful-driver-action">Successful driver action</h3>
+<p>Produced after a successful click, entering text in a field, etc.<br />
+Used in the event listener of the driver used by the Carina Framework. It is also logical to use it in custom event listeners of the driver.</p>
+<p>The default rule implementation is provided in the <a href="https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/webdriver/screenshot/DefaultSuccessfulDriverActionScreenshotRule.java">DefaultSuccessfulDriverActionScreenshotRule</a> class and has the following logic:</p>
+<ol>
+<li>A screenshot is taken of only the visible part of the site/application.</li>
+<li>Whether to create screenshots or not depends on the configuration parameter <code>auto_screenshot</code>.</li>
+</ol>
+<p>A rule of this type must use <code>SUCCESSFUL_DRIVER_ACTION</code> as the return value in the <code>getScreenshotType</code> method.</p>
+<p>Usage example:</p>
+<pre><code>// taking a screenshot of the visible part of the page
+Screenshot.capture(getDriver(), ScreenshotType.SUCCESSFUL_DRIVER_ACTION);
 </code></pre>
 
-<p>Example of the extended screenshot rule can be found <a href="https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/webdriver/screenshot/DebugLevelScreenshotRule.java">here</a></p>
-<p>When <code>auto_screenshot</code> enabled Carina capture screenshots after every important actions: click, type, page opening and of cause after driver and test failures.
-Via <code>allow_fullsize_screenshot</code> you can enable full size screenshoting for driver and test failures. Make sure to test its enabling in advance on your webapp. 
-Huge pages concatenation might significantly slow down your tests execution. </p>
-<p>Default timeout for capturing visible screen is <code>EXPLICIT_TIMEOUT/3</code> and for fullsize screenshoting <code>EXPLICIT_TIMEOUT/2</code></p>
-<p>To disable completely automatic screenshots capturing clear all rules:</p>
+<p>If you need to take a screenshot of just the element:</p>
+<pre><code>...
+ @Override
+    public void afterClick(WebElement element) {
+        // taking a screenshot of an element
+        Screenshot.capture(element, ScreenshotType.SUCCESSFUL_DRIVER_ACTION, &quot;Element clicked&quot;);
+    }
+...
+</code></pre>
+
+<h3 id="error-while-executing-driver-action">Error while executing driver action</h3>
+<p>Produced after an unsuccessful click, text input, etc.
+Used in the event listener of the driver used by the Carina Framework. It is also logical to use it in custom event listeners of the driver.</p>
+<p>The default rule implementation is provided in the <a href="https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/webdriver/screenshot/DefaultUnSuccessfulDriverActionScreenshotRule.java">DefaultUnSuccessfulDriverActionScreenshotRule</a> class and has the following logic:</p>
+<ol>
+<li>Screenshot required.</li>
+<li>Creating a full page/only visible part of a screenshot depends on the <code>allow_fullsize_screenshot</code> configuration value.</li>
+</ol>
+<p><b>Important</b>: Taking a screenshot of the entire page might significantly slow down your tests execution.</p>
+<p>A rule of this type must use <code>UNSUCCESSFUL_DRIVER_ACTION</code> as the return value in the <code>getScreenshotType</code> method.</p>
+<p>Usage example:</p>
+<pre><code>// taking a screenshot of the visible part of the page
+Screenshot.capture(getDriver(), ScreenshotType.UNSUCCESSFUL_DRIVER_ACTION);
+</code></pre>
+
+<h3 id="explicitly-creating-a-full-page-screenshot">Explicitly creating a full-page screenshot</h3>
+<p>Designed for those cases when you need to take a screenshot in the test.</p>
+<p>The default rule implementation is provided in the <a href="https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/webdriver/screenshot/ExplicitFullSizeScreenshotRule.java">ExplicitFullSizeScreenshotRule</a> class and has the following logic:</p>
+<ol>
+<li>Screenshot required.</li>
+<li>t's always full page.</li>
+</ol>
+<p>A rule of this type must use <code>EXPLICIT_FULL_SIZE</code> as the return value in the <code>getScreenshotType</code> method.</p>
+<p>Usage example:</p>
+<pre><code>Screenshot.capture(getDriver(), ScreenshotType.EXPLICIT_FULL_SIZE);
+</code></pre>
+
+<p><b>Important</b>: Taking a screenshot of the entire page might significantly slow down your tests execution.</p>
+<h3 id="explicit-creation-of-a-screenshot-of-the-visible-part-of-the-pageapplication">Explicit creation of a screenshot of the visible part of the page/application</h3>
+<p>Designed for those cases when you need to take a screenshot in the test.</p>
+<p>The default rule implementation is provided in the <a href="https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/webdriver/screenshot/ExplicitVisibleScreenshotRule.java">ExplicitVisibleScreenshotRule</a> class and has the following logic:</p>
+<ol>
+<li>Screenshot required.</li>
+<li>It is always only the visible part of the page/application.</li>
+</ol>
+<p>A rule of this type must use <code>EXPLICIT_VISIBLE</code> as the return value in the <code>getScreenshotType</code> method.</p>
+<h2 id="create-your-own-rule">Create your own rule</h2>
+<p>You can implement and register any custom rules based on your requirements. The rule must implement the <a href="https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/webdriver/screenshot/IScreenshotRule.java">IScreenshotRule</a> interface.</p>
+<p>The rule is registered using <code>addRule</code> method of the <code>Screenshot</code> class. The rule is registered globally, and if already registered
+rule of the same type, it will be overwritten.</p>
+<p>All default rules have the following properties (which can be changed):</p>
+<ol>
+<li>The timeout is calculated by dividing the <code>explicit_timeout</code> configuration value by a divisor.
+If the screenshot is full-page, then the divisor is <code>2</code>, otherwise <code>3</code>. </li>
+<li><code>DEBUG</code> logging mode performs strict rule compliance checks.</li>
+<li>The name of the screenshot file is generated by the <code>System.currentTimeMillis()</code> method.</li>
+<li>The folder where screenshots are saved is determined by the value of the <code>ReportContext.getTestDir().getAbsolutePath()</code> method.</li>
+<li>Screenshot resizing is determined by the configuration parameters <code>big_screen_width</code> and <code>big_screen_height</code>.</li>
+</ol>
+<p>To turn off all kinds of screenshots, remove all rules:</p>
 <pre><code>Screenshot.clearRules()
-</code></pre>
-
-<p>To capture screenshot explcitly from test code use:</p>
-<pre><code>Screenshot.capture(getDriver(), &quot;my page screenshot&quot;);
-Screenshot.capture(getDriver(), &quot;Captureg full size screenshot&quot;, true);
 </code></pre>
 
 <h3 id="faq">FAQ</h3>

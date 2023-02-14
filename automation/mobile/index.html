@@ -402,6 +402,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#what-if-the-mobile-app-link-points-to-amazonazureappcenterother" class="md-nav__link">
+    What if the mobile app link points to Amazon/Azure/AppCenter/other
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#faq" class="md-nav__link">
     FAQ
   </a>
@@ -758,6 +765,13 @@
         <li class="md-nav__item">
   <a href="#how-to-change-context-of-application" class="md-nav__link">
     How to change context of application
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-if-the-mobile-app-link-points-to-amazonazureappcenterother" class="md-nav__link">
+    What if the mobile app link points to Amazon/Azure/AppCenter/other
   </a>
   
 </li>
@@ -1121,6 +1135,19 @@ WEB2(&quot;WEBVIEW_opera&quot;);
 }
 </code></pre>
 
+<h3 id="what-if-the-mobile-app-link-points-to-amazonazureappcenterother">What if the mobile app link points to Amazon/Azure/AppCenter/other</h3>
+<p>When the driver starts, a link to the application is taken from the capabilities. The type of link determines how to process it 
+and get the final (for example, pre-assign) link which will be used when starting the driver instead of the original.
+If you provide a link to an application located on Amazon, then add the dependency <code>com.zebrunner.carina-aws-s3</code>, 
+Azure - <code>com.zebrunner.carina-azure</code>, AppCenter - <code>com.zebrunner.carina-appcenter</code>.</p>
+<p>You can also create your own implementation of getting the final link to the mobile application:</p>
+<ol>
+<li>Create a class that implements the <code>com.zebrunner.carina.commons.artifact.IArtifactManager</code> interface (from <code>com.zebrunner.carina-commons</code> dependency).
+The <code>getDirectLink</code> method just transforms the link to the final.</li>
+<li>Create a class that implements the <code>com.zebrunner.carina.commons.artifact.IArtifactManagerFactory</code> interface and annotate it
+by <code>com.zebrunner.carina.commons.artifact.ArtifactManagerFactory</code>. So this class will be discovered by Carina Framework at runtime.</li>
+</ol>
+<p>If Carina Framework does not find a suitable artifact manager to generate final link, then the link will be passed to the driver as is.</p>
 <h2 id="faq">FAQ</h2>
 <p><strong>Where can I find mobile-specific methods?</strong></p>
 <ul>
