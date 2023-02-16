@@ -1213,7 +1213,7 @@ public class ExtendedWebElement implements IWebElement {
                 if (Arrays.stream(objects).findAny().isPresent()) {
                     if (innerLocator.getLocatorConverters().stream()
                             .anyMatch(FormatLocatorConverter.class::isInstance)) {
-                        LOGGER.warn("Called format method of ExtendedWebElement class with parameters, but FormatLocatorConverter already exists "
+                        LOGGER.debug("Called format method of ExtendedWebElement class with parameters, but FormatLocatorConverter already exists "
                                 + "for element: '{}', so locator will be recreated from original locator with new format parameters.", this.name);
                         innerLocator.getLocatorConverters()
                                 .removeIf(FormatLocatorConverter.class::isInstance);
@@ -1287,7 +1287,7 @@ public class ExtendedWebElement implements IWebElement {
                 if (Arrays.stream(objects).findAny().isPresent()) {
                     if (innerLocator.getLocatorConverters().stream()
                             .anyMatch(FormatLocatorConverter.class::isInstance)) {
-                        LOGGER.warn(
+                        LOGGER.debug(
                                 "Called formatToList method of ExtendedWebElement class with parameters, but FormatLocatorConverter already exists "
                                         + "for element: '{}', so locator will be recreated from original locator with new format parameters.",
                                 this.name);
