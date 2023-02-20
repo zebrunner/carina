@@ -770,6 +770,10 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 System.setProperty(systemPropertyName, value);
             }
         }
+
+        if (R.CONFIG.containsKey(Parameter.ENV.getKey())) {
+            System.setProperty("reporting.run.environment", R.CONFIG.get(Parameter.ENV.getKey()));
+        }
     }
 
     /**
