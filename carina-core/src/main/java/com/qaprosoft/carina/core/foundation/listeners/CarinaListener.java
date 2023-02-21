@@ -47,6 +47,7 @@ import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.SkipException;
+import org.testng.internal.ConfigurationMethod;
 import org.testng.xml.XmlSuite;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -58,8 +59,8 @@ import com.qaprosoft.carina.core.foundation.report.qtest.IQTestManager;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestRailManager;
 import com.qaprosoft.carina.core.foundation.skip.ExpectedSkipManager;
 import com.qaprosoft.carina.core.foundation.webdriver.CarinaDriver;
-import com.qaprosoft.carina.core.foundation.webdriver.ScreenshotType;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
+import com.qaprosoft.carina.core.foundation.webdriver.ScreenshotType;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase;
 import com.qaprosoft.carina.core.foundation.webdriver.TestPhase.Phase;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.CapabilitiesLoader;
@@ -100,6 +101,8 @@ import com.zebrunner.carina.utils.resources.L10N;
  */
 public class CarinaListener extends AbstractTestListener implements ISuiteListener, IQTestManager, ITestRailManager, IClassListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    // show us should we remove driver after the after method or not
+    private static final ThreadLocal<Boolean> QUIT_DRIVER_AFTER_METHOD_AFTER_CONFIGURATION = ThreadLocal.withInitial(() -> Boolean.FALSE);
 
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
@@ -256,11 +259,39 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     }
 
     @Override
+    public void onConfigurationSuccess(ITestResult result) {
+        LOGGER.debug("CarinaListener->onConfigurationSuccess");
+        onConfigurationFinish(result);
+        super.onConfigurationSuccess(result);
+    }
+
+    @Override
+    public void onConfigurationSkip(ITestResult result) {
+        LOGGER.debug("CarinaListener->onConfigurationSkip");
+        onConfigurationFinish(result);
+        super.onConfigurationSkip(result);
+    }
+
+    @Override
     public void onConfigurationFailure(ITestResult result) {
         LOGGER.debug("CarinaListener->onConfigurationFailure");
+        onConfigurationFinish(result);
         super.onConfigurationFailure(result);
     }
 
+    private void onConfigurationFinish(ITestResult testResult) {
+        ITestNGMethod testMethod = testResult.getMethod();
+        if (testMethod instanceof ConfigurationMethod) {
+            ConfigurationMethod configurationMethod = (ConfigurationMethod) testMethod;
+            if (configurationMethod.isAfterMethodConfiguration()) {
+                if (QUIT_DRIVER_AFTER_METHOD_AFTER_CONFIGURATION.get()) {
+                    quitDrivers(Phase.BEFORE_METHOD, Phase.METHOD);
+                }
+                QUIT_DRIVER_AFTER_METHOD_AFTER_CONFIGURATION.remove();
+            }
+        }
+    }
+    
     @Override
     public void onTestStart(ITestResult result) {
         LOGGER.debug("CarinaListener->onTestStart");
@@ -326,14 +357,16 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             R.EMAIL.clearTestProperties();
             R.REPORT.clearTestProperties();
             R.ZAFIRA.clearTestProperties();
-            //remove thread proxy rule
+            // remove thread proxy rule
             com.zebrunner.carina.proxy.ProxyPool.clearThreadRule();
 
             LOGGER.debug("Test result is : " + result.getStatus());
             // result status == 2 means failure, status == 3 means skip. We need to quit driver anyway for failure and skip
-            if ((automaticDriversCleanup && !hasDependencies(result)) || result.getStatus() == 2 || result.getStatus() == 3) {
+            if ((automaticDriversCleanup && !hasDependencies(result)) ||
+                    result.getStatus() == 2 ||
+                    result.getStatus() == 3) {
                 if (!Configuration.getBoolean(Parameter.FORCIBLY_DISABLE_DRIVER_QUIT)) {
-                    quitDrivers(Phase.BEFORE_METHOD, Phase.METHOD);
+                    QUIT_DRIVER_AFTER_METHOD_AFTER_CONFIGURATION.set(Boolean.TRUE);
                 }
             }
 

@@ -15,10 +15,12 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation;
 
-/*
+/**
  * AbstractTest - base test for UI and API tests.
+ * 
+ * @deprecated use {@link IAbstractTest} instead
  */
-
+@Deprecated(forRemoval = true, since = "8.0.8")
 public abstract class AbstractTest implements IAbstractTest {
 
 }

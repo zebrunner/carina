@@ -20,6 +20,7 @@ import java.lang.annotation.Annotation;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.SkipException;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
@@ -30,39 +31,47 @@ import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactor
 import com.qaprosoft.carina.core.foundation.listeners.CarinaListener;
 import com.qaprosoft.carina.core.foundation.listeners.FilterTestsListener;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestCases;
+import com.zebrunner.agent.core.registrar.CurrentTest;
+import com.zebrunner.agent.testng.listener.TestRunListener;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.Configuration.Parameter;
 import com.zebrunner.carina.utils.common.CommonUtils;
 import com.zebrunner.carina.utils.factory.ICustomTypePageFactory;
-import com.zebrunner.agent.core.registrar.CurrentTest;
-import com.zebrunner.agent.testng.listener.TestRunListener;
 
-/*
- * IAbstractTest - base test for UI and API tests.
+/**
+ * Base interface for test classes.<br>
+ * Each test class must implement this interface
  */
-
-// https://github.com/zebrunner/carina/issues/951
-// reused com.nordstrom.tools.testng-foundation to register ordered listeners
-
-// on start order is FilterTestsListener, TestRunListener and CarinaListener
-// on finish reverse order, i.e. CarinaListener, TestRunListener and FilterTestsListener
 @LinkedListeners({ CarinaListener.class, TestRunListener.class, FilterTestsListener.class })
 public interface IAbstractTest extends ICustomTypePageFactory, ITestCases {
+    // https://github.com/zebrunner/carina/issues/951
+    // reused com.nordstrom.tools.testng-foundation to register ordered listeners
+
+    // on start order is FilterTestsListener, TestRunListener and CarinaListener
+    // on finish reverse order, i.e. CarinaListener, TestRunListener and FilterTestsListener
+
+    // [AS] configuration methods should not be private here, because they should be invoked by testng
+    // For example, we need at least one call of onCarinaAfterMethod to correctly remove drivers
 
     long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
     @BeforeSuite(alwaysRun = true)
-    private void onCarinaBeforeSuite() {
+    default void onCarinaBeforeSuite() {
         // do nothing
     }
 
     @BeforeClass(alwaysRun = true)
-    private void onCarinaBeforeClass() {
+    default void onCarinaBeforeClass() {
         // do nothing
     }
 
     @BeforeMethod(alwaysRun = true)
-    private void onCarinaBeforeMethod() {
+    default void onCarinaBeforeMethod() {
+        // do nothing
+    }
+
+    @AfterMethod(alwaysRun = true)
+    default void onCarinaAfterMethod() {
         // do nothing
     }
 
