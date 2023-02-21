@@ -217,7 +217,7 @@ To get proxy instance for the current test/thread, you can call:
     They all can be set as comma-separated parameters.
     
 3. You may want to save the captured content into a .har file:
-
+   
     ```
     proxy.newHar(HAR_NAME);
     
@@ -233,7 +233,7 @@ To get proxy instance for the current test/thread, you can call:
         e.printStackTrace();
     }
     ```
-
+   
     Your .har file will be created in the project root folder
     
 4. There are four methods to support request and response interception:
