@@ -175,67 +175,67 @@ Note: The above settings are mostly required to get public internet access throu
 [ProxyPool](https://github.com/zebrunner/carina-proxy/blob/master/src/main/java/com/zebrunner/carina/proxy/ProxyPool.java).
 
 1. Make sure the driver instance is already started:
-```
-getDriver();
-```
-
-Note: During the driver startup, Carina automatically starts proxy (depends on rule) and adjusts browser capabilities to track the desired protocols. 
+    ```
+    getDriver();
+    ```
+    
+    Note: During the driver startup, Carina automatically starts proxy (depends on rule) and adjusts browser capabilities to track the desired protocols. 
 To get proxy instance for the current test/thread, you can call:
-```
-Optional<IProxy> proxy = ProxyPool.getProxy();
-```
-You can get a specific implementation of a dynamic proxy as follows
+    ```
+    Optional<IProxy> proxy = ProxyPool.getProxy();
+    ```
+    You can get a specific implementation of a dynamic proxy as follows
 (but you need to be sure which implementation will be in the pool):
-```
-Optional<CarinaBrowserUpProxy> proxy = ProxyPool.getOriginal(CarinaBrowserUpProxy.class);
-```
-
+    ```
+    Optional<CarinaBrowserUpProxy> proxy = ProxyPool.getOriginal(CarinaBrowserUpProxy.class);
+    ```
+    
 2. Enable the required Har capture type using:
-```
-CarinaBrowserUpProxy proxy = ProxyPool.getOriginal(CarinaBrowserUpProxy.class)
-.orElseThrow();
-BrowserUpProxy browserUpProxy = proxy.getProxy();
-browserUpProxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT);
-```
-There are a lot of possible content types:
-```
-CaptureType.RESPONSE_COOKIES
-CaptureType.RESPONSE_HEADERS
-CaptureType.REQUEST_HEADERS
-CaptureType.RESPONSE_CONTENT
-CaptureType.REQUEST_CONTENT
-...
-```
-They all can be set as comma-separated parameters.
+    ```
+    CarinaBrowserUpProxy proxy = ProxyPool.getOriginal(CarinaBrowserUpProxy.class)
+    .orElseThrow();
+    BrowserUpProxy browserUpProxy = proxy.getProxy();
+    browserUpProxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT);
+    ```
+    There are a lot of possible content types:
+    ```
+    CaptureType.RESPONSE_COOKIES
+    CaptureType.RESPONSE_HEADERS
+    CaptureType.REQUEST_HEADERS
+    CaptureType.RESPONSE_CONTENT
+    CaptureType.REQUEST_CONTENT
+    ...
+    ```
+    They all can be set as comma-separated parameters.
+    
+3. You may want to save the captured content into a .har file:
+    ```
+    proxy.newHar(HAR_NAME);
+    
+    //Some testing activity...
+    
+    //Saving har to a file...
+    File file = new File(HAR_NAME + ".har");
+    Assert.assertNotNull(proxy.getHar(), "Har is NULL!");
+    
+    try {
+        proxy.getHar().writeTo(file);
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+    ```
+    Your .har file will be created in the project root folder
+    
+4. There are four methods to support request and response interception:
+    
+    * addRequestFilter
+    * addResponseFilter
+    * addFirstHttpFilterFactory
+    * addLastHttpFilterFactory
+    
+    To add and configure content filters, look [here](https://github.com/browserup/browserup-proxy#littleproxy-interceptors).
 
-4. You may want to save the captured content into a .har file:
-```
-proxy.newHar(HAR_NAME);
-
-//Some testing activity...
-
-//Saving har to a file...
-File file = new File(HAR_NAME + ".har");
-Assert.assertNotNull(proxy.getHar(), "Har is NULL!");
-
-try {
-    proxy.getHar().writeTo(file);
-} catch (IOException e) {
-    e.printStackTrace();
-}
-```
-Your .har file will be created in the project root folder
-
-5. There are four methods to support request and response interception:
-
-* addRequestFilter
-* addResponseFilter
-* addFirstHttpFilterFactory
-* addLastHttpFilterFactory
-
-To add and configure content filters, look [here](https://github.com/browserup/browserup-proxy#littleproxy-interceptors).
-
-An example of using response filtering can be viewed [here](https://github.com/zebrunner/carina-demo/blob/c73f1a3c03dd9065c9256f930427a15639475763/src/test/java/com/qaprosoft/carina/demo/ProxySampleTest.java#L304).
+    An example of using response filtering can be viewed [here](https://github.com/zebrunner/carina-demo/blob/c73f1a3c03dd9065c9256f930427a15639475763/src/test/java/com/qaprosoft/carina/demo/ProxySampleTest.java#L304).
 
 ### Dealing with MITM and installing SSL certificate into your system:
 
@@ -243,25 +243,25 @@ An example of using response filtering can be viewed [here](https://github.com/z
 
 1. Go [here](https://github.com/browserup/browserup-proxy/blob/master/browserup-proxy-core/src/main/resources/sslSupport/ca-certificate-rsa.cer) and save it as **ca-certificate-rsa.cer**.
 2. A double click creates a file. The next window should appear:
-
-![Adding ssl certificate](../img/SSLInstallStep1.png)
-
+    
+    ![Adding ssl certificate](../img/SSLInstallStep1.png)
+    
 3. After authorization, the certificate will be added into your system certificates,  but it's still untrusted:
-
-![Adding ssl certificate](../img/SSLInstallStep2.png)
-
+    
+    ![Adding ssl certificate](../img/SSLInstallStep2.png)
+    
 4. To make it trusted, double click on it. The following window should appear:
-
-![Adding ssl certificate](../img/SSLInstallStep3.png)
-
+    
+    ![Adding ssl certificate](../img/SSLInstallStep3.png)
+    
 5. First, click the drop-down menu and select **Always Trust** option. Then close the window (a second authorization will be required):
-
-![Adding ssl certificate](../img/SSLInstallStep4.png)
-
+    
+    ![Adding ssl certificate](../img/SSLInstallStep4.png)
+    
 6. Make sure the red cross on your certificate turned into a blue one:
-
-![Adding ssl certificate](../img/SSLInstallStep5.png)
-
+    
+    ![Adding ssl certificate](../img/SSLInstallStep5.png)
+    
 ### Adding SSL certificate into Java keystore:
 
 If you are still receiving the following exception:
