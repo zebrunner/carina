@@ -311,7 +311,7 @@ public class HomePage extends HomePageBase {
 
 ### How to use Find by Image strategy
 
-Find by image strategy is based on [appium implementation](https://github.com/appium/appium/blob/master/docs/en/writing-running-appium/image-comparison.md). Be sure you have OpenCV libraries installed to [your system](https://github.com/justadudewhohacks/opencv4nodejs).
+Find by image strategy is based on [appium implementation](https://github.com/appium/appium/blob/master/packages/images-plugin/docs/image-comparison.md). Be sure you have OpenCV libraries installed to [your system](https://github.com/justadudewhohacks/opencv4nodejs).
 Find by image logic is covered by ```@ExtendedFindBy``` annotation. 
 
 **Example:**
@@ -377,10 +377,10 @@ If Carina Framework does not find a suitable artifact manager to generate final 
 
 **Where can I find mobile-specific methods?**
 
-* [IMobileUtils](https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/utils/mobile/IMobileUtils.java) -
+* [IMobileUtils](https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/zebrunner/carina/utils/mobile/IMobileUtils.java) -
 contains methods for interacting with both IOS and Android devices
-* [IAndroidUtils](https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/utils/android/IAndroidUtils.java),
-[AndroidService](https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/utils/android/AndroidService.java) -
+* [IAndroidUtils](https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/zebrunner/carina/utils/android/IAndroidUtils.java),
+[AndroidService](https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/zebrunner/carina/utils/android/AndroidService.java) -
 contains methods for interacting with Android devices only
-* [IOSUtils](https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/utils/ios/IOSUtils.java) -
+* [IOSUtils](https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/zebrunner/carina/utils/ios/IOSUtils.java) -
 contains methods for interacting with IOS devices only
