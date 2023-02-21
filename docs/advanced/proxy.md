@@ -227,11 +227,8 @@ To get proxy instance for the current test/thread, you can call:
     File file = new File(HAR_NAME + ".har");
     Assert.assertNotNull(proxy.getHar(), "Har is NULL!");
     
-    try {
-        proxy.getHar().writeTo(file);
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
+    try { proxy.getHar().writeTo(file); } 
+    catch (IOException e) { e.printStackTrace(); }
     ```
    
     Your .har file will be created in the project root folder
