@@ -175,29 +175,36 @@ Note: The above settings are mostly required to get public internet access throu
 [ProxyPool](https://github.com/zebrunner/carina-proxy/blob/master/src/main/java/com/zebrunner/carina/proxy/ProxyPool.java).
 
 1. Make sure the driver instance is already started:
+    
     ```
     getDriver();
     ```
     
     Note: During the driver startup, Carina automatically starts proxy (depends on rule) and adjusts browser capabilities to track the desired protocols. 
 To get proxy instance for the current test/thread, you can call:
+    
     ```
     Optional<IProxy> proxy = ProxyPool.getProxy();
     ```
+   
     You can get a specific implementation of a dynamic proxy as follows
 (but you need to be sure which implementation will be in the pool):
+    
     ```
     Optional<CarinaBrowserUpProxy> proxy = ProxyPool.getOriginal(CarinaBrowserUpProxy.class);
     ```
     
 2. Enable the required Har capture type using:
+    
     ```
     CarinaBrowserUpProxy proxy = ProxyPool.getOriginal(CarinaBrowserUpProxy.class)
     .orElseThrow();
     BrowserUpProxy browserUpProxy = proxy.getProxy();
     browserUpProxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT);
     ```
+   
     There are a lot of possible content types:
+    
     ```
     CaptureType.RESPONSE_COOKIES
     CaptureType.RESPONSE_HEADERS
@@ -206,9 +213,11 @@ To get proxy instance for the current test/thread, you can call:
     CaptureType.REQUEST_CONTENT
     ...
     ```
+   
     They all can be set as comma-separated parameters.
     
 3. You may want to save the captured content into a .har file:
+
     ```
     proxy.newHar(HAR_NAME);
     
@@ -224,8 +233,9 @@ To get proxy instance for the current test/thread, you can call:
         e.printStackTrace();
     }
     ```
+
     Your .har file will be created in the project root folder
-    
+
 4. There are four methods to support request and response interception:
     
     * addRequestFilter
