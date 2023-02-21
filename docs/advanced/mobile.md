@@ -73,7 +73,7 @@ driver.executeScript("mobile: pressButton", commandUpAttributes);
 
 Also, to emulate transitions between elements, you can use a simple click on the element you are looking for.
 
-For more info visit [tvOS appium support](https://appium.io/docs/en/writing-running-appium/ios/ios-tvos/).
+For more info visit [tvOS appium support](https://github.com/appium/appium-xcuitest-driver/blob/master/docs/ios-tvos.md).
 
 In the implementation of tests, the idea is the same as in [mobile-testing](https://zebrunner.github.io/carina/automation/mobile/).
 
