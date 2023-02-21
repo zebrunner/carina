@@ -943,95 +943,84 @@ Also, to enable proxy for TestNG Java process, <strong>proxy_set_to_system</stro
 <p><strong>IMPORTANT</strong>: All of the following examples of using ProxyPool in the current section use the class
 <a href="https://github.com/zebrunner/carina-proxy/blob/master/src/main/java/com/zebrunner/carina/proxy/ProxyPool.java">ProxyPool</a>.</p>
 <ol>
-<li>Make sure the driver instance is already started:</li>
-</ol>
-<pre><code>getDriver();
-</code></pre>
-
+<li>
+<p>Make sure the driver instance is already started:
+    <code>getDriver();</code></p>
 <p>Note: During the driver startup, Carina automatically starts proxy (depends on rule) and adjusts browser capabilities to track the desired protocols. 
-To get proxy instance for the current test/thread, you can call:</p>
-<pre><code>Optional&lt;IProxy&gt; proxy = ProxyPool.getProxy();
-</code></pre>
-
-<p>You can get a specific implementation of a dynamic proxy as follows
-(but you need to be sure which implementation will be in the pool):</p>
-<pre><code>Optional&lt;CarinaBrowserUpProxy&gt; proxy = ProxyPool.getOriginal(CarinaBrowserUpProxy.class);
-</code></pre>
-
-<ol>
-<li>Enable the required Har capture type using:</li>
-</ol>
-<pre><code>CarinaBrowserUpProxy proxy = ProxyPool.getOriginal(CarinaBrowserUpProxy.class)
-.orElseThrow();
-BrowserUpProxy browserUpProxy = proxy.getProxy();
-browserUpProxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT);
-</code></pre>
-
-<p>There are a lot of possible content types:</p>
-<pre><code>CaptureType.RESPONSE_COOKIES
-CaptureType.RESPONSE_HEADERS
-CaptureType.REQUEST_HEADERS
-CaptureType.RESPONSE_CONTENT
-CaptureType.REQUEST_CONTENT
-...
-</code></pre>
-
-<p>They all can be set as comma-separated parameters.</p>
-<ol>
-<li>You may want to save the captured content into a .har file:</li>
-</ol>
-<pre><code>proxy.newHar(HAR_NAME);
-
-//Some testing activity...
-
-//Saving har to a file...
-File file = new File(HAR_NAME + &quot;.har&quot;);
-Assert.assertNotNull(proxy.getHar(), &quot;Har is NULL!&quot;);
-
-try {
+To get proxy instance for the current test/thread, you can call:
+<code>Optional&lt;IProxy&gt; proxy = ProxyPool.getProxy();</code>
+You can get a specific implementation of a dynamic proxy as follows
+(but you need to be sure which implementation will be in the pool):
+<code>Optional&lt;CarinaBrowserUpProxy&gt; proxy = ProxyPool.getOriginal(CarinaBrowserUpProxy.class);</code></p>
+</li>
+<li>
+<p>Enable the required Har capture type using:
+    <code>CarinaBrowserUpProxy proxy = ProxyPool.getOriginal(CarinaBrowserUpProxy.class)
+    .orElseThrow();
+    BrowserUpProxy browserUpProxy = proxy.getProxy();
+    browserUpProxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT);</code>
+    There are a lot of possible content types:
+    <code>CaptureType.RESPONSE_COOKIES
+    CaptureType.RESPONSE_HEADERS
+    CaptureType.REQUEST_HEADERS
+    CaptureType.RESPONSE_CONTENT
+    CaptureType.REQUEST_CONTENT
+    ...</code>
+    They all can be set as comma-separated parameters.</p>
+</li>
+<li>
+<p>You may want to save the captured content into a .har file:
+    ```
+    proxy.newHar(HAR_NAME);</p>
+<p>//Some testing activity...</p>
+<p>//Saving har to a file...
+File file = new File(HAR_NAME + ".har");
+Assert.assertNotNull(proxy.getHar(), "Har is NULL!");</p>
+<p>try {
     proxy.getHar().writeTo(file);
 } catch (IOException e) {
     e.printStackTrace();
 }
-</code></pre>
-
-<p>Your .har file will be created in the project root folder</p>
-<ol>
+```
+Your .har file will be created in the project root folder</p>
+</li>
 <li>
 <p>There are four methods to support request and response interception:</p>
-</li>
-<li>
-<p>addRequestFilter</p>
-</li>
+<ul>
+<li>addRequestFilter</li>
 <li>addResponseFilter</li>
 <li>addFirstHttpFilterFactory</li>
 <li>addLastHttpFilterFactory</li>
-</ol>
+</ul>
 <p>To add and configure content filters, look <a href="https://github.com/browserup/browserup-proxy#littleproxy-interceptors">here</a>.</p>
 <p>An example of using response filtering can be viewed <a href="https://github.com/zebrunner/carina-demo/blob/c73f1a3c03dd9065c9256f930427a15639475763/src/test/java/com/qaprosoft/carina/demo/ProxySampleTest.java#L304">here</a>.</p>
+</li>
+</ol>
 <h3 id="dealing-with-mitm-and-installing-ssl-certificate-into-your-system">Dealing with MITM and installing SSL certificate into your system:</h3>
 <h4 id="for-mac-users">For Mac users:</h4>
 <ol>
 <li>Go <a href="https://github.com/browserup/browserup-proxy/blob/master/browserup-proxy-core/src/main/resources/sslSupport/ca-certificate-rsa.cer">here</a> and save it as <strong>ca-certificate-rsa.cer</strong>.</li>
-<li>A double click creates a file. The next window should appear:</li>
-</ol>
+<li>
+<p>A double click creates a file. The next window should appear:</p>
 <p><img alt="Adding ssl certificate" src="../../img/SSLInstallStep1.png" /></p>
-<ol>
-<li>After authorization, the certificate will be added into your system certificates,  but it's still untrusted:</li>
-</ol>
+</li>
+<li>
+<p>After authorization, the certificate will be added into your system certificates,  but it's still untrusted:</p>
 <p><img alt="Adding ssl certificate" src="../../img/SSLInstallStep2.png" /></p>
-<ol>
-<li>To make it trusted, double click on it. The following window should appear:</li>
-</ol>
+</li>
+<li>
+<p>To make it trusted, double click on it. The following window should appear:</p>
 <p><img alt="Adding ssl certificate" src="../../img/SSLInstallStep3.png" /></p>
-<ol>
-<li>First, click the drop-down menu and select <strong>Always Trust</strong> option. Then close the window (a second authorization will be required):</li>
-</ol>
+</li>
+<li>
+<p>First, click the drop-down menu and select <strong>Always Trust</strong> option. Then close the window (a second authorization will be required):</p>
 <p><img alt="Adding ssl certificate" src="../../img/SSLInstallStep4.png" /></p>
-<ol>
-<li>Make sure the red cross on your certificate turned into a blue one:</li>
-</ol>
+</li>
+<li>
+<p>Make sure the red cross on your certificate turned into a blue one:</p>
 <p><img alt="Adding ssl certificate" src="../../img/SSLInstallStep5.png" /></p>
+</li>
+</ol>
 <h3 id="adding-ssl-certificate-into-java-keystore">Adding SSL certificate into Java keystore:</h3>
 <p>If you are still receiving the following exception:</p>
 <pre><code>javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target

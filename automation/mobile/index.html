@@ -1095,7 +1095,7 @@ public class HomePage extends HomePageBase {
 </code></pre>
 
 <h3 id="how-to-use-find-by-image-strategy">How to use Find by Image strategy</h3>
-<p>Find by image strategy is based on <a href="https://github.com/appium/appium/blob/master/docs/en/writing-running-appium/image-comparison.md">appium implementation</a>. Be sure you have OpenCV libraries installed to <a href="https://github.com/justadudewhohacks/opencv4nodejs">your system</a>.
+<p>Find by image strategy is based on <a href="https://github.com/appium/appium/blob/master/packages/images-plugin/docs/image-comparison.md">appium implementation</a>. Be sure you have OpenCV libraries installed to <a href="https://github.com/justadudewhohacks/opencv4nodejs">your system</a>.
 Find by image logic is covered by <code>@ExtendedFindBy</code> annotation. </p>
 <p><strong>Example:</strong></p>
 <pre><code class="java">@ExtendedFindBy(image = &quot;images/singUp6.png&quot;)
@@ -1151,12 +1151,12 @@ by <code>com.zebrunner.carina.commons.artifact.ArtifactManagerFactory</code>. So
 <h2 id="faq">FAQ</h2>
 <p><strong>Where can I find mobile-specific methods?</strong></p>
 <ul>
-<li><a href="https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/utils/mobile/IMobileUtils.java">IMobileUtils</a> -
+<li><a href="https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/zebrunner/carina/utils/mobile/IMobileUtils.java">IMobileUtils</a> -
 contains methods for interacting with both IOS and Android devices</li>
-<li><a href="https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/utils/android/IAndroidUtils.java">IAndroidUtils</a>,
-<a href="https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/utils/android/AndroidService.java">AndroidService</a> -
+<li><a href="https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/zebrunner/carina/utils/android/IAndroidUtils.java">IAndroidUtils</a>,
+<a href="https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/zebrunner/carina/utils/android/AndroidService.java">AndroidService</a> -
 contains methods for interacting with Android devices only</li>
-<li><a href="https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/utils/ios/IOSUtils.java">IOSUtils</a> -
+<li><a href="https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/zebrunner/carina/utils/ios/IOSUtils.java">IOSUtils</a> -
 contains methods for interacting with IOS devices only</li>
 </ul>
                 
