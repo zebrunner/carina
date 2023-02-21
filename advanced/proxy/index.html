@@ -944,34 +944,34 @@ Also, to enable proxy for TestNG Java process, <strong>proxy_set_to_system</stro
 <a href="https://github.com/zebrunner/carina-proxy/blob/master/src/main/java/com/zebrunner/carina/proxy/ProxyPool.java">ProxyPool</a>.</p>
 <ol>
 <li>
-<p>Make sure the driver instance is already started:
-    <code>getDriver();</code></p>
+<p>Make sure the driver instance is already started:</p>
+<p><code>getDriver();</code></p>
 <p>Note: During the driver startup, Carina automatically starts proxy (depends on rule) and adjusts browser capabilities to track the desired protocols. 
-To get proxy instance for the current test/thread, you can call:
-<code>Optional&lt;IProxy&gt; proxy = ProxyPool.getProxy();</code>
-You can get a specific implementation of a dynamic proxy as follows
-(but you need to be sure which implementation will be in the pool):
-<code>Optional&lt;CarinaBrowserUpProxy&gt; proxy = ProxyPool.getOriginal(CarinaBrowserUpProxy.class);</code></p>
+To get proxy instance for the current test/thread, you can call:</p>
+<p><code>Optional&lt;IProxy&gt; proxy = ProxyPool.getProxy();</code></p>
+<p>You can get a specific implementation of a dynamic proxy as follows
+(but you need to be sure which implementation will be in the pool):</p>
+<p><code>Optional&lt;CarinaBrowserUpProxy&gt; proxy = ProxyPool.getOriginal(CarinaBrowserUpProxy.class);</code></p>
 </li>
 <li>
-<p>Enable the required Har capture type using:
-    <code>CarinaBrowserUpProxy proxy = ProxyPool.getOriginal(CarinaBrowserUpProxy.class)
-    .orElseThrow();
-    BrowserUpProxy browserUpProxy = proxy.getProxy();
-    browserUpProxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT);</code>
-    There are a lot of possible content types:
-    <code>CaptureType.RESPONSE_COOKIES
-    CaptureType.RESPONSE_HEADERS
-    CaptureType.REQUEST_HEADERS
-    CaptureType.RESPONSE_CONTENT
-    CaptureType.REQUEST_CONTENT
-    ...</code>
-    They all can be set as comma-separated parameters.</p>
+<p>Enable the required Har capture type using:</p>
+<p><code>CarinaBrowserUpProxy proxy = ProxyPool.getOriginal(CarinaBrowserUpProxy.class)
+.orElseThrow();
+BrowserUpProxy browserUpProxy = proxy.getProxy();
+browserUpProxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT);</code></p>
+<p>There are a lot of possible content types:</p>
+<p><code>CaptureType.RESPONSE_COOKIES
+CaptureType.RESPONSE_HEADERS
+CaptureType.REQUEST_HEADERS
+CaptureType.RESPONSE_CONTENT
+CaptureType.REQUEST_CONTENT
+...</code></p>
+<p>They all can be set as comma-separated parameters.</p>
 </li>
 <li>
-<p>You may want to save the captured content into a .har file:
-    ```
-    proxy.newHar(HAR_NAME);</p>
+<p>You may want to save the captured content into a .har file:</p>
+<p>```
+proxy.newHar(HAR_NAME);</p>
 <p>//Some testing activity...</p>
 <p>//Saving har to a file...
 File file = new File(HAR_NAME + ".har");
@@ -981,8 +981,8 @@ Assert.assertNotNull(proxy.getHar(), "Har is NULL!");</p>
 } catch (IOException e) {
     e.printStackTrace();
 }
-```
-Your .har file will be created in the project root folder</p>
+```</p>
+<p>Your .har file will be created in the project root folder</p>
 </li>
 <li>
 <p>There are four methods to support request and response interception:</p>
