@@ -39,6 +39,7 @@
       <directory>src/main/resources</directory>
       <includes>
         <include>**/*.properties</include>
+        <include>**/*.xml</include>
         <include>logback.xml</include>
       </includes>
     </fileSet>
