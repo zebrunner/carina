@@ -1843,11 +1843,23 @@ public interface IMobileUtils extends IDriverPool {
 
     /**
      * Drag and drop
-     * 
+     *
      * @param dragMeElement element to drag
      * @param dropZoneElement drop zone element
      */
     public default void dragAndDrop(ExtendedWebElement dragMeElement, ExtendedWebElement dropZoneElement) {
+        dragAndDrop(dragMeElement, dropZoneElement, Duration.ofMillis(1000), Duration.ofMillis(1000));
+    }
+
+    /**
+     * Drag and drop
+     *
+     * @param dragMeElement element to drag
+     * @param dropZoneElement drop zone element
+     * @param pressingTime time of clicking on the element to be dragged
+     * @param dragTime time to drag an element to the drop zone
+     */
+    public default void dragAndDrop(ExtendedWebElement dragMeElement, ExtendedWebElement dropZoneElement, Duration pressingTime,Duration dragTime){
 
         Dimension dragMeElementSize = dragMeElement.getSize();
         Point dragMeElementLocation = dragMeElement.getLocation();
@@ -1860,7 +1872,7 @@ public interface IMobileUtils extends IDriverPool {
                 dropZoneElementLocation.getY() + dropZoneElementSize.getHeight() / 2);
 
         dragAndDrop(dragMeElementCenter.x, dragMeElementCenter.y, dropZoneElementCenter.x, dropZoneElementCenter.y,
-                Duration.ofMillis(1000), Duration.ofMillis(1000));
+                pressingTime, dragTime);
     }
 
     /**
@@ -1871,6 +1883,7 @@ public interface IMobileUtils extends IDriverPool {
      * @param toX x point of the drop zone
      * @param toY y point of the drop zone
      * @param pressingTime time of clicking on the element to be dragged
+     * @param dragTime time to drag an element to the drop zone
      */
     public default void dragAndDrop(int fromX, int fromY, int toX, int toY, Duration pressingTime, Duration dragTime) {
         PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
