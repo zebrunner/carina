@@ -174,75 +174,70 @@ Note: The above settings are mostly required to get public internet access throu
 **IMPORTANT**: All of the following examples of using ProxyPool in the current section use the class
 [ProxyPool](https://github.com/zebrunner/carina-proxy/blob/master/src/main/java/com/zebrunner/carina/proxy/ProxyPool.java).
 
-1. Make sure the driver instance is already started:
-    
-    ```
-    getDriver();
-    ```
-    
-    Note: During the driver startup, Carina automatically starts proxy (depends on rule) and adjusts browser capabilities to track the desired protocols. 
-To get proxy instance for the current test/thread, you can call:
-    
-    ```
-    Optional<IProxy> proxy = ProxyPool.getProxy();
-    ```
-   
-    You can get a specific implementation of a dynamic proxy as follows
-(but you need to be sure which implementation will be in the pool):
-    
-    ```
-    Optional<CarinaBrowserUpProxy> proxy = ProxyPool.getOriginal(CarinaBrowserUpProxy.class);
-    ```
-    
-2. Enable the required Har capture type using:
-    
-    ```
-    CarinaBrowserUpProxy proxy = ProxyPool.getOriginal(CarinaBrowserUpProxy.class)
-    .orElseThrow();
-    BrowserUpProxy browserUpProxy = proxy.getProxy();
-    browserUpProxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT);
-    ```
-   
-    There are a lot of possible content types:
-    
-    ```
-    CaptureType.RESPONSE_COOKIES
-    CaptureType.RESPONSE_HEADERS
-    CaptureType.REQUEST_HEADERS
-    CaptureType.RESPONSE_CONTENT
-    CaptureType.REQUEST_CONTENT
-    ...
-    ```
-   
-    They all can be set as comma-separated parameters.
-    
-3. You may want to save the captured content into a .har file:
-    
-    ```
-    proxy.newHar(HAR_NAME);
-    //Some testing activity...
-    //Saving har to a file...
-    File file = new File(HAR_NAME + ".har");
-    Assert.assertNotNull(proxy.getHar(), "Har is NULL!");
-    try { 
-        proxy.getHar().writeTo(file); 
-    } catch (IOException e) {
-        e.printStackTrace(); 
-    }
-    ```
-    
-    Your .har file will be created in the project root folder
-    
-4. There are four methods to support request and response interception:
-    
-    * addRequestFilter
-    * addResponseFilter
-    * addFirstHttpFilterFactory
-    * addLastHttpFilterFactory
-    
-    To add and configure content filters, look [here](https://github.com/browserup/browserup-proxy#littleproxy-interceptors).
+1) Make sure the driver instance is already started:
+```
+getDriver();
+```
 
-    An example of using response filtering can be viewed [here](https://github.com/zebrunner/carina-demo/blob/c73f1a3c03dd9065c9256f930427a15639475763/src/test/java/com/qaprosoft/carina/demo/ProxySampleTest.java#L304).
+Note: During the driver startup, Carina automatically starts proxy (depends on rule) and adjusts browser capabilities to track the desired protocols. 
+To get proxy instance for the current test/thread, you can call:
+
+```
+Optional<IProxy> proxy = ProxyPool.getProxy();
+```
+
+You can get a specific implementation of a dynamic proxy as follows (but you need to be sure which implementation will be in the pool):
+
+```
+Optional<CarinaBrowserUpProxy> proxy = ProxyPool.getOriginal(CarinaBrowserUpProxy.class);
+```
+
+2) Enable the required Har capture type using:
+```
+CarinaBrowserUpProxy proxy = ProxyPool.getOriginal(CarinaBrowserUpProxy.class)
+.orElseThrow();
+BrowserUpProxy browserUpProxy = proxy.getProxy();
+browserUpProxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT);
+```
+
+There are a lot of possible content types:
+
+```
+CaptureType.RESPONSE_COOKIES
+CaptureType.RESPONSE_HEADERS
+CaptureType.REQUEST_HEADERS
+CaptureType.RESPONSE_CONTENT
+CaptureType.REQUEST_CONTENT
+...
+```
+
+They all can be set as comma-separated parameters.
+
+3) You may want to save the captured content into a .har file:
+```
+proxy.newHar(HAR_NAME);
+//Some testing activity...
+//Saving har to a file...
+File file = new File(HAR_NAME + ".har");
+Assert.assertNotNull(proxy.getHar(), "Har is NULL!");
+try { 
+  proxy.getHar().writeTo(file); 
+} catch (IOException e) {
+  e.printStackTrace(); 
+}
+```
+
+Your .har file will be created in the project root folder.
+
+4) There are four methods to support request and response interception:
+* addRequestFilter
+* addResponseFilter
+* addFirstHttpFilterFactory
+* addLastHttpFilterFactory
+
+To add and configure content filters, look [here](https://github.com/browserup/browserup-proxy#littleproxy-interceptors).
+
+An example of using response filtering can be viewed [here](https://github.com/zebrunner/carina-demo/blob/c73f1a3c03dd9065c9256f930427a15639475763/src/test/java/com/qaprosoft/carina/demo/ProxySampleTest.java#L304).
 
 ### Dealing with MITM and installing SSL certificate into your system:
 
