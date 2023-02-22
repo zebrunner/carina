@@ -230,10 +230,12 @@ try {
 Your .har file will be created in the project root folder.
 
 4) There are four methods to support request and response interception:
-* addRequestFilter
-* addResponseFilter
-* addFirstHttpFilterFactory
-* addLastHttpFilterFactory
+```
+addRequestFilter
+addResponseFilter
+addFirstHttpFilterFactory
+addLastHttpFilterFactory
+```
 
 To add and configure content filters, look [here](https://github.com/browserup/browserup-proxy#littleproxy-interceptors).
 
