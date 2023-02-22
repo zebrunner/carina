@@ -220,13 +220,10 @@ To get proxy instance for the current test/thread, you can call:
     
     ```
     proxy.newHar(HAR_NAME);
-    
     //Some testing activity...
-    
     //Saving har to a file...
     File file = new File(HAR_NAME + ".har");
     Assert.assertNotNull(proxy.getHar(), "Har is NULL!");
-    
     try { 
         proxy.getHar().writeTo(file); 
     } catch (IOException e) {
