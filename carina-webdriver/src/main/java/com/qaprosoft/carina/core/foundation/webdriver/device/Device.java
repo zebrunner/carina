@@ -87,17 +87,14 @@ public class Device implements IDriverPool {
     }
 
     public Device(Capabilities capabilities) {
-        // 1. read from CONFIG and specify if any: capabilities.deviceName
-        // 2. read from capabilities object and set if it is not null
-        String deviceName = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_NAME);
-        if (deviceName == null && capabilities.getCapability("deviceModel") != null) {
+
+        String deviceName = "";
+        if (capabilities.getCapability(MobileCapabilityType.DEVICE_NAME) != null){
             // deviceModel is returned from capabilities with name of device for local appium runs
             deviceName = capabilities.getCapability("deviceModel").toString();
         }
-
-        if (capabilities.getCapability("desired") != null &&
-                ((Map) (capabilities.getCapability("desired"))).get("deviceName") != null) {
-            deviceName = ((Map) (capabilities.getCapability("desired"))).get("deviceName").toString();
+        if (!R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_NAME).isBlank()){
+            deviceName = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_NAME);
         }
 
         setName(deviceName);
