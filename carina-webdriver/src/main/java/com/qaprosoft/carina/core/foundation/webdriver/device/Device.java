@@ -90,7 +90,6 @@ public class Device implements IDriverPool {
 
         String deviceName = "";
         if (capabilities.getCapability(MobileCapabilityType.DEVICE_NAME) != null){
-            // deviceModel is returned from capabilities with name of device for local appium runs
             deviceName = capabilities.getCapability("deviceModel").toString();
         }
         if (!R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_NAME).isBlank()){
