@@ -88,15 +88,18 @@ public class Device implements IDriverPool {
 
     public Device(Capabilities capabilities) {
         // 1. read from CONFIG and specify if any: capabilities.deviceName
-        // 2. read from capabilities object and set if if it is not null
+        // 2. read from capabilities object and set if it is not null
         String deviceName = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_NAME);
-        if (capabilities.getCapability(MobileCapabilityType.DEVICE_NAME) != null) {
-            deviceName = capabilities.getCapability(MobileCapabilityType.DEVICE_NAME).toString();
-        }
-        if (capabilities.getCapability("deviceModel") != null) {
+        if (deviceName == null && capabilities.getCapability("deviceModel") != null) {
             // deviceModel is returned from capabilities with name of device for local appium runs
             deviceName = capabilities.getCapability("deviceModel").toString();
         }
+
+        if (capabilities.getCapability("desired") != null &&
+                ((Map) (capabilities.getCapability("desired"))).get("deviceName") != null) {
+            deviceName = ((Map) (capabilities.getCapability("desired"))).get("deviceName").toString();
+        }
+
         setName(deviceName);
 
         // TODO: should we register default device type as phone?
