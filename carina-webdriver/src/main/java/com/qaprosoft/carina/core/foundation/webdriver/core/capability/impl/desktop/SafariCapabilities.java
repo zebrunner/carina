@@ -29,11 +29,6 @@ public class SafariCapabilities extends AbstractCapabilities<SafariOptions> {
     @Override
     public SafariOptions getCapability(String testName) {
         SafariOptions safariOptions = new SafariOptions();
-        // we want to test safari not only on IOS, but on MAC
-        safariOptions.setPlatformName(Platform.ANY.toString());
-        // it is strange that safari options is not contains browser
-        safariOptions.setCapability(SupportsBrowserNameOption.BROWSER_NAME_OPTION, Browser.SAFARI.browserName());
-        safariOptions.setCapability(CapabilityType.BROWSER_NAME, Browser.SAFARI.browserName());
         initBaseCapabilities(safariOptions, testName);
         return safariOptions;
     }
