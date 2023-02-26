@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 
+import java.io.UncheckedIOException;
 import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -35,19 +36,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
-import com.zebrunner.carina.utils.Configuration;
-import com.zebrunner.carina.utils.Configuration.Parameter;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.ChromeCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.EdgeCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.FirefoxCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.OperaCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.SafariCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.Configuration.Parameter;
+
+import io.appium.java_client.safari.SafariDriver;
 
 public class DesktopFactory extends AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
     private static MutableCapabilities staticCapabilities = null;
 
     @Override
@@ -65,27 +68,24 @@ public class DesktopFactory extends AbstractFactory {
             LOGGER.info("Static MutableCapabilities will be merged to basic driver capabilities");
             capabilities.merge(staticCapabilities);
         }
-
-        if (Browser.SAFARI.browserName().equalsIgnoreCase(capabilities.getBrowserName()) &&
-                "false".equalsIgnoreCase(Configuration.get(Parameter.W3C))) {
-            capabilities = removeAppiumPrefix(capabilities);
-        }
-
         LOGGER.debug("capabilities: {}", capabilities);
 
         try {
-            EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(new URL(seleniumHost));
-            driver = new RemoteWebDriver(ce, capabilities);
-
+            if (Browser.SAFARI.browserName().equalsIgnoreCase(capabilities.getBrowserName())) {
+                EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
+                driver = new SafariDriver(ce, capabilities);
+            } else {
+                EventFiringSeleniumCommandExecutor ce = new EventFiringSeleniumCommandExecutor(new URL(seleniumHost));
+                driver = new RemoteWebDriver(ce, capabilities);
+            }
         } catch (MalformedURLException e) {
-            throw new RuntimeException("Malformed selenium URL!", e);
+            throw new UncheckedIOException("Malformed selenium URL!", e);
         }
         resizeBrowserWindow(driver, capabilities);
 
         return driver;
     }
 
-    @SuppressWarnings("deprecation")
     public MutableCapabilities getCapabilities(String name) {
         String browser = Configuration.getBrowser();
         
