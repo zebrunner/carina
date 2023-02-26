@@ -15,20 +15,19 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 
+import java.io.UncheckedIOException;
 import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Objects;
 
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.zebrunner.carina.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mac.Mac2Capabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
+import com.zebrunner.carina.utils.Configuration;
 
 import io.appium.java_client.mac.Mac2Driver;
 
@@ -46,20 +45,11 @@ public class MacFactory extends AbstractFactory {
         if (seleniumHost == null) {
             seleniumHost = Configuration.getSeleniumUrl();
         }
-        LOGGER.debug("selenium: {}", seleniumHost);
-
-        String driverType = Configuration.getDriverType(capabilities);
-        if (!SpecialKeywords.MAC.equals(driverType)) {
-            throw new RuntimeException(String.format("Driver type %s is not applicable for Windows driver", driverType));
-        }
+        LOGGER.debug("Selenium URL: {}", seleniumHost);
 
         WebDriver driver = null;
         if (isCapabilitiesEmpty(capabilities)) {
             capabilities = getCapabilities(name);
-        }
-
-        if (Objects.equals(Configuration.get(Configuration.Parameter.W3C), "false")) {
-            capabilities = removeAppiumPrefix(capabilities);
         }
 
         LOGGER.debug("capabilities: {}", capabilities);
@@ -68,7 +58,7 @@ public class MacFactory extends AbstractFactory {
         try {
             url = new URL(seleniumHost);
         } catch (MalformedURLException e) {
-            throw new RuntimeException("Malformed appium URL!", e);
+            throw new UncheckedIOException("Malformed appium URL!", e);
         }
         driver = new Mac2Driver(url, capabilities);
 
