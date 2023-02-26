@@ -24,11 +24,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.zebrunner.carina.utils.exception.InvalidConfigurationException;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,13 +43,13 @@ import com.zebrunner.carina.commons.artifact.IArtifactManager;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.R;
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.exception.InvalidConfigurationException;
 import com.zebrunner.carina.utils.mobile.ArtifactProvider;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.remote.AutomationName;
 import io.appium.java_client.remote.MobileCapabilityType;
-import io.appium.java_client.remote.options.SupportsAutomationNameOption;
 
 /**
  * MobileFactory creates instance {@link WebDriver} for mobile testing.
@@ -84,7 +83,7 @@ public class MobileFactory extends AbstractFactory {
     }
 
     @Override
-    public WebDriver create(String name, MutableCapabilities capabilities, String seleniumHost) {
+    public WebDriver create(String name, Capabilities capabilities, String seleniumHost) {
 
         if (seleniumHost == null) {
             seleniumHost = Configuration.getSeleniumUrl();
@@ -113,16 +112,19 @@ public class MobileFactory extends AbstractFactory {
         // if inside capabilities only singly "udid" capability then generate default one and append udid
         if (isCapabilitiesEmpty(capabilities)) {
             capabilities = getCapabilities(name);
-        } else if (capabilities.asMap().size() == 1 && capabilities.getCapability("udid") != null) {
-            String udid = capabilities.getCapability("udid").toString();
-            capabilities = getCapabilities(name);
-            capabilities.setCapability("appium:udid", udid);
+        } else if (capabilities.asMap().size() == 1 && capabilities.getCapability(MobileCapabilityType.UDID) != null) {
+            String udid = capabilities.getCapability(MobileCapabilityType.UDID).toString();
+            MutableCapabilities capsWithUdid = getCapabilities(name);
+            capsWithUdid.setCapability("appium:udid", udid);
+            capabilities = capabilities.merge(capsWithUdid);
             LOGGER.debug("Appended udid to capabilities: {}", capabilities);
         }
 
         Object mobileAppCapability = capabilities.getCapability(MobileCapabilityType.APP);
         if (mobileAppCapability != null) {
-            capabilities.setCapability(MobileCapabilityType.APP, getCachedAppLink(String.valueOf(mobileAppCapability)));
+            MutableCapabilities capsWithCachedApp = new MutableCapabilities();
+            capsWithCachedApp.setCapability("appium:" + MobileCapabilityType.APP, getCachedAppLink(String.valueOf(mobileAppCapability)));
+            capabilities = capabilities.merge(capsWithCachedApp);
         }
 
         LOGGER.debug("capabilities: {}", capabilities);

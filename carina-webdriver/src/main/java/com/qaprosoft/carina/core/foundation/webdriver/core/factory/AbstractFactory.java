@@ -31,14 +31,14 @@ import org.openqa.selenium.support.events.WebDriverListener;
 public abstract class AbstractFactory {
 
     /**
-     * Creates new instance of {@link WebDriver} according to specified {@link MutableCapabilities}.
+     * Creates new instance of {@link WebDriver} according to specified {@link Capabilities}.
      * 
      * @param testName - where driver is initiated
      * @param capabilities - driver capabilities
      * @param seleniumHost - selenium server URL
      * @return instance of {@link WebDriver}
      */
-    public abstract WebDriver create(String testName, MutableCapabilities capabilities, String seleniumHost);
+    public abstract WebDriver create(String testName, Capabilities capabilities, String seleniumHost);
 
     /**
      * If any listeners specified, converts RemoteWebDriver to EventFiringDecorator and registers all listeners.

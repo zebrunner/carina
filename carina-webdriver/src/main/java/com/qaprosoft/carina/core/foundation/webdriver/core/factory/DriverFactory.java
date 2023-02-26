@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.ConstructorUtils;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.events.EventFiringDecorator;
@@ -54,7 +55,7 @@ public class DriverFactory {
     private DriverFactory() {
     }
 
-    public static WebDriver create(String testName, MutableCapabilities capabilities, String seleniumHost) {
+    public static WebDriver create(String testName, Capabilities capabilities, String seleniumHost) {
 		LOGGER.debug("DriverFactory start...");
         AbstractFactory factory = null;
 
@@ -64,7 +65,7 @@ public class DriverFactory {
             R.CONFIG.put(Parameter.SELENIUM_URL.getKey(), seleniumUrl.toString());
         }
 
-		String driverType = Configuration.getDriverType(capabilities);
+		String driverType = Configuration.getDriverType(new MutableCapabilities(capabilities));
 		switch (driverType) {
 		case SpecialKeywords.DESKTOP:
 			factory = new DesktopFactory();

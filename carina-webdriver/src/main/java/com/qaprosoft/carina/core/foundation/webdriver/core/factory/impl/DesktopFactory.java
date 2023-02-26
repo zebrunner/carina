@@ -21,6 +21,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
 
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.NoSuchSessionException;
@@ -54,7 +55,7 @@ public class DesktopFactory extends AbstractFactory {
     private static MutableCapabilities staticCapabilities = null;
 
     @Override
-    public WebDriver create(String name, MutableCapabilities capabilities, String seleniumHost) {
+    public WebDriver create(String name, Capabilities capabilities, String seleniumHost) {
         WebDriver driver = null;
         if (seleniumHost == null) {
             seleniumHost = Configuration.getSeleniumUrl();
@@ -118,7 +119,7 @@ public class DesktopFactory extends AbstractFactory {
      * @param driver - instance of desktop @WebDriver
      * @param capabilities - driver capabilities
      */
-    private void resizeBrowserWindow(WebDriver driver, MutableCapabilities capabilities) {
+    private void resizeBrowserWindow(WebDriver driver, Capabilities capabilities) {
         try {
             Wait<WebDriver> wait = new FluentWait<WebDriver>(driver)
                     .pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)))

@@ -20,6 +20,7 @@ import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
@@ -40,7 +41,7 @@ public class MacFactory extends AbstractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public WebDriver create(String name, MutableCapabilities capabilities, String seleniumHost) {
+    public WebDriver create(String name, Capabilities capabilities, String seleniumHost) {
 
         if (seleniumHost == null) {
             seleniumHost = Configuration.getSeleniumUrl();

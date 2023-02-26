@@ -27,6 +27,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -61,7 +62,7 @@ public interface IDriverPool {
     static final ThreadLocal<Device> currentDevice = new ThreadLocal<Device>();
     static final Device nullDevice = new Device();
     
-    static final ThreadLocal<MutableCapabilities> customCapabilities = new ThreadLocal<>();
+    static final ThreadLocal<Capabilities> customCapabilities = new ThreadLocal<>();
     
     /**
      * Get default driver. If no default driver discovered it will be created.
@@ -91,7 +92,7 @@ public interface IDriverPool {
      * @param capabilities capabilities
      * @return WebDriver
      */
-    default public WebDriver getDriver(String name, MutableCapabilities capabilities) {
+    default public WebDriver getDriver(String name, Capabilities capabilities) {
         return getDriver(name, capabilities, null);
     }
 
@@ -105,7 +106,7 @@ public interface IDriverPool {
      *            String
      * @return WebDriver
      */
-    default public WebDriver getDriver(String name, MutableCapabilities capabilities, String seleniumHost) {
+    default public WebDriver getDriver(String name, Capabilities capabilities, String seleniumHost) {
         WebDriver drv = null;
 
         ConcurrentHashMap<String, CarinaDriver> currentDrivers = getDrivers();
@@ -289,7 +290,7 @@ public interface IDriverPool {
      * 
      * @param caps capabilities
      */
-    default public void setCapabilities(MutableCapabilities caps) {
+    default public void setCapabilities(Capabilities caps) {
         customCapabilities.set(caps);
     }
     
@@ -371,7 +372,7 @@ public interface IDriverPool {
      *            String
      * @return WebDriver
      */
-    private WebDriver createDriver(String name, MutableCapabilities capabilities, String seleniumHost) {
+    private WebDriver createDriver(String name, Capabilities capabilities, String seleniumHost) {
         int count = 0;
         WebDriver drv = null;
         Device device = nullDevice;
