@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.factory.impl;
 
+import java.io.UncheckedIOException;
 import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -49,18 +50,9 @@ public class WindowsFactory extends AbstractFactory {
         }
         LOGGER.debug("selenium: {}", seleniumHost);
 
-        String driverType = Configuration.getDriverType(capabilities);
-        if (!SpecialKeywords.WINDOWS.equals(driverType)) {
-            throw new RuntimeException(String.format("Driver type %s is not applicable for Windows driver", driverType));
-        }
-
         WebDriver driver = null;
         if (isCapabilitiesEmpty(capabilities)) {
             capabilities = getCapabilities(name);
-        }
-
-        if (Objects.equals(Configuration.get(Configuration.Parameter.W3C), "false")) {
-            capabilities = removeAppiumPrefix(capabilities);
         }
 
         LOGGER.debug("capabilities: {}", capabilities);
@@ -69,7 +61,7 @@ public class WindowsFactory extends AbstractFactory {
         try {
             url = new URL(seleniumHost);
         } catch (MalformedURLException e) {
-            throw new RuntimeException("Malformed appium URL!", e);
+            throw new UncheckedIOException("Malformed appium URL!", e);
         }
         driver = new WindowsDriver(url, capabilities);
 
