@@ -21,7 +21,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.tuple.MutablePair;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.CapabilityType;
@@ -40,97 +42,27 @@ import io.appium.java_client.remote.options.SupportsLocaleOption;
 
 public abstract class AbstractCapabilities<T extends MutableCapabilities> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final ArrayList<String> numericCaps = new ArrayList<>(Arrays.asList("waitForIdleTimeout"));
-    private static final List<String> STRING_CAPABILITIES = List.of("idleTimeout");
+    private static final ArrayList<String> NUMERIC_CAPABILITIES = new ArrayList<>(
+            Arrays.asList("waitForIdleTimeout", "zebrunner:options.waitForIdleTimeout"));
+    private static final List<String> STRING_CAPABILITIES = List.of("idleTimeout", "zebrunner:options.idleTimeout");
 
     /**
-     * Generate Capabilities according to configuration file
+     * Generate capabilities. Capabilities will be taken from the configuration.
+     * Additional capabilities may also be added (depends on the implementation)
+     * 
+     * @param testName todo add description
+     * @return see {@link T}
      */
     public abstract T getCapability(String testName);
 
-    protected T initBaseCapabilities(T capabilities, String testName) {
-
+    protected void initBaseCapabilities(T capabilities, String testName) {
         if (!IDriverPool.DEFAULT.equalsIgnoreCase(testName)) {
             // #1573: remove "default" driver name capability registration
-            // capabilities.setCapability("name", testName);
-            // todo investigate is in work, if not, think about another path
-            R.CONFIG.put(SpecialKeywords.CAPABILITIES + ".name", testName, true);
+            R.CONFIG.put(SpecialKeywords.CAPABILITIES + "zebrunner:options.name", testName, true);
         }
 
         ProxyUtils.getSeleniumProxy()
                 .ifPresent(proxy -> capabilities.setCapability(CapabilityType.PROXY, proxy));
-
-        // add capabilities based on dynamic _config.properties variables
-        return initCapabilities(capabilities);
-    }
-
-    /**
-     * Add capabilities from configuration file to capabilities param
-     * 
-     * @param capabilities capabilities to which will be added the capabilities from the configuration file
-     * @return upgraded capabilities
-     */
-    protected T initCapabilities(T capabilities) {
-        // read all properties which starts from "capabilities.*" prefix and add them into desired capabilities.
-        final String prefix = SpecialKeywords.CAPABILITIES + ".";
-        boolean isW3C = Configuration.getBoolean(Parameter.W3C);
-        String provider = R.CONFIG.get(SpecialKeywords.PROVIDER);
-        String providerOptions = R.CONFIG.get(SpecialKeywords.PROVIDER_OPTIONS);
-
-        @SuppressWarnings({ "unchecked", "rawtypes" })
-        Map<String, String> capabilitiesMap = new HashMap(R.CONFIG.getProperties());
-        Map<String, Object> customCapabilities = new HashMap<>();
-
-        for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
-
-            // ignore non-capabilities
-            if (!entry.getKey().toLowerCase().startsWith(prefix)) {
-                continue;
-            }
-
-            // provider and providerType is not w3c-compatible capability, so we ignore it
-            if (SpecialKeywords.PROVIDER.equalsIgnoreCase(entry.getKey()) ||
-                    SpecialKeywords.PROVIDER_OPTIONS.equalsIgnoreCase(entry.getKey())) {
-                continue;
-            }
-
-            // ignore empty capabilities
-            if (R.CONFIG.get(entry.getKey()).isEmpty()) {
-                continue;
-            }
-
-            String capabilityName = entry.getKey().replaceAll(prefix, "");
-            Object value = R.CONFIG.get(entry.getKey());
-
-            if (STRING_CAPABILITIES.contains(capabilityName)) {
-                value = String.valueOf(entry.getValue());
-            } else if (numericCaps.contains(capabilityName) && isNumber(entry.getValue())) {
-                LOGGER.debug("Adding {} to capabilities as integer", entry.getValue());
-                value = Integer.parseInt(entry.getValue());
-            } else if ("false".equalsIgnoreCase(entry.getValue())) {
-                value = false;
-            } else if ("true".equalsIgnoreCase(entry.getValue())) {
-                value = true;
-            }
-
-            if (isW3C) {
-                if (W3CCapabilityCommonKeys.INSTANCE.test(capabilityName)) {
-                    capabilities.setCapability(capabilityName, value);
-                } else {
-                    if (provider.isEmpty()) {
-                        throw new RuntimeException(
-                                "W3C enabled, but provider capability is empty. Please, provide 'provider' capability. Detected w3c-incompatible capability: "
-                                        + capabilityName);
-                    }
-                    customCapabilities.put(capabilityName, value);
-                }
-            } else {
-                capabilities.setCapability(capabilityName, value);
-            }
-        }
-
-        //TODO: [VD] reorganize in the same way Firefox profiles args/options if any and review other browsers
-        // support customization for Chrome args and options
 
         // for pc we may set browserName through Desired capabilities in our Test with a help of a method initBaseCapabilities,
         // so we don't want to override with value from config
@@ -140,23 +72,100 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
         if (Configuration.getBoolean(Parameter.HEADLESS)) {
             if (Browser.FIREFOX.browserName().equalsIgnoreCase(browser)
                     || Browser.CHROME.browserName().equalsIgnoreCase(browser)
-                    && Configuration.getDriverType().equalsIgnoreCase(SpecialKeywords.DESKTOP)) {
+                            && Configuration.getDriverType().equalsIgnoreCase(SpecialKeywords.DESKTOP)) {
                 LOGGER.info("Browser will be started in headless mode. VNC and Video will be disabled.");
-                customCapabilities.put("enableVNC", false);
-                customCapabilities.put("enableVideo", false);
+                R.CONFIG.put("zebrunner:options.enableVNC", "false", true);
+                R.CONFIG.put("zebrunner:options.enableVideo", "false", true);
             } else {
                 LOGGER.error("Headless mode isn't supported by {} browser / platform.", browser);
             }
         }
+        // add capabilities based on dynamic _config.properties variables
+        initCapabilities(capabilities);
+    }
 
-        if (isW3C && !customCapabilities.isEmpty()) {
-            capabilities.setCapability(provider + ":" + providerOptions, customCapabilities);
-        } else {
-            for (String capabilityName : customCapabilities.keySet()) {
-                capabilities.setCapability(capabilityName, customCapabilities.get(capabilityName));
+    /**
+     * Add capabilities from configuration {@link R#CONFIG}.
+     * 
+     * @param options see {@link T}
+     */
+    protected void initCapabilities(T options) {
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        Map<String, String> properties = new HashMap(R.CONFIG.getProperties());
+        Map<String, Object> capabilities = properties.entrySet()
+                .stream()
+                .filter(entry -> entry.getKey().startsWith("capabilities."))
+                .filter(entry -> entry.getValue() != null)
+                .map(entry -> {
+                    MutablePair<String, String> pair = new MutablePair<>();
+                    pair.setLeft(entry.getKey().replaceFirst("capabilities.", ""));
+                    pair.setRight(entry.getValue());
+                    return pair;
+                })
+                .map(p -> {
+                    MutablePair<String, Object> pair = new MutablePair<>();
+                    pair.setLeft(p.getLeft());
+                    String stringValue = p.getRight();
+
+                    if (STRING_CAPABILITIES.contains(p.getLeft())) {
+                        // custom Zebrunner logic
+                        pair.setRight(stringValue);
+                    } else if (NUMERIC_CAPABILITIES.contains(p.getLeft())) {
+                        // custom Zebrunner logic
+                        pair.setRight(Integer.parseInt(stringValue));
+                    } else if (isNumber(stringValue)) {
+                        pair.setRight(Integer.parseInt(stringValue));
+                    } else if ("true".equalsIgnoreCase(stringValue)) {
+                        pair.setRight(true);
+                    } else if ("false".equalsIgnoreCase(stringValue)) {
+                        pair.setRight(false);
+                    } else {
+                        pair.setRight(stringValue);
+                    }
+                    return pair;
+                }).collect(Collectors.toMap(MutablePair::getLeft, MutablePair::getRight));
+
+        for (Map.Entry<String, Object> entry : capabilities.entrySet()) {
+            List<String> names = Arrays.asList(entry.getKey().split("\\."));
+
+            // TODO add support of any nesting. maybe use some algorithm? or there will never be such nesting
+            if (names.isEmpty()) {
+                // it should never happens
+                throw new RuntimeException("Something went wrong when try to create capabilities from configuration.");
+            } else if (names.size() == 1) {
+                options.setCapability(names.get(0), entry.getValue());
+            } else if (names.size() == 2) {
+                HashMap<String, Object> nestCapability = new HashMap<>();
+                if (options.getCapability(names.get(0)) != null) {
+                    // If we already have inner capability, we think that it is HashMap<String, Object> (custom capabilities)
+                    nestCapability = (HashMap<String, Object>) options.getCapability(names.get(0));
+                }
+
+                nestCapability.put(names.get(1), entry.getValue());
+                options.setCapability(names.get(0), nestCapability);
+            } else if (names.size() == 3) {
+                HashMap<String, Object> nestCapability = new HashMap<>();
+                HashMap<String, Object> secondNestCapability = new HashMap<>();
+
+                if (options.getCapability(names.get(0)) != null) {
+                    // If we already have inner capability, we think that it is HashMap<String, Object> (custom capabilities)
+                    // todo investigate if we have situations when value that already present is not HashMap
+                    nestCapability = (HashMap<String, Object>) options.getCapability(names.get(0));
+                    if (nestCapability.containsKey(names.get(1))) {
+                        secondNestCapability = (HashMap<String, Object>) nestCapability.get(names.get(1));
+                    }
+                }
+                secondNestCapability.put(names.get(2), entry.getValue());
+                nestCapability.put(names.get(1), secondNestCapability);
+                options.setCapability(names.get(0), nestCapability);
+            } else {
+                // Let's hope it won't be needed.
+                throw new UnsupportedOperationException("At the moment nesting of more than 3 capabilities is not supported. "
+                        + "If you come across a situation in which this is necessary, please notify the Carina Support team.");
             }
         }
-        return capabilities;
+        //TODO: [VD] reorganize in the same way Firefox profiles args/options if any and review other browsers
+        // support customization for Chrome args and options
     }
 
     protected boolean isNumber(String value) {
