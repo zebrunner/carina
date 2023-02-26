@@ -58,7 +58,7 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
     protected void initBaseCapabilities(T capabilities, String testName) {
         if (!IDriverPool.DEFAULT.equalsIgnoreCase(testName)) {
             // #1573: remove "default" driver name capability registration
-            R.CONFIG.put(SpecialKeywords.CAPABILITIES + "zebrunner:options.name", testName, true);
+            R.CONFIG.put("capabilities.zebrunner:options.name", testName, true);
         }
 
         ProxyUtils.getSeleniumProxy()
@@ -74,8 +74,8 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
                     || Browser.CHROME.browserName().equalsIgnoreCase(browser)
                             && Configuration.getDriverType().equalsIgnoreCase(SpecialKeywords.DESKTOP)) {
                 LOGGER.info("Browser will be started in headless mode. VNC and Video will be disabled.");
-                R.CONFIG.put("zebrunner:options.enableVNC", "false", true);
-                R.CONFIG.put("zebrunner:options.enableVideo", "false", true);
+                R.CONFIG.put("capabilities.zebrunner:options.enableVNC", "false", true);
+                R.CONFIG.put("capabilities.zebrunner:options.enableVideo", "false", true);
             } else {
                 LOGGER.error("Headless mode isn't supported by {} browser / platform.", browser);
             }

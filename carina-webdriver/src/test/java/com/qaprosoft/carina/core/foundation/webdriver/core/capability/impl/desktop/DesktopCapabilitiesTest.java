@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -50,7 +51,8 @@ public class DesktopCapabilitiesTest {
 
         Assert.assertEquals(capabilities.getBrowserName(), Browser.CHROME.browserName(), "Returned browser name is not valid!");
 
-        Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
+        Assert.assertEquals(((HashMap<String, Object>) capabilities.getCapability("zebrunner:options")).get("name"), testName,
+                "Returned test name is not valid!");
         Map<String, Object> chromeOptions = (Map<String, Object>) capabilities.getCapability(ChromeOptions.CAPABILITY);
         List<String> chromeOptionsArgs = (List<String>) chromeOptions.get("args");
         Assert.assertTrue(chromeOptionsArgs.contains("--start-maximized"),
@@ -69,7 +71,8 @@ public class DesktopCapabilitiesTest {
 
         Assert.assertEquals(capabilities.getBrowserName(), Browser.FIREFOX.browserName(), "Returned browser name is not valid!");
 
-        Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
+        Assert.assertEquals(((HashMap<String, Object>) capabilities.getCapability("zebrunner:options")).get("name"), testName,
+                "Returned test name is not valid!");
 
 
         boolean actualMediaEmeEnabled = ((FirefoxProfile) capabilities.getCapability("firefox_profile"))
@@ -95,7 +98,8 @@ public class DesktopCapabilitiesTest {
 
         Assert.assertEquals(capabilities.getBrowserName(), Browser.FIREFOX.browserName(), "Returned browser name is not valid!");
 
-        Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
+        Assert.assertEquals(((HashMap<String, Object>) capabilities.getCapability("zebrunner:options")).get("name"), testName,
+                "Returned test name is not valid!");
 
 
         boolean actualMediaEmeEnabled = ((FirefoxProfile) capabilities.getCapability("firefox_profile"))
@@ -116,7 +120,8 @@ public class DesktopCapabilitiesTest {
 
         Assert.assertEquals(capabilities.getBrowserName(), Browser.OPERA.browserName(), "Returned browser name is not valid!");
 
-        Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
+        Assert.assertEquals(((HashMap<String, Object>) capabilities.getCapability("zebrunner:options")).get("name"), testName,
+                "Returned test name is not valid!");
     }
 
    @Test(groups = {"DesktopCapabilitiesTestClass"}, enabled = false)
@@ -128,7 +133,8 @@ public class DesktopCapabilitiesTest {
 
         Assert.assertEquals(capabilities.getBrowserName(), BrowserType.SAFARI, "Returned browser name is not valid!");
 
-        Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
+        Assert.assertEquals(((HashMap<String, Object>) capabilities.getCapability("zebrunner:options")).get("name"), testName,
+                "Returned test name is not valid!");
     }
 
     @Test(groups = {"DesktopCapabilitiesTestClass"})
@@ -140,7 +146,8 @@ public class DesktopCapabilitiesTest {
 
         Assert.assertEquals(capabilities.getBrowserName(), Browser.EDGE.browserName(), "Returned browser name is not valid!");
 
-        Assert.assertEquals(capabilities.getCapability("name"), testName, "Returned test name is not valid!");
+        Assert.assertEquals(((HashMap<String, Object>) capabilities.getCapability("zebrunner:options")).get("name"), testName,
+                "Returned test name is not valid!");
     }
 
     @Test(groups = {"DesktopCapabilitiesTestClass"})
@@ -150,8 +157,10 @@ public class DesktopCapabilitiesTest {
         ChromeCapabilities chromeCapabilities = new ChromeCapabilities();
         ChromeOptions capabilities = chromeCapabilities.getCapability("chrome - getChromeCapabilityHeadlessTest");
 
-        Assert.assertFalse((Boolean) capabilities.getCapability("enableVNC"), "Returned capability value is not valid!");
-        Assert.assertFalse((Boolean) capabilities.getCapability("enableVideo"), "Returned capability value is not valid!");
+        Assert.assertFalse((Boolean) ((HashMap<String, Object>) capabilities.getCapability("zebrunner:options")).get("enableVNC"),
+                "Returned capability value is not valid!");
+        Assert.assertFalse((Boolean) ((HashMap<String, Object>) capabilities.getCapability("zebrunner:options")).get("enableVideo"),
+                "Returned capability value is not valid!");
     }
 
     @Test(groups = {"DesktopCapabilitiesTestClass"})
