@@ -65,7 +65,8 @@ public class DriverFactory {
             R.CONFIG.put(Parameter.SELENIUM_URL.getKey(), seleniumUrl.toString());
         }
 
-		String driverType = Configuration.getDriverType(new MutableCapabilities(capabilities));
+        // todo fix getDriverType method - it should have Capabilities type of parameter instead of MutableCapabilities
+        String driverType = Configuration.getDriverType(capabilities != null ? new MutableCapabilities(capabilities) : null);
 		switch (driverType) {
 		case SpecialKeywords.DESKTOP:
 			factory = new DesktopFactory();
