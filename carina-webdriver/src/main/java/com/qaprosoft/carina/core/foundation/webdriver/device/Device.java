@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import io.appium.java_client.internal.CapabilityHelpers;
@@ -114,13 +113,14 @@ public class Device implements IDriverPool {
         setOs(Configuration.getPlatform(new MutableCapabilities(capabilities)));
 
         String platformVersion = "";
-        Optional<String> optionalPlatformVersion =  Optional.ofNullable(CapabilityHelpers.getCapability(capabilities, "os_version", String.class));
-        if (optionalPlatformVersion.isPresent()){
-            platformVersion = optionalPlatformVersion.get();
+        if (capabilities.getCapability("os_version") != null) {
+            platformVersion = capabilities.getCapability("os_version").toString();
         }
-        optionalPlatformVersion = Optional.ofNullable(CapabilityHelpers.getCapability(capabilities, "platformVersion", String.class));
-        if (optionalPlatformVersion.isPresent()) {
-            platformVersion = optionalPlatformVersion.get();
+        if (!R.CONFIG.get(SpecialKeywords.BROWSERSTACK_PLATFORM_VERSION).isBlank()) {
+            platformVersion = R.CONFIG.get(SpecialKeywords.BROWSERSTACK_PLATFORM_VERSION);
+        }
+        if (CapabilityHelpers.getCapability(capabilities, "platformVersion", String.class) != null) {
+            platformVersion = CapabilityHelpers.getCapability(capabilities, "platformVersion", String.class);
         }
         if (!R.CONFIG.get(SpecialKeywords.PLATFORM_VERSION).isBlank()) {
             platformVersion = R.CONFIG.get(SpecialKeywords.PLATFORM_VERSION);
