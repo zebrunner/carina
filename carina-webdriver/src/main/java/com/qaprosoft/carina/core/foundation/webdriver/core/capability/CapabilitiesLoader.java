@@ -15,20 +15,25 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability;
 
+import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.tuple.MutablePair;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
 import com.zebrunner.carina.utils.R;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
 
 /**
  * Created by yauhenipatotski on 10/26/15.
@@ -102,35 +107,79 @@ public class CapabilitiesLoader {
      * @return capabilities MutableCapabilities
      */
     public MutableCapabilities getCapabilities(String fileName) {
-        MutableCapabilities capabilities = new MutableCapabilities();
-        
-        LOGGER.info("Generating capabilities from " + fileName);
+        MutableCapabilities options = new MutableCapabilities();
+        LOGGER.info("Generating capabilities from '{}'", fileName);
         Properties props = loadProperties(fileName);
 
-        final String prefix = SpecialKeywords.CAPABILITIES + ".";
-        
-        @SuppressWarnings({ "rawtypes", "unchecked" })
-        Map<String, String> capabilitiesMap = new HashMap(props);
-        for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
-            if (entry.getKey().toLowerCase().startsWith(prefix)) {
-                String value = entry.getValue();
-                if (!value.isEmpty()) {
-                    String cap = entry.getKey().replaceAll(prefix, "");
-                    if ("false".equalsIgnoreCase(value)) {
-                        LOGGER.debug("Set capabilities value as boolean: false");
-                        capabilities.setCapability(cap, false);
-                    } else if ("true".equalsIgnoreCase(value)) {
+        Map<String, String> properties = new HashMap(props);
+        Map<String, Object> capabilities = properties.entrySet()
+                .stream()
+                .filter(entry -> entry.getKey().startsWith("capabilities."))
+                .filter(entry -> entry.getValue() != null)
+                .map(entry -> {
+                    MutablePair<String, String> pair = new MutablePair<>();
+                    pair.setLeft(entry.getKey().replaceFirst("capabilities.", ""));
+                    pair.setRight(entry.getValue());
+                    return pair;
+                })
+                .map(p -> {
+                    MutablePair<String, Object> pair = new MutablePair<>();
+                    pair.setLeft(p.getLeft());
+                    String stringValue = p.getRight();
+
+                    if ("true".equalsIgnoreCase(stringValue)) {
                         LOGGER.debug("Set capabilities value as boolean: true");
-                        capabilities.setCapability(cap, true);
+                        pair.setRight(true);
+                    } else if ("false".equalsIgnoreCase(stringValue)) {
+                        LOGGER.debug("Set capabilities value as boolean: false");
+                        pair.setRight(false);
                     } else {
-                        LOGGER.debug("Set capabilities value as string: " + value);
-                        capabilities.setCapability(cap, value);
+                        LOGGER.debug("Set capabilities value as string: " + stringValue);
+                        pair.setRight(stringValue);
+                    }
+                    return pair;
+                }).collect(Collectors.toMap(MutablePair::getLeft, MutablePair::getRight));
+
+        for (Map.Entry<String, Object> entry : capabilities.entrySet()) {
+            List<String> names = Arrays.asList(entry.getKey().split("\\."));
+
+            // TODO add support of any nesting. maybe use some algorithm? or there will never be such nesting
+            if (names.isEmpty()) {
+                // it should never happens
+                throw new RuntimeException("Something went wrong when try to create capabilities from configuration.");
+            } else if (names.size() == 1) {
+                options.setCapability(names.get(0), entry.getValue());
+            } else if (names.size() == 2) {
+                HashMap<String, Object> nestCapability = new HashMap<>();
+                if (options.getCapability(names.get(0)) != null) {
+                    // If we already have inner capability, we think that it is HashMap<String, Object> (custom capabilities)
+                    nestCapability = (HashMap<String, Object>) options.getCapability(names.get(0));
+                }
+
+                nestCapability.put(names.get(1), entry.getValue());
+                options.setCapability(names.get(0), nestCapability);
+            } else if (names.size() == 3) {
+                HashMap<String, Object> nestCapability = new HashMap<>();
+                HashMap<String, Object> secondNestCapability = new HashMap<>();
+
+                if (options.getCapability(names.get(0)) != null) {
+                    // If we already have inner capability, we think that it is HashMap<String, Object> (custom capabilities)
+                    // todo investigate if we have situations when value that already present is not HashMap
+                    nestCapability = (HashMap<String, Object>) options.getCapability(names.get(0));
+                    if (nestCapability.containsKey(names.get(1))) {
+                        secondNestCapability = (HashMap<String, Object>) nestCapability.get(names.get(1));
                     }
                 }
+                secondNestCapability.put(names.get(2), entry.getValue());
+                nestCapability.put(names.get(1), secondNestCapability);
+                options.setCapability(names.get(0), nestCapability);
+            } else {
+                // Let's hope it won't be needed.
+                throw new UnsupportedOperationException("At the moment nesting of more than 3 capabilities is not supported. "
+                        + "If you come across a situation in which this is necessary, please notify the Carina Support team.");
             }
         }
-
-        return capabilities;
+        return options;
     }
     
     private Properties loadProperties(String fileName) {
@@ -138,8 +187,10 @@ public class CapabilitiesLoader {
         URL baseResource = ClassLoader.getSystemResource(fileName);
         try {
             if (baseResource != null) {
-                props.load(baseResource.openStream());
-                LOGGER.info("Custom capabilities properties loaded: " + fileName);
+                try (InputStream istream = baseResource.openStream()) {
+                    props.load(istream);
+                }
+                LOGGER.info("Custom capabilities properties loaded: {}", fileName);
             } else {
                 Assert.fail("Unable to find custom capabilities file '" + fileName + "'!");
             }
