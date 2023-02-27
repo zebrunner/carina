@@ -16,11 +16,12 @@
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.MutablePair;
@@ -36,15 +37,14 @@ import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.Configuration.Parameter;
 import com.zebrunner.carina.utils.R;
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.exception.InvalidConfigurationException;
 
 import io.appium.java_client.remote.options.SupportsLanguageOption;
 import io.appium.java_client.remote.options.SupportsLocaleOption;
 
 public abstract class AbstractCapabilities<T extends MutableCapabilities> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final ArrayList<String> NUMERIC_CAPABILITIES = new ArrayList<>(
-            Arrays.asList("waitForIdleTimeout", "zebrunner:options.waitForIdleTimeout"));
-    private static final List<String> STRING_CAPABILITIES = List.of("idleTimeout", "zebrunner:options.idleTimeout");
+    private static final Pattern CAPABILITY_WITH_TYPE_PATTERN = Pattern.compile("^(?<name>.+)(?<type>\\[.+\\])$");
 
     /**
      * Generate capabilities. Capabilities will be taken from the configuration.
@@ -102,28 +102,8 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
                     pair.setRight(entry.getValue());
                     return pair;
                 })
-                .map(p -> {
-                    MutablePair<String, Object> pair = new MutablePair<>();
-                    pair.setLeft(p.getLeft());
-                    String stringValue = p.getRight();
-
-                    if (STRING_CAPABILITIES.contains(p.getLeft())) {
-                        // custom Zebrunner logic
-                        pair.setRight(stringValue);
-                    } else if (NUMERIC_CAPABILITIES.contains(p.getLeft())) {
-                        // custom Zebrunner logic
-                        pair.setRight(Integer.parseInt(stringValue));
-                    } else if (isNumber(stringValue)) {
-                        pair.setRight(Integer.parseInt(stringValue));
-                    } else if ("true".equalsIgnoreCase(stringValue)) {
-                        pair.setRight(true);
-                    } else if ("false".equalsIgnoreCase(stringValue)) {
-                        pair.setRight(false);
-                    } else {
-                        pair.setRight(stringValue);
-                    }
-                    return pair;
-                }).collect(Collectors.toMap(MutablePair::getLeft, MutablePair::getRight));
+                .map(p -> parseCapabilityType(p.getLeft(), p.getRight()))
+                .collect(Collectors.toMap(MutablePair::getLeft, MutablePair::getRight));
 
         for (Map.Entry<String, Object> entry : capabilities.entrySet()) {
             List<String> names = Arrays.asList(entry.getKey().split("\\."));
@@ -180,6 +160,56 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
         }
 
         return true;
+    }
+
+    /**
+     * Parse capability type.<br>
+     * Result type depends on:
+     * 1. If name of the capability ends with [string], [boolean] or [integer], then the capability value will be cast to it.
+     * 2. If we have no information about type in capability name, result value depends on value.
+     * 
+     * @param capabilityName name of the capability, for example {@code platformName} or {zebrunner:options.enableVideo[boolean]}
+     * @param capabilityValue capability value. Since we take it from the configuration file, it is immediately of type String
+     * @return {@link MutablePair}, where left is the capability name and right is the value
+     */
+    MutablePair<String, Object> parseCapabilityType(String capabilityName, String capabilityValue) {
+        MutablePair<String, Object> pair = new MutablePair<>();
+        Matcher matcher = CAPABILITY_WITH_TYPE_PATTERN.matcher(capabilityName);
+        if (matcher.find()) {
+            String name = matcher.group("name");
+            String type = matcher.group("type");
+            Object value = null;
+            if ("[string]".equalsIgnoreCase(type)) {
+                value = capabilityValue;
+            } else if ("[boolean]".equalsIgnoreCase(type)) {
+                if ("true".equalsIgnoreCase(capabilityValue)) {
+                    value = true;
+                } else if ("false".equalsIgnoreCase(capabilityValue)) {
+                    value = false;
+                } else {
+                    throw new InvalidConfigurationException(
+                            String.format("Provided boolean type for '%s' capability, but it is not contains true or false value.", name));
+                }
+            } else if ("[integer]".equalsIgnoreCase(type)) {
+                value = Integer.parseInt(type);
+            } else {
+                throw new InvalidConfigurationException(String.format("Unsupported '%s' type of '%s' capability.", type, name));
+            }
+            pair.setLeft(name);
+            pair.setRight(value);
+        } else {
+            pair.setLeft(capabilityName);
+            if (isNumber(capabilityValue)) {
+                pair.setRight(Integer.parseInt(capabilityValue));
+            } else if ("true".equalsIgnoreCase(capabilityValue)) {
+                pair.setRight(true);
+            } else if ("false".equalsIgnoreCase(capabilityValue)) {
+                pair.setRight(false);
+            } else {
+                pair.setRight(capabilityValue);
+            }
+        }
+        return pair;
     }
 
     /**
