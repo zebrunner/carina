@@ -46,7 +46,7 @@
 
         <carina-utils.version>1.0.1</carina-utils.version>
         <carina-commons.version>1.0.1</carina-commons.version>
-        <carina-proxy.version>1.0.1</carina-proxy.version>
+        <carina-proxy.version>1.0.2.22-SNAPSHOT</carina-proxy.version>
 
         <!-- Testings -->
         <testng.version>7.6.1</testng.version>
