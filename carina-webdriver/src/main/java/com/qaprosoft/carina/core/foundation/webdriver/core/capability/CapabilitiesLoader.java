@@ -122,23 +122,8 @@ public class CapabilitiesLoader {
                     pair.setRight(entry.getValue());
                     return pair;
                 })
-                .map(p -> {
-                    MutablePair<String, Object> pair = new MutablePair<>();
-                    pair.setLeft(p.getLeft());
-                    String stringValue = p.getRight();
-
-                    if ("true".equalsIgnoreCase(stringValue)) {
-                        LOGGER.debug("Set capabilities value as boolean: true");
-                        pair.setRight(true);
-                    } else if ("false".equalsIgnoreCase(stringValue)) {
-                        LOGGER.debug("Set capabilities value as boolean: false");
-                        pair.setRight(false);
-                    } else {
-                        LOGGER.debug("Set capabilities value as string: " + stringValue);
-                        pair.setRight(stringValue);
-                    }
-                    return pair;
-                }).collect(Collectors.toMap(MutablePair::getLeft, MutablePair::getRight));
+                .map(p -> AbstractCapabilities.parseCapabilityType(p.getLeft(), p.getRight()))
+                .collect(Collectors.toMap(MutablePair::getLeft, MutablePair::getRight));
 
         for (Map.Entry<String, Object> entry : capabilities.entrySet()) {
             List<String> names = Arrays.asList(entry.getKey().split("\\."));

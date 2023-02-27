@@ -148,7 +148,7 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
         // support customization for Chrome args and options
     }
 
-    protected boolean isNumber(String value) {
+    protected static boolean isNumber(String value) {
         if (value == null || value.isEmpty()){
             return false;
         }
@@ -172,7 +172,7 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
      * @param capabilityValue capability value. Since we take it from the configuration file, it is immediately of type String
      * @return {@link MutablePair}, where left is the capability name and right is the value
      */
-    MutablePair<String, Object> parseCapabilityType(String capabilityName, String capabilityValue) {
+    static MutablePair<String, Object> parseCapabilityType(String capabilityName, String capabilityValue) {
         MutablePair<String, Object> pair = new MutablePair<>();
         Matcher matcher = CAPABILITY_WITH_TYPE_PATTERN.matcher(capabilityName);
         if (matcher.find()) {
