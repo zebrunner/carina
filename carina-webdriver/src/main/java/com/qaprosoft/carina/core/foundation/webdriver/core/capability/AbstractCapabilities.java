@@ -191,7 +191,12 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
                             String.format("Provided boolean type for '%s' capability, but it is not contains true or false value.", name));
                 }
             } else if ("[integer]".equalsIgnoreCase(type)) {
-                value = Integer.parseInt(type);
+                try {
+                    value = Integer.parseInt(type);
+                } catch (NumberFormatException e) {
+                    throw new InvalidConfigurationException(
+                            String.format("Provided integer type for '%s' capability, but it is not contains integer value.", name));
+                }
             } else {
                 throw new InvalidConfigurationException(String.format("Unsupported '%s' type of '%s' capability.", type, name));
             }
