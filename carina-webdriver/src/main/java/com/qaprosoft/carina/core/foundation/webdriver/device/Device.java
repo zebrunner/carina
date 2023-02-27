@@ -90,7 +90,7 @@ public class Device implements IDriverPool {
     public Device(Capabilities capabilities) {
 
         String deviceName = "";
-        if (capabilities.getCapability(MobileCapabilityType.DEVICE_NAME) != null){
+        if (CapabilityHelpers.getCapability(capabilities, MobileCapabilityType.DEVICE_NAME, String.class) != null){
             deviceName = CapabilityHelpers.getCapability(capabilities, MobileCapabilityType.DEVICE_NAME, String.class);
         }
         if (!R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_NAME).isBlank()){
