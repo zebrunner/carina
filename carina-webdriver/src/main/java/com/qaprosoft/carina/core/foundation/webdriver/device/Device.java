@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import io.appium.java_client.internal.CapabilityHelpers;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Capabilities;
@@ -90,7 +91,7 @@ public class Device implements IDriverPool {
 
         String deviceName = "";
         if (capabilities.getCapability(MobileCapabilityType.DEVICE_NAME) != null){
-            deviceName = capabilities.getCapability("deviceModel").toString();
+            deviceName = CapabilityHelpers.getCapability(capabilities, MobileCapabilityType.DEVICE_NAME, String.class);
         }
         if (!R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_NAME).isBlank()){
             deviceName = R.CONFIG.get(SpecialKeywords.MOBILE_DEVICE_NAME);
