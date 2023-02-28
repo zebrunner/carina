@@ -28,7 +28,6 @@ import org.openqa.selenium.support.FindAll;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.pagefactory.AbstractAnnotations;
-import org.openqa.selenium.support.pagefactory.Annotations;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
 import org.slf4j.Logger;
@@ -41,7 +40,6 @@ import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Pred
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
 
 import io.appium.java_client.internal.CapabilityHelpers;
-import io.appium.java_client.pagefactory.DefaultElementByBuilder;
 import io.appium.java_client.remote.MobileCapabilityType;
 
 public final class ExtendedElementLocatorFactory implements ElementLocatorFactory, IDriverPool {
@@ -83,14 +81,15 @@ public final class ExtendedElementLocatorFactory implements ElementLocatorFactor
                     field.isAnnotationPresent(Predicate.class)) {
                 annotations = new ExtendedAnnotations(field);
             } else {
-                    DefaultElementByBuilder builder = new DefaultElementByBuilder(platform, automation);
-                    builder.setAnnotated(field);
-                    annotations = builder;
+                ExtendedAppiumAnnotations builder = new ExtendedAppiumAnnotations(platform, automation);
+                builder.setAnnotated(field);
+                annotations = builder;
             }
         } else if (field.getAnnotation(FindBy.class) != null ||
                     field.getAnnotation(FindBys.class) != null ||
-                    field.getAnnotation(FindAll.class) != null) {
-                annotations = new Annotations(field);
+                field.getAnnotation(FindAll.class) != null ||
+                field.getAnnotation(FindAny.class) != null) {
+            annotations = new ExtendedSeleniumAnnotations(field);
         }
 
         if (annotations == null) {
