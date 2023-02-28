@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.CapabilityType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,23 +56,6 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
     protected void initBaseCapabilities(T capabilities, String testName) {
         ProxyUtils.getSeleniumProxy()
                 .ifPresent(proxy -> capabilities.setCapability(CapabilityType.PROXY, proxy));
-
-        // for pc we may set browserName through Desired capabilities in our Test with a help of a method initBaseCapabilities,
-        // so we don't want to override with value from config
-        String browser = capabilities.getBrowserName() != null && capabilities.getBrowserName().length() > 0 ? capabilities.getBrowserName()
-                : Configuration.getBrowser();
-
-        if (Configuration.getBoolean(Parameter.HEADLESS)) {
-            if (Browser.FIREFOX.browserName().equalsIgnoreCase(browser)
-                    || Browser.CHROME.browserName().equalsIgnoreCase(browser)
-                            && Configuration.getDriverType().equalsIgnoreCase(SpecialKeywords.DESKTOP)) {
-                LOGGER.info("Browser will be started in headless mode. VNC and Video will be disabled.");
-                R.CONFIG.put("capabilities.zebrunner:options.enableVNC", "false", true);
-                R.CONFIG.put("capabilities.zebrunner:options.enableVideo", "false", true);
-            } else {
-                LOGGER.error("Headless mode isn't supported by {} browser / platform.", browser);
-            }
-        }
         // add capabilities based on dynamic _config.properties variables
         initCapabilities(capabilities);
     }
