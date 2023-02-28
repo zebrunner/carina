@@ -31,7 +31,6 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
 import com.zebrunner.carina.proxy.ProxyUtils;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.Configuration.Parameter;
@@ -56,11 +55,6 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
     public abstract T getCapability(String testName);
 
     protected void initBaseCapabilities(T capabilities, String testName) {
-        if (!IDriverPool.DEFAULT.equalsIgnoreCase(testName)) {
-            // #1573: remove "default" driver name capability registration
-            R.CONFIG.put("capabilities.zebrunner:options.name", testName, true);
-        }
-
         ProxyUtils.getSeleniumProxy()
                 .ifPresent(proxy -> capabilities.setCapability(CapabilityType.PROXY, proxy));
 
