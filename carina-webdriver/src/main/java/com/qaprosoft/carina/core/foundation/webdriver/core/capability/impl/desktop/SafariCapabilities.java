@@ -15,13 +15,8 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop;
 
-import org.openqa.selenium.Platform;
-import org.openqa.selenium.remote.Browser;
-import org.openqa.selenium.remote.CapabilityType;
-
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 
-import io.appium.java_client.remote.options.SupportsBrowserNameOption;
 import io.appium.java_client.safari.options.SafariOptions;
 
 public class SafariCapabilities extends AbstractCapabilities<SafariOptions> {
@@ -29,7 +24,8 @@ public class SafariCapabilities extends AbstractCapabilities<SafariOptions> {
     @Override
     public SafariOptions getCapability(String testName) {
         SafariOptions safariOptions = new SafariOptions();
-        initBaseCapabilities(safariOptions, testName);
+        addProxy(safariOptions);
+        addConfigurationCapabilities(safariOptions);
         return safariOptions;
     }
 }

@@ -25,11 +25,11 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.zebrunner.carina.utils.report.ReportContext;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.R;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.report.ReportContext;
 
 public class EdgeCapabilities extends AbstractCapabilities<ChromiumOptions<?>> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -37,7 +37,8 @@ public class EdgeCapabilities extends AbstractCapabilities<ChromiumOptions<?>> {
     @Override
     public ChromiumOptions<?> getCapability(String testName) {
         ChromiumOptions<?> capabilities = new ChromiumOptions<>(CapabilityType.BROWSER_NAME, Browser.EDGE.browserName(), "ms:edgeOptions");
-        initBaseCapabilities(capabilities, testName);
+        addProxy(capabilities);
+        addConfigurationCapabilities(capabilities);
         addEdgeOptions(capabilities);
         capabilities.addArguments("--start-maximized", "--ignore-ssl-errors");
         capabilities.setAcceptInsecureCerts(true);

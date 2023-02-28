@@ -24,11 +24,11 @@ import org.openqa.selenium.net.PortProber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.zebrunner.carina.utils.report.ReportContext;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.R;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.report.ReportContext;
 
 public class FirefoxCapabilities extends AbstractCapabilities<FirefoxOptions> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -42,7 +42,8 @@ public class FirefoxCapabilities extends AbstractCapabilities<FirefoxOptions> {
     @Override
     public FirefoxOptions getCapability(String testName) {
         FirefoxOptions capabilities = new FirefoxOptions();
-        initBaseCapabilities(capabilities, testName);
+        addProxy(capabilities);
+        addConfigurationCapabilities(capabilities);
         addFirefoxOptions(capabilities);
         FirefoxProfile profile = new FirefoxProfile();
         profile.setPreference("media.eme.enabled", true);
@@ -61,7 +62,8 @@ public class FirefoxCapabilities extends AbstractCapabilities<FirefoxOptions> {
      */
     public FirefoxOptions getCapability(String testName, FirefoxProfile profile) {
         FirefoxOptions capabilities = new FirefoxOptions();
-        initBaseCapabilities(capabilities, testName);
+        addProxy(capabilities);
+        addConfigurationCapabilities(capabilities);
         addFirefoxOptions(capabilities);
         capabilities.setProfile(profile);
         return capabilities;

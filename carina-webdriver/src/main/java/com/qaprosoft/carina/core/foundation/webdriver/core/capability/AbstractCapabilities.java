@@ -41,8 +41,12 @@ import io.appium.java_client.remote.options.SupportsLanguageOption;
 import io.appium.java_client.remote.options.SupportsLocaleOption;
 
 public abstract class AbstractCapabilities<T extends MutableCapabilities> {
+    // TODO: [VD] reorganize in the same way Firefox profiles args/options if any and review other browsers
+    // support customization for Chrome args and options
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final Pattern CAPABILITY_WITH_TYPE_PATTERN = Pattern.compile("^(?<name>.+)(?<type>\\[.+\\])$");
+
 
     /**
      * Generate capabilities. Capabilities will be taken from the configuration.
@@ -53,11 +57,14 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
      */
     public abstract T getCapability(String testName);
 
-    protected void initBaseCapabilities(T capabilities, String testName) {
+    /**
+     * Add proxy capability. Should only be used for Selenium session.
+     * 
+     * @param capabilities see {@link T}
+     */
+    protected void addProxy(T capabilities) {
         ProxyUtils.getSeleniumProxy()
                 .ifPresent(proxy -> capabilities.setCapability(CapabilityType.PROXY, proxy));
-        // add capabilities based on dynamic _config.properties variables
-        initCapabilities(capabilities);
     }
 
     /**
@@ -65,7 +72,7 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
      * 
      * @param options see {@link T}
      */
-    protected void initCapabilities(T options) {
+    protected void addConfigurationCapabilities(T options) {
         @SuppressWarnings({ "unchecked", "rawtypes" })
         Map<String, String> properties = new HashMap(R.CONFIG.getProperties());
         Map<String, Object> capabilities = properties.entrySet()
@@ -84,9 +91,9 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
         for (Map.Entry<String, Object> entry : capabilities.entrySet()) {
             List<String> names = Arrays.asList(entry.getKey().split("\\."));
 
-            // TODO add support of any nesting. maybe use some algorithm? or there will never be such nesting
+            // TODO add support of any nesting
             if (names.isEmpty()) {
-                // it should never happens
+                // should never happens
                 throw new RuntimeException("Something went wrong when try to create capabilities from configuration.");
             } else if (names.size() == 1) {
                 options.setCapability(names.get(0), entry.getValue());
@@ -104,8 +111,7 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
                 HashMap<String, Object> secondNestCapability = new HashMap<>();
 
                 if (options.getCapability(names.get(0)) != null) {
-                    // If we already have inner capability, we think that it is HashMap<String, Object> (custom capabilities)
-                    // todo investigate if we have situations when value that already present is not HashMap
+                    // If we already have inner capability, we think that it is HashMap<String, Object>
                     nestCapability = (HashMap<String, Object>) options.getCapability(names.get(0));
                     if (nestCapability.containsKey(names.get(1))) {
                         secondNestCapability = (HashMap<String, Object>) nestCapability.get(names.get(1));
@@ -120,15 +126,12 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
                         + "If you come across a situation in which this is necessary, please notify the Carina Support team.");
             }
         }
-        //TODO: [VD] reorganize in the same way Firefox profiles args/options if any and review other browsers
-        // support customization for Chrome args and options
     }
 
     protected static boolean isNumber(String value) {
         if (value == null || value.isEmpty()){
             return false;
         }
-
         try {
             Integer.parseInt(value);
         } catch (NumberFormatException ex){

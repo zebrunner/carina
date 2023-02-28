@@ -23,11 +23,11 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.zebrunner.carina.utils.report.ReportContext;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.R;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.report.ReportContext;
 
 public class ChromeCapabilities extends AbstractCapabilities<ChromeOptions> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -39,7 +39,8 @@ public class ChromeCapabilities extends AbstractCapabilities<ChromeOptions> {
     @Override
     public ChromeOptions getCapability(String testName) {
         ChromeOptions options = new ChromeOptions();
-        initBaseCapabilities(options, testName);
+        addProxy(options);
+        addConfigurationCapabilities(options);
         addChromeOptions(options);
         options.addArguments("--start-maximized", "--ignore-ssl-errors");
         options.setAcceptInsecureCerts(true);

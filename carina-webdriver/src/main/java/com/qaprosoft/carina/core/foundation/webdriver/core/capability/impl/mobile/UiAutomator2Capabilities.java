@@ -27,7 +27,7 @@ public class UiAutomator2Capabilities extends AbstractCapabilities<UiAutomator2O
         // this step should be executed before initCapabilities() to be able to override this capabilities by default appium approach.
         setLocaleAndLanguage(capabilities);
         // add capabilities based on dynamic _config.properties variables
-        initCapabilities(capabilities);
+        addConfigurationCapabilities(capabilities);
         return capabilities;
     }
 }

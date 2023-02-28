@@ -26,7 +26,8 @@ public class OperaCapabilities extends AbstractCapabilities<MutableCapabilities>
     @Override
     public MutableCapabilities getCapability(String testName) {
         MutableCapabilities capabilities = new MutableCapabilities();
-        initBaseCapabilities(capabilities, testName);
+        addProxy(capabilities);
+        addConfigurationCapabilities(capabilities);
         capabilities.setCapability(CapabilityType.BROWSER_NAME, Browser.OPERA.browserName());
 
         //TODO: add support for AUTO_DOWNLOAD and PROXY

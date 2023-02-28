@@ -24,7 +24,7 @@ public class Mac2Capabilities extends AbstractCapabilities<Mac2Options> {
     @Override
     public Mac2Options getCapability(String testName) {
         Mac2Options capabilities = new Mac2Options();
-        initCapabilities(capabilities);
+        addConfigurationCapabilities(capabilities);
         return capabilities;
     }
 }
