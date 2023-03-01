@@ -37,8 +37,8 @@ import com.zebrunner.carina.utils.R;
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
 import com.zebrunner.carina.utils.exception.InvalidConfigurationException;
 
-import io.appium.java_client.remote.options.SupportsLanguageOption;
-import io.appium.java_client.remote.options.SupportsLocaleOption;
+import io.appium.java_client.internal.CapabilityHelpers;
+import io.appium.java_client.remote.MobileCapabilityType;
 
 public abstract class AbstractCapabilities<T extends MutableCapabilities> {
     // TODO: [VD] reorganize in the same way Firefox profiles args/options if any and review other browsers
@@ -52,7 +52,6 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
      * Generate capabilities. Capabilities will be taken from the configuration.
      * Additional capabilities may also be added (depends on the implementation)
      * 
-     * @param testName todo add description
      * @return see {@link T}
      */
     public abstract T getCapability(String testName);
@@ -197,9 +196,10 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
     }
 
     /**
-     * Add locale and language capabilities to caps param
+     * Add {@link MobileCapabilityType#LOCALE} and {@link MobileCapabilityType#LANGUAGE} capabilities.
+     * This method depends on {@link Configuration.Parameter#LOCALE} and {@link Configuration.Parameter#LANGUAGE} parameters.
      */
-    protected T setLocaleAndLanguage(T caps) {
+    protected void setLocaleAndLanguage(T caps) {
         /*
          * http://appium.io/docs/en/writing-running-appium/caps/ locale and language
          * Locale to set for iOS (XCUITest driver only) and Android.
@@ -212,28 +212,27 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
         String[] values = localeValue.split("_");
         if (values.length == 1) {
             // only locale is present!
-            caps.setCapability(SupportsLocaleOption.LOCALE_OPTION, localeValue);
+            caps.setCapability(MobileCapabilityType.LOCALE, localeValue);
 
             String langValue = Configuration.get(Parameter.LANGUAGE);
             if (!langValue.isEmpty()) {
                 LOGGER.debug("Default language value is : {}", langValue);
                 // provide extra capability language only if it exists among config parameters...
-                caps.setCapability(SupportsLanguageOption.LANGUAGE_OPTION, langValue);
+                caps.setCapability(MobileCapabilityType.LANGUAGE, langValue);
             }
-
         } else if (values.length == 2) {
-            if (Configuration.getPlatform(caps).equalsIgnoreCase(SpecialKeywords.ANDROID)) {
+            String platformName = CapabilityHelpers.getCapability(caps, CapabilityType.PLATFORM_NAME, String.class);
+            if (SpecialKeywords.ANDROID.equalsIgnoreCase(platformName)) {
                 LOGGER.debug("Put language and locale to android capabilities. language: {}; locale: {}", values[0], values[1]);
-                caps.setCapability(SupportsLanguageOption.LANGUAGE_OPTION, values[0]);
-                caps.setCapability(SupportsLocaleOption.LOCALE_OPTION, values[1]);
-            } else if (Configuration.getPlatform().equalsIgnoreCase(SpecialKeywords.IOS)) {
+                caps.setCapability(MobileCapabilityType.LANGUAGE, values[0]);
+                caps.setCapability(MobileCapabilityType.LOCALE, values[1]);
+            } else if (SpecialKeywords.IOS.equalsIgnoreCase(platformName)) {
                 LOGGER.debug("Put language and locale to iOS capabilities. language: {}; locale: {}", values[0], localeValue);
-                caps.setCapability(SupportsLanguageOption.LANGUAGE_OPTION, values[0]);
-                caps.setCapability(SupportsLocaleOption.LOCALE_OPTION, localeValue);
+                caps.setCapability(MobileCapabilityType.LANGUAGE, values[0]);
+                caps.setCapability(MobileCapabilityType.LOCALE, localeValue);
             }
         } else {
             LOGGER.error("Undefined locale provided (ignoring for mobile capabilitites): {}", localeValue);
         }
-        return caps;
     }
 }
