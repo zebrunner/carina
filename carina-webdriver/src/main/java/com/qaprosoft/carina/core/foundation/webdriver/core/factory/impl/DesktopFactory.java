@@ -61,6 +61,7 @@ public class DesktopFactory extends AbstractFactory {
         if (seleniumHost == null) {
             seleniumHost = Configuration.getSeleniumUrl();
         }
+        LOGGER.debug("Selenium URL: {}", seleniumHost);
 
         if (isCapabilitiesEmpty(capabilities)) {
             capabilities = getCapabilities();

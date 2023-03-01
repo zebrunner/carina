@@ -19,21 +19,18 @@ import java.io.UncheckedIOException;
 import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Objects;
 
 import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.zebrunner.carina.utils.Configuration;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.windows.WindowsCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
+import com.zebrunner.carina.utils.Configuration;
 
 import io.appium.java_client.windows.WindowsDriver;
-import io.appium.java_client.windows.options.WindowsOptions;
 
 /**
  * WindowsFactory creates instance {@link WebDriver} for Windows native application testing.
@@ -45,18 +42,16 @@ public class WindowsFactory extends AbstractFactory {
 
     @Override
     public WebDriver create(String name, Capabilities capabilities, String seleniumHost) {
-
         if (seleniumHost == null) {
             seleniumHost = Configuration.getSeleniumUrl();
         }
-        LOGGER.debug("selenium: {}", seleniumHost);
+        LOGGER.debug("Selenium URL: {}", seleniumHost);
 
-        WebDriver driver = null;
         if (isCapabilitiesEmpty(capabilities)) {
-            capabilities = getCapabilities(name);
+            capabilities = new WindowsCapabilities().getCapabilities();
         }
 
-        LOGGER.debug("capabilities: {}", capabilities);
+        LOGGER.debug("Capabilities: {}", capabilities);
 
         URL url;
         try {
@@ -64,12 +59,7 @@ public class WindowsFactory extends AbstractFactory {
         } catch (MalformedURLException e) {
             throw new UncheckedIOException("Malformed appium URL!", e);
         }
-        driver = new WindowsDriver(url, capabilities);
-
-        return driver;
-    }
-
-    private WindowsOptions getCapabilities(String name) {
-        return new WindowsCapabilities().getCapability(name);
+        EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(url);
+        return new WindowsDriver(ce, capabilities);
     }
 }
