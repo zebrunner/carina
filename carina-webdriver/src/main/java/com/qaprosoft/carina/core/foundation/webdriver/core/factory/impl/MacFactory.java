@@ -21,19 +21,19 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.mac.Mac2Capabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.factory.AbstractFactory;
+import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppiumCommandExecutor;
 import com.zebrunner.carina.utils.Configuration;
 
 import io.appium.java_client.mac.Mac2Driver;
 
 /**
- * WindowsFactory creates instance {@link WebDriver} for Windows native application testing.
+ * MacFactory creates instance {@link WebDriver} for Mac native application testing.
  * 
  * @author Sergei Zagriychuk (sergeizagriychuk@gmail.com)
  */
@@ -48,12 +48,11 @@ public class MacFactory extends AbstractFactory {
         }
         LOGGER.debug("Selenium URL: {}", seleniumHost);
 
-        WebDriver driver = null;
         if (isCapabilitiesEmpty(capabilities)) {
-            capabilities = getCapabilities(name);
+            capabilities = new Mac2Capabilities().getCapabilities();
         }
 
-        LOGGER.debug("capabilities: {}", capabilities);
+        LOGGER.debug("Capabilities: {}", capabilities);
 
         URL url;
         try {
@@ -61,12 +60,7 @@ public class MacFactory extends AbstractFactory {
         } catch (MalformedURLException e) {
             throw new UncheckedIOException("Malformed appium URL!", e);
         }
-        driver = new Mac2Driver(url, capabilities);
-
-        return driver;
-    }
-
-    private MutableCapabilities getCapabilities(String name) {
-        return new Mac2Capabilities().getCapability(name);
+        EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(url);
+        return new Mac2Driver(ce, capabilities);
     }
 }
