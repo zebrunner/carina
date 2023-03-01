@@ -61,6 +61,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedElementLoc
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorType;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocatorUtils;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.FormatLocatorConverter;
+import com.qaprosoft.carina.core.foundation.webdriver.locator.converter.LocalizeLocatorConverter;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.internal.LocatingListHandler;
 import com.zebrunner.carina.crypto.Algorithm;
 import com.zebrunner.carina.crypto.CryptoTool;
@@ -1211,6 +1212,21 @@ public class ExtendedWebElement implements IWebElement {
                                 .get(innerProxy);
 
                 if (Arrays.stream(objects).findAny().isPresent()) {
+                    // start of case when we have L10N only on this step
+                    boolean isTextContainsL10N = Arrays.stream(objects)
+                            .map(String::valueOf)
+                            .anyMatch(text -> LocalizeLocatorConverter.getL10nPattern().matcher(text).find());
+                    if (isTextContainsL10N) {
+                        boolean isAlreadyContainsL10NConverter = innerLocator.getLocatorConverters()
+                                .stream()
+                                .anyMatch(LocalizeLocatorConverter.class::isInstance);
+                        if (!isAlreadyContainsL10NConverter) {
+                            LocalizeLocatorConverter converter = new LocalizeLocatorConverter();
+                            innerLocator.getLocatorConverters().addFirst(converter);
+                        }
+                    }
+                    // end of case when we have L10N only on this step
+
                     if (innerLocator.getLocatorConverters().stream()
                             .anyMatch(FormatLocatorConverter.class::isInstance)) {
                         LOGGER.debug("Called format method of ExtendedWebElement class with parameters, but FormatLocatorConverter already exists "
@@ -1285,6 +1301,21 @@ public class ExtendedWebElement implements IWebElement {
                         "locator", true))
                                 .get(innerProxy);
                 if (Arrays.stream(objects).findAny().isPresent()) {
+                    // start of case when we have L10N only on this step
+                    boolean isTextContainsL10N = Arrays.stream(objects)
+                            .map(String::valueOf)
+                            .anyMatch(text -> LocalizeLocatorConverter.getL10nPattern().matcher(text).find());
+                    if (isTextContainsL10N) {
+                        boolean isAlreadyContainsL10NConverter = innerLocator.getLocatorConverters()
+                                .stream()
+                                .anyMatch(LocalizeLocatorConverter.class::isInstance);
+                        if (!isAlreadyContainsL10NConverter) {
+                            LocalizeLocatorConverter converter = new LocalizeLocatorConverter();
+                            innerLocator.getLocatorConverters().addFirst(converter);
+                        }
+                    }
+                    // end of case when we have L10N only on this step
+
                     if (innerLocator.getLocatorConverters().stream()
                             .anyMatch(FormatLocatorConverter.class::isInstance)) {
                         LOGGER.debug(
