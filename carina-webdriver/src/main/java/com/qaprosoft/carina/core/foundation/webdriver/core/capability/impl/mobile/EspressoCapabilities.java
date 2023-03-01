@@ -22,12 +22,16 @@ import io.appium.java_client.android.options.EspressoOptions;
 public class EspressoCapabilities extends AbstractCapabilities<EspressoOptions> {
 
     @Override
-    public EspressoOptions getCapability(String testName) {
-        EspressoOptions capabilities = new EspressoOptions();
+    public EspressoOptions getCapabilities() {
+        EspressoOptions options = new EspressoOptions();
         // this step should be executed before initCapabilities() to be able to override this capabilities by default appium approach.
-        setLocaleAndLanguage(capabilities);
-        // add capabilities based on dynamic _config.properties variables
-        addConfigurationCapabilities(capabilities);
-        return capabilities;
+        setLocaleAndLanguage(options);
+        addConfigurationCapabilities(options);
+        return options;
+    }
+
+    @Override
+    public EspressoOptions getCapability(String testName) {
+        return getCapabilities();
     }
 }

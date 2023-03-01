@@ -35,22 +35,41 @@ public class FirefoxCapabilities extends AbstractCapabilities<FirefoxOptions> {
     private static final ArrayList<Integer> firefoxPorts = new ArrayList<>();
 
     /**
-     * Generate FirefoxOptions for Firefox with default Carina FirefoxProfile.
-     * 
-     * @return Firefox capabilities.
+     * Generate capabilities with default Carina FirefoxProfile.
+     *
+     * @return see {@link FirefoxOptions}
      */
     @Override
-    public FirefoxOptions getCapability(String testName) {
-        FirefoxOptions capabilities = new FirefoxOptions();
-        addProxy(capabilities);
-        addConfigurationCapabilities(capabilities);
-        addFirefoxOptions(capabilities);
+    public FirefoxOptions getCapabilities() {
+        FirefoxOptions options = new FirefoxOptions();
+        addProxy(options);
+        addConfigurationCapabilities(options);
+        addFirefoxOptions(options);
         FirefoxProfile profile = new FirefoxProfile();
         profile.setPreference("media.eme.enabled", true);
         profile.setPreference("media.gmp-manager.updateEnabled", true);
+        options.setProfile(profile);
+        return options;
+    }
 
-        capabilities.setProfile(profile);
-        return capabilities;
+    @Override
+    public FirefoxOptions getCapability(String testName) {
+        return getCapabilities();
+    }
+
+    /**
+     * Generate capabilities with custom FirefoxProfile.
+     *
+     * @param profile see {@link FirefoxProfile}
+     * @return see {@link FirefoxOptions}
+     */
+    public FirefoxOptions getCapabilities(FirefoxProfile profile) {
+        FirefoxOptions options = new FirefoxOptions();
+        addProxy(options);
+        addConfigurationCapabilities(options);
+        addFirefoxOptions(options);
+        options.setProfile(profile);
+        return options;
     }
 
     /**
@@ -59,16 +78,18 @@ public class FirefoxCapabilities extends AbstractCapabilities<FirefoxOptions> {
      * @param testName - String.
      * @param profile - FirefoxProfile.
      * @return FirefoxOptions
+     * @deprecated use {@link #getCapabilities(FirefoxProfile)}
      */
+    @Deprecated(forRemoval = true, since = "8.0.8")
     public FirefoxOptions getCapability(String testName, FirefoxProfile profile) {
-        FirefoxOptions capabilities = new FirefoxOptions();
-        addProxy(capabilities);
-        addConfigurationCapabilities(capabilities);
-        addFirefoxOptions(capabilities);
-        capabilities.setProfile(profile);
-        return capabilities;
+        return getCapabilities(profile);
     }
 
+    /**
+     * Add firefox-specific arguments, prefs.
+     *
+     * @param options see {@link FirefoxOptions}
+     */
     private void addFirefoxOptions(FirefoxOptions options) {
         FirefoxProfile profile = getDefaultFirefoxProfile();
         options.setProfile(profile);

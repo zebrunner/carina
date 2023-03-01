@@ -22,9 +22,14 @@ import io.appium.java_client.windows.options.WindowsOptions;
 public class WindowsCapabilities extends AbstractCapabilities<WindowsOptions> {
 
     @Override
+    public WindowsOptions getCapabilities() {
+        WindowsOptions options = new WindowsOptions();
+        addConfigurationCapabilities(options);
+        return options;
+    }
+
+    @Override
     public WindowsOptions getCapability(String testName) {
-        WindowsOptions capabilities = new WindowsOptions();
-        addConfigurationCapabilities(capabilities);
-        return capabilities;
+        return getCapabilities();
     }    
 }

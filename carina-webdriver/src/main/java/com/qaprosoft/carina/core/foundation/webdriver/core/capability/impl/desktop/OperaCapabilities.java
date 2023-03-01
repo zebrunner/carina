@@ -24,13 +24,18 @@ import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCa
 public class OperaCapabilities extends AbstractCapabilities<MutableCapabilities> {
 
     @Override
-    public MutableCapabilities getCapability(String testName) {
-        MutableCapabilities capabilities = new MutableCapabilities();
-        addProxy(capabilities);
-        addConfigurationCapabilities(capabilities);
-        capabilities.setCapability(CapabilityType.BROWSER_NAME, Browser.OPERA.browserName());
+    public MutableCapabilities getCapabilities() {
+        MutableCapabilities options = new MutableCapabilities();
+        addProxy(options);
+        addConfigurationCapabilities(options);
+        options.setCapability(CapabilityType.BROWSER_NAME, Browser.OPERA.browserName());
 
-        //TODO: add support for AUTO_DOWNLOAD and PROXY
-        return capabilities;
+        // TODO: add support for AUTO_DOWNLOAD and PROXY
+        return options;
+    }
+
+    @Override
+    public MutableCapabilities getCapability(String testName) {
+        return getCapabilities();
     }
 }

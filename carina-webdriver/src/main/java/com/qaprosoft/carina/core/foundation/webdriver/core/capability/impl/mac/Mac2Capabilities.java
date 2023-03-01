@@ -22,9 +22,14 @@ import io.appium.java_client.mac.options.Mac2Options;
 public class Mac2Capabilities extends AbstractCapabilities<Mac2Options> {
 
     @Override
+    public Mac2Options getCapabilities() {
+        Mac2Options options = new Mac2Options();
+        addConfigurationCapabilities(options);
+        return options;
+    }
+
+    @Override
     public Mac2Options getCapability(String testName) {
-        Mac2Options capabilities = new Mac2Options();
-        addConfigurationCapabilities(capabilities);
-        return capabilities;
+        return getCapabilities();
     }
 }

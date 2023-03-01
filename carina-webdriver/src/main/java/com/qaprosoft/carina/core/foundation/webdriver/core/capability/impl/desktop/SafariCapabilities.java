@@ -22,10 +22,15 @@ import io.appium.java_client.safari.options.SafariOptions;
 public class SafariCapabilities extends AbstractCapabilities<SafariOptions> {
 
     @Override
+    public SafariOptions getCapabilities() {
+        SafariOptions options = new SafariOptions();
+        addProxy(options);
+        addConfigurationCapabilities(options);
+        return options;
+    }
+
+    @Override
     public SafariOptions getCapability(String testName) {
-        SafariOptions safariOptions = new SafariOptions();
-        addProxy(safariOptions);
-        addConfigurationCapabilities(safariOptions);
-        return safariOptions;
+        return getCapabilities();
     }
 }

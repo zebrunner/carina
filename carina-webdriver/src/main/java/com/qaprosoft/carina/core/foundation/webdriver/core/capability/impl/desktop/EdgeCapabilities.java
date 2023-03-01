@@ -35,26 +35,36 @@ public class EdgeCapabilities extends AbstractCapabilities<ChromiumOptions<?>> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public ChromiumOptions<?> getCapability(String testName) {
-        ChromiumOptions<?> capabilities = new ChromiumOptions<>(CapabilityType.BROWSER_NAME, Browser.EDGE.browserName(), "ms:edgeOptions");
-        addProxy(capabilities);
-        addConfigurationCapabilities(capabilities);
-        addEdgeOptions(capabilities);
-        capabilities.addArguments("--start-maximized", "--ignore-ssl-errors");
-        capabilities.setAcceptInsecureCerts(true);
-        return capabilities;
+    public ChromiumOptions<?> getCapabilities() {
+        ChromiumOptions<?> options = new ChromiumOptions<>(CapabilityType.BROWSER_NAME, Browser.EDGE.browserName(), "ms:edgeOptions");
+        addProxy(options);
+        addConfigurationCapabilities(options);
+        addEdgeOptions(options);
+        options.addArguments("--start-maximized", "--ignore-ssl-errors");
+        options.setAcceptInsecureCerts(true);
+        return options;
     }
 
-    private void addEdgeOptions(ChromiumOptions<?> caps) {
+    @Override
+    public ChromiumOptions<?> getCapability(String testName) {
+        return getCapabilities();
+    }
+
+    /**
+     * Add edge-specific arguments, prefs.
+     *
+     * @param options see {@link ChromiumOptions}
+     */
+    private void addEdgeOptions(ChromiumOptions<?> options) {
         Map<String, Object> prefs = new HashMap<>();
         boolean needsPrefs = false;
         // disable the "unsupported flag" prompt
-        caps.addArguments("--test-type");
+        options.addArguments("--test-type");
         // update browser language
         String browserLang = Configuration.get(Configuration.Parameter.BROWSER_LANGUAGE);
         if (!browserLang.isEmpty()) {
             LOGGER.info("Set Edge language to: {}", browserLang);
-            caps.addArguments("--lang=" + browserLang);
+            options.addArguments("--lang=" + browserLang);
             prefs.put("intl.accept_languages", browserLang);
             needsPrefs = true;
         }
@@ -69,14 +79,14 @@ public class EdgeCapabilities extends AbstractCapabilities<ChromiumOptions<?>> {
         }
 
         if (needsPrefs) {
-            caps.setCapability("prefs", prefs);
+            options.setCapability("prefs", prefs);
         }
-        caps.setCapability("ms:edgeChrominum", true);
+        options.setCapability("ms:edgeChrominum", true);
 
         String driverType = Configuration.getDriverType();
         if (Configuration.getBoolean(Configuration.Parameter.HEADLESS)
                 && driverType.equals(SpecialKeywords.DESKTOP)) {
-            caps.setHeadless(Configuration.getBoolean(Configuration.Parameter.HEADLESS));
+            options.setHeadless(Configuration.getBoolean(Configuration.Parameter.HEADLESS));
         }
     }
 }

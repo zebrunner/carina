@@ -22,12 +22,17 @@ import io.appium.java_client.android.options.UiAutomator2Options;
 public class UiAutomator2Capabilities extends AbstractCapabilities<UiAutomator2Options> {
 
     @Override
-    public UiAutomator2Options getCapability(String testName) {
-        UiAutomator2Options capabilities = new UiAutomator2Options();
+    public UiAutomator2Options getCapabilities() {
+        UiAutomator2Options options = new UiAutomator2Options();
         // this step should be executed before initCapabilities() to be able to override this capabilities by default appium approach.
-        setLocaleAndLanguage(capabilities);
+        setLocaleAndLanguage(options);
         // add capabilities based on dynamic _config.properties variables
-        addConfigurationCapabilities(capabilities);
-        return capabilities;
+        addConfigurationCapabilities(options);
+        return options;
+    }
+
+    @Override
+    public UiAutomator2Options getCapability(String testName) {
+        return getCapabilities();
     }
 }

@@ -32,12 +32,8 @@ import com.zebrunner.carina.utils.report.ReportContext;
 public class ChromeCapabilities extends AbstractCapabilities<ChromeOptions> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    /**
-     * Generate ChromeOptions depends on capabilities defines in configuration file
-     * Also adds chrome-specific arguments, prefs and so on
-     */
     @Override
-    public ChromeOptions getCapability(String testName) {
+    public ChromeOptions getCapabilities() {
         ChromeOptions options = new ChromeOptions();
         addProxy(options);
         addConfigurationCapabilities(options);
@@ -47,10 +43,15 @@ public class ChromeCapabilities extends AbstractCapabilities<ChromeOptions> {
         return options;
     }
 
+    @Override
+    public ChromeOptions getCapability(String testName) {
+        return getCapabilities();
+    }
+
     /**
-     * Add chrome-specific arguments, prefs and so on
+     * Add chrome-specific arguments, prefs.
      * 
-     * @param options ChromeOptions to which will be added
+     * @param options see {@link ChromeOptions}
      */
     private void addChromeOptions(ChromeOptions options) {
         // add default carina options and arguments

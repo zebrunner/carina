@@ -47,13 +47,22 @@ public abstract class AbstractCapabilities<T extends MutableCapabilities> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final Pattern CAPABILITY_WITH_TYPE_PATTERN = Pattern.compile("^(?<name>.+)(?<type>\\[.+\\])$");
 
+    /**
+     * Get capabilities from the configuration ({@link R#CONFIG}).
+     * Additional capabilities can also be added (depends on implementation).
+     *
+     * @return see {@link T}
+     */
+    public abstract T getCapabilities();
 
     /**
      * Generate capabilities. Capabilities will be taken from the configuration.
      * Additional capabilities may also be added (depends on the implementation)
      * 
      * @return see {@link T}
+     * @deprecated use {@link #getCapabilities()} instead
      */
+    @Deprecated(forRemoval = true, since = "8.0.8")
     public abstract T getCapability(String testName);
 
     /**
