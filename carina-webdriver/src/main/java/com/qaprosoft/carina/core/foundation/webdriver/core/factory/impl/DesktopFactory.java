@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
+import com.qaprosoft.carina.core.foundation.webdriver.core.capability.AbstractCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.ChromeCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.EdgeCapabilities;
 import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.FirefoxCapabilities;
@@ -47,6 +48,7 @@ import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringAppium
 import com.qaprosoft.carina.core.foundation.webdriver.listener.EventFiringSeleniumCommandExecutor;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.Configuration.Parameter;
+import com.zebrunner.carina.utils.exception.InvalidConfigurationException;
 
 import io.appium.java_client.safari.SafariDriver;
 
@@ -62,7 +64,7 @@ public class DesktopFactory extends AbstractFactory {
         }
 
         if (isCapabilitiesEmpty(capabilities)) {
-            capabilities = getCapabilities(name);
+            capabilities = getCapabilities();
         }
 
         if (staticCapabilities != null) {
@@ -87,22 +89,24 @@ public class DesktopFactory extends AbstractFactory {
         return driver;
     }
 
-    public MutableCapabilities getCapabilities(String name) {
+    public Capabilities getCapabilities() {
         String browser = Configuration.getBrowser();
-        
+        AbstractCapabilities<?> capabilities = null;
         if (Browser.FIREFOX.browserName().equalsIgnoreCase(browser)) {
-            return new FirefoxCapabilities().getCapability(name);
+            capabilities = new FirefoxCapabilities();
         } else if (Browser.SAFARI.browserName().equalsIgnoreCase(browser)) {
-            return new SafariCapabilities().getCapability(name);
+            capabilities = new SafariCapabilities();
         } else if (Browser.CHROME.browserName().equalsIgnoreCase(browser)) {
-            return new ChromeCapabilities().getCapability(name);
+            capabilities = new ChromeCapabilities();
         } else if (Browser.OPERA.browserName().equalsIgnoreCase(browser)) {
-            return new OperaCapabilities().getCapability(name);
-        } else if (Browser.EDGE.browserName().equalsIgnoreCase(browser) || "edge".equalsIgnoreCase(browser)) {
-            return new EdgeCapabilities().getCapability(name);
+            capabilities = new OperaCapabilities();
+        } else if (Browser.EDGE.browserName().equalsIgnoreCase(browser) ||
+                "edge".equalsIgnoreCase(browser)) {
+            capabilities = new EdgeCapabilities();
         } else {
-            throw new RuntimeException("Unsupported browser: " + browser);
+            throw new InvalidConfigurationException("Unsupported browser: " + browser);
         }
+        return capabilities.getCapabilities();
     }
 
     public static void addStaticCapability(String name, Object value) {
@@ -121,7 +125,7 @@ public class DesktopFactory extends AbstractFactory {
      */
     private void resizeBrowserWindow(WebDriver driver, Capabilities capabilities) {
         try {
-            Wait<WebDriver> wait = new FluentWait<WebDriver>(driver)
+            Wait<WebDriver> wait = new FluentWait<>(driver)
                     .pollingEvery(Duration.ofMillis(Configuration.getInt(Parameter.RETRY_INTERVAL)))
                     .withTimeout(Duration.ofSeconds(Configuration.getInt(Parameter.EXPLICIT_TIMEOUT)))
                     .ignoring(WebDriverException.class)
