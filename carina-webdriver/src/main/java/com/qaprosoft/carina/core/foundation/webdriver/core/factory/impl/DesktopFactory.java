@@ -58,7 +58,6 @@ public class DesktopFactory extends AbstractFactory {
 
     @Override
     public WebDriver create(String name, Capabilities capabilities, String seleniumHost) {
-        WebDriver driver = null;
         if (seleniumHost == null) {
             seleniumHost = Configuration.getSeleniumUrl();
         }
@@ -68,11 +67,12 @@ public class DesktopFactory extends AbstractFactory {
         }
 
         if (staticCapabilities != null) {
-            LOGGER.info("Static MutableCapabilities will be merged to basic driver capabilities");
+            LOGGER.info("Static MutableCapabilities will be merged to basic driver capabilities.");
             capabilities.merge(staticCapabilities);
         }
-        LOGGER.debug("capabilities: {}", capabilities);
+        LOGGER.debug("Capabilities: {}", capabilities);
 
+        WebDriver driver = null;
         try {
             if (Browser.SAFARI.browserName().equalsIgnoreCase(capabilities.getBrowserName())) {
                 EventFiringAppiumCommandExecutor ce = new EventFiringAppiumCommandExecutor(new URL(seleniumHost));
