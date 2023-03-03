@@ -16,8 +16,8 @@
 package com.qaprosoft.carina.core.foundation.listeners;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Collection;
-import java.util.Map;
+import java.lang.reflect.Type;
+import java.util.*;
 
 import com.zebrunner.carina.core.testng.TestNamingService;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -186,14 +186,16 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
                 if (result.getParameters()[i] instanceof Map) {
                     @SuppressWarnings("unchecked")
-                    Map<String, String> dynamicAgrs = (Map<String, String>) result.getParameters()[i];
-                    for (Map.Entry<String, String> entry : dynamicAgrs.entrySet()) {
-                        Object param = ParameterGenerator.process(entry.getValue());
+                    Map<Object, Object> dynamicAgrs = (Map<Object, Object>) result.getParameters()[i];
+                    Map<Object, Object> mapToProcess = new HashMap<>(dynamicAgrs);
+                    for (Map.Entry<Object, Object> entry : dynamicAgrs.entrySet()) {
+                        Object param = ParameterGenerator.process(String.valueOf(entry.getValue()));
                         if (param != null)
-                            dynamicAgrs.put(entry.getKey(), param.toString());
+                            mapToProcess.put(entry.getKey(), String.valueOf(param));
                         else
-                            dynamicAgrs.put(entry.getKey(), null);
+                            mapToProcess.put(entry.getKey(), null);
                     }
+                    result.getParameters()[i] = Collections.unmodifiableMap(mapToProcess);
                 }
             }
         }
