@@ -25,43 +25,9 @@ import java.lang.annotation.Target;
 public @interface XlsDataSourceParameters {
     String className() default "com.qaprosoft.carina.core.foundation.dataprovider.core.impl.XlsDataProvider";
 
-    /**
-     * Is mutually exclusive with spreadsheetId
-     *
-     * @return String
-     */
-    String path() default "";
-
-    /**
-     * Is mutually exclusive with path
-     *
-     * @return String
-     */
     String spreadsheetId() default "";
 
     String sheet() default "";
 
-    String dsArgs() default "";
-
-    String dsUid() default "";
-
-    String executeColumn() default "";
-
-    String executeValue() default "";
-
-    String staticArgs() default "";
-
-    String groupColumn() default "";
-
-    String testRailColumn() default "";
-
-    String qTestColumn() default "";
-
-    String testMethodColumn() default "";
-
-    String testMethodOwnerColumn() default "";
-
-    String bugColumn() default "";
-
-    String[] doNotRunTestNames() default {};
+    DataSourceParameters data();
 }

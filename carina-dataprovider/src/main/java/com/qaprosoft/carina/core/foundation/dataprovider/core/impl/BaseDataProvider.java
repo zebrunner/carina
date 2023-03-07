@@ -42,8 +42,6 @@ public abstract class BaseDataProvider {
     protected List<String> argsList;
     protected List<String> staticArgsList;
 
-    protected List<String> doNotRunTestNames;
-
     public abstract Object[][] getDataProvider(Annotation annotation, ITestContext context, ITestNGMethod testMethod);
 
     protected static Object getStaticParam(String name, ITestContext context, DSBean dsBean) {
@@ -63,8 +61,17 @@ public abstract class BaseDataProvider {
         return testRailsArgsMap;
     }
 
-    public List<String> getDoNotRunRowsIDs() {
-        return doNotRunTestNames;
+    protected void addValueToSpecialMap(Map<String, String> map, String column, String hashCode, Map<String, String> row) {
+        if (column != null) {
+            if (!column.isEmpty()) {
+                if (row.get(column) != null) {
+                    if (!row.get(column).isEmpty()) {
+                        // put into the args only non empty jira tickets
+                        map.put(hashCode, row.get(column));
+                    }
+                }
+            }
+        }
     }
 
 }

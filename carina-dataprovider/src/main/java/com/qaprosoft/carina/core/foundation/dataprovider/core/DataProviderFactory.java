@@ -19,12 +19,12 @@ import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
+import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,52 +48,21 @@ public class DataProviderFactory {
     }
 
     public static Object[][] getDataProvider(Annotation[] annotations, ITestContext context, ITestNGMethod m) {
-
         Map<String, String> testNameArgsMap = Collections.synchronizedMap(new HashMap<>());
-        Map<String, String> testMethodOwnerArgsMap = Collections.synchronizedMap(new HashMap<>());
-        Map<String, String> testRailsArgsMap = Collections.synchronizedMap(new HashMap<>());
-        List<String> doNotRunTests = Collections.synchronizedList(new ArrayList<>());
-
-        Object[][] provider = new Object[][] {};
+        Object[][] provider = new Object[][]{};
 
         for (Annotation annotation : annotations) {
-            try {
-                Class<? extends Annotation> type = annotation.annotationType();
-
-                String providerClass = "";
-
-                for (Method method : type.getDeclaredMethods()) {
-                    if (method.getName().equalsIgnoreCase("classname")) {
-                        providerClass = (String) method.invoke(annotation);
-                        break;
-                    }
-                }
-
-                if (providerClass.isEmpty())
-                    continue;
-
-                Class<?> clazz;
-                Object object = null;
-                try {
-                    clazz = Class.forName(providerClass);
-                    Constructor<?> ctor = clazz.getConstructor();
-                    object = ctor.newInstance();
-                } catch (Exception e) {
-                    LOGGER.error("DataProvider failure", e);
-                }
-
-                if (object instanceof com.qaprosoft.carina.core.foundation.dataprovider.core.impl.BaseDataProvider) {
-                    BaseDataProvider activeProvider = (BaseDataProvider) object;
-                    provider = ArrayUtils.addAll(provider, activeProvider.getDataProvider(annotation, context, m));
-                    testNameArgsMap.putAll(activeProvider.getTestNameArgsMap());
-                    testMethodOwnerArgsMap.putAll(activeProvider.getTestMethodOwnerArgsMap());
-                    testRailsArgsMap.putAll(activeProvider.getTestRailsArgsMap());
-                    doNotRunTests.addAll(activeProvider.getDoNotRunRowsIDs());
-                }
-
-            } catch (Exception e) {
-                LOGGER.error("DataProvider failure", e);
+            String providerClass;
+            if (annotation instanceof CsvDataSourceParameters || annotation instanceof XlsDataSourceParameters) {
+                providerClass = findProviderClass(annotation);
+            } else {
+                continue;
             }
+
+            BaseDataProvider dataProvider = initDataProvider(providerClass);
+
+            provider = ArrayUtils.addAll(provider, dataProvider.getDataProvider(annotation, context, m));
+            testNameArgsMap.putAll(dataProvider.getTestNameArgsMap());
         }
 
         if (!GroupByMapper.getInstanceInt().isEmpty() || !GroupByMapper.getInstanceStrings().isEmpty()) {
@@ -107,6 +76,53 @@ public class DataProviderFactory {
         GroupByMapper.getInstanceStrings().clear();
 
         return provider;
+    }
+
+    /**
+     * Finds class name for data provider implementation.
+     *
+     * @param annotation test method annotation.
+     *
+     * @return class name of data provider if it was found in annotation classname() method.
+     *         Empty string if not.
+     */
+    private static String findProviderClass(Annotation annotation) {
+        Class<? extends Annotation> type = annotation.annotationType();
+        String providerClass = "";
+
+        try {
+            for (Method method : type.getDeclaredMethods()) {
+                if (method.getName().equalsIgnoreCase("classname")) {
+                    providerClass = (String) method.invoke(annotation);
+                    break;
+                }
+            }
+        } catch (ReflectiveOperationException e){
+            LOGGER.error("Failure on finding DataProvider class instance", e);
+        }
+
+        return providerClass;
+    }
+
+    /**
+     * Initialize DataProvider based on className parameter.
+     *
+     * @param providerClass String full className.
+     *
+     * @return DataProvider Instance.
+     */
+    private static BaseDataProvider initDataProvider(String providerClass){
+        Class<?> clazz;
+        BaseDataProvider dataProvider = null;
+        try {
+            clazz = Class.forName(providerClass);
+            Constructor<?> ctor = clazz.getConstructor();
+            dataProvider = (BaseDataProvider) ctor.newInstance();
+        } catch (Exception e) {
+            LOGGER.error("DataProvider initialization failure", e);
+        }
+
+        return dataProvider;
     }
 
     private static Object[][] getGroupedList(Object[][] provider) {

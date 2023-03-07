@@ -74,8 +74,7 @@ public interface IAbstractTest extends ICustomTypePageFactory, ITestCases {
     }
 
     @DataProvider(name = "SingleDataProvider")
-    default Object[][] createDataSingleThread(final ITestNGMethod testMethod,
-            ITestContext context) {
+    default Object[][] createDataSingleThread(final ITestNGMethod testMethod, ITestContext context) {
         Annotation[] annotations = testMethod.getConstructorOrMethod().getMethod().getDeclaredAnnotations();
         Object[][] objects = DataProviderFactory.getDataProvider(annotations, context, testMethod);
         return objects;

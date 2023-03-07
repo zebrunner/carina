@@ -25,34 +25,9 @@ import java.lang.annotation.Target;
 public @interface CsvDataSourceParameters {
     String className() default "com.qaprosoft.carina.core.foundation.dataprovider.core.impl.CsvDataProvider";
 
-    String path();
-
     char separator() default ',';
 
     char quote() default '"';
 
-    String dsArgs() default "";
-
-    String dsUid() default "";
-
-    String executeColumn() default "";
-
-    String executeValue() default "";
-
-    String staticArgs() default "";
-
-    String groupColumn() default "";
-
-    String testRailColumn() default "";
-
-    String qTestColumn() default "";
-
-    String testMethodColumn() default "";
-
-    String testMethodOwnerColumn() default "";
-
-    String bugColumn() default "";
-
-    String[] doNotRunTestNames() default {};
-
+    DataSourceParameters data();
 }

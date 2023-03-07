@@ -23,7 +23,6 @@ import java.util.Set;
  * Created by Yauheni_Patotski on 1/7/2015.
  */
 public class GroupByMapper {
-
     private static Set<Integer> instanceInt;
 
     private static Set<String> instanceString;
@@ -37,6 +36,8 @@ public class GroupByMapper {
     public static void setIsHashMapped(boolean isHashMapped) {
         GroupByMapper.hashMapped = isHashMapped;
     }
+
+    private GroupByMapper() {}
 
     public static Set<Integer> getInstanceInt() {
         if (instanceInt == null) {

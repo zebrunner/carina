@@ -38,44 +38,42 @@ public class XlsDataProvider extends BaseDataProvider {
     public Object[][] getDataProvider(Annotation annotation, ITestContext context, ITestNGMethod testMethod) {
 
         XlsDataSourceParameters parameters = (XlsDataSourceParameters) annotation;
-        doNotRunTestNames = Arrays.asList(parameters.doNotRunTestNames());
 
-        DSBean dsBean = new DSBean(parameters, context
-                .getCurrentXmlTest().getAllParameters());
+        DSBean dsBean = new DSBean(parameters, context.getCurrentXmlTest().getAllParameters());
 
         XLSTable dsData = XLSParser.parseSpreadSheet(dsBean.getDsFile(), dsBean.getXlsSheet(), dsBean.getExecuteColumn(), dsBean.getExecuteValue());
 
         argsList = dsBean.getArgs();
         staticArgsList = dsBean.getStaticArgs();
 
-        if (parameters.dsArgs().isEmpty()) {
+        if (parameters.data().dsArgs().isEmpty()) {
             GroupByMapper.setIsHashMapped(true);
         }
 
-        String groupByParameter = parameters.groupColumn();
+        String groupByParameter = parameters.data().groupColumn();
         if (!groupByParameter.isEmpty()) {
             GroupByMapper.getInstanceInt().add(argsList.indexOf(groupByParameter));
             GroupByMapper.getInstanceStrings().add(groupByParameter);
         }
 
         String testRailColumn = "";
-        if (!parameters.testRailColumn().isEmpty())
-            testRailColumn = parameters.testRailColumn();
+        if (!parameters.data().testRailColumn().isEmpty())
+            testRailColumn = parameters.data().testRailColumn();
 
-        if (!parameters.qTestColumn().isEmpty() && testRailColumn.isEmpty())
-            testRailColumn = parameters.qTestColumn();
+        if (!parameters.data().qTestColumn().isEmpty() && testRailColumn.isEmpty())
+            testRailColumn = parameters.data().qTestColumn();
 
         String testMethodColumn = "";
-        if (!parameters.testMethodColumn().isEmpty())
-            testMethodColumn = parameters.testMethodColumn();
+        if (!parameters.data().testMethodColumn().isEmpty())
+            testMethodColumn = parameters.data().testMethodColumn();
 
         String testMethodOwnerColumn = "";
-        if (!parameters.testMethodOwnerColumn().isEmpty())
-            testMethodOwnerColumn = parameters.testMethodOwnerColumn();
+        if (!parameters.data().testMethodOwnerColumn().isEmpty())
+            testMethodOwnerColumn = parameters.data().testMethodOwnerColumn();
 
         String bugColumn = "";
-        if (!parameters.bugColumn().isEmpty())
-            bugColumn = parameters.bugColumn();
+        if (!parameters.data().bugColumn().isEmpty())
+            bugColumn = parameters.data().bugColumn();
 
         int width = 0;
         if (argsList.size() == 0) {
@@ -143,18 +141,4 @@ public class XlsDataProvider extends BaseDataProvider {
 
         return args;
     }
-
-    private void addValueToSpecialMap(Map<String, String> map, String column, String hashCode, Map<String, String> xlsRow) {
-        if (column != null) {
-            if (!column.isEmpty()) {
-                if (xlsRow.get(column) != null) {
-                    if (!xlsRow.get(column).isEmpty()) {
-                        // put into the args only non empty jira tickets
-                        map.put(hashCode, xlsRow.get(column));
-                    }
-                }
-            }
-        }
-    }
-
 }

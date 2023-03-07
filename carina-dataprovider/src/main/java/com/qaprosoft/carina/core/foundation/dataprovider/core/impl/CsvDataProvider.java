@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.qaprosoft.carina.core.foundation.dataprovider.annotations.DataSourceParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
@@ -57,37 +58,35 @@ public class CsvDataProvider extends BaseDataProvider {
     @Override
     public Object[][] getDataProvider(Annotation annotation, ITestContext context, ITestNGMethod testMethod) {
         CsvDataSourceParameters parameters = (CsvDataSourceParameters) annotation;
-        doNotRunTestNames = Arrays.asList(parameters.doNotRunTestNames());
-
         DSBean dsBean = new DSBean(parameters, context.getCurrentXmlTest().getAllParameters());
 
         char separator, quote;
+        separator = parameters.separator();
+        quote = parameters.quote();
 
         executeColumn = dsBean.getExecuteColumn();
         executeValue = dsBean.getExecuteValue();
 
-        separator = parameters.separator();
-        quote = parameters.quote();
+        DataSourceParameters data = parameters.data();
+        testRailColumn = data.testRailColumn();
 
-        testRailColumn = parameters.testRailColumn();
+        if (!data.qTestColumn().isEmpty() && testRailColumn.isEmpty())
+            testRailColumn = data.qTestColumn();
 
-        if (!parameters.qTestColumn().isEmpty() && testRailColumn.isEmpty())
-            testRailColumn = parameters.qTestColumn();
-
-        testMethodColumn = parameters.testMethodColumn();
-        testMethodOwnerColumn = parameters.testMethodOwnerColumn();
-        bugColumn = parameters.bugColumn();
+        testMethodColumn = data.testMethodColumn();
+        testMethodOwnerColumn = data.testMethodOwnerColumn();
+        bugColumn = data.bugColumn();
 
         List<String> argsList = dsBean.getArgs();
         List<String> staticArgsList = dsBean.getStaticArgs();
 
-        String groupByParameter = parameters.groupColumn();
+        String groupByParameter = data.groupColumn();
         if (!groupByParameter.isEmpty()) {
             GroupByMapper.getInstanceInt().add(argsList.indexOf(groupByParameter));
             GroupByMapper.getInstanceStrings().add(groupByParameter);
         }
 
-        if (parameters.dsArgs().isEmpty()) {
+        if (data.dsArgs().isEmpty()) {
             GroupByMapper.setIsHashMapped(true);
         }
         CSVReader reader;
@@ -234,18 +233,4 @@ public class CsvDataProvider extends BaseDataProvider {
         }
         return index;
     }
-
-    private void addValueToSpecialMap(Map<String, String> map, String column, String hashCode, Map<String, String> csvRow) {
-        if (column != null) {
-            if (!column.isEmpty()) {
-                if (csvRow.get(column) != null) {
-                    if (!csvRow.get(column).isEmpty()) {
-                        // put into the args only non empty jira tickets
-                        map.put(hashCode, csvRow.get(column));
-                    }
-                }
-            }
-        }
-    }
-
 }

@@ -154,23 +154,6 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         
         generateParameters(result);
 
-        if (!result.getTestContext().getCurrentXmlTest().getAllParameters()
-                .containsKey(SpecialKeywords.EXCEL_DS_CUSTOM_PROVIDER) &&
-                result.getParameters().length > 0) // set parameters from XLS only if test contains any parameter at
-                                                   // all)
-        {
-            if (result.getTestContext().getCurrentXmlTest().getAllParameters()
-                    .containsKey(SpecialKeywords.EXCEL_DS_ARGS)) {
-                DSBean dsBean = new DSBean(result.getTestContext());
-                int index = 0;
-                for (String arg : dsBean.getArgs()) {
-                    dsBean.getTestParams().put(arg, (String) result.getParameters()[index++]);
-                }
-                result.getTestContext().getCurrentXmlTest().setParameters(dsBean.getTestParams());
-
-            }
-        }
-
         //TODO: do not write STARTED at message for retry! or move it into the DEBUG level!
         startItem(result, Messager.TEST_STARTED);
         
