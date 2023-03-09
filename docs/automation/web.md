@@ -423,3 +423,14 @@ cellLink.format(2, "My link");
 //getting text of element
 cell.format("My link").getText();
 ```
+
+**How do I install extensions for Chrome?**
+
+Installing an extension for Chrome is done by using the `addEncodedExtensions` method of `ChromeOptions` class, for example:
+```
+ChromeOptions options = new ChromeCapabilities().getCapability("default");
+List<File> paths = new ArrayList();
+paths.add(new File("path to the file with crx extension (packed Chrome extension)"));
+options.addEncodedExtensions(paths);
+getDriver("default", options);
+```
