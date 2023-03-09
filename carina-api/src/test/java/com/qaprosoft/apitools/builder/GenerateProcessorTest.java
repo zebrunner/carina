@@ -15,7 +15,8 @@
  *******************************************************************************/
 package com.qaprosoft.apitools.builder;
 
-import com.qaprosoft.apitools.util.GenerationUtil;
+import com.zebrunner.carina.api.apitools.builder.GenerateProcessor;
+import com.zebrunner.carina.api.apitools.util.GenerationUtil;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

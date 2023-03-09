@@ -15,6 +15,9 @@
  *******************************************************************************/
 package com.qaprosoft.apitools.message;
 
+import com.zebrunner.carina.api.apitools.message.Message;
+import com.zebrunner.carina.api.apitools.message.TemplateMessage;
+import com.zebrunner.carina.api.apitools.message.TextMessage;
 import com.zebrunner.carina.utils.R;
 import org.testng.Assert;
 import org.testng.annotations.Test;

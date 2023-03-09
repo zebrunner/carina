@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.apitools.util;
 
+import com.zebrunner.carina.api.apitools.util.PropertiesUtil;
 import com.zebrunner.carina.utils.R;
 import org.testng.Assert;
 import org.testng.annotations.Test;

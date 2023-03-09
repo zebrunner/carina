@@ -15,9 +15,10 @@
  *******************************************************************************/
 package com.qaprosoft.mock.apimethod;
 
-import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
-import com.qaprosoft.carina.core.foundation.api.annotation.*;
-import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
+import com.zebrunner.carina.api.AbstractApiMethodV2;
+import com.zebrunner.carina.api.annotation.ResponseTemplatePath;
+import com.zebrunner.carina.api.annotation.SuccessfulHttpStatus;
+import com.zebrunner.carina.api.http.HttpResponseStatusType;
 import com.zebrunner.carina.utils.Configuration;
 
 @SuccessfulHttpStatus(status = HttpResponseStatusType.OK_200)

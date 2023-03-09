@@ -15,6 +15,8 @@
  *******************************************************************************/
 package com.qaprosoft.apitools.validation;
 
+import com.zebrunner.carina.api.apitools.validation.XmlCompareMode;
+import com.zebrunner.carina.api.apitools.validation.XmlValidator;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

@@ -15,7 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.mock.apimethod;
 
-import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
+import com.zebrunner.carina.api.AbstractApiMethodV2;
 
 @Deprecated
 public class PutDocMethod extends AbstractApiMethodV2 {

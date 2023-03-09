@@ -69,7 +69,7 @@ Now we are ready to create REST service domain object which will be used to inte
 ```java
 package com.qaprosoft.carina.demo.api;
 
-import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
+import AbstractApiMethodV2;
 import com.zebrunner.carina.utils.Configuration;
 
 public class PostUserMethod extends AbstractApiMethodV2 {
@@ -230,17 +230,17 @@ Here is example of multiple api methods definition for one url pattern. Base url
 ```java
 package com.qaprosoft.carina.demo.api;
 
-import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
-import com.qaprosoft.carina.core.foundation.api.annotation.EndpointTemplate;
-import com.qaprosoft.carina.core.foundation.api.annotation.EndpointTemplateMethod;
-import com.qaprosoft.carina.core.foundation.api.annotation.PathParam;
-import com.qaprosoft.carina.core.foundation.api.annotation.PropertiesPath;
-import com.qaprosoft.carina.core.foundation.api.annotation.RequestTemplatePath;
-import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePath;
-import com.qaprosoft.carina.core.foundation.api.annotation.SuccessfulHttpStatus;
-import com.qaprosoft.carina.core.foundation.api.annotation.method.DeleteMethod;
-import com.qaprosoft.carina.core.foundation.api.http.HttpMethodType;
-import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
+import AbstractApiMethodV2;
+import EndpointTemplate;
+import EndpointTemplateMethod;
+import PathParam;
+import PropertiesPath;
+import RequestTemplatePath;
+import ResponseTemplatePath;
+import SuccessfulHttpStatus;
+import DeleteMethod;
+import HttpMethodType;
+import HttpResponseStatusType;
 
 @EndpointTemplate(url = "${config.env.base_url}/users")
 public interface UserTemplate {
@@ -303,8 +303,8 @@ For more customization on api method definition level you can implement the inte
 ```java
 package com.qaprosoft.carina.demo.api.impl;
 
-import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
-import com.qaprosoft.carina.core.foundation.api.binding.TemplateFactory;
+import AbstractApiMethodV2;
+import TemplateFactory;
 import com.qaprosoft.carina.demo.api.UserTemplate;
 
 public class UserTemplateImpl implements UserTemplate {
@@ -370,8 +370,8 @@ This option provides the ability for handling and changing of your AbstractApiMe
 ```java
 package com.qaprosoft.carina.demo.api.interceptor;
 
-import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
-import com.qaprosoft.carina.core.foundation.api.interceptor.ApiMethodInterceptor;
+import AbstractApiMethodV2;
+import ApiMethodInterceptor;
 
 public class CustomInterceptor implements ApiMethodInterceptor<AbstractApiMethodV2> {
 
@@ -418,7 +418,7 @@ public interface UserTemplate {
 ```
 Then all logic defined in interceptor methods will be called on particular events (once api method is instantiated; once request is ready for sending to endpoint; once endpoint was called).    
 Also it's possible to create global interceptors which will be applied for all api methods by default.    
-Just create a file named `com.qaprosoft.carina.core.foundation.api.interceptor.ApiMethodInterceptor` in `/resources/META-INF/services` folder and set the path(s) of your implementation(s) into it:    
+Just create a file named `ApiMethodInterceptor` in `/resources/META-INF/services` folder and set the path(s) of your implementation(s) into it:    
 ```
 com.qaprosoft.carina.demo.CustomInterceptor
 com.qaprosoft.carina.demo.OtherCustomInterceptor
