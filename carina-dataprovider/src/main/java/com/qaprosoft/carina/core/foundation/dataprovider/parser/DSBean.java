@@ -228,6 +228,7 @@ public class DSBean {
         return StringUtils.removeEnd(sb.toString(), "; ");
     }
 
+    @Deprecated(forRemoval = true, since = "8.0.6")
     public String setDataSorceUUID(String testName, Map<String, String> params) {
 
         if (!params.isEmpty()) {
@@ -244,6 +245,53 @@ public class DSBean {
         return testName;
     }
 
+    /**
+     * Get TUID
+     * 
+     * @param params
+     * @return tuid if exists, empty string otherwise
+     */
+    public String getDataSourceTUID(Map<String, String> params) {
+        String tuid = "";
+        if (!params.isEmpty() && params.containsKey(SpecialKeywords.TUID)) {
+            tuid = params.get(SpecialKeywords.TUID);
+        }
+        return tuid;
+    }
+
+    public String getDataSourceTUID(Object[] params, Map<String, Integer> mapper) {
+        String tuid = "";
+        // looks through the parameters for TUID or get column value by uidArgs parameter
+        Integer indexTUID = mapper.get(SpecialKeywords.TUID);
+        if (indexTUID != null) {
+            tuid = params[indexTUID] + "";
+        }
+        return tuid;
+    }
+
+    public String getDataSourceUUID(Map<String, String> params) {
+        String uid = "";
+        if (!uidArgs.isEmpty()) {
+            if (!argsToString(uidArgs, params).isEmpty()) {
+                uid = argsToString(uidArgs, params);
+            }
+        }
+        return uid;
+    }
+
+    public String getDataSourceUUID(Object[] params, Map<String, Integer> mapper) {
+        String uid = "";
+        if (!uidArgs.isEmpty()) {
+            String uidString = argsToString(uidArgs, params, mapper);
+            if (!uidString.isEmpty()) {
+                uid = uidString;
+            }
+        }
+        return uid;
+
+    }
+
+    @Deprecated(forRemoval = true, since = "8.0.6")
     public String setDataSorceUUID(String testName, Object[] params, Map<String, Integer> mapper) {
         // looks through the parameters for TUID or get column value by uidArgs parameter
         Integer indexTUID = mapper.get(SpecialKeywords.TUID);

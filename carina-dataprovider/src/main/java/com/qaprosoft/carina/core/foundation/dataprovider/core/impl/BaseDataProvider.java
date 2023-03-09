@@ -16,13 +16,16 @@
 package com.qaprosoft.carina.core.foundation.dataprovider.core.impl;
 
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
+import org.testng.internal.ConstructorOrMethod;
 
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.zebrunner.carina.utils.ParameterGenerator;
@@ -33,7 +36,10 @@ import com.zebrunner.carina.utils.ParameterGenerator;
 
 public abstract class BaseDataProvider {
 
+    protected Map<String, String> tuidArgsMap = Collections.synchronizedMap(new HashMap<>());
     protected Map<String, String> testNameArgsMap = Collections.synchronizedMap(new HashMap<>());
+    protected Map<String, String> uidArgsMap = Collections.synchronizedMap(new HashMap<>());
+
 
     protected Map<String, String> testMethodOwnerArgsMap = Collections.synchronizedMap(new HashMap<>());
 
@@ -49,8 +55,16 @@ public abstract class BaseDataProvider {
                 .getTestParams().get(name));
     }
 
+    public Map<String, String> getTUIDArgsMap() {
+        return tuidArgsMap;
+    }
+
     public Map<String, String> getTestNameArgsMap() {
         return testNameArgsMap;
+    }
+
+    public Map<String, String> getUidArgsMap() {
+        return uidArgsMap;
     }
 
     public Map<String, String> getTestMethodOwnerArgsMap() {
