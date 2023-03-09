@@ -57,10 +57,13 @@ public class DataProviderFactory {
                 continue;
             }
 
-            BaseDataProvider dataProvider = initDataProvider(providerClass);
+            Object providerObject = initDataProvider(providerClass);
 
-            provider = ArrayUtils.addAll(provider, dataProvider.getDataProvider(annotation, context, m));
-            testNameArgsMap.putAll(dataProvider.getTestNameArgsMap());
+            if (providerObject instanceof BaseDataProvider) {
+                BaseDataProvider dataProvider = (BaseDataProvider) providerObject;
+                provider = ArrayUtils.addAll(provider, dataProvider.getDataProvider(annotation, context, m));
+                testNameArgsMap.putAll(dataProvider.getTestNameArgsMap());
+            }
         }
 
         if (!GroupByMapper.getInstanceInt().isEmpty() || !GroupByMapper.getInstanceStrings().isEmpty()) {
@@ -109,13 +112,13 @@ public class DataProviderFactory {
      *
      * @return DataProvider Instance.
      */
-    private static BaseDataProvider initDataProvider(String providerClass){
+    private static Object initDataProvider(String providerClass){
         Class<?> clazz;
-        BaseDataProvider dataProvider = null;
+        Object dataProvider = null;
         try {
             clazz = Class.forName(providerClass);
             Constructor<?> ctor = clazz.getConstructor();
-            dataProvider = (BaseDataProvider) ctor.newInstance();
+            dataProvider =  ctor.newInstance();
         } catch (Exception e) {
             LOGGER.error("DataProvider initialization failure", e);
         }
