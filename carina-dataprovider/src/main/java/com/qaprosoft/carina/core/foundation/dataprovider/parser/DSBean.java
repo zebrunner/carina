@@ -15,12 +15,12 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.dataprovider.parser;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import com.qaprosoft.carina.core.foundation.dataprovider.annotations.DataSourceParameters;
 import org.apache.commons.lang3.StringUtils;
 import org.testng.ITestContext;
 
@@ -56,7 +56,7 @@ public class DSBean {
     public DSBean(XlsDataSourceParameters xlsDataSourceParameters, Map<String, String> suiteParams) {
         // params init order: 1) from test annotation 2) from suite
         if (xlsDataSourceParameters != null) {
-            this.initParamsFromAnnotation(xlsDataSourceParameters.data());
+            this.initParamsFromAnnotation(xlsDataSourceParameters);
             if (!xlsDataSourceParameters.sheet().isEmpty()) {
                 xlsSheet = xlsDataSourceParameters.sheet();
             }
@@ -84,7 +84,7 @@ public class DSBean {
     public DSBean(CsvDataSourceParameters csvDataSourceParameters, Map<String, String> suiteParams) {
         // initialize default Xls data source parameters from suite xml file
         if (csvDataSourceParameters != null) {
-            this.initParamsFromAnnotation(csvDataSourceParameters.data());
+            this.initParamsFromAnnotation(csvDataSourceParameters);
         }
 
         if (!suiteParams.isEmpty()) {
@@ -95,25 +95,48 @@ public class DSBean {
         this.xlsSheet = null;
     }
 
-    private void initParamsFromAnnotation(DataSourceParameters data) {
-        if (data != null) {
-            if (!data.path().isEmpty()) {
-                this.dsFile = data.path();
+    private void initParamsFromAnnotation(XlsDataSourceParameters parameters) {
+        if (parameters != null) {
+            if (!parameters.path().isEmpty()) {
+                this.dsFile = parameters.path();
             }
-            if (!data.executeColumn().isEmpty()) {
-                this.executeColumn = data.executeColumn();
+            if (!parameters.executeColumn().isEmpty()) {
+                this.executeColumn = parameters.executeColumn();
             }
-            if (!data.executeValue().isEmpty()) {
-                this.executeValue = data.executeValue();
+            if (!parameters.executeValue().isEmpty()) {
+                this.executeValue = parameters.executeValue();
             }
-            if (!data.dsArgs().isEmpty()) {
-                this.args = Arrays.asList(data.dsArgs().replace(" ", "").split(","));
+            if (!parameters.dsArgs().isEmpty()) {
+                this.args = Arrays.asList(parameters.dsArgs().replace(" ", "").split(","));
             }
-            if (!data.dsUid().isEmpty()) {
-                this.uidArgs = Arrays.asList(data.dsUid().replace(" ", "").split(","));
+            if (!parameters.dsUid().isEmpty()) {
+                this.uidArgs = Arrays.asList(parameters.dsUid().replace(" ", "").split(","));
             }
-            if (!data.staticArgs().isEmpty()) {
-                this.staticArgs = Arrays.asList(data.staticArgs().replace(" ", "").split(","));
+            if (!parameters.staticArgs().isEmpty()) {
+                this.staticArgs = Arrays.asList(parameters.staticArgs().replace(" ", "").split(","));
+            }
+        }
+    }
+
+    private void initParamsFromAnnotation(CsvDataSourceParameters parameters) {
+        if (parameters != null) {
+            if (!parameters.path().isEmpty()) {
+                this.dsFile = parameters.path();
+            }
+            if (!parameters.executeColumn().isEmpty()) {
+                this.executeColumn = parameters.executeColumn();
+            }
+            if (!parameters.executeValue().isEmpty()) {
+                this.executeValue = parameters.executeValue();
+            }
+            if (!parameters.dsArgs().isEmpty()) {
+                this.args = Arrays.asList(parameters.dsArgs().replace(" ", "").split(","));
+            }
+            if (!parameters.dsUid().isEmpty()) {
+                this.uidArgs = Arrays.asList(parameters.dsUid().replace(" ", "").split(","));
+            }
+            if (!parameters.staticArgs().isEmpty()) {
+                this.staticArgs = Arrays.asList(parameters.staticArgs().replace(" ", "").split(","));
             }
         }
     }

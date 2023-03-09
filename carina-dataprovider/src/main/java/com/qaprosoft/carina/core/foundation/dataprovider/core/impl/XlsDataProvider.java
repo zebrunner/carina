@@ -46,34 +46,34 @@ public class XlsDataProvider extends BaseDataProvider {
         argsList = dsBean.getArgs();
         staticArgsList = dsBean.getStaticArgs();
 
-        if (parameters.data().dsArgs().isEmpty()) {
+        if (parameters.dsArgs().isEmpty()) {
             GroupByMapper.setIsHashMapped(true);
         }
 
-        String groupByParameter = parameters.data().groupColumn();
+        String groupByParameter = parameters.groupColumn();
         if (!groupByParameter.isEmpty()) {
             GroupByMapper.getInstanceInt().add(argsList.indexOf(groupByParameter));
             GroupByMapper.getInstanceStrings().add(groupByParameter);
         }
 
         String testRailColumn = "";
-        if (!parameters.data().testRailColumn().isEmpty())
-            testRailColumn = parameters.data().testRailColumn();
+        if (!parameters.testRailColumn().isEmpty())
+            testRailColumn = parameters.testRailColumn();
 
-        if (!parameters.data().qTestColumn().isEmpty() && testRailColumn.isEmpty())
-            testRailColumn = parameters.data().qTestColumn();
+        if (!parameters.qTestColumn().isEmpty() && testRailColumn.isEmpty())
+            testRailColumn = parameters.qTestColumn();
 
         String testMethodColumn = "";
-        if (!parameters.data().testMethodColumn().isEmpty())
-            testMethodColumn = parameters.data().testMethodColumn();
+        if (!parameters.testMethodColumn().isEmpty())
+            testMethodColumn = parameters.testMethodColumn();
 
         String testMethodOwnerColumn = "";
-        if (!parameters.data().testMethodOwnerColumn().isEmpty())
-            testMethodOwnerColumn = parameters.data().testMethodOwnerColumn();
+        if (!parameters.testMethodOwnerColumn().isEmpty())
+            testMethodOwnerColumn = parameters.testMethodOwnerColumn();
 
         String bugColumn = "";
-        if (!parameters.data().bugColumn().isEmpty())
-            bugColumn = parameters.data().bugColumn();
+        if (!parameters.bugColumn().isEmpty())
+            bugColumn = parameters.bugColumn();
 
         int width = 0;
         if (argsList.size() == 0) {

@@ -29,5 +29,27 @@ public @interface XlsDataSourceParameters {
 
     String sheet() default "";
 
-    DataSourceParameters data();
+    String path() default "";
+
+    String dsArgs() default "";
+
+    String dsUid() default "";
+
+    String executeColumn() default "Execute";
+
+    String executeValue() default "y";
+
+    String staticArgs() default "";
+
+    String groupColumn() default "";
+
+    String testRailColumn() default "";
+
+    String qTestColumn() default "";
+
+    String testMethodColumn() default "";
+
+    String testMethodOwnerColumn() default "";
+
+    String bugColumn() default "";
 }

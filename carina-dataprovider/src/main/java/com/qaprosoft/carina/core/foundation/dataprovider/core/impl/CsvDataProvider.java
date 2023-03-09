@@ -26,7 +26,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.qaprosoft.carina.core.foundation.dataprovider.annotations.DataSourceParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
@@ -67,26 +66,25 @@ public class CsvDataProvider extends BaseDataProvider {
         executeColumn = dsBean.getExecuteColumn();
         executeValue = dsBean.getExecuteValue();
 
-        DataSourceParameters data = parameters.data();
-        testRailColumn = data.testRailColumn();
+        testRailColumn = parameters.testRailColumn();
 
-        if (!data.qTestColumn().isEmpty() && testRailColumn.isEmpty())
-            testRailColumn = data.qTestColumn();
+        if (!parameters.qTestColumn().isEmpty() && testRailColumn.isEmpty())
+            testRailColumn = parameters.qTestColumn();
 
-        testMethodColumn = data.testMethodColumn();
-        testMethodOwnerColumn = data.testMethodOwnerColumn();
-        bugColumn = data.bugColumn();
+        testMethodColumn = parameters.testMethodColumn();
+        testMethodOwnerColumn = parameters.testMethodOwnerColumn();
+        bugColumn = parameters.bugColumn();
 
         List<String> argsList = dsBean.getArgs();
         List<String> staticArgsList = dsBean.getStaticArgs();
 
-        String groupByParameter = data.groupColumn();
+        String groupByParameter = parameters.groupColumn();
         if (!groupByParameter.isEmpty()) {
             GroupByMapper.getInstanceInt().add(argsList.indexOf(groupByParameter));
             GroupByMapper.getInstanceStrings().add(groupByParameter);
         }
 
-        if (data.dsArgs().isEmpty()) {
+        if (parameters.dsArgs().isEmpty()) {
             GroupByMapper.setIsHashMapped(true);
         }
         CSVReader reader;

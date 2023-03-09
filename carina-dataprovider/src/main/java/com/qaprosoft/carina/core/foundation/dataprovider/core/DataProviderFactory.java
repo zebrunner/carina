@@ -52,10 +52,8 @@ public class DataProviderFactory {
         Object[][] provider = new Object[][]{};
 
         for (Annotation annotation : annotations) {
-            String providerClass;
-            if (annotation instanceof CsvDataSourceParameters || annotation instanceof XlsDataSourceParameters) {
-                providerClass = findProviderClass(annotation);
-            } else {
+            String providerClass = findProviderClass(annotation);
+            if (providerClass.isEmpty()){
                 continue;
             }
 
