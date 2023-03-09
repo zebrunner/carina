@@ -20,9 +20,9 @@ import org.testng.annotations.Test;
 
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.R;
-import com.qaprosoft.mock.apimethod.AutoReplaceUrlPartsMethod;
-import com.qaprosoft.mock.apimethod.NoPlaceholdersInURLMethod;
-import com.qaprosoft.mock.apimethod.PutDocMethod;
+import com.zebrunner.carina.api.mock.apimethod.AutoReplaceUrlPartsMethod;
+import com.zebrunner.carina.api.mock.apimethod.NoPlaceholdersInURLMethod;
+import com.zebrunner.carina.api.mock.apimethod.PutDocMethod;
 
 public class AbstractApiMethodTest {
 

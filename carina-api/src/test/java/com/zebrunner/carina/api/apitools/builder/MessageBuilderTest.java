@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.apitools.builder;
+package com.zebrunner.carina.api.apitools.builder;
 
 import com.zebrunner.carina.api.apitools.builder.MessageBuilder;
 import com.zebrunner.carina.utils.R;

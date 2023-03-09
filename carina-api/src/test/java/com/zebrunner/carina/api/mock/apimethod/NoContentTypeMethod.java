@@ -13,20 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.mock.apimethod;
+package com.zebrunner.carina.api.mock.apimethod;
 
 import com.zebrunner.carina.api.AbstractApiMethodV2;
-import com.zebrunner.carina.api.annotation.ContentType;
+import com.zebrunner.carina.api.annotation.ResponseTemplatePath;
 import com.zebrunner.carina.api.annotation.SuccessfulHttpStatus;
 import com.zebrunner.carina.api.http.HttpResponseStatusType;
 import com.zebrunner.carina.utils.Configuration;
 
-@ContentType(type = "application/xml")
 @SuccessfulHttpStatus(status = HttpResponseStatusType.OK_200)
-public class XmlContentTypeMethod extends AbstractApiMethodV2 {
+@ResponseTemplatePath(path = "validation/array/duplicate/array_act.json")
+public class NoContentTypeMethod extends AbstractApiMethodV2 {
 
-    public XmlContentTypeMethod() {
-        super(null, "src/test/resources/validation/xml_file/object/expected_res.xml");
+    public NoContentTypeMethod() {
         replaceUrlPlaceholder("base_url", Configuration.getEnvArg("api_url"));
     }
 }

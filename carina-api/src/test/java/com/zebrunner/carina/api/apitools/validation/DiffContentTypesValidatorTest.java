@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.apitools.validation;
+package com.zebrunner.carina.api.apitools.validation;
 
 import static org.apache.commons.lang3.StringUtils.normalizeSpace;
 
@@ -29,9 +29,9 @@ import org.testng.annotations.Test;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.zebrunner.carina.utils.R;
-import com.qaprosoft.mock.apimethod.NoContentTypeMethod;
-import com.qaprosoft.mock.apimethod.XmlContentTypeMethod;
-import com.qaprosoft.mock.server.MockServer;
+import com.zebrunner.carina.api.mock.apimethod.NoContentTypeMethod;
+import com.zebrunner.carina.api.mock.apimethod.XmlContentTypeMethod;
+import com.zebrunner.carina.api.mock.server.MockServer;
 
 public class DiffContentTypesValidatorTest {
 

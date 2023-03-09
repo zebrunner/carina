@@ -16,7 +16,7 @@
 package com.zebrunner.carina.api.ssl;
 
 import com.zebrunner.carina.api.http.HttpResponseStatusType;
-import com.qaprosoft.mock.apimethod.PutDocMethod;
+import com.zebrunner.carina.api.mock.apimethod.PutDocMethod;
 
 @Deprecated
 public class PutDocTest {

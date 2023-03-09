@@ -33,11 +33,6 @@
 			<artifactId>carina-utils</artifactId>
 		</dependency>
 		<dependency>
-			<!-- do not remove otherwise a lot of compilation failures on test projects! -->
-			<groupId>com.qaprosoft</groupId>
-			<artifactId>carina-api</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-reporting</artifactId>
 		</dependency>

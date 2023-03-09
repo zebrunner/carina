@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.apitools.validation;
+package com.zebrunner.carina.api.apitools.validation;
 
-import com.zebrunner.carina.api.apitools.validation.XmlValidator;
 import org.apache.commons.io.IOUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;

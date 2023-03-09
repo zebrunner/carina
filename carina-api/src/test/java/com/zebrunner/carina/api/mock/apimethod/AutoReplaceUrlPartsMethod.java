@@ -1,4 +1,4 @@
-package com.qaprosoft.mock.apimethod;
+package com.zebrunner.carina.api.mock.apimethod;
 
 import com.zebrunner.carina.api.AbstractApiMethodV2;
 import com.zebrunner.carina.api.annotation.Endpoint;
