@@ -97,7 +97,7 @@ public class XlsDataProvider extends BaseDataProvider {
                     if (value == null)
                         continue;
 
-                    Object param = ParameterGenerator.process(entry.getValue().toString());
+                    Object param = ParameterGenerator.process(value);
                     if (param == null)
                         continue;
 

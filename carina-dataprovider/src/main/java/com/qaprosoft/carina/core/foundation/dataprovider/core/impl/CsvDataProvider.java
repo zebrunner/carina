@@ -75,8 +75,8 @@ public class CsvDataProvider extends BaseDataProvider {
         testMethodOwnerColumn = parameters.testMethodOwnerColumn();
         bugColumn = parameters.bugColumn();
 
-        List<String> argsList = dsBean.getArgs();
-        List<String> staticArgsList = dsBean.getStaticArgs();
+        argsList = dsBean.getArgs();
+        staticArgsList = dsBean.getStaticArgs();
 
         String groupByParameter = parameters.groupColumn();
         if (!groupByParameter.isEmpty()) {
@@ -101,20 +101,16 @@ public class CsvDataProvider extends BaseDataProvider {
         if (list.size() == 0) {
             throw new RuntimeException("Unable to retrieve data from CSV DataProvider! Verify separator and quote settings.");
         }
-        List<String> headers = Arrays.asList((String[]) list.get(0));
-
-        // handle empty argsList inside initMapper
-        mapper = initMapper(argsList, headers);
+        List<String> headers = Arrays.asList(list.get(0));
         list.remove(0);
 
+        List<Map<String, String>> dsData = initData(headers, list);
         // exclude those lines which don't satisfy executeColumn/executeValue filter
-        Iterator<String[]> iter = list.iterator();
-        while (iter.hasNext()) {
-            int index = mapper.get(executeColumn);
-
-            String[] line = iter.next();
-            if (!line[index].equalsIgnoreCase(executeValue)) {
-                iter.remove();
+        for (int i = 0; i < dsData.size(); i++) {
+            Map<String, String> row = dsData.get(i);
+            if (!row.get(dsBean.getExecuteColumn()).equalsIgnoreCase(executeValue)) {
+                dsData.remove(i);
+                i--;
             }
         }
 
@@ -130,55 +126,56 @@ public class CsvDataProvider extends BaseDataProvider {
 
         Object[][] args = new Object[listSize][width];
         int rowIndex = 0;
-        for (String[] strings : list) {
-            int i = 0;
+        for (Map<String, String> row : dsData) {
+
             if (argsList.size() == 0) {
-                // read all csv data into the single HashMap<String, String> object
-                HashMap<String, String> dynamicAttrs = new HashMap<String, String>();
+                for (Map.Entry<String, String> entry : row.entrySet()) {
+                    if (entry == null)
+                        continue;
 
-                for (String header : headers) {
-                    int index = mapper.get(header);
-                    if (ParameterGenerator.process(strings[index]) != null) {
-                        dynamicAttrs.put(header, ParameterGenerator.process(strings[index]).toString());
-                    } else {
-                        dynamicAttrs.put(header, null);
+                    String value = entry.getValue();
+                    if (value == null)
+                        continue;
+
+                    Object param = ParameterGenerator.process(value);
+                    if (param == null)
+                        continue;
+
+                    String newValue = param.toString();
+                    if (!value.equals(newValue)) {
+                        entry.setValue(newValue);
                     }
                 }
-
-                args[rowIndex][0] = dynamicAttrs;
-                i++;
+                args[rowIndex][0] = row;
+                for (int i = 0; i < staticArgsList.size(); i++) {
+                    args[rowIndex][i + 1] = getStaticParam(staticArgsList.get(i), context, dsBean);
+                }
             } else {
-                for (String arg : argsList) {
-                    int index = mapper.get(arg);
-                    if (ParameterGenerator.process(strings[index]) != null) {
-                        args[rowIndex][i] = ParameterGenerator.process(strings[index]).toString();
-                    } else {
-                        args[rowIndex][i] = null;
-                    }
-                    i++;
+                int i;
+                for (i = 0; i < argsList.size(); i++) {
+                    args[rowIndex][i] = ParameterGenerator
+                            .process(row.get(argsList.get(i)));
+                }
+
+                for (int j = 0; j < staticArgsList.size(); j++) {
+                    args[rowIndex][i + j] = getStaticParam(staticArgsList.get(j), context, dsBean);
                 }
             }
 
-            for (int j = 0; j < staticArgsList.size(); j++) {
-                args[rowIndex][i + j] = getStaticParam(staticArgsList.get(j), context, dsBean);
-            }
-
-            HashMap<String, String> csvRow = (HashMap<String, String>) args[rowIndex][0];
-            tuidMap.put(hash(args[rowIndex], testMethod), getValueFromRow(csvRow, dsBean.getUidArgs()));
+            tuidMap.put(hash(args[rowIndex], testMethod), getValueFromRow(row, dsBean.getUidArgs()));
 
             if (!testMethodColumn.isEmpty()) {
-                String testNameOverride = getValueFromRow(csvRow, List.of(testMethodColumn));
+                String testNameOverride = getValueFromRow(row, List.of(testMethodColumn));
                 if (!testNameOverride.isEmpty()) {
-                    testColumnNamesMap.put(hash(args[rowIndex], testMethod), getValueFromRow(csvRow, testMethodColumn));
+                    testColumnNamesMap.put(hash(args[rowIndex], testMethod), getValueFromRow(row, testMethodColumn));
                 }
             }
 
-
             // add testMethoOwner from xls datasource to special hashMap
-            addValueToSpecialMap(testMethodOwnerArgsMap, testMethodOwnerColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
+            addValueToSpecialMap(testMethodOwnerArgsMap, testMethodOwnerColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), row);
 
             // add testrails cases from xls datasource to special hashMap
-            addValueToSpecialMap(testRailsArgsMap, testRailColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
+            addValueToSpecialMap(testRailsArgsMap, testRailColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), row);
 
             rowIndex++;
         }
@@ -186,46 +183,17 @@ public class CsvDataProvider extends BaseDataProvider {
         return args;
     }
 
-    /*
-     * obligatory add to mapper all columns for DataProvider artifacts like:
-     * executeColumn - filter column
-     * testRailColumn
-     * testMethodColumn
-     * testMethodOwnerColumn
-     */
-    private Map<String, Integer> initMapper(List<String> argsList, List<String> headers) {
-        Map<String, Integer> mapper = new HashMap<String, Integer>();
+    private List<Map<String, String>> initData(List<String> headers, List<String[]> values) {
+        List<Map<String, String>> list = new ArrayList<>();
 
-        if (argsList.size() == 0) {
-            // read all columns and put their name into the mapper
-            for (String arg : headers) {
-                mapper.put(arg, getIndex(arg, headers));
-            }
-        } else {
-            for (String arg : argsList) {
-                mapper.put(arg, getIndex(arg, headers));
+        for (int i = 0; i < values.size(); i++) {
+            Map<String, String> map = new HashMap<>();
+            list.add(map);
+            for (int j = 0; j < headers.size(); j++) {
+                map.put(headers.get(j), values.get(i)[j]);
             }
         }
 
-        mapper.put(executeColumn, getIndex(executeColumn, headers));
-        mapper.put(testRailColumn, getIndex(testRailColumn, headers));
-        mapper.put(testMethodColumn, getIndex(testMethodColumn, headers));
-        mapper.put(testMethodOwnerColumn, getIndex(testMethodOwnerColumn, headers));
-        mapper.put(bugColumn, getIndex(bugColumn, headers));
-
-        return mapper;
-    }
-
-    private Integer getIndex(String arg, List<String> headers) {
-        if (arg.isEmpty()) {
-            return -1;
-        }
-
-        int index = headers.indexOf(arg);
-        if (index == -1) {
-            throw new RuntimeException(
-                    "Unable to find column '" + arg + "' in DataProvider among '" + headers + "'!  Verify separator and quote settings.");
-        }
-        return index;
+        return list;
     }
 }
