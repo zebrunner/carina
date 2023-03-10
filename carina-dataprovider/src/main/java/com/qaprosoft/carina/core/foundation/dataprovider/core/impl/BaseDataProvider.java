@@ -16,10 +16,7 @@
 package com.qaprosoft.carina.core.foundation.dataprovider.core.impl;
 
 import java.lang.annotation.Annotation;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
@@ -32,12 +29,11 @@ import com.zebrunner.carina.utils.ParameterGenerator;
  */
 
 public abstract class BaseDataProvider {
-
+    protected Map<String, String> tuidMap = Collections.synchronizedMap(new HashMap<>());
     protected Map<String, String> testNameArgsMap = Collections.synchronizedMap(new HashMap<>());
-
     protected Map<String, String> testMethodOwnerArgsMap = Collections.synchronizedMap(new HashMap<>());
-
     protected Map<String, String> testRailsArgsMap = Collections.synchronizedMap(new HashMap<>());
+    protected Map<String, String> testColumnNamesMap = Collections.synchronizedMap(new HashMap<>());
 
     protected List<String> argsList;
     protected List<String> staticArgsList;
@@ -49,8 +45,12 @@ public abstract class BaseDataProvider {
                 .getTestParams().get(name));
     }
 
-    public Map<String, String> getTestNameArgsMap() {
-        return testNameArgsMap;
+    public Map<String, String> getTestColumnNamesMap() {
+        return testColumnNamesMap;
+    }
+
+    public Map<String, String> getTuidMap() {
+        return tuidMap;
     }
 
     public Map<String, String> getTestMethodOwnerArgsMap() {
@@ -72,6 +72,14 @@ public abstract class BaseDataProvider {
                 }
             }
         }
+    }
+
+    public static String hash(Object[] args, ITestNGMethod method) {
+        String toHash = "";
+        toHash += Arrays.hashCode(args);
+        toHash += method.getMethodName();
+        toHash += (method.getRealClass());
+        return String.valueOf(toHash.hashCode());
     }
 
 }

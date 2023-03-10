@@ -48,12 +48,13 @@ public class DataProviderFactory {
     }
 
     public static Object[][] getDataProvider(Annotation[] annotations, ITestContext context, ITestNGMethod m) {
-        Map<String, String> testNameArgsMap = Collections.synchronizedMap(new HashMap<>());
+        Map<String, String> tuidMap = Collections.synchronizedMap(new HashMap<>());
+        Map<String, String> testNameFromColumn = Collections.synchronizedMap(new HashMap<>());
         Object[][] provider = new Object[][]{};
 
         for (Annotation annotation : annotations) {
             String providerClass = findProviderClass(annotation);
-            if (providerClass.isEmpty()){
+            if (providerClass.isEmpty()) {
                 continue;
             }
 
@@ -62,15 +63,15 @@ public class DataProviderFactory {
             if (providerObject instanceof BaseDataProvider) {
                 BaseDataProvider dataProvider = (BaseDataProvider) providerObject;
                 provider = ArrayUtils.addAll(provider, dataProvider.getDataProvider(annotation, context, m));
-                testNameArgsMap.putAll(dataProvider.getTestNameArgsMap());
+                tuidMap.putAll(dataProvider.getTuidMap());
+                testNameFromColumn.putAll(dataProvider.getTestColumnNamesMap());
             }
         }
 
         if (!GroupByMapper.getInstanceInt().isEmpty() || !GroupByMapper.getInstanceStrings().isEmpty()) {
             provider = getGroupedList(provider);
         }
-
-        context.setAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP, testNameArgsMap);
+        putValuesToContext(context, tuidMap, testNameFromColumn);
 
         // clear group by settings
         GroupByMapper.getInstanceInt().clear();
@@ -79,13 +80,32 @@ public class DataProviderFactory {
         return provider;
     }
 
+    private static void putValuesToContext(ITestContext context,
+                                           Map<String, String> tuidMap,
+                                           Map<String, String> testNameFromColumn) {
+        @SuppressWarnings("unchecked")
+        Map<String, String> contextTUID = (Map<String, String>) context.getAttribute(SpecialKeywords.TUID);
+        if (contextTUID != null) {
+            contextTUID.putAll(tuidMap);
+        } else {
+            context.setAttribute(SpecialKeywords.TUID, tuidMap);
+        }
+
+        @SuppressWarnings("unchecked")
+        Map<String, String> contextTestName = (Map<String, String>) context.getAttribute(SpecialKeywords.TEST_NAME);
+        if (contextTestName != null) {
+            contextTUID.putAll(tuidMap);
+        } else {
+            context.setAttribute(SpecialKeywords.TEST_NAME, testNameFromColumn);
+        }
+    }
+
     /**
      * Finds class name for data provider implementation.
      *
      * @param annotation test method annotation.
-     *
      * @return class name of data provider if it was found in annotation classname() method.
-     *         Empty string if not.
+     * Empty string if not.
      */
     private static String findProviderClass(Annotation annotation) {
         Class<? extends Annotation> type = annotation.annotationType();
@@ -98,7 +118,7 @@ public class DataProviderFactory {
                     break;
                 }
             }
-        } catch (ReflectiveOperationException e){
+        } catch (ReflectiveOperationException e) {
             LOGGER.error("Failure on finding DataProvider class instance", e);
         }
 
@@ -109,16 +129,15 @@ public class DataProviderFactory {
      * Initialize DataProvider based on className parameter.
      *
      * @param providerClass String full className.
-     *
      * @return DataProvider Instance.
      */
-    private static Object initDataProvider(String providerClass){
+    private static Object initDataProvider(String providerClass) {
         Class<?> clazz;
         Object dataProvider = null;
         try {
             clazz = Class.forName(providerClass);
             Constructor<?> ctor = clazz.getConstructor();
-            dataProvider =  ctor.newInstance();
+            dataProvider = ctor.newInstance();
         } catch (Exception e) {
             LOGGER.error("DataProvider initialization failure", e);
         }

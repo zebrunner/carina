@@ -17,6 +17,7 @@ package com.qaprosoft.carina.core.foundation.dataprovider.core.impl;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.testng.ITestContext;
@@ -121,13 +122,14 @@ public class XlsDataProvider extends BaseDataProvider {
                     args[rowIndex][i + j] = getStaticParam(staticArgsList.get(j), context, dsBean);
                 }
             }
-            // update testName adding UID values from DataSource arguments if any
-            testName = dsBean.setDataSorceUUID(testName, xlsRow);
 
-            testNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), testName);
+            tuidMap.put(hash(args[rowIndex], testMethod), getValueFromRow(xlsRow, dsBean.getUidArgs()));
+
             if (!testMethodColumn.isEmpty()) {
-                // override testName value from xls datasource to special hashMap
-                addValueToSpecialMap(testNameArgsMap, testMethodColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);
+                String testNameOverride = getValueFromRow(xlsRow, List.of(testMethodColumn));
+                if (!testNameOverride.isEmpty()) {
+                    testColumnNamesMap.put(hash(args[rowIndex], testMethod), getValueFromRow(xlsRow, testMethodColumn));
+                }
             }
 
             // add testMethoOwner from xls datasource to special hashMap
@@ -140,5 +142,28 @@ public class XlsDataProvider extends BaseDataProvider {
         }
 
         return args;
+    }
+
+    private String getValueFromRow(Map<String, String> xlsRow, String key) {
+        return getValueFromRow(xlsRow, List.of(key));
+    }
+
+    private String getValueFromRow(Map<String, String> xlsRow, List<String> keys) {
+        StringBuilder valueRes = new StringBuilder();
+
+        for (String key : keys) {
+            if (xlsRow.containsKey(key)) {
+                String value = xlsRow.get(key);
+                if (value != null && !value.isEmpty()) {
+                    valueRes.append(value);
+                    valueRes.append(", ");
+                }
+            }
+        }
+
+        if (valueRes.indexOf(",") != -1) {
+            valueRes.replace(valueRes.length() - 2, valueRes.length() - 1, "");
+        }
+        return valueRes.toString();
     }
 }
