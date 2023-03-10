@@ -94,7 +94,7 @@ public class DataProviderFactory {
         @SuppressWarnings("unchecked")
         Map<String, String> contextTestName = (Map<String, String>) context.getAttribute(SpecialKeywords.TEST_NAME);
         if (contextTestName != null) {
-            contextTUID.putAll(tuidMap);
+            contextTestName.putAll(testNameFromColumn);
         } else {
             context.setAttribute(SpecialKeywords.TEST_NAME, testNameFromColumn);
         }

@@ -170,7 +170,13 @@ public class CsvDataProvider extends BaseDataProvider {
             testName = dsBean.setDataSorceUUID(testName, strings, mapper); // provide whole line from data provider for UUID generation
 
             HashMap<String, String> csvRow = (HashMap<String, String>) args[rowIndex][0];
-            
+            tuidMap.put(hash(args[rowIndex], testMethod), getValueFromRow(csvRow, dsBean.getUidArgs()));
+            if (!testMethodColumn.isEmpty()) {
+                String testNameOverride = getValueFromRow(csvRow, List.of(testMethodColumn));
+                if (!testNameOverride.isEmpty()) {
+                    testColumnNamesMap.put(hash(args[rowIndex], testMethod), getValueFromRow(csvRow, testMethodColumn));
+                }
+            }
             testNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), testName);
             if (!testMethodColumn.isEmpty()) {
                 // override testName value from xls datasource to special hashMap

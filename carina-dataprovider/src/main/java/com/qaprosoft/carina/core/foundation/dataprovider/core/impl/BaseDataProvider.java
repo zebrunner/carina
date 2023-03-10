@@ -82,4 +82,27 @@ public abstract class BaseDataProvider {
         return String.valueOf(toHash.hashCode());
     }
 
+    protected String getValueFromRow(Map<String, String> xlsRow, String key) {
+        return getValueFromRow(xlsRow, List.of(key));
+    }
+
+    protected String getValueFromRow(Map<String, String> xlsRow, List<String> keys) {
+        StringBuilder valueRes = new StringBuilder();
+
+        for (String key : keys) {
+            if (xlsRow.containsKey(key)) {
+                String value = xlsRow.get(key);
+                if (value != null && !value.isEmpty()) {
+                    valueRes.append(value);
+                    valueRes.append(", ");
+                }
+            }
+        }
+
+        if (valueRes.indexOf(",") != -1) {
+            valueRes.replace(valueRes.length() - 2, valueRes.length() - 1, "");
+        }
+        return valueRes.toString();
+    }
+
 }
