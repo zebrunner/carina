@@ -22,7 +22,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -42,16 +41,7 @@ import au.com.bytecode.opencsv.CSVReader;
  * Created by Patotsky on 16.12.2014.
  */
 public class CsvDataProvider extends BaseDataProvider {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private Map<String, Integer> mapper = new HashMap<String, Integer>();
-
-    private String executeColumn;
-    private String executeValue;
-    private String testRailColumn;
-    private String testMethodColumn;
-    private String testMethodOwnerColumn;
-    private String bugColumn;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -63,32 +53,21 @@ public class CsvDataProvider extends BaseDataProvider {
         separator = parameters.separator();
         quote = parameters.quote();
 
-        executeColumn = dsBean.getExecuteColumn();
-        executeValue = dsBean.getExecuteValue();
+        String testRailColumn = dsBean.getTestRailColumn();
+        if (testRailColumn.isEmpty())
+            testRailColumn = dsBean.getQTestColumn();
 
-        testRailColumn = parameters.testRailColumn();
-
-        if (!parameters.qTestColumn().isEmpty() && testRailColumn.isEmpty())
-            testRailColumn = parameters.qTestColumn();
-
-        testMethodColumn = parameters.testMethodColumn();
-        testMethodOwnerColumn = parameters.testMethodOwnerColumn();
-        bugColumn = parameters.bugColumn();
-
-        argsList = dsBean.getArgs();
-        staticArgsList = dsBean.getStaticArgs();
-
-        String groupByParameter = parameters.groupColumn();
+        String groupByParameter = dsBean.getGroupColumn();
         if (!groupByParameter.isEmpty()) {
-            GroupByMapper.getInstanceInt().add(argsList.indexOf(groupByParameter));
+            GroupByMapper.getInstanceInt().add(dsBean.getArgs().indexOf(groupByParameter));
             GroupByMapper.getInstanceStrings().add(groupByParameter);
         }
 
-        if (parameters.dsArgs().isEmpty()) {
+        if (dsBean.getArgs().isEmpty()) {
             GroupByMapper.setIsHashMapped(true);
         }
         CSVReader reader;
-        List<String[]> list = new ArrayList<String[]>();
+        List<String[]> list = new ArrayList<>();
 
         try {
             String csvFile = ClassLoader.getSystemResource(dsBean.getDsFile()).getFile();
@@ -108,7 +87,7 @@ public class CsvDataProvider extends BaseDataProvider {
         // exclude those lines which don't satisfy executeColumn/executeValue filter
         for (int i = 0; i < dsData.size(); i++) {
             Map<String, String> row = dsData.get(i);
-            if (!row.get(dsBean.getExecuteColumn()).equalsIgnoreCase(executeValue)) {
+            if (!row.get(dsBean.getExecuteColumn()).equalsIgnoreCase(dsBean.getExecuteValue())) {
                 dsData.remove(i);
                 i--;
             }
@@ -117,18 +96,18 @@ public class CsvDataProvider extends BaseDataProvider {
         int listSize = list.size();
 
         int width = 0;
-        if (argsList.size() == 0) {
+        if (dsBean.getArgs().size() == 0) {
             // first element is dynamic HashMap<String, String>
-            width = staticArgsList.size() + 1;
+            width = dsBean.getStaticArgs().size() + 1;
         } else {
-            width = argsList.size() + staticArgsList.size();
+            width = dsBean.getArgs().size() + dsBean.getStaticArgs().size();
         }
 
         Object[][] args = new Object[listSize][width];
         int rowIndex = 0;
         for (Map<String, String> row : dsData) {
 
-            if (argsList.size() == 0) {
+            if (dsBean.getArgs().size() == 0) {
                 for (Map.Entry<String, String> entry : row.entrySet()) {
                     if (entry == null)
                         continue;
@@ -147,32 +126,32 @@ public class CsvDataProvider extends BaseDataProvider {
                     }
                 }
                 args[rowIndex][0] = row;
-                for (int i = 0; i < staticArgsList.size(); i++) {
-                    args[rowIndex][i + 1] = getStaticParam(staticArgsList.get(i), context, dsBean);
+                for (int i = 0; i < dsBean.getStaticArgs().size(); i++) {
+                    args[rowIndex][i + 1] = getStaticParam(dsBean.getStaticArgs().get(i), dsBean);
                 }
             } else {
                 int i;
-                for (i = 0; i < argsList.size(); i++) {
+                for (i = 0; i < dsBean.getArgs().size(); i++) {
                     args[rowIndex][i] = ParameterGenerator
-                            .process(row.get(argsList.get(i)));
+                            .process(row.get(dsBean.getArgs().get(i)));
                 }
 
-                for (int j = 0; j < staticArgsList.size(); j++) {
-                    args[rowIndex][i + j] = getStaticParam(staticArgsList.get(j), context, dsBean);
+                for (int j = 0; j < dsBean.getStaticArgs().size(); j++) {
+                    args[rowIndex][i + j] = getStaticParam(dsBean.getStaticArgs().get(j), dsBean);
                 }
             }
 
             tuidMap.put(hash(args[rowIndex], testMethod), getValueFromRow(row, dsBean.getUidArgs()));
 
-            if (!testMethodColumn.isEmpty()) {
-                String testNameOverride = getValueFromRow(row, List.of(testMethodColumn));
+            if (!dsBean.getTestMethodColumn().isEmpty()) {
+                String testNameOverride = getValueFromRow(row, dsBean.getTestMethodColumn());
                 if (!testNameOverride.isEmpty()) {
-                    testColumnNamesMap.put(hash(args[rowIndex], testMethod), getValueFromRow(row, testMethodColumn));
+                    testColumnNamesMap.put(hash(args[rowIndex], testMethod), testNameOverride);
                 }
             }
 
             // add testMethoOwner from xls datasource to special hashMap
-            addValueToSpecialMap(testMethodOwnerArgsMap, testMethodOwnerColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), row);
+            addValueToSpecialMap(testMethodOwnerArgsMap, dsBean.getTestMethodOwnerColumn(), String.valueOf(Arrays.hashCode(args[rowIndex])), row);
 
             // add testrails cases from xls datasource to special hashMap
             addValueToSpecialMap(testRailsArgsMap, testRailColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), row);
@@ -186,11 +165,11 @@ public class CsvDataProvider extends BaseDataProvider {
     private List<Map<String, String>> initData(List<String> headers, List<String[]> values) {
         List<Map<String, String>> list = new ArrayList<>();
 
-        for (int i = 0; i < values.size(); i++) {
+        for (String[] value : values) {
             Map<String, String> map = new HashMap<>();
             list.add(map);
             for (int j = 0; j < headers.size(); j++) {
-                map.put(headers.get(j), values.get(i)[j]);
+                map.put(headers.get(j), value[j]);
             }
         }
 

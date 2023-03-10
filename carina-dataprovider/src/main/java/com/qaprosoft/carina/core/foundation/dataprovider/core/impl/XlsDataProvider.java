@@ -44,50 +44,33 @@ public class XlsDataProvider extends BaseDataProvider {
 
         XLSTable dsData = XLSParser.parseSpreadSheet(dsBean.getDsFile(), dsBean.getXlsSheet(), dsBean.getExecuteColumn(), dsBean.getExecuteValue());
 
-        argsList = dsBean.getArgs();
-        staticArgsList = dsBean.getStaticArgs();
 
-        if (parameters.dsArgs().isEmpty()) {
+        if (dsBean.getArgs().isEmpty()) {
             GroupByMapper.setIsHashMapped(true);
         }
 
-        String groupByParameter = parameters.groupColumn();
+        String groupByParameter = dsBean.getGroupColumn();
         if (!groupByParameter.isEmpty()) {
-            GroupByMapper.getInstanceInt().add(argsList.indexOf(groupByParameter));
+            GroupByMapper.getInstanceInt().add(dsBean.getArgs().indexOf(groupByParameter));
             GroupByMapper.getInstanceStrings().add(groupByParameter);
         }
 
-        String testRailColumn = "";
-        if (!parameters.testRailColumn().isEmpty())
-            testRailColumn = parameters.testRailColumn();
-
-        if (!parameters.qTestColumn().isEmpty() && testRailColumn.isEmpty())
-            testRailColumn = parameters.qTestColumn();
-
-        String testMethodColumn = "";
-        if (!parameters.testMethodColumn().isEmpty())
-            testMethodColumn = parameters.testMethodColumn();
-
-        String testMethodOwnerColumn = "";
-        if (!parameters.testMethodOwnerColumn().isEmpty())
-            testMethodOwnerColumn = parameters.testMethodOwnerColumn();
-
-        String bugColumn = "";
-        if (!parameters.bugColumn().isEmpty())
-            bugColumn = parameters.bugColumn();
+        String testRailColumn = dsBean.getTestRailColumn();
+        if (testRailColumn.isEmpty())
+            testRailColumn = dsBean.getQTestColumn();
 
         int width = 0;
-        if (argsList.size() == 0) {
-            width = staticArgsList.size() + 1;
+        if (dsBean.getArgs().size() == 0) {
+            width = dsBean.getStaticArgs().size() + 1;
         } else {
-            width = argsList.size() + staticArgsList.size();
+            width = dsBean.getArgs().size() + dsBean.getStaticArgs().size();
         }
         Object[][] args = new Object[dsData.getDataRows().size()][width];
 
         int rowIndex = 0;
         for (Map<String, String> xlsRow : dsData.getDataRows()) {
 
-            if (argsList.size() == 0) {
+            if (dsBean.getArgs().size() == 0) {
                 // process each column in xlsRow data obligatory replacing special keywords like UUID etc
                 for (Map.Entry<String, String> entry : xlsRow.entrySet()) {
                     if (entry == null)
@@ -107,32 +90,31 @@ public class XlsDataProvider extends BaseDataProvider {
                     }
                 }
                 args[rowIndex][0] = xlsRow;
-                for (int i = 0; i < staticArgsList.size(); i++) {
-                    args[rowIndex][i + 1] = getStaticParam(staticArgsList.get(i), context, dsBean);
+                for (int i = 0; i < dsBean.getStaticArgs().size(); i++) {
+                    args[rowIndex][i + 1] = getStaticParam(dsBean.getStaticArgs().get(i), dsBean);
                 }
             } else {
                 int i;
-                for (i = 0; i < argsList.size(); i++) {
-                    args[rowIndex][i] = ParameterGenerator.process(xlsRow
-                            .get(argsList.get(i)));
+                for (i = 0; i < dsBean.getArgs().size(); i++) {
+                    args[rowIndex][i] = ParameterGenerator.process(xlsRow.get(dsBean.getArgs().get(i)));
                 }
                 // populate the rest of items by static parameters from testParams
-                for (int j = 0; j < staticArgsList.size(); j++) {
-                    args[rowIndex][i + j] = getStaticParam(staticArgsList.get(j), context, dsBean);
+                for (int j = 0; j < dsBean.getStaticArgs().size(); j++) {
+                    args[rowIndex][i + j] = getStaticParam(dsBean.getStaticArgs().get(j), dsBean);
                 }
             }
 
             tuidMap.put(hash(args[rowIndex], testMethod), getValueFromRow(xlsRow, dsBean.getUidArgs()));
 
-            if (!testMethodColumn.isEmpty()) {
-                String testNameOverride = getValueFromRow(xlsRow, List.of(testMethodColumn));
+            if (!dsBean.getTestMethodColumn().isEmpty()) {
+                String testNameOverride = getValueFromRow(xlsRow, dsBean.getTestMethodColumn());
                 if (!testNameOverride.isEmpty()) {
-                    testColumnNamesMap.put(hash(args[rowIndex], testMethod), getValueFromRow(xlsRow, testMethodColumn));
+                    testColumnNamesMap.put(hash(args[rowIndex], testMethod), testNameOverride);
                 }
             }
 
             // add testMethoOwner from xls datasource to special hashMap
-            addValueToSpecialMap(testMethodOwnerArgsMap, testMethodOwnerColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);
+            addValueToSpecialMap(testMethodOwnerArgsMap, dsBean.getTestMethodOwnerColumn(), String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);
 
             // add testrails cases from xls datasource to special hashMap
             addValueToSpecialMap(testRailsArgsMap, testRailColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);

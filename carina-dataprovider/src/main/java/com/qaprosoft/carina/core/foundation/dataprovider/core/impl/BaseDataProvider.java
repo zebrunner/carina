@@ -34,14 +34,10 @@ public abstract class BaseDataProvider {
     protected Map<String, String> testRailsArgsMap = Collections.synchronizedMap(new HashMap<>());
     protected Map<String, String> testColumnNamesMap = Collections.synchronizedMap(new HashMap<>());
 
-    protected List<String> argsList;
-    protected List<String> staticArgsList;
-
     public abstract Object[][] getDataProvider(Annotation annotation, ITestContext context, ITestNGMethod testMethod);
 
-    protected static Object getStaticParam(String name, ITestContext context, DSBean dsBean) {
-        return ParameterGenerator.process(dsBean
-                .getTestParams().get(name));
+    protected static Object getStaticParam(String name, DSBean dsBean) {
+        return ParameterGenerator.process(dsBean.getTestParams().get(name));
     }
 
     public Map<String, String> getTestColumnNamesMap() {
