@@ -86,7 +86,6 @@ public class XlsDataProvider extends BaseDataProvider {
 
         int rowIndex = 0;
         for (Map<String, String> xlsRow : dsData.getDataRows()) {
-            String testName = context.getName();
 
             if (argsList.size() == 0) {
                 // process each column in xlsRow data obligatory replacing special keywords like UUID etc

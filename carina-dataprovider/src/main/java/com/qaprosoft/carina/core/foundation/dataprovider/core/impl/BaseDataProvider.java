@@ -30,7 +30,6 @@ import com.zebrunner.carina.utils.ParameterGenerator;
 
 public abstract class BaseDataProvider {
     protected Map<String, String> tuidMap = Collections.synchronizedMap(new HashMap<>());
-    protected Map<String, String> testNameArgsMap = Collections.synchronizedMap(new HashMap<>());
     protected Map<String, String> testMethodOwnerArgsMap = Collections.synchronizedMap(new HashMap<>());
     protected Map<String, String> testRailsArgsMap = Collections.synchronizedMap(new HashMap<>());
     protected Map<String, String> testColumnNamesMap = Collections.synchronizedMap(new HashMap<>());

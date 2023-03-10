@@ -131,8 +131,6 @@ public class CsvDataProvider extends BaseDataProvider {
         Object[][] args = new Object[listSize][width];
         int rowIndex = 0;
         for (String[] strings : list) {
-            String testName = context.getName();
-
             int i = 0;
             if (argsList.size() == 0) {
                 // read all csv data into the single HashMap<String, String> object
@@ -145,10 +143,9 @@ public class CsvDataProvider extends BaseDataProvider {
                     } else {
                         dynamicAttrs.put(header, null);
                     }
-
-                    args[rowIndex][0] = dynamicAttrs;
                 }
 
+                args[rowIndex][0] = dynamicAttrs;
                 i++;
             } else {
                 for (String arg : argsList) {
@@ -166,22 +163,16 @@ public class CsvDataProvider extends BaseDataProvider {
                 args[rowIndex][i + j] = getStaticParam(staticArgsList.get(j), context, dsBean);
             }
 
-            // update testName adding UID values from DataSource arguments if any
-            testName = dsBean.setDataSorceUUID(testName, strings, mapper); // provide whole line from data provider for UUID generation
-
             HashMap<String, String> csvRow = (HashMap<String, String>) args[rowIndex][0];
             tuidMap.put(hash(args[rowIndex], testMethod), getValueFromRow(csvRow, dsBean.getUidArgs()));
+
             if (!testMethodColumn.isEmpty()) {
                 String testNameOverride = getValueFromRow(csvRow, List.of(testMethodColumn));
                 if (!testNameOverride.isEmpty()) {
                     testColumnNamesMap.put(hash(args[rowIndex], testMethod), getValueFromRow(csvRow, testMethodColumn));
                 }
             }
-            testNameArgsMap.put(String.valueOf(Arrays.hashCode(args[rowIndex])), testName);
-            if (!testMethodColumn.isEmpty()) {
-                // override testName value from xls datasource to special hashMap
-                addValueToSpecialMap(testNameArgsMap, testMethodColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
-            }
+
 
             // add testMethoOwner from xls datasource to special hashMap
             addValueToSpecialMap(testMethodOwnerArgsMap, testMethodOwnerColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), csvRow);
