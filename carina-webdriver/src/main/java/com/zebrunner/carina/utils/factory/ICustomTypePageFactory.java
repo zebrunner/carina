@@ -30,9 +30,9 @@ import org.slf4j.LoggerFactory;
 
 import com.zebrunner.carina.utils.exception.RequiredCtorNotFoundException;
 import com.zebrunner.carina.utils.factory.DeviceType.Type;
-import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
-import com.qaprosoft.carina.core.foundation.webdriver.device.Device;
-import com.qaprosoft.carina.core.gui.AbstractPage;
+import com.zebrunner.carina.webdriver.IDriverPool;
+import com.zebrunner.carina.webdriver.device.Device;
+import com.zebrunner.carina.webdriver.gui.AbstractPage;
 
 public interface ICustomTypePageFactory extends IDriverPool {
     static final Logger PAGEFACTORY_LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

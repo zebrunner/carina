@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.qaprosoft.carina.core.foundation.webdriver.ScreenshotType;
+import com.zebrunner.carina.webdriver.ScreenshotType;
 import com.zebrunner.carina.utils.mobile.IMobileUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.decorators.Decorated;
@@ -35,12 +35,12 @@ import com.zebrunner.carina.utils.android.recorder.utils.CmdLine;
 import com.zebrunner.carina.utils.common.CommonUtils;
 import com.zebrunner.carina.utils.factory.DeviceType;
 import com.zebrunner.carina.utils.mobile.notifications.android.Notification;
-import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
-import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
-import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.fakegps.FakeGpsPage;
-import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.notifications.NotificationPage;
-import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.settings.DateTimeSettingsPage;
-import com.qaprosoft.carina.core.gui.mobile.devices.android.phone.pages.tzchanger.TZChangerPage;
+import com.zebrunner.carina.webdriver.IDriverPool;
+import com.zebrunner.carina.webdriver.Screenshot;
+import com.zebrunner.carina.webdriver.gui.mobile.devices.android.phone.pages.fakegps.FakeGpsPage;
+import com.zebrunner.carina.webdriver.gui.mobile.devices.android.phone.pages.notifications.NotificationPage;
+import com.zebrunner.carina.webdriver.gui.mobile.devices.android.phone.pages.settings.DateTimeSettingsPage;
+import com.zebrunner.carina.webdriver.gui.mobile.devices.android.phone.pages.tzchanger.TZChangerPage;
 
 import io.appium.java_client.android.Activity;
 import io.appium.java_client.android.AndroidDriver;

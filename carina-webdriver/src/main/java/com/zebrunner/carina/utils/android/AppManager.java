@@ -18,7 +18,7 @@ package com.zebrunner.carina.utils.android;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
+import com.zebrunner.carina.webdriver.IDriverPool;
 
 public class AppManager {
 
