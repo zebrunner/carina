@@ -58,7 +58,7 @@ public class DataProviderFactory {
     public static Object[][] getDataProvider(Annotation[] annotations, ITestContext context, ITestNGMethod m) {
         Map<String, String> tuidMap = Collections.synchronizedMap(new HashMap<>());
         Map<String, String> testNameMap = Collections.synchronizedMap(new HashMap<>());
-        Map<String, String> testRailMap = Collections.synchronizedMap(new HashMap<>());
+
         Object[][] provider = new Object[][]{};
 
         for (Annotation annotation : annotations) {
@@ -75,14 +75,13 @@ public class DataProviderFactory {
 
                 tuidMap.putAll(dataProvider.getTuidMap());
                 testNameMap.putAll(dataProvider.getTestColumnNamesMap());
-                testRailMap.putAll(dataProvider.getTestRailsArgsMap());
             }
         }
 
         if (!GroupByMapper.getInstanceInt().isEmpty() || !GroupByMapper.getInstanceStrings().isEmpty()) {
             provider = getGroupedList(provider);
         }
-        putValuesToContext(context, tuidMap, testNameMap, testRailMap);
+        putValuesToContext(context, tuidMap, testNameMap);
 
         // clear group by settings
         GroupByMapper.getInstanceInt().clear();
@@ -100,8 +99,7 @@ public class DataProviderFactory {
      */
     private static void putValuesToContext(ITestContext context,
                                            Map<String, String> tuidMap,
-                                           Map<String, String> testNameFromColumn,
-                                           Map<String, String> testRailMap) {
+                                           Map<String, String> testNameFromColumn) {
         @SuppressWarnings("unchecked")
         Map<String, String> contextTUID = (Map<String, String>) context.getAttribute(SpecialKeywords.TUID);
         if (contextTUID != null) {
