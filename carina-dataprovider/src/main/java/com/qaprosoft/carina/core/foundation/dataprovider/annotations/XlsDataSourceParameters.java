@@ -23,33 +23,98 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface XlsDataSourceParameters {
+    /**
+     * Define data provider instance
+     *
+     * @return String
+     */
     String className() default "com.qaprosoft.carina.core.foundation.dataprovider.core.impl.XlsDataProvider";
 
     String spreadsheetId() default "";
 
     String sheet() default "";
 
+    /**
+     * Path to data source file
+     *
+     * @return String
+     */
     String path() default "";
 
+    /**
+     * Column names that need to be inserted into test from row. Several arguments should be split by ",".
+     * If empty, per row will be created hashMap with all data source columns as keys and row data as values.
+     *
+     * @return String
+     */
     String dsArgs() default "";
 
+    /**
+     * Column name with unique test identifiers. Several name arguments should be split by ",".
+     *
+     * @return String
+     */
     String dsUid() default "";
 
+    /**
+     * Column name which rows determines whether to execute test or not
+     *
+     * @return String
+     */
     String executeColumn() default "Execute";
 
+    /**
+     * Defines to execute test or not.
+     * If executeValue equalsIgnoreCase to value from executeColumn -> add test row to run.
+     *
+     * @return String
+     */
     String executeValue() default "y";
 
+    /**
+     * Gets value from testNG suite by defined static arguments name.
+     * The same argument will present in every test
+     *
+     * @return String
+     */
     String staticArgs() default "";
 
     String groupColumn() default "";
 
-    String testRailColumn() default "";
-
-    String qTestColumn() default "";
-
+    /**
+     * Column name, which contains values for test name overriding
+     *
+     * @return String
+     */
     String testMethodColumn() default "";
 
+    /**
+     * Reason: not implemented
+     */
+    @Deprecated(forRemoval = true, since = "1.0.0")
+    String testRailColumn() default "";
+
+    /**
+     * Reason: not implemented
+     */
+    @Deprecated(forRemoval = true, since = "1.0.0")
+    String qTestColumn() default "";
+
+    /**
+     * Reason: not implemented
+     */
+    @Deprecated(forRemoval = true, since = "1.0.0")
     String testMethodOwnerColumn() default "";
 
+    /**
+     * Reason: not implemented
+     */
+    @Deprecated(forRemoval = true, since = "1.0.0")
     String bugColumn() default "";
+
+    /**
+     * Reason: not implemented
+     */
+    @Deprecated(forRemoval = true, since = "1.0.0")
+    String[] doNotRunTestNames() default {};
 }

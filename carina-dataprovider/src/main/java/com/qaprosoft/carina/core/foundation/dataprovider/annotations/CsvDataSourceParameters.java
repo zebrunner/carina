@@ -38,63 +38,58 @@ public @interface CsvDataSourceParameters {
     char separator() default ',';
 
     /**
-     * The character to use for quoted elements
+     * The character to use for quoted elements when parsing
      *
      * @return char
      */
     char quote() default '"';
 
     /**
-     * Path to source data file
+     * Path to data source file
      *
      * @return String
      */
     String path() default "";
 
     /**
-     * Column names with data that need to be inserted into test.
-     * If empty, all columns as keys and data as values will be put into hashMap
-     * and can be accessed by column names in test
+     * Column names that need to be inserted into test from row. Several arguments should be split by ",".
+     * If empty, per row will be created hashMap with all data source columns as keys and row data as values.
      *
      * @return String
      */
     String dsArgs() default "";
 
     /**
-     * Column name with unique test identifiers
+     * Column name with unique test identifiers. Several name arguments should be split by ",".
      *
      * @return String
      */
     String dsUid() default "";
 
     /**
-     * Column name that determines whether to execute test or not
+     * Column name which rows determines whether to execute test or not
      *
      * @return String
      */
     String executeColumn() default "Execute";
 
     /**
-     * executeColumn value from record which defines to execute test or not
-     * (if executeValue equalsIgnoreCase to value from executeColumn -> add test to run)
+     * Defines to execute test or not.
+     * If executeValue equalsIgnoreCase to value from executeColumn -> add test row to run.
      *
      * @return String
      */
     String executeValue() default "y";
 
     /**
-     * Static arguments names, which values will be present in every test.
-     * Gets value from testNG suite by defined static arguments name
+     * Gets value from testNG suite by defined static arguments name.
+     * The same argument will present in every test
      *
      * @return String
      */
     String staticArgs() default "";
 
     String groupColumn() default "";
-
-    String testRailColumn() default "";
-
-    String qTestColumn() default "";
 
     /**
      * Column name, which contains values for test name overriding
@@ -103,7 +98,33 @@ public @interface CsvDataSourceParameters {
      */
     String testMethodColumn() default "";
 
+    /**
+     * Reason: not implemented
+     */
+    @Deprecated(forRemoval = true, since = "1.0.0")
+    String testRailColumn() default "";
+
+    /**
+     * Reason: not implemented
+     */
+    @Deprecated(forRemoval = true, since = "1.0.0")
+    String qTestColumn() default "";
+
+    /**
+     * Reason: not implemented
+     */
+    @Deprecated(forRemoval = true, since = "1.0.0")
     String testMethodOwnerColumn() default "";
 
+    /**
+     * Reason: not implemented
+     */
+    @Deprecated(forRemoval = true, since = "1.0.0")
     String bugColumn() default "";
+
+    /**
+     * Reason: not implemented
+     */
+    @Deprecated(forRemoval = true, since = "1.0.0")
+    String[] doNotRunTestNames() default {};
 }

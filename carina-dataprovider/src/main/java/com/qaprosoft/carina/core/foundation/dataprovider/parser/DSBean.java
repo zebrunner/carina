@@ -24,6 +24,7 @@ import com.zebrunner.carina.utils.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
 import com.zebrunner.carina.utils.exception.InvalidArgsException;
+import org.testng.ITestContext;
 
 public class DSBean {
     private Map<String, String> testParams;
@@ -37,11 +38,11 @@ public class DSBean {
     private String executeValue;
     private boolean spreadsheet;
     private String groupColumn;
-    private String testRailColumn;
-    private String qTestColumn;
     private String testMethodColumn;
-    private String testMethodOwnerColumn;
-    private String bugColumn;
+
+    public DSBean(ITestContext context){
+        initParamsFromSuite(context.getCurrentXmlTest().getAllParameters(), "excel");
+    }
 
     public DSBean(XlsDataSourceParameters xlsDataSourceParameters, Map<String, String> suiteParams) {
         // params init order: 1) from test annotation 2) from suite
@@ -90,10 +91,7 @@ public class DSBean {
         this.executeColumn = parameters.executeColumn();
         this.executeValue = parameters.executeValue();
         this.groupColumn = parameters.groupColumn();
-        this.testRailColumn = parameters.testRailColumn();
-        this.qTestColumn = parameters.qTestColumn();
         this.testMethodColumn = parameters.testMethodColumn();
-        this.testMethodOwnerColumn = parameters.testMethodOwnerColumn();
 
         if (!parameters.dsArgs().isEmpty()) {
             this.args = Arrays.asList(parameters.dsArgs().replace(" ", "").split(","));
@@ -112,10 +110,7 @@ public class DSBean {
         this.executeColumn = parameters.executeColumn();
         this.executeValue = parameters.executeValue();
         this.groupColumn = parameters.groupColumn();
-        this.testRailColumn = parameters.testRailColumn();
-        this.qTestColumn = parameters.qTestColumn();
         this.testMethodColumn = parameters.testMethodColumn();
-        this.testMethodOwnerColumn = parameters.testMethodOwnerColumn();
 
         if (!parameters.dsArgs().isEmpty()) {
             this.args = Arrays.asList(parameters.dsArgs().replace(" ", "").split(","));
@@ -183,24 +178,8 @@ public class DSBean {
         return groupColumn;
     }
 
-    public String getTestRailColumn() {
-        return testRailColumn;
-    }
-
-    public String getQTestColumn() {
-        return qTestColumn;
-    }
-
     public String getTestMethodColumn() {
         return testMethodColumn;
-    }
-
-    public String getTestMethodOwnerColumn() {
-        return testMethodOwnerColumn;
-    }
-
-    public String getBugColumn() {
-        return bugColumn;
     }
 
     public boolean isSpreadsheet() {

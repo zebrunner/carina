@@ -30,8 +30,6 @@ import com.zebrunner.carina.utils.ParameterGenerator;
 
 public abstract class BaseDataProvider {
     protected Map<String, String> tuidMap = Collections.synchronizedMap(new HashMap<>());
-    protected Map<String, String> testMethodOwnerArgsMap = Collections.synchronizedMap(new HashMap<>());
-    protected Map<String, String> testRailsArgsMap = Collections.synchronizedMap(new HashMap<>());
     protected Map<String, String> testColumnNamesMap = Collections.synchronizedMap(new HashMap<>());
 
     public abstract Object[][] getDataProvider(Annotation annotation, ITestContext context, ITestNGMethod testMethod);
@@ -48,31 +46,16 @@ public abstract class BaseDataProvider {
         return tuidMap;
     }
 
-    public Map<String, String> getTestMethodOwnerArgsMap() {
-        return testMethodOwnerArgsMap;
-    }
-
-    public Map<String, String> getTestRailsArgsMap() {
-        return testRailsArgsMap;
-    }
-
-    protected void addValueToSpecialMap(Map<String, String> map, String column, String hashCode, Map<String, String> row) {
-        if (column != null) {
-            if (!column.isEmpty()) {
-                if (row.get(column) != null) {
-                    if (!row.get(column).isEmpty()) {
-                        // put into the args only non empty jira tickets
-                        map.put(hashCode, row.get(column));
-                    }
-                }
-            }
+    protected void addValueToMap(Map<String, String> map, String hashCode, String value) {
+        if (!value.isEmpty()) {
+            map.put(hashCode, value);
         }
     }
 
     /**
      * Generates hash by class name, method name and arg values.
      *
-     * @param args Object[] test method arguments
+     * @param args   Object[] test method arguments
      * @param method ITestNGMethod
      * @return String hash
      */
@@ -88,7 +71,7 @@ public abstract class BaseDataProvider {
      * Get value from data source in specified row.
      *
      * @param dataRow Map<String, String> test method arguments/ record from source table
-     * @param key String argument name/ column name from source table
+     * @param key     String argument name/ column name from source table
      * @return String "value " from record
      */
     protected String getValueFromRow(Map<String, String> dataRow, String key) {
@@ -99,24 +82,24 @@ public abstract class BaseDataProvider {
      * Get value from data source in specified row from several columns.
      *
      * @param dataRow Map<String, String> test method arguments/ record from source table
-     * @param keys List<String> argument names/ column names from source table
+     * @param keys    List<String> argument names/ column names from source table
      * @return String "value1, value2, ..., valueN " from record
      */
     protected String getValueFromRow(Map<String, String> dataRow, List<String> keys) {
         StringBuilder valueRes = new StringBuilder();
 
         for (String key : keys) {
-            if (dataRow.containsKey(key)) {
+            if (!key.isEmpty() && dataRow.containsKey(key)) {
                 String value = dataRow.get(key);
                 if (value != null && !value.isEmpty()) {
                     valueRes.append(value);
-                    valueRes.append(", ");
+                    valueRes.append(",");
                 }
             }
         }
 
         if (valueRes.indexOf(",") != -1) {
-            valueRes.replace(valueRes.length() - 2, valueRes.length() - 1, "");
+            valueRes.replace(valueRes.length() - 1, valueRes.length(), "");
         }
         return valueRes.toString();
     }

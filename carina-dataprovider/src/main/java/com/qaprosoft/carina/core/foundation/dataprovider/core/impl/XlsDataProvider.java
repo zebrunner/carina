@@ -17,7 +17,6 @@ package com.qaprosoft.carina.core.foundation.dataprovider.core.impl;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import org.testng.ITestContext;
@@ -64,10 +63,6 @@ public class XlsDataProvider extends BaseDataProvider {
             GroupByMapper.getInstanceStrings().add(groupByParameter);
         }
 
-        String testRailColumn = dsBean.getTestRailColumn();
-        if (testRailColumn.isEmpty())
-            testRailColumn = dsBean.getQTestColumn();
-
         int width = 0;
         if (dsBean.getArgs().size() == 0) {
             width = dsBean.getStaticArgs().size() + 1;
@@ -112,21 +107,9 @@ public class XlsDataProvider extends BaseDataProvider {
                     args[rowIndex][i + j] = getStaticParam(dsBean.getStaticArgs().get(j), dsBean);
                 }
             }
-
-            tuidMap.put(hash(args[rowIndex], testMethod), getValueFromRow(xlsRow, dsBean.getUidArgs()));
-
-            if (!dsBean.getTestMethodColumn().isEmpty()) {
-                String testNameOverride = getValueFromRow(xlsRow, dsBean.getTestMethodColumn());
-                if (!testNameOverride.isEmpty()) {
-                    testColumnNamesMap.put(hash(args[rowIndex], testMethod), testNameOverride);
-                }
-            }
-
-            // add testMethoOwner from xls datasource to special hashMap
-            addValueToSpecialMap(testMethodOwnerArgsMap, dsBean.getTestMethodOwnerColumn(), String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);
-
-            // add testrails cases from xls datasource to special hashMap
-            addValueToSpecialMap(testRailsArgsMap, testRailColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), xlsRow);
+            String recordHash = hash(args[rowIndex], testMethod);
+            addValueToMap(tuidMap, recordHash, getValueFromRow(xlsRow, dsBean.getUidArgs()));
+            addValueToMap(testColumnNamesMap, recordHash, getValueFromRow(xlsRow, dsBean.getTestMethodColumn()));
 
             rowIndex++;
         }

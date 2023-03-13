@@ -47,9 +47,8 @@ public class CsvDataProvider extends BaseDataProvider {
      * Create data for tests from csv data source by annotation and context parameters
      *
      * @param annotation Annotation csv data source parameters
-     * @param context ITestContext
+     * @param context    ITestContext
      * @param testMethod ITestNGMethod
-     *
      * @return Object[][] dataProvider
      */
     @SuppressWarnings("unchecked")
@@ -61,10 +60,6 @@ public class CsvDataProvider extends BaseDataProvider {
         char separator, quote;
         separator = parameters.separator();
         quote = parameters.quote();
-
-        String testRailColumn = dsBean.getTestRailColumn();
-        if (testRailColumn.isEmpty())
-            testRailColumn = dsBean.getQTestColumn();
 
         String groupByParameter = dsBean.getGroupColumn();
         if (!groupByParameter.isEmpty()) {
@@ -141,8 +136,7 @@ public class CsvDataProvider extends BaseDataProvider {
             } else {
                 int i;
                 for (i = 0; i < dsBean.getArgs().size(); i++) {
-                    args[rowIndex][i] = ParameterGenerator
-                            .process(row.get(dsBean.getArgs().get(i)));
+                    args[rowIndex][i] = ParameterGenerator.process(row.get(dsBean.getArgs().get(i)));
                 }
 
                 for (int j = 0; j < dsBean.getStaticArgs().size(); j++) {
@@ -150,20 +144,9 @@ public class CsvDataProvider extends BaseDataProvider {
                 }
             }
 
-            tuidMap.put(hash(args[rowIndex], testMethod), getValueFromRow(row, dsBean.getUidArgs()));
-
-            if (!dsBean.getTestMethodColumn().isEmpty()) {
-                String testNameOverride = getValueFromRow(row, dsBean.getTestMethodColumn());
-                if (!testNameOverride.isEmpty()) {
-                    testColumnNamesMap.put(hash(args[rowIndex], testMethod), testNameOverride);
-                }
-            }
-
-            // add testMethoOwner from xls datasource to special hashMap
-            addValueToSpecialMap(testMethodOwnerArgsMap, dsBean.getTestMethodOwnerColumn(), String.valueOf(Arrays.hashCode(args[rowIndex])), row);
-
-            // add testrails cases from xls datasource to special hashMap
-            addValueToSpecialMap(testRailsArgsMap, testRailColumn, String.valueOf(Arrays.hashCode(args[rowIndex])), row);
+            String recordHash = hash(args[rowIndex], testMethod);
+            addValueToMap(tuidMap, recordHash, getValueFromRow(row, dsBean.getUidArgs()));
+            addValueToMap(testColumnNamesMap, recordHash, getValueFromRow(row, dsBean.getTestMethodColumn()));
 
             rowIndex++;
         }
