@@ -69,6 +69,13 @@ public abstract class BaseDataProvider {
         }
     }
 
+    /**
+     * Generates hash by class name, method name and arg values.
+     *
+     * @param args Object[] test method arguments
+     * @param method ITestNGMethod
+     * @return String hash
+     */
     public static String hash(Object[] args, ITestNGMethod method) {
         String toHash = "";
         toHash += Arrays.hashCode(args);
@@ -77,16 +84,30 @@ public abstract class BaseDataProvider {
         return String.valueOf(toHash.hashCode());
     }
 
-    protected String getValueFromRow(Map<String, String> xlsRow, String key) {
-        return getValueFromRow(xlsRow, List.of(key));
+    /**
+     * Get value from data source in specified row.
+     *
+     * @param dataRow Map<String, String> test method arguments/ record from source table
+     * @param key String argument name/ column name from source table
+     * @return String "value " from record
+     */
+    protected String getValueFromRow(Map<String, String> dataRow, String key) {
+        return getValueFromRow(dataRow, List.of(key));
     }
 
-    protected String getValueFromRow(Map<String, String> xlsRow, List<String> keys) {
+    /**
+     * Get value from data source in specified row from several columns.
+     *
+     * @param dataRow Map<String, String> test method arguments/ record from source table
+     * @param keys List<String> argument names/ column names from source table
+     * @return String "value1, value2, ..., valueN " from record
+     */
+    protected String getValueFromRow(Map<String, String> dataRow, List<String> keys) {
         StringBuilder valueRes = new StringBuilder();
 
         for (String key : keys) {
-            if (xlsRow.containsKey(key)) {
-                String value = xlsRow.get(key);
+            if (dataRow.containsKey(key)) {
+                String value = dataRow.get(key);
                 if (value != null && !value.isEmpty()) {
                     valueRes.append(value);
                     valueRes.append(", ");

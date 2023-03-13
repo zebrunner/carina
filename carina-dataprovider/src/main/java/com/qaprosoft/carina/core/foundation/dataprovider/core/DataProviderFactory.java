@@ -23,8 +23,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
-import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,12 +39,22 @@ import com.qaprosoft.carina.core.foundation.dataprovider.core.impl.BaseDataProvi
  * Created by Patotsky on 16.12.2014.
  */
 public class DataProviderFactory {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private DataProviderFactory() {
-    }
+    private DataProviderFactory() {}
 
+    /**
+     * Creates data provider from specified source in annotations.
+     *
+     * @param annotations test method annotations. For using carina's custom data provider
+     *        test should be annotated with @CsvDataSourceParameters or @XlsDataSourceParameters
+     *
+     * @param context test context
+     * @param m current test method
+     * @return Object[][] provider from specified source,
+     *         where provider.length shows number of test to be invoked
+     *         and provider[i][] contains test invocation args for each i test
+     */
     public static Object[][] getDataProvider(Annotation[] annotations, ITestContext context, ITestNGMethod m) {
         Map<String, String> tuidMap = Collections.synchronizedMap(new HashMap<>());
         Map<String, String> testNameFromColumn = Collections.synchronizedMap(new HashMap<>());
@@ -80,6 +88,13 @@ public class DataProviderFactory {
         return provider;
     }
 
+    /**
+     * Put data from test parameters to test's context. Necessary for correct test naming.
+     *
+     * @param context ITestContext.
+     * @param tuidMap Map<String, String> contains tuid values for each test (if present)
+     * @param testNameFromColumn Map<String, String> contains values for overriding test names from specified column
+     */
     private static void putValuesToContext(ITestContext context,
                                            Map<String, String> tuidMap,
                                            Map<String, String> testNameFromColumn) {
@@ -103,9 +118,8 @@ public class DataProviderFactory {
     /**
      * Finds class name for data provider implementation.
      *
-     * @param annotation test method annotation.
-     * @return class name of data provider if it was found in annotation classname() method.
-     * Empty string if not.
+     * @param annotation test method annotation
+     * @return String class name of data provider if it was found in annotation classname() method. Empty if not
      */
     private static String findProviderClass(Annotation annotation) {
         Class<? extends Annotation> type = annotation.annotationType();
@@ -128,8 +142,8 @@ public class DataProviderFactory {
     /**
      * Initialize DataProvider based on className parameter.
      *
-     * @param providerClass String full className.
-     * @return DataProvider Instance.
+     * @param providerClass String full className
+     * @return Object DataProvider Instance
      */
     private static Object initDataProvider(String providerClass) {
         Class<?> clazz;

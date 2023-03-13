@@ -35,6 +35,15 @@ import com.zebrunner.carina.utils.ParameterGenerator;
  */
 public class XlsDataProvider extends BaseDataProvider {
 
+    /**
+     * Create data for tests from xls data source by annotation and context parameters
+     *
+     * @param annotation Annotation xls data source parameters
+     * @param context ITestContext
+     * @param testMethod ITestNGMethod
+     *
+     * @return Object[][] dataProvider
+     */
     @Override
     public Object[][] getDataProvider(Annotation annotation, ITestContext context, ITestNGMethod testMethod) {
 
