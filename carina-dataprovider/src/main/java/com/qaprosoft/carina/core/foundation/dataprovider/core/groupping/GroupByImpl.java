@@ -51,8 +51,7 @@ public class GroupByImpl {
             ordered.add(tempList);
         }
 
-        int arraySize = listOfObjects.get(0).length;
-        Object[][] finalObject = new Object[ordered.size()][arraySize];
+        Object[][] finalObject = new Object[ordered.size()][ordered.get(0).size()];
 
         int i = 0;
         for (List<Object[]> list : ordered) {
