@@ -95,7 +95,7 @@ public class TestNamingService {
         ITestNGMethod method = result.getMethod();
 
         name = Configuration.get(Configuration.Parameter.TEST_NAMING_PATTERN);
-        name = name.replace(SpecialKeywords.TEST_NAME, getTestNameMapName(result))
+        name = name.replace(SpecialKeywords.TEST_NAME, getTestNameMap(result))
                 .replace(SpecialKeywords.TEST_NAME_TUID, getMethodUID(result))
                 .replace(SpecialKeywords.METHOD_NAME, method.getMethodName())
                 .replace(SpecialKeywords.METHOD_PRIORITY, String.valueOf(method.getPriority()))
@@ -116,7 +116,7 @@ public class TestNamingService {
         return testName.get();
     }
 
-    private static String getTestNameMapName(ITestResult result) {
+    private static String getTestNameMap(ITestResult result) {
         String testNameMapName = StringUtils.EMPTY;
         @SuppressWarnings("unchecked")
         Map<Object[], String> testNameMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TEST_NAME);
@@ -125,9 +125,9 @@ public class TestNamingService {
             String testHash = BaseDataProvider.hash(result.getParameters(), result.getMethod());
             if (testNameMap.containsKey(testHash)) {
                 testNameMapName = testNameMap.get(testHash);
-            } else {
-                testNameMapName = result.getTestContext().getCurrentXmlTest().getName();
             }
+        } else {
+            testNameMapName = result.getTestContext().getCurrentXmlTest().getName();
         }
         return testNameMapName;
     }
