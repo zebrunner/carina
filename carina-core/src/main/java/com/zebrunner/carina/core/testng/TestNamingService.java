@@ -121,7 +121,7 @@ public class TestNamingService {
         @SuppressWarnings("unchecked")
         Map<Object[], String> testNameMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TEST_NAME);
 
-        if (testNameMap != null) {
+        if (testNameMap != null && !testNameMap.isEmpty()) {
             String testHash = BaseDataProvider.hash(result.getParameters(), result.getMethod());
             if (testNameMap.containsKey(testHash)) {
                 testNameMapName = testNameMap.get(testHash);
