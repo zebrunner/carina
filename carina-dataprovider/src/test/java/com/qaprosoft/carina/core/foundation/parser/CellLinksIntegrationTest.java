@@ -19,12 +19,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.qaprosoft.carina.core.foundation.dataprovider.parser.xls.XLSParser;
 import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSParser;
-import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSTable;
+import com.qaprosoft.carina.core.foundation.dataprovider.parser.xls.XLSTable;
 
 public class CellLinksIntegrationTest {
     private List<String> headers;

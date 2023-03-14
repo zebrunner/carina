@@ -13,11 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.dataprovider.parser;
+package com.qaprosoft.carina.core.foundation.dataprovider.parser.xls;
 
-abstract class AbstractXLSParser {
+import org.apache.poi.ss.usermodel.Row;
 
-    protected static XLSTable prepareDataTable(String executeColumn, String executeValue) {
-        return executeColumn != null && executeValue != null ? new XLSTable(executeColumn, executeValue) : new XLSTable();
+import java.util.HashMap;
+import java.util.Map;
+
+public class XLSChildTable extends XLSTable {
+    public void addDataRow(Row row) {
+        Map<String, String> dataMap = new HashMap<String, String>();
+        for (int i = 0; i < super.getHeaders().size(); i++) {
+            synchronized (dataMap) {
+                dataMap.put(super.getHeaders().get(i), XLSParser.getCellValue(row.getCell(i)));
+            }
+        }
+        super.getDataRows().add(dataMap);
     }
 }

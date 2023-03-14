@@ -15,14 +15,14 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.dataprovider.core.impl;
 
-import java.lang.annotation.Annotation;
-import java.util.*;
-
+import com.qaprosoft.carina.core.foundation.dataprovider.parser.AbstractTable;
+import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
+import com.zebrunner.carina.utils.ParameterGenerator;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 
-import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
-import com.zebrunner.carina.utils.ParameterGenerator;
+import java.lang.annotation.Annotation;
+import java.util.*;
 
 /**
  * Created by Patotsky on 19.12.2014.
@@ -33,18 +33,6 @@ public abstract class BaseDataProvider {
     protected Map<String, String> testColumnNamesMap = Collections.synchronizedMap(new HashMap<>());
 
     public abstract Object[][] getDataProvider(Annotation annotation, ITestContext context, ITestNGMethod testMethod);
-
-    protected static Object getStaticParam(String name, DSBean dsBean) {
-        return ParameterGenerator.process(dsBean.getTestParams().get(name));
-    }
-
-    public Map<String, String> getTestColumnNamesMap() {
-        return testColumnNamesMap;
-    }
-
-    public Map<String, String> getTuidMap() {
-        return tuidMap;
-    }
 
     protected void addValueToMap(Map<String, String> map, String hashCode, String value) {
         if (!value.isEmpty()) {
@@ -102,6 +90,96 @@ public abstract class BaseDataProvider {
             valueRes.replace(valueRes.length() - 1, valueRes.length(), "");
         }
         return valueRes.toString();
+    }
+
+    protected Object[][] fillDataProviderWithData(AbstractTable table, DSBean dsBean, ITestNGMethod testMethod) {
+        processTable(table);
+
+        Object[][] dataProvider = declareDataProviderArray(table, dsBean);
+
+        if (dsBean.isArgsToHashMap()) {
+            fillArgsAsHashMap(dataProvider, table, dsBean);
+        } else {
+            fillArgsAsArray(dataProvider, table, dsBean);
+        }
+
+        configureTestNamingVars(dataProvider, dsBean, table, testMethod);
+
+        return dataProvider;
+    }
+
+    private void processTable(AbstractTable table) {
+        for (Map<String, String> row : table.getDataRows()) {
+            ParameterGenerator.processMap(row);
+        }
+    }
+
+    private void fillArgsAsHashMap(Object[][] dataProvider, AbstractTable table, DSBean dsBean) {
+        for (int rowIndex = 0; rowIndex < dataProvider.length; rowIndex++) {
+            Map<String, String> row = table.getDataRows().get(rowIndex);
+
+            // populate arguments by parameters from data source
+            dataProvider[rowIndex][0] = row;
+
+            // populate the rest of arguments by static parameters from testParams
+            for (int staticArgsColumn = 0; staticArgsColumn < dsBean.getStaticArgs().size(); staticArgsColumn++) {
+                String staticArgName = dsBean.getStaticArgs().get(staticArgsColumn);
+                dataProvider[rowIndex][staticArgsColumn + 1] = getStaticParam(staticArgName, dsBean);
+            }
+        }
+    }
+
+    private void fillArgsAsArray(Object[][] dataProvider, AbstractTable table, DSBean dsBean) {
+        for (int rowIndex = 0; rowIndex < dataProvider.length; rowIndex++) {
+            Map<String, String> row = table.getDataRows().get(rowIndex);
+
+            // populate arguments by parameters from data source
+            for (int argsColumn = 0; argsColumn < dsBean.getArgs().size(); argsColumn++) {
+                dataProvider[rowIndex][argsColumn] = row.get(dsBean.getArgs().get(argsColumn));
+            }
+
+            // populate the rest of arguments by static parameters from testParams
+            for (int staticArgsColumn = 0; staticArgsColumn < dsBean.getStaticArgs().size(); staticArgsColumn++) {
+                String staticArgName = dsBean.getStaticArgs().get(staticArgsColumn);
+                dataProvider[rowIndex][staticArgsColumn + row.entrySet().size()] = getStaticParam(staticArgName, dsBean);
+            }
+        }
+    }
+
+    private Object[][] declareDataProviderArray(AbstractTable table, DSBean dsBean) {
+        int numberOfRowsToExecute = table.getDataRows().size();
+
+        int numberOfArgsInTest;
+        if (dsBean.isArgsToHashMap()) {
+            // first element is dynamic HashMap<String, String>
+            numberOfArgsInTest = 1 + dsBean.getStaticArgs().size();
+        } else {
+            numberOfArgsInTest = dsBean.getArgs().size() + dsBean.getStaticArgs().size();
+        }
+
+        return new Object[numberOfRowsToExecute][numberOfArgsInTest];
+    }
+
+    private void configureTestNamingVars(Object[][] dataProvider, DSBean dsBean, AbstractTable table, ITestNGMethod testNGMethod) {
+        for (int rowIndex = 0; rowIndex < dataProvider.length; rowIndex++) {
+            Map<String, String> row = table.getDataRows().get(rowIndex);
+
+            String rowHash = hash(dataProvider[rowIndex], testNGMethod);
+            addValueToMap(tuidMap, rowHash, getValueFromRow(row, dsBean.getUidArgs()));
+            addValueToMap(testColumnNamesMap, rowHash, getValueFromRow(row, dsBean.getTestMethodColumn()));
+        }
+    }
+
+    protected static Object getStaticParam(String name, DSBean dsBean) {
+        return ParameterGenerator.process(dsBean.getTestParams().get(name));
+    }
+
+    public Map<String, String> getTestColumnNamesMap() {
+        return testColumnNamesMap;
+    }
+
+    public Map<String, String> getTuidMap() {
+        return tuidMap;
     }
 
 }

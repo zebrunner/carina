@@ -15,6 +15,17 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.dataprovider.core;
 
+import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByImpl;
+import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByMapper;
+import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.exceptions.GroupByException;
+import com.qaprosoft.carina.core.foundation.dataprovider.core.impl.BaseDataProvider;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
+import org.apache.commons.lang3.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testng.ITestContext;
+import org.testng.ITestNGMethod;
+
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
@@ -22,18 +33,6 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.testng.ITestContext;
-import org.testng.ITestNGMethod;
-
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByImpl;
-import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByMapper;
-import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.exceptions.GroupByException;
-import com.qaprosoft.carina.core.foundation.dataprovider.core.impl.BaseDataProvider;
 
 /**
  * Created by Patotsky on 16.12.2014.

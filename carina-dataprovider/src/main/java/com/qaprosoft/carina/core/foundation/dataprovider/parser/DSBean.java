@@ -15,16 +15,16 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.dataprovider.parser;
 
+import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
+import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.exception.InvalidArgsException;
+import org.testng.ITestContext;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
-import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
-import com.zebrunner.carina.utils.exception.InvalidArgsException;
-import org.testng.ITestContext;
 
 public class DSBean {
     private Map<String, String> testParams;
@@ -40,7 +40,7 @@ public class DSBean {
     private String groupColumn;
     private String testMethodColumn;
 
-    public DSBean(ITestContext context){
+    public DSBean(ITestContext context) {
         initParamsFromSuite(context.getCurrentXmlTest().getAllParameters(), "excel");
     }
 
@@ -81,7 +81,6 @@ public class DSBean {
         if (!suiteParams.isEmpty()) {
             initParamsFromSuite(suiteParams, "");
         }
-
         this.testParams = suiteParams;
         this.xlsSheet = null;
     }
@@ -192,5 +191,13 @@ public class DSBean {
 
     public String getExecuteValue() {
         return executeValue;
+    }
+
+    public boolean isArgsToHashMap() {
+        if (this.args.size() == 0) {
+          return  true;
+        } else {
+            return false;
+        }
     }
 }
