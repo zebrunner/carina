@@ -30,12 +30,23 @@ public @interface XlsDataSourceParameters {
      */
     String className() default "com.qaprosoft.carina.core.foundation.dataprovider.core.impl.XlsDataProvider";
 
+    /**
+     * Is mutually exclusive with path
+     *
+     * @return String
+     */
     String spreadsheetId() default "";
 
+    /**
+     * Define data provider instance
+     *
+     * @return String
+     */
     String sheet() default "";
 
     /**
-     * Path to data source file
+     * Path to data source file.
+     * Is mutually exclusive with spreadsheetId
      *
      * @return String
      */
@@ -65,7 +76,7 @@ public @interface XlsDataSourceParameters {
 
     /**
      * Defines to execute test or not.
-     * If executeValue equalsIgnoreCase to value from executeColumn -> add test row to run.
+     * If executeValue equalsIgnoreCase to value from executeColumn test will be added to run.
      *
      * @return String
      */
@@ -90,30 +101,40 @@ public @interface XlsDataSourceParameters {
 
     /**
      * Reason: not implemented
+     *
+     * @return String
      */
     @Deprecated(forRemoval = true, since = "1.0.0")
     String testRailColumn() default "";
 
     /**
      * Reason: not implemented
+     *
+     * @return String
      */
     @Deprecated(forRemoval = true, since = "1.0.0")
     String qTestColumn() default "";
 
     /**
      * Reason: not implemented
+     *
+     * @return String
      */
     @Deprecated(forRemoval = true, since = "1.0.0")
     String testMethodOwnerColumn() default "";
 
     /**
      * Reason: not implemented
+     *
+     * @return String
      */
     @Deprecated(forRemoval = true, since = "1.0.0")
     String bugColumn() default "";
 
     /**
      * Reason: not implemented
+     *
+     * @return String
      */
     @Deprecated(forRemoval = true, since = "1.0.0")
     String[] doNotRunTestNames() default {};

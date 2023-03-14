@@ -58,7 +58,7 @@ public abstract class BaseDataProvider {
     /**
      * Get value from data source in specified row.
      *
-     * @param dataRow Map<String, String> test method arguments/ record from source table
+     * @param dataRow @literal{Map<String, String>} test method arguments/ record from source table
      * @param key     String argument name/ column name from source table
      * @return String "value " from record
      */
@@ -69,8 +69,8 @@ public abstract class BaseDataProvider {
     /**
      * Get value from data source in specified row from several columns.
      *
-     * @param dataRow Map<String, String> test method arguments/ record from source table
-     * @param keys    List<String> argument names/ column names from source table
+     * @param dataRow @literal{Map<String, String>} test method arguments/ record from source table
+     * @param keys    @literal{List<String>} argument names/ column names from source table
      * @return String "value1, value2, ..., valueN " from record
      */
     protected String getValueFromRow(Map<String, String> dataRow, List<String> keys) {

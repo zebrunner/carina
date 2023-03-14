@@ -15,23 +15,18 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.dataprovider.core.impl;
 
-import au.com.bytecode.opencsv.CSVReader;
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByMapper;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.csv.CSVParser;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.csv.CSVTable;
-import com.zebrunner.carina.utils.ParameterGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 
-import java.io.FileReader;
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
-import java.util.*;
 
 /**
  * Created by Patotsky on 16.12.2014.

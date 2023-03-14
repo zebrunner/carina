@@ -157,7 +157,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         if (!result.getTestContext().getCurrentXmlTest().getAllParameters()
                 .containsKey(SpecialKeywords.EXCEL_DS_CUSTOM_PROVIDER) &&
                 result.getParameters().length > 0) // set parameters from XLS only if test contains any parameter at
-        // all)
+                                                   // all)
         {
             if (result.getTestContext().getCurrentXmlTest().getAllParameters()
                     .containsKey(SpecialKeywords.EXCEL_DS_ARGS)) {

@@ -1,7 +1,6 @@
 package com.qaprosoft.carina.core.foundation.dataprovider.parser.csv;
 
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.AbstractTable;
-import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

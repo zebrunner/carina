@@ -75,7 +75,7 @@ public @interface CsvDataSourceParameters {
 
     /**
      * Defines to execute test or not.
-     * If executeValue equalsIgnoreCase to value from executeColumn -> add test row to run.
+     * If executeValue equalsIgnoreCase to value from executeColumn test will be added to run.
      *
      * @return String
      */
@@ -100,30 +100,40 @@ public @interface CsvDataSourceParameters {
 
     /**
      * Reason: not implemented
+     *
+     * @return String
      */
     @Deprecated(forRemoval = true, since = "1.0.0")
     String testRailColumn() default "";
 
     /**
      * Reason: not implemented
+     *
+     * @return String
      */
     @Deprecated(forRemoval = true, since = "1.0.0")
     String qTestColumn() default "";
 
     /**
      * Reason: not implemented
+     *
+     * @return String
      */
     @Deprecated(forRemoval = true, since = "1.0.0")
     String testMethodOwnerColumn() default "";
 
     /**
      * Reason: not implemented
+     *
+     * @return String
      */
     @Deprecated(forRemoval = true, since = "1.0.0")
     String bugColumn() default "";
 
     /**
      * Reason: not implemented
+     *
+     * @return String[]
      */
     @Deprecated(forRemoval = true, since = "1.0.0")
     String[] doNotRunTestNames() default {};
