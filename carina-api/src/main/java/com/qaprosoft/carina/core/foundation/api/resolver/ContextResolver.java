@@ -33,6 +33,8 @@ interface ContextResolver<E extends AnnotatedElement> {
 
     Optional<String[]> resolveHiddenRequestHeadersInLogs(E element);
 
+    Optional<String[]> resolveHiddenResponseHeadersInLogs(E element);
+
     Optional<String> resolveRequestTemplatePath(E element);
 
     Optional<RequestBodyContainer> resolveRequestBody(E element);

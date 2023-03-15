@@ -35,6 +35,7 @@ import javax.net.ssl.TrustManager;
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatus;
 import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
 import com.qaprosoft.carina.core.foundation.api.interceptor.InterceptorChain;
+import com.qaprosoft.carina.core.foundation.api.log.CarinaResponseHeadersLoggingFilter;
 import com.qaprosoft.carina.core.foundation.api.resolver.ContextResolverChain;
 import com.qaprosoft.carina.core.foundation.api.resolver.RequestStartLine;
 import org.apache.commons.lang3.ArrayUtils;
@@ -263,8 +264,11 @@ public abstract class AbstractApiMethod extends HttpClient {
         }
 
         if (logResponse) {
+            Set<String> headers = ContextResolverChain.resolveHiddenResponseHeadersInLogs(this.anchorElement)
+                    .orElse(Collections.emptySet());
+            ResponseLoggingFilter fHeaders = new CarinaResponseHeadersLoggingFilter(true, ps, Matchers.any(Integer.class), headers);
+
             ResponseLoggingFilter fStatus = new ResponseLoggingFilter(LogDetail.STATUS, ps);
-            ResponseLoggingFilter fHeaders = new ResponseLoggingFilter(LogDetail.HEADERS, ps);
             ResponseLoggingFilter fCookies = new ResponseLoggingFilter(LogDetail.COOKIES, ps);
 
             ResponseLoggingFilter fBody = ContextResolverChain.resolveHiddenResponseBodyPartsInLogs(this.anchorElement)
