@@ -15,7 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.dataprovider.core.impl;
 
-import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByImpl;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.AbstractTable;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.zebrunner.carina.utils.ParameterGenerator;
@@ -42,7 +41,7 @@ public abstract class BaseDataProvider {
     }
 
     /**
-     * Generates hash by class name, method name and arg values.
+     * Generate hash by class name, method name and arg values.
      *
      * @param args   Object[] test method arguments
      * @param method ITestNGMethod
@@ -56,19 +55,35 @@ public abstract class BaseDataProvider {
         return String.valueOf(toHash.hashCode());
     }
 
+    /**
+     * Generate dataProvider based on grouped data rows
+     *
+     * @param groupedList @literal{List<List<Map<String, String>>>} grouped data rows
+     * @param dsBean      DSBean test parameters bean
+     * @param testMethod  ITestNGMethod current test method
+     * @return Object[][] grouped data provider, where object[i][0] contains @literal{ArrayList<HashMap<String, String>>}
+     */
     public Object[][] createGroupedDataProvider(List<List<Map<String, String>>> groupedList, DSBean dsBean, ITestNGMethod testMethod) {
         Object[][] dataProvider = declareDataProviderArray(groupedList, dsBean);
 
         if (dsBean.getArgs().isEmpty()) {
             fillArgsAsMap(dataProvider, groupedList, dsBean);
         } else {
-            fillArgsAsGropedMap(dataProvider, groupedList, dsBean);
+            fillArgsAsGroupedMap(dataProvider, groupedList, dsBean);
         }
 
         configureTestNamingVarsForGroupedProvider(dataProvider, dsBean, groupedList, testMethod);
         return dataProvider;
     }
 
+    /**
+     * Generate dataProvider based on data source rows
+     *
+     * @param table      AbstractTable contains parsed from data source data rows
+     * @param dsBean     DSBean test parameters bean
+     * @param testMethod ITestNGMethod current test method
+     * @return Object[][] grouped data provider
+     */
     public Object[][] createDataProvider(AbstractTable table, DSBean dsBean, ITestNGMethod testMethod) {
         Object[][] dataProvider = declareDataProviderArray(table.getDataRows(), dsBean);
 
@@ -83,17 +98,20 @@ public abstract class BaseDataProvider {
         return dataProvider;
     }
 
-    private void fillArgsAsGropedMap(Object[][] dataProvider, List<List<Map<String, String>>> gropedList, DSBean dsBean) {
+    private void fillArgsAsGroupedMap(Object[][] dataProvider, List<List<Map<String, String>>> groupedList, DSBean dsBean) {
+        //selecting only specified in test parameters args from whole dataRow into new grouped list
         List<String> argsToPass = dsBean.getArgs();
-        for (int rowIndex = 0; rowIndex < gropedList.size(); rowIndex++) {
+        for (int rowIndex = 0; rowIndex < groupedList.size(); rowIndex++) {
             List<Map<String, String>> listToPass = new ArrayList<>();
-            for (Map<String, String> groupedMap : gropedList.get(rowIndex)) {
+            for (Map<String, String> groupedMap : groupedList.get(rowIndex)) {
                 Map<String, String> mapToPass = new HashMap<>();
                 for (String argName : argsToPass) {
                     mapToPass.put(argName, groupedMap.get(argName));
                 }
                 listToPass.add(mapToPass);
             }
+
+            //creating grouped data provider with specified args
             dataProvider[rowIndex][0] = listToPass;
 
             for (int staticArgsColumn = 0; staticArgsColumn < dsBean.getStaticArgs().size(); staticArgsColumn++) {
@@ -165,11 +183,14 @@ public abstract class BaseDataProvider {
 
             String rowHash = hash(dataProvider[rowIndex], testNGMethod);
 
+            //get all unique tuid values from certain group
             String testUid = getValueFromGroupList(rowIndex, groupedList, dsBean.getUidArgs());
             addValueToMap(tuidMap, rowHash, testUid);
 
+            //get only first test name occurrence in group
             String testName = getValueFromGroupList(rowIndex, groupedList, List.of(dsBean.getTestMethodColumn()));
-            addValueToMap(testColumnNamesMap, rowHash, testName.split(",")[0]);
+            testName = testName.split(",")[0];
+            addValueToMap(testColumnNamesMap, rowHash, testName);
         }
     }
 
@@ -188,7 +209,7 @@ public abstract class BaseDataProvider {
         return valueRes.toString();
     }
 
-    public String getValueFromRow(Map<String, String> row, List<String> columnNames) {
+    private String getValueFromRow(Map<String, String> row, List<String> columnNames) {
         StringBuilder valueRes = new StringBuilder();
 
         for (String key : columnNames) {
@@ -208,6 +229,7 @@ public abstract class BaseDataProvider {
     }
 
     protected static Object getStaticParam(String name, DSBean dsBean) {
+        //get value from suite by name
         return ParameterGenerator.process(dsBean.getTestParams().get(name));
     }
 

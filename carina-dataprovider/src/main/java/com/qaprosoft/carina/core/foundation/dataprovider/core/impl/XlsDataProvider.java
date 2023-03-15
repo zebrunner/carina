@@ -32,12 +32,11 @@ import java.util.Map;
 public class XlsDataProvider extends BaseDataProvider {
 
     /**
-     * Create data for tests from xls data source by annotation and context parameters
+     * Create data provider for test based on xls data source, suite and annotation parameters
      *
      * @param annotation Annotation xls data source parameters
-     * @param context ITestContext
-     * @param testMethod ITestNGMethod
-     *
+     * @param context    ITestContext suite data source parameters
+     * @param testMethod ITestNGMethod current test method
      * @return Object[][] dataProvider
      */
     @Override
@@ -52,7 +51,7 @@ public class XlsDataProvider extends BaseDataProvider {
         if (groupColumn.isEmpty()) {
             return createDataProvider(xlsTable, dsBean, testMethod);
         } else {
-            List<List<Map<String,String>>> groupedList = xlsTable.getGroupedDataProviderMap(groupColumn);
+            List<List<Map<String, String>>> groupedList = xlsTable.getGroupedDataProviderMap(groupColumn);
             dsBean.setArgsToMap(true);
             return createGroupedDataProvider(groupedList, dsBean, testMethod);
         }

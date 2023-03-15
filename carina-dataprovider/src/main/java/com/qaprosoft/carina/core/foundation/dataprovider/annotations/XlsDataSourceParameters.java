@@ -90,10 +90,18 @@ public @interface XlsDataSourceParameters {
      */
     String staticArgs() default "";
 
+    /**
+     * Name of the column, by which will be performed grouping.
+     * If used, test will receive @literal{ArrayList<HashMap<String,String>} argument,
+     * where data grouped by lists depending on groupColumn values.
+     *
+     * @return String
+     */
     String groupColumn() default "";
 
     /**
      * Column name, which contains values for test name overriding
+     * If used with groupColumn parameter, test will be overridden by first occurrence in group
      *
      * @return String
      */

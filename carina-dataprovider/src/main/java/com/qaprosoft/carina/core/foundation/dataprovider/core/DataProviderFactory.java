@@ -43,13 +43,12 @@ public class DataProviderFactory {
      * Creates data provider from specified source in annotations.
      *
      * @param annotations test method annotations. For using carina's custom data provider
-     *        test should be annotated with @CsvDataSourceParameters or @XlsDataSourceParameters
-     *
-     * @param context test context
-     * @param m current test method
+     *                    test should be annotated with @CsvDataSourceParameters or @XlsDataSourceParameters
+     * @param context     test context
+     * @param m           current test method
      * @return Object[][] provider from specified source,
-     *         where provider.length shows number of test to be invoked
-     *         and provider[i][] contains test invocation args for each i test
+     * where provider.length shows number of test to be invoked
+     * and provider[i][] contains test invocation args for each i test
      */
     public static Object[][] getDataProvider(Annotation[] annotations, ITestContext context, ITestNGMethod m) {
         Map<String, String> tuidMap = Collections.synchronizedMap(new HashMap<>());
@@ -82,13 +81,13 @@ public class DataProviderFactory {
     /**
      * Put data from test parameters to test's context. Necessary for correct test naming.
      *
-     * @param context ITestContext.
-     * @param tuidMap Map<String, String> contains tuid values for each test (if present)
-     * @param testNameFromColumn Map<String, String> contains values for overriding test names from specified column
+     * @param context            ITestContext.
+     * @param tuidMap            @literal{Map<String, String>} contains tuid values for each test (if present)
+     * @param testNameFromColumn @literal{Map<String, String>} contains values for overriding test names from specified column
      */
     private static synchronized void putValuesToContext(ITestContext context,
-                                           Map<String, String> tuidMap,
-                                           Map<String, String> testNameFromColumn) {
+                                                        Map<String, String> tuidMap,
+                                                        Map<String, String> testNameFromColumn) {
         @SuppressWarnings("unchecked")
         Map<String, String> contextTUID = (Map<String, String>) context.getAttribute(SpecialKeywords.TUID);
         if (contextTUID != null) {

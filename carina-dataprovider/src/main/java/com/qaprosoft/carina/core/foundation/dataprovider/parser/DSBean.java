@@ -47,7 +47,7 @@ public class DSBean {
     }
 
     public DSBean(XlsDataSourceParameters xlsDataSourceParameters, Map<String, String> suiteParams) {
-        // params init order: 1) from test annotation 2) from suite
+        // params initialize order: 1) from test annotation 2) from suite
         if (xlsDataSourceParameters != null) {
             this.initParamsFromAnnotation(xlsDataSourceParameters);
             if (!xlsDataSourceParameters.sheet().isEmpty()) {
@@ -76,7 +76,7 @@ public class DSBean {
     }
 
     public DSBean(CsvDataSourceParameters csvDataSourceParameters, Map<String, String> suiteParams) {
-        // initialize default Xls data source parameters from suite xml file
+        // params initialize order: 1) from test annotation 2) from suite
         if (csvDataSourceParameters != null) {
             this.initParamsFromAnnotation(csvDataSourceParameters);
         }
@@ -90,6 +90,7 @@ public class DSBean {
     }
 
     private void initParamsFromAnnotation(XlsDataSourceParameters parameters) {
+        // initialize default xls data source parameters from annotation
         this.dsFile = parameters.path();
         this.executeColumn = parameters.executeColumn();
         this.executeValue = parameters.executeValue();
@@ -109,6 +110,7 @@ public class DSBean {
     }
 
     private void initParamsFromAnnotation(CsvDataSourceParameters parameters) {
+        // initialize default xls data source parameters from annotation
         this.dsFile = parameters.path();
         this.executeColumn = parameters.executeColumn();
         this.executeValue = parameters.executeValue();
@@ -127,6 +129,7 @@ public class DSBean {
     }
 
     private void initParamsFromSuite(Map<String, String> suiteParams, String specialKeyPrefix) {
+        // initialize data source parameters from suite xml file
         if (suiteParams.get(insert(SpecialKeywords.DS_FILE, specialKeyPrefix)) != null) {
             this.dsFile = suiteParams.get(insert(SpecialKeywords.DS_FILE, specialKeyPrefix));
         }

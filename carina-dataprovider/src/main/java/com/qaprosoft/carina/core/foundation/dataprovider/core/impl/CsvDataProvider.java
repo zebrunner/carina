@@ -36,11 +36,11 @@ public class CsvDataProvider extends BaseDataProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
-     * Create data for tests from csv data source by annotation and context parameters
+     * Create data provider for test based on csv data source, suite and annotation parameters
      *
      * @param annotation Annotation csv data source parameters
-     * @param context    ITestContext
-     * @param testMethod ITestNGMethod
+     * @param context    ITestContext suite data source parameters
+     * @param testMethod ITestNGMethod current test method
      * @return Object[][] dataProvider
      */
     @SuppressWarnings("unchecked")
@@ -57,7 +57,7 @@ public class CsvDataProvider extends BaseDataProvider {
         if (groupColumn.isEmpty()) {
             return createDataProvider(csvTable, dsBean, testMethod);
         } else {
-            List<List<Map<String,String>>> groupedList = csvTable.getGroupedDataProviderMap(groupColumn);
+            List<List<Map<String, String>>> groupedList = csvTable.getGroupedDataProviderMap(groupColumn);
             dsBean.setArgsToMap(true);
             return createGroupedDataProvider(groupedList, dsBean, testMethod);
         }
