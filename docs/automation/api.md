@@ -102,14 +102,13 @@ Approach based on initialisation of super class constructor is deprecated and mo
 3. `@Endpoint` - combination of http method + url which defines any single API endpoint
 4. `@Header` - is used to specify headers in the request
 5. `@HideRequestBodyPartsInLogs` - is used to hide sensitive parts of the request body in the logs
-6. `@HideResponseBodyPartsInLogs` - is used to hide secret parts of the response body in the logs
 6. `@HideRequestHeadersInLogs` - is used to hide sensitive parts of the request headers in the logs
-7. `@HideResponseHeadersInLogs` - is used to hide sensitive parts of the response headers in the logs
-9. `@PropertiesPath` - contains a path to default properties file for endpoint templates (relative path from root of code sources)
-10. `@QueryParam` - is used to specify query parameters in the request
-11. `@RequestTemplatePath` - contains a path to default request template for mentioned endpoint (relative path from root of code sources)
-12. `@ResponseTemplatePath` - contains a path to default response template for mentioned endpoint (relative path from root of code sources)
-13. `@SuccessfulHttpStatus` - specifies the expected HTTP status for happy-path scenarios
+7. `@HideResponseBodyPartsInLogs` - is used to hide secret parts of the response body in the logs
+8. `@PropertiesPath` - contains a path to default properties file for endpoint templates (relative path from root of code sources)
+9. `@QueryParam` - is used to specify query parameters in the request
+10. `@RequestTemplatePath` - contains a path to default request template for mentioned endpoint (relative path from root of code sources)
+11. `@ResponseTemplatePath` - contains a path to default response template for mentioned endpoint (relative path from root of code sources)
+12. `@SuccessfulHttpStatus` - specifies the expected HTTP status for happy-path scenarios
 
 In this case we don’t need to define _api.properties file and call the constructor of a super class, but if we have some properties file used in this request we should explicitly set it in test method. Insead of callAPI() and expectResponseStatus() methods we can use callAPIExpectSuccess() that will call API expecting http status in response taken from @SuccessfulHttpStatus value.
 ```java
@@ -786,12 +785,11 @@ In order to encrypt the data you can use carina's [CryptoConsole](../advanced/se
 Then you can save your encrypted properties using default pattern: "{crypt:ENCRYPTED_TXT}"  
 During properties parsing process carina-api module will automatically decrypt the text and put decrypted value into request body.  
 
-#### Hiding of API call headers
-In order to hide the value of API call header you need to annotate your API method with @HideRequestHeadersInLogs/@HideResponseHeadersInLogs annotations.
+#### Hiding of API request headers
+In order to hide the value of API request header you need to annotate your API method with @HideRequestHeadersInLogs annotation.
 Usage sample:
 ```java
-@HideRequestHeadersInLogs(headers = "Authorization")
-@HideResponseHeadersInLogs(headers = "Authorization")
+@HideRequestHeadersInLogs(headers = "Content-Type")
 public class YourAPIMethod extends AbstractApiMethodV2 {
     public YourAPIMethod() {    
     }

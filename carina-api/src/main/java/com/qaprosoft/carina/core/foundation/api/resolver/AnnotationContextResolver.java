@@ -24,7 +24,6 @@ import com.qaprosoft.carina.core.foundation.api.annotation.Header;
 import com.qaprosoft.carina.core.foundation.api.annotation.HideRequestBodyPartsInLogs;
 import com.qaprosoft.carina.core.foundation.api.annotation.HideRequestHeadersInLogs;
 import com.qaprosoft.carina.core.foundation.api.annotation.HideResponseBodyPartsInLogs;
-import com.qaprosoft.carina.core.foundation.api.annotation.HideResponseHeadersInLogs;
 import com.qaprosoft.carina.core.foundation.api.annotation.PropertiesPath;
 import com.qaprosoft.carina.core.foundation.api.annotation.RequestTemplatePath;
 import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePath;
@@ -75,13 +74,6 @@ class AnnotationContextResolver implements ContextResolver<Class<?>> {
         return AnnotationUtils.findFirstAnnotationContextByChain(element, HideRequestHeadersInLogs.class)
                 .map(AnnotationContext::getAnnotation)
                 .map(HideRequestHeadersInLogs::headers);
-    }
-
-    @Override
-    public Optional<String[]> resolveHiddenResponseHeadersInLogs(Class<?> element) {
-        return AnnotationUtils.findFirstAnnotationContextByChain(element, HideResponseHeadersInLogs.class)
-                .map(AnnotationContext::getAnnotation)
-                .map(HideResponseHeadersInLogs::headers);
     }
 
     @Override

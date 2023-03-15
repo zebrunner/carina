@@ -72,11 +72,6 @@ class PropertiesContextResolver implements ContextResolver<Class<?>> {
     }
 
     @Override
-    public Optional<String[]> resolveHiddenResponseHeadersInLogs(Class<?> element) {
-        return Optional.empty();
-    }
-
-    @Override
     public Optional<String> resolveRequestTemplatePath(Class<?> element) {
         return Optional.empty();
     }

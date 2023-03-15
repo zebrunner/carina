@@ -55,11 +55,6 @@ public class ContextResolverChain {
                 .map(Set::of);
     }
 
-    public static Optional<Set<String>> resolveHiddenResponseHeadersInLogs(AnnotatedElement element) {
-        return getResolverValue(resolver -> resolver.resolveHiddenResponseHeadersInLogs(element), element)
-                .map(Set::of);
-    }
-
     public static Optional<String> resolveRequestTemplatePath(AnnotatedElement element) {
         return getResolverValue(resolver -> resolver.resolveRequestTemplatePath(element), element);
     }
