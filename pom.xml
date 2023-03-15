@@ -70,7 +70,7 @@
         <!-- Zebrunner integrations -->
         <zebrunner-testng-pluggable.version>1.9.3</zebrunner-testng-pluggable.version>
         <!-- Others -->
-        <rest-assured.version>4.3.0</rest-assured.version>
+        <rest-assured.version>5.3.0</rest-assured.version>
         <imgscalr-lib.version>4.2</imgscalr-lib.version>
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
         <gson.version>2.9.0</gson.version>
