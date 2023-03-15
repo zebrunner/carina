@@ -39,9 +39,11 @@ public class DSBean {
     private boolean spreadsheet;
     private String groupColumn;
     private String testMethodColumn;
+    private boolean argsToMap;
 
     public DSBean(ITestContext context) {
         initParamsFromSuite(context.getCurrentXmlTest().getAllParameters(), "excel");
+        this.argsToMap = this.args.size() == 0;
     }
 
     public DSBean(XlsDataSourceParameters xlsDataSourceParameters, Map<String, String> suiteParams) {
@@ -70,6 +72,7 @@ public class DSBean {
         }
 
         this.testParams = suiteParams;
+        this.argsToMap = this.args.size() == 0;
     }
 
     public DSBean(CsvDataSourceParameters csvDataSourceParameters, Map<String, String> suiteParams) {
@@ -83,6 +86,7 @@ public class DSBean {
         }
         this.testParams = suiteParams;
         this.xlsSheet = null;
+        this.argsToMap = this.args.size() == 0;
     }
 
     private void initParamsFromAnnotation(XlsDataSourceParameters parameters) {
@@ -193,11 +197,11 @@ public class DSBean {
         return executeValue;
     }
 
-    public boolean isArgsToHashMap() {
-        if (this.args.size() == 0) {
-          return  true;
-        } else {
-            return false;
-        }
+    public boolean isArgsToMap() {
+        return argsToMap;
+    }
+
+    public void setArgsToMap(boolean argsToMap) {
+        this.argsToMap = argsToMap;
     }
 }

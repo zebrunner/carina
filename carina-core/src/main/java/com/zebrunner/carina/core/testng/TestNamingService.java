@@ -117,17 +117,15 @@ public class TestNamingService {
     }
 
     private static String getTestNameMap(ITestResult result) {
-        String testNameMapName = StringUtils.EMPTY;
+        String testNameMapName = result.getTestContext().getCurrentXmlTest().getName();
+
         @SuppressWarnings("unchecked")
         Map<Object[], String> testNameMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TEST_NAME);
-
         if (testNameMap != null && !testNameMap.isEmpty()) {
             String testHash = BaseDataProvider.hash(result.getParameters(), result.getMethod());
             if (testNameMap.containsKey(testHash)) {
                 testNameMapName = testNameMap.get(testHash);
             }
-        } else {
-            testNameMapName = result.getTestContext().getCurrentXmlTest().getName();
         }
         return testNameMapName;
     }

@@ -16,7 +16,6 @@
 package com.qaprosoft.carina.core.foundation.dataprovider.core.impl;
 
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
-import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByMapper;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.xls.XLSParser;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.xls.XLSTable;
@@ -24,6 +23,8 @@ import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 
 import java.lang.annotation.Annotation;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Patotsky on 16.12.2014.
@@ -45,14 +46,15 @@ public class XlsDataProvider extends BaseDataProvider {
         DSBean dsBean = new DSBean(parameters, context.getCurrentXmlTest().getAllParameters());
 
         XLSTable xlsTable = XLSParser.parseSpreadSheet(dsBean.getDsFile(), dsBean.getXlsSheet(), dsBean.getExecuteColumn(), dsBean.getExecuteValue());
+        xlsTable.processTable();
 
-        String groupByParameter = dsBean.getGroupColumn();
-        if (!groupByParameter.isEmpty()) {
-            GroupByMapper.getInstanceInt().add(dsBean.getArgs().indexOf(groupByParameter));
-            GroupByMapper.getInstanceStrings().add(groupByParameter);
+        String groupColumn = dsBean.getGroupColumn();
+        if (groupColumn.isEmpty()) {
+            return createDataProvider(xlsTable, dsBean, testMethod);
+        } else {
+            List<List<Map<String,String>>> groupedList = xlsTable.getGroupedDataProviderMap(groupColumn);
+            dsBean.setArgsToMap(true);
+            return createGroupedDataProvider(groupedList, dsBean, testMethod);
         }
-        GroupByMapper.setIsHashMapped(dsBean.isArgsToHashMap());
-
-        return fillDataProviderWithData(xlsTable, dsBean, testMethod);
     }
 }

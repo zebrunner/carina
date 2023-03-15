@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.dataprovider.core.impl;
 
+import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByImpl;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.AbstractTable;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.zebrunner.carina.utils.ParameterGenerator;
@@ -55,50 +56,24 @@ public abstract class BaseDataProvider {
         return String.valueOf(toHash.hashCode());
     }
 
-    /**
-     * Get value from data source in specified row.
-     *
-     * @param dataRow @literal{Map<String, String>} test method arguments/ record from source table
-     * @param key     String argument name/ column name from source table
-     * @return String "value " from record
-     */
-    protected String getValueFromRow(Map<String, String> dataRow, String key) {
-        return getValueFromRow(dataRow, List.of(key));
-    }
+    public Object[][] createGroupedDataProvider(List<List<Map<String, String>>> groupedList, DSBean dsBean, ITestNGMethod testMethod) {
+        Object[][] dataProvider = declareDataProviderArray(groupedList, dsBean);
 
-    /**
-     * Get value from data source in specified row from several columns.
-     *
-     * @param dataRow @literal{Map<String, String>} test method arguments/ record from source table
-     * @param keys    @literal{List<String>} argument names/ column names from source table
-     * @return String "value1, value2, ..., valueN " from record
-     */
-    protected String getValueFromRow(Map<String, String> dataRow, List<String> keys) {
-        StringBuilder valueRes = new StringBuilder();
-
-        for (String key : keys) {
-            if (!key.isEmpty() && dataRow.containsKey(key)) {
-                String value = dataRow.get(key);
-                if (value != null && !value.isEmpty()) {
-                    valueRes.append(value);
-                    valueRes.append(",");
-                }
-            }
+        if (dsBean.getArgs().isEmpty()) {
+            fillArgsAsMap(dataProvider, groupedList, dsBean);
+        } else {
+            fillArgsAsGropedMap(dataProvider, groupedList, dsBean);
         }
 
-        if (valueRes.indexOf(",") != -1) {
-            valueRes.replace(valueRes.length() - 1, valueRes.length(), "");
-        }
-        return valueRes.toString();
+        configureTestNamingVarsForGroupedProvider(dataProvider, dsBean, groupedList, testMethod);
+        return dataProvider;
     }
 
-    protected Object[][] fillDataProviderWithData(AbstractTable table, DSBean dsBean, ITestNGMethod testMethod) {
-        processTable(table);
+    public Object[][] createDataProvider(AbstractTable table, DSBean dsBean, ITestNGMethod testMethod) {
+        Object[][] dataProvider = declareDataProviderArray(table.getDataRows(), dsBean);
 
-        Object[][] dataProvider = declareDataProviderArray(table, dsBean);
-
-        if (dsBean.isArgsToHashMap()) {
-            fillArgsAsHashMap(dataProvider, table, dsBean);
+        if (dsBean.isArgsToMap()) {
+            fillArgsAsMap(dataProvider, table.getDataRows(), dsBean);
         } else {
             fillArgsAsArray(dataProvider, table, dsBean);
         }
@@ -108,18 +83,30 @@ public abstract class BaseDataProvider {
         return dataProvider;
     }
 
-    private void processTable(AbstractTable table) {
-        for (Map<String, String> row : table.getDataRows()) {
-            ParameterGenerator.processMap(row);
+    private void fillArgsAsGropedMap(Object[][] dataProvider, List<List<Map<String, String>>> gropedList, DSBean dsBean) {
+        List<String> argsToPass = dsBean.getArgs();
+        for (int rowIndex = 0; rowIndex < gropedList.size(); rowIndex++) {
+            List<Map<String, String>> listToPass = new ArrayList<>();
+            for (Map<String, String> groupedMap : gropedList.get(rowIndex)) {
+                Map<String, String> mapToPass = new HashMap<>();
+                for (String argName : argsToPass) {
+                    mapToPass.put(argName, groupedMap.get(argName));
+                }
+                listToPass.add(mapToPass);
+            }
+            dataProvider[rowIndex][0] = listToPass;
+
+            for (int staticArgsColumn = 0; staticArgsColumn < dsBean.getStaticArgs().size(); staticArgsColumn++) {
+                String staticArgName = dsBean.getStaticArgs().get(staticArgsColumn);
+                dataProvider[rowIndex][staticArgsColumn + 1] = getStaticParam(staticArgName, dsBean);
+            }
         }
     }
 
-    private void fillArgsAsHashMap(Object[][] dataProvider, AbstractTable table, DSBean dsBean) {
+    private void fillArgsAsMap(Object[][] dataProvider, List<?> dataRows, DSBean dsBean) {
         for (int rowIndex = 0; rowIndex < dataProvider.length; rowIndex++) {
-            Map<String, String> row = table.getDataRows().get(rowIndex);
-
             // populate arguments by parameters from data source
-            dataProvider[rowIndex][0] = row;
+            dataProvider[rowIndex][0] = dataRows.get(rowIndex);
 
             // populate the rest of arguments by static parameters from testParams
             for (int staticArgsColumn = 0; staticArgsColumn < dsBean.getStaticArgs().size(); staticArgsColumn++) {
@@ -146,11 +133,11 @@ public abstract class BaseDataProvider {
         }
     }
 
-    private Object[][] declareDataProviderArray(AbstractTable table, DSBean dsBean) {
-        int numberOfRowsToExecute = table.getDataRows().size();
+    private Object[][] declareDataProviderArray(List<?> dataRows, DSBean dsBean) {
+        int numberOfRowsToExecute = dataRows.size();
 
         int numberOfArgsInTest;
-        if (dsBean.isArgsToHashMap()) {
+        if (dsBean.isArgsToMap()) {
             // first element is dynamic HashMap<String, String>
             numberOfArgsInTest = 1 + dsBean.getStaticArgs().size();
         } else {
@@ -166,8 +153,58 @@ public abstract class BaseDataProvider {
 
             String rowHash = hash(dataProvider[rowIndex], testNGMethod);
             addValueToMap(tuidMap, rowHash, getValueFromRow(row, dsBean.getUidArgs()));
-            addValueToMap(testColumnNamesMap, rowHash, getValueFromRow(row, dsBean.getTestMethodColumn()));
+            addValueToMap(testColumnNamesMap, rowHash, getValueFromRow(row, List.of(dsBean.getTestMethodColumn())));
         }
+    }
+
+    private void configureTestNamingVarsForGroupedProvider(Object[][] dataProvider,
+                                                           DSBean dsBean,
+                                                           List<List<Map<String, String>>> groupedList,
+                                                           ITestNGMethod testNGMethod) {
+        for (int rowIndex = 0; rowIndex < dataProvider.length; rowIndex++) {
+
+            String rowHash = hash(dataProvider[rowIndex], testNGMethod);
+
+            String testUid = getValueFromGroupList(rowIndex, groupedList, dsBean.getUidArgs());
+            addValueToMap(tuidMap, rowHash, testUid);
+
+            String testName = getValueFromGroupList(rowIndex, groupedList, List.of(dsBean.getTestMethodColumn()));
+            addValueToMap(testColumnNamesMap, rowHash, testName.split(",")[0]);
+        }
+    }
+
+    private String getValueFromGroupList(int rowIndex, List<List<Map<String, String>>> groupedList, List<String> columnNames) {
+        Set<String> values = new LinkedHashSet<>();
+        List<Map<String, String>> dataRowList = groupedList.get(rowIndex);
+
+        for (Map<String, String> dataMap : dataRowList) {
+            values.add(getValueFromRow(dataMap, columnNames));
+        }
+
+        StringBuilder valueRes = new StringBuilder(String.join(",", values));
+        if (valueRes.indexOf(",") != -1) {
+            valueRes.replace(valueRes.length() - 1, valueRes.length(), "");
+        }
+        return valueRes.toString();
+    }
+
+    public String getValueFromRow(Map<String, String> row, List<String> columnNames) {
+        StringBuilder valueRes = new StringBuilder();
+
+        for (String key : columnNames) {
+            if (!key.isEmpty() && row.containsKey(key)) {
+                String value = row.get(key);
+                if (value != null && !value.isEmpty()) {
+                    valueRes.append(value);
+                    valueRes.append(",");
+                }
+            }
+        }
+
+        if (valueRes.indexOf(",") != -1) {
+            valueRes.replace(valueRes.length() - 1, valueRes.length(), "");
+        }
+        return valueRes.toString();
     }
 
     protected static Object getStaticParam(String name, DSBean dsBean) {
@@ -181,5 +218,4 @@ public abstract class BaseDataProvider {
     public Map<String, String> getTuidMap() {
         return tuidMap;
     }
-
 }

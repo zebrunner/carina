@@ -15,9 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.dataprovider.core;
 
-import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByImpl;
-import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByMapper;
-import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.exceptions.GroupByException;
 import com.qaprosoft.carina.core.foundation.dataprovider.core.impl.BaseDataProvider;
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
 import org.apache.commons.lang3.ArrayUtils;
@@ -77,14 +74,7 @@ public class DataProviderFactory {
             }
         }
 
-        if (!GroupByMapper.getInstanceInt().isEmpty() || !GroupByMapper.getInstanceStrings().isEmpty()) {
-            provider = getGroupedList(provider);
-        }
         putValuesToContext(context, tuidMap, testNameMap);
-
-        // clear group by settings
-        GroupByMapper.getInstanceInt().clear();
-        GroupByMapper.getInstanceStrings().clear();
 
         return provider;
     }
@@ -96,7 +86,7 @@ public class DataProviderFactory {
      * @param tuidMap Map<String, String> contains tuid values for each test (if present)
      * @param testNameFromColumn Map<String, String> contains values for overriding test names from specified column
      */
-    private static void putValuesToContext(ITestContext context,
+    private static synchronized void putValuesToContext(ITestContext context,
                                            Map<String, String> tuidMap,
                                            Map<String, String> testNameFromColumn) {
         @SuppressWarnings("unchecked")
@@ -159,25 +149,4 @@ public class DataProviderFactory {
 
         return dataProvider;
     }
-
-    private static Object[][] getGroupedList(Object[][] provider) {
-        Object[][] finalProvider;
-        if (GroupByMapper.isHashMapped()) {
-            if (GroupByMapper.getInstanceStrings().size() == 1) {
-                finalProvider = GroupByImpl.getGroupedDataProviderMap(provider, GroupByMapper.getInstanceStrings().iterator().next());
-            } else {
-                throw new GroupByException("Incorrect groupColumn annotation parameter!");
-            }
-        } else {
-            if (GroupByMapper.getInstanceInt().size() == 1 && !GroupByMapper.getInstanceInt().contains(-1)) {
-
-                finalProvider = GroupByImpl.getGroupedDataProviderArgs(provider, GroupByMapper.getInstanceInt().iterator().next());
-            } else {
-                throw new GroupByException("Incorrect groupColumn annotation  parameter!");
-            }
-        }
-
-        return finalProvider;
-    }
-
 }

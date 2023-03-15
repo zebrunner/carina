@@ -16,7 +16,6 @@
 package com.qaprosoft.carina.core.foundation.dataprovider.core.impl;
 
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
-import com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.GroupByMapper;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.csv.CSVParser;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.csv.CSVTable;
@@ -27,6 +26,8 @@ import org.testng.ITestNGMethod;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Patotsky on 16.12.2014.
@@ -40,7 +41,6 @@ public class CsvDataProvider extends BaseDataProvider {
      * @param annotation Annotation csv data source parameters
      * @param context    ITestContext
      * @param testMethod ITestNGMethod
-     *
      * @return Object[][] dataProvider
      */
     @SuppressWarnings("unchecked")
@@ -51,14 +51,15 @@ public class CsvDataProvider extends BaseDataProvider {
 
         CSVTable csvTable = CSVParser.parseCsvFile(dsBean, parameters.separator(), parameters.quote());
         csvTable.excludeEntriesForNonExecution();
+        csvTable.processTable();
 
-        String groupByParameter = dsBean.getGroupColumn();
-        if (!groupByParameter.isEmpty()) {
-            GroupByMapper.getInstanceInt().add(dsBean.getArgs().indexOf(groupByParameter));
-            GroupByMapper.getInstanceStrings().add(groupByParameter);
+        String groupColumn = dsBean.getGroupColumn();
+        if (groupColumn.isEmpty()) {
+            return createDataProvider(csvTable, dsBean, testMethod);
+        } else {
+            List<List<Map<String,String>>> groupedList = csvTable.getGroupedDataProviderMap(groupColumn);
+            dsBean.setArgsToMap(true);
+            return createGroupedDataProvider(groupedList, dsBean, testMethod);
         }
-        GroupByMapper.setIsHashMapped(dsBean.isArgsToHashMap());
-
-        return fillDataProviderWithData(csvTable, dsBean, testMethod);
     }
 }
