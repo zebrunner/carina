@@ -25,7 +25,6 @@ import com.qaprosoft.carina.core.foundation.api.annotation.Header;
 import com.qaprosoft.carina.core.foundation.api.annotation.HideRequestBodyPartsInLogs;
 import com.qaprosoft.carina.core.foundation.api.annotation.HideRequestHeadersInLogs;
 import com.qaprosoft.carina.core.foundation.api.annotation.HideResponseBodyPartsInLogs;
-import com.qaprosoft.carina.core.foundation.api.annotation.HideResponseHeadersInLogs;
 import com.qaprosoft.carina.core.foundation.api.annotation.PathParam;
 import com.qaprosoft.carina.core.foundation.api.annotation.PropertiesPath;
 import com.qaprosoft.carina.core.foundation.api.annotation.Property;
@@ -113,12 +112,6 @@ public class MethodBasedContextResolver implements ContextResolver<RuntimeMethod
     public Optional<String[]> resolveHiddenRequestHeadersInLogs(RuntimeMethod element) {
         return AnnotationUtils.findFirstAnnotationContextByChain(element, HideRequestHeadersInLogs.class)
                 .map(context -> context.getValue(HideRequestHeadersInLogs::headers, o -> (String[]) o, new String[] {}));
-    }
-
-    @Override
-    public Optional<String[]> resolveHiddenResponseHeadersInLogs(RuntimeMethod element) {
-        return AnnotationUtils.findFirstAnnotationContextByChain(element, HideResponseHeadersInLogs.class)
-                .map(context -> context.getValue(HideResponseHeadersInLogs::headers, o -> (String[]) o, new String[] {}));
     }
 
     @Override
