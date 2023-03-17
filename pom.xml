@@ -45,7 +45,6 @@
         <log4j.version>2.17.1</log4j.version>
         <!-- Commons -->
         <commons-lang3.version>3.5</commons-lang3.version>
-        <commons-collections.version>3.2.2</commons-collections.version>
         <!-- Zebrunner integrations -->
         <zebrunner-testng-pluggable.version>1.9.3</zebrunner-testng-pluggable.version>
         <!-- Others -->
@@ -343,11 +342,6 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${commons-lang3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-collections</groupId>
-                <artifactId>commons-collections</artifactId>
-                <version>${commons-collections.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.poi</groupId>
