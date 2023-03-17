@@ -54,16 +54,6 @@
 			<artifactId>carina-utils</artifactId>
 			<version>${carina-utils.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>com.zebrunner</groupId>
-			<artifactId>carina-proxy</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>com.google.guava</groupId>
-					<artifactId>guava</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
 
 		<dependency>
 			<groupId>com.zebrunner</groupId>

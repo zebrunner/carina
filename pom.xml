@@ -37,7 +37,6 @@
         <!-- Define project's dependency version properties here -->
         <java.version>11</java.version>
         <carina-commons.version>1.0.1</carina-commons.version>
-        <carina-proxy.version>1.0.1</carina-proxy.version>
         <!-- Testings -->
         <testng.version>7.6.1</testng.version>
         <testng-foundation.version>2.0.1</testng-foundation.version>
@@ -298,11 +297,6 @@
         <dependencies>
             <!-- Project Level Dependencies: Manage them here at one place; pull specific
                                          dependency as needed in child -->
-            <dependency>
-                <groupId>com.zebrunner</groupId>
-                <artifactId>carina-proxy</artifactId>
-                <version>${carina-proxy.version}</version>
-            </dependency>
             <dependency>
                 <groupId>com.qaprosoft</groupId>
                 <artifactId>carina-dataprovider</artifactId>
