@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.zebrunner.carina.core.foundation.report.email;
+package com.qaprosoft.carina.core.foundation.reporting;
 
-import com.zebrunner.carina.utils.report.TestResultItem;
-import com.zebrunner.carina.utils.report.TestResultType;
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.Test;
+
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemComparator;
 import com.qaprosoft.carina.core.foundation.report.email.EmailValidator;
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import com.zebrunner.carina.utils.R;
+import com.zebrunner.carina.utils.report.TestResultItem;
+import com.zebrunner.carina.utils.report.TestResultType;
 
 public class EmailTest {
 
@@ -39,6 +42,10 @@ public class EmailTest {
     private static final String CREATED_ITEM1 = "item 1";
     private static final String CREATED_ITEM2 = "item 2";
 
+    @AfterMethod
+    public void afterMethod() {
+        R.CONFIG.getTestProperties().clear();
+    }
 
     @Test
     public void testEmailValidator() {
@@ -78,18 +85,15 @@ public class EmailTest {
                 TEST_RESULT_ITEM1.getTest() + " is the same as " + TEST_RESULT_ITEM2.getTest());
     }
 
-
     @Test
     public void testEmailReportComparatorTheSameTestResultItems() {
         Assert.assertTrue(isEqual(TEST_RESULT_ITEM1, TEST_RESULT_ITEM1_1),
                 TEST_RESULT_ITEM1.getTest() + " is different than " + TEST_RESULT_ITEM1_1.getTest());
     }
 
-
     private boolean isEqual(TestResultItem testResultItem1, TestResultItem testResultItem2) {
         EmailReportItemComparator comparator = new EmailReportItemComparator();
 
         return comparator.compare(testResultItem1, testResultItem2) == 0;
     }
-
 }
