@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.reporting;
+package com.zebrunner.carina.core.foundation.report.qtest;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Set;

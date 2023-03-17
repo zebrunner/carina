@@ -67,7 +67,6 @@
         <module>carina-api</module>
         <module>carina-webdriver</module>
         <module>carina-dataprovider</module>
-        <module>carina-reporting</module>
         <module>carina-core</module>
     </modules>
     <repositories>
