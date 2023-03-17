@@ -67,7 +67,6 @@
         <module>carina-api</module>
         <module>carina-webdriver</module>
         <module>carina-dataprovider</module>
-        <module>carina-reporting</module>
         <module>carina-core</module>
     </modules>
     <repositories>
@@ -314,11 +313,6 @@
                 <groupId>com.zebrunner</groupId>
                 <artifactId>carina-utils</artifactId>
                 <version>${carina-utils.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.qaprosoft</groupId>
-                <artifactId>carina-reporting</artifactId>
-                <version>1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.qaprosoft</groupId>

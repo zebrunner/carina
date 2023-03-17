@@ -24,14 +24,15 @@ import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.Reporter;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestRailManager;
 import com.qaprosoft.carina.core.foundation.report.testrail.TestRailCases;
 import com.zebrunner.carina.utils.Configuration.Parameter;
 import com.zebrunner.carina.utils.R;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
 
 /**
  * Tests for {@link ITestRailManager}
@@ -51,6 +52,11 @@ public class TestRailTest implements ITestRailManager {
     @BeforeSuite()
     public void initData(ITestContext context) {
         context.getSuite().setAttribute(SpecialKeywords.TESTRAIL_SUITE_ID, SUITE_ID);
+    }
+
+    @AfterMethod
+    public void afterMethod() {
+        R.CONFIG.getTestProperties().clear();
     }
 
     @Test
@@ -93,6 +99,7 @@ public class TestRailTest implements ITestRailManager {
         LOGGER.info("TestRail list: " + testRailUdids.toString());
 
         Assert.assertEquals(testRailUdids.size(), 4);
+        R.CONFIG.getTestProperties().clear();
     }
 
     @Test
@@ -120,7 +127,7 @@ public class TestRailTest implements ITestRailManager {
 
         Assert.assertEquals(testRailUdids.size(), 0);
 
-        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, SpecialKeywords.IOS);
+        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, SpecialKeywords.IOS, true);
 
         testRailUdids = getTestRailCasesUuid(result);
 
@@ -128,7 +135,7 @@ public class TestRailTest implements ITestRailManager {
 
         Assert.assertEquals(testRailUdids.size(), 1);
 
-        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, SpecialKeywords.ANDROID);
+        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, SpecialKeywords.ANDROID, true);
 
         testRailUdids = getTestRailCasesUuid(result);
 
@@ -136,7 +143,7 @@ public class TestRailTest implements ITestRailManager {
 
         Assert.assertEquals(testRailUdids.size(), 1);
 
-        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, "");
+        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, "", true);
     }
 
 
@@ -166,13 +173,13 @@ public class TestRailTest implements ITestRailManager {
         Assert.assertTrue(testRailUdids.contains(FIRST_TEST_ID), "TestRail should contain id=" + FIRST_TEST_ID);
         Assert.assertEquals(testRailUdids.size(), 1);
 
-        R.CONFIG.put(Parameter.LOCALE.getKey(), "fr");
+        R.CONFIG.put(Parameter.LOCALE.getKey(), "fr", true);
         testRailUdids = getTestRailCasesUuid(result);
 
         Assert.assertTrue(testRailUdids.contains(SECOND_TEST_ID), "TestRail should contain id=" + SECOND_TEST_ID);
         Assert.assertEquals(testRailUdids.size(), 1);
         
-        R.CONFIG.put(Parameter.LOCALE.getKey(), "en");
+        R.CONFIG.put(Parameter.LOCALE.getKey(), "en", true);
     }
     
     @Test

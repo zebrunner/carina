@@ -53,10 +53,6 @@
 			<artifactId>carina-utils</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.qaprosoft</groupId>
-			<artifactId>carina-reporting</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.zebrunner</groupId>
 			<artifactId>carina-proxy</artifactId>
 			<exclusions>

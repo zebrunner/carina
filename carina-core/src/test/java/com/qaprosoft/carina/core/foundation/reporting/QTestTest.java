@@ -24,14 +24,15 @@ import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.Reporter;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.report.qtest.IQTestManager;
 import com.qaprosoft.carina.core.foundation.report.qtest.QTestCases;
 import com.zebrunner.carina.utils.Configuration.Parameter;
 import com.zebrunner.carina.utils.R;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
 
 /**
  * Tests for {@link IQTestManager}
@@ -50,6 +51,11 @@ public class QTestTest implements IQTestManager {
     @BeforeSuite()
     public void initData(ITestContext context) {
         context.getSuite().setAttribute(SpecialKeywords.QTEST_PROJECT_ID, PROJECT_ID);
+    }
+
+    @AfterMethod
+    public void afterMethod() {
+        R.CONFIG.getTestProperties().clear();
     }
 
     @Test
@@ -125,7 +131,7 @@ public class QTestTest implements IQTestManager {
 
         LOGGER.info(QTestUdids.toString());
 
-        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, SpecialKeywords.IOS);
+        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, SpecialKeywords.IOS, true);
 
         QTestUdids = getQTestCasesUuid(result);
 
@@ -133,7 +139,7 @@ public class QTestTest implements IQTestManager {
 
         Assert.assertEquals(QTestUdids.size(), 1);
 
-        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, SpecialKeywords.ANDROID);
+        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, SpecialKeywords.ANDROID, true);
 
         QTestUdids = getQTestCasesUuid(result);
 
@@ -141,7 +147,7 @@ public class QTestTest implements IQTestManager {
 
         Assert.assertEquals(QTestUdids.size(), 1);
 
-        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, "");
+        R.CONFIG.put(SpecialKeywords.MOBILE_DEVICE_PLATFORM, "", true);
     }
 
 
@@ -173,13 +179,13 @@ public class QTestTest implements IQTestManager {
         Assert.assertTrue(QTestUdids.contains(FIRST_TEST_ID), "TestRail should contain id=" + FIRST_TEST_ID);
         Assert.assertEquals(QTestUdids.size(), 1);
 
-        R.CONFIG.put(Parameter.LOCALE.getKey(), "fr");
+        R.CONFIG.put(Parameter.LOCALE.getKey(), "fr", true);
         QTestUdids = getQTestCasesUuid(result);
 
         Assert.assertTrue(QTestUdids.contains(SECOND_TEST_ID), "TestRail should contain id=" + SECOND_TEST_ID);
         Assert.assertEquals(QTestUdids.size(), 1);
 
-        R.CONFIG.put(Parameter.LOCALE.getKey(), "en");
+        R.CONFIG.put(Parameter.LOCALE.getKey(), "en", true);
     }
 
 }
