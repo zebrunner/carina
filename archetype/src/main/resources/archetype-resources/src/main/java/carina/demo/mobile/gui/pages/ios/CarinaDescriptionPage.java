@@ -3,13 +3,18 @@
 #set( $symbol_escape = '\' )
 package ${package}.carina.demo.mobile.gui.pages.ios;
 
-import com.zebrunner.carina.utils.factory.DeviceType;
-import com.zebrunner.carina.utils.factory.DeviceType.Type;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Predicate;
-import ${package}.carina.demo.mobile.gui.pages.common.*;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
+
+import ${package}.carina.demo.mobile.gui.pages.common.CarinaDescriptionPageBase;
+import ${package}.carina.demo.mobile.gui.pages.common.ChartsPageBase;
+import ${package}.carina.demo.mobile.gui.pages.common.MapsPageBase;
+import ${package}.carina.demo.mobile.gui.pages.common.UIElementsPageBase;
+import ${package}.carina.demo.mobile.gui.pages.common.WebViewPageBase;
+import com.zebrunner.carina.utils.factory.DeviceType;
+import com.zebrunner.carina.utils.factory.DeviceType.Type;
+import com.zebrunner.carina.webdriver.decorator.ExtendedWebElement;
+import com.zebrunner.carina.webdriver.decorator.annotations.Predicate;
 
 @DeviceType(pageType = Type.IOS_PHONE, parentClass = CarinaDescriptionPageBase.class)
 public class CarinaDescriptionPage extends CarinaDescriptionPageBase {

@@ -12,11 +12,11 @@
 
     <parameter name="jenkinsRegressionPipeline" value="web_regression, full_regression"/>
 
-    <parameter name="jenkinsRegressionMatrix_full_regression" value="browser: chrome, locale: en_US; browser: chrome, locale: es_ES; browser: chrome, locale: de_DE; browser: chrome, locale: zh_CN; browser: chrome, locale: ru_RU; browser: chrome, locale: hu_HU"/>
+    <parameter name="jenkinsRegressionMatrix_full_regression" value="browser:chrome, locale:en_US; browser:chrome, locale:es_ES; browser:chrome, locale:de_DE; browser:chrome, locale:zh_CN; browser:chrome, locale:ru_RU; browser:chrome, locale:hu_HU; browser:chrome, locale:ja_JP"/>
     <parameter name="jenkinsJobExecutionOrder" value="1"/>
     <parameter name="jenkinsJobExecutionMode" value="continue"/>
 
-    <parameter name="choiceParam::locale::supported locales in example" value="en_US,es_ES,de_DE,ja_JP,zh_CN,ru_RU,hu_HU" />
+    <parameter name="choiceParam::locale::supported locales in example" value="en_US,es_ES,de_DE,zh_CN,ru_RU,hu_HU,ja_JP" />
     <parameter name="jenkinsAutoScreenshot" value="true"/>
 
     <test name="Wikipedia Localization Test">

@@ -9,7 +9,7 @@
 	<parameter name="jenkinsJobType" value="api"/>
 
 	<parameter name="jenkinsEnvironments" value="DEMO"/>
-	
+
 	<parameter name="jenkinsRegressionPipeline" value="api_regression, full_regression"/>
 
 	<test name="Soap API tests">

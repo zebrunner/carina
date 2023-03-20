@@ -3,15 +3,16 @@
 #set( $symbol_escape = '\' )
 package ${package}.carina.demo;
 
-import com.qaprosoft.apitools.validation.XmlCompareMode;
-import com.qaprosoft.carina.core.foundation.IAbstractTest;
-import io.restassured.path.xml.XmlPath;
-import io.restassured.response.Response;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import ${package}.carina.demo.soap.AddIntegerMethod;
 import ${package}.carina.demo.soap.LookupCityMethod;
+import com.zebrunner.carina.api.apitools.validation.XmlCompareMode;
+
+import io.restassured.path.xml.XmlPath;
+import io.restassured.response.Response;
 
 public class SoapSampleTest implements IAbstractTest {
 
@@ -35,4 +36,5 @@ public class SoapSampleTest implements IAbstractTest {
         soap.callAPIExpectSuccess();
         soap.validateXmlResponse(XmlCompareMode.STRICT);
     }
+
 }

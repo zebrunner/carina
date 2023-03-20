@@ -13,10 +13,11 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<carina-core_version>8.0.4</carina-core_version>
-		<carina-aws-s3.version>1.0.0</carina-aws-s3.version>
+		<carina-core_version>8.0.8.P10-SNAPSHOT</carina-core_version>
+		<carina-api.version>1.0.0.P3-SNAPSHOT</carina-api.version>
+		<carina-aws-s3.version>1.0.1</carina-aws-s3.version>
 		<java.version>11</java.version>
-		<zebrunner-agent.version>1.9.2</zebrunner-agent.version>
+		<zebrunner-agent.version>1.9.3</zebrunner-agent.version>
 		<suite>helloWorld</suite>
 	</properties>
 
@@ -40,6 +41,11 @@
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-core</artifactId>
 			<version>${carina-core_version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.zebrunner</groupId>
+			<artifactId>carina-api</artifactId>
+			<version>${carina-api.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.zebrunner</groupId>
@@ -90,9 +96,6 @@
 				<version>3.10.1</version>
 				<configuration>
 					<release>${java.version}</release>
-					<compilerArgs>
-						<arg>-parameters</arg>
-					</compilerArgs>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -123,7 +126,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.0.0-M6</version>
+				<version>3.0.0</version>
 				<configuration>
 					<argLine>-javaagent:${project.build.directory}/agent/zebrunner-agent.jar</argLine>
 					<useSystemClassLoader>false</useSystemClassLoader>

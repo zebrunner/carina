@@ -3,8 +3,9 @@
 #set( $symbol_escape = '\' )
 package ${package}.carina.demo.mobile.gui.pages.common;
 
-import com.qaprosoft.carina.core.gui.AbstractPage;
 import org.openqa.selenium.WebDriver;
+
+import com.zebrunner.carina.webdriver.gui.AbstractPage;
 
 public abstract class CarinaDescriptionPageBase extends AbstractPage {
 

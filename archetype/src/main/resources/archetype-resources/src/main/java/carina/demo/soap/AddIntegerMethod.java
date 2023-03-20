@@ -3,9 +3,14 @@
 #set( $symbol_escape = '\' )
 package ${package}.carina.demo.soap;
 
-import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
-import com.qaprosoft.carina.core.foundation.api.http.HttpMethodType;
-import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
+import com.zebrunner.carina.api.AbstractApiMethodV2;
+import com.zebrunner.carina.api.annotation.ContentType;
+import com.zebrunner.carina.api.annotation.Endpoint;
+import com.zebrunner.carina.api.annotation.RequestTemplatePath;
+import com.zebrunner.carina.api.annotation.ResponseTemplatePath;
+import com.zebrunner.carina.api.annotation.SuccessfulHttpStatus;
+import com.zebrunner.carina.api.http.HttpMethodType;
+import com.zebrunner.carina.api.http.HttpResponseStatusType;
 import com.zebrunner.carina.utils.Configuration;
 
 @Endpoint(url = "${base_url}", methodType = HttpMethodType.POST)
@@ -19,4 +24,5 @@ public class AddIntegerMethod extends AbstractApiMethodV2 {
         replaceUrlPlaceholder("base_url", Configuration.getEnvArg("soap_url"));
         setHeaders(String.format("SOAPAction=%s", "http://tempuri.org/SOAP.Demo.AddInteger"));
     }
+
 }
