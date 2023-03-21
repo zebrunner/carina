@@ -66,7 +66,7 @@
         <module>carina-dataprovider</module>
         <module>carina-core</module>
     </modules>
-    <repositories>
+    <!--repositories>
         <repository>
             <id>zebrunner_snapshots</id>
             <name>zebrunner Snapshots</name>
@@ -78,7 +78,7 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-    </repositories>
+    </repositories-->
     <profiles>
         <profile>
             <id>default</id>
