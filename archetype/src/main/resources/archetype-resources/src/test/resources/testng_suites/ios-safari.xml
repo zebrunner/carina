@@ -13,14 +13,14 @@
 
 	<parameter name="jenkinsMobileDefaultPool" value="ANY" />
 
- 	<parameter name="jenkinsRegressionPipeline" value="mobile_regression" />
+	<parameter name="jenkinsRegressionPipeline" value="mobile_regression" />
 	<parameter name="jenkinsJobExecutionOrder" value="5" />
 	<parameter name="jenkinsJobExecutionMode" value="continue" />
 	<parameter name="jenkinsAutoScreenshot" value="true"/>
 
 	<test name="Safari test">
 		<classes>
-			<class name="com.qaprosoft.carina.demo.IOSSafariTest" />
+			<class name="${package}.carina.demo.IOSSafariTest" />
 		</classes>
 	</test>
 

@@ -5,10 +5,13 @@ package ${package}.carina.demo;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
+import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
-import java.time.Duration;
 
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -16,19 +19,15 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.FluentWait;
-
 import com.qaprosoft.carina.core.foundation.IAbstractTest;
-import com.zebrunner.carina.utils.report.ReportContext;
 import com.zebrunner.carina.utils.R;
-import com.qaprosoft.carina.core.foundation.webdriver.DriverHelper;
+import com.zebrunner.carina.utils.report.ReportContext;
+import com.zebrunner.carina.webdriver.DriverHelper;
 
 public class AutoDownloadTest implements IAbstractTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
+    
     @BeforeSuite()
     public void BeforeAutoDownload() {
         R.CONFIG.put("auto_download", "true");
@@ -48,7 +47,7 @@ public class AutoDownloadTest implements IAbstractTest {
         File file = ReportContext.getArtifact(getDriver(), "klassy-cafe.zip");
         Assert.assertTrue(file.exists(), "klassy-cafe.zip is not available among downloaded artifacts");
     }
-
+    
     @Test(expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp = "Unable to find artifact:.*")
     public void getInvalidArtifactTest() {
         String url = "https://www.free-css.com/assets/files/free-css-templates/download/page280/klassy-cafe.zip";
@@ -60,7 +59,7 @@ public class AutoDownloadTest implements IAbstractTest {
 
         ReportContext.getArtifact(getDriver(), UUID.randomUUID().toString());
     }
-
+    
     @Test()
     public void getArtifactsTest() {
         String url1 = "https://www.free-css.com/assets/files/free-css-templates/download/page279/tropiko.zip";

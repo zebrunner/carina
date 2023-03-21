@@ -6,10 +6,10 @@ package ${package}.carina.demo.mobile.gui.pages.android;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 
+import ${package}.carina.demo.mobile.gui.pages.common.UIElementsPageBase;
 import com.zebrunner.carina.utils.factory.DeviceType;
 import com.zebrunner.carina.utils.mobile.IMobileUtils;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
-import ${package}.carina.demo.mobile.gui.pages.common.UIElementsPageBase;
+import com.zebrunner.carina.webdriver.decorator.ExtendedWebElement;
 
 @DeviceType(pageType = DeviceType.Type.ANDROID_PHONE, parentClass = UIElementsPageBase.class)
 public class UIElementsPage extends UIElementsPageBase implements IMobileUtils {

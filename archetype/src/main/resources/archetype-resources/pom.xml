@@ -13,10 +13,11 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<carina-core_version>8.0.4</carina-core_version>
-		<carina-aws-s3.version>1.0.0</carina-aws-s3.version>
+		<carina-core_version>8.0.8</carina-core_version>
+		<carina-api.version>1.0.0</carina-api.version>
+		<carina-aws-s3.version>1.0.1</carina-aws-s3.version>
 		<java.version>11</java.version>
-		<zebrunner-agent.version>1.9.2</zebrunner-agent.version>
+		<zebrunner-agent.version>1.9.3</zebrunner-agent.version>
 		<suite>helloWorld</suite>
 	</properties>
 
@@ -40,6 +41,11 @@
 			<groupId>com.qaprosoft</groupId>
 			<artifactId>carina-core</artifactId>
 			<version>${carina-core_version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.zebrunner</groupId>
+			<artifactId>carina-api</artifactId>
+			<version>${carina-api.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.zebrunner</groupId>

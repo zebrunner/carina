@@ -3,17 +3,20 @@
 #set( $symbol_escape = '\' )
 package ${package}.carina.demo;
 
-import com.amazonaws.regions.Regions;
-import com.zebrunner.carina.amazon.AmazonS3Manager;
-import com.zebrunner.carina.utils.report.ReportContext;
-import com.zebrunner.carina.utils.Configuration;
-import com.zebrunner.carina.utils.R;
+import java.io.File;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.io.File;
+import com.amazonaws.regions.Regions;
+import com.qaprosoft.carina.core.foundation.IAbstractTest;
+import com.zebrunner.carina.amazon.AmazonS3Manager;
+import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.R;
+import com.zebrunner.carina.utils.report.ReportContext;
 
-public class AmazonS3Test {
+public class AmazonS3Test implements IAbstractTest {
+
     private static final String FILE_NAME = "carinademoexample.apk";
     private static final String BUCKET_NAME = "qaprosoft";
 
@@ -25,4 +28,5 @@ public class AmazonS3Test {
         amazonS3Manager.download(BUCKET_NAME, FILE_NAME, artifact);
         Assert.assertTrue(artifact.exists(), "Artifact should exists");
     }
+
 }

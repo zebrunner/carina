@@ -1,15 +1,18 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-package ${package}.carina.demo.gui.pages;
+package ${package}.carina.demo.gui.pages.desktop;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
-import com.qaprosoft.carina.core.gui.AbstractPage;
+import ${package}.carina.demo.gui.pages.common.ModelInfoPageBase;
+import com.zebrunner.carina.utils.factory.DeviceType;
+import com.zebrunner.carina.webdriver.decorator.ExtendedWebElement;
 
-public class ModelInfoPage extends AbstractPage {
+@DeviceType(pageType = DeviceType.Type.DESKTOP, parentClass = ModelInfoPageBase.class)
+public class ModelInfoPage extends ModelInfoPageBase {
+
     @FindBy(css = ".help-display strong")
     private ExtendedWebElement displayInfoLabel;
 
@@ -45,4 +48,5 @@ public class ModelInfoPage extends AbstractPage {
         assertElementPresent(displayInfoLabel);
         return batteryInfoLabel.getText();
     }
+
 }
