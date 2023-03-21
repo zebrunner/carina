@@ -23,7 +23,7 @@
 		<carina-utils.version>1.0.2</carina-utils.version>
 	</properties>
 
-	<repositories>
+	<!--repositories>
        <repository>
            <id>zebrunner_snapshots</id>
            <name>zebrunner Snapshots</name>
@@ -35,7 +35,7 @@
                <enabled>true</enabled>
            </snapshots>
        </repository>
-   </repositories>
+   </repositories-->
 
 	<dependencies>
 		<dependency>
