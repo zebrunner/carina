@@ -1041,7 +1041,7 @@ files, source code, etc.) based on templates and changing data."</li>
 <p>Now we are ready to create REST service domain object which will be used to interact with web service and perform additional response validations. Our domain object is located in /carina-demo/src/main/java/com/qaprosoft/carina/demo/api, make sure that it extends AbstractApiMethodV2 and triggers the base class constructor for initialization. In general cases, you will specify the path to request and response templates along with default properties files (all of them have been created in the previous step). Also, we replace the URL placeholder to set an appropriate environment.</p>
 <pre><code class="java">package com.qaprosoft.carina.demo.api;
 
-import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
+import com.zebrunner.carina.api.AbstractApiMethodV2;
 import com.zebrunner.carina.utils.Configuration;
 
 public class PostUserMethod extends AbstractApiMethodV2 {
@@ -1115,7 +1115,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.apitools.validation.JsonCompareKeywords;
+import com.zebrunner.carina.api.apitools.validation.JsonCompareKeywords;
 import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import com.zebrunner.carina.core.registrar.ownership.MethodOwner;
 import com.zebrunner.carina.core.registrar.tag.TestPriority;
@@ -1196,17 +1196,17 @@ It allows to: <br />
 <p>Here is example of multiple api methods definition for one url pattern. Base url template can be easily overwritten with use of <code>@EndpointTemplateMethod</code> annotation:</p>
 <pre><code class="java">package com.qaprosoft.carina.demo.api;
 
-import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
-import com.qaprosoft.carina.core.foundation.api.annotation.EndpointTemplate;
-import com.qaprosoft.carina.core.foundation.api.annotation.EndpointTemplateMethod;
-import com.qaprosoft.carina.core.foundation.api.annotation.PathParam;
-import com.qaprosoft.carina.core.foundation.api.annotation.PropertiesPath;
-import com.qaprosoft.carina.core.foundation.api.annotation.RequestTemplatePath;
-import com.qaprosoft.carina.core.foundation.api.annotation.ResponseTemplatePath;
-import com.qaprosoft.carina.core.foundation.api.annotation.SuccessfulHttpStatus;
-import com.qaprosoft.carina.core.foundation.api.annotation.method.DeleteMethod;
-import com.qaprosoft.carina.core.foundation.api.http.HttpMethodType;
-import com.qaprosoft.carina.core.foundation.api.http.HttpResponseStatusType;
+import com.zebrunner.carina.api.AbstractApiMethodV2;
+import com.zebrunner.carina.api.annotation.EndpointTemplate;
+import com.zebrunner.carina.api.annotation.EndpointTemplateMethod;
+import com.zebrunner.carina.api.annotation.PathParam;
+import com.zebrunner.carina.api.annotation.PropertiesPath;
+import com.zebrunner.carina.api.annotation.RequestTemplatePath;
+import com.zebrunner.carina.api.annotation.ResponseTemplatePath;
+import com.zebrunner.carina.api.annotation.SuccessfulHttpStatus;
+import com.zebrunner.carina.api.annotation.method.DeleteMethod;
+import com.zebrunner.carina.api.http.HttpMethodType;
+import com.zebrunner.carina.api.http.HttpResponseStatusType;
 
 @EndpointTemplate(url = &quot;${config.env.base_url}/users&quot;)
 public interface UserTemplate {
@@ -1267,8 +1267,8 @@ public void testCreateUser() {
 <p>For more customization on api method definition level you can implement the interface and use the proxy class inside:    </p>
 <pre><code class="java">package com.qaprosoft.carina.demo.api.impl;
 
-import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
-import com.qaprosoft.carina.core.foundation.api.binding.TemplateFactory;
+import com.zebrunner.carina.api.AbstractApiMethodV2;
+import com.zebrunner.carina.api.binding.TemplateFactory;
 import com.qaprosoft.carina.demo.api.UserTemplate;
 
 public class UserTemplateImpl implements UserTemplate {
@@ -1330,8 +1330,8 @@ response is considered successful, action that will be executed after all api ca
 <p>This option provides the ability for handling and changing of your AbstractApiMethod instances on-the-fly. For that it's needed to create an implementation of <code>ApiMethodInterceptor</code> interface:    </p>
 <pre><code class="java">package com.qaprosoft.carina.demo.api.interceptor;
 
-import com.qaprosoft.carina.core.foundation.api.AbstractApiMethodV2;
-import com.qaprosoft.carina.core.foundation.api.interceptor.ApiMethodInterceptor;
+import com.zebrunner.carina.api.AbstractApiMethodV2;
+import com.zebrunner.carina.api.interceptor.ApiMethodInterceptor;
 
 public class CustomInterceptor implements ApiMethodInterceptor&lt;AbstractApiMethodV2&gt; {
 
@@ -1378,7 +1378,7 @@ public interface UserTemplate {
 
 <p>Then all logic defined in interceptor methods will be called on particular events (once api method is instantiated; once request is ready for sending to endpoint; once endpoint was called).  <br />
 Also it's possible to create global interceptors which will be applied for all api methods by default.  <br />
-Just create a file named <code>com.qaprosoft.carina.core.foundation.api.interceptor.ApiMethodInterceptor</code> in <code>/resources/META-INF/services</code> folder and set the path(s) of your implementation(s) into it:    </p>
+Just create a file named <code>com.zebrunner.carina.api.interceptor.ApiMethodInterceptor</code> in <code>/resources/META-INF/services</code> folder and set the path(s) of your implementation(s) into it:    </p>
 <pre><code>com.qaprosoft.carina.demo.CustomInterceptor
 com.qaprosoft.carina.demo.OtherCustomInterceptor
 </code></pre>
@@ -1429,8 +1429,8 @@ Also you have an access to full json tree using <code>#root</code> keyword.</p>
 <p>You have a possibility to implement custom wildcard for response validation as well. All you need is JsonKeywordComparator interface implementation:</p>
 <pre><code class="java">package com.qaprosoft.carina.demo;
 
-import com.qaprosoft.apitools.validation.JsonCompareResultWrapper;
-import com.qaprosoft.apitools.validation.JsonKeywordComparator;
+import com.zebrunner.carina.api.apitools.validation.JsonCompareResultWrapper;
+import com.zebrunner.carina.api.apitools.validation.JsonKeywordComparator;
 
 public class CustomComparator implements JsonKeywordComparator {
 
@@ -1494,7 +1494,7 @@ myApiMethod.validateResponse(comparatorContext);
 
 <p><em>Using Service Provider</em></p>
 <p>This option provides the ability to register your comparators, which will be always available for response validation, to the whole project.</p>
-<p>Just create a file named <code>com.qaprosoft.apitools.validation.JsonKeywordComparator</code>
+<p>Just create a file named <code>com.zebrunner.carina.api.apitools.validation.JsonKeywordComparator</code>
 in <code>/resources/META-INF/services</code> folder and set the path(s) of your implementation(s) into it:</p>
 <pre><code>com.qaprosoft.carina.demo.CustomComparator
 com.qaprosoft.carina.demo.OtherCustomComparator

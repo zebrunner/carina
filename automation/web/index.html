@@ -772,8 +772,8 @@ assertEquals(&quot;MyCityName&quot;, city.getText());
 
 <p><strong>Important:</strong></p>
 <ul>
-<li>Page should extend <strong>com.qaprosoft.carina.core.gui.AbstractPage</strong></li>
-<li>Use <strong>com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement</strong> instead of Selenium WebElement</li>
+<li>Page should extend <strong>com.zebrunner.carina.webdriver.gui.AbstractPage</strong></li>
+<li>Use <strong>com.zebrunner.carina.webdriver.decorator.ExtendedWebElement</strong> instead of Selenium WebElement</li>
 <li>Locate Page Object classes in <code>src/main/java</code></li>
 </ul>
 <h3 id="implementation-of-ui-components">Implementation of UI Components</h3>
@@ -834,7 +834,7 @@ assertEquals(&quot;MyCityName&quot;, city.getText());
 
 <p><strong>Important:</strong></p>
 <ul>
-<li>UI Object should extend <strong>com.qaprosoft.carina.core.gui.AbstractUIObject</strong></li>
+<li>UI Object should extend <strong>com.zebrunner.carina.webdriver.gui.AbstractUIObject</strong></li>
 <li>You should call the super constructor <strong>super(driver, searchContext)</strong> where searchContext is an instance of <strong>org.openqa.selenium.SearchContext</strong></li>
 <li>Locate UI Object classes in <code>src/main/java</code> source folder</li>
 </ul>
@@ -1097,6 +1097,15 @@ cellLink.format(2, &quot;My link&quot;);
 <p>3) As a result of calling this method, we get a specific ExtendedWebElement, which we can use in the future, for example:</p>
 <pre><code class="java">//getting text of element
 cell.format(&quot;My link&quot;).getText();
+</code></pre>
+
+<p><strong>How do I install extensions for Chrome?</strong></p>
+<p>Installing an extension for Chrome is done by using the <code>addEncodedExtensions</code> method of <code>ChromeOptions</code> class, for example:</p>
+<pre><code>ChromeOptions options = new ChromeCapabilities().getCapability(&quot;default&quot;);
+List&lt;File&gt; paths = new ArrayList();
+paths.add(new File(&quot;path to the file with crx extension (packed Chrome extension)&quot;));
+options.addEncodedExtensions(paths);
+getDriver(&quot;default&quot;, options);
 </code></pre>
                 
               

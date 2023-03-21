@@ -751,43 +751,92 @@ public void mutableCapsTest() {
 </code></pre>
 
 <h3 id="capabilities">Capabilities</h3>
-<p>Primitive Selenium/Appium capabilities can be provided in <code>_config.properties</code> using <code>capabilities.name=value</code>:</p>
-<pre><code>capabilities.automationName=uiautomator2
-capabilities.deviceName=Samsung_Galaxy_S10
-capabilities.platformName=ANDROID
-capabilities.app=https://qaprosoft.s3-us-west-2.amazonaws.com/carinademoexample.apk
-capabilities.newCommandTimeout=180
+<p>Capabilities can be specified in several ways.</p>
+<p>1)&nbsp;Specifying capabilities via <code>_config.properties</code>. Capabilities in the properties will be those parameters that have <code>capabilities.</code> added to the name first, for example <code>capabilities.platformName=Android</code>.</p>
+<p>1.1)&nbsp;Standard capabilities (listed <a href="https://www.w3.org/TR/webdriver/#capabilities">here</a>) should be specified as follows:</p>
+<pre><code class="properties"># The delimiter can be both the = symbol and the : symbol, but the first style is preferable.
+capabilities.browserName=chrome
+capabilities.browserVersion=100.0
+capabilities.platformName=mac
 </code></pre>
 
-<p>Visit these resources to see all capabilities:
-- <a href="https://w3c.github.io/webdriver/#capabilities">Selenium</a>
-- <a href="https://github.com/appium/appium-xcuitest-driver#capabilities">Appium - XCUITest</a>
-- <a href="https://github.com/appium/appium-uiautomator2-driver#capabilities">Appium - UiAutomator2</a>
-- <a href="https://github.com/appium/appium-espresso-driver#capabilities">Appium - Espresso</a>
-- <a href="https://github.com/appium/appium-geckodriver#usage">Appium - Gecko</a>
-- <a href="https://github.com/appium/appium-safari-driver#usage">Appium - Safari</a>
-- <a href="https://github.com/appium/appium-windows-driver#usage">Appium - Windows</a></p>
-<p>You can also look at outdated list of capabilities:
-- <a href="https://www.selenium.dev/documentation/legacy/desired_capabilities/">Selenium</a>
-- <a href="https://appium.io/docs/en/writing-running-appium/caps/">Appium</a></p>
-<p><strong>Important</strong>: capabilities should not be added to the configuration file with the <code>appium:</code> prefix!
-If you want the capabilities to be handled according to w3c, set the value of the w3c parameter in the config file to true.
-Also, if you use w3c mode, and at the same time use the capabilities specific to the service where you 
-run the tests, add <code>capabilities.provider</code> to the config file, for example <code>capabilities.provider=zebrunner</code>.</p>
-<p>The most popular capabilities sets can be declared in properties files and reused via <code>custom_capabilities</code> configuration parameter.
-It can be convenient for external hub providers like Zebrunner Device Farm, BrowserStack, Sauce Labs, etc.</p>
+<p>1.2)&nbsp;Capabilities that are not included in the standard ones. Such capabilities can be specified in two ways - with a prefix and nested.</p>
+<p>1.2.1)&nbsp;Capabilities with prefix. Example:</p>
+<pre><code class="properties"># Appium capabilities
+capabilities.appium\:automationName=uiautomator2
+capabilities.appium\:noReset=true
+capabilities.appium\:fullReset=true
+capabilities.appium\:app=https://qaprosoft.s3-us-west-2.amazonaws.com/carinademoexample.apk
+</code></pre>
+
+<p>However, it is not recommended to add an <code>appium:</code> prefix for <strong>Appium</strong> capabilities in the configuration file, as Appium drivers able to add it
+themselves.</p>
+<p>1.2.2)&nbsp;Nested capabilities. Example:</p>
+<pre><code class="properties">capabilities.zebrunner\:options.enableVideo=true
+capabilities.zebrunner\:options.enableLog=true
+</code></pre>
+
+<p>The final form of these capabilities as a result of processing:</p>
+<pre><code>{
+    ...
+    zebrunner:options {
+        enableVideo=true,
+        enableLog=true
+    }
+    ...
+}
+</code></pre>
+
+<p>2)&nbsp;Specifying via the auxiliary properties file</p>
+<p>2.1)&nbsp;The most popular capabilities sets can be declared in properties files and reused via <code>custom_capabilities</code> configuration parameter. It can be
+convenient for external hub providers like Zebrunner Device Farm, BrowserStack, Sauce Labs, etc.</p>
 <p>Collect device/browser specific capabilities and put into <code>src/main/resources/browserstack-iphone_12.properties</code>:</p>
-<pre><code>capabilities.realMobile=true
-capabilities.platformName=iOS
-capabilities.deviceName=iPhone 12
-capabilities.osVersion=14
-#capabilities.app=bs://444bd0308813ae0dc236f8cd461c02d3afa7901d
-#capabilities.browserstack.local=false
-#capabilities.appiumVersion=1.20.2
-#capabilities.deviceOrientation=portrait
+<pre><code>capabilities.platformName=ios
+capabilities.deviceName=iPhone 14 Pro Max
+capabilities.platformVersion=16
+capabilities.app=bs://444bd0308813ae0dc236f8cd461c02d3afa7901d
+capabilities.bstack\:options.local[string]=false
+capabilities.bstack\:options.appiumVersion[string]=2.0.0
+capabilities.bstack\:options.deviceOrientation=landscape
 </code></pre>
 
 <p>Put <code>custom_capabilities=browserstack-iphone_12.properties</code> into the <strong>_config.properties</strong> to start all tests on this device.</p>
+<p>2.2)&nbsp;Also you can create the same properties file as described in paragraph 2.1, but add its capabilities using the <code>loadCapabilities</code> method of
+the <code>com.zebrunner.carina.webdriver.core.capability.CapabilitiesLoader</code> class.</p>
+<p>3)&nbsp;Using the <code>put</code> method of the <code>R.CONFIG</code> class. You can specify not only capabilities, but also parameters, for example:</p>
+<pre><code>...
+R.CONFIG.put(&quot;capabilities.browserName&quot;, &quot;chrome&quot;);
+R.CONFIG.put(&quot;capabilities.browserName&quot;, &quot;firefox&quot;, true);
+...
+</code></pre>
+
+<p>4)&nbsp;Static Capabilities (Only when testing desktop browsers). You can specify capabilities that will apply to all sessions, using
+   the <code>addStaticCapability</code> method of the <code>com.zebrunner.carina.webdriver.core.factory.impl.DesktopFactory</code> class.</p>
+<p><strong>For paragraphs 1, 2, 3:</strong> Sometimes you need to explicitly specify the type of the capability value. When processing capabilities, their final type
+is determined based on the value (if we can parse as a number then it will be number, if as boolean then boolean, if not then string). However, there
+are situations when it is necessary to explicitly specify the type of the value, for example, the value is a number, but we want the resulting value
+to be a string. For example:</p>
+<pre><code class="properties"># We want to explicitly specify the String type for the idleTimeout value
+capabilities.zebrunner\:options.idleTimeout[String]=100
+capabilities.browserVersion[string]=100.0
+</code></pre>
+
+<p>Available explicit casting options - <code>[string]</code>, <code>[boolean]</code>, <code>[integer]</code>.</p>
+<p>Visit these resources to see all capabilities:</p>
+<ul>
+<li><a href="https://w3c.github.io/webdriver/#capabilities">Selenium</a></li>
+<li><a href="https://github.com/appium/appium-xcuitest-driver#capabilities">Appium - XCUITest</a></li>
+<li><a href="https://github.com/appium/appium-uiautomator2-driver#capabilities">Appium - UiAutomator2</a></li>
+<li><a href="https://github.com/appium/appium-espresso-driver#capabilities">Appium - Espresso</a></li>
+<li><a href="https://github.com/appium/appium-geckodriver#usage">Appium - Gecko</a></li>
+<li><a href="https://github.com/appium/appium-safari-driver#usage">Appium - Safari</a></li>
+<li><a href="https://github.com/appium/appium-windows-driver#usage">Appium - Windows</a></li>
+</ul>
+<p>You can also look at outdated list of capabilities:</p>
+<ul>
+<li><a href="https://www.selenium.dev/documentation/legacy/desired_capabilities/">Selenium</a></li>
+<li><a href="https://appium.io/docs/en/writing-running-appium/caps/">Appium</a></li>
+</ul>
 <h3 id="options">Options</h3>
 <p>Options and arguments can be provided through <code>_config.properties</code> using comma-separated values for multiple options/args, for example:</p>
 <pre><code>firefox_args=--no-first-run,--disable-notifications
