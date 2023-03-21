@@ -20,7 +20,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<carina-utils.version>1.0.2.P2-SNAPSHOT</carina-utils.version>
+		<carina-utils.version>1.0.2</carina-utils.version>
 		<opencsv.version>1.7</opencsv.version>
 	</properties>
 
