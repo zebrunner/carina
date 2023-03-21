@@ -17,12 +17,32 @@
 		<relativePath>..</relativePath>
 	</parent>
 
-
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<carina-webdriver.version>1.0.0</carina-webdriver.version>
+		<carina-utils.version>1.0.2</carina-utils.version>
 	</properties>
 
+	<!--repositories>
+       <repository>
+           <id>zebrunner_snapshots</id>
+           <name>zebrunner Snapshots</name>
+           <url>https://nexus.zebrunner.dev/repository/ce-snapshots/</url>
+           <releases>
+               <enabled>false</enabled>
+           </releases>
+           <snapshots>
+               <enabled>true</enabled>
+           </snapshots>
+       </repository>
+   </repositories-->
+
 	<dependencies>
+		<dependency>
+			<groupId>com.zebrunner</groupId>
+			<artifactId>carina-webdriver</artifactId>
+			<version>${carina-webdriver.version}</version>
+		</dependency>
 		<!-- Carina Core sub-modules -->
 		<dependency>
 			<groupId>com.qaprosoft</groupId>
@@ -31,29 +51,7 @@
 		<dependency>
 			<groupId>com.zebrunner</groupId>
 			<artifactId>carina-utils</artifactId>
-		</dependency>
-		<dependency>
-			<!-- do not remove otherwise a lot of compilation failures on test projects! -->
-			<groupId>com.qaprosoft</groupId>
-			<artifactId>carina-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.qaprosoft</groupId>
-			<artifactId>carina-reporting</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.qaprosoft</groupId>
-			<artifactId>carina-webdriver</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.zebrunner</groupId>
-			<artifactId>carina-proxy</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>com.google.guava</groupId>
-					<artifactId>guava</artifactId>
-				</exclusion>
-			</exclusions>
+			<version>${carina-utils.version}</version>
 		</dependency>
 
 		<dependency>
@@ -85,16 +83,6 @@
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>commons-collections</groupId>
-			<artifactId>commons-collections</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>selenium-support</artifactId>
-		</dependency>
-
 		<!-- Test utilities -->
 		<dependency>
 			<groupId>org.testng</groupId>
@@ -104,13 +92,6 @@
 		<dependency>
 			<groupId>com.nordstrom.tools</groupId>
 			<artifactId>testng-foundation</artifactId>
-		</dependency>
-
-		<!-- Appium -->
-		<dependency>
-			<!-- do not remove otherwise maven warn: Used undeclared dependencies found -->
-			<groupId>io.appium</groupId>
-			<artifactId>java-client</artifactId>
 		</dependency>
 
     </dependencies>

@@ -3,20 +3,21 @@
 #set( $symbol_escape = '\' )
 package ${package}.carina.demo;
 
-import com.qaprosoft.carina.core.foundation.IAbstractTest;
-import com.zebrunner.carina.core.registrar.ownership.MethodOwner;
-import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.ChromeCapabilities;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.FirefoxCapabilities;
-import ${package}.carina.demo.gui.components.NewsItem;
-import ${package}.carina.demo.gui.pages.HomePage;
-import ${package}.carina.demo.gui.pages.NewsPage;
+import java.util.List;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.util.List;
+import com.qaprosoft.carina.core.foundation.IAbstractTest;
+import ${package}.carina.demo.gui.components.NewsItem;
+import ${package}.carina.demo.gui.pages.desktop.HomePage;
+import ${package}.carina.demo.gui.pages.desktop.NewsPage;
+import com.zebrunner.carina.core.registrar.ownership.MethodOwner;
+import com.zebrunner.carina.webdriver.Screenshot;
+import com.zebrunner.carina.webdriver.core.capability.impl.desktop.ChromeCapabilities;
+import com.zebrunner.carina.webdriver.core.capability.impl.desktop.FirefoxCapabilities;
 
 /**
  * This sample shows how initialize multiple drivers and run the tests on different browsers.
@@ -48,6 +49,6 @@ public class WebMultipleBrowserTest implements IAbstractTest {
             System.out.println(n.readTitle());
             Assert.assertTrue(StringUtils.containsIgnoreCase(n.readTitle(), searchQ), "Invalid search results!");
         }
-
     }
+
 }

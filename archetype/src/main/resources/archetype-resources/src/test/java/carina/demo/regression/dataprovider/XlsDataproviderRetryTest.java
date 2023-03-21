@@ -15,8 +15,8 @@ import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
 import com.zebrunner.carina.core.registrar.ownership.MethodOwner;
 
-
 public class XlsDataproviderRetryTest implements IAbstractTest {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     
     @Test(dataProvider = "DataProvider")

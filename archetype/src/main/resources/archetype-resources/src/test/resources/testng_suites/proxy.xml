@@ -9,7 +9,7 @@
 	<parameter name="jenkinsJobType" value="web"/>
 	<parameter name="jenkinsEnvironments" value="DEMO"/>
 	<parameter name="jenkinsEmail" value="demo@qaprosoft.com"/>
-  
+
 	<parameter name="jenkinsRegressionPipeline" value="web_regression, full_regression"/>
 
 	<parameter name="jenkinsJobExecutionOrder" value="1"/>

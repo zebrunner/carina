@@ -1,0 +1,19 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite verbose="1" name="Carina Demo Tests - Attach File Sample" parallel="methods">
+
+    <parameter name="suiteOwner" value="qpsdemo"/>
+    <parameter name="jenkinsJobName" value="Attach-File-Web-Demo-Test"/>
+    <parameter name="jenkinsJobType" value="web"/>
+    <parameter name="jenkinsEnvironments" value="DEMO"/>
+    <parameter name="jenkinsRegressionPipeline" value="full_regression"/>
+
+    <test name="Attach File Test">
+        <classes>
+            <class name="${package}.carina.demo.regression.attachfile.AttachFileTest"/>
+        </classes>
+    </test>
+
+</suite>

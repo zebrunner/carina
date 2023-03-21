@@ -36,6 +36,22 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Define project's dependency version properties here -->
         <java.version>11</java.version>
+        <carina-commons.version>1.0.1</carina-commons.version>
+        <!-- Testings -->
+        <testng.version>7.6.1</testng.version>
+        <testng-foundation.version>2.0.1</testng-foundation.version>
+        <!-- Logging -->
+        <slf4j.version>1.7.30</slf4j.version>
+        <log4j.version>2.17.1</log4j.version>
+        <!-- Commons -->
+        <commons-lang3.version>3.5</commons-lang3.version>
+        <!-- Zebrunner integrations -->
+        <zebrunner-testng-pluggable.version>1.9.3</zebrunner-testng-pluggable.version>
+        <!-- Others -->
+        <apache-poi.version>4.1.2</apache-poi.version>
+        <!-- Never add mockito-all as compile dependency as it has their own invalid hamcrest-all implementation otherwise api fail to common with:
+                org.hamcrest.core.IsInstanceOf.any(Ljava/lang/Class;)Lorg/hamcrest/Matcher
+         -->
         <maven-assembly-plugin.version>3.1.0</maven-assembly-plugin.version>
         <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
@@ -43,53 +59,11 @@
         <maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <jacoco-maven-plugin>0.8.7</jacoco-maven-plugin>
-
-        <carina-utils.version>1.0.1</carina-utils.version>
-        <carina-commons.version>1.0.1</carina-commons.version>
-        <carina-proxy.version>1.0.1</carina-proxy.version>
-
-        <!-- Testings -->
-        <testng.version>7.6.1</testng.version>
-        <testng-foundation.version>2.0.1</testng-foundation.version>
-        <!-- Logging -->
-        <slf4j.version>1.7.30</slf4j.version>
-        <log4j.version>2.17.1</log4j.version>
-
-        <!-- Commons -->
-        <commons-lang3.version>3.5</commons-lang3.version>
-        <commons-logging.version>1.2</commons-logging.version>
-        <commons-cli.version>1.2</commons-cli.version>
-        <commons-io.version>2.7</commons-io.version>
-        <commons-codec.version>1.9</commons-codec.version>
-        <commons-collections.version>3.2.2</commons-collections.version>
-        <httpclient.version>4.5.13</httpclient.version>
-        <jna.version>3.0.9</jna.version>
-        <!-- Selenium -->
-        <selenium.version>4.4.0</selenium.version>
-        <appium.version>8.2.0</appium.version>
-        <!-- Zebrunner integrations -->
-        <zebrunner-testng-pluggable.version>1.9.3</zebrunner-testng-pluggable.version>
-        <!-- Others -->
-        <rest-assured.version>4.3.0</rest-assured.version>
-        <imgscalr-lib.version>4.2</imgscalr-lib.version>
-        <commons-beanutils.version>1.9.4</commons-beanutils.version>
-        <gson.version>2.9.0</gson.version>
-        <apache-poi.version>4.1.2</apache-poi.version>
-        <jaxb-api.version>2.2.2</jaxb-api.version>
-        <hamcrest.version>1.3</hamcrest.version>
-        <org.json.version>20160810</org.json.version>
-        <jersey.version>1.19.4</jersey.version>
-        <mokito-core.version>2.18.0</mokito-core.version>
-        <!-- Never add mockito-all as compile dependency as it has their own invalid hamcrest-all implementation otherwise api fail to common with:
-                org.hamcrest.core.IsInstanceOf.any(Ljava/lang/Class;)Lorg/hamcrest/Matcher
-         -->
-
     </properties>
     <modules>
         <module>carina-api</module>
-        <module>carina-dataprovider</module>
-        <module>carina-reporting</module>
         <module>carina-webdriver</module>
+        <module>carina-dataprovider</module>
         <module>carina-core</module>
     </modules>
     <!--repositories>
@@ -323,45 +297,11 @@
             <!-- Project Level Dependencies: Manage them here at one place; pull specific
                                          dependency as needed in child -->
             <dependency>
-                <groupId>com.zebrunner</groupId>
-                <artifactId>carina-proxy</artifactId>
-                <version>${carina-proxy.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.qaprosoft</groupId>
-                <artifactId>carina-api</artifactId>
-                <version>1.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
                 <groupId>com.qaprosoft</groupId>
                 <artifactId>carina-dataprovider</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>
-            <dependency>
-                <groupId>com.zebrunner</groupId>
-                <artifactId>carina-utils</artifactId>
-                <version>${carina-utils.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.zebrunner</groupId>
-                <artifactId>carina-commons</artifactId>
-                <version>${carina-commons.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.qaprosoft</groupId>
-                <artifactId>carina-reporting</artifactId>
-                <version>1.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>com.qaprosoft</groupId>
-                <artifactId>carina-webdriver</artifactId>
-                <version>1.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>com.qaprosoft</groupId>
-                <artifactId>carina-grid</artifactId>
-                <version>1.0-SNAPSHOT</version>
-            </dependency>
+
             <dependency>
                 <groupId>com.qaprosoft</groupId>
                 <artifactId>carina-core</artifactId>
@@ -404,85 +344,9 @@
                 <version>${commons-lang3.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.httpcomponents</groupId>
-                <artifactId>httpclient</artifactId>
-                <version>${httpclient.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-logging</groupId>
-                <artifactId>commons-logging</artifactId>
-                <version>${commons-logging.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-                <version>${commons-io.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-cli</groupId>
-                <artifactId>commons-cli</artifactId>
-                <version>${commons-cli.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-codec</groupId>
-                <artifactId>commons-codec</artifactId>
-                <version>${commons-codec.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-collections</groupId>
-                <artifactId>commons-collections</artifactId>
-                <version>${commons-collections.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi-ooxml</artifactId>
                 <version>${apache-poi.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.seleniumhq.selenium</groupId>
-                <artifactId>selenium-java</artifactId>
-                <version>${selenium.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.seleniumhq.selenium</groupId>
-                <artifactId>selenium-api</artifactId>
-                <version>${selenium.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.seleniumhq.selenium</groupId>
-                <artifactId>selenium-server</artifactId>
-                <version>${selenium.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.seleniumhq.selenium</groupId>
-                <artifactId>selenium-support</artifactId>
-                <version>${selenium.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.seleniumhq.selenium</groupId>
-                <artifactId>selenium-remote-driver</artifactId>
-                <version>${selenium.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.seleniumhq.selenium</groupId>
-                <artifactId>selenium-firefox-driver</artifactId>
-                <version>${selenium.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.seleniumhq.selenium</groupId>
-                <artifactId>selenium-chrome-driver</artifactId>
-                <version>${selenium.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.appium</groupId>
-                <artifactId>java-client</artifactId>
-                <version>${appium.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-context</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <!-- Test utilities -->
@@ -511,74 +375,6 @@
                         <artifactId>logback-classic</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>commons-beanutils</groupId>
-                <artifactId>commons-beanutils</artifactId>
-                <version>${commons-beanutils.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>io.rest-assured</groupId>
-                <artifactId>rest-assured</artifactId>
-                <version>${rest-assured.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.rest-assured</groupId>
-                <artifactId>json-path</artifactId>
-                <version>${rest-assured.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.imgscalr</groupId>
-                <artifactId>imgscalr-lib</artifactId>
-                <version>${imgscalr-lib.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.code.gson</groupId>
-                <artifactId>gson</artifactId>
-                <version>${gson.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.xml.bind</groupId>
-                <artifactId>jaxb-api</artifactId>
-                <version>${jaxb-api.version}</version>
-                <scope>runtime</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.hamcrest</groupId>
-                <artifactId>hamcrest-library</artifactId>
-                <version>${hamcrest.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hamcrest</groupId>
-                <artifactId>hamcrest-core</artifactId>
-                <version>${hamcrest.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hamcrest</groupId>
-                <artifactId>hamcrest-all</artifactId>
-                <version>${hamcrest.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.json</groupId>
-                <artifactId>json</artifactId>
-                <version>${org.json.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.sun.jersey</groupId>
-                <artifactId>jersey-core</artifactId>
-                <version>${jersey.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
-                <version>${mokito-core.version}</version>
-                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

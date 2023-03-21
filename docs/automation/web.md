@@ -68,8 +68,8 @@ public class ModelInfoPage extends AbstractPage {
 ```
 **Important:**
 
-* Page should extend **com.qaprosoft.carina.core.gui.AbstractPage**
-* Use **com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement** instead of Selenium WebElement
+* Page should extend **com.zebrunner.carina.webdriver.gui.AbstractPage**
+* Use **com.zebrunner.carina.webdriver.decorator.ExtendedWebElement** instead of Selenium WebElement
 * Locate Page Object classes in `src/main/java`
 
 
@@ -131,7 +131,7 @@ public class HomePage extends AbstractPage {
 ```
 **Important:**
 
-* UI Object should extend **com.qaprosoft.carina.core.gui.AbstractUIObject**
+* UI Object should extend **com.zebrunner.carina.webdriver.gui.AbstractUIObject**
 * You should call the super constructor **super(driver, searchContext)** where searchContext is an instance of **org.openqa.selenium.SearchContext**
 * Locate UI Object classes in `src/main/java` source folder
 
@@ -422,4 +422,15 @@ cellLink.format(2, "My link");
 ```java
 //getting text of element
 cell.format("My link").getText();
+```
+
+**How do I install extensions for Chrome?**
+
+Installing an extension for Chrome is done by using the `addEncodedExtensions` method of `ChromeOptions` class, for example:
+```
+ChromeOptions options = new ChromeCapabilities().getCapability("default");
+List<File> paths = new ArrayList();
+paths.add(new File("path to the file with crx extension (packed Chrome extension)"));
+options.addEncodedExtensions(paths);
+getDriver("default", options);
 ```

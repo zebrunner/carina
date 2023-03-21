@@ -20,7 +20,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
+		<carina-utils.version>1.0.2</carina-utils.version>
 		<opencsv.version>1.7</opencsv.version>
 	</properties>
 
@@ -29,6 +29,7 @@
 		<dependency>
 			<groupId>com.zebrunner</groupId>
 			<artifactId>carina-utils</artifactId>
+			<version>${carina-utils.version}</version>
 		</dependency>
 
 		<dependency>

@@ -9,7 +9,7 @@
 	<parameter name="jenkinsJobType" value="api"/>
 
 	<parameter name="jenkinsEnvironments" value="DEMO"/>
-	
+
 	<test name="Hello World test">
 		<classes>
 			<class name="${package}.carina.demo.HelloWorld" />

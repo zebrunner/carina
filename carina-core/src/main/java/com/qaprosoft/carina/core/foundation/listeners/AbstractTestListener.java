@@ -42,7 +42,7 @@ import com.zebrunner.carina.utils.messager.Messager;
 import com.zebrunner.carina.utils.ParameterGenerator;
 import com.zebrunner.carina.utils.R;
 import com.zebrunner.carina.utils.StringGenerator;
-import com.qaprosoft.carina.core.foundation.webdriver.IDriverPool;
+import com.zebrunner.carina.webdriver.IDriverPool;
 import com.zebrunner.agent.testng.core.retry.RetryAnalyzerInterceptor;
 import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
 import com.zebrunner.agent.testng.listener.RetryService;

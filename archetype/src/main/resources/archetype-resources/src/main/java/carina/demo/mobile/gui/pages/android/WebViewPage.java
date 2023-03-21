@@ -3,17 +3,18 @@
 #set( $symbol_escape = '\' )
 package ${package}.carina.demo.mobile.gui.pages.android;
 
-import com.zebrunner.carina.utils.factory.DeviceType;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
-import ${package}.carina.demo.mobile.gui.pages.common.ContactUsPageBase;
-import ${package}.carina.demo.mobile.gui.pages.common.WebViewPageBase;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
+
+import ${package}.carina.demo.mobile.gui.pages.common.ContactUsPageBase;
+import ${package}.carina.demo.mobile.gui.pages.common.WebViewPageBase;
+import com.zebrunner.carina.utils.factory.DeviceType;
+import com.zebrunner.carina.webdriver.decorator.ExtendedWebElement;
 
 @DeviceType(pageType = DeviceType.Type.ANDROID_PHONE, parentClass = WebViewPageBase.class)
 public class WebViewPage extends WebViewPageBase {
 
-    @FindBy(xpath = "//*[@class='t708__icon']")
+    @FindBy(xpath = "//*[text()='Get a quote']")
     private ExtendedWebElement contactUsLink;
 
     public WebViewPage(WebDriver driver) {
@@ -22,7 +23,9 @@ public class WebViewPage extends WebViewPageBase {
 
     @Override
     public ContactUsPageBase goToContactUsPage() {
+        swipe(contactUsLink);
         contactUsLink.click();
+        pause(7);
         return initPage(getDriver(), ContactUsPageBase.class);
     }
 

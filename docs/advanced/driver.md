@@ -52,18 +52,105 @@ public void mutableCapsTest() {
 }
 ```
 
-### Capabilities 
+### Capabilities
 
-Primitive Selenium/Appium capabilities can be provided in `_config.properties` using `capabilities.name=value`:
+Capabilities can be specified in several ways.
+
+1)&nbsp;Specifying capabilities via `_config.properties`. Capabilities in the properties will be those parameters that have `capabilities.` added to the name first, for example `capabilities.platformName=Android`.
+
+1.1)&nbsp;Standard capabilities (listed [here](https://www.w3.org/TR/webdriver/#capabilities)) should be specified as follows:
+
+```properties
+# The delimiter can be both the = symbol and the : symbol, but the first style is preferable.
+capabilities.browserName=chrome
+capabilities.browserVersion=100.0
+capabilities.platformName=mac
 ```
-capabilities.automationName=uiautomator2
-capabilities.deviceName=Samsung_Galaxy_S10
-capabilities.platformName=ANDROID
-capabilities.app=https://qaprosoft.s3-us-west-2.amazonaws.com/carinademoexample.apk
-capabilities.newCommandTimeout=180
+
+1.2)&nbsp;Capabilities that are not included in the standard ones. Such capabilities can be specified in two ways - with a prefix and nested.
+
+1.2.1)&nbsp;Capabilities with prefix. Example:
+
+```properties
+# Appium capabilities
+capabilities.appium\:automationName=uiautomator2
+capabilities.appium\:noReset=true
+capabilities.appium\:fullReset=true
+capabilities.appium\:app=https://qaprosoft.s3-us-west-2.amazonaws.com/carinademoexample.apk
 ```
+
+However, it is not recommended to add an `appium:` prefix for **Appium** capabilities in the configuration file, as Appium drivers able to add it
+themselves.
+
+1.2.2)&nbsp;Nested capabilities. Example:
+
+```properties
+capabilities.zebrunner\:options.enableVideo=true
+capabilities.zebrunner\:options.enableLog=true
+```
+
+The final form of these capabilities as a result of processing:
+
+```
+{
+    ...
+    zebrunner:options {
+        enableVideo=true,
+        enableLog=true
+    }
+    ...
+}
+```
+
+2)&nbsp;Specifying via the auxiliary properties file
+
+2.1)&nbsp;The most popular capabilities sets can be declared in properties files and reused via `custom_capabilities` configuration parameter. It can be
+convenient for external hub providers like Zebrunner Device Farm, BrowserStack, Sauce Labs, etc.
+
+Collect device/browser specific capabilities and put into `src/main/resources/browserstack-iphone_12.properties`:
+
+```
+capabilities.platformName=ios
+capabilities.deviceName=iPhone 14 Pro Max
+capabilities.platformVersion=16
+capabilities.app=bs://444bd0308813ae0dc236f8cd461c02d3afa7901d
+capabilities.bstack\:options.local[string]=false
+capabilities.bstack\:options.appiumVersion[string]=2.0.0
+capabilities.bstack\:options.deviceOrientation=landscape
+```
+
+Put `custom_capabilities=browserstack-iphone_12.properties` into the **_config.properties** to start all tests on this device.
+
+2.2)&nbsp;Also you can create the same properties file as described in paragraph 2.1, but add its capabilities using the `loadCapabilities` method of
+the `com.zebrunner.carina.webdriver.core.capability.CapabilitiesLoader` class.
+
+3)&nbsp;Using the `put` method of the `R.CONFIG` class. You can specify not only capabilities, but also parameters, for example:
+
+```
+...
+R.CONFIG.put("capabilities.browserName", "chrome");
+R.CONFIG.put("capabilities.browserName", "firefox", true);
+...
+```
+
+4)&nbsp;Static Capabilities (Only when testing desktop browsers). You can specify capabilities that will apply to all sessions, using
+   the `addStaticCapability` method of the `com.zebrunner.carina.webdriver.core.factory.impl.DesktopFactory` class.
+
+**For paragraphs 1, 2, 3:** Sometimes you need to explicitly specify the type of the capability value. When processing capabilities, their final type
+is determined based on the value (if we can parse as a number then it will be number, if as boolean then boolean, if not then string). However, there
+are situations when it is necessary to explicitly specify the type of the value, for example, the value is a number, but we want the resulting value
+to be a string. For example:
+
+```properties
+# We want to explicitly specify the String type for the idleTimeout value
+capabilities.zebrunner\:options.idleTimeout[String]=100
+capabilities.browserVersion[string]=100.0
+```
+
+Available explicit casting options - `[string]`, `[boolean]`, `[integer]`.
 
 Visit these resources to see all capabilities:
+
 - [Selenium](https://w3c.github.io/webdriver/#capabilities)
 - [Appium - XCUITest](https://github.com/appium/appium-xcuitest-driver#capabilities)
 - [Appium - UiAutomator2](https://github.com/appium/appium-uiautomator2-driver#capabilities)
@@ -73,31 +160,9 @@ Visit these resources to see all capabilities:
 - [Appium - Windows](https://github.com/appium/appium-windows-driver#usage)
 
 You can also look at outdated list of capabilities:
+
 - [Selenium](https://www.selenium.dev/documentation/legacy/desired_capabilities/)
 - [Appium](https://appium.io/docs/en/writing-running-appium/caps/)
-
-**Important**: capabilities should not be added to the configuration file with the `appium:` prefix!
-If you want the capabilities to be handled according to w3c, set the value of the w3c parameter in the config file to true.
-Also, if you use w3c mode, and at the same time use the capabilities specific to the service where you 
-run the tests, add `capabilities.provider` to the config file, for example `capabilities.provider=zebrunner`.
-
-The most popular capabilities sets can be declared in properties files and reused via `custom_capabilities` configuration parameter.
-It can be convenient for external hub providers like Zebrunner Device Farm, BrowserStack, Sauce Labs, etc.
-
-Collect device/browser specific capabilities and put into `src/main/resources/browserstack-iphone_12.properties`:
-
-```
-capabilities.realMobile=true
-capabilities.platformName=iOS
-capabilities.deviceName=iPhone 12
-capabilities.osVersion=14
-#capabilities.app=bs://444bd0308813ae0dc236f8cd461c02d3afa7901d
-#capabilities.browserstack.local=false
-#capabilities.appiumVersion=1.20.2
-#capabilities.deviceOrientation=portrait
-```
-
-Put `custom_capabilities=browserstack-iphone_12.properties` into the **_config.properties** to start all tests on this device.
 
 ### Options 
 
