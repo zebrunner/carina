@@ -6,7 +6,7 @@ import org.testng.annotations.DataProvider;
 
 import java.lang.annotation.Annotation;
 
-public interface CustomProvider {
+public interface IAbstractDataProvider {
 
     @DataProvider(name = "DataProvider", parallel = true)
     default Object[][] createData(final ITestNGMethod testMethod, ITestContext context) {
