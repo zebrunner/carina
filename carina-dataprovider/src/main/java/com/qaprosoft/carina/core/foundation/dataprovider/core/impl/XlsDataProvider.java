@@ -15,16 +15,17 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.dataprovider.core.impl;
 
-import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
-import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
-import com.qaprosoft.carina.core.foundation.dataprovider.parser.xls.XLSParser;
-import com.qaprosoft.carina.core.foundation.dataprovider.parser.xls.XLSTable;
-import org.testng.ITestContext;
-import org.testng.ITestNGMethod;
-
 import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
+
+import org.testng.ITestContext;
+import org.testng.ITestNGMethod;
+
+import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
+import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
+import com.zebrunner.carina.utils.parser.xls.XLSParser;
+import com.zebrunner.carina.utils.parser.xls.XLSTable;
 
 /**
  * Created by Patotsky on 16.12.2014.

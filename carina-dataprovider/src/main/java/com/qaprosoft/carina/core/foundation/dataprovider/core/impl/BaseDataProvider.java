@@ -17,7 +17,6 @@ package com.qaprosoft.carina.core.foundation.dataprovider.core.impl;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -28,9 +27,9 @@ import java.util.Set;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 
-import com.qaprosoft.carina.core.foundation.dataprovider.parser.AbstractTable;
 import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.zebrunner.carina.utils.ParameterGenerator;
+import com.zebrunner.carina.utils.parser.xls.AbstractTable;
 
 /**
  * Created by Patotsky on 19.12.2014.
@@ -46,21 +45,6 @@ public abstract class BaseDataProvider {
         if (!value.isEmpty()) {
             map.put(hashCode, value);
         }
-    }
-
-    /**
-     * Generate hash by class name, method name and arg values.
-     *
-     * @param args   Object[] test method arguments
-     * @param method ITestNGMethod
-     * @return String hash
-     */
-    public static String hash(Object[] args, ITestNGMethod method) {
-        String toHash = "";
-        toHash += Arrays.hashCode(args);
-        toHash += method.getMethodName();
-        toHash += (method.getRealClass());
-        return String.valueOf(toHash.hashCode());
     }
 
     /**
@@ -177,7 +161,7 @@ public abstract class BaseDataProvider {
         for (int rowIndex = 0; rowIndex < dataProvider.length; rowIndex++) {
             Map<String, String> row = table.getDataRows().get(rowIndex);
 
-            String rowHash = hash(dataProvider[rowIndex], testNGMethod);
+            String rowHash = ParameterGenerator.hash(dataProvider[rowIndex], testNGMethod);
             addValueToMap(tuidMap, rowHash, getValueFromRow(row, dsBean.getUidArgs()));
             addValueToMap(testColumnNamesMap, rowHash, getValueFromRow(row, List.of(dsBean.getTestMethodColumn())));
         }
@@ -189,7 +173,7 @@ public abstract class BaseDataProvider {
                                                            ITestNGMethod testNGMethod) {
         for (int rowIndex = 0; rowIndex < dataProvider.length; rowIndex++) {
 
-            String rowHash = hash(dataProvider[rowIndex], testNGMethod);
+            String rowHash = ParameterGenerator.hash(dataProvider[rowIndex], testNGMethod);
 
             //get all unique tuid values from certain group
             String testUid = getValueFromGroupList(rowIndex, groupedList, dsBean.getUidArgs());

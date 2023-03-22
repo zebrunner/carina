@@ -20,10 +20,10 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<carina-webdriver.version>1.0.0</carina-webdriver.version>
-		<carina-utils.version>1.0.2</carina-utils.version>
+		<carina-utils.version>1.0.3.P1-SNAPSHOT</carina-utils.version>
 	</properties>
 
-	<!--repositories>
+	<repositories>
        <repository>
            <id>zebrunner_snapshots</id>
            <name>zebrunner Snapshots</name>
@@ -35,7 +35,7 @@
                <enabled>true</enabled>
            </snapshots>
        </repository>
-   </repositories-->
+   </repositories>
 
 	<dependencies>
 		<dependency>
@@ -44,10 +44,6 @@
 			<version>${carina-webdriver.version}</version>
 		</dependency>
 		<!-- Carina Core sub-modules -->
-		<dependency>
-			<groupId>com.qaprosoft</groupId>
-			<artifactId>carina-dataprovider</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>com.zebrunner</groupId>
 			<artifactId>carina-utils</artifactId>

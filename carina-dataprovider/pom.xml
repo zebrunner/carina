@@ -20,9 +20,23 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<carina-utils.version>1.0.2</carina-utils.version>
+		<carina-utils.version>1.0.3.P1-SNAPSHOT</carina-utils.version>
 		<opencsv.version>1.7</opencsv.version>
 	</properties>
+
+	<repositories>
+       <repository>
+           <id>zebrunner_snapshots</id>
+           <name>zebrunner Snapshots</name>
+           <url>https://nexus.zebrunner.dev/repository/ce-snapshots/</url>
+           <releases>
+               <enabled>false</enabled>
+           </releases>
+           <snapshots>
+               <enabled>true</enabled>
+           </snapshots>
+       </repository>
+   </repositories>
 
 	<dependencies>
 		<!-- Carina sub-modules dependencies -->

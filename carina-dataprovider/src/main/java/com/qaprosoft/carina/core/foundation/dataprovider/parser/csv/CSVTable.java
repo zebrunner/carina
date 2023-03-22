@@ -1,13 +1,14 @@
 package com.qaprosoft.carina.core.foundation.dataprovider.parser.csv;
 
-import com.qaprosoft.carina.core.foundation.dataprovider.parser.AbstractTable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.zebrunner.carina.utils.parser.xls.AbstractTable;
 
 public class CSVTable extends AbstractTable {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
