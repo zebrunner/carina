@@ -19,6 +19,7 @@ import com.zebrunner.carina.core.registrar.ownership.MethodOwner;
  * @author qpsdemo
  */
 public class DataproviderRetryTest implements IAbstractTest {
+
     @Test(dataProvider = "DP1")
     @MethodOwner(owner = "qpsdemo")
     public void testDataproviderRetry(String testRailColumn, int a, int b, int c) {
@@ -45,6 +46,5 @@ public class DataproviderRetryTest implements IAbstractTest {
                 {"111,112", 2, 3, 6},
                 {"114", 6, 6, 36}};
     }
-
 
 }

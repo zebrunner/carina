@@ -3,10 +3,11 @@
 #set( $symbol_escape = '\' )
 package ${package}.carina.demo;
 
-import com.qaprosoft.carina.core.foundation.IAbstractTest;
-import com.zebrunner.carina.utils.R;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import com.qaprosoft.carina.core.foundation.IAbstractTest;
+import com.zebrunner.carina.utils.R;
 
 /**
  * This sample shows how use Crypto in tests.
@@ -19,7 +20,6 @@ public class CryptoSampleTest implements IAbstractTest {
     public void testPlaceholdersWithEncryptionTestData() {
         Assert.assertEquals(R.TESTDATA.get("test_credentials"), "test@gmail.com/EncryptMe");
     }
-
 
     @Test
     public void testEncryption() {

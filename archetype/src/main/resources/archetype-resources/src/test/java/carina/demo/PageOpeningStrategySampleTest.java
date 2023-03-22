@@ -3,13 +3,14 @@
 #set( $symbol_escape = '\' )
 package ${package}.carina.demo;
 
-import com.qaprosoft.carina.core.foundation.IAbstractTest;
-import com.zebrunner.carina.core.registrar.ownership.MethodOwner;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.PageOpeningStrategy;
-import ${package}.carina.demo.gui.pages.CompareModelsPage;
-import ${package}.carina.demo.gui.pages.HomePage;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
+
+import com.qaprosoft.carina.core.foundation.IAbstractTest;
+import ${package}.carina.demo.gui.pages.desktop.CompareModelsPage;
+import ${package}.carina.demo.gui.pages.desktop.HomePage;
+import com.zebrunner.carina.core.registrar.ownership.MethodOwner;
+import com.zebrunner.carina.webdriver.decorator.PageOpeningStrategy;
 
 /**
  * This sample shows how works page opening strategy
@@ -75,4 +76,5 @@ public class PageOpeningStrategySampleTest implements IAbstractTest {
 
         softAssert.assertAll();
     }
+
 }

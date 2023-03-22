@@ -7,13 +7,13 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 
-import com.zebrunner.carina.utils.factory.DeviceType;
-import com.zebrunner.carina.utils.factory.DeviceType.Type;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.ClassChain;
-import com.qaprosoft.carina.core.foundation.webdriver.decorator.annotations.Predicate;
 import ${package}.carina.demo.mobile.gui.pages.common.CarinaDescriptionPageBase;
 import ${package}.carina.demo.mobile.gui.pages.common.LoginPageBase;
+import com.zebrunner.carina.utils.factory.DeviceType;
+import com.zebrunner.carina.utils.factory.DeviceType.Type;
+import com.zebrunner.carina.webdriver.decorator.ExtendedWebElement;
+import com.zebrunner.carina.webdriver.decorator.annotations.ClassChain;
+import com.zebrunner.carina.webdriver.decorator.annotations.Predicate;
 
 @DeviceType(pageType = Type.IOS_PHONE, parentClass = LoginPageBase.class)
 public class LoginPage extends LoginPageBase {

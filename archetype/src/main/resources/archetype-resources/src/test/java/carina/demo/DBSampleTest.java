@@ -10,14 +10,13 @@ import org.apache.ibatis.session.SqlSession;
 import org.testng.annotations.Test;
 
 import com.qaprosoft.carina.core.foundation.IAbstractTest;
-import com.zebrunner.agent.core.annotation.TestLabel;
-
 import ${package}.carina.demo.db.mappers.UserMapper;
 import ${package}.carina.demo.db.mappers.UserPreferenceMapper;
 import ${package}.carina.demo.db.models.User;
 import ${package}.carina.demo.db.models.User.Status;
-import ${package}.carina.demo.utils.ConnectionFactory;
 import ${package}.carina.demo.db.models.UserPreference;
+import ${package}.carina.demo.utils.ConnectionFactory;
+import com.zebrunner.agent.core.annotation.TestLabel;
 
 /**
  * This sample shows how create DB test.
@@ -100,4 +99,5 @@ public class DBSampleTest implements IAbstractTest {
 		assertEquals(userPreference.getValue(), USER_PREFERENCE.getValue(), "Preference value must match");
 		assertEquals(userPreference.getUserId(), USER_PREFERENCE.getUserId(), "Preference user id must match");
 	}
+
 }

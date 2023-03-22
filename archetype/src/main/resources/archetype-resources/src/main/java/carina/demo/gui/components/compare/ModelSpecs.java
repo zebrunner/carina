@@ -7,11 +7,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ModelSpecs {
+
     public enum SpecType {
         TECHNOLOGY("Technology"),
         ANNOUNCED("Announced");
 
-        private String type;
+        private final String type;
 
         SpecType(String type) {
             this.type = type;
@@ -22,7 +23,7 @@ public class ModelSpecs {
         }
     }
 
-    private Map<SpecType, String> modelSpecsMap;
+    private final Map<SpecType, String> modelSpecsMap;
 
     public ModelSpecs() {
         this.modelSpecsMap = new HashMap<>();

@@ -3,9 +3,10 @@
 #set( $symbol_escape = '\' )
 package ${package}.carina.demo.mobile.gui.pages.android;
 
-import com.zebrunner.carina.utils.factory.DeviceType;
-import ${package}.carina.demo.mobile.gui.pages.common.ChartsPageBase;
 import org.openqa.selenium.WebDriver;
+
+import ${package}.carina.demo.mobile.gui.pages.common.ChartsPageBase;
+import com.zebrunner.carina.utils.factory.DeviceType;
 
 @DeviceType(pageType = DeviceType.Type.ANDROID_PHONE, parentClass = ChartsPageBase.class)
 public class ChartsPage extends ChartsPageBase {

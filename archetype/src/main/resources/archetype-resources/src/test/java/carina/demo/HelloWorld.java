@@ -18,6 +18,7 @@ import com.zebrunner.carina.core.registrar.ownership.MethodOwner;
  * @author qpsdemo
  */
 public class HelloWorld implements IAbstractTest {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Test()
@@ -25,4 +26,5 @@ public class HelloWorld implements IAbstractTest {
     public void helloWorld() {
         LOGGER.info("Hello World!");
     }
+
 }
