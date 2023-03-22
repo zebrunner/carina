@@ -1,7 +1,7 @@
-package com.qaprosoft.carina.core.foundation.dataprovider.parser.csv;
+package com.zebrunner.carina.dataprovider.parser.csv;
 
 import au.com.bytecode.opencsv.CSVReader;
-import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
+import com.zebrunner.carina.dataprovider.parser.DSBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.dataprovider.core.impl;
+package com.zebrunner.carina.dataprovider.core.impl;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
 
+import com.zebrunner.carina.dataprovider.annotations.XlsDataSourceParameters;
+import com.zebrunner.carina.dataprovider.parser.DSBean;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 
-import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
-import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
 import com.zebrunner.carina.utils.parser.xls.XLSParser;
 import com.zebrunner.carina.utils.parser.xls.XLSTable;
 

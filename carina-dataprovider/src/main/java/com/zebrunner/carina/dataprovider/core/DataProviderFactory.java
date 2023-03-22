@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.dataprovider.core;
+package com.zebrunner.carina.dataprovider.core;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 
-import com.qaprosoft.carina.core.foundation.dataprovider.core.impl.BaseDataProvider;
+import com.zebrunner.carina.dataprovider.core.impl.BaseDataProvider;
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
 
 /**

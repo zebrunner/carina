@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.dataprovider.annotations;
+package com.zebrunner.carina.dataprovider.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -22,31 +22,30 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface XlsDataSourceParameters {
+public @interface CsvDataSourceParameters {
     /**
      * Define data provider instance
      *
      * @return String
      */
-    String className() default "com.qaprosoft.carina.core.foundation.dataprovider.core.impl.XlsDataProvider";
+    String className() default "com.qaprosoft.carina.core.foundation.dataprovider.core.impl.CsvDataProvider";
 
     /**
-     * Is mutually exclusive with path
+     * Define column separator for parsing
      *
-     * @return String
+     * @return char
      */
-    String spreadsheetId() default "";
+    char separator() default ',';
 
     /**
-     * Define data provider instance
+     * The character to use for quoted elements when parsing
      *
-     * @return String
+     * @return char
      */
-    String sheet() default "";
+    char quote() default '"';
 
     /**
-     * Path to data source file.
-     * Is mutually exclusive with spreadsheetId
+     * Path to data source file
      *
      * @return String
      */
@@ -92,7 +91,7 @@ public @interface XlsDataSourceParameters {
 
     /**
      * Name of the column, by which will be performed grouping.
-     * If used, test will receive {@literal ArrayList<HashMap<String,String>>} argument,
+     * If used, test will receive {@code ArrayList<HashMap<String,String>} argument,
      * where data grouped by lists depending on groupColumn values.
      *
      * @return String
@@ -142,7 +141,7 @@ public @interface XlsDataSourceParameters {
     /**
      * Reason: not implemented
      *
-     * @return String
+     * @return String[]
      */
     @Deprecated(forRemoval = true, since = "1.0.0")
     String[] doNotRunTestNames() default {};

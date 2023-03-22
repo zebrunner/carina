@@ -48,7 +48,6 @@
         <!-- Zebrunner integrations -->
         <zebrunner-testng-pluggable.version>1.9.3</zebrunner-testng-pluggable.version>
         <!-- Others -->
-        <apache-poi.version>4.1.2</apache-poi.version>
         <!-- Never add mockito-all as compile dependency as it has their own invalid hamcrest-all implementation otherwise api fail to common with:
                 org.hamcrest.core.IsInstanceOf.any(Ljava/lang/Class;)Lorg/hamcrest/Matcher
          -->
@@ -337,11 +336,6 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${commons-lang3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-ooxml</artifactId>
-                <version>${apache-poi.version}</version>
             </dependency>
 
             <!-- Test utilities -->

@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.dataprovider.core.impl;
+package com.zebrunner.carina.dataprovider.core.impl;
 
-import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
-import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
-import com.qaprosoft.carina.core.foundation.dataprovider.parser.csv.CSVParser;
-import com.qaprosoft.carina.core.foundation.dataprovider.parser.csv.CSVTable;
+import com.zebrunner.carina.dataprovider.annotations.CsvDataSourceParameters;
+import com.zebrunner.carina.dataprovider.parser.DSBean;
+import com.zebrunner.carina.dataprovider.parser.csv.CSVParser;
+import com.zebrunner.carina.dataprovider.parser.csv.CSVTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;

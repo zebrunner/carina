@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.dataprovider.parser;
+package com.zebrunner.carina.dataprovider.parser;
 
-import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
-import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
+import com.zebrunner.carina.dataprovider.annotations.CsvDataSourceParameters;
+import com.zebrunner.carina.dataprovider.annotations.XlsDataSourceParameters;
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
 import com.zebrunner.carina.utils.exception.InvalidArgsException;
 import org.testng.ITestContext;

@@ -1,4 +1,4 @@
-package com.qaprosoft.carina.core.foundation.dataprovider.parser.csv;
+package com.zebrunner.carina.dataprovider.parser.csv;
 
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;

@@ -1,6 +1,6 @@
-package com.qaprosoft.carina.core.foundation.dataprovider;
+package com.zebrunner.carina.dataprovider;
 
-import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactory;
+import com.zebrunner.carina.dataprovider.core.DataProviderFactory;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.annotations.DataProvider;

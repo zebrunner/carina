@@ -58,12 +58,6 @@
 		</dependency>
 
 		<dependency>
-			<!-- do not remove otherwise 65 compilation failures -->
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi-ooxml</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
