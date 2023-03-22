@@ -91,7 +91,7 @@ public @interface CsvDataSourceParameters {
 
     /**
      * Name of the column, by which will be performed grouping.
-     * If used, test will receive @literal{ArrayList<HashMap<String,String>} argument,
+     * If used, test will receive {@code ArrayList<HashMap<String,String>} argument,
      * where data grouped by lists depending on groupColumn values.
      *
      * @return String

@@ -15,14 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.dataprovider.core;
 
-import com.qaprosoft.carina.core.foundation.dataprovider.core.impl.BaseDataProvider;
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import org.apache.commons.lang3.ArrayUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.testng.ITestContext;
-import org.testng.ITestNGMethod;
-
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
@@ -30,6 +22,15 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testng.ITestContext;
+import org.testng.ITestNGMethod;
+
+import com.qaprosoft.carina.core.foundation.dataprovider.core.impl.BaseDataProvider;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
 
 /**
  * Created by Patotsky on 16.12.2014.
@@ -81,9 +82,9 @@ public class DataProviderFactory {
     /**
      * Put data from test parameters to test's context. Necessary for correct test naming.
      *
-     * @param context            ITestContext.
-     * @param tuidMap            @literal{Map<String, String>} contains tuid values for each test (if present)
-     * @param testNameFromColumn @literal{Map<String, String>} contains values for overriding test names from specified column
+     * @param context ITestContext.
+     * @param tuidMap contains tuid values for each test (if present)
+     * @param testNameFromColumn contains values for overriding test names from specified column
      */
     private static synchronized void putValuesToContext(ITestContext context,
                                                         Map<String, String> tuidMap,

@@ -15,14 +15,22 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.dataprovider.core.impl;
 
-import com.qaprosoft.carina.core.foundation.dataprovider.parser.AbstractTable;
-import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
-import com.zebrunner.carina.utils.ParameterGenerator;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 
-import java.lang.annotation.Annotation;
-import java.util.*;
+import com.qaprosoft.carina.core.foundation.dataprovider.parser.AbstractTable;
+import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
+import com.zebrunner.carina.utils.ParameterGenerator;
 
 /**
  * Created by Patotsky on 19.12.2014.
@@ -58,10 +66,10 @@ public abstract class BaseDataProvider {
     /**
      * Generate dataProvider based on grouped data rows
      *
-     * @param groupedList @literal{List<List<Map<String, String>>>} grouped data rows
-     * @param dsBean      DSBean test parameters bean
-     * @param testMethod  ITestNGMethod current test method
-     * @return Object[][] grouped data provider, where object[i][0] contains @literal{ArrayList<HashMap<String, String>>}
+     * @param groupedList grouped data rows
+     * @param dsBean DSBean test parameters bean
+     * @param testMethod ITestNGMethod current test method
+     * @return Object[][] grouped data provider, where object[i][0] contains {@code ArrayList<HashMap<String, String>>}
      */
     public Object[][] createGroupedDataProvider(List<List<Map<String, String>>> groupedList, DSBean dsBean, ITestNGMethod testMethod) {
         Object[][] dataProvider = declareDataProviderArray(groupedList, dsBean);
