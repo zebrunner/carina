@@ -16,6 +16,7 @@
 package com.zebrunner.carina.utils;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.dataprovider.parser.XLSParser;
+import com.qaprosoft.carina.core.foundation.dataprovider.parser.xls.XLSParser;
 import com.zebrunner.carina.utils.exception.InvalidArgsException;
 import com.zebrunner.carina.utils.resources.L10N;
 
@@ -119,6 +120,26 @@ public class ParameterGenerator {
             LOGGER.error(e.getMessage());
         }
         return param;
+    }
+
+    public static void processMap(Map<String, String> paramsMap) {
+        for (Map.Entry<String, String> entry : paramsMap.entrySet()) {
+            if (entry == null)
+                continue;
+
+            String value = entry.getValue();
+            if (value == null)
+                continue;
+
+            Object param = process(value);
+            if (param == null)
+                continue;
+
+            String newValue = param.toString();
+            if (!value.equals(newValue)) {
+                entry.setValue(newValue);
+            }
+        }
     }
 
     private static String getValueFromXLS(String xlsSheetKey) {

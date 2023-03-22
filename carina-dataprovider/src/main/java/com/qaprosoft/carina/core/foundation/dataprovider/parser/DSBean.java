@@ -15,285 +15,181 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation.dataprovider.parser;
 
+import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
+import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.exception.InvalidArgsException;
+import org.testng.ITestContext;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-import org.testng.ITestContext;
-
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.dataprovider.annotations.CsvDataSourceParameters;
-import com.qaprosoft.carina.core.foundation.dataprovider.annotations.XlsDataSourceParameters;
-import com.zebrunner.carina.utils.exception.InvalidArgsException;
-
 public class DSBean {
-    Map<String, String> testParams;
-    private List<String> args;
-    private List<String> uidArgs;
-    private List<String> staticArgs;
+    private Map<String, String> testParams;
+    private List<String> args = new ArrayList<>();
+    private List<String> uidArgs = new ArrayList<>();
+    private List<String> staticArgs = new ArrayList<>();
 
     private String dsFile;
     private String xlsSheet;
-
     private String executeColumn;
     private String executeValue;
-
     private boolean spreadsheet;
+    private String groupColumn;
+    private String testMethodColumn;
+    private boolean argsToMap;
 
     public DSBean(ITestContext context) {
-        this(context.getCurrentXmlTest().getAllParameters());
+        initParamsFromSuite(context.getCurrentXmlTest().getAllParameters(), "excel");
+        this.argsToMap = this.args.size() == 0;
     }
 
-    public DSBean(Map<String, String> testParams) {
-        this.testParams = testParams;
-        this.dsFile = testParams.get(SpecialKeywords.EXCEL_DS_FILE);
-        this.xlsSheet = testParams.get(SpecialKeywords.EXCEL_DS_SHEET);
-        this.args = new ArrayList<String>();
-        this.uidArgs = new ArrayList<String>();
-
-        if (testParams.get(SpecialKeywords.EXCEL_DS_ARGS) != null) {
-            args = Arrays.asList(testParams.get(SpecialKeywords.EXCEL_DS_ARGS).replace(",", ";").replace(" ", "").split(";"));
-        }
-        if (testParams.get(SpecialKeywords.EXCEL_DS_UID) != null) {
-            uidArgs = Arrays.asList(testParams.get(SpecialKeywords.EXCEL_DS_UID).replace(",", ";").replace(" ", "").split(";"));
-        }
-    }
-
-    public DSBean(String xlsFile, String xlsSheet, String dsArgs, String dsUids) {
-        this.dsFile = xlsFile;
-        this.xlsSheet = xlsSheet;
-        this.args = new ArrayList<String>();
-        this.uidArgs = new ArrayList<String>();
-
-        if (dsArgs != null && !dsArgs.isEmpty()) {
-            args = Arrays.asList(dsArgs.replace(",", ";").replace(" ", "").split(";"));
-        }
-        if (dsUids != null && !dsUids.isEmpty()) {
-            uidArgs = Arrays.asList(dsUids.replace(",", ";").replace(" ", "").split(";"));
+    public DSBean(XlsDataSourceParameters xlsDataSourceParameters, Map<String, String> suiteParams) {
+        // params initialize order: 1) from test annotation 2) from suite
+        if (xlsDataSourceParameters != null) {
+            this.initParamsFromAnnotation(xlsDataSourceParameters);
+            if (!xlsDataSourceParameters.sheet().isEmpty()) {
+                xlsSheet = xlsDataSourceParameters.sheet();
+            }
         }
 
-    }
+        if (!suiteParams.isEmpty()) {
+            initParamsFromSuite(suiteParams, "excel");
+            if (suiteParams.get(SpecialKeywords.EXCEL_DS_SHEET) != null) {
+                this.xlsSheet = suiteParams.get(SpecialKeywords.EXCEL_DS_SHEET);
+            }
+        }
 
-    public DSBean(XlsDataSourceParameters parameters, Map<String, String> testParams) {
-        // initialize default Xls data source parameters from suite xml file
-        String xlsFile = testParams.get(SpecialKeywords.EXCEL_DS_FILE);
-        String xlsSheet = testParams.get(SpecialKeywords.EXCEL_DS_SHEET);
-        String dsArgs = testParams.get(SpecialKeywords.EXCEL_DS_ARGS);
-        String dsUid = testParams.get(SpecialKeywords.EXCEL_DS_UID);
-        String dsStaticArgs = "";
-
-        if (parameters != null) {
-            // reinitialize parameters from annotation if any
-            if (!parameters.path().isEmpty() && !parameters.spreadsheetId().isEmpty())
+        if (xlsDataSourceParameters != null && !xlsDataSourceParameters.spreadsheetId().isEmpty()) {
+            if (!this.dsFile.isEmpty()) {
                 throw new InvalidArgsException("Spreadsheet id and path parameters are mutually exclusive");
-            if (!parameters.path().isEmpty())
-                xlsFile = parameters.path();
-            if (!parameters.spreadsheetId().isEmpty()) {
-                xlsFile = parameters.spreadsheetId();
+            } else {
+                this.dsFile = xlsDataSourceParameters.spreadsheetId();
                 this.spreadsheet = true;
             }
-
-            if (!parameters.sheet().isEmpty())
-                xlsSheet = parameters.sheet();
-
-            if (!parameters.dsArgs().isEmpty())
-                dsArgs = parameters.dsArgs();
-
-            if (!parameters.dsUid().isEmpty())
-                dsUid = parameters.dsUid();
-
-            if (!parameters.staticArgs().isEmpty())
-                dsStaticArgs = parameters.staticArgs();
         }
 
-        this.testParams = testParams;
-        this.dsFile = xlsFile;
-        this.xlsSheet = xlsSheet;
-        this.args = new ArrayList<String>();
-        this.uidArgs = new ArrayList<String>();
-        this.staticArgs = new ArrayList<String>();
-
-        if (dsArgs != null && !dsArgs.isEmpty()) {
-            args = Arrays.asList(dsArgs.replace(",", ";").replace(" ", "").split(";"));
-        }
-        if (dsUid != null && !dsUid.isEmpty()) {
-            uidArgs = Arrays.asList(dsUid.replace(",", ";").replace(" ", "").split(";"));
-        }
-
-        if (dsStaticArgs != null && !dsStaticArgs.isEmpty()) {
-            staticArgs = Arrays.asList(dsStaticArgs.replace(",", ";").replace(" ", "").split(";"));
-        }
-
-        this.executeColumn = "Execute";
-        this.executeValue = "y";
-        if (testParams.get(SpecialKeywords.DS_EXECUTE_COLUMN) != null)
-            this.executeColumn = testParams.get(SpecialKeywords.DS_EXECUTE_COLUMN);
-        if (testParams.get(SpecialKeywords.DS_EXECUTE_VALUE) != null)
-            this.executeValue = testParams.get(SpecialKeywords.DS_EXECUTE_VALUE);
-
-        if (!parameters.executeColumn().isEmpty())
-            this.executeColumn = parameters.executeColumn();
-        if (!parameters.executeValue().isEmpty())
-            this.executeValue = parameters.executeValue();
+        this.testParams = suiteParams;
+        this.argsToMap = this.args.size() == 0;
     }
 
-    // TODO: Analyze DSBean for XLS and CSV DataProviders and remove code duplicates
-    public DSBean(CsvDataSourceParameters parameters, Map<String, String> testParams) {
-        // initialize default Xls data source parameters from suite xml file
-        String dsFile = testParams.get(SpecialKeywords.DS_FILE);
-        String dsArgs = testParams.get(SpecialKeywords.DS_ARGS);
-        String dsUid = testParams.get(SpecialKeywords.DS_UID);
-        String dsStaticArgs = "";
-
-        if (parameters != null) {
-            // reinitialize parameters from annotation if any
-            if (!parameters.path().isEmpty())
-                dsFile = parameters.path();
-
-            if (!parameters.dsArgs().isEmpty())
-                dsArgs = parameters.dsArgs();
-
-            if (!parameters.dsUid().isEmpty())
-                dsUid = parameters.dsUid();
-
-            if (!parameters.staticArgs().isEmpty())
-                dsStaticArgs = parameters.staticArgs();
+    public DSBean(CsvDataSourceParameters csvDataSourceParameters, Map<String, String> suiteParams) {
+        // params initialize order: 1) from test annotation 2) from suite
+        if (csvDataSourceParameters != null) {
+            this.initParamsFromAnnotation(csvDataSourceParameters);
         }
 
-        this.testParams = testParams;
-        this.dsFile = dsFile;
+        if (!suiteParams.isEmpty()) {
+            initParamsFromSuite(suiteParams, "");
+        }
+        this.testParams = suiteParams;
         this.xlsSheet = null;
-        this.args = new ArrayList<String>();
-        this.uidArgs = new ArrayList<String>();
-        this.staticArgs = new ArrayList<String>();
+        this.argsToMap = this.args.size() == 0;
+    }
 
+    private void initParamsFromAnnotation(XlsDataSourceParameters parameters) {
+        // initialize default xls data source parameters from annotation
+        this.dsFile = parameters.path();
+        this.executeColumn = parameters.executeColumn();
+        this.executeValue = parameters.executeValue();
+        this.groupColumn = parameters.groupColumn();
+        this.testMethodColumn = parameters.testMethodColumn();
+
+        if (!parameters.dsArgs().isEmpty()) {
+            this.args = Arrays.asList(parameters.dsArgs().replace(" ", "").split(","));
+        }
+        if (!parameters.dsUid().isEmpty()) {
+            this.uidArgs = Arrays.asList(parameters.dsUid().replace(" ", "").split(","));
+        }
+        if (!parameters.staticArgs().isEmpty()) {
+            this.staticArgs = Arrays.asList(parameters.staticArgs().replace(" ", "").split(","));
+        }
+
+    }
+
+    private void initParamsFromAnnotation(CsvDataSourceParameters parameters) {
+        // initialize default xls data source parameters from annotation
+        this.dsFile = parameters.path();
+        this.executeColumn = parameters.executeColumn();
+        this.executeValue = parameters.executeValue();
+        this.groupColumn = parameters.groupColumn();
+        this.testMethodColumn = parameters.testMethodColumn();
+
+        if (!parameters.dsArgs().isEmpty()) {
+            this.args = Arrays.asList(parameters.dsArgs().replace(" ", "").split(","));
+        }
+        if (!parameters.dsUid().isEmpty()) {
+            this.uidArgs = Arrays.asList(parameters.dsUid().replace(" ", "").split(","));
+        }
+        if (!parameters.staticArgs().isEmpty()) {
+            this.staticArgs = Arrays.asList(parameters.staticArgs().replace(" ", "").split(","));
+        }
+    }
+
+    private void initParamsFromSuite(Map<String, String> suiteParams, String specialKeyPrefix) {
+        // initialize data source parameters from suite xml file
+        if (suiteParams.get(insert(SpecialKeywords.DS_FILE, specialKeyPrefix)) != null) {
+            this.dsFile = suiteParams.get(insert(SpecialKeywords.DS_FILE, specialKeyPrefix));
+        }
+        if (suiteParams.get(SpecialKeywords.DS_EXECUTE_COLUMN) != null) {
+            this.executeColumn = suiteParams.get(SpecialKeywords.DS_EXECUTE_COLUMN);
+        }
+        if (suiteParams.get(SpecialKeywords.DS_EXECUTE_VALUE) != null) {
+            this.executeValue = suiteParams.get(SpecialKeywords.DS_EXECUTE_VALUE);
+        }
+
+        String dsArgs = suiteParams.get(insert(SpecialKeywords.DS_ARGS, specialKeyPrefix));
         if (dsArgs != null && !dsArgs.isEmpty()) {
-            args = Arrays.asList(dsArgs.replace(",", ";").replace(" ", "").split(";"));
+            this.args = Arrays.asList(dsArgs.replace(" ", "").split(","));
         }
+        String dsUid = suiteParams.get(insert(SpecialKeywords.DS_UID, specialKeyPrefix));
         if (dsUid != null && !dsUid.isEmpty()) {
-            uidArgs = Arrays.asList(dsUid.replace(",", ";").replace(" ", "").split(";"));
+            this.uidArgs = Arrays.asList(dsUid.replace(" ", "").split(","));
         }
-
-        if (dsStaticArgs != null && !dsStaticArgs.isEmpty()) {
-            staticArgs = Arrays.asList(dsStaticArgs.replace(",", ";").replace(" ", "").split(";"));
-        }
-
-        this.executeColumn = "Execute";
-        this.executeValue = "y";
-        if (testParams.get(SpecialKeywords.DS_EXECUTE_COLUMN) != null)
-            this.executeColumn = testParams.get(SpecialKeywords.DS_EXECUTE_COLUMN);
-        if (testParams.get(SpecialKeywords.DS_EXECUTE_VALUE) != null)
-            this.executeValue = testParams.get(SpecialKeywords.DS_EXECUTE_VALUE);
-
-        if (!parameters.executeColumn().isEmpty())
-            this.executeColumn = parameters.executeColumn();
-        if (!parameters.executeValue().isEmpty())
-            this.executeValue = parameters.executeValue();
     }
 
-    public String getDsFile() {
-        return dsFile;
-    }
-
-    public void setDsFile(String xlsFile) {
-        this.dsFile = xlsFile;
-    }
-
-    public String getXlsSheet() {
-        return xlsSheet;
-    }
-
-    public void setXlsSheet(String xlsSheet) {
-        this.xlsSheet = xlsSheet;
-    }
-
-    public List<String> getUidArgs() {
-        return uidArgs;
-    }
-
-    public List<String> getArgs() {
-        return args;
-    }
-
-    public void setArgs(List<String> args) {
-        this.args = args;
-    }
-
-    public List<String> getStaticArgs() {
-        return staticArgs;
-    }
-
-    public void setStaticArgs(List<String> staticArgs) {
-        this.staticArgs = staticArgs;
+    private String insert(String into, String insertion) {
+        StringBuilder newString = new StringBuilder(into);
+        newString.insert(1, insertion);
+        return newString.toString();
     }
 
     public Map<String, String> getTestParams() {
         return testParams;
     }
 
-    public void setTestParams(Map<String, String> testParams) {
-        this.testParams = testParams;
+    public List<String> getArgs() {
+        return args;
     }
 
-    public String argsToString(List<String> args, Map<String, String> params) {
-        if (args.size() == 0) {
-            return "";
-        }
-        StringBuilder sb = new StringBuilder();
-        for (String arg : args) {
-            if (SpecialKeywords.TUID.equals(arg))
-                continue;
-            sb.append(String.format("%s=%s; ", arg, params.get(arg)));
-        }
-        return StringUtils.removeEnd(sb.toString(), "; ");
+    public List<String> getUidArgs() {
+        return uidArgs;
     }
 
-    public String setDataSorceUUID(String testName, Map<String, String> params) {
-
-        if (!params.isEmpty()) {
-            if (params.containsKey(SpecialKeywords.TUID)) {
-                testName = params.get(SpecialKeywords.TUID) + " - " + testName;
-            }
-        }
-        if (!uidArgs.isEmpty()) {
-            if (!argsToString(uidArgs, params).isEmpty()) {
-                testName = testName + " [" + argsToString(uidArgs, params) + "]";
-            }
-        }
-
-        return testName;
+    public List<String> getStaticArgs() {
+        return staticArgs;
     }
 
-    public String setDataSorceUUID(String testName, Object[] params, Map<String, Integer> mapper) {
-        // looks through the parameters for TUID or get column value by uidArgs parameter
-        Integer indexTUID = mapper.get(SpecialKeywords.TUID);
-        if (indexTUID != null) {
-            testName = params[indexTUID] + " - " + testName;
-        }
-
-        if (!uidArgs.isEmpty()) {
-            String uidString = argsToString(uidArgs, params, mapper);
-            if (!uidString.isEmpty()) {
-                testName = testName + " [" + uidString + "]";
-            }
-        }
-        return testName;
+    public String getDsFile() {
+        return dsFile;
     }
 
-    public String argsToString(List<String> args, Object[] params, Map<String, Integer> mapper) {
-        if (args.size() == 0) {
-            return "";
-        }
-        StringBuilder sb = new StringBuilder();
-        for (String arg : args) {
-            Integer index = mapper.get(arg);
-            if (index != null) {
-                sb.append(String.format("%s=%s; ", arg, params[index].toString()));
-            }
-        }
-        return StringUtils.removeEnd(sb.toString(), "; ");
+    public String getXlsSheet() {
+        return xlsSheet;
+    }
+
+    public String getGroupColumn() {
+        return groupColumn;
+    }
+
+    public String getTestMethodColumn() {
+        return testMethodColumn;
+    }
+
+    public boolean isSpreadsheet() {
+        return spreadsheet;
     }
 
     public String getExecuteColumn() {
@@ -304,7 +200,11 @@ public class DSBean {
         return executeValue;
     }
 
-    public boolean isSpreadsheet() {
-        return spreadsheet;
+    public boolean isArgsToMap() {
+        return argsToMap;
+    }
+
+    public void setArgsToMap(boolean argsToMap) {
+        this.argsToMap = argsToMap;
     }
 }

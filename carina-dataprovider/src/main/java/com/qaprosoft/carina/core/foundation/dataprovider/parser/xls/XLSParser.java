@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.qaprosoft.carina.core.foundation.dataprovider.parser;
+package com.qaprosoft.carina.core.foundation.dataprovider.parser.xls;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 import com.zebrunner.carina.utils.exception.DataLoadingException;
 import com.zebrunner.carina.utils.exception.InvalidArgsException;
 
-public class XLSParser extends AbstractXLSParser {
+public class XLSParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static DataFormatter df;
     private static FormulaEvaluator evaluator;
@@ -260,5 +260,9 @@ public class XLSParser extends AbstractXLSParser {
         childTable.setHeaders(sheet.getRow(0));
         childTable.addDataRow(sheet.getRow(rowNumber));
         return childTable;
+    }
+
+    private static XLSTable prepareDataTable(String executeColumn, String executeValue) {
+        return executeColumn != null && executeValue != null ? new XLSTable(executeColumn, executeValue) : new XLSTable();
     }
 }

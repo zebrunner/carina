@@ -19,6 +19,7 @@ package com.qaprosoft.carina.core.foundation.dataprovider.core.groupping.excepti
  * Created by Patotsky on 08.01.2015.
  */
 
+@Deprecated(forRemoval = true, since = "1.0.0")
 @SuppressWarnings("serial")
 public class GroupByException extends RuntimeException {
 
