@@ -1,2 +1,2 @@
-com.zebrunner.carina.core.listeners.CarinaListenerChain
+com.qaprosoft.carina.core.foundation.listeners.CarinaListenerChain
 com.zebrunner.agent.testng.listener.DataProviderInterceptor
