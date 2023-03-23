@@ -46,17 +46,17 @@ public interface IAbstractTest extends ICustomTypePageFactory, ITestCases {
     long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
     @BeforeSuite(alwaysRun = true)
-    private void onCarinaBeforeSuite() {
+    default void onCarinaBeforeSuite() {
         // do nothing
     }
 
     @BeforeClass(alwaysRun = true)
-    private void onCarinaBeforeClass() {
+    default void onCarinaBeforeClass() {
         // do nothing
     }
 
     @BeforeMethod(alwaysRun = true)
-    private void onCarinaBeforeMethod() {
+    default void onCarinaBeforeMethod() {
         // do nothing
     }
 
