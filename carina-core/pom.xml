@@ -19,7 +19,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<carina-webdriver.version>1.0.0</carina-webdriver.version>
+		<carina-webdriver.version>1.0.1.P1-SNAPSHOT</carina-webdriver.version>
 		<carina-utils.version>1.0.3.P1-SNAPSHOT</carina-utils.version>
 	</properties>
 
