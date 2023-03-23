@@ -22,8 +22,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.qaprosoft.carina.core.foundation.dataprovider.core.impl.BaseDataProvider;
-import com.zebrunner.agent.testng.listener.RunContextService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +29,9 @@ import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 
+import com.zebrunner.agent.testng.listener.RunContextService;
 import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.ParameterGenerator;
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
 
 public class TestNamingService {
@@ -122,7 +122,7 @@ public class TestNamingService {
         @SuppressWarnings("unchecked")
         Map<Object[], String> testNameMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TEST_NAME);
         if (testNameMap != null && !testNameMap.isEmpty()) {
-            String testHash = BaseDataProvider.hash(result.getParameters(), result.getMethod());
+            String testHash = ParameterGenerator.hash(result.getParameters(), result.getMethod());
             if (testNameMap.containsKey(testHash)) {
                 testNameMapName = testNameMap.get(testHash);
             }
@@ -164,7 +164,7 @@ public class TestNamingService {
         Map<Object[], String> tuidMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TUID);
 
         if (tuidMap != null) {
-            String testHash = BaseDataProvider.hash(result.getParameters(), result.getMethod());
+            String testHash = ParameterGenerator.hash(result.getParameters(), result.getMethod());
             if (tuidMap.containsKey(testHash)) {
                 methodUID = tuidMap.get(testHash) + " - ";
             }

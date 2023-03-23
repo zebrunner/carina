@@ -19,7 +19,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Map;
 
-import com.zebrunner.carina.core.testng.TestNamingService;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -30,22 +29,22 @@ import org.testng.ITestResult;
 import org.testng.TestListenerAdapter;
 import org.testng.internal.annotations.DisabledRetryAnalyzer;
 
-import com.zebrunner.carina.utils.commons.SpecialKeywords;
-import com.qaprosoft.carina.core.foundation.dataprovider.parser.DSBean;
-import com.zebrunner.carina.utils.report.ReportContext;
-import com.zebrunner.carina.utils.report.TestResultItem;
-import com.zebrunner.carina.utils.report.TestResultType;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
-import com.zebrunner.carina.utils.retry.RetryAnalyzer;
-import com.zebrunner.carina.utils.DateUtils;
-import com.zebrunner.carina.utils.messager.Messager;
-import com.zebrunner.carina.utils.ParameterGenerator;
-import com.zebrunner.carina.utils.R;
-import com.zebrunner.carina.utils.StringGenerator;
-import com.zebrunner.carina.webdriver.IDriverPool;
 import com.zebrunner.agent.testng.core.retry.RetryAnalyzerInterceptor;
 import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
 import com.zebrunner.agent.testng.listener.RetryService;
+import com.zebrunner.carina.core.testng.TestNamingService;
+import com.zebrunner.carina.utils.DateUtils;
+import com.zebrunner.carina.utils.ParameterGenerator;
+import com.zebrunner.carina.utils.R;
+import com.zebrunner.carina.utils.StringGenerator;
+import com.zebrunner.carina.utils.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.messager.Messager;
+import com.zebrunner.carina.utils.report.ReportContext;
+import com.zebrunner.carina.utils.report.TestResultItem;
+import com.zebrunner.carina.utils.report.TestResultType;
+import com.zebrunner.carina.utils.retry.RetryAnalyzer;
+import com.zebrunner.carina.webdriver.IDriverPool;
 
 public class AbstractTestListener extends TestListenerAdapter implements IDriverPool {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -153,23 +152,6 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         }
         
         generateParameters(result);
-
-        if (!result.getTestContext().getCurrentXmlTest().getAllParameters()
-                .containsKey(SpecialKeywords.EXCEL_DS_CUSTOM_PROVIDER) &&
-                result.getParameters().length > 0) // set parameters from XLS only if test contains any parameter at
-                                                   // all)
-        {
-            if (result.getTestContext().getCurrentXmlTest().getAllParameters()
-                    .containsKey(SpecialKeywords.EXCEL_DS_ARGS)) {
-                DSBean dsBean = new DSBean(result.getTestContext());
-                int index = 0;
-                for (String arg : dsBean.getArgs()) {
-                    dsBean.getTestParams().put(arg, (String) result.getParameters()[index++]);
-                }
-                result.getTestContext().getCurrentXmlTest().setParameters(dsBean.getTestParams());
-
-            }
-        }
 
         //TODO: do not write STARTED at message for retry! or move it into the DEBUG level!
         startItem(result, Messager.TEST_STARTED);
