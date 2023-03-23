@@ -60,8 +60,6 @@
         <jacoco-maven-plugin>0.8.7</jacoco-maven-plugin>
     </properties>
     <modules>
-        <module>carina-api</module>
-        <module>carina-webdriver</module>
         <module>carina-core</module>
     </modules>
     <!--repositories>
