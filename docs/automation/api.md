@@ -148,7 +148,7 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 import com.zebrunner.carina.api.apitools.validation.JsonCompareKeywords;
-import com.zebrunner.carina.core.IAbstractTest;
+import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import com.zebrunner.carina.core.registrar.ownership.MethodOwner;
 import com.zebrunner.carina.core.registrar.tag.TestPriority;
 import com.qaprosoft.carina.core.foundation.utils.tag.TestPriority;
