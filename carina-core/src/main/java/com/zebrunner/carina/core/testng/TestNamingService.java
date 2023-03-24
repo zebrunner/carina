@@ -151,7 +151,7 @@ public class TestNamingService {
 
                     methodUID = result.getParameters()[i].toString();
                     if (methodUID.contains(SpecialKeywords.TUID + ":")) {
-                        methodUID = methodUID.replace(SpecialKeywords.TUID + ":", "");
+                        methodUID = methodUID.replace(SpecialKeywords.TUID + ":", "") + " - ";
                     }
                     break;
                 }
