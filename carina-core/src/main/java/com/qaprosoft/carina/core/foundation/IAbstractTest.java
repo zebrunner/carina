@@ -15,7 +15,9 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation;
 
+import org.testng.ITestResult;
 import org.testng.SkipException;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
@@ -45,18 +47,41 @@ public interface IAbstractTest extends ICustomTypePageFactory, ITestCases {
 
     long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
+    /**
+     * Carina BeforeSuite<br>
+     * <b>For internal usage only - should not be overridden!</b>
+     */
     @BeforeSuite(alwaysRun = true)
     default void onCarinaBeforeSuite() {
         // do nothing
     }
 
+    /**
+     * Carina BeforeClass<br>
+     * <b>For internal usage only - should not be overridden!</b>
+     */
     @BeforeClass(alwaysRun = true)
     default void onCarinaBeforeClass() {
         // do nothing
     }
 
+    /**
+     * Carina BeforeMethod<br>
+     * <b>For internal usage only - should not be overridden!</b>
+     */
     @BeforeMethod(alwaysRun = true)
     default void onCarinaBeforeMethod() {
+        // do nothing
+    }
+
+    /**
+     * Carina AfterMethod<br>
+     * <b>For internal usage only - should not be overridden!</b>
+     * 
+     * @param result see {@link ITestResult}. For {@link CarinaListener}
+     */
+    @AfterMethod(alwaysRun = true)
+    default void onCarinaAfterMethod(ITestResult result) {
         // do nothing
     }
 

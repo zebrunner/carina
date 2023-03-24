@@ -47,27 +47,18 @@ import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.SkipException;
+import org.testng.internal.ConfigurationMethod;
 import org.testng.xml.XmlSuite;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
+import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
 import com.qaprosoft.carina.core.foundation.report.qtest.IQTestManager;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestRailManager;
 import com.qaprosoft.carina.core.foundation.skip.ExpectedSkipManager;
-import com.zebrunner.carina.webdriver.CarinaDriver;
-import com.zebrunner.carina.webdriver.ScreenshotType;
-import com.zebrunner.carina.webdriver.Screenshot;
-import com.zebrunner.carina.webdriver.TestPhase;
-import com.zebrunner.carina.webdriver.TestPhase.Phase;
-import com.zebrunner.carina.webdriver.core.capability.CapabilitiesLoader;
-import com.zebrunner.carina.webdriver.screenshot.DefaultSuccessfulDriverActionScreenshotRule;
-import com.zebrunner.carina.webdriver.screenshot.DefaultUnSuccessfulDriverActionScreenshotRule;
-import com.zebrunner.carina.webdriver.screenshot.ExplicitFullSizeScreenshotRule;
-import com.zebrunner.carina.webdriver.screenshot.ExplicitVisibleScreenshotRule;
-import com.zebrunner.carina.webdriver.screenshot.IScreenshotRule;
 import com.zebrunner.agent.core.registrar.CurrentTest;
 import com.zebrunner.agent.core.registrar.CurrentTestRun;
 import com.zebrunner.agent.core.registrar.Label;
@@ -92,6 +83,17 @@ import com.zebrunner.carina.utils.report.ReportContext;
 import com.zebrunner.carina.utils.report.TestResult;
 import com.zebrunner.carina.utils.report.TestResultItem;
 import com.zebrunner.carina.utils.resources.L10N;
+import com.zebrunner.carina.webdriver.CarinaDriver;
+import com.zebrunner.carina.webdriver.Screenshot;
+import com.zebrunner.carina.webdriver.ScreenshotType;
+import com.zebrunner.carina.webdriver.TestPhase;
+import com.zebrunner.carina.webdriver.TestPhase.Phase;
+import com.zebrunner.carina.webdriver.core.capability.CapabilitiesLoader;
+import com.zebrunner.carina.webdriver.screenshot.DefaultSuccessfulDriverActionScreenshotRule;
+import com.zebrunner.carina.webdriver.screenshot.DefaultUnSuccessfulDriverActionScreenshotRule;
+import com.zebrunner.carina.webdriver.screenshot.ExplicitFullSizeScreenshotRule;
+import com.zebrunner.carina.webdriver.screenshot.ExplicitVisibleScreenshotRule;
+import com.zebrunner.carina.webdriver.screenshot.IScreenshotRule;
 
 /*
  * CarinaListener - base carina-core TestNG Listener.
@@ -100,7 +102,6 @@ import com.zebrunner.carina.utils.resources.L10N;
  */
 public class CarinaListener extends AbstractTestListener implements ISuiteListener, IQTestManager, ITestRailManager, IClassListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
     protected static final String SUITE_TITLE = "%s%s%s - %s (%s)";
@@ -256,9 +257,59 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     }
 
     @Override
+    public void onConfigurationSuccess(ITestResult result) {
+        LOGGER.debug("CarinaListener->onCongigurationSuccess");
+        onConfigurationFinish(result);
+        super.onConfigurationSuccess(result);
+    }
+
+    @Override
+    public void onConfigurationSkip(ITestResult result) {
+        LOGGER.debug("CarinaListener->onConfigurationSkip");
+        onConfigurationFinish(result);
+        super.onConfigurationSkip(result);
+    }
+
+    @Override
     public void onConfigurationFailure(ITestResult result) {
         LOGGER.debug("CarinaListener->onConfigurationFailure");
+        onConfigurationFinish(result);
         super.onConfigurationFailure(result);
+    }
+
+    /**
+     * Logic executed after configuration methods.
+     *
+     * 1. Remove the drivers if it was created in beforeMethod or in the test method itself
+     * 
+     * @param configurationResult see {@link ITestResult}
+     */
+    private void onConfigurationFinish(ITestResult configurationResult) {
+        ITestNGMethod testMethod = configurationResult.getMethod();
+        if (testMethod instanceof ConfigurationMethod) {
+            ConfigurationMethod configurationMethod = (ConfigurationMethod) testMethod;
+            if (configurationMethod.isAfterMethodConfiguration()) {
+                // we want to intercept IAbstractTest#onCarinaAfterMethod that have only one parameter -
+                // result of the test method
+                // We are not going to check amount of parameters / their type because it is our method
+                if (IAbstractTest.class.equals(configurationMethod.getRealClass()) &&
+                        StringUtils.equals("onCarinaAfterMethod", configurationMethod.getMethodName())) {
+                    ITestResult testMethodResult = (ITestResult) Arrays.stream(configurationResult.getParameters())
+                            .filter(ITestResult.class::isInstance)
+                            .findFirst()
+                            .orElseThrow(() -> new RuntimeException("onCarinaAfterMethod should have ITestResult parameter"));
+
+                    // result status == 2 means failure, status == 3 means skip. We need to quit driver anyway for failure and skip
+                    if (((automaticDriversCleanup &&
+                            !hasDependencies(testMethodResult)) ||
+                            testMethodResult.getStatus() == 2 ||
+                            testMethodResult.getStatus() == 3) &&
+                            !Configuration.getBoolean(Parameter.FORCIBLY_DISABLE_DRIVER_QUIT)) {
+                        quitDrivers(Phase.BEFORE_METHOD, Phase.METHOD);
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -330,13 +381,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             com.zebrunner.carina.proxy.ProxyPool.clearThreadRule();
 
             LOGGER.debug("Test result is : " + result.getStatus());
-            // result status == 2 means failure, status == 3 means skip. We need to quit driver anyway for failure and skip
-            if ((automaticDriversCleanup && !hasDependencies(result)) || result.getStatus() == 2 || result.getStatus() == 3) {
-                if (!Configuration.getBoolean(Parameter.FORCIBLY_DISABLE_DRIVER_QUIT)) {
-                    quitDrivers(Phase.BEFORE_METHOD, Phase.METHOD);
-                }
-            }
-
             attachTestLabels(result);
         } catch (Exception e) {
             LOGGER.error("Exception in CarinaListener->onTestFinish!", e);
