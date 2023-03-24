@@ -1,4 +1,5 @@
-Modern test automation frameworks should support data-driven testing, when you are able to verify a variety of edge cases providing test data sets into the tests using external data sources. Carina is not an exception, the framework supports multiple ways of test parametrization (see the [samples](https://github.com/zebrunner/carina-demo/blob/master/src/test/java/com/qaprosoft/carina/demo/DataprovidersSampleTest.java)):
+Modern test automation frameworks should support data-driven testing, when you are able to verify a variety of edge cases providing test data sets into the tests using external data sources. 
+Carina is not an exception, the framework supports multiple ways of test parametrization (see the [TestNG approach samples](https://github.com/zebrunner/carina-demo/blob/master/src/test/java/com/qaprosoft/carina/demo/DataprovidersSampleTest.java), [Carina's custom data provider samples](https://github.com/zebrunner/carina-demo/blob/develop/src/test/java/com/qaprosoft/carina/demo/CustomDataProvidersSampleTest.java)):
 
 * Java data-providers
 * XML parametrization
@@ -52,58 +53,8 @@ public void testSubstractOperation(int a, int b, int c) {
 	</classes>
 </test>
 ...
-```
-
-## XLS/CSV data-providers
-Carina test framework provides a possibility to write all tests with data providers in one place, including parametrization using external XLS/CSV spreadsheets. First of all, you need to declare a test class that implements `IAbstractTest.java`.
-
-After that, you can specify data provider tests as follows.
 
 ```
-public class DataprovidersSampleTest implements IAbstractTest {
-	@Test(dataProvider = "DataProvider")
-	@XlsDataSourceParameters(path = "xls/demo.xlsx", sheet = "Calculator", dsUid = "TUID", dsArgs = "a,b,c")
-	public void testSumOperation(String a, String b, String c) {
-		int actual = Integer.valueOf(a) + Integer.valueOf(b);
-		int expected = Integer.valueOf(c);
-		Assert.assertEquals(actual, expected, "Invalid sum result!");
-	}
-}
-```
-
-This test uses XLS/CSV files as a data source. Every line in a spreadsheet is a set of arguments for a test. You should specify the `dataProvider` parameter for TestNG annotation `@Test` . Carina test framework initially defines several data provider methods in `IAbstractTest.java`, which you've extended earlier:
-
-* createData method (data provider name = "DataProvider") for common use cases
-
-* createDataSingeThread method (data provider name = "SingleDataProvider") for a single-thread execution.
-
-To specify the XLS/CSV spreadsheets for a test, you should declare `@XlsDataSourceParameters` annotation and define its parameters:
-
-* path - file path located in src/test/resources
-* sheet - sheet name
-* dsUid - data-source unique identifier
-* dsArgs - column names from the sheet
-
-Here you can look at a spreadsheet as a data provider example for your further tests:
-
-![XLS file - Data Provider - screenshot](../img/xlsscreen.png)
-
-In the TUID column, you should specify some unique test identifier that will be set at the beginning of the test name in a test result report. In the next columns, you can specify arguments for a test and their values in the bottom lines. They will be used as parameters in `@XlsDataSourceParameters`. In this example, the values of a, b, c arguments were defined in 3 sets of values with different TUID.
-
-## DataProvider with huge number of columns
-In some cases, we have to provide 10+ columns into a test. In this case, there is one tricky point. Just removing dsArgs dataprovider parameter will collect all the lines into a single HashMap<String, String> object, so you can dynamically get any column in a test using the column name.
-```
-public class DataprovidersSampleTest implements IAbstractTest {
-	@Test(dataProvider = "DataProvider")
-	@XlsDataSourceParameters(path = "xls/demo.xlsx", sheet = "Calculator", dsUid = "TUID")
-	public void testSumOperation(HashMap<String, String> args) {
-		int actual = Integer.valueOf(args.get("a")) + Integer.valueOf(args.get("b"));
-		int expected = Integer.valueOf(args.get("c"));
-		Assert.assertEquals(actual, expected, "Invalid sum result!");
-	}
-}
-```
-
 ## Adding test unique identifier (TUID) to the test name using Java data provider
 
 TUID sets at the beginning of the test name in a test result report.
@@ -142,7 +93,7 @@ you should do the following:
 1. Add to the data provider field with test unique identifier (TUID), for example:
 
 ```
-@DataProvider(name = "dataProvider")
+@DataProvider(name = "DP1")
 public static Object[][] dataprovider() {
     return new Object[][]{
         {"Data1", "some data", ... },
@@ -157,18 +108,156 @@ where `"Data1"`, `"Data2"`, `"Data3"` in this example is the tests unique identi
 2. In the test, that use our provider, for example
 
 ```
-@Test(dataProvider = "dataProvider")
+@Test(dataProvider = "DP1")
 public void testDataProvider(...) {
     ...
 }
 ```
 
-when you receive data from the data provider, you must name the method parameter 
+when you receive data from the data provider, you must name the method parameter
 that receives a TUID as `TUID`, for example:
 
 ```
-@Test(dataProvider = "dataProvider")
+@Test(dataProvider = "DP1")
 public void testDataProvider(String TUID, String data, ...) {
     ...
+}
+```
+
+
+## Carina's custom data-providers
+Carina test framework provides a possibility to write all tests with data providers in one place, including parametrization using external XLS/CSV spreadsheets. First of all, you need to declare a test class that implements `IAbstractTest.java` and `IAbstractDataProvider.java`.
+
+After that, you can specify data provider tests as follows.
+
+```
+public class CustomDataProvidersSampleTest implements IAbstractTest, IAbstractDataProvider {
+    @Test(dataProvider = "DataProvider")
+    @XlsDataSourceParameters(path = "data_source/demo.xlsx", sheet = "Calculator", dsUid = "TUID", dsArgs = "a,b,c")
+    public void testXlsSumOperation(String a, String b, String c) {
+        int actual = Integer.valueOf(a) + Integer.valueOf(b);
+        int expected = Integer.valueOf(c);
+        Assert.assertEquals(actual, expected, "Invalid sum result!");
+    }
+}
+```
+
+This test uses XLS files as a data source. Every line in a spreadsheet is a set of arguments for a test. You should specify the `dataProvider` parameter for TestNG annotation `@Test`.\
+Carina test framework defines several data provider methods in `IAbstractDataProvider.java`:
+
+* use `@Test(dataProvider = "DataProvider")` for common use cases.
+
+* use `@Test(dataProvider = "SingleDataProvider")` for a single-thread execution.
+
+To specify the `xls`/`csv` spreadsheets for a test, you should declare `@XlsDataSourceParameters`/`@CsvDataSourceParameters` annotation and define its parameters.
+
+Common data sources annotation parameters:
+<table>
+    <tr>
+        <th>Parameter</th>
+        <th>Meaning</th>
+        <th>Example</th>
+    </tr>
+    <tr>
+        <td>path</td>
+        <td>File path located in src/test/resources</td>
+        <td>path = "data_source/demo.xlsx"</td>
+    </tr>
+    <tr>
+        <td>dsUid</td>
+        <td>Defines column name from spreadsheet with unique identifiers</td>
+        <td>dsUid = "TUID"</td>
+    </tr>
+    <tr>
+        <td>dsArgs</td>
+        <td>Defines column names from spreadsheet that should be passed to test by splitting it with ','.</td>
+        <td>dsArgs = "a,b,c"</td>
+    </tr>
+    <tr>
+        <td>staticArgs</td>
+        <td>Defines parameter name from testNG suite which value will be passed in test. This value will be present in every test</td>
+        <td>in data source annoation: staticArgs = "key"<br> 
+            in suite: &lt;parameter name="key" value="arg"/&gt;</td>
+    </tr>
+    <tr>
+        <td>testMethodColumn</td>
+        <td>Defines column name which contains values for test name overriding</td>
+        <td>testMethodColumn = "TestTitle"</td>
+    </tr>
+    <tr>
+        <td>executeColumn</td>
+        <td>Defines column name that determines whether to add row to test run or not.<br>
+            Default - 'Execute'</td>
+        <td>executeColumn = "Records to run"</td>
+    </tr>
+    <tr>
+        <td>executeValue</td>
+        <td>Defines value by which tests will be added to test run if it equals to value from executeColumn.<br>
+            Default - 'y'</td>
+        <td>executeValue = "+"</td>
+    </tr>
+    <tr>
+        <td>groupColumn</td>
+        <td>Every row in table being grouped by value from selected groupColumn.
+            Provide arguments to test as List&lt;Map&lt;String, String&gt;&gt; for 1 test</td>
+        <td>groupColumn = "country"</td>
+    </tr>
+</table>
+
+CsvDataSourceParameters can also contain:
+<table>
+    <tr>
+        <th>Parameter</th>
+        <th>Meaning</th>
+        <th>Example</th>
+    </tr>
+    <tr>
+        <td>separator</td>
+        <td>Defines column separator for parsing<br>
+            Default - ','</td>
+        <td>separator = ";"</td>
+    </tr>
+    <tr>
+        <td>quote</td>
+        <td>defines the character to use for quoted elements when parsing.<br>
+            Default - '"'</td>
+        <td>quote = "`"</td>
+    </tr>
+</table>
+
+XlsDataSourceParameters can also contain:
+<table>
+    <tr>
+        <th>Parameter</th>
+        <th>Meaning</th>
+        <th>Example</th>
+    </tr>
+    <tr>
+        <td>sheet</td>
+        <td>Defines sheet to parse</td>
+        <td>sheet = "calculator"</td>
+    </tr>
+    <tr>
+        <td>spreadsheetId</td>
+        <td>Defines spreadsheet's id. Is mutually exclusive with path</td>
+        <td>spreadsheetId = "abc1234567"</td>
+    </tr>
+</table>
+
+Here you can look at a spreadsheet as a data source example for test:
+
+![XLS file - Data Provider - screenshot](../img/xlsscreen.png)
+
+## DataProvider with huge number of columns
+In some cases, we have to provide 10+ columns into a test. In this case, there is one tricky point. Just removing dsArgs parameter will collect all the lines into a single Map<String, String> object, so you can dynamically get any column in a test using the column name.
+```
+public class CustomDataProvidersSampleTest implements IAbstractTest, IAbstractDataProvider {
+    @Test(dataProvider = "DataProvider")
+    @XlsDataSourceParameters(path = "data_source/demo.xlsx", sheet = "Calculator", dsUid = "TUID")
+    public void testSumOperationFromMap(Map<String, String> args) {
+        int actual = Integer.valueOf(args.get("a")) + Integer.valueOf(args.get("b"));
+        int expected = Integer.valueOf(args.get("c"));
+        Assert.assertEquals(actual, expected, "Invalid sum result!");
+    }
 }
 ```
