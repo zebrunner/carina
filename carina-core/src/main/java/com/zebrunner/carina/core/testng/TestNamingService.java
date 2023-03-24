@@ -151,7 +151,7 @@ public class TestNamingService {
 
                     methodUID = result.getParameters()[i].toString();
                     if (methodUID.contains(SpecialKeywords.TUID + ":")) {
-                        methodUID = methodUID.replace(SpecialKeywords.TUID + ":", "") + " - ";
+                        methodUID = methodUID.replace(SpecialKeywords.TUID + ":", "");
                     }
                     break;
                 }
@@ -166,7 +166,7 @@ public class TestNamingService {
         if (tuidMap != null) {
             String testHash = ParameterGenerator.hash(result.getParameters(), result.getMethod());
             if (tuidMap.containsKey(testHash)) {
-                methodUID = tuidMap.get(testHash) + " - ";
+                methodUID = tuidMap.get(testHash);
             }
         }
 
