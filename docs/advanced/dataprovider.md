@@ -221,7 +221,7 @@ CsvDataSourceParameters can also contain:
         <td>quote</td>
         <td>defines the character to use for quoted elements when parsing.<br>
             Default - '"'</td>
-        <td>quote = "`"</td>
+        <td>quote = "©"</td>
     </tr>
 </table>
 
