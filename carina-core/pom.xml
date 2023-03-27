@@ -19,8 +19,8 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<carina-webdriver.version>1.0.1.P2-SNAPSHOT</carina-webdriver.version>
-		<carina-utils.version>1.0.3.P1-SNAPSHOT</carina-utils.version>
+		<carina-webdriver.version>1.0.1.P3-SNAPSHOT</carina-webdriver.version>
+		<carina-utils.version>1.0.3.P2-SNAPSHOT</carina-utils.version>
 	</properties>
 
 	<repositories>
