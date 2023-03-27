@@ -21,7 +21,7 @@ files, source code, etc.) based on templates and changing data."
 
 ### Pre requirements
 
-To use carina's api feature, add certain dependency to your pom.xml
+To use api feature, add certain dependency to your pom.xml
 
 ```xml
 <dependency>

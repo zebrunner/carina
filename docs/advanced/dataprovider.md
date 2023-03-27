@@ -1,13 +1,13 @@
 Modern test automation frameworks should support data-driven testing, when you are able to verify a variety of edge cases providing test data sets into the tests using external data sources. 
 Carina is not an exception, the framework supports multiple ways of test parametrization (see the [TestNG approach samples](https://github.com/zebrunner/carina-demo/blob/master/src/test/java/com/qaprosoft/carina/demo/DataprovidersSampleTest.java), [Carina's custom data provider samples](https://github.com/zebrunner/carina-demo/blob/develop/src/test/java/com/qaprosoft/carina/demo/CustomDataProvidersSampleTest.java)):
 
-* Java data-providers
+* Java data providers
 * XML parametrization
-* XLS data-providers
-* CSV data-providers
+* XLS data providers
+* CSV data providers
 
-## Java data-provider
-As far as Carina is based on TestNG framework, you are able to use well known Java data-providers which return a matrix of Objects and pass it to the appropriate test arguments. You have to use dataProvider attribute along with @Test annotation and implement the method annotated with `@DataProvider` that will return `Object[][]` as a test data set:
+## Java data provider
+As far as Carina is based on TestNG framework, you are able to use well known Java data providers which return a matrix of Objects and pass it to the appropriate test arguments. You have to use dataProvider attribute along with @Test annotation and implement the method annotated with `@DataProvider` that will return `Object[][]` as a test data set:
 ```
 @Test(dataProvider = "DP1")
 public void testMuliplyOperation(int a, int b, int c)
@@ -125,11 +125,11 @@ public void testDataProvider(String TUID, String data, ...) {
 ```
 
 
-## Carina's custom data-providers
+## Custom data providers
 
 ### Pre requirements
 
-To use carina's custom provider feature, add certain dependency to your pom.xml
+To use custom provider feature, add certain dependency to your pom.xml
 
 ```xml
 <dependency>
@@ -158,8 +158,8 @@ public class CustomDataProvidersSampleTest implements IAbstractTest, IAbstractDa
 }
 ```
 
-This test uses XLS files as a data source. Every line in a spreadsheet is a set of arguments for a test. You should specify the `dataProvider` parameter for TestNG annotation `@Test`.\
-Carina test framework defines several data provider methods in `IAbstractDataProvider.java`:
+This test uses XLS files as a data source. Every line in a spreadsheet is a set of arguments for a test. You should specify the `dataProvider` parameter for TestNG annotation `@Test`.  
+`IAbstractDataProvider` interface defines several data provider methods to implement:
 
 * use `@Test(dataProvider = "DataProvider")` for common use cases.
 
@@ -257,6 +257,48 @@ XlsDataSourceParameters can also contain:
         <td>spreadsheetId</td>
         <td>Defines spreadsheet's id. Is mutually exclusive with path</td>
         <td>spreadsheetId = "abc1234567"</td>
+    </tr>
+</table>
+
+Several parameters from annotation could be overridden in suite. Such parameters:
+
+<table>
+    <tr>
+        <th>Parameter</th>
+        <th>Meaning</th>
+        <th>Example</th>
+    </tr>
+    <tr>
+        <td>{ds_file}</td>
+        <td>File path located in src/test/resources</td>
+        <td>&lt;parameter name="{ds_args}" value="data_source/demo.xlsx"/&gt;</td>
+    </tr>
+    <tr>
+        <td>{excel_ds_sheet}</td>
+        <td>Defines sheet to parse</td>
+        <td>&lt;parameter name="{excel_ds_sheet}" value="calculator"/&gt;</td>
+    </tr>
+    <tr>
+        <td>{ds_args}</td>
+        <td>Defines column names from spreadsheet that should be passed to test by splitting it with ','</td>
+        <td>&lt;parameter name="{ds_args}" value="a,b,c"/&gt;</td>
+    </tr>
+    <tr>
+        <td>{ds_uid}</td>
+        <td>Defines column name from spreadsheet with unique identifiers</td>
+        <td>&lt;parameter name="{ds_uid}" value="TUID"/&gt;</td>
+    </tr>
+    <tr>
+        <td>{ds_execute_column}</td>
+        <td>Defines column name that determines whether to add row to test run or not.<br>
+            Default - 'Execute'</td>
+        <td>&lt;parameter name="{ds_execute_column}" value="Records to run"/&gt;</td>
+    </tr>
+    <tr>
+        <td>{ds_execute_value}</td>
+        <td>Defines value by which tests will be added to test run if it equals to value from executeColumn.<br>
+            Default - 'y'</td>
+        <td>&lt;parameter name="{ds_execute_value}" value="+"/&gt;</td>
     </tr>
 </table>
 
