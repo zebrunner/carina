@@ -135,6 +135,61 @@ public class HomePage extends AbstractPage {
 * You should call the super constructor **super(driver, searchContext)** where searchContext is an instance of **org.openqa.selenium.SearchContext**
 * Locate UI Object classes in `src/main/java` source folder
 
+
+### Implementation of Context annotation
+In some cases, it is useful to reduce elements locator by using @Context annotation.
+
+For example, instead of using:
+```java
+@FindBy(xpath = "//div[@class='search-field']//input")
+private ExtendedWebElement searchField;
+
+@FindBy(xpath = "//div[@class='search-field']//button")
+private ExtendedWebElement searchButton;
+```
+We can aggregate the same locator into new element. Then we need refer to it in @Context annotation like this:
+```java
+@FindBy(xpath = "//div[@class='search-field']")
+private ExtendedWebElement searchComp;
+
+@Context(dependsOn = "searchComp")
+@FindBy(tagName = "input")
+private ExtendedWebElement searchField;
+
+@Context(dependsOn = "searchComp")
+@FindBy(tagName = "button")
+private ExtendedWebElement searchButton;
+```
+
+With context annotation could be also created chains of elements dependency
+
+```java
+@FindBy(id = "news")
+private ExtendedWebElement newsBlock;
+
+@Context(dependsOn = "newsBlock")
+@FindBy(xpath = ".//div[@class='news-item']")
+private ExtendedWebElement newsItem;
+
+@Context(dependsOn = "newsItem")
+@FindBy(tagName = "h3")
+private ExtendedWebElement newsTitle;
+```
+
+> @Context can also refer to element from super class by its name.
+
+**Referred element type could be:**
+
+* ExtendedWebElement
+* Extends from AbstractUIObject
+
+**Elements type that are marked with @Context annotation could be:**
+
+* ExtendedWebElement
+* Extends from AbstractUIObject
+* List &lt;ExtendedWebElement&gt;
+* List&lt;? extends AbstractUIObject&gt;
+
 ### Work with iframe
 Before working with an iframe, you need to understand that an iframe is a separate page. Therefore, if we need to work with the internal structure of an iframe, we need to create a separate class for it inherited from AbstractPage, in which we already paint its internal structure, for example:
 
