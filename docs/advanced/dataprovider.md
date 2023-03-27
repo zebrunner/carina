@@ -126,6 +126,22 @@ public void testDataProvider(String TUID, String data, ...) {
 
 
 ## Carina's custom data-providers
+
+### Pre requirements
+
+To use carina's custom provider feature, add certain dependency to your pom.xml
+
+```xml
+<dependency>
+    <groupId>com.zebrunner</groupId>
+    <artifactId>carina-dataprovider</artifactId>
+    <version>RELEASE</version>
+</dependency>
+```
+
+Visit our [github](https://github.com/zebrunner/carina-dataprovider/releases) to check the latest version of carina-dataprovider.
+
+### Implementation
 Carina test framework provides a possibility to write all tests with data providers in one place, including parametrization using external XLS/CSV spreadsheets. First of all, you need to declare a test class that implements `IAbstractTest.java` and `IAbstractDataProvider.java`.
 
 After that, you can specify data provider tests as follows.

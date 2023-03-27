@@ -357,12 +357,12 @@ public void testWebView() {
 }
 ```
 
-### What if the mobile app link points to Amazon/Azure/AppCenter/other
+### What if the mobile app link points to Amazon / Azure/ AppCenter / other
 
 When the driver starts, a link to the application is taken from the capabilities. The type of link determines how to process it 
 and get the final (for example, pre-assign) link which will be used when starting the driver instead of the original.
-If you provide a link to an application located on Amazon, then add the dependency `com.zebrunner.carina-aws-s3`, 
-Azure - `com.zebrunner.carina-azure`, AppCenter - `com.zebrunner.carina-appcenter`.
+If you provide a link to an application located on Amazon, then add the dependency [com.zebrunner.carina-aws-s3](https://github.com/zebrunner/carina-aws-s3/releases), 
+Azure - [com.zebrunner.carina-azure](https://github.com/zebrunner/carina-azure/releases), AppCenter - [com.zebrunner.carina-appcenter](https://github.com/zebrunner/carina-appcenter/releases).
 
 You can also create your own implementation of getting the final link to the mobile application:
 
