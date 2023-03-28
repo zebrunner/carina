@@ -47,30 +47,18 @@ public interface IAbstractTest extends ICustomTypePageFactory, ITestCases {
 
     long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
-    /**
-     * Carina BeforeSuite<br>
-     * <b>For internal usage only - should not be overridden!</b>
-     */
     @BeforeSuite(alwaysRun = true)
-    default void onCarinaBeforeSuite() {
+    private void onCarinaBeforeSuite() {
         // do nothing
     }
 
-    /**
-     * Carina BeforeClass<br>
-     * <b>For internal usage only - should not be overridden!</b>
-     */
     @BeforeClass(alwaysRun = true)
-    default void onCarinaBeforeClass() {
+    private void onCarinaBeforeClass() {
         // do nothing
     }
 
-    /**
-     * Carina BeforeMethod<br>
-     * <b>For internal usage only - should not be overridden!</b>
-     */
     @BeforeMethod(alwaysRun = true)
-    default void onCarinaBeforeMethod() {
+    private void onCarinaBeforeMethod() {
         // do nothing
     }
 
