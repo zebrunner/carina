@@ -167,6 +167,11 @@ All the project configuration properties are located in a **_config.properties**
 		<td>BY_ELEMENT, BY_URL, BY_URL_AND_ELEMENT</td>
 	</tr>
 	<tr>
+		<td>page_recursive_reflection</td>
+		<td>Determines if pages should be searched in dependencies. **Default: false**</td>
+		<td>Boolean</td>
+	</tr>
+	<tr>
 		<td>element_loading_strategy</td>
 		<td>Determines how carina detects appearing of [web elements](https://zebrunner.github.io/carina/automation/web/#element-loading-strategy) on page</td>
 		<td>BY_PRESENCE, BY_VISIBILITY, BY_PRESENCE_OR_VISIBILITY</td>
