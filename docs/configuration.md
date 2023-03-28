@@ -262,11 +262,6 @@ All the project configuration properties are located in a **_config.properties**
 		<td>./tls/keysecure</td>
 	</tr>
     <tr>
-		<td>w3c</td>
-		<td>Enable capabilities processing according to w3c.**Default: false**</td>
-		<td>false</td>
-	</tr>
-    <tr>
 		<td>db.url</td>
 		<td>Database url</td>
 		<td>jdbc:mysql://localhost/test</td>

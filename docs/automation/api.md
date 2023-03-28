@@ -19,6 +19,20 @@ files, source code, etc.) based on templates and changing data."
 * JsonAssert - a library for comparing the actual JSON body with an expected one
 * Json-schema-validator - a library for validating of JSON body for matching to JSON schema
 
+### Pre requirements
+
+To use api feature, add certain dependency to your pom.xml
+
+```xml
+<dependency>
+    <groupId>com.zebrunner</groupId>
+    <artifactId>carina-api</artifactId>
+    <version>RELEASE</version>
+</dependency>
+```
+
+Visit our [github](https://github.com/zebrunner/carina-api/releases) to check the latest version of carina-api. 
+
 ### Example of test implementation
 Let's create an automated test for the next call: POST https://jsonplaceholder.typicode.com/users request with a request body
 ```json
