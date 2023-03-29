@@ -15,7 +15,6 @@ import ${package}.carina.demo.gui.pages.common.CompareModelsPageBase;
 import ${package}.carina.demo.gui.pages.common.HomePageBase;
 import com.zebrunner.carina.utils.factory.DeviceType;
 import com.zebrunner.carina.webdriver.decorator.ExtendedWebElement;
-import com.zebrunner.carina.webdriver.decorator.PageOpeningStrategy;
 
 @DeviceType(pageType = DeviceType.Type.ANDROID_PHONE, parentClass = HomePageBase.class)
 public class HomePage extends HomePageBase {
@@ -43,7 +42,6 @@ public class HomePage extends HomePageBase {
 
     public HomePage(WebDriver driver) {
         super(driver);
-        setPageOpeningStrategy(PageOpeningStrategy.BY_ELEMENT);
         setUiLoadedMarker(newsColumn);
     }
 

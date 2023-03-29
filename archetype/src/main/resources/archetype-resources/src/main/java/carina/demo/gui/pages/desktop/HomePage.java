@@ -17,8 +17,6 @@ import ${package}.carina.demo.gui.pages.common.AllBrandsPageBase;
 import ${package}.carina.demo.gui.pages.common.BrandModelsPageBase;
 import ${package}.carina.demo.gui.pages.common.CompareModelsPageBase;
 import ${package}.carina.demo.gui.pages.common.HomePageBase;
-import com.zebrunner.carina.utils.Configuration;
-import com.zebrunner.carina.utils.R;
 import com.zebrunner.carina.utils.factory.DeviceType;
 import com.zebrunner.carina.webdriver.decorator.ExtendedWebElement;
 
@@ -45,7 +43,6 @@ public class HomePage extends HomePageBase {
     public HomePage(WebDriver driver) {
         super(driver);
         setUiLoadedMarker(newsColumn);
-        setPageAbsoluteURL(R.CONFIG.get(Configuration.Parameter.URL.getKey()));
     }
 
     @Override
