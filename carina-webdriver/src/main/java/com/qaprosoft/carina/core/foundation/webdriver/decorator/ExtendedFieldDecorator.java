@@ -121,15 +121,24 @@ public class ExtendedFieldDecorator implements FieldDecorator {
         return true;
     }
 
-    protected ExtendedWebElement proxyForLocator(ClassLoader loader, Field field, ElementLocator locator) {
+    @SuppressWarnings("unchecked")
+    protected <T extends ExtendedWebElement> T proxyForLocator(ClassLoader loader, Field field, ElementLocator locator) {
         InvocationHandler handler = new LocatingElementHandler(locator);
         WebElement proxy = (WebElement) Proxy.newProxyInstance(loader, new Class[] { WebElement.class, WrapsElement.class, Locatable.class },
                 handler);
         /**
          * Questionable place - called ExtendedWebElement constructor with no initializing searchContext
          */
-        return new ExtendedWebElement(proxy, field.getName(),
-                field.isAnnotationPresent(FindBy.class) || field.isAnnotationPresent(ExtendedFindBy.class)? new LocalizedAnnotations(field).buildBy() : null);
+        Class<? extends ExtendedWebElement> clazz = (Class<? extends ExtendedWebElement>) field.getType();
+        try {
+            return (T) clazz.getConstructor(WebElement.class, String.class, By.class).newInstance(
+            		proxy, field.getName(), field.isAnnotationPresent(FindBy.class) || field.isAnnotationPresent(ExtendedFindBy.class)? new LocalizedAnnotations(field).buildBy() : null);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(
+                    "Implement appropriate AbstractUIObject constructor for auto-initialization!", e);
+        } catch (Exception e) {
+            throw new RuntimeException("Error creating ExtendedWebElement!", e);
+        }
     }
 
     @SuppressWarnings("unchecked")
