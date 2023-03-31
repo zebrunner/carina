@@ -33,17 +33,19 @@ import org.openqa.selenium.support.pagefactory.ElementLocator;
 import com.qaprosoft.carina.core.foundation.webdriver.decorator.ExtendedWebElement;
 import com.qaprosoft.carina.core.foundation.webdriver.locator.LocalizedAnnotations;
 
-public class LocatingListHandler implements InvocationHandler {
+public class LocatingListHandler<T extends ExtendedWebElement> implements InvocationHandler {
     private final ElementLocator locator;
     private String name;
     private By by;
     private final ClassLoader loader;
+    private final Class<T> clazz;
 
-    public LocatingListHandler(ClassLoader loader, ElementLocator locator, Field field){
+    public LocatingListHandler(ClassLoader loader, ElementLocator locator, Field field, Class<T> clazz) {
         this.loader = loader;
         this.locator = locator;
         this.name = field.getName();
         this.by = new LocalizedAnnotations(field).buildBy();
+        this.clazz = clazz;
     }
 
     public Object invoke(Object object, Method method, Object[] objects) throws Throwable {
@@ -60,15 +62,23 @@ public class LocatingListHandler implements InvocationHandler {
 
     	
     	List<WebElement> elements = locator.findElements();
-        List<ExtendedWebElement> extendedWebElements = null;
+        List<T> extendedWebElements = null;
         int i = 0;
         if (elements != null) {
-            extendedWebElements = new ArrayList<ExtendedWebElement>();
+            extendedWebElements = new ArrayList<T>();
             for (WebElement element : elements) {
                 InvocationHandler handler = new LocatingListsElementHandler(element, locator);
                 WebElement proxy = (WebElement) Proxy.newProxyInstance(loader, new Class[]{WebElement.class, WrapsElement.class, Locatable.class},
                         handler);
-                ExtendedWebElement webElement = new ExtendedWebElement(proxy, name + i, by);
+                T webElement;
+                try {
+                    webElement = (T) clazz.getConstructor(WebElement.class, String.class, By.class).newInstance(proxy, name + i, by);
+                } catch (NoSuchMethodException e) {
+                    throw new RuntimeException(
+                            "Implement appropriate AbstractUIObject constructor for auto-initialization!", e);
+                } catch (Exception e) {
+                    throw new RuntimeException("Error creating ExtendedWebElement!", e);
+                }
 
                 Field searchContextField = locator.getClass().getDeclaredField("searchContext");
                 searchContextField.setAccessible(true);
