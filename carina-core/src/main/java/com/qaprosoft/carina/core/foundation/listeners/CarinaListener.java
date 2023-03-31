@@ -258,7 +258,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     @Override
     public void onConfigurationSuccess(ITestResult result) {
-        LOGGER.debug("CarinaListener->onCongigurationSuccess");
+        LOGGER.debug("CarinaListener->onConfigurationSuccess");
         onConfigurationFinish(result);
         super.onConfigurationSuccess(result);
     }
