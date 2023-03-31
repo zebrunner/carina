@@ -53,7 +53,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
 import com.qaprosoft.carina.core.foundation.report.qtest.IQTestManager;
@@ -103,6 +102,7 @@ import com.zebrunner.carina.webdriver.screenshot.IScreenshotRule;
 public class CarinaListener extends AbstractTestListener implements ISuiteListener, IQTestManager, ITestRailManager, IClassListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
+    private static final ThreadLocal<Boolean> IS_REMOVE_DRIVER = ThreadLocal.withInitial(() -> Boolean.FALSE);
 
     protected static final String SUITE_TITLE = "%s%s%s - %s (%s)";
     protected static final String XML_SUITE_NAME = " (%s)";
@@ -288,26 +288,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         ITestNGMethod testMethod = configurationResult.getMethod();
         if (testMethod instanceof ConfigurationMethod) {
             ConfigurationMethod configurationMethod = (ConfigurationMethod) testMethod;
-            if (configurationMethod.isAfterMethodConfiguration()) {
-                // we want to intercept IAbstractTest#onCarinaAfterMethod that have only one parameter -
-                // result of the test method
-                // We are not going to check amount of parameters / their type because it is our method
-                if (IAbstractTest.class.equals(configurationMethod.getRealClass()) &&
-                        StringUtils.equals("onCarinaAfterMethod", configurationMethod.getMethodName())) {
-                    ITestResult testMethodResult = (ITestResult) Arrays.stream(configurationResult.getParameters())
-                            .filter(ITestResult.class::isInstance)
-                            .findFirst()
-                            .orElseThrow(() -> new RuntimeException("onCarinaAfterMethod should have ITestResult parameter"));
-
-                    // result status == 2 means failure, status == 3 means skip. We need to quit driver anyway for failure and skip
-                    if (((automaticDriversCleanup &&
-                            !hasDependencies(testMethodResult)) ||
-                            testMethodResult.getStatus() == 2 ||
-                            testMethodResult.getStatus() == 3) &&
-                            !Configuration.getBoolean(Parameter.FORCIBLY_DISABLE_DRIVER_QUIT)) {
-                        quitDrivers(Phase.BEFORE_METHOD, Phase.METHOD);
-                    }
-                }
+            if (configurationMethod.isAfterMethodConfiguration() && configurationMethod.isLastTimeOnly() && IS_REMOVE_DRIVER.get()) {
+                quitDrivers(Phase.BEFORE_METHOD, Phase.METHOD);
             }
         }
     }
@@ -381,6 +363,14 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             com.zebrunner.carina.proxy.ProxyPool.clearThreadRule();
 
             LOGGER.debug("Test result is : " + result.getStatus());
+            // result status == 2 means failure, status == 3 means skip. We need to quit driver anyway for failure and skip
+            if (((automaticDriversCleanup &&
+                    !hasDependencies(result)) ||
+                    result.getStatus() == 2 ||
+                    result.getStatus() == 3) &&
+                    !Configuration.getBoolean(Parameter.FORCIBLY_DISABLE_DRIVER_QUIT)) {
+                IS_REMOVE_DRIVER.set(Boolean.TRUE);
+            }
             attachTestLabels(result);
         } catch (Exception e) {
             LOGGER.error("Exception in CarinaListener->onTestFinish!", e);
