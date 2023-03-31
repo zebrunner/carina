@@ -12,7 +12,7 @@ import com.zebrunner.carina.webdriver.gui.AbstractUIObject;
 
 public class NewsItem extends AbstractUIObject {
 
-    @FindBy(xpath = ".//a/*[name()='h3' or name()='h2']")
+    @FindBy(xpath="./a")
     public ExtendedWebElement titleLink;
 
     public NewsItem(WebDriver driver, SearchContext sc) {
@@ -20,6 +20,6 @@ public class NewsItem extends AbstractUIObject {
     }
 
     public String readTitle() {
-        return titleLink.getElement().getText();
+        return titleLink.getText();
     }
 }

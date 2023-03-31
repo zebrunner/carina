@@ -11,7 +11,6 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
-import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import ${package}.carina.demo.gui.components.ModelItem;
 import ${package}.carina.demo.gui.components.NewsItem;
 import ${package}.carina.demo.gui.components.compare.ModelSpecs;
@@ -22,6 +21,7 @@ import ${package}.carina.demo.gui.pages.common.CompareModelsPageBase;
 import ${package}.carina.demo.gui.pages.common.HomePageBase;
 import ${package}.carina.demo.gui.pages.common.ModelInfoPageBase;
 import ${package}.carina.demo.gui.pages.common.NewsPageBase;
+import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import com.zebrunner.agent.core.annotation.TestLabel;
 import com.zebrunner.carina.core.registrar.ownership.MethodOwner;
 import com.zebrunner.carina.core.registrar.tag.Priority;
@@ -37,7 +37,7 @@ public class WebSampleTest implements IAbstractTest {
     @Test
     @MethodOwner(owner = "qpsdemo")
     @TestPriority(Priority.P3)
-    @TestLabel(name = "feature", value = {"web", "regression"})
+    @TestLabel(name = "feature", value = { "web", "regression" })
     public void testModelSpecs() {
         // Open GSM Arena home page and verify page is opened
         HomePageBase homePage = initPage(getDriver(), HomePageBase.class);
@@ -60,7 +60,7 @@ public class WebSampleTest implements IAbstractTest {
     @Test
     @MethodOwner(owner = "qpsdemo")
     @TestPriority(Priority.P1)
-    @TestLabel(name = "feature", value = {"web", "acceptance"})
+    @TestLabel(name = "feature", value = { "web", "acceptance" })
     public void testCompareModels() {
         // Open GSM Arena home page and verify page is opened
         HomePageBase homePage = initPage(getDriver(), HomePageBase.class);
@@ -76,6 +76,7 @@ public class WebSampleTest implements IAbstractTest {
         softAssert.assertEquals(specs.get(0).readSpec(SpecType.TECHNOLOGY), "GSM / HSPA / LTE");
         softAssert.assertEquals(specs.get(1).readSpec(SpecType.ANNOUNCED), "2023, February 29");
         softAssert.assertEquals(specs.get(1).readSpec(SpecType.TECHNOLOGY), "GSM / CDMA / HSPA / EVDO / LTE / 5G");
+        // for desktop could be compared 3 devices, when for mobile only 2
         if (specs.size() > 2) {
             softAssert.assertEquals(specs.get(2).readSpec(SpecType.ANNOUNCED), "2017, June");
             softAssert.assertEquals(specs.get(2).readSpec(SpecType.TECHNOLOGY), "GSM / HSPA / LTE");
@@ -83,23 +84,23 @@ public class WebSampleTest implements IAbstractTest {
 
         softAssert.assertAll();
     }
-    
+
     @Test
     @MethodOwner(owner = "qpsdemo")
-    @TestLabel(name = "feature", value = {"web", "acceptance"})
+    @TestLabel(name = "feature", value = { "web", "acceptance" })
     public void testNewsSearch() {
         HomePageBase homePage = initPage(getDriver(), HomePageBase.class);
         homePage.open();
         Assert.assertTrue(homePage.isPageOpened(), "Home page is not opened!");
-        
+
         NewsPageBase newsPage = homePage.getFooterMenu().openNewsPage();
         Assert.assertTrue(newsPage.isPageOpened(), "News page is not opened!");
-        
+
         final String searchQ = "iphone";
         List<NewsItem> news = newsPage.searchNews(searchQ);
         Assert.assertFalse(CollectionUtils.isEmpty(news), "News not found!");
         SoftAssert softAssert = new SoftAssert();
-        for(NewsItem n : news) {
+        for (NewsItem n : news) {
             System.out.println(n.readTitle());
             softAssert.assertTrue(StringUtils.containsIgnoreCase(n.readTitle(), searchQ),
                     "Invalid search results for " + n.readTitle());
@@ -110,7 +111,7 @@ public class WebSampleTest implements IAbstractTest {
     @Test()
     @MethodOwner(owner = "qpsdemo")
     @TestPriority(Priority.P3)
-    @TestLabel(name = "feature", value = {"web", "regression"})
+    @TestLabel(name = "feature", value = { "web", "regression" })
     public void testBrandGroup() {
         HomePageBase homePage = initPage(getDriver(), HomePageBase.class);
         homePage.open();

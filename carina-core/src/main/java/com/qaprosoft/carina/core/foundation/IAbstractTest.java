@@ -15,27 +15,23 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation;
 
-import java.lang.annotation.Annotation;
-
-import org.testng.ITestContext;
-import org.testng.ITestNGMethod;
+import org.testng.ITestResult;
 import org.testng.SkipException;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.DataProvider;
 
 import com.nordstrom.automation.testng.LinkedListeners;
-import com.qaprosoft.carina.core.foundation.dataprovider.core.DataProviderFactory;
 import com.qaprosoft.carina.core.foundation.listeners.CarinaListener;
 import com.qaprosoft.carina.core.foundation.listeners.FilterTestsListener;
 import com.qaprosoft.carina.core.foundation.report.testrail.ITestCases;
+import com.zebrunner.agent.core.registrar.CurrentTest;
+import com.zebrunner.agent.testng.listener.TestRunListener;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.Configuration.Parameter;
 import com.zebrunner.carina.utils.common.CommonUtils;
 import com.zebrunner.carina.utils.factory.ICustomTypePageFactory;
-import com.zebrunner.agent.core.registrar.CurrentTest;
-import com.zebrunner.agent.testng.listener.TestRunListener;
 
 /*
  * IAbstractTest - base test for UI and API tests.
@@ -66,19 +62,15 @@ public interface IAbstractTest extends ICustomTypePageFactory, ITestCases {
         // do nothing
     }
 
-    @DataProvider(name = "DataProvider", parallel = true)
-    default Object[][] createData(final ITestNGMethod testMethod, ITestContext context) {
-        Annotation[] annotations = testMethod.getConstructorOrMethod().getMethod().getDeclaredAnnotations();
-        Object[][] objects = DataProviderFactory.getDataProvider(annotations, context, testMethod);
-        return objects;
-    }
-
-    @DataProvider(name = "SingleDataProvider")
-    default Object[][] createDataSingleThread(final ITestNGMethod testMethod,
-            ITestContext context) {
-        Annotation[] annotations = testMethod.getConstructorOrMethod().getMethod().getDeclaredAnnotations();
-        Object[][] objects = DataProviderFactory.getDataProvider(annotations, context, testMethod);
-        return objects;
+    /**
+     * Carina AfterMethod<br>
+     * <b>For internal usage only - should not be overridden!</b>
+     * 
+     * @param result see {@link ITestResult}. For {@link CarinaListener}
+     */
+    @AfterMethod(alwaysRun = true)
+    default void onCarinaAfterMethod(ITestResult result) {
+        // do nothing
     }
 
     /**

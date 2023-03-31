@@ -19,11 +19,15 @@ import com.zebrunner.carina.webdriver.decorator.ExtendedWebElement;
 @DeviceType(pageType = DeviceType.Type.ANDROID_PHONE, parentClass = CompareModelsPageBase.class)
 public class CompareModelsPage extends CompareModelsPageBase {
 
+    @FindBy(xpath = "//h1[@class='section nobor']")
+    private ExtendedWebElement compareBlock;
+
     @FindBy(xpath = "//div[contains(@class, 'candidate-search')]")
     private List<CandidateBlock> candidateBlocks;
 
     public CompareModelsPage(WebDriver driver) {
         super(driver);
+        setUiLoadedMarker(compareBlock);
     }
 
     @Override

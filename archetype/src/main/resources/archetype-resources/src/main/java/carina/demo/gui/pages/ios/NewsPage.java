@@ -10,6 +10,7 @@ import org.openqa.selenium.support.FindBy;
 
 import ${package}.carina.demo.gui.components.NewsItem;
 import ${package}.carina.demo.gui.pages.common.NewsPageBase;
+import com.zebrunner.carina.webdriver.locator.Context;
 import com.zebrunner.carina.utils.factory.DeviceType;
 import com.zebrunner.carina.webdriver.decorator.ExtendedWebElement;
 import com.zebrunner.carina.webdriver.decorator.PageOpeningStrategy;
@@ -17,10 +18,15 @@ import com.zebrunner.carina.webdriver.decorator.PageOpeningStrategy;
 @DeviceType(pageType = DeviceType.Type.IOS_PHONE, parentClass = NewsPageBase.class)
 public class NewsPage extends NewsPageBase {
 
-    @FindBy(xpath = "//div[@class='search-field']//input[@type='search']")
+    @FindBy(xpath = "//div[@class='search-field']")
+    private ExtendedWebElement searchComp;
+
+    @Context(dependsOn = "searchComp")
+    @FindBy(tagName = "input")
     private ExtendedWebElement searchField;
 
-    @FindBy(xpath = "//div[@class='search-field']//button")
+    @Context(dependsOn = "searchComp")
+    @FindBy(tagName = "button")
     private ExtendedWebElement searchButton;
 
     @FindBy(xpath = "//div[@class='news-item']")
@@ -36,6 +42,7 @@ public class NewsPage extends NewsPageBase {
     public List<NewsItem> searchNews(String searchInput) {
         searchField.type(searchInput);
         searchButton.click();
+
         return news;
     }
 

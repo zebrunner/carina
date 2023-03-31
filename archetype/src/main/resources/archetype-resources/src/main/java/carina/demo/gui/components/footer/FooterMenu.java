@@ -34,12 +34,15 @@ public class FooterMenu extends FooterMenuBase {
     }
 
     public CompareModelsPage openComparePage() {
+        compareLink.scrollTo();
         compareLink.hover();
         compareLink.click();
         return new CompareModelsPage(driver);
     }
 
     public NewsPage openNewsPage() {
+        newsLink.scrollTo();
+        newsLink.hover();
         newsLink.click();
         return new NewsPage(driver);
     }

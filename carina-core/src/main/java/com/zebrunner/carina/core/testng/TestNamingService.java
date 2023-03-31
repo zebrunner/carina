@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.zebrunner.agent.testng.listener.RunContextService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +29,9 @@ import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 
+import com.zebrunner.agent.testng.listener.RunContextService;
 import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.ParameterGenerator;
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
 
 public class TestNamingService {
@@ -94,10 +95,7 @@ public class TestNamingService {
         ITestNGMethod method = result.getMethod();
 
         name = Configuration.get(Configuration.Parameter.TEST_NAMING_PATTERN);
-        String testNameMapName = getTestNameMapName(result);
-        name = name.replace(SpecialKeywords.TEST_NAME_MAP, testNameMapName)
-                .replace(SpecialKeywords.TEST_NAME,
-                        testNameMapName.isEmpty() ? result.getTestContext().getCurrentXmlTest().getName() : "")
+        name = name.replace(SpecialKeywords.TEST_NAME, getTestNameMap(result))
                 .replace(SpecialKeywords.TEST_NAME_TUID, getMethodUID(result))
                 .replace(SpecialKeywords.METHOD_NAME, method.getMethodName())
                 .replace(SpecialKeywords.METHOD_PRIORITY, String.valueOf(method.getPriority()))
@@ -118,13 +116,13 @@ public class TestNamingService {
         return testName.get();
     }
 
-    private static String getTestNameMapName(ITestResult result) {
-        String testNameMapName = StringUtils.EMPTY;
-        @SuppressWarnings("unchecked")
-        Map<Object[], String> testNameMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TEST_NAME_ARGS_MAP);
+    private static String getTestNameMap(ITestResult result) {
+        String testNameMapName = result.getTestContext().getCurrentXmlTest().getName();
 
-        if (testNameMap != null) {
-            String testHash = String.valueOf(Arrays.hashCode(result.getParameters()));
+        @SuppressWarnings("unchecked")
+        Map<Object[], String> testNameMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TEST_NAME);
+        if (testNameMap != null && !testNameMap.isEmpty()) {
+            String testHash = ParameterGenerator.hash(result.getParameters(), result.getMethod());
             if (testNameMap.containsKey(testHash)) {
                 testNameMapName = testNameMap.get(testHash);
             }
@@ -161,9 +159,20 @@ public class TestNamingService {
         } catch (NoSuchMethodException e) {
             LOGGER.error("For some reason test method not found using reflection: {}", result.getMethod().getMethodName());
         }
+
+        @SuppressWarnings("unchecked")
+        Map<Object[], String> tuidMap = (Map<Object[], String>) result.getTestContext().getAttribute(SpecialKeywords.TUID);
+
+        if (tuidMap != null) {
+            String testHash = ParameterGenerator.hash(result.getParameters(), result.getMethod());
+            if (tuidMap.containsKey(testHash)) {
+                methodUID = tuidMap.get(testHash);
+            }
+        }
+
         return methodUID;
     }
-    
+
     /**
      * get Test Method name
      * 
