@@ -66,9 +66,15 @@
       <directory>src/test/resources</directory>
       <includes>
         <include>**/*.schema</include>
-        <include>**/*.xlsx</include>
         <include>**/*.json</include>
         <include>**/*.feature</include>
+      </includes>
+    </fileSet>
+    <fileSet encoding="UTF-8">
+      <directory>src/test/resources/data_source</directory>
+      <includes>
+        <include>**/*.xlsx</include>
+        <include>**/*.csv</include>
       </includes>
     </fileSet>
     <fileSet encoding="UTF-8">

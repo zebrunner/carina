@@ -21,8 +21,6 @@ import com.zebrunner.carina.webdriver.decorator.ExtendedWebElement;
 @DeviceType(pageType = DeviceType.Type.DESKTOP, parentClass = CompareModelsPageBase.class)
 public class CompareModelsPage extends CompareModelsPageBase {
 
-    private final String comparePageUrl = "https://www.gsmarena.com/compare.php3";
-
     @FindBy(xpath = "//div[contains(@class, 'candidate-search')]")
     private List<CandidateBlock> candidateBlocks;
 
@@ -32,8 +30,6 @@ public class CompareModelsPage extends CompareModelsPageBase {
     public CompareModelsPage(WebDriver driver) {
         super(driver);
         setUiLoadedMarker(compareMenu);
-        setPageAbsoluteURL(comparePageUrl);
-        //setPageURL("/compare.php3");
     }
 
     @Override
