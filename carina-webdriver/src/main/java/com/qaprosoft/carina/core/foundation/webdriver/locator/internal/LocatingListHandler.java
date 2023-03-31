@@ -20,7 +20,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,14 +38,14 @@ public class LocatingListHandler<T extends ExtendedWebElement> implements Invoca
     private String name;
     private By by;
     private final ClassLoader loader;
-    private final Type listType;
+    private final Class<?> clazz;
 
-    public LocatingListHandler(ClassLoader loader, ElementLocator locator, Field field, Type listType) {
+    public LocatingListHandler(ClassLoader loader, ElementLocator locator, Field field, Class<?> clazz) {
         this.loader = loader;
         this.locator = locator;
         this.name = field.getName();
         this.by = new LocalizedAnnotations(field).buildBy();
-        this.listType = listType;
+        this.clazz = clazz;
     }
 
     @SuppressWarnings("unchecked")
@@ -74,7 +73,7 @@ public class LocatingListHandler<T extends ExtendedWebElement> implements Invoca
                         handler);
                 T webElement;
                 try {
-                    webElement = (T) Class.forName(listType.getTypeName()).getConstructor(WebElement.class, String.class, By.class).newInstance(proxy,
+                    webElement = (T) clazz.getConstructor(WebElement.class, String.class, By.class).newInstance(proxy,
                             name + i, by);
                 } catch (NoSuchMethodException e) {
                     throw new RuntimeException(
