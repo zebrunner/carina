@@ -390,7 +390,7 @@
       
         <li class="md-nav__item">
   <a href="#java-data-provider" class="md-nav__link">
-    Java data-provider
+    Java data provider
   </a>
   
 </li>
@@ -398,20 +398,6 @@
         <li class="md-nav__item">
   <a href="#xml-parametrization" class="md-nav__link">
     XML parametrization
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#xlscsv-data-providers" class="md-nav__link">
-    XLS/CSV data-providers
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#dataprovider-with-huge-number-of-columns" class="md-nav__link">
-    DataProvider with huge number of columns
   </a>
   
 </li>
@@ -440,6 +426,40 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-data-providers" class="md-nav__link">
+    Custom data providers
+  </a>
+  
+    <nav class="md-nav" aria-label="Custom data providers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pre-requirements" class="md-nav__link">
+    Pre requirements
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#implementation_1" class="md-nav__link">
+    Implementation
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dataprovider-with-huge-number-of-columns" class="md-nav__link">
+    DataProvider with huge number of columns
+  </a>
   
 </li>
       
@@ -630,7 +650,7 @@
       
         <li class="md-nav__item">
   <a href="#java-data-provider" class="md-nav__link">
-    Java data-provider
+    Java data provider
   </a>
   
 </li>
@@ -638,20 +658,6 @@
         <li class="md-nav__item">
   <a href="#xml-parametrization" class="md-nav__link">
     XML parametrization
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#xlscsv-data-providers" class="md-nav__link">
-    XLS/CSV data-providers
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#dataprovider-with-huge-number-of-columns" class="md-nav__link">
-    DataProvider with huge number of columns
   </a>
   
 </li>
@@ -683,6 +689,40 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#custom-data-providers" class="md-nav__link">
+    Custom data providers
+  </a>
+  
+    <nav class="md-nav" aria-label="Custom data providers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pre-requirements" class="md-nav__link">
+    Pre requirements
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#implementation_1" class="md-nav__link">
+    Implementation
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dataprovider-with-huge-number-of-columns" class="md-nav__link">
+    DataProvider with huge number of columns
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -705,15 +745,16 @@
                 
                   <h1>DataProvider</h1>
                 
-                <p>Modern test automation frameworks should support data-driven testing, when you are able to verify a variety of edge cases providing test data sets into the tests using external data sources. Carina is not an exception, the framework supports multiple ways of test parametrization (see the <a href="https://github.com/zebrunner/carina-demo/blob/master/src/test/java/com/qaprosoft/carina/demo/DataprovidersSampleTest.java">samples</a>):</p>
+                <p>Modern test automation frameworks should support data-driven testing, when you are able to verify a variety of edge cases providing test data sets into the tests using external data sources. 
+Carina is not an exception, the framework supports multiple ways of test parametrization (see the <a href="https://github.com/zebrunner/carina-demo/blob/master/src/test/java/com/qaprosoft/carina/demo/DataprovidersSampleTest.java">TestNG approach samples</a>, <a href="https://github.com/zebrunner/carina-demo/blob/develop/src/test/java/com/qaprosoft/carina/demo/CustomDataProvidersSampleTest.java">Carina's custom data provider samples</a>):</p>
 <ul>
-<li>Java data-providers</li>
+<li>Java data providers</li>
 <li>XML parametrization</li>
-<li>XLS data-providers</li>
-<li>CSV data-providers</li>
+<li>XLS data providers</li>
+<li>CSV data providers</li>
 </ul>
-<h2 id="java-data-provider">Java data-provider</h2>
-<p>As far as Carina is based on TestNG framework, you are able to use well known Java data-providers which return a matrix of Objects and pass it to the appropriate test arguments. You have to use dataProvider attribute along with @Test annotation and implement the method annotated with <code>@DataProvider</code> that will return <code>Object[][]</code> as a test data set:</p>
+<h2 id="java-data-provider">Java data provider</h2>
+<p>As far as Carina is based on TestNG framework, you are able to use well known Java data providers which return a matrix of Objects and pass it to the appropriate test arguments. You have to use dataProvider attribute along with @Test annotation and implement the method annotated with <code>@DataProvider</code> that will return <code>Object[][]</code> as a test data set:</p>
 <pre><code>@Test(dataProvider = &quot;DP1&quot;)
 public void testMuliplyOperation(int a, int b, int c)
 {
@@ -757,52 +798,7 @@ public void testSubstractOperation(int a, int b, int c) {
     &lt;/classes&gt;
 &lt;/test&gt;
 ...
-</code></pre>
 
-<h2 id="xlscsv-data-providers">XLS/CSV data-providers</h2>
-<p>Carina test framework provides a possibility to write all tests with data providers in one place, including parametrization using external XLS/CSV spreadsheets. First of all, you need to declare a test class that implements <code>IAbstractTest.java</code>.</p>
-<p>After that, you can specify data provider tests as follows.</p>
-<pre><code>public class DataprovidersSampleTest implements IAbstractTest {
-    @Test(dataProvider = &quot;DataProvider&quot;)
-    @XlsDataSourceParameters(path = &quot;xls/demo.xlsx&quot;, sheet = &quot;Calculator&quot;, dsUid = &quot;TUID&quot;, dsArgs = &quot;a,b,c&quot;)
-    public void testSumOperation(String a, String b, String c) {
-        int actual = Integer.valueOf(a) + Integer.valueOf(b);
-        int expected = Integer.valueOf(c);
-        Assert.assertEquals(actual, expected, &quot;Invalid sum result!&quot;);
-    }
-}
-</code></pre>
-
-<p>This test uses XLS/CSV files as a data source. Every line in a spreadsheet is a set of arguments for a test. You should specify the <code>dataProvider</code> parameter for TestNG annotation <code>@Test</code> . Carina test framework initially defines several data provider methods in <code>IAbstractTest.java</code>, which you've extended earlier:</p>
-<ul>
-<li>
-<p>createData method (data provider name = "DataProvider") for common use cases</p>
-</li>
-<li>
-<p>createDataSingeThread method (data provider name = "SingleDataProvider") for a single-thread execution.</p>
-</li>
-</ul>
-<p>To specify the XLS/CSV spreadsheets for a test, you should declare <code>@XlsDataSourceParameters</code> annotation and define its parameters:</p>
-<ul>
-<li>path - file path located in src/test/resources</li>
-<li>sheet - sheet name</li>
-<li>dsUid - data-source unique identifier</li>
-<li>dsArgs - column names from the sheet</li>
-</ul>
-<p>Here you can look at a spreadsheet as a data provider example for your further tests:</p>
-<p><img alt="XLS file - Data Provider - screenshot" src="../../img/xlsscreen.png" /></p>
-<p>In the TUID column, you should specify some unique test identifier that will be set at the beginning of the test name in a test result report. In the next columns, you can specify arguments for a test and their values in the bottom lines. They will be used as parameters in <code>@XlsDataSourceParameters</code>. In this example, the values of a, b, c arguments were defined in 3 sets of values with different TUID.</p>
-<h2 id="dataprovider-with-huge-number-of-columns">DataProvider with huge number of columns</h2>
-<p>In some cases, we have to provide 10+ columns into a test. In this case, there is one tricky point. Just removing dsArgs dataprovider parameter will collect all the lines into a single HashMap<String, String> object, so you can dynamically get any column in a test using the column name.</p>
-<pre><code>public class DataprovidersSampleTest implements IAbstractTest {
-    @Test(dataProvider = &quot;DataProvider&quot;)
-    @XlsDataSourceParameters(path = &quot;xls/demo.xlsx&quot;, sheet = &quot;Calculator&quot;, dsUid = &quot;TUID&quot;)
-    public void testSumOperation(HashMap&lt;String, String&gt; args) {
-        int actual = Integer.valueOf(args.get(&quot;a&quot;)) + Integer.valueOf(args.get(&quot;b&quot;));
-        int expected = Integer.valueOf(args.get(&quot;c&quot;));
-        Assert.assertEquals(actual, expected, &quot;Invalid sum result!&quot;);
-    }
-}
 </code></pre>
 
 <h2 id="adding-test-unique-identifier-tuid-to-the-test-name-using-java-data-provider">Adding test unique identifier (TUID) to the test name using Java data provider</h2>
@@ -834,7 +830,7 @@ public void testSubstractOperation(int a, int b, int c) {
 <ol>
 <li>Add to the data provider field with test unique identifier (TUID), for example:</li>
 </ol>
-<pre><code>@DataProvider(name = &quot;dataProvider&quot;)
+<pre><code>@DataProvider(name = &quot;DP1&quot;)
 public static Object[][] dataprovider() {
     return new Object[][]{
         {&quot;Data1&quot;, &quot;some data&quot;, ... },
@@ -848,17 +844,199 @@ public static Object[][] dataprovider() {
 <ol>
 <li>In the test, that use our provider, for example</li>
 </ol>
-<pre><code>@Test(dataProvider = &quot;dataProvider&quot;)
+<pre><code>@Test(dataProvider = &quot;DP1&quot;)
 public void testDataProvider(...) {
     ...
 }
 </code></pre>
 
-<p>when you receive data from the data provider, you must name the method parameter 
+<p>when you receive data from the data provider, you must name the method parameter
 that receives a TUID as <code>TUID</code>, for example:</p>
-<pre><code>@Test(dataProvider = &quot;dataProvider&quot;)
+<pre><code>@Test(dataProvider = &quot;DP1&quot;)
 public void testDataProvider(String TUID, String data, ...) {
     ...
+}
+</code></pre>
+
+<h2 id="custom-data-providers">Custom data providers</h2>
+<h3 id="pre-requirements">Pre requirements</h3>
+<p>To use custom provider feature, add certain dependency to your pom.xml</p>
+<pre><code class="xml">&lt;dependency&gt;
+    &lt;groupId&gt;com.zebrunner&lt;/groupId&gt;
+    &lt;artifactId&gt;carina-dataprovider&lt;/artifactId&gt;
+    &lt;version&gt;RELEASE&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+
+<p>Visit our <a href="https://github.com/zebrunner/carina-dataprovider/releases">github</a> to check the latest version of carina-dataprovider.</p>
+<h3 id="implementation_1">Implementation</h3>
+<p>Carina test framework provides a possibility to write all tests with data providers in one place, including parameterization using external XLS/CSV spreadsheets. First of all, you need to declare a test class that implements <code>com.qaprosoft.carina.core.foundation.IAbstractTest.java</code> and <code>com.zebrunner.carina.dataprovider.IAbstractDataProvider.java</code>.</p>
+<p>After that, you can specify data provider tests as follows.</p>
+<pre><code>public class CustomDataProvidersSampleTest implements IAbstractTest, IAbstractDataProvider {
+    @Test(dataProvider = &quot;DataProvider&quot;)
+    @XlsDataSourceParameters(path = &quot;data_source/demo.xlsx&quot;, sheet = &quot;Calculator&quot;, dsUid = &quot;TUID&quot;, dsArgs = &quot;a,b,c&quot;)
+    public void testXlsSumOperation(String a, String b, String c) {
+        int actual = Integer.valueOf(a) + Integer.valueOf(b);
+        int expected = Integer.valueOf(c);
+        Assert.assertEquals(actual, expected, &quot;Invalid sum result!&quot;);
+    }
+}
+</code></pre>
+
+<p>This test uses XLS files as a data source. Every line in a spreadsheet is a set of arguments for a test. You should specify the <code>dataProvider</code> parameter for TestNG annotation <code>@Test</code>.<br />
+<code>IAbstractDataProvider</code> interface defines several data provider methods to implement:</p>
+<ul>
+<li>
+<p>use <code>@Test(dataProvider = "DataProvider")</code> for common use cases.</p>
+</li>
+<li>
+<p>use <code>@Test(dataProvider = "SingleDataProvider")</code> for a single-thread execution.</p>
+</li>
+</ul>
+<p>To specify the <code>xls</code>/<code>csv</code> spreadsheets for a test, you should declare <code>@XlsDataSourceParameters</code>/<code>@CsvDataSourceParameters</code> annotation and define its parameters.</p>
+<p>Common data sources annotation parameters:
+<table>
+    <tr>
+        <th>Parameter</th>
+        <th>Meaning</th>
+        <th>Example</th>
+    </tr>
+    <tr>
+        <td>path</td>
+        <td>File path located in src/test/resources</td>
+        <td>path = "data_source/demo.xlsx"</td>
+    </tr>
+    <tr>
+        <td>dsUid</td>
+        <td>Defines column name from spreadsheet with unique identifiers</td>
+        <td>dsUid = "TUID"</td>
+    </tr>
+    <tr>
+        <td>dsArgs</td>
+        <td>Defines column names from spreadsheet that should be passed to test by splitting it with ','.</td>
+        <td>dsArgs = "a,b,c"</td>
+    </tr>
+    <tr>
+        <td>staticArgs</td>
+        <td>Defines parameter name from testNG suite which value will be passed in test. This value will be present in every test</td>
+        <td>in data source annoation: staticArgs = "key"<br> 
+            in suite: &lt;parameter name="key" value="arg"/&gt;</td>
+    </tr>
+    <tr>
+        <td>testMethodColumn</td>
+        <td>Defines column name which contains values for test name overriding</td>
+        <td>testMethodColumn = "TestTitle"</td>
+    </tr>
+    <tr>
+        <td>executeColumn</td>
+        <td>Defines column name that determines whether to add row to test run or not.<br>
+            Default - 'Execute'</td>
+        <td>executeColumn = "Records to run"</td>
+    </tr>
+    <tr>
+        <td>executeValue</td>
+        <td>Defines value by which tests will be added to test run if it equals to value from executeColumn.<br>
+            Default - 'y'</td>
+        <td>executeValue = "+"</td>
+    </tr>
+    <tr>
+        <td>groupColumn</td>
+        <td>Every row in table being grouped by value from selected groupColumn.
+            Provide arguments to test as List&lt;Map&lt;String, String&gt;&gt; for 1 test</td>
+        <td>groupColumn = "country"</td>
+    </tr>
+</table></p>
+<p>CsvDataSourceParameters can also contain:
+<table>
+    <tr>
+        <th>Parameter</th>
+        <th>Meaning</th>
+        <th>Example</th>
+    </tr>
+    <tr>
+        <td>separator</td>
+        <td>Defines column separator for parsing<br>
+            Default - ','</td>
+        <td>separator = ";"</td>
+    </tr>
+    <tr>
+        <td>quote</td>
+        <td>defines the character to use for quoted elements when parsing.<br>
+            Default - '"'</td>
+        <td>quote = "©"</td>
+    </tr>
+</table></p>
+<p>XlsDataSourceParameters can also contain:
+<table>
+    <tr>
+        <th>Parameter</th>
+        <th>Meaning</th>
+        <th>Example</th>
+    </tr>
+    <tr>
+        <td>sheet</td>
+        <td>Defines sheet to parse</td>
+        <td>sheet = "calculator"</td>
+    </tr>
+    <tr>
+        <td>spreadsheetId</td>
+        <td>Defines spreadsheet's id. Is mutually exclusive with path</td>
+        <td>spreadsheetId = "abc1234567"</td>
+    </tr>
+</table></p>
+<p>Several parameters from annotation could be overridden in suite. Such parameters:</p>
+<table>
+    <tr>
+        <th>Parameter</th>
+        <th>Meaning</th>
+        <th>Example</th>
+    </tr>
+    <tr>
+        <td>{ds_file}</td>
+        <td>File path located in src/test/resources</td>
+        <td>&lt;parameter name="{ds_args}" value="data_source/demo.xlsx"/&gt;</td>
+    </tr>
+    <tr>
+        <td>{excel_ds_sheet}</td>
+        <td>Defines sheet to parse</td>
+        <td>&lt;parameter name="{excel_ds_sheet}" value="calculator"/&gt;</td>
+    </tr>
+    <tr>
+        <td>{ds_args}</td>
+        <td>Defines column names from spreadsheet that should be passed to test by splitting it with ','</td>
+        <td>&lt;parameter name="{ds_args}" value="a,b,c"/&gt;</td>
+    </tr>
+    <tr>
+        <td>{ds_uid}</td>
+        <td>Defines column name from spreadsheet with unique identifiers</td>
+        <td>&lt;parameter name="{ds_uid}" value="TUID"/&gt;</td>
+    </tr>
+    <tr>
+        <td>{ds_execute_column}</td>
+        <td>Defines column name that determines whether to add row to test run or not.<br>
+            Default - 'Execute'</td>
+        <td>&lt;parameter name="{ds_execute_column}" value="Records to run"/&gt;</td>
+    </tr>
+    <tr>
+        <td>{ds_execute_value}</td>
+        <td>Defines value by which tests will be added to test run if it equals to value from executeColumn.<br>
+            Default - 'y'</td>
+        <td>&lt;parameter name="{ds_execute_value}" value="+"/&gt;</td>
+    </tr>
+</table>
+
+<p>Here you can look at a spreadsheet as a data source example for test:</p>
+<p><img alt="XLS file - Data Provider - screenshot" src="../../img/xlsscreen.png" /></p>
+<h2 id="dataprovider-with-huge-number-of-columns">DataProvider with huge number of columns</h2>
+<p>In some cases, we have to provide 10+ columns into a test. In this case, there is one tricky point. Just removing dsArgs parameter will collect all the lines into a single Map<String, String> object, so you can dynamically get any column in a test using the column name.</p>
+<pre><code>public class CustomDataProvidersSampleTest implements IAbstractTest, IAbstractDataProvider {
+    @Test(dataProvider = &quot;DataProvider&quot;)
+    @XlsDataSourceParameters(path = &quot;data_source/demo.xlsx&quot;, sheet = &quot;Calculator&quot;, dsUid = &quot;TUID&quot;)
+    public void testSumOperationFromMap(Map&lt;String, String&gt; args) {
+        int actual = Integer.valueOf(args.get(&quot;a&quot;)) + Integer.valueOf(args.get(&quot;b&quot;));
+        int expected = Integer.valueOf(args.get(&quot;c&quot;));
+        Assert.assertEquals(actual, expected, &quot;Invalid sum result!&quot;);
+    }
 }
 </code></pre>
                 

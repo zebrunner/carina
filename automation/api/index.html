@@ -55,7 +55,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#example-of-test-implementation" class="md-skip">
+        <a href="#pre-requirements" class="md-skip">
           Skip to content
         </a>
       
@@ -321,6 +321,13 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#pre-requirements" class="md-nav__link">
+    Pre requirements
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#example-of-test-implementation" class="md-nav__link">
@@ -766,6 +773,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#pre-requirements" class="md-nav__link">
+    Pre requirements
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#example-of-test-implementation" class="md-nav__link">
     Example of test implementation
   </a>
@@ -999,6 +1013,16 @@ files, source code, etc.) based on templates and changing data."</li>
 <li>JsonAssert - a library for comparing the actual JSON body with an expected one</li>
 <li>Json-schema-validator - a library for validating of JSON body for matching to JSON schema</li>
 </ul>
+<h3 id="pre-requirements">Pre requirements</h3>
+<p>To use api feature, add certain dependency to your pom.xml</p>
+<pre><code class="xml">&lt;dependency&gt;
+    &lt;groupId&gt;com.zebrunner&lt;/groupId&gt;
+    &lt;artifactId&gt;carina-api&lt;/artifactId&gt;
+    &lt;version&gt;RELEASE&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+
+<p>Visit our <a href="https://github.com/zebrunner/carina-api/releases">github</a> to check the latest version of carina-api. </p>
 <h3 id="example-of-test-implementation">Example of test implementation</h3>
 <p>Let's create an automated test for the next call: POST https://jsonplaceholder.typicode.com/users request with a request body</p>
 <pre><code class="json">[

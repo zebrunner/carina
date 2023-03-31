@@ -313,6 +313,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#implementation-of-context-annotation" class="md-nav__link">
+    Implementation of Context annotation
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#work-with-iframe" class="md-nav__link">
     Work with iframe
   </a>
@@ -644,6 +651,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#implementation-of-context-annotation" class="md-nav__link">
+    Implementation of Context annotation
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#work-with-iframe" class="md-nav__link">
     Work with iframe
   </a>
@@ -837,6 +851,57 @@ assertEquals(&quot;MyCityName&quot;, city.getText());
 <li>UI Object should extend <strong>com.zebrunner.carina.webdriver.gui.AbstractUIObject</strong></li>
 <li>You should call the super constructor <strong>super(driver, searchContext)</strong> where searchContext is an instance of <strong>org.openqa.selenium.SearchContext</strong></li>
 <li>Locate UI Object classes in <code>src/main/java</code> source folder</li>
+</ul>
+<h3 id="implementation-of-context-annotation">Implementation of Context annotation</h3>
+<p>In some cases, it is useful to reduce elements locator by using @Context annotation.</p>
+<p>For example, instead of using:</p>
+<pre><code class="java">@FindBy(xpath = &quot;//div[@class='search-field']//input&quot;)
+private ExtendedWebElement searchField;
+
+@FindBy(xpath = &quot;//div[@class='search-field']//button&quot;)
+private ExtendedWebElement searchButton;
+</code></pre>
+
+<p>We can aggregate the same locator into new element. Then we need refer to it in @Context annotation like this:</p>
+<pre><code class="java">@FindBy(xpath = &quot;//div[@class='search-field']&quot;)
+private ExtendedWebElement searchComp;
+
+@Context(dependsOn = &quot;searchComp&quot;)
+@FindBy(tagName = &quot;input&quot;)
+private ExtendedWebElement searchField;
+
+@Context(dependsOn = &quot;searchComp&quot;)
+@FindBy(tagName = &quot;button&quot;)
+private ExtendedWebElement searchButton;
+</code></pre>
+
+<p>With context annotation could be also created chains of elements dependency</p>
+<pre><code class="java">@FindBy(id = &quot;news&quot;)
+private ExtendedWebElement newsBlock;
+
+@Context(dependsOn = &quot;newsBlock&quot;)
+@FindBy(xpath = &quot;.//div[@class='news-item']&quot;)
+private ExtendedWebElement newsItem;
+
+@Context(dependsOn = &quot;newsItem&quot;)
+@FindBy(tagName = &quot;h3&quot;)
+private ExtendedWebElement newsTitle;
+</code></pre>
+
+<blockquote>
+<p>@Context can also refer to element from super class by its name.</p>
+</blockquote>
+<p><strong>Referred element type could be:</strong></p>
+<ul>
+<li>ExtendedWebElement</li>
+<li>Extends from AbstractUIObject</li>
+</ul>
+<p><strong>Elements type that are marked with @Context annotation could be:</strong></p>
+<ul>
+<li>ExtendedWebElement</li>
+<li>Extends from AbstractUIObject</li>
+<li>List &lt;ExtendedWebElement&gt;</li>
+<li>List&lt;? extends AbstractUIObject&gt;</li>
 </ul>
 <h3 id="work-with-iframe">Work with iframe</h3>
 <p>Before working with an iframe, you need to understand that an iframe is a separate page. Therefore, if we need to work with the internal structure of an iframe, we need to create a separate class for it inherited from AbstractPage, in which we already paint its internal structure, for example:</p>
