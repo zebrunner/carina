@@ -89,7 +89,7 @@ public class ExtendedFieldDecorator implements FieldDecorator {
         } else if (List.class.isAssignableFrom(field.getType())) {
             Type listType = getListType(field);
             if (ExtendedWebElement.class.isAssignableFrom((Class<?>) listType)) {
-                return proxyForListLocator(loader, field, locator, listType.getClass());
+                return proxyForListLocator(loader, field, locator, listType);
             } else if (AbstractUIObject.class.isAssignableFrom((Class<?>) listType)) {
                 return proxyForListUIObjects(loader, field, locator);
             } else {
@@ -165,8 +165,8 @@ public class ExtendedFieldDecorator implements FieldDecorator {
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected <T extends ExtendedWebElement> List<T> proxyForListLocator(ClassLoader loader, Field field, ElementLocator locator, Class<?> clazz) {
-        InvocationHandler handler = new LocatingListHandler(loader, locator, field, clazz);
+    protected <T extends ExtendedWebElement> List<T> proxyForListLocator(ClassLoader loader, Field field, ElementLocator locator, Type listType) {
+        InvocationHandler handler = new LocatingListHandler(loader, locator, field, listType);
         List<T> proxies = (List<T>) Proxy.newProxyInstance(loader, new Class[] { List.class }, handler);
 
         return proxies;

@@ -20,6 +20,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,16 +39,17 @@ public class LocatingListHandler<T extends ExtendedWebElement> implements Invoca
     private String name;
     private By by;
     private final ClassLoader loader;
-    private final Class<T> clazz;
+    private final Type listType;
 
-    public LocatingListHandler(ClassLoader loader, ElementLocator locator, Field field, Class<T> clazz) {
+    public LocatingListHandler(ClassLoader loader, ElementLocator locator, Field field, Type listType) {
         this.loader = loader;
         this.locator = locator;
         this.name = field.getName();
         this.by = new LocalizedAnnotations(field).buildBy();
-        this.clazz = clazz;
+        this.listType = listType;
     }
 
+    @SuppressWarnings("unchecked")
     public Object invoke(Object object, Method method, Object[] objects) throws Throwable {
 		// Hotfix for huge and expected regression in carina: we lost managed
 		// time delays with lists manipulations
@@ -72,7 +74,8 @@ public class LocatingListHandler<T extends ExtendedWebElement> implements Invoca
                         handler);
                 T webElement;
                 try {
-                    webElement = (T) clazz.getConstructor(WebElement.class, String.class, By.class).newInstance(proxy, name + i, by);
+                    webElement = (T) Class.forName(listType.getTypeName()).getConstructor(WebElement.class, String.class, By.class).newInstance(proxy,
+                            name + i, by);
                 } catch (NoSuchMethodException e) {
                     throw new RuntimeException(
                             "Implement appropriate AbstractUIObject constructor for auto-initialization!", e);
