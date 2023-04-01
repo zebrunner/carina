@@ -53,6 +53,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
+import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportGenerator;
 import com.qaprosoft.carina.core.foundation.report.email.EmailReportItemCollector;
 import com.qaprosoft.carina.core.foundation.report.qtest.IQTestManager;
@@ -288,8 +289,13 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         ITestNGMethod testMethod = configurationResult.getMethod();
         if (testMethod instanceof ConfigurationMethod) {
             ConfigurationMethod configurationMethod = (ConfigurationMethod) testMethod;
-            if (configurationMethod.isAfterMethodConfiguration() && configurationMethod.isLastTimeOnly() && IS_REMOVE_DRIVER.get()) {
-                quitDrivers(Phase.BEFORE_METHOD, Phase.METHOD);
+            if (configurationMethod.isAfterMethodConfiguration() &&
+                    IAbstractTest.class.equals(configurationMethod.getRealClass()) &&
+                    StringUtils.equals("onCarinaAfterMethod", configurationMethod.getMethodName())) {
+                if (IS_REMOVE_DRIVER.get()) {
+                    quitDrivers(Phase.BEFORE_METHOD, Phase.METHOD);
+                }
+                IS_REMOVE_DRIVER.remove();
             }
         }
     }
@@ -361,7 +367,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             R.ZAFIRA.clearTestProperties();
             //remove thread proxy rule
             com.zebrunner.carina.proxy.ProxyPool.clearThreadRule();
-
             LOGGER.debug("Test result is : " + result.getStatus());
             // result status == 2 means failure, status == 3 means skip. We need to quit driver anyway for failure and skip
             if (((automaticDriversCleanup &&
