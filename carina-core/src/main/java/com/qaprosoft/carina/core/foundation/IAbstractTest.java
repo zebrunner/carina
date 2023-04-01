@@ -15,7 +15,6 @@
  *******************************************************************************/
 package com.qaprosoft.carina.core.foundation;
 
-import org.testng.ITestResult;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -65,11 +64,9 @@ public interface IAbstractTest extends ICustomTypePageFactory, ITestCases {
     /**
      * Carina AfterMethod<br>
      * <b>For internal usage only - should not be overridden!</b>
-     * 
-     * @param result see {@link ITestResult}. For {@link CarinaListener}
      */
     @AfterMethod(alwaysRun = true)
-    default void onCarinaAfterMethod(ITestResult result) {
+    default void onCarinaAfterMethod() {
         // do nothing
     }
 
