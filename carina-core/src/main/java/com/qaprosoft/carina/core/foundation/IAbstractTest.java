@@ -61,6 +61,10 @@ public interface IAbstractTest extends ICustomTypePageFactory, ITestCases {
         // do nothing
     }
 
+    /**
+     * Carina AfterMethod<br>
+     * <b>For internal usage only - should not be overridden!</b>
+     */
     @AfterMethod(alwaysRun = true)
     default void onCarinaAfterMethod() {
         // do nothing
