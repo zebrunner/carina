@@ -292,6 +292,11 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             if (configurationMethod.isAfterMethodConfiguration() &&
                     IAbstractTest.class.equals(configurationMethod.getRealClass()) &&
                     StringUtils.equals("onCarinaAfterMethod", configurationMethod.getMethodName())) {
+                // If an error occurs in afterMethod , then all subsequent test methods in the class? become skipped (if run in one thread).
+                // If this occurred (the number of threads is unimportant), then onCarinaAfterMethod received an incorrect ITestResult
+                // object
+                // (namely, as a result of calling result.getTestContext() on it, we got null, and when we tried to call .getSuite().getAllMethods()
+                // we got a NullPointerException. Also, the test method status was CREATED.
                 if (IS_REMOVE_DRIVER.get()) {
                     quitDrivers(Phase.BEFORE_METHOD, Phase.METHOD);
                 }
