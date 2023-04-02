@@ -46,7 +46,7 @@
         <!-- Commons -->
         <commons-lang3.version>3.5</commons-lang3.version>
         <!-- Zebrunner integrations -->
-        <zebrunner-testng-pluggable.version>1.9.3</zebrunner-testng-pluggable.version>
+        <zebrunner-testng-pluggable.version>1.7.5</zebrunner-testng-pluggable.version>
         <!-- Others -->
         <apache-poi.version>4.1.2</apache-poi.version>
         <!-- Never add mockito-all as compile dependency as it has their own invalid hamcrest-all implementation otherwise api fail to common with:
