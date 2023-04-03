@@ -61,7 +61,6 @@
     </properties>
     <modules>
         <module>carina-core</module>
-        <module>carina-dataprovider</module>
     </modules>
     <!--repositories>
         <repository>
