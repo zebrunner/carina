@@ -106,7 +106,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>com.qaprosoft.carina.core.foundation.AbstractTest</mainClass>
+							<mainClass>com.zebrunner.carina.core.AbstractTest</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>
