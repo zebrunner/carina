@@ -86,33 +86,38 @@
 			<artifactId>carina-webdriver</artifactId>
 			<version>${carina-webdriver.version}</version>
 		</dependency>
-		<!-- Carina Core sub-modules -->
+
 		<dependency>
 			<groupId>com.zebrunner</groupId>
 			<artifactId>carina-utils</artifactId>
 			<version>${carina-utils.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.zebrunner</groupId>
 			<artifactId>agent-testng-pluggable</artifactId>
 			<version>${zebrunner-testng-pluggable.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>${slf4j.version}</version>
 		</dependency>
+
 		<!-- Log4j2 -->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
 			<version>${log4j.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
 			<version>${log4j.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-slf4j-impl</artifactId>
@@ -133,13 +138,6 @@
 			<scope>compile</scope>
 		</dependency>
 
-		<!-- Test utilities -->
-		<dependency>
-			<groupId>org.testng</groupId>
-			<artifactId>testng</artifactId>
-			<version>${testng.version}</version>
-			<scope>compile</scope>
-		</dependency>
 		<dependency>
 			<groupId>com.nordstrom.tools</groupId>
 			<artifactId>testng-foundation</artifactId>
@@ -160,7 +158,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
 	</dependencies>
 
 	<profiles>
