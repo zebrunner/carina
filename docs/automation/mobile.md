@@ -186,7 +186,7 @@ public class SampleTest implements IAbstractTest {
 ```
 
 <b>Important:</b>
-* Test class should implement com.qaprosoft.carina.core.foundation.IAbstractTest
+* Test class should implement com.zebrunner.carina.core.IAbstractTest
 * Test method should start with org.testng.annotations.Test annotation
 * Use getDriver() method to get driver instance in test
 * Locate tests in src/test/java source folder
