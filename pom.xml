@@ -45,8 +45,6 @@
         <log4j.version>2.17.1</log4j.version>
         <!-- Commons -->
         <commons-lang3.version>3.5</commons-lang3.version>
-        <!-- Zebrunner integrations -->
-        <zebrunner-testng-pluggable.version>1.9.3</zebrunner-testng-pluggable.version>
         <!-- Others -->
         <!-- Never add mockito-all as compile dependency as it has their own invalid hamcrest-all implementation otherwise api fail to common with:
                 org.hamcrest.core.IsInstanceOf.any(Ljava/lang/Class;)Lorg/hamcrest/Matcher
@@ -301,11 +299,6 @@
 
             <!-- Define 3rd party compile-time dependencies here for children. 
                  Define version as property, and refer to the versionPropertyName in <version> tag -->
-            <dependency>
-                <groupId>com.zebrunner</groupId>
-                <artifactId>agent-testng-pluggable</artifactId>
-                <version>${zebrunner-testng-pluggable.version}</version>
-            </dependency>
 
             <dependency>
                 <groupId>org.slf4j</groupId>

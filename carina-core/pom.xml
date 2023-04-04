@@ -19,11 +19,11 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<carina-webdriver.version>1.0.1</carina-webdriver.version>
+		<carina-webdriver.version>1.0.2.P1-SNAPSHOT</carina-webdriver.version>
 		<carina-utils.version>1.0.3</carina-utils.version>
 	</properties>
 
-	<!--repositories>
+	<repositories>
        <repository>
            <id>zebrunner_snapshots</id>
            <name>zebrunner Snapshots</name>
@@ -35,7 +35,7 @@
                <enabled>true</enabled>
            </snapshots>
        </repository>
-   </repositories-->
+   </repositories>
 
 	<dependencies>
 		<dependency>
@@ -48,11 +48,20 @@
 			<groupId>com.zebrunner</groupId>
 			<artifactId>carina-utils</artifactId>
 			<version>${carina-utils.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.zebrunner</groupId>
-			<artifactId>agent-testng-pluggable</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.testng</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.seleniumhq.selenium</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>io.rest-assured</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
