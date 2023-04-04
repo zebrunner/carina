@@ -63,6 +63,10 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<dependency>
+			<groupId>com.zebrunner</groupId>
+			<artifactId>agent-testng-pluggable</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
