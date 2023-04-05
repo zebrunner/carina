@@ -19,11 +19,11 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<carina-webdriver.version>1.0.2.P1-SNAPSHOT</carina-webdriver.version>
+		<carina-webdriver.version>1.0.2</carina-webdriver.version>
 		<carina-utils.version>1.0.3</carina-utils.version>
 	</properties>
 
-	<repositories>
+	<!--repositories>
        <repository>
            <id>zebrunner_snapshots</id>
            <name>zebrunner Snapshots</name>
@@ -35,7 +35,7 @@
                <enabled>true</enabled>
            </snapshots>
        </repository>
-   </repositories>
+   </repositories-->
 
 	<dependencies>
 		<dependency>

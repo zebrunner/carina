@@ -37,7 +37,6 @@
         <!-- Define project's dependency version properties here -->
         <java.version>11</java.version>
         <zebrunner-testng-pluggable.version>1.9.3</zebrunner-testng-pluggable.version>
-        <carina-commons.version>1.0.1</carina-commons.version>
         <!-- Testings -->
         <testng.version>7.6.1</testng.version>
         <testng-foundation.version>2.0.1</testng-foundation.version>
