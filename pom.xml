@@ -36,7 +36,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Define project's dependency version properties here -->
         <java.version>11</java.version>
-        <carina-commons.version>1.0.1</carina-commons.version>
+        <zebrunner-testng-pluggable.version>1.9.3</zebrunner-testng-pluggable.version>
         <!-- Testings -->
         <testng.version>7.6.1</testng.version>
         <testng-foundation.version>2.0.1</testng-foundation.version>
@@ -45,8 +45,6 @@
         <log4j.version>2.17.1</log4j.version>
         <!-- Commons -->
         <commons-lang3.version>3.5</commons-lang3.version>
-        <!-- Zebrunner integrations -->
-        <zebrunner-testng-pluggable.version>1.9.3</zebrunner-testng-pluggable.version>
         <!-- Others -->
         <!-- Never add mockito-all as compile dependency as it has their own invalid hamcrest-all implementation otherwise api fail to common with:
                 org.hamcrest.core.IsInstanceOf.any(Ljava/lang/Class;)Lorg/hamcrest/Matcher
@@ -61,7 +59,6 @@
     </properties>
     <modules>
         <module>carina-core</module>
-        <module>carina-dataprovider</module>
     </modules>
     <!--repositories>
         <repository>
@@ -307,7 +304,6 @@
                 <artifactId>agent-testng-pluggable</artifactId>
                 <version>${zebrunner-testng-pluggable.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
