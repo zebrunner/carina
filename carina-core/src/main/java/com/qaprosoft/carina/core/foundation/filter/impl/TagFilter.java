@@ -31,7 +31,8 @@ public class TagFilter implements IFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
-    public boolean isPerform(ITestNGMethod testMethod, List<String> rules) {
+    // Renamed 'rules' variable to 'expectedTags' for clarity and readability
+    public boolean isPerform(ITestNGMethod testMethod, List<String> expectedTags) {
         String tagName;
         String tagValue;
 
@@ -44,8 +45,8 @@ public class TagFilter implements IFilter {
                     tagName = methodAnnotation.name();
                     tagValue = methodAnnotation.value();
                     String tag = tagName + "=" + tagValue;
-                    LOGGER.info(String.format("Test: [%s]. Tag: [%s]. Expected tag: [%s]", testMethod.getMethodName(), tag, rules.toString()));
-                    return ruleCheck(rules, tag);
+                    LOGGER.info(String.format("Test: [%s]. Tag: [%s]. Expected tag: [%s]", testMethod.getMethodName(), tag, expectedTags.toString()));
+                    return ruleCheck(expectedTags, tag);
                 }
             }
 
@@ -61,13 +62,13 @@ public class TagFilter implements IFilter {
                         tags.add(fullTag.toLowerCase());
                     }
                     LOGGER.info(
-                            String.format("Test: [%s]. Tag: [%s]. Expected tag: [%s]", testMethod.getMethodName(), tags, rules.toString()));
-                    return ruleCheck(rules, tags);
+                            String.format("Test: [%s]. Tag: [%s]. Expected tag: [%s]", testMethod.getMethodName(), tags, expectedTags.toString()));
+                    return ruleCheck(expectedTags, tags);
                 }
             }
 
             //if test was not described by TagFilters
-            return ruleCheck(rules);
+            return ruleCheck(expectedTags);
         }
         return false;
     }
