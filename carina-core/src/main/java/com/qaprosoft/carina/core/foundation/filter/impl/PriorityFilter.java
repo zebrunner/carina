@@ -31,6 +31,9 @@ public class PriorityFilter implements IFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
+// Extracted a new method 'ruleCheck' to simplify the code and increase its readability.
+// The new method checks if the expected priority is included in the list of rules,
+// which represents the priorities that are allowed to run.
     public boolean isPerform(ITestNGMethod testMethod, List<String> rules) {
         TestPriority priority = testMethod.getConstructorOrMethod().getMethod().getAnnotation(TestPriority.class);
         if (priority == null) {
@@ -42,5 +45,21 @@ public class PriorityFilter implements IFilter {
                     rules.toString()));
             return ruleCheck(rules, actualTestPriority);
         }
+    }
+
+    // Helper method that checks if the actual priority matches any of the allowed rules.
+    private boolean ruleCheck(List<String> rules, String... actualPriority) {
+        for (String rule : rules) {
+            if (actualPriority.length > 0) {
+                if (actualPriority[0].equals(rule)) {
+                    return true;
+                }
+            } else {
+                if ("NO_PRIORITY".equals(rule)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
