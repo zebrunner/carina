@@ -31,47 +31,12 @@ public interface IFilter {
     boolean isPerform(ITestNGMethod testMethod, List<String> rules);
 
     default boolean ruleCheck(List<String> ruleExpression, List<String> actualValues) {
-        String expression = ruleExpression.get(0);
-        boolean match;
-
-        //checking value with the highest priority ([0] element of ruleExpression)
-        if (expression.contains(SpecialKeywords.RULE_FILTER_EXCLUDE_CONDITION)) {
-            String finalExpression = expression.substring(expression.indexOf(SpecialKeywords.RULE_FILTER_EXCLUDE_CONDITION) + 2);
-            match = actualValues.stream().allMatch(actualValue -> !actualValue.equalsIgnoreCase(finalExpression));
-        } else {
-            String finalExpression = expression;
-            match = actualValues.stream().anyMatch(actualValue -> actualValue.equalsIgnoreCase(finalExpression));
-        }
-
+        RuleExpressionParser ruleExpressionParser = getRuleExpressionParser(ruleExpression.get(0));
+        boolean match = ruleExpressionParser.evaluate(actualValues);
         for (int i = 1; i < ruleExpression.size(); i++) {
-            expression = ruleExpression.get(i);
-            if (expression.contains(SpecialKeywords.RULE_FILTER_OR_CONDITION)) {
-                //if previous expression is true, we don't need to check this because of (true || false) == true
-                if (match) {
-                    continue;
-                }
-                String value = expression.substring(expression.indexOf(SpecialKeywords.RULE_FILTER_OR_CONDITION) + 2);
-                if (value.contains(SpecialKeywords.RULE_FILTER_EXCLUDE_CONDITION)) {
-                    String finalValue = value.substring(value.indexOf(SpecialKeywords.RULE_FILTER_EXCLUDE_CONDITION) + 2);
-                    match = actualValues.stream().allMatch(actualValue -> !actualValue.equalsIgnoreCase(finalValue));
-                } else {
-                    match = actualValues.stream().anyMatch(actualValue -> actualValue.equalsIgnoreCase(value));
-                }
-            } else if (expression.contains(SpecialKeywords.RULE_FILTER_AND_CONDITION)) {
-                //if previous expression is false, we don't need to check this because of (false && true) = false
-                if (!match) {
-                    continue;
-                }
-                String value = expression.substring(expression.indexOf(SpecialKeywords.RULE_FILTER_AND_CONDITION) + 2);
-                if (value.contains(SpecialKeywords.RULE_FILTER_EXCLUDE_CONDITION)) {
-                    String finalValue = value.substring(value.indexOf(SpecialKeywords.RULE_FILTER_EXCLUDE_CONDITION) + 2);
-                    match = actualValues.stream().allMatch(actualValue -> !actualValue.equalsIgnoreCase(finalValue));
-                } else {
-                    match = actualValues.stream().anyMatch(actualValue -> actualValue.equalsIgnoreCase(value));
-                }
-            }
+            RuleExpressionParser currentRuleExpressionParser = getRuleExpressionParser(ruleExpression.get(i));
+            match = currentRuleExpressionParser.evaluate(actualValues, match);
         }
-
         return match;
     }
 
@@ -80,36 +45,92 @@ public interface IFilter {
     }
 
     default boolean ruleCheck(List<String> ruleExpression) {
-        String expression = ruleExpression.get(0);
-        boolean match;
-
-        if (expression.contains(SpecialKeywords.RULE_FILTER_EXCLUDE_CONDITION)) {
-            match = true;
-        } else {
-            match = false;
-        }
-
+        RuleExpressionParser ruleExpressionParser = getRuleExpressionParser(ruleExpression.get(0));
+        boolean match = ruleExpressionParser.isDefaultMatch();
         for (int i = 1; i < ruleExpression.size(); i++) {
-            expression = ruleExpression.get(i);
-            if (expression.contains(SpecialKeywords.RULE_FILTER_OR_CONDITION)) {
-                //if previous expression is true, we don't need to check this because of (true || false) == true
-                if (match) {
-                    continue;
-                }
-                if (expression.contains(SpecialKeywords.RULE_FILTER_EXCLUDE_CONDITION)) {
-                    match = true;
-                }
-            } else if (expression.contains(SpecialKeywords.RULE_FILTER_AND_CONDITION)) {
-                //if previous expression is false, we don't need to check this because of (false && true) = false
-                if (!match) {
-                    continue;
-                }
-                if (!expression.contains(SpecialKeywords.RULE_FILTER_EXCLUDE_CONDITION)) {
-                    match = false;
-                }
-            }
+            RuleExpressionParser currentRuleExpressionParser = getRuleExpressionParser(ruleExpression.get(i));
+            match = currentRuleExpressionParser.evaluate(match);
         }
-
         return match;
     }
+
+    default RuleExpressionParser getRuleExpressionParser(String expression) {
+        if (expression.contains(SpecialKeywords.RULE_FILTER_EXCLUDE_CONDITION)) {
+            String finalExpression = expression.substring(expression.indexOf(SpecialKeywords.RULE_FILTER_EXCLUDE_CONDITION) + 2);
+            return new ExcludeRuleExpressionParser(finalExpression);
+        } else {
+            String finalExpression = expression;
+            return new IncludeRuleExpressionParser(finalExpression);
+        }
+    }
+
+    interface RuleExpressionParser {
+        boolean evaluate(List<String> actualValues);
+        boolean evaluate(List<String> actualValues, boolean previousMatch);
+        boolean evaluate(boolean previousMatch);
+        boolean isDefaultMatch();
+    }
+
+    class IncludeRuleExpressionParser implements RuleExpressionParser {
+        private final String includeValue;
+
+        public IncludeRuleExpressionParser(String includeValue) {
+            this.includeValue = includeValue;
+        }
+
+        @Override
+        public boolean evaluate(List<String> actualValues) {
+            return actualValues.stream().anyMatch(actualValue -> actualValue.equalsIgnoreCase(includeValue));
+        }
+
+        @Override
+        public boolean evaluate(List<String> actualValues, boolean previousMatch) {
+            if (previousMatch) {
+                return true;
+            }
+            return evaluate(actualValues);
+        }
+
+        @Override
+        public boolean evaluate(boolean previousMatch) {
+            return previousMatch || isDefaultMatch();
+        }
+
+        @Override
+        public boolean isDefaultMatch() {
+            return false;
+        }
+    }
+
+    class ExcludeRuleExpressionParser implements RuleExpressionParser {
+        private final String excludeValue;
+
+        public ExcludeRuleExpressionParser(String excludeValue) {
+            this.excludeValue = excludeValue;
+        }
+
+        @Override
+        public boolean evaluate(List<String> actualValues) {
+            return actualValues.stream().allMatch(actualValue -> !actualValue.equalsIgnoreCase(excludeValue));
+        }
+
+        @Override
+        public boolean evaluate(List<String> actualValues, boolean previousMatch) {
+            if (!previousMatch) {
+                return false;
+            }
+            return evaluate(actualValues);
+        }
+
+        @Override
+        public boolean evaluate(boolean previousMatch) {
+            return previousMatch && !isDefaultMatch();
+        }
+
+        @Override
+        public boolean isDefaultMatch() {
+            return true;
+        }
+    }
+
 }
