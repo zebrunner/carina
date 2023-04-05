@@ -194,6 +194,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         if (!sha1.isEmpty()) {
             Label.attachToTestRun("sha1", sha1);
         }
+
+        // register owner of the run
+        registerOwner();
         
         /*
          * To support multi-suite declaration as below we have to init test run labels at once only!
@@ -782,6 +785,26 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             }
         }
 
+    }
+
+    /**
+     * Register owner launch attribute<br>
+     * -DBUILD_USER_ID="develop"<br>
+     * 1. read from system properties BUILD_USER_ID<br>
+     * 2. if it is not empty -> register as owner label for run/launch<br>
+     * 3. if it is empty -> read env var USERNAME<br>
+     * 4. if not empty -> register as owner<br>
+     * 5.Label.attachToTestRun("Author", "Andrei Kamarouski");<br>
+     */
+    private void registerOwner() {
+        String owner = System.getProperty("BUILD_USER_ID");
+        if (owner == null) {
+            owner = System.getenv("USERNAME");
+            System.out.println(owner);
+        }
+        if (owner != null) {
+            Label.attachToTestRun("Owner", owner);
+        }
     }
 
     /**
