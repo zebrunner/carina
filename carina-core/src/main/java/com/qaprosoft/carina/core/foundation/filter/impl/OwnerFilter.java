@@ -33,35 +33,50 @@ public class OwnerFilter implements IFilter {
 
     @Override
     public boolean isPerform(ITestNGMethod testMethod, List<String> rules) {
+        // Extract method level owners from test method
+        List<String> owners = extractOwnersFromMethod(testMethod);
+
+        // Log test method details for debugging purposes
+        logTestMethodDetails(testMethod, owners, rules);
+
+        // Check if any of the owners match with the expected rules
+        return ruleCheck(rules, owners);
+    }
+
+    /**
+     * Extracts method level owners from test method.
+     * @param testMethod - TestNG method for which owners are to be extracted.
+     * @return - List of owners extracted from the test method.
+     */
+    private List<String> extractOwnersFromMethod(ITestNGMethod testMethod) {
+        List<String> owners = new ArrayList<>();
         if (testMethod != null) {
-            //if test was described only by one OwnerFilter
             if (testMethod.getConstructorOrMethod().getMethod().isAnnotationPresent(MethodOwner.class)) {
                 MethodOwner ownerAnnotation = testMethod.getConstructorOrMethod().getMethod().getAnnotation(MethodOwner.class);
                 if (ownerAnnotation != null) {
-                    String owner = ownerAnnotation.owner().toLowerCase();
-                    LOGGER.info(String.format("Test: [%s]. Owners: %s. Expected ownerAnnotation: [%s]", testMethod.getMethodName(), owner,
-                            rules.toString()));
-                    return ruleCheck(rules, owner);
+                    owners.add(ownerAnnotation.owner().toLowerCase());
                 }
-            }
-
-            //if test was described by several OwnerFilters
-            if (testMethod.getConstructorOrMethod().getMethod().isAnnotationPresent(MethodOwner.List.class)) {
+            } else if (testMethod.getConstructorOrMethod().getMethod().isAnnotationPresent(MethodOwner.List.class)) {
                 MethodOwner.List ownerAnnotations = testMethod.getConstructorOrMethod().getMethod().getAnnotation(MethodOwner.List.class);
                 if (ownerAnnotations != null) {
-                    List<String> owners = new ArrayList<String>();
                     for (MethodOwner methodOwner : ownerAnnotations.value()) {
                         owners.add(methodOwner.owner().toLowerCase());
                     }
-                    LOGGER.info(String.format("Test: [%s]. Owners: %s. Expected owner: [%s]", testMethod.getMethodName(), owners.toString(),
-                            rules.toString()));
-                    return ruleCheck(rules, owners);
                 }
             }
-
-            //if test was not described by OwnerFilter annotation
-            return ruleCheck(rules);
         }
-        return false;
+        return owners;
     }
+
+    /**
+     * Logs test method details for debugging purposes.
+     * @param testMethod - TestNG method to be logged.
+     * @param owners - List of extracted owners.
+     * @param rules - Expected owners as per the test configuration.
+     */
+    private void logTestMethodDetails(ITestNGMethod testMethod, List<String> owners, List<String> rules) {
+        LOGGER.info(String.format("Test: [%s]. Owners: %s. Expected ownerAnnotation: [%s]",
+                testMethod.getMethodName(), owners.toString(), rules.toString()));
+    }
+
 }
