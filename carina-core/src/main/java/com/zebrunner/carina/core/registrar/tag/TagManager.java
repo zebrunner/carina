@@ -38,23 +38,23 @@ public class TagManager implements LabelResolver {
         labels.putAll(getAnnotations(method));
 
         return labels.entrySet()
-                     .stream()
-                     .flatMap(keyToValues -> keyToValues.getValue().stream()
-                                                        .map(value -> new LabelDTO(keyToValues.getKey(), value)))
-                     .collect(Collectors.toList());
+                .stream()
+                .flatMap(keyToValues -> keyToValues.getValue().stream()
+                        .map(value -> new LabelDTO(keyToValues.getKey(), value)))
+                .collect(Collectors.toList());
     }
 
     private Map<String, List<String>> getAnnotations(AnnotatedElement annotatedElement) {
         return Optional.ofNullable(annotatedElement.getAnnotation(TestTag.List.class))
-                       .map(TestTag.List::value)
-                       .map(Arrays::stream)
-                       .orElseGet(() -> Stream.of(annotatedElement.getAnnotation(TestTag.class)))
-                       .filter(Objects::nonNull)
-                       .collect(Collectors.toMap(
-                               TestTag::name,
-                               tagLabel -> new ArrayList<>(Collections.singletonList(tagLabel.value())),
-                               this::union
-                       ));
+                .map(TestTag.List::value)
+                .map(Arrays::stream)
+                .orElseGet(() -> Stream.of(annotatedElement.getAnnotation(TestTag.class)))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toMap(
+                        TestTag::name,
+                        tagLabel -> new ArrayList<>(Collections.singletonList(tagLabel.value())),
+                        this::union
+                ));
     }
 
     private List<String> union(List<String> values1, List<String> values2) {
@@ -62,5 +62,4 @@ public class TagManager implements LabelResolver {
         values.addAll(values2);
         return values;
     }
-
 }

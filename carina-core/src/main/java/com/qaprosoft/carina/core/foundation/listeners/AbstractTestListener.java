@@ -214,7 +214,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
 
     protected TestResultItem createTestResult(ITestResult result, TestResultType resultType, String failReason,
             String description) {
-        String group = StringEscapeUtils.escapeHtml4(TestNamingService.getPackageName(result));
+        String group = StringEscapeUtils.escapeHtml4(TestNamingService.getTestName(result));
         
         String linkToLog = ReportContext.getTestLogLink();
         String linkToScreenshots = ReportContext.getTestScreenshotsLink();

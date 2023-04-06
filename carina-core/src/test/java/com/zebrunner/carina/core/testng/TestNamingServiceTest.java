@@ -20,7 +20,7 @@ import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
 
-import com.zebrunner.carina.utils.R;
+import com.zebrunner.carina.utils.R;import static com.zebrunner.carina.core.testng.TestNamingService.*;
 
 public class TestNamingServiceTest {
 
@@ -30,8 +30,8 @@ public class TestNamingServiceTest {
     @Test
     public void testGetTestNameWhenTestNameIsNull() {
         try {
-            TestNamingService.setTestName(null);
-            TestNamingService.getTestName();
+            setTestName(null);
+            getTestName();
         } catch (RuntimeException e) {
             Assert.assertEquals(e.getMessage(), "Unable to detect full test name yet!");
         }
@@ -41,8 +41,8 @@ public class TestNamingServiceTest {
     public void testGetTestNameAfterSetTestName() {
         String testMethodName = "customTestName";
 
-        TestNamingService.setTestName(testMethodName);
-        String testName = TestNamingService.getTestName();
+        setTestName(testMethodName);
+        String testName = getTestName();
 
         Assert.assertEquals(testName, testMethodName, "Test name wasn't set");
     }
@@ -50,7 +50,7 @@ public class TestNamingServiceTest {
     @Test
     public void testNameByPattern() {
         ITestResult result = Reporter.getCurrentTestResult();
-        String testName = TestNamingService.getTestName(result);
+        String testName = getTestName(result);
         String expectedTestName = result.getTestContext().getCurrentXmlTest().getName() + " " +
                 result.getMethod().getTestClass().getRealClass().getSimpleName() + " - " +
                 result.getMethod().getMethodName() + " " +
@@ -66,7 +66,7 @@ public class TestNamingServiceTest {
     @Test
     public void testGetPackageName() {
         ITestResult result = Reporter.getCurrentTestResult();
-        String packageName = TestNamingService.getPackageName(result);
+        String packageName = getPackageName(result);
 
         Assert.assertEquals(packageName, result.getMethod().getRealClass().getPackage().getName(),
                 "Package name " + packageName + " wasn't generated correctly");

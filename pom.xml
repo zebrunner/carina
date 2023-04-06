@@ -365,6 +365,13 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>com.truthbean.logger</groupId>
+            <artifactId>logger-stdout</artifactId>
+            <version>0.4.0-RELEASE</version>
+        </dependency>
+    </dependencies>
 
     <distributionManagement>
         <repository>

@@ -54,6 +54,7 @@ public class PriorityFilter implements IFilter {
     }
 
     // Helper method that checks if the actual priority matches any of the allowed rules.
+
     private boolean ruleCheck(List<String> rules, String... actualPriority) {
         // Loop through the list of rules and check if the actual priority matches any of them
         for (String rule : rules) {
