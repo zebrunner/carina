@@ -35,31 +35,42 @@ public class PriorityFilter implements IFilter {
 // The new method checks if the expected priority is included in the list of rules,
 // which represents the priorities that are allowed to run.
     public boolean isPerform(ITestNGMethod testMethod, List<String> rules) {
+        // Extract the TestPriority annotation from the method, if present
         TestPriority priority = testMethod.getConstructorOrMethod().getMethod().getAnnotation(TestPriority.class);
+
+        // If the method has no TestPriority annotation, simply check if the actual priority matches any of the rules
         if (priority == null) {
             return ruleCheck(rules);
-        } else {
+        }
+        // Otherwise, get the actual priority from the TestPriority annotation and log information about the test and its priority
+        else {
             Priority testPriority = priority.value();
             String actualTestPriority = testPriority.toString();
             LOGGER.info(String.format("Test: [%s]. Priority: [%s]. Expected priority: [%s]", testMethod.getMethodName(), actualTestPriority,
                     rules.toString()));
+            // Check if the actual priority matches any of the rules
             return ruleCheck(rules, actualTestPriority);
         }
     }
 
     // Helper method that checks if the actual priority matches any of the allowed rules.
     private boolean ruleCheck(List<String> rules, String... actualPriority) {
+        // Loop through the list of rules and check if the actual priority matches any of them
         for (String rule : rules) {
+            // If the actual priority is provided as an argument, check if it matches the current rule
             if (actualPriority.length > 0) {
                 if (actualPriority[0].equals(rule)) {
                     return true;
                 }
-            } else {
+            }
+            // If no actual priority is provided, check if the rule is "NO_PRIORITY"
+            else {
                 if ("NO_PRIORITY".equals(rule)) {
                     return true;
                 }
             }
         }
+        // If no rule matches the actual priority, return false
         return false;
     }
 }
