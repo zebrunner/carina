@@ -26,9 +26,8 @@ public class Ownership implements MaintainerResolver {
     @Override
     public String resolve(Class<?> clazz, Method method) {
         String owner = StringUtils.EMPTY;
+
         // Get a handle to the class and method
-        // We can't use getMethod() because we may have parameterized tests
-        // for which we don't know the matching signature
         String methodName = method.getName();
         Method testMethod = null;
         Method[] possibleMethods = clazz.getMethods();
@@ -38,13 +37,13 @@ public class Ownership implements MaintainerResolver {
                 break;
             }
         }
-        
+
         // do a scan for single Methodowner annotation as well)
         if (testMethod != null && testMethod.isAnnotationPresent(MethodOwner.class)) {
             MethodOwner methodAnnotation = testMethod.getAnnotation(MethodOwner.class);
             owner = methodAnnotation.owner();
         }
-        
+
         // scan all MethodOwner annotations to find default ownership without any platform
         if (testMethod != null && testMethod.isAnnotationPresent(MethodOwner.List.class)) {
             MethodOwner.List methodAnnotation = testMethod.getAnnotation(MethodOwner.List.class);
@@ -53,29 +52,24 @@ public class Ownership implements MaintainerResolver {
                 if (actualPlatform.isEmpty()) {
                     owner = methodOwner.owner();
                     break;
-                }            
+                }
             }
         }
-        
-        //do one more scan using platform ownership filter if any to override default owner value
+
+        // do one more scan using platform ownership filter if any to override default owner value
         if (testMethod != null && testMethod.isAnnotationPresent(MethodOwner.List.class)) {
             MethodOwner.List methodAnnotation = testMethod.getAnnotation(MethodOwner.List.class);
             for (MethodOwner methodOwner : methodAnnotation.value()) {
-
                 String actualPlatform = methodOwner.platform();
                 String expectedPlatform = Configuration.getPlatform();
-                
-                if (!actualPlatform.isEmpty() && isValidPlatform(actualPlatform, expectedPlatform)) {
+                if (!actualPlatform.isEmpty() && actualPlatform.equalsIgnoreCase(expectedPlatform)) {
                     owner = methodOwner.owner();
-                }               
+                    break;
+                }
             }
         }
 
         return owner;
-    }
-    
-    private static boolean isValidPlatform(String actualPlatform, String expectedPlatform) {
-        return actualPlatform.equalsIgnoreCase(expectedPlatform);
     }
 
 }
