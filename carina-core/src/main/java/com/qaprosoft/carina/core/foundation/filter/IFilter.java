@@ -30,30 +30,6 @@ public interface IFilter {
 
     boolean isPerform(ITestNGMethod testMethod, List<String> rules);
 
-    default boolean ruleCheck(List<String> ruleExpression, List<String> actualValues) {
-        RuleExpressionParser ruleExpressionParser = getRuleExpressionParser(ruleExpression.get(0));
-        boolean match = ruleExpressionParser.evaluate(actualValues);
-        for (int i = 1; i < ruleExpression.size(); i++) {
-            RuleExpressionParser currentRuleExpressionParser = getRuleExpressionParser(ruleExpression.get(i));
-            match = currentRuleExpressionParser.evaluate(actualValues, match);
-        }
-        return match;
-    }
-
-    default boolean ruleCheck(List<String> ruleExpression, String actualValue) {
-        return ruleCheck(ruleExpression, Arrays.asList(actualValue));
-    }
-
-    default boolean ruleCheck(List<String> ruleExpression) {
-        RuleExpressionParser ruleExpressionParser = getRuleExpressionParser(ruleExpression.get(0));
-        boolean match = ruleExpressionParser.isDefaultMatch();
-        for (int i = 1; i < ruleExpression.size(); i++) {
-            RuleExpressionParser currentRuleExpressionParser = getRuleExpressionParser(ruleExpression.get(i));
-            match = currentRuleExpressionParser.evaluate(match);
-        }
-        return match;
-    }
-
     default RuleExpressionParser getRuleExpressionParser(String expression) {
         if (expression.contains(SpecialKeywords.RULE_FILTER_EXCLUDE_CONDITION)) {
             String finalExpression = expression.substring(expression.indexOf(SpecialKeywords.RULE_FILTER_EXCLUDE_CONDITION) + 2);
@@ -66,9 +42,6 @@ public interface IFilter {
 
     interface RuleExpressionParser {
         boolean evaluate(List<String> actualValues);
-        boolean evaluate(List<String> actualValues, boolean previousMatch);
-        boolean evaluate(boolean previousMatch);
-        boolean isDefaultMatch();
     }
 
     class IncludeRuleExpressionParser implements RuleExpressionParser {
@@ -81,24 +54,6 @@ public interface IFilter {
         @Override
         public boolean evaluate(List<String> actualValues) {
             return actualValues.stream().anyMatch(actualValue -> actualValue.equalsIgnoreCase(includeValue));
-        }
-
-        @Override
-        public boolean evaluate(List<String> actualValues, boolean previousMatch) {
-            if (previousMatch) {
-                return true;
-            }
-            return evaluate(actualValues);
-        }
-
-        @Override
-        public boolean evaluate(boolean previousMatch) {
-            return previousMatch || isDefaultMatch();
-        }
-
-        @Override
-        public boolean isDefaultMatch() {
-            return false;
         }
     }
 
@@ -113,24 +68,29 @@ public interface IFilter {
         public boolean evaluate(List<String> actualValues) {
             return actualValues.stream().allMatch(actualValue -> !actualValue.equalsIgnoreCase(excludeValue));
         }
-
-        @Override
-        public boolean evaluate(List<String> actualValues, boolean previousMatch) {
-            if (!previousMatch) {
-                return false;
-            }
-            return evaluate(actualValues);
-        }
-
-        @Override
-        public boolean evaluate(boolean previousMatch) {
-            return previousMatch && !isDefaultMatch();
-        }
-
-        @Override
-        public boolean isDefaultMatch() {
-            return true;
-        }
     }
 
+    default boolean ruleCheck(List<String> ruleExpression, List<String> actualValues) {
+        RuleExpressionParser ruleExpressionParser = getRuleExpressionParser(ruleExpression.get(0));
+        boolean match = ruleExpressionParser.evaluate(actualValues);
+        for (int i = 1; i < ruleExpression.size(); i++) {
+            RuleExpressionParser currentRuleExpressionParser = getRuleExpressionParser(ruleExpression.get(i));
+            match = currentRuleExpressionParser.evaluate(actualValues);
+        }
+        return match;
+    }
+
+    default boolean ruleCheck(List<String> ruleExpression, String actualValue) {
+        return ruleCheck(ruleExpression, Arrays.asList(actualValue));
+    }
+
+    default boolean ruleCheck(List<String> ruleExpression) {
+        RuleExpressionParser ruleExpressionParser = getRuleExpressionParser(ruleExpression.get(0));
+        boolean match = ruleExpressionParser.evaluate(null);
+        for (int i = 1; i < ruleExpression.size(); i++) {
+            RuleExpressionParser currentRuleExpressionParser = getRuleExpressionParser(ruleExpression.get(i));
+            match = currentRuleExpressionParser.evaluate(null);
+        }
+        return match;
+    }
 }
