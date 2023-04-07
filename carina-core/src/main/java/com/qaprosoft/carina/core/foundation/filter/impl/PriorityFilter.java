@@ -26,9 +26,8 @@ import com.qaprosoft.carina.core.foundation.filter.IFilter;
 import com.zebrunner.carina.core.registrar.tag.Priority;
 import com.zebrunner.carina.core.registrar.tag.TestPriority;
 
-public class PriorityFilter implements IFilter {
+public class PriorityFilter extends Filter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
 // Extracted a new method 'ruleCheck' to simplify the code and increase its readability.

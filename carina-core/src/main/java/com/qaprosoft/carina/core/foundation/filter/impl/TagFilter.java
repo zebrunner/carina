@@ -26,9 +26,7 @@ import org.testng.ITestNGMethod;
 import com.qaprosoft.carina.core.foundation.filter.IFilter;
 import com.zebrunner.carina.core.registrar.tag.TestTag;
 
-public class TagFilter implements IFilter {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+public class TagFilter extends Filter {
 
     @Override
     // Renamed 'rules' variable to 'expectedTags' for clarity and readability

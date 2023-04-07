@@ -27,9 +27,8 @@ import org.testng.ITestNGMethod;
 import com.qaprosoft.carina.core.foundation.filter.IFilter;
 import com.zebrunner.carina.core.registrar.ownership.MethodOwner;
 
-public class OwnerFilter implements IFilter {
+public class OwnerFilter extends Filter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public boolean isPerform(ITestNGMethod testMethod, List<String> rules) {
