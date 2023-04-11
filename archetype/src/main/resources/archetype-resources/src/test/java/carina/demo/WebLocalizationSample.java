@@ -10,7 +10,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
-import com.qaprosoft.carina.core.foundation.IAbstractTest;
+import com.zebrunner.carina.core.IAbstractTest;
 import ${package}.carina.demo.gui.pages.desktop.WikipediaHomePage;
 import ${package}.carina.demo.gui.pages.desktop.WikipediaLocalePage;
 import com.zebrunner.agent.core.annotation.TestLabel;

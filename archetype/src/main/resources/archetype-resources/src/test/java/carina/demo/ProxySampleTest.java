@@ -21,7 +21,7 @@ import org.testng.annotations.Test;
 
 import com.browserup.bup.BrowserUpProxy;
 import com.browserup.bup.proxy.CaptureType;
-import com.qaprosoft.carina.core.foundation.IAbstractTest;
+import com.zebrunner.carina.core.IAbstractTest;
 import ${package}.carina.demo.gui.pages.desktop.HomePage;
 import ${package}.carina.demo.gui.pages.desktop.NewsPage;
 import ${package}.carina.demo.proxy.CustomProxy;

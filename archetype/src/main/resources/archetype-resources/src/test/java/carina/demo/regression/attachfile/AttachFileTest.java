@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.IAbstractTest;
+import com.zebrunner.carina.core.IAbstractTest;
 import ${package}.carina.demo.gui.pages.desktop.AttachFilePage;
 import com.zebrunner.carina.core.registrar.ownership.MethodOwner;
 

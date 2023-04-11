@@ -5,7 +5,7 @@ package ${package}.carina.demo;
 
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.IAbstractTest;
+import com.zebrunner.carina.core.IAbstractTest;
 import ${package}.carina.demo.mobile.gui.pages.ios.SaucePage;
 import com.zebrunner.carina.utils.mobile.IMobileUtils;
 

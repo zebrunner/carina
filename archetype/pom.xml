@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.qaprosoft</groupId>
+  <groupId>com.zebrunner</groupId>
   <artifactId>carina-archetype</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>maven-archetype</packaging>
@@ -17,6 +17,7 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+
   <developers>
     <developer>
       <name>Vadim Delendik</name>
@@ -25,6 +26,7 @@
       <organizationUrl>https://zebrunner.com</organizationUrl>
     </developer>
   </developers>
+
   <scm>
     <url>https://github.com/zebrunner/carina.git</url>
   </scm>
@@ -72,15 +74,15 @@
   </build>
 
   <distributionManagement>
-      <repository>
-          <id>QPS_Nexus</id>
-          <name>Qaprosoft Releases</name>
-          <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-      </repository>
-      <snapshotRepository>
-          <id>QPS_Nexus</id>
-          <name>Qaprosoft Snapshots</name>
-          <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-      </snapshotRepository>
+    <repository>
+      <id>Maven_Nexus</id>
+      <name>Maven Releases</name>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+    </repository>
+    <snapshotRepository>
+      <id>ZBR_Nexus</id>
+      <name>Zebrunner Snapshots</name>
+      <url>https://nexus.zebrunner.dev/repository/ce-snapshots/</url>
+    </snapshotRepository>
   </distributionManagement>
 </project>

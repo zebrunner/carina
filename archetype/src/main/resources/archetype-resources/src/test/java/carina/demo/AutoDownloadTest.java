@@ -19,7 +19,7 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
-import com.qaprosoft.carina.core.foundation.IAbstractTest;
+import com.zebrunner.carina.core.IAbstractTest;
 import com.zebrunner.carina.utils.R;
 import com.zebrunner.carina.utils.report.ReportContext;
 import com.zebrunner.carina.webdriver.DriverHelper;

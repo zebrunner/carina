@@ -9,7 +9,7 @@ import static org.testng.Assert.assertNull;
 import org.apache.ibatis.session.SqlSession;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.IAbstractTest;
+import com.zebrunner.carina.core.IAbstractTest;
 import ${package}.carina.demo.db.mappers.UserMapper;
 import ${package}.carina.demo.db.mappers.UserPreferenceMapper;
 import ${package}.carina.demo.db.models.User;
