@@ -795,9 +795,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         String owner = System.getProperty("BUILD_USER_ID");
         if (owner == null) {
             owner = System.getenv("USERNAME");
-            System.out.println(owner);
         }
         if (owner != null) {
+            System.out.println(owner);
             Label.attachToTestRun("Owner", owner);
         }
     }
