@@ -44,7 +44,7 @@ public class TagFilter implements IFilter {
                     tagName = methodAnnotation.name();
                     tagValue = methodAnnotation.value();
                     String tag = tagName + "=" + tagValue;
-                    LOGGER.info(String.format("Test: [%s]. Tag: [%s]. Expected tag: [%s]", testMethod.getMethodName(), tag, rules.toString()));
+                    LOGGER.info("Test: [{}]. Tag: [{}]. Expected tag: [{}]", testMethod.getMethodName(), tag, rules);
                     return ruleCheck(rules, tag);
                 }
             }
@@ -53,15 +53,14 @@ public class TagFilter implements IFilter {
             if (testMethod.getConstructorOrMethod().getMethod().isAnnotationPresent(TestTag.List.class)) {
                 TestTag.List methodAnnotation = testMethod.getConstructorOrMethod().getMethod().getAnnotation(TestTag.List.class);
                 if (methodAnnotation != null) {
-                    List<String> tags = new ArrayList<String>();
+                    List<String> tags = new ArrayList<>();
                     for (TestTag tag : methodAnnotation.value()) {
                         tagName = tag.name();
                         tagValue = tag.value();
                         String fullTag = tagName + "=" + tagValue;
                         tags.add(fullTag.toLowerCase());
                     }
-                    LOGGER.info(
-                            String.format("Test: [%s]. Tag: [%s]. Expected tag: [%s]", testMethod.getMethodName(), tags, rules.toString()));
+                    LOGGER.info("Test: [{}]. Tag: [{}]. Expected tag: [{}]", testMethod.getMethodName(), tags, rules);
                     return ruleCheck(rules, tags);
                 }
             }

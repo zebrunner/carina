@@ -124,7 +124,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         // That is why it is necessary to reinit R class here when TestNG loads the CarinaListener class.
         R.reinit();
         registerDecryptAgentProperties();
-        
+
         LOGGER.info(Configuration.asString());
         // Configuration.validateConfiguration();
 
@@ -211,12 +211,12 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             this.isRunLabelsRegistered = true;
         }
 
-        LOGGER.info("CARINA_CORE_VERSION: " + getCarinaVersion());
+        LOGGER.info("CARINA_CORE_VERSION: {}", getCarinaVersion());
     }
 
 	@Override
     public void onStart(ITestContext context) {
-        LOGGER.debug("CarinaListener->OnTestStart(ITestContext context): " + context.getName());
+        LOGGER.debug("CarinaListener->OnTestStart(ITestContext context): {}", context.getName());
         super.onStart(context);
     }
 
@@ -357,7 +357,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
             if (dependencies.contains(methodName) ||
                     dependencies.contains(className + "." + methodName)) {
-                LOGGER.debug("dependency detected for " + methodName);
+                LOGGER.debug("dependency detected for {}", methodName);
                 return true;
             }
         }
@@ -375,7 +375,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             R.ZAFIRA.clearTestProperties();
             //remove thread proxy rule
             com.zebrunner.carina.proxy.ProxyPool.clearThreadRule();
-            LOGGER.debug("Test result is : " + result.getStatus());
+            LOGGER.debug("Test result is : {}", result.getStatus());
             // result status == 2 means failure, status == 3 means skip. We need to quit driver anyway for failure and skip
             if (((automaticDriversCleanup &&
                     !hasDependencies(result)) ||
@@ -406,7 +406,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 //        quitDrivers(Phase.BEFORE_CLASS); already exited in onAfterClass() method
         quitDrivers(Phase.BEFORE_TEST);
 
-        LOGGER.debug("CarinaListener->onFinish(context): " + context.getName());
+        LOGGER.debug("CarinaListener->onFinish(context): {}", context.getName());
     }
 
     @Override
@@ -414,7 +414,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         LOGGER.debug("CarinaListener->onFinish(ISuite suite)");
         try {
             String browser = getBrowser();
-            // String suiteName = getSuiteName(context);
             String title = getTitle(suite.getXmlSuite());
 
             TestResult testResult = EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
@@ -433,9 +432,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             }
 
             ReportContext.getTempDir().delete();
-
-            // EmailReportItemCollector.getTestResults());
-
             LOGGER.debug("Generating email report...");
 
             // Generate emailable html report using regular method
@@ -478,17 +474,17 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 : Configuration.get(Parameter.URL);
 
         String title = "";
-        String app_version = "";
+        String appVersion = "";
 
         if (!Configuration.get(Parameter.APP_VERSION).isEmpty()) {
             // if nothing is specified then title will contain nothing
-            app_version = Configuration.get(Parameter.APP_VERSION) + " - ";
+            appVersion = Configuration.get(Parameter.APP_VERSION) + " - ";
         }
 
         String suiteName = getSuiteName(suite);
         String xmlFile = getSuiteFileName(suite);
 
-        title = String.format(SUITE_TITLE, app_version, suiteName, String.format(XML_SUITE_NAME, xmlFile), env, browser);
+        title = String.format(SUITE_TITLE, appVersion, suiteName, String.format(XML_SUITE_NAME, xmlFile), env, browser);
 
         return title;
     }
@@ -499,12 +495,12 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         if (fileName == null) {
             fileName = "undefined";
         }
-        LOGGER.debug("Full suite file name: " + fileName);
+        LOGGER.debug("Full suite file name: {}", fileName);
         if (fileName.contains("\\")) {
             fileName = fileName.replaceAll("\\\\", "/");
         }
         fileName = StringUtils.substringAfterLast(fileName, "/");
-        LOGGER.debug("Short suite file name: " + fileName);
+        LOGGER.debug("Short suite file name: {}", fileName);
         return fileName;
     }
 
@@ -617,10 +613,10 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         if (Configuration.getThreadCount()>= 1) {
             // use thread-count from config.properties
             suite.getXmlSuite().setThreadCount(Configuration.getThreadCount());
-            LOGGER.debug("Updated thread-count=" + suite.getXmlSuite().getThreadCount());
+            LOGGER.debug("Updated thread-count={}", suite.getXmlSuite().getThreadCount());
         } else {
             String suiteThreadCount = getAttributeValue(suite, "thread-count");
-            LOGGER.debug("thread-count from suite: " + suiteThreadCount);
+            LOGGER.debug("thread-count from suite: {}", suiteThreadCount);
             if (suiteThreadCount.isEmpty()) {
                 LOGGER.info("Set thread-count=1");
                 R.CONFIG.put(Parameter.THREAD_COUNT.getKey(), "1");
@@ -629,17 +625,17 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 // reuse value from suite xml file
                 LOGGER.debug("Synching thread-count with values from suite xml file...");
                 R.CONFIG.put(Parameter.THREAD_COUNT.getKey(), suiteThreadCount);
-                LOGGER.info("Use thread-count='" + suite.getXmlSuite().getThreadCount() + "' from suite file.");
+                LOGGER.info("Use thread-count='{}' from suite file.", suite.getXmlSuite().getThreadCount());
             }
         }
 
         if (Configuration.getDataProviderThreadCount() >= 1) {
             // use thread-count from config.properties
             suite.getXmlSuite().setDataProviderThreadCount(Configuration.getDataProviderThreadCount());
-            LOGGER.debug("Updated data-provider-thread-count=" + suite.getXmlSuite().getDataProviderThreadCount());
+            LOGGER.debug("Updated data-provider-thread-count={}", suite.getXmlSuite().getDataProviderThreadCount());
         } else {
             String suiteDataProviderThreadCount = getAttributeValue(suite, "data-provider-thread-count");
-            LOGGER.debug("data-provider-thread-count from suite: " + suiteDataProviderThreadCount);
+            LOGGER.debug("data-provider-thread-count from suite: {}", suiteDataProviderThreadCount);
 
             if (suiteDataProviderThreadCount.isEmpty()) {
                 LOGGER.info("Set data-provider-thread-count=1");
@@ -649,7 +645,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 // reuse value from suite xml file
                 LOGGER.debug("Synching data-provider-thread-count with values from suite xml file...");
                 R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(), suiteDataProviderThreadCount);
-                LOGGER.info("Use data-provider-thread-count='" + suite.getXmlSuite().getDataProviderThreadCount() + "' from suite file.");
+                LOGGER.info("Use data-provider-thread-count='{}' from suite file.", suite.getXmlSuite().getDataProviderThreadCount());
             }
         }
     }
@@ -661,7 +657,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             Class<CarinaListener> theClass = CarinaListener.class;
 
             String classPath = theClass.getResource(theClass.getSimpleName() + ".class").toString();
-            LOGGER.debug("Class: " + classPath);
+            LOGGER.debug("Class: {}", classPath);
 
             Pattern pattern = Pattern.compile(".*\\/(.*)\\/.*!");
             Matcher matcher = pattern.matcher(classPath);
@@ -685,7 +681,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
         // register qtest cases...
         Set<String> qtestCases = getQTestCasesUuid(result);
-        if (qtestCases.size() > 0) {
+        if (!qtestCases.isEmpty()) {
             Label.attachToTest(SpecialKeywords.QTEST_TESTCASE_UUID, Arrays.copyOf(qtestCases.toArray(), qtestCases.size(), String[].class));
         }
     }
@@ -710,19 +706,19 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         
         String milestone = Configuration.get(Parameter.MILESTONE);
         if (!milestone.isEmpty()) {
-            LOGGER.info("Set TestRail milestone name: " + milestone);
+            LOGGER.info("Set TestRail milestone name: {}", milestone);
             TestRail.setMilestone(milestone);
         }
         
         String runName = Configuration.get(Parameter.RUN_NAME);
         if (!runName.isEmpty()) {
-            LOGGER.info("Set TestRail run name: " + runName);
+            LOGGER.info("Set TestRail run name: {}", runName);
             TestRail.setRunName(runName);
         }
         
         String assignee = Configuration.get(Parameter.ASSIGNEE);
         if (!assignee.isEmpty()) {
-            LOGGER.info("Set TestRail assignee: " + assignee);
+            LOGGER.info("Set TestRail assignee: {}", assignee);
             TestRail.setAssignee(assignee);
         }
 
@@ -760,14 +756,14 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             for (CarinaDriver carinaDriver : driversPool) {
                 // it is expected that all drivers are killed in appropriate AfterMethod/Class/Suite blocks
                 String name = carinaDriver.getName();
-                LOGGER.warn("Trying to quit driver '" + name + "' on shutdown hook action!");
+                LOGGER.warn("Trying to quit driver '{}' on shutdown hook action!", name);
                 carinaDriver.getDevice().disconnectRemote();
                 try {
-                    LOGGER.debug("Driver closing..." + name);
+                    LOGGER.debug("Driver closing...{}", name);
                     carinaDriver.getDriver().close();
-                    LOGGER.debug("Driver exiting..." + name);
+                    LOGGER.debug("Driver exiting...{}", name);
                     carinaDriver.getDriver().quit();
-                    LOGGER.debug("Driver exited..." + name);
+                    LOGGER.debug("Driver exited...{}", name);
                 } catch (Exception e) {
                     // do nothing
                 }

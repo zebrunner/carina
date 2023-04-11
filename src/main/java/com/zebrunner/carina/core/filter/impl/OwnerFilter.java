@@ -39,8 +39,7 @@ public class OwnerFilter implements IFilter {
                 MethodOwner ownerAnnotation = testMethod.getConstructorOrMethod().getMethod().getAnnotation(MethodOwner.class);
                 if (ownerAnnotation != null) {
                     String owner = ownerAnnotation.owner().toLowerCase();
-                    LOGGER.info(String.format("Test: [%s]. Owners: %s. Expected ownerAnnotation: [%s]", testMethod.getMethodName(), owner,
-                            rules.toString()));
+                    LOGGER.info("Test: [{}]. Owners: {}. Expected ownerAnnotation: [{}]", testMethod.getMethodName(), owner, rules);
                     return ruleCheck(rules, owner);
                 }
             }
@@ -49,12 +48,11 @@ public class OwnerFilter implements IFilter {
             if (testMethod.getConstructorOrMethod().getMethod().isAnnotationPresent(MethodOwner.List.class)) {
                 MethodOwner.List ownerAnnotations = testMethod.getConstructorOrMethod().getMethod().getAnnotation(MethodOwner.List.class);
                 if (ownerAnnotations != null) {
-                    List<String> owners = new ArrayList<String>();
+                    List<String> owners = new ArrayList<>();
                     for (MethodOwner methodOwner : ownerAnnotations.value()) {
                         owners.add(methodOwner.owner().toLowerCase());
                     }
-                    LOGGER.info(String.format("Test: [%s]. Owners: %s. Expected owner: [%s]", testMethod.getMethodName(), owners.toString(),
-                            rules.toString()));
+                    LOGGER.info("Test: [{}]. Owners: {}. Expected owner: [{}]", testMethod.getMethodName(), owners, rules);
                     return ruleCheck(rules, owners);
                 }
             }

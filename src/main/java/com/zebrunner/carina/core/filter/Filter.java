@@ -62,8 +62,7 @@ public enum Filter {
 
     public static Filter getRuleByName(String ruleName) {
         try {
-            Filter rule = Filter.valueOf(ruleName.toUpperCase());
-            return rule;
+            return Filter.valueOf(ruleName.toUpperCase());
         } catch (IllegalArgumentException e) {
             LOGGER.info(String.format("Filter [%s] is not defined. Please, review all available filters", ruleName));
             throw new IncorrectFilterException(String.format("Filter [%s] is not defined. Please, review all available filters", ruleName));

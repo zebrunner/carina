@@ -37,7 +37,7 @@ import com.zebrunner.carina.utils.commons.SpecialKeywords;
 public class TestNamingService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass()); 
     
-    static final ThreadLocal<String> testName = new ThreadLocal<String>();
+    static final ThreadLocal<String> testName = new ThreadLocal<>();
     private static final ConcurrentHashMap<String, AtomicInteger> testNameInvCounter = new ConcurrentHashMap<>();
 
     /**
@@ -73,7 +73,7 @@ public class TestNamingService {
      * @return String test name
      */ 
     public static String setTestName(String name) {
-        LOGGER.warn("Overridden testName: " + name);
+        LOGGER.warn("Overridden testName: {}", name);
         testName.set(name);
         return testName.get();
     }
@@ -184,14 +184,14 @@ public class TestNamingService {
         // adjust testName using pattern
         ITestNGMethod m = result.getMethod();
         String name = Configuration.get(Configuration.Parameter.TEST_NAMING_PATTERN);
-        LOGGER.debug("TestNamingPattern: " + name);
+        LOGGER.debug("TestNamingPattern: {}", name);
         name = name.replace(SpecialKeywords.METHOD_NAME, m.getMethodName());
         name = name.replace(SpecialKeywords.METHOD_PRIORITY, String.valueOf(m.getPriority()));
         name = name.replace(SpecialKeywords.METHOD_THREAD_POOL_SIZE, String.valueOf(m.getThreadPoolSize()));
         name = name.replace(SpecialKeywords.METHOD_GROUP_NAMES, Arrays.toString(m.getGroups()));
 
         if (m.getDescription() != null) {
-            LOGGER.debug("Test method description: " + m.getDescription());
+            LOGGER.debug("Test method description: {}", m.getDescription());
             name = name.replace(SpecialKeywords.METHOD_DESCRIPTION, m.getDescription());
         } else {
             name = name.replace(SpecialKeywords.METHOD_DESCRIPTION, "");

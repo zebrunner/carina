@@ -15,7 +15,17 @@
  *******************************************************************************/
 package com.zebrunner.carina.core.log;
 
-import com.zebrunner.carina.utils.report.ReportContext;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Core;
 import org.apache.logging.log4j.core.Filter;
@@ -31,16 +41,7 @@ import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.apache.logging.log4j.message.Message;
 import org.slf4j.MDC;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import com.zebrunner.carina.utils.report.ReportContext;
 
 /*
  * This appender log groups test outputs by test method/test thread so they don't mess up each other even they runs in parallel.
@@ -52,7 +53,7 @@ import java.util.concurrent.ConcurrentHashMap;
 )
 public class ThreadLogAppender extends AbstractAppender {
 
-    private static final long MAX_LOG_FILE_SIZE_IN_MEGABYTES = 1024 * 1024 * 1024;
+    private static final long MAX_LOG_FILE_SIZE_IN_MEGABYTES = (long) 1024 * 1024 * 1024;
     private static final DateTimeFormatter LOG_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
 
     private static final ThreadLocal<File> currentTestDirectory = new ThreadLocal<>();

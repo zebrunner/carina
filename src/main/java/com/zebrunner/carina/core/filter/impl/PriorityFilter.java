@@ -38,8 +38,8 @@ public class PriorityFilter implements IFilter {
         } else {
             Priority testPriority = priority.value();
             String actualTestPriority = testPriority.toString();
-            LOGGER.info(String.format("Test: [%s]. Priority: [%s]. Expected priority: [%s]", testMethod.getMethodName(), actualTestPriority,
-                    rules.toString()));
+            LOGGER.info("Test: [{}]. Priority: [{}]. Expected priority: [{}]", testMethod.getMethodName(), actualTestPriority,
+                    rules);
             return ruleCheck(rules, actualTestPriority);
         }
     }

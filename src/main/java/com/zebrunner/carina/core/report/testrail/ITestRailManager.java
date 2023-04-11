@@ -31,7 +31,7 @@ public interface ITestRailManager extends ITestCases {
     static final Logger TESTRAIL_LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     default Set<String> getTestRailCasesUuid(ITestResult result) {
-        Set<String> testCases = new HashSet<String>();
+        Set<String> testCases = new HashSet<>();
 
         int suiteID = getTestRailSuiteIdFromSuite(result.getTestContext().getSuite());
 
@@ -64,7 +64,7 @@ public interface ITestRailManager extends ITestCases {
                             tcase = tcase.trim();
                             if (!tcase.isEmpty()) {
                                 testCases.add(tcase);
-                                TESTRAIL_LOGGER.debug("TestRail test case uuid '" + tcase + "' is registered.");
+                                TESTRAIL_LOGGER.debug("TestRail test case uuid '{}' is registered.", tcase);
                             } else {
                                 TESTRAIL_LOGGER.error("TestRail test case uuid was not registered because of an empty value");
                             }
@@ -85,7 +85,7 @@ public interface ITestRailManager extends ITestCases {
                                 tcase = tcase.trim();
                                 if (!tcase.isEmpty()) {
                                     testCases.add(tcase);
-                                    TESTRAIL_LOGGER.debug("TestRail test case uuid '" + tcase + "' is registered.");
+                                    TESTRAIL_LOGGER.debug("TestRail test case uuid '{}' is registered.", tcase);
                                 } else {
                                     TESTRAIL_LOGGER.error("TestRail test case uuid was not registered because of an empty value");
                                 }

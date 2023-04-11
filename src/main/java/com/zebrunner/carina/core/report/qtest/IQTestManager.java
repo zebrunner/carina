@@ -32,7 +32,7 @@ public interface IQTestManager extends ITestCases {
     static final Logger QTEST_LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     default Set<String> getQTestCasesUuid(ITestResult result) {
-        Set<String> testCases = new HashSet<String>();
+        Set<String> testCases = new HashSet<>();
 
         int projectID = getQTestProjectIdFromSuite(result.getTestContext().getSuite());
         if (projectID == -1) {
@@ -68,7 +68,7 @@ public interface IQTestManager extends ITestCases {
                             tcase = tcase.trim();
                             if (!tcase.isEmpty()) {
                                 testCases.add(tcase);
-                                QTEST_LOGGER.debug("qTest test case uuid '" + tcase + "' is registered.");
+                                QTEST_LOGGER.debug("qTest test case uuid '{}' is registered.", tcase);
                             } else {
                                 QTEST_LOGGER.error("qTest test case uuid was not registered because of an empty value");
                             }
@@ -88,7 +88,7 @@ public interface IQTestManager extends ITestCases {
                                 tcase = tcase.trim();
                                 if (!tcase.isEmpty()) {
                                     testCases.add(tcase);
-                                    QTEST_LOGGER.debug("qTest test case uuid '" + tcase + "' is registered.");
+                                    QTEST_LOGGER.debug("qTest test case uuid '{}' is registered.", tcase);
                                 } else {
                                     QTEST_LOGGER.error("qTest test case uuid was not registered because of an empty value");
                                 }
@@ -123,7 +123,6 @@ public interface IQTestManager extends ITestCases {
         }
     }
 
-
     private int getQTestProjectIdFromSuite(ISuite suite) {
         if (suite.getParameter(SpecialKeywords.QTEST_PROJECT_ID) != null) {
             return Integer.parseInt(suite.getParameter(SpecialKeywords.QTEST_PROJECT_ID).trim());
@@ -134,5 +133,4 @@ public interface IQTestManager extends ITestCases {
             return -1;
         }
     }
-
 }

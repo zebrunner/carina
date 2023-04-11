@@ -146,7 +146,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
             RetryService.setRetryAnalyzerClass(RetryAnalyzer.class, result.getTestContext(), result.getMethod());
             result.getMethod().setRetryAnalyzerClass(RetryAnalyzerInterceptor.class);
         } else if (!(curRetryAnalyzer instanceof RetryAnalyzerInterceptor)) {
-            LOGGER.warn("Custom RetryAnalyzer is used: " + curRetryAnalyzer.getClass().getName());
+            LOGGER.warn("Custom RetryAnalyzer is used: {}", curRetryAnalyzer.getClass().getName());
             RetryService.setRetryAnalyzerClass(curRetryAnalyzer.getClass(), result.getTestContext(), result.getMethod());
             result.getMethod().setRetryAnalyzerClass(RetryAnalyzerInterceptor.class);
         }
@@ -220,8 +220,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
         String linkToScreenshots = ReportContext.getTestScreenshotsLink();
 
         String test = StringEscapeUtils.escapeHtml4(TestNameResolverRegistry.get().resolve(result));
-        TestResultItem testResultItem = new TestResultItem(group, test, description, resultType, linkToScreenshots, linkToLog, failReason);
-        return testResultItem;
+        return new TestResultItem(group, test, description, resultType, linkToScreenshots, linkToLog, failReason);
     }
 
     protected String getFailureReason(ITestResult result) {
@@ -251,21 +250,20 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     }
 
     private String getFullStackTrace(Throwable thr) {
-        String stackTrace = "";
-
+        StringBuilder stackTrace = new StringBuilder();
         if (thr != null) {
-            stackTrace = thr.getMessage() + "\n";
+            stackTrace = new StringBuilder(thr.getMessage() + "\n");
 
             StackTraceElement[] elems = thr.getStackTrace();
             for (StackTraceElement elem : elems) {
-                stackTrace = stackTrace + "\n" + elem.toString();
+                stackTrace.append("\n")
+                        .append(elem.toString());
             }
         }
-        return stackTrace;
+        return stackTrace.toString();
     }
     
     private IRetryAnalyzer getRetryAnalyzer(ITestResult result) {
         return result.getMethod().getRetryAnalyzer(result);
     }
-
 }

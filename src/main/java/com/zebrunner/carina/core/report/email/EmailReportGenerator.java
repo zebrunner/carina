@@ -17,7 +17,6 @@ package com.zebrunner.carina.core.report.email;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -41,18 +40,18 @@ import com.zebrunner.carina.utils.report.TestResultType;
 public class EmailReportGenerator {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static String CONTAINER = R.EMAIL.get("container");
-    private static String PACKAGE_TR = R.EMAIL.get("package_tr");
-    private static String PASS_TEST_LOG_DEMO_TR = R.EMAIL.get("pass_test_log_demo_tr");
-    private static String FAIL_TEST_LOG_DEMO_TR = R.EMAIL.get("fail_test_log_demo_tr");
-    private static String SKIP_TEST_LOG_DEMO_TR = R.EMAIL.get("skip_test_log_demo_tr");
-    private static String FAIL_CONFIG_LOG_DEMO_TR = R.EMAIL.get("fail_config_log_demo_tr");
-    private static String PASS_TEST_LOG_TR = R.EMAIL.get("pass_test_log_tr");
-    private static String FAIL_TEST_LOG_TR = R.EMAIL.get("fail_test_log_tr");
-    private static String SKIP_TEST_LOG_TR = R.EMAIL.get("skip_test_log_tr");
-    private static String FAIL_CONFIG_LOG_TR = R.EMAIL.get("fail_config_log_tr");
-    private static String CREATED_ITEMS_LIST = R.EMAIL.get("created_items_list");
-    private static String CREATED_ITEM = R.EMAIL.get("created_item");
+    private static final String CONTAINER = R.EMAIL.get("container");
+    private static final String PACKAGE_TR = R.EMAIL.get("package_tr");
+    private static final String PASS_TEST_LOG_DEMO_TR = R.EMAIL.get("pass_test_log_demo_tr");
+    private static final String FAIL_TEST_LOG_DEMO_TR = R.EMAIL.get("fail_test_log_demo_tr");
+    private static final String SKIP_TEST_LOG_DEMO_TR = R.EMAIL.get("skip_test_log_demo_tr");
+    private static final String FAIL_CONFIG_LOG_DEMO_TR = R.EMAIL.get("fail_config_log_demo_tr");
+    private static final String PASS_TEST_LOG_TR = R.EMAIL.get("pass_test_log_tr");
+    private static final String FAIL_TEST_LOG_TR = R.EMAIL.get("fail_test_log_tr");
+    private static final String SKIP_TEST_LOG_TR = R.EMAIL.get("skip_test_log_tr");
+    private static final String FAIL_CONFIG_LOG_TR = R.EMAIL.get("fail_config_log_tr");
+    private static final String CREATED_ITEMS_LIST = R.EMAIL.get("created_items_list");
+    private static final String CREATED_ITEM = R.EMAIL.get("created_item");
     private static final String TITLE_PLACEHOLDER = "${title}";
     private static final String ENV_PLACEHOLDER = "${env}";
     private static final String BROWSER_PLACEHOLDER = "${browser}";
@@ -77,9 +76,9 @@ public class EmailReportGenerator {
     // Cucumber section
     private static final String CUCUMBER_RESULTS_PLACEHOLDER = "${cucumber_results}";
 
-    private static boolean INCLUDE_PASS = R.EMAIL.getBoolean("include_pass");
-    private static boolean INCLUDE_FAIL = R.EMAIL.getBoolean("include_fail");
-    private static boolean INCLUDE_SKIP = R.EMAIL.getBoolean("include_skip");
+    private static final boolean INCLUDE_PASS = R.EMAIL.getBoolean("include_pass");
+    private static final boolean INCLUDE_FAIL = R.EMAIL.getBoolean("include_fail");
+    private static final boolean INCLUDE_SKIP = R.EMAIL.getBoolean("include_skip");
 
     private String emailBody = CONTAINER;
     private StringBuilder testResults = null;
@@ -112,8 +111,8 @@ public class EmailReportGenerator {
     }
 
     private String getTestResultsList(List<TestResultItem> testResultItems) {
-        if (testResultItems.size() > 0) {
-            Collections.sort(testResultItems, new EmailReportItemComparator());
+        if (!testResultItems.isEmpty()) {
+            testResultItems.sort(new EmailReportItemComparator());
 
             String packageName = "";
             testResults = new StringBuilder();
@@ -195,17 +194,16 @@ public class EmailReportGenerator {
                 skipCount++;
             }
         }
-        if (testResultItem.getResult().name().equalsIgnoreCase("PASS")) {
-            if (!testResultItem.isConfig()) {
-                passCount++;
-                if (INCLUDE_PASS) {
-                    result = testResultItem.getLinkToScreenshots() != null && !"".equals(testResultItem.getLinkToScreenshots()) ? PASS_TEST_LOG_DEMO_TR : PASS_TEST_LOG_TR;
-                    result = result.replace(TEST_NAME_PLACEHOLDER, testResultItem.getTest());
-                    result = result.replace(LOG_URL_PLACEHOLDER, testResultItem.getLinkToLog());
+        if (testResultItem.getResult().name().equalsIgnoreCase("PASS") && !testResultItem.isConfig()) {
+            passCount++;
+            if (INCLUDE_PASS) {
+                result = testResultItem.getLinkToScreenshots() != null && !"".equals(testResultItem.getLinkToScreenshots()) ? PASS_TEST_LOG_DEMO_TR
+                        : PASS_TEST_LOG_TR;
+                result = result.replace(TEST_NAME_PLACEHOLDER, testResultItem.getTest());
+                result = result.replace(LOG_URL_PLACEHOLDER, testResultItem.getLinkToLog());
 
-                    if (testResultItem.getLinkToScreenshots() != null) {
-                        result = result.replace(SCREENSHOTS_URL_PLACEHOLDER, testResultItem.getLinkToScreenshots());
-                    }
+                if (testResultItem.getLinkToScreenshots() != null) {
+                    result = result.replace(SCREENSHOTS_URL_PLACEHOLDER, testResultItem.getLinkToScreenshots());
                 }
             }
         }
@@ -284,11 +282,11 @@ public class EmailReportGenerator {
         if (isCucumberReportFolderExists()) {
 
             String link = ReportContext.getCucumberReportLink();
-            LOGGER.debug("Cucumber Report link: " + link);
+            LOGGER.debug("Cucumber Report link: {}", link);
             result = String.format(
                     "<br/><b><a href='%s' style='color: green;' target='_blank' style='display: block'> Open Cucumber Report in a new tab</a></b><br/>",
                     link);
-            LOGGER.debug("Cucumber result: " + result);
+            LOGGER.debug("Cucumber result: {}", result);
         }
 
         return result;
@@ -312,7 +310,7 @@ public class EmailReportGenerator {
                 }
             }
         } catch (Exception e) {
-            LOGGER.debug("Error happen during checking that CucumberReport Folder exists or not. Error: " + e.getMessage());
+            LOGGER.debug("Error happen during checking that CucumberReport Folder exists or not. Error: {}", e.getMessage());
         }
         return false;
     }

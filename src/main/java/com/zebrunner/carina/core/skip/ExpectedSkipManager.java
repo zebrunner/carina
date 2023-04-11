@@ -31,13 +31,13 @@ import com.zebrunner.carina.core.rule.IRule;
 public class ExpectedSkipManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
     private static ExpectedSkipManager instance = null;
 
     private ExpectedSkipManager() {
-    };
+        // do nothing
+    }
 
-    public synchronized static ExpectedSkipManager getInstance() {
+    public static synchronized ExpectedSkipManager getInstance() {
         if (null == instance) {
             instance = new ExpectedSkipManager();
         }
@@ -57,7 +57,7 @@ public class ExpectedSkipManager {
         for (Class<? extends IRule> rule : collectRules(testMethod, context)) {
             try {
                 if (rule.newInstance().isPerform()) {
-                    LOGGER.info("Test execution will be skipped due to following rule: ".concat(rule.getName()));
+                    LOGGER.info("Test execution will be skipped due to following rule: {}", rule.getName());
                     return true;
                 }
             } catch (InstantiationException | IllegalAccessException e) {
@@ -123,20 +123,20 @@ public class ExpectedSkipManager {
         String shortName = methodName.substring(indexDot + 1);
         List<Class<? extends IRule>> rules = new ArrayList<>();
         try {
-            LOGGER.debug("Extracted class name: ".concat(clazz));
+            LOGGER.debug("Extracted class name: {}", clazz);
             Class<?> testClass = Class.forName(clazz);
             // Class marked with @ExpectedSkip and it applies on all tests
             // methods within
             // this class
             if (testClass.isAnnotationPresent(ExpectedSkip.class)) {
-                LOGGER.debug("Class is annotated with @ExpectedSkip: ".concat(clazz));
+                LOGGER.debug("Class is annotated with @ExpectedSkip: {}", clazz);
                 rules.addAll(Arrays.asList(testClass.getAnnotation(ExpectedSkip.class).rules()));
             }
             Method[] methods = testClass.getDeclaredMethods();
             // verify if dependent method is marked as expected skip
             for (Method method : methods) {
                 if (shortName.equalsIgnoreCase(method.getName()) && method.isAnnotationPresent(ExpectedSkip.class)) {
-                    LOGGER.debug("Method is annotated with @ExpectedSkip: ".concat(methodName));
+                    LOGGER.debug("Method is annotated with @ExpectedSkip: {}", methodName);
                     rules.addAll(Arrays.asList(method.getAnnotation(ExpectedSkip.class).rules()));
                 }
             }
