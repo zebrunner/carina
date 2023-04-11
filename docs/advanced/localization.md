@@ -40,11 +40,11 @@ private List<ExtendedWebElement> pageLinks;
 ```
 Add to the project resources that corresponds to `@Localized` elements:
 ```
-#!The key from locale file should have Page name + name of variable that needs to be compared.
+#Single elements
 WikipediaLocalePage.createAccountElem=fiók létrehozása
 WikipediaLocalePage.contribElem=közreműködések
 
-#!Elements from List should have the same name of a variable + current element's number
+#Elements from List
 WikipediaLocalePage.pageLinks0=Kezdőlap
 WikipediaLocalePage.pageLinks1=Tartalom
 WikipediaLocalePage.pageLinks2=Kiemelt szócikkek
@@ -64,6 +64,34 @@ String welcomeText = wikipediaLocalePage.getWelcomeText();
 String expectedWelcomeText = L10N.getText("welcomeText");
 Assert.assertEquals(welcomeText, expectedWelcomeText.trim(), "Wikipedia welcome text was not the expected.");
 ```
+## Localized customization
+
+@Localized could be customized by focus and localeName parameters.
+
+Focus parameter is an enum that can take values
+* ELEMENT - search locale only by elements name (elementName)
+* CLASS_DECLARE - is used by default. Search locale by declaring class and elements name (PageClassName.elementName or ComponentClassName.elementName)
+* FULL_PATH - search locale by full declarative path to element (PageClassName.ComponentClassName3.ComponentClassName1.element)
+
+In code:
+```java
+@Localized(focus = Localized.NameFocus.FULL_PATH)
+@FindBy(tagName = "p")
+private ExtendedWebElement element;
+```
+
+LocaleName parameter takes String and overrides elements name for locale search. Example:
+
+```java
+public class Component extends AbstractUIObject {
+    //in locale.properties file value for localization will be searched by full declarative path + defined localeName
+    //PageClassName.ComponentClassName.Component
+    @Localized(focus = Localized.NameFocus.FULL_PATH, localeName = "Component")
+    @FindBy(tagName = "p")
+    private ExtendedWebElement element;
+}
+```
+
 ## Resources generation
 To generate resources with Carina, you need to enable `localization_testing` parameter.For elements that are need localization, you need to mark them with `@Localized` and operate with them.
 In test call `L10N.flush()` to create new locale file in your project directory.

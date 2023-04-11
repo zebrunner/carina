@@ -190,6 +190,28 @@ private ExtendedWebElement newsTitle;
 * List &lt;ExtendedWebElement&gt;
 * List&lt;? extends AbstractUIObject&gt;
 
+### Element's search by Annotations
+
+Carina support all different types of appium (@AndroidBy, @iOSXCUITFindByAllSet, @WindowsFindBySet, etc) and selenium (@FindBy, @FindBys, @FindAll) search annotations.
+For element's search could be also used one more annotation - [@FindAny](https://github.com/zebrunner/carina-webdriver/blob/master/src/main/java/com/zebrunner/carina/webdriver/locator/FindAny.java).
+
+Every annotation is supported by carina's converters:
+* ExtendedWebElement.format()
+* ExtendedWebElement.formatToList()
+* @CaseInsensitiveXPath
+* @FindBy(id = "{L10N:elementName}")
+
+For example:
+```java
+@CaseInsensitiveXPath
+@FindAny({
+    @FindBy(xpath = "//*[@id='{L10N:WikipediaLocalePage.welcomeTextId}']"),
+    @FindBy(xpath = "//*[contains(text(),'{L10N:WikipediaLocalePage.welcomeText}')]"),
+    @FindBy(xpath = "//*[@class='welcome-title']")
+})
+private ExtendedWebElement welcomeText;
+```
+
 ### Work with iframe
 Before working with an iframe, you need to understand that an iframe is a separate page. Therefore, if we need to work with the internal structure of an iframe, we need to create a separate class for it inherited from AbstractPage, in which we already paint its internal structure, for example:
 
