@@ -5,7 +5,7 @@
 ### Generating project
 The easiest way to initialize a new project is to use Carina archetype, you will get correct project structure along with test samples. Run below command from any <b>empty folder</b>:
 ```
-mvn archetype:generate -DarchetypeGroupId=com.qaprosoft \
+mvn archetype:generate -DarchetypeGroupId=com.zebrunner \
                        -DarchetypeArtifactId=carina-archetype \
                        -DarchetypeVersion=RELEASE \
                        -DgroupId=<your_groupId> \

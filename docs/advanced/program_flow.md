@@ -1,16 +1,16 @@
 Under the hood, Carina uses TestNG framework, so the first class to initialize is `RemoteTestNGStarter` class. Program lifecycle logic can be observed at `TestNG` [run()](https://github.com/cbeust/testng/blob/c394d371224b7d1aa3872c34c1f7818e2b9335f9/testng-core/src/main/java/org/testng/TestNG.java#L1058) method.
 
-The initializing turn comes to Carina when [CarinaListenerChain](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListenerChain.java) object is created.
+The initializing turn comes to Carina when [CarinaListenerChain](https://github.com/zebrunner/carina/blob/master/src/main/java/com/zebrunner/carina/core/listeners/CarinaListenerChain.java) object is created.
 It extends [ListenerChain](http://javadox.com/com.nordstrom.tools/testng-foundation/1.10.0/com/nordstrom/automation/testng/package-summary.html)
-which will create, sort and attach [IAbstractTest](https://github.com/zebrunner/carina/blob/60bea823c0921cb808e4c68eb6c056710a72b847/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/IAbstractTest.java#L49) listeners `CarinaListener.class, TestRunListener.class, FilterTestsListener.class`. This whole sequence is described in `TestRunner` [init()](https://github.com/cbeust/testng/blob/c394d371224b7d1aa3872c34c1f7818e2b9335f9/testng-core/src/main/java/org/testng/TestRunner.java#L229) method.
+which will create, sort and attach [IAbstractTest](https://github.com/zebrunner/carina/blob/master/src/main/java/com/zebrunner/carina/core/IAbstractTest.java) listeners `CarinaListener.class, TestRunListener.class, FilterTestsListener.class`. This whole sequence is described in `TestRunner` [init()](https://github.com/cbeust/testng/blob/c394d371224b7d1aa3872c34c1f7818e2b9335f9/testng-core/src/main/java/org/testng/TestRunner.java#L229) method.
 
 These listeners are being attached and created when transform(IListenersAnnotation annotation, Class testClass) method is called.
 
-* [FilterTestsListener](https://github.com/zebrunner/carina/blob/1202f5f7a660e53ab463548dd111682b310be261/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/FilterTestsListener.java#L33) which is resposible for tets execution [rules]( https://zebrunner.github.io/carina/configuration/#tests-execution-filter-configuration)
+* [FilterTestsListener](https://github.com/zebrunner/carina/blob/master/src/main/java/com/zebrunner/carina/core/listeners/FilterTestsListener.java) which is resposible for tests execution [rules]( https://zebrunner.github.io/carina/configuration/#tests-execution-filter-configuration)
 
 * `TestRunListener` which is implemented in the Zebrunner agent. 
 
-* [CarinaListener](https://github.com/zebrunner/carina/blob/1202f5f7a660e53ab463548dd111682b310be261/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListener.java#L105) which is the main Carina TestNG listener.
+* [CarinaListener](https://github.com/zebrunner/carina/blob/master/src/main/java/com/zebrunner/carina/core/listeners/CarinaListener.java) which is the main Carina TestNG listener.
 
 Because CarinaListener object is created, the class static field is initialized in it. There are several important steps inside:
 
@@ -49,7 +49,7 @@ public void webTest() {
 } 
 ```
 
-Debug entry point at : [AbstractPage](https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/gui/AbstractPage.java) constructor and [IDriverPool](https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/webdriver/IDriverPool.java) getDriver() method.
+Debug entry point at : [AbstractPage](https://github.com/zebrunner/carina-webdriver/blob/master/src/main/java/com/zebrunner/carina/webdriver/gui/AbstractPage.java) constructor and [IDriverPool](https://github.com/zebrunner/carina-webdriver/blob/master/src/main/java/com/zebrunner/carina/webdriver/IDriverPool.java) getDriver() method.
    
 **API**
 
@@ -63,7 +63,7 @@ public void testCreateUser() throws Exception {
 }
 ```
 
-Debug entry point at : [AbstractApiMethodV2](https://github.com/zebrunner/carina/blob/master/carina-api/src/main/java/com/qaprosoft/carina/core/foundation/api/AbstractApiMethodV2.java) constructor.
+Debug entry point at : [AbstractApiMethodV2](https://github.com/zebrunner/carina-api/blob/master/src/main/java/com/zebrunner/carina/api/AbstractApiMethodV2.java) constructor.
 
 **Database**
 
@@ -86,7 +86,7 @@ public void createUser() {
 }
 ```  
 
-These are user's classes, samples at carina-demo: [UserMapper](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/mappers/UserMapper.java), [ConnectionFactory](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/ConnectionFactory.java), [User](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/models/User.java).
+These are user's classes, samples at carina-demo: [UserMapper](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/zebrunner/carina/demo/db/mappers/UserMapper.java), [ConnectionFactory](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/zebrunner/carina/demo/utils/ConnectionFactory.java), [User](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/zebrunner/carina/demo/db/models/User.java).
 
 ### FAQ
 

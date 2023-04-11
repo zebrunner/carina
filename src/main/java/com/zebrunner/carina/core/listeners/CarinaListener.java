@@ -133,8 +133,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         if (!"INFO".equalsIgnoreCase(Configuration.get(Parameter.CORE_LOG_LEVEL))) {
             LoggerContext ctx = (LoggerContext) LogManager.getContext(this.getClass().getClassLoader(), false);
             org.apache.logging.log4j.core.config.Configuration config = ctx.getConfiguration();
-            // make sure to update after moving to "com.zebrunner"
-            LoggerConfig logger = config.getLoggerConfig("com.qaprosoft.carina.core");
+            LoggerConfig logger = config.getLoggerConfig("com.zebrunner.carina.core");
             logger.setLevel(Level.getLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
         }
 

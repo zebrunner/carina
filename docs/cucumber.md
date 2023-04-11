@@ -4,7 +4,7 @@ To integrate carina-cucumber functionality you just need to add its library into
 For instance with maven that can be done by adding next lines into your pom.xml:
 ```xml
 <dependency>
-    <groupId>com.qaprosoft</groupId>
+    <groupId>com.zebrunner</groupId>
     <artifactId>carina-cucumber</artifactId>
     <version>${carina-cucumber_version}</version>
 </dependency>
@@ -58,7 +58,7 @@ Class body can be empty since all logic for buildind of scripts and running them
 Here is the sample of such code:
 ```
 @CucumberOptions(features = "src/test/resources/features/GSMArenaNews.feature", 
-        glue = "com.qaprosoft.carina.demo.cucumber.steps",
+        glue = "com.zebrunner.carina.demo.cucumber.steps",
         plugin = {"pretty",
                 "html:target/cucumber-core-test-report",
                 "pretty:target/cucumber-core-test-report.txt",
