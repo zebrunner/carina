@@ -983,7 +983,7 @@ protected ExtendedWebElement developerText;
 </code></pre>
 
 <p><b>Important:</b>
-* Test class should implement com.qaprosoft.carina.core.foundation.IAbstractTest
+* Test class should implement com.zebrunner.carina.core.IAbstractTest
 * Test method should start with org.testng.annotations.Test annotation
 * Use getDriver() method to get driver instance in test
 * Locate tests in src/test/java source folder</p>
@@ -1106,8 +1106,8 @@ private ExtendedWebElement signUpBtn;
 <p>Basically, all you need is to create an image template of the element in .png format and place it to your project. We suggest using <code>src/main/resources/</code> folder to store images. 
 Be sure your image size is less than the real screen size. Real iOS screen sizes are listed <a href="https://developer.apple.com/library/archive/documentation/DeviceInformation/Reference/iOSDeviceCompatibility/Displays/Displays.html">here</a> in 'UIKit Size (Points)' column. You can also find the ultimate guide to iPhone resolutions <a href="https://www.paintcodeapp.com/news/ultimate-guide-to-iphone-resolutions">here</a>.</p>
 <h3 id="how-to-change-context-of-application">How to change context of application</h3>
-<p>In carina-demo there is an example of a <a href="https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/MobileContextUtils.java">tool</a>,
-that can change context of application. Just add needed context as a field in <a href="https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/MobileContextUtils.java#L51">View</a> enum.</p>
+<p>In carina-demo there is an example of a <a href="https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/zebrunner/carina/demo/utils/MobileContextUtils.java">tool</a>,
+that can change context of application. Just add needed context as a field in <a href="https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/zebrunner/carina/demo/utils/MobileContextUtils.java#L51">View</a> enum.</p>
 <pre><code class="java">// for example
 NATIVE(&quot;NATIVE_APP&quot;),
 WEB1(&quot;WEBVIEW_chromeapp&quot;),

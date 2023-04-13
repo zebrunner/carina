@@ -959,7 +959,7 @@ getDriver().switchTo().defaultContent();
 <p>It is good practice to implement all elements search logic of Page Object/UI Object side and perform assertions and validations in the test, do not mix this logic.</p>
 <p><strong>Important:</strong></p>
 <ul>
-<li>Test class should implement <strong>com.qaprosoft.carina.core.foundation.IAbstractTest</strong></li>
+<li>Test class should implement <strong>com.zebrunner.carina.core.IAbstractTest</strong></li>
 <li>Test method should start with <strong>org.testng.annotations.Test</strong> annotation</li>
 <li>Use <strong>getDriver()</strong> method to get driver instance in the test. <blockquote>
 <p>1st call of this method will start a driver based on default capabilities.</p>
@@ -979,7 +979,7 @@ capabilities.browserName=chrome
 &lt;suite verbose=&quot;1&quot; name=&quot;Carina Demo Tests - Web Sample&quot; parallel=&quot;methods&quot;&gt;
   &lt;test name=&quot;GSM arena web tests&quot;&gt;
       &lt;classes&gt;
-          &lt;class name=&quot;com.qaprosoft.carina.demo.WebSampleTest&quot; /&gt;
+          &lt;class name=&quot;com.zebrunner.carina.demo.WebSampleTest&quot; /&gt;
       &lt;/classes&gt;
   &lt;/test&gt;
 &lt;/suite&gt;

@@ -640,7 +640,7 @@ Under the hood it uses popular BDD framework Cucumber extending its basic functi
 To integrate carina-cucumber functionality you just need to add its library into your project.
 For instance with maven that can be done by adding next lines into your pom.xml:</p>
 <pre><code class="xml">&lt;dependency&gt;
-    &lt;groupId&gt;com.qaprosoft&lt;/groupId&gt;
+    &lt;groupId&gt;com.zebrunner&lt;/groupId&gt;
     &lt;artifactId&gt;carina-cucumber&lt;/artifactId&gt;
     &lt;version&gt;${carina-cucumber_version}&lt;/version&gt;
 &lt;/dependency&gt;
@@ -690,7 +690,7 @@ Then use <strong>@CucumberOptions</strong> annotation in order to complete the m
 Class body can be empty since all logic for buildind of scripts and running them is implemented inside CucumberBaseTest class. <br />
 Here is the sample of such code:</p>
 <pre><code>@CucumberOptions(features = &quot;src/test/resources/features/GSMArenaNews.feature&quot;, 
-        glue = &quot;com.qaprosoft.carina.demo.cucumber.steps&quot;,
+        glue = &quot;com.zebrunner.carina.demo.cucumber.steps&quot;,
         plugin = {&quot;pretty&quot;,
                 &quot;html:target/cucumber-core-test-report&quot;,
                 &quot;pretty:target/cucumber-core-test-report.txt&quot;,

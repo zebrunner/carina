@@ -691,13 +691,13 @@
                 
                   <h1>Screenshot</h1>
                 
-                <p>The screenshot creation logic is provided in the <a href="https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/webdriver/Screenshot.java">Screenshot</a> class.</p>
+                <p>The screenshot creation logic is provided in the <a href="https://github.com/zebrunner/carina-webdriver/blob/master/src/main/java/com/zebrunner/carina/webdriver/Screenshot.java">Screenshot</a> class.</p>
 <p>Taking screenshots is controlled by rules. Rules are divided into four types - successful driver action, unsuccessful driver action, 
 explicit full-size and explicit visible (page or element, depends on the method used).</p>
 <h3 id="successful-driver-action">Successful driver action</h3>
 <p>Produced after a successful click, entering text in a field, etc.<br />
 Used in the event listener of the driver used by the Carina Framework. It is also logical to use it in custom event listeners of the driver.</p>
-<p>The default rule implementation is provided in the <a href="https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/webdriver/screenshot/DefaultSuccessfulDriverActionScreenshotRule.java">DefaultSuccessfulDriverActionScreenshotRule</a> class and has the following logic:</p>
+<p>The default rule implementation is provided in the <a href="https://github.com/zebrunner/carina-webdriver/blob/master/src/main/java/com/zebrunner/carina/webdriver/screenshot/DefaultSuccessfulDriverActionScreenshotRule.java">DefaultSuccessfulDriverActionScreenshotRule</a> class and has the following logic:</p>
 <ol>
 <li>A screenshot is taken of only the visible part of the site/application.</li>
 <li>Whether to create screenshots or not depends on the configuration parameter <code>auto_screenshot</code>.</li>
@@ -721,7 +721,7 @@ Screenshot.capture(getDriver(), ScreenshotType.SUCCESSFUL_DRIVER_ACTION);
 <h3 id="error-while-executing-driver-action">Error while executing driver action</h3>
 <p>Produced after an unsuccessful click, text input, etc.
 Used in the event listener of the driver used by the Carina Framework. It is also logical to use it in custom event listeners of the driver.</p>
-<p>The default rule implementation is provided in the <a href="https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/webdriver/screenshot/DefaultUnSuccessfulDriverActionScreenshotRule.java">DefaultUnSuccessfulDriverActionScreenshotRule</a> class and has the following logic:</p>
+<p>The default rule implementation is provided in the <a href="https://github.com/zebrunner/carina-webdriver/blob/master/src/main/java/com/zebrunner/carina/webdriver/screenshot/DefaultUnSuccessfulDriverActionScreenshotRule.java">DefaultUnSuccessfulDriverActionScreenshotRule</a> class and has the following logic:</p>
 <ol>
 <li>Screenshot required.</li>
 <li>Creating a full page/only visible part of a screenshot depends on the <code>allow_fullsize_screenshot</code> configuration value.</li>
@@ -735,7 +735,7 @@ Screenshot.capture(getDriver(), ScreenshotType.UNSUCCESSFUL_DRIVER_ACTION);
 
 <h3 id="explicitly-creating-a-full-page-screenshot">Explicitly creating a full-page screenshot</h3>
 <p>Designed for those cases when you need to take a screenshot in the test.</p>
-<p>The default rule implementation is provided in the <a href="https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/webdriver/screenshot/ExplicitFullSizeScreenshotRule.java">ExplicitFullSizeScreenshotRule</a> class and has the following logic:</p>
+<p>The default rule implementation is provided in the <a href="https://github.com/zebrunner/carina-webdriver/blob/master/src/main/java/com/zebrunner/carina/webdriver/screenshot/ExplicitFullSizeScreenshotRule.java">ExplicitFullSizeScreenshotRule</a> class and has the following logic:</p>
 <ol>
 <li>Screenshot required.</li>
 <li>t's always full page.</li>
@@ -748,14 +748,14 @@ Screenshot.capture(getDriver(), ScreenshotType.UNSUCCESSFUL_DRIVER_ACTION);
 <p><b>Important</b>: Taking a screenshot of the entire page might significantly slow down your tests execution.</p>
 <h3 id="explicit-creation-of-a-screenshot-of-the-visible-part-of-the-pageapplication">Explicit creation of a screenshot of the visible part of the page/application</h3>
 <p>Designed for those cases when you need to take a screenshot in the test.</p>
-<p>The default rule implementation is provided in the <a href="https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/webdriver/screenshot/ExplicitVisibleScreenshotRule.java">ExplicitVisibleScreenshotRule</a> class and has the following logic:</p>
+<p>The default rule implementation is provided in the <a href="https://github.com/zebrunner/carina-webdriver/blob/master/src/main/java/com/zebrunner/carina/webdriver/screenshot/ExplicitVisibleScreenshotRule.java">ExplicitVisibleScreenshotRule</a> class and has the following logic:</p>
 <ol>
 <li>Screenshot required.</li>
 <li>It is always only the visible part of the page/application.</li>
 </ol>
 <p>A rule of this type must use <code>EXPLICIT_VISIBLE</code> as the return value in the <code>getScreenshotType</code> method.</p>
 <h2 id="create-your-own-rule">Create your own rule</h2>
-<p>You can implement and register any custom rules based on your requirements. The rule must implement the <a href="https://github.com/zebrunner/carina/blob/master/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/webdriver/screenshot/IScreenshotRule.java">IScreenshotRule</a> interface.</p>
+<p>You can implement and register any custom rules based on your requirements. The rule must implement the <a href="https://github.com/zebrunner/carina-webdriver/blob/master/src/main/java/com/zebrunner/carina/webdriver/screenshot/IScreenshotRule.java">IScreenshotRule</a> interface.</p>
 <p>The rule is registered using <code>addRule</code> method of the <code>Screenshot</code> class. The rule is registered globally, and if already registered
 rule of the same type, it will be overwritten.</p>
 <p>All default rules have the following properties (which can be changed):</p>
@@ -773,8 +773,8 @@ If the screenshot is full-page, then the divisor is <code>2</code>, otherwise <c
 
 <h3 id="faq">FAQ</h3>
 <p><strong>How can I find all places where automatic screenshot capturing is performed?</strong></p>
-<p>You can take a look into the <a href="https://github.com/zebrunner/carina/blob/1c9b50202e9254545600488e13f326eaa564e034/carina-webdriver/src/main/java/com/qaprosoft/carina/core/foundation/webdriver/listener/DriverListener.java#L276">DriverListener</a> 
-and <a href="https://github.com/zebrunner/carina/blob/1c9b50202e9254545600488e13f326eaa564e034/carina-core/src/main/java/com/qaprosoft/carina/core/foundation/listeners/CarinaListener.java#L958">CarinaListener</a> to find call hierarchy.</p>
+<p>You can take a look into the <a href="https://github.com/zebrunner/carina-webdriver/blob/master/src/main/java/com/zebrunner/carina/webdriver/listener/DriverListener.java">DriverListener</a> 
+and <a href="https://github.com/zebrunner/carina/blob/master/src/main/java/com/zebrunner/carina/core/listeners/CarinaListener.java">CarinaListener</a> to find call hierarchy.</p>
                 
               
               
