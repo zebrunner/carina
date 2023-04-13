@@ -1,5 +1,5 @@
 Modern test automation frameworks should support data-driven testing, when you are able to verify a variety of edge cases providing test data sets into the tests using external data sources. 
-Carina is not an exception, the framework supports multiple ways of test parametrization (see the [TestNG approach samples](https://github.com/zebrunner/carina-demo/blob/master/src/test/java/com/qaprosoft/carina/demo/DataprovidersSampleTest.java), [Carina's custom data provider samples](https://github.com/zebrunner/carina-demo/blob/develop/src/test/java/com/qaprosoft/carina/demo/CustomDataProvidersSampleTest.java)):
+Carina is not an exception, the framework supports multiple ways of test parametrization (see the [TestNG approach samples](https://github.com/zebrunner/carina-demo/blob/master/src/test/java/com/zebrunner/carina/demo/DataprovidersSampleTest.java), [Carina's custom data provider samples](https://github.com/zebrunner/carina-demo/blob/develop/src/test/java/com/qaprosoft/carina/demo/CustomDataProvidersSampleTest.java)):
 
 * Java data providers
 * XML parametrization
@@ -45,7 +45,7 @@ public void testSubstractOperation(int a, int b, int c) {
 	<parameter name="b" value="3"/>
 	<parameter name="c" value="9"/>
 	<classes>
-		<class name="com.qaprosoft.carina.demo.DataprovidersSampleTest">
+		<class name="com.zebrunner.carina.demo.DataprovidersSampleTest">
 			<methods>
 				<include name="testSubstractOperation"/>
 			</methods>
@@ -142,7 +142,7 @@ To use custom provider feature, add certain dependency to your pom.xml
 Visit our [github](https://github.com/zebrunner/carina-dataprovider/releases) to check the latest version of carina-dataprovider.
 
 ### Implementation
-Carina test framework provides a possibility to write all tests with data providers in one place, including parameterization using external XLS/CSV spreadsheets. First of all, you need to declare a test class that implements `com.qaprosoft.carina.core.foundation.IAbstractTest.java` and `com.zebrunner.carina.dataprovider.IAbstractDataProvider.java`.
+Carina test framework provides a possibility to write all tests with data providers in one place, including parameterization using external XLS/CSV spreadsheets. First of all, you need to declare a test class that implements `com.zebrunner.carina.core.IAbstractTest.java` and `com.zebrunner.carina.dataprovider.IAbstractDataProvider.java`.
 
 After that, you can specify data provider tests as follows.
 

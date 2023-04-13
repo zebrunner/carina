@@ -30,7 +30,7 @@ The next step is MyBatis mappers implementation, read [the official documentatio
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.qaprosoft.carina.demo.db.mappers.UserMapper">
+<mapper namespace="com.zebrunner.carina.demo.db.mappers.UserMapper">
 
 	<insert id="create" useGeneratedKeys="true" keyProperty="id">
 		<![CDATA[
@@ -128,7 +128,7 @@ The next step is MyBatis mappers implementation, read [the official documentatio
 		]]>
 	</delete>
 
-	<resultMap type="com.qaprosoft.carina.demo.db.models.User"
+	<resultMap type="com.zebrunner.carina.demo.db.models.User"
 		id="UserResultMap" autoMapping="false">
 		<id column="USER_ID" property="id" />
 		<result column="USER_USERNAME" property="username" />
@@ -138,16 +138,16 @@ The next step is MyBatis mappers implementation, read [the official documentatio
 		<result column="USER_EMAIL" property="email" />
 		<result column="USER_STATUS" property="status" />
 		<collection property="preferences"
-			ofType="com.qaprosoft.carina.demo.db.models.UserPreference"
-			resultMap="com.qaprosoft.carina.demo.db.mappers.UserPreferenceMapper.UserPreferenceResultMap" />
+			ofType="com.zebrunner.carina.demo.db.models.UserPreference"
+			resultMap="com.zebrunner.carina.demo.db.mappers.UserPreferenceMapper.UserPreferenceResultMap" />
 	</resultMap>
 
 </mapper>
 ```
 
-Now we have to implement a DB domain object [User class](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/models/User.java) which reflects the DB table structure:
+Now we have to implement a DB domain object [User class](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/zebrunner/carina/demo/db/models/User.java) which reflects the DB table structure:
 ```
-package com.qaprosoft.carina.demo.db.models;
+package com.zebrunner.carina.demo.db.models;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -236,12 +236,12 @@ public class User {
 }
 ```
 
-Also, we have to describe the mapper interface, [UserMapper interface](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/db/mappers/UserMapper.java):
+Also, we have to describe the mapper interface, [UserMapper interface](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/zebrunner/carina/demo/db/mappers/UserMapper.java):
 
 ```
-package com.qaprosoft.carina.demo.db.mappers;
+package com.zebrunner.carina.demo.db.mappers;
 
-import com.qaprosoft.carina.demo.db.models.User;
+import com.zebrunner.carina.demo.db.models.User;
 
 public interface UserMapper {
 
@@ -305,9 +305,9 @@ All the mappers and reference to _database.properties should be specified in **s
 ```
 
 ## Connection factory
-Connection factory is responsible for MyBatis context initialization and creation of mapper instances, take a look at the sample implementation of [ConnectionFactory](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/ConnectionFactory.java):
+Connection factory is responsible for MyBatis context initialization and creation of mapper instances, take a look at the sample implementation of [ConnectionFactory](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/zebrunner/carina/demo/utils/ConnectionFactory.java):
 ```
-package com.qaprosoft.carina.demo.utils;
+package com.zebrunner.carina.demo.utils;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -316,8 +316,8 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
-import com.qaprosoft.carina.demo.db.mappers.UserMapper;
-import com.qaprosoft.carina.demo.db.mappers.UserPreferenceMapper;
+import com.zebrunner.carina.demo.db.mappers.UserMapper;
+import com.zebrunner.carina.demo.db.mappers.UserPreferenceMapper;
 
 public class ConnectionFactory {
 	private static SqlSessionFactory factory;
@@ -347,23 +347,23 @@ public class ConnectionFactory {
 ```
 
 ## Usage sample
-Finally, [DBSampleTest](https://github.com/zebrunner/carina-demo/blob/master/src/test/java/com/qaprosoft/carina/demo/DBSampleTest.java) illustrates the usage of MyBatis in tests:
+Finally, [DBSampleTest](https://github.com/zebrunner/carina-demo/blob/master/src/test/java/com/zebrunner/carina/demo/DBSampleTest.java) illustrates the usage of MyBatis in tests:
 ```
-package com.qaprosoft.carina.demo;
+package com.zebrunner.carina.demo;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
 
-import com.qaprosoft.carina.core.foundation.IAbstractTest;
+import com.zebrunner.carina.core.IAbstractTest;
 import com.zebrunner.agent.core.annotation.TestLabel;
 import org.apache.ibatis.session.SqlSession;
 import org.testng.annotations.Test;
-import com.qaprosoft.carina.demo.db.mappers.UserMapper;
-import com.qaprosoft.carina.demo.db.mappers.UserPreferenceMapper;
-import com.qaprosoft.carina.demo.db.models.User;
-import com.qaprosoft.carina.demo.db.models.User.Status;
-import com.qaprosoft.carina.demo.utils.ConnectionFactory;
-import com.qaprosoft.carina.demo.db.models.UserPreference;
+import com.zebrunner.carina.demo.db.mappers.UserMapper;
+import com.zebrunner.carina.demo.db.mappers.UserPreferenceMapper;
+import com.zebrunner.carina.demo.db.models.User;
+import com.zebrunner.carina.demo.db.models.User.Status;
+import com.zebrunner.carina.demo.utils.ConnectionFactory;
+import com.zebrunner.carina.demo.db.models.UserPreference;
 
 /**
  * This sample shows how create DB test.

@@ -252,7 +252,7 @@ It is good practice to implement all elements search logic of Page Object/UI Obj
 
 **Important:**
 
-* Test class should implement **com.qaprosoft.carina.core.foundation.IAbstractTest**
+* Test class should implement **com.zebrunner.carina.core.IAbstractTest**
 * Test method should start with **org.testng.annotations.Test** annotation
 * Use **getDriver()** method to get driver instance in the test. 
   > 1st call of this method will start a driver based on default capabilities.
@@ -272,7 +272,7 @@ The implemented test cases should be placed in a TestNG xml file according to th
 <suite verbose="1" name="Carina Demo Tests - Web Sample" parallel="methods">
   <test name="GSM arena web tests">
       <classes>
-          <class name="com.qaprosoft.carina.demo.WebSampleTest" />
+          <class name="com.zebrunner.carina.demo.WebSampleTest" />
       </classes>
   </test>
 </suite>

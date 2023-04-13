@@ -13,7 +13,7 @@ import org.testng.asserts.SoftAssert;
 
 import org.apache.commons.math3.util.Precision;
 
-import com.qaprosoft.carina.core.foundation.IAbstractTest;
+import com.zebrunner.carina.core.IAbstractTest;
 import com.zebrunner.carina.core.registrar.ownership.MethodOwner;
 import com.zebrunner.carina.dataprovider.IAbstractDataProvider;
 import com.zebrunner.carina.dataprovider.annotations.CsvDataSourceParameters;

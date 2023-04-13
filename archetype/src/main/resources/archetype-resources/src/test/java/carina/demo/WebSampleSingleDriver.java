@@ -16,7 +16,7 @@ import ${package}.carina.demo.gui.pages.common.CompareModelsPageBase;
 import ${package}.carina.demo.gui.pages.common.HomePageBase;
 import ${package}.carina.demo.gui.components.compare.ModelSpecs;
 import ${package}.carina.demo.gui.components.compare.ModelSpecs.SpecType;
-import com.qaprosoft.carina.core.foundation.IAbstractTest;
+import com.zebrunner.carina.core.IAbstractTest;
 import com.zebrunner.agent.core.annotation.TestLabel;
 import com.zebrunner.carina.core.registrar.ownership.MethodOwner;
 

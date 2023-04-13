@@ -8,7 +8,7 @@
 	<parameter name="jenkinsJobName" value="API-DataProvider-Classes"/>
 	<parameter name="jenkinsJobType" value="api"/>
 	<parameter name="jenkinsEnvironments" value="DEMO"/>
-	<parameter name="jenkinsEmail" value="demo@qaprosoft.com"/>
+	<parameter name="jenkinsEmail" value="demo@zebrunner.com"/>
 
 	<parameter name="jenkinsRegressionPipeline" value="full_regression"/>
 	<parameter name="jenkinsRegressionMatrix_full_regression" value="retry_count:0; retry_count:3"/>

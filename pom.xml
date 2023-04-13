@@ -1,13 +1,18 @@
-<?xml version="1.0"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0">
+
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.qaprosoft</groupId>
-    <artifactId>carina</artifactId>
+    <groupId>com.zebrunner</groupId>
+    <artifactId>carina-core</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
+
+    <name>Carina Core</name>
+    <description>Carina core module for web, mobile testing.</description>
     <url>https://www.carina-core.io/</url>
-    <name>Carina Core - Multi Module</name>
-    <description>Test automation framework for Web, Mobile, API testing.</description>
+
     <licenses>
         <license>
             <name>Apache Software License v2.0</name>
@@ -15,6 +20,7 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+
     <developers>
         <developer>
             <name>Alex Khursevich</name>
@@ -28,51 +34,145 @@
             <organization>Zebrunner</organization>
             <organizationUrl>https://zebrunner.com</organizationUrl>
         </developer>
+        <developer>
+            <name>Andrei Kamarouski</name>
+            <email>akamarouski@zebrunner.com</email>
+            <organization>Zebrunner</organization>
+            <organizationUrl>https://zebrunner.com</organizationUrl>
+        </developer>
     </developers>
+
     <scm>
         <url>https://github.com/zebrunner/carina.git</url>
     </scm>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- Define project's dependency version properties here -->
         <java.version>11</java.version>
         <zebrunner-testng-pluggable.version>1.9.3</zebrunner-testng-pluggable.version>
-        <!-- Testings -->
-        <testng.version>7.6.1</testng.version>
-        <testng-foundation.version>2.0.1</testng-foundation.version>
+        <carina-webdriver.version>1.0.2</carina-webdriver.version>
+        <carina-utils.version>1.0.3</carina-utils.version>
         <!-- Logging -->
         <slf4j.version>1.7.30</slf4j.version>
         <log4j.version>2.17.1</log4j.version>
         <!-- Commons -->
         <commons-lang3.version>3.5</commons-lang3.version>
-        <!-- Others -->
-        <!-- Never add mockito-all as compile dependency as it has their own invalid hamcrest-all implementation otherwise api fail to common with:
-                org.hamcrest.core.IsInstanceOf.any(Ljava/lang/Class;)Lorg/hamcrest/Matcher
-         -->
-        <maven-assembly-plugin.version>3.1.0</maven-assembly-plugin.version>
-        <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
+        <!-- Testings -->
+        <testng.version>7.6.1</testng.version>
+        <testng-foundation.version>2.0.1</testng-foundation.version>
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
-        <maven-surefire-plugin.version>3.0.0-M4</maven-surefire-plugin.version>
+        <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
         <maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
+        <maven-surefire-plugin.version>3.0.0-M4</maven-surefire-plugin.version>
+        <maven-assembly-plugin.version>3.1.0</maven-assembly-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
-        <jacoco-maven-plugin>0.8.7</jacoco-maven-plugin>
     </properties>
-    <modules>
-        <module>carina-core</module>
-    </modules>
+
     <!--repositories>
-        <repository>
-            <id>zebrunner_snapshots</id>
-            <name>zebrunner Snapshots</name>
-            <url>https://nexus.zebrunner.dev/repository/ce-snapshots/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories-->
+         <repository>
+             <id>zebrunner_snapshots</id>
+             <name>zebrunner Snapshots</name>
+             <url>https://nexus.zebrunner.dev/repository/ce-snapshots/</url>
+             <releases>
+                 <enabled>false</enabled>
+             </releases>
+             <snapshots>
+                 <enabled>true</enabled>
+             </snapshots>
+         </repository>
+     </repositories-->
+
+    <dependencies>
+        <dependency>
+            <groupId>com.zebrunner</groupId>
+            <artifactId>carina-webdriver</artifactId>
+            <version>${carina-webdriver.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.zebrunner</groupId>
+            <artifactId>carina-utils</artifactId>
+            <version>${carina-utils.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.testng</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.seleniumhq.selenium</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>io.rest-assured</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.zebrunner</groupId>
+            <artifactId>agent-testng-pluggable</artifactId>
+            <version>${zebrunner-testng-pluggable.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+        <!-- Log4j2 -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
+        </dependency>
+
+        <!-- Test utilities -->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.nordstrom.tools</groupId>
+            <artifactId>testng-foundation</artifactId>
+            <version>${testng-foundation.version}</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.testng</groupId>
+                    <artifactId>testng</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+    </dependencies>
+
     <profiles>
         <profile>
             <id>default</id>
@@ -106,25 +206,6 @@
                             </execution>
                         </executions>
                     </plugin>
-					<plugin>
-						<groupId>org.jacoco</groupId>
-						<artifactId>jacoco-maven-plugin</artifactId>
-						<version>${jacoco-maven-plugin}</version>
-						<executions>
-							<execution>
-								<id>prepare-agent</id>
-								<goals>
-									<goal>prepare-agent</goal>
-								</goals>
-							</execution>
-							<execution>
-								<id>report</id>
-								<goals>
-									<goal>report</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
                 </plugins>
                 <pluginManagement>
                     <plugins>
@@ -140,11 +221,6 @@
                             <artifactId>maven-assembly-plugin</artifactId>
                             <version>${maven-assembly-plugin.version}</version>
                             <configuration>
-                                <archive>
-                                    <manifest>
-                                        <mainClass>com.qaprosoft.carina.core.foundation.AbstractTest</mainClass>
-                                    </manifest>
-                                </archive>
                                 <descriptorRefs>
                                     <descriptorRef>jar-with-dependencies</descriptorRef>
                                 </descriptorRefs>
@@ -254,7 +330,7 @@
                             <configuration>
                                 <archive>
                                     <manifest>
-                                        <mainClass>com.qaprosoft.carina.core.foundation.AbstractTest</mainClass>
+                                        <mainClass>com.zebrunner.carina.core.AbstractTest</mainClass>
                                     </manifest>
                                 </archive>
                                 <descriptorRefs>
@@ -286,86 +362,45 @@
         </profile>
     </profiles>
 
-    <dependencyManagement>
-        <dependencies>
-            <!-- Project Level Dependencies: Manage them here at one place; pull specific
-                                         dependency as needed in child -->
-
-            <dependency>
-                <groupId>com.qaprosoft</groupId>
-                <artifactId>carina-core</artifactId>
-                <version>1.0-SNAPSHOT</version>
-            </dependency>
-
-            <!-- Define 3rd party compile-time dependencies here for children. 
-                 Define version as property, and refer to the versionPropertyName in <version> tag -->
-            <dependency>
-                <groupId>com.zebrunner</groupId>
-                <artifactId>agent-testng-pluggable</artifactId>
-                <version>${zebrunner-testng-pluggable.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
-            <!-- Log4j2 -->
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-api</artifactId>
-                <version>${log4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-core</artifactId>
-                <version>${log4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-slf4j-impl</artifactId>
-                <version>${log4j.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-lang3</artifactId>
-                <version>${commons-lang3.version}</version>
-            </dependency>
-
-            <!-- Test utilities -->
-            <dependency>
-                <groupId>org.testng</groupId>
-                <artifactId>testng</artifactId>
-                <version>${testng.version}</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.nordstrom.tools</groupId>
-                <artifactId>testng-foundation</artifactId>
-                <version>${testng-foundation.version}</version>
-                <scope>compile</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.testng</groupId>
-                        <artifactId>testng</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>ch.qos.logback</groupId>
-                        <artifactId>logback-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>ch.qos.logback</groupId>
-                        <artifactId>logback-classic</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <release>${java.version}</release>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
     <distributionManagement>
         <repository>
-            <id>QPS_Nexus</id>
-            <name>Qaprosoft Releases</name>
+            <id>Maven_Nexus</id>
+            <name>Maven Releases</name>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
         </repository>
         <snapshotRepository>

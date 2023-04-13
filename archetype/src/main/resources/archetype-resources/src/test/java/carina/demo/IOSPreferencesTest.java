@@ -6,7 +6,7 @@ package ${package}.carina.demo;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.IAbstractTest;
+import com.zebrunner.carina.core.IAbstractTest;
 import ${package}.carina.demo.mobile.gui.pages.ios.PreferencesPage;
 import ${package}.carina.demo.utils.MobileContextUtils;
 import com.zebrunner.carina.utils.mobile.IMobileUtils;

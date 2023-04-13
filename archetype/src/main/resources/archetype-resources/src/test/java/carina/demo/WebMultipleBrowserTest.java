@@ -15,7 +15,7 @@ import org.testng.asserts.SoftAssert;
 import ${package}.carina.demo.gui.pages.common.HomePageBase;
 import ${package}.carina.demo.gui.pages.common.NewsPageBase;
 import ${package}.carina.demo.gui.components.NewsItem;
-import com.qaprosoft.carina.core.foundation.IAbstractTest;
+import com.zebrunner.carina.core.IAbstractTest;
 import com.zebrunner.carina.core.registrar.ownership.MethodOwner;
 import com.zebrunner.carina.webdriver.Screenshot;
 import com.zebrunner.carina.webdriver.ScreenshotType;

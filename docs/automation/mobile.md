@@ -186,7 +186,7 @@ public class SampleTest implements IAbstractTest {
 ```
 
 <b>Important:</b>
-* Test class should implement com.qaprosoft.carina.core.foundation.IAbstractTest
+* Test class should implement com.zebrunner.carina.core.IAbstractTest
 * Test method should start with org.testng.annotations.Test annotation
 * Use getDriver() method to get driver instance in test
 * Locate tests in src/test/java source folder
@@ -326,8 +326,8 @@ Be sure your image size is less than the real screen size. Real iOS screen sizes
 
 ### How to change context of application
 
-In carina-demo there is an example of a [tool](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/MobileContextUtils.java),
-that can change context of application. Just add needed context as a field in [View](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/qaprosoft/carina/demo/utils/MobileContextUtils.java#L51) enum.
+In carina-demo there is an example of a [tool](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/zebrunner/carina/demo/utils/MobileContextUtils.java),
+that can change context of application. Just add needed context as a field in [View](https://github.com/zebrunner/carina-demo/blob/master/src/main/java/com/zebrunner/carina/demo/utils/MobileContextUtils.java#L51) enum.
 ```java
 // for example
 NATIVE("NATIVE_APP"),

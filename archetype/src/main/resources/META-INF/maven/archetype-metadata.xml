@@ -10,7 +10,7 @@
             <defaultValue>CarinaDemo</defaultValue>
         </requiredProperty>
         <requiredProperty key="url">
-            <defaultValue>https://qaprosoft.com</defaultValue>
+            <defaultValue>https://zebrunner.com</defaultValue>
         </requiredProperty>
         <requiredProperty key="demo">
             <defaultValue>true</defaultValue>

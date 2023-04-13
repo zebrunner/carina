@@ -7,7 +7,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.qaprosoft.carina.core.foundation.IAbstractTest;
+import com.zebrunner.carina.core.IAbstractTest;
 import ${package}.carina.demo.mobile.gui.pages.common.CarinaDescriptionPageBase;
 import ${package}.carina.demo.mobile.gui.pages.common.ContactUsPageBase;
 import ${package}.carina.demo.mobile.gui.pages.common.LoginPageBase;

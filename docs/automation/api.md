@@ -79,9 +79,9 @@ While user.properties contains some default value which may be replaced later:
 ![API flow](../img/api/props-example.png)
 
 #### REST service call domain object [DEPRECATED]
-Now we are ready to create REST service domain object which will be used to interact with web service and perform additional response validations. Our domain object is located in /carina-demo/src/main/java/com/qaprosoft/carina/demo/api, make sure that it extends AbstractApiMethodV2 and triggers the base class constructor for initialization. In general cases, you will specify the path to request and response templates along with default properties files (all of them have been created in the previous step). Also, we replace the URL placeholder to set an appropriate environment.
+Now we are ready to create REST service domain object which will be used to interact with web service and perform additional response validations. Our domain object is located in /carina-demo/src/main/java/com/zebrunner/carina/demo/api, make sure that it extends AbstractApiMethodV2 and triggers the base class constructor for initialization. In general cases, you will specify the path to request and response templates along with default properties files (all of them have been created in the previous step). Also, we replace the URL placeholder to set an appropriate environment.
 ```java
-package com.qaprosoft.carina.demo.api;
+package com.zebrunner.carina.demo.api;
 
 import com.zebrunner.carina.api.AbstractApiMethodV2;
 import com.zebrunner.carina.utils.Configuration;
@@ -150,9 +150,9 @@ public class DeleteUserMethod extends AbstractApiMethodV2 {
 And before sending of request base part of URL will be set by carina depending on used environment automatically.
 
 #### API test
-API test is a general TestNG test, a class should extend APITest, in our case, the test implements IAbstractTest that encapsulates some test data and login method. The test is located in /carina-demo/src/test/java/com/qaprosoft/carina/demo.
+API test is a general TestNG test, a class should extend APITest, in our case, the test implements IAbstractTest that encapsulates some test data and login method. The test is located in /carina-demo/src/test/java/com/zebrunner/carina/demo.
 ```java
-package com.qaprosoft.carina.demo;
+package com.zebrunner.carina.demo;
 
 import java.lang.invoke.MethodHandles;
 
@@ -162,13 +162,13 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 import com.zebrunner.carina.api.apitools.validation.JsonCompareKeywords;
-import com.qaprosoft.carina.core.foundation.IAbstractTest;
+import com.zebrunner.carina.core.IAbstractTest;
 import com.zebrunner.carina.core.registrar.ownership.MethodOwner;
 import com.zebrunner.carina.core.registrar.tag.TestPriority;
-import com.qaprosoft.carina.core.foundation.utils.tag.TestPriority;
-import com.qaprosoft.carina.demo.api.DeleteUserMethod;
-import com.qaprosoft.carina.demo.api.GetUserMethods;
-import com.qaprosoft.carina.demo.api.PostUserMethod;
+import com.zebrunner.carina.core.foundation.utils.tag.TestPriority;
+import com.zebrunner.carina.demo.api.DeleteUserMethod;
+import com.zebrunner.carina.demo.api.GetUserMethods;
+import com.zebrunner.carina.demo.api.PostUserMethod;
 
 /**
  * This sample shows how create REST API tests.
@@ -242,7 +242,7 @@ It allows to:
 
 Here is example of multiple api methods definition for one url pattern. Base url template can be easily overwritten with use of `@EndpointTemplateMethod` annotation:
 ```java
-package com.qaprosoft.carina.demo.api;
+package com.zebrunner.carina.demo.api;
 
 import com.zebrunner.carina.api.AbstractApiMethodV2;
 import com.zebrunner.carina.api.annotation.EndpointTemplate;
@@ -315,11 +315,11 @@ public void testCreateUser() {
 ```
 For more customization on api method definition level you can implement the interface and use the proxy class inside:    
 ```java
-package com.qaprosoft.carina.demo.api.impl;
+package com.zebrunner.carina.demo.api.impl;
 
 import com.zebrunner.carina.api.AbstractApiMethodV2;
 import com.zebrunner.carina.api.binding.TemplateFactory;
-import com.qaprosoft.carina.demo.api.UserTemplate;
+import com.zebrunner.carina.demo.api.UserTemplate;
 
 public class UserTemplateImpl implements UserTemplate {
     
@@ -364,7 +364,7 @@ This method provides us an object of `APIMethodPoller` class. Methods of this ob
 timeout, logging strategy, actions that should be executed immediately after the api calling, condition under which the
 response is considered successful, action that will be executed after all api callings.
 
-[Example](https://github.com/zebrunner/carina-demo/blob/98ecd27e28b323050cc9b37cb9627ae3164f47a7/src/test/java/com/qaprosoft/carina/demo/APISampleTest.java#L55) of using:
+[Example](https://github.com/zebrunner/carina-demo/blob/master/src/test/java/com/zebrunner/carina/demo/APISampleTest.java) of using:
 ```java
     @Test
     public void testCreateUserWaitingResponseContainsAddress() {
@@ -382,7 +382,7 @@ response is considered successful, action that will be executed after all api ca
 #### Handling and changing AbstractApiMethod on-the-fly
 This option provides the ability for handling and changing of your AbstractApiMethod instances on-the-fly. For that it's needed to create an implementation of `ApiMethodInterceptor` interface:    
 ```java
-package com.qaprosoft.carina.demo.api.interceptor;
+package com.zebrunner.carina.demo.api.interceptor;
 
 import com.zebrunner.carina.api.AbstractApiMethodV2;
 import com.zebrunner.carina.api.interceptor.ApiMethodInterceptor;
@@ -434,8 +434,8 @@ Then all logic defined in interceptor methods will be called on particular event
 Also it's possible to create global interceptors which will be applied for all api methods by default.    
 Just create a file named `com.zebrunner.carina.api.interceptor.ApiMethodInterceptor` in `/resources/META-INF/services` folder and set the path(s) of your implementation(s) into it:    
 ```
-com.qaprosoft.carina.demo.CustomInterceptor
-com.qaprosoft.carina.demo.OtherCustomInterceptor
+com.zebrunner.carina.demo.CustomInterceptor
+com.zebrunner.carina.demo.OtherCustomInterceptor
 ```
 
 #### Wildcards
@@ -488,7 +488,7 @@ In your json file
 #### Custom wildcards
 You have a possibility to implement custom wildcard for response validation as well. All you need is JsonKeywordComparator interface implementation:
 ```java
-package com.qaprosoft.carina.demo;
+package com.zebrunner.carina.demo;
 
 import com.zebrunner.carina.api.apitools.validation.JsonCompareResultWrapper;
 import com.zebrunner.carina.api.apitools.validation.JsonKeywordComparator;
@@ -561,8 +561,8 @@ This option provides the ability to register your comparators, which will be alw
 Just create a file named `com.zebrunner.carina.api.apitools.validation.JsonKeywordComparator`
 in `/resources/META-INF/services` folder and set the path(s) of your implementation(s) into it:
 ```
-com.qaprosoft.carina.demo.CustomComparator
-com.qaprosoft.carina.demo.OtherCustomComparator
+com.zebrunner.carina.demo.CustomComparator
+com.zebrunner.carina.demo.OtherCustomComparator
 ```
 
 #### Validation against JSON schema
@@ -891,7 +891,7 @@ secondNumber=6
 result=10
 ```
 
-Now we are ready to create SOAP service domain object which will be used to interact with web service and perform additional response validations. This domain object is located in **/carina-demo/src/main/java/com/qaprosoft/carina/demo/soap/**, make sure that it extends AbstractApiMethodV2.
+Now we are ready to create SOAP service domain object which will be used to interact with web service and perform additional response validations. This domain object is located in **/carina-demo/src/main/java/com/zebrunner/carina/demo/soap/**, make sure that it extends AbstractApiMethodV2.
 
 We can specify the endpoint-url, expected HttpStatus, paths to request and response templates and content type using annotations.
 
@@ -911,7 +911,7 @@ public class LookupCityMethod extends AbstractApiMethodV2 {
 }
 ```
 
-Then we can create test class with soap test methods. This class is located in **/carina-demo/src/test/java/com/qaprosoft/carina/demo/**. Test class must implement IAbstractTest. Test methods should start with @Test annotation.
+Then we can create test class with soap test methods. This class is located in **/carina-demo/src/test/java/com/zebrunner/carina/demo/**. Test class must implement IAbstractTest. Test methods should start with @Test annotation.
 
 To send SOAP request we have to set some request headers. SOAPAction header indicates the intent of the SOAP HTTP request.
 

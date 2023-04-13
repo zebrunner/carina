@@ -21,7 +21,7 @@ import ${package}.carina.demo.gui.pages.common.CompareModelsPageBase;
 import ${package}.carina.demo.gui.pages.common.HomePageBase;
 import ${package}.carina.demo.gui.pages.common.ModelInfoPageBase;
 import ${package}.carina.demo.gui.pages.common.NewsPageBase;
-import com.qaprosoft.carina.core.foundation.IAbstractTest;
+import com.zebrunner.carina.core.IAbstractTest;
 import com.zebrunner.agent.core.annotation.TestLabel;
 import com.zebrunner.carina.core.registrar.ownership.MethodOwner;
 import com.zebrunner.carina.core.registrar.tag.Priority;
