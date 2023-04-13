@@ -5,82 +5,21 @@
   <groupId>com.qaprosoft</groupId>
   <artifactId>carina-archetype</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <packaging>maven-archetype</packaging>
-  <url>https://zebrunner.com</url>
-  <name>carina-archetype</name>
-  <description>Carina Archetype</description>
-
-  <licenses>
-    <license>
-      <name>Apache Software License v2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-  <developers>
-    <developer>
-      <name>Vadim Delendik</name>
-      <email>vdelendik@zebrunner.com</email>
-      <organization>Zebrunner Inc</organization>
-      <organizationUrl>https://zebrunner.com</organizationUrl>
-    </developer>
-  </developers>
-  <scm>
-    <url>https://github.com/zebrunner/carina.git</url>
-  </scm>
-
-  <build>
-    <extensions>
-      <extension>
-        <groupId>org.apache.maven.archetype</groupId>
-        <artifactId>archetype-packaging</artifactId>
-        <version>3.0.1</version>
-      </extension>
-    </extensions>
-
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <artifactId>maven-archetype-plugin</artifactId>
-          <version>3.2.1</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-gpg-plugin</artifactId>
-        <configuration>
-          <!-- Prevent `gpg` from using pinentry programs -->
-          <gpgArguments>
-            <arg>--pinentry-mode</arg>
-            <arg>loopback</arg>
-          </gpgArguments>
-        </configuration>
-        <executions>
-          <execution>
-            <id>sign-artifacts</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>sign</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
-
   <distributionManagement>
-      <repository>
-          <id>QPS_Nexus</id>
-          <name>Qaprosoft Releases</name>
-          <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-      </repository>
-      <snapshotRepository>
-          <id>QPS_Nexus</id>
-          <name>Qaprosoft Snapshots</name>
-          <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-      </snapshotRepository>
+    <relocation>
+      <groupId>com.zebrunner</groupId>
+      <artifactId>carina-archetype</artifactId>
+      <version>1.0.0</version>
+    </relocation>
+    <repository>
+      <id>QPS_Nexus</id>
+      <name>Qaprosoft Releases</name>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+    </repository>
+    <snapshotRepository>
+      <id>QPS_Nexus</id>
+      <name>Qaprosoft Snapshots</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+    </snapshotRepository>
   </distributionManagement>
 </project>
