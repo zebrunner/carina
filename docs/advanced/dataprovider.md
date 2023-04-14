@@ -1,5 +1,5 @@
 Modern test automation frameworks should support data-driven testing, when you are able to verify a variety of edge cases providing test data sets into the tests using external data sources. 
-Carina is not an exception, the framework supports multiple ways of test parametrization (see the [TestNG approach samples](https://github.com/zebrunner/carina-demo/blob/master/src/test/java/com/zebrunner/carina/demo/DataprovidersSampleTest.java), [Carina's custom data provider samples](https://github.com/zebrunner/carina-demo/blob/develop/src/test/java/com/qaprosoft/carina/demo/CustomDataProvidersSampleTest.java)):
+Carina is not an exception, the framework supports multiple ways of test parametrization (see the [TestNG approach samples](https://github.com/zebrunner/carina-demo/blob/master/src/test/java/com/zebrunner/carina/demo/DataProvidersSampleTest.java), [Carina's custom data provider samples](https://github.com/zebrunner/carina-demo/blob/master/src/test/java/com/zebrunner/carina/demo/CustomDataProvidersSampleTest.java)):
 
 * Java data providers
 * XML parametrization
@@ -10,11 +10,11 @@ Carina is not an exception, the framework supports multiple ways of test paramet
 As far as Carina is based on TestNG framework, you are able to use well known Java data providers which return a matrix of Objects and pass it to the appropriate test arguments. You have to use dataProvider attribute along with @Test annotation and implement the method annotated with `@DataProvider` that will return `Object[][]` as a test data set:
 ```
 @Test(dataProvider = "DP1")
-public void testMuliplyOperation(int a, int b, int c)
+public void testMultiplyOperation(int a, int b, int c)
 {
 	int actual = a * b;
 	int expected = c;
-	Assert.assertEquals(actual, expected, "Invalid sum result!");
+	Assert.assertEquals(actual, expected, "Invalid multiply result!");
 }
 
 @DataProvider(parallel = false, name = "DP1")
@@ -33,21 +33,21 @@ TestNG supports parametrization from XML files when you organize test suites usi
 ```
 @Test
 @Parameters({ "a", "b", "c" })
-public void testSubstractOperation(int a, int b, int c) {
+public void testSubtractOperation(int a, int b, int c) {
 	int actual = Integer.valueOf(a) - Integer.valueOf(b);
 	int expected = Integer.valueOf(c);
-	Assert.assertEquals(actual, expected, "Invalid substract result!");
+	Assert.assertEquals(actual, expected, "Invalid subtract result!");
 }
 
 ...
-<test name="Substract operation test">
+<test name="Subtract operation test">
 	<parameter name="a" value="12"/>
 	<parameter name="b" value="3"/>
 	<parameter name="c" value="9"/>
 	<classes>
 		<class name="com.zebrunner.carina.demo.DataprovidersSampleTest">
 			<methods>
-				<include name="testSubstractOperation"/>
+				<include name="testSubtractOperation"/>
 			</methods>
 		</class>
 	</classes>
