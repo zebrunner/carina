@@ -5,6 +5,31 @@
   <groupId>com.qaprosoft</groupId>
   <artifactId>carina-archetype</artifactId>
   <version>1.0-SNAPSHOT</version>
+  <url>https://zebrunner.com</url>
+  <name>carina-archetype</name>
+  <description>Carina Archetype</description>
+
+  <licenses>
+    <license>
+      <name>Apache Software License v2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>Vadim Delendik</name>
+      <email>vdelendik@zebrunner.com</email>
+      <organization>Zebrunner Inc</organization>
+      <organizationUrl>https://zebrunner.com</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <url>https://github.com/zebrunner/carina.git</url>
+  </scm>
+
   <distributionManagement>
     <relocation>
       <groupId>com.zebrunner</groupId>
