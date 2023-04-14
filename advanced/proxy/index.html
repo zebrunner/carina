@@ -835,7 +835,7 @@ This possibility is implemented and supplemented in Carina Framework through the
 <h3 id="direct-proxy-mode">DIRECT proxy mode</h3>
 <p>Specifies that the session will not use a proxy.</p>
 <p>Set by changing the value of the <code>proxy_type</code> parameter in the configuration to <code>DIRECT</code>.</p>
-<p>An example of using a proxy can be viewed <a href="https://github.com/zebrunner/carina-demo/blob/c73f1a3c03dd9065c9256f930427a15639475763/src/test/java/com/qaprosoft/carina/demo/ProxySampleTest.java#L91">here</a>.</p>
+<p>An example of using a proxy can be viewed <a href="https://github.com/zebrunner/carina-demo/blob/318b5235b3d100c9f9419dcb274f1e4c25700cf0/src/test/java/com/zebrunner/carina/demo/ProxySampleTest.java#L93">here</a>.</p>
 <h3 id="pac-proxy-mode">PAC proxy mode</h3>
 <p>A Proxy Auto-Configuration (PAC) file is a JavaScript function that determines whether 
 web browser requests (HTTP, HTTPS, and FTP) go directly to the destination or are 
@@ -850,15 +850,15 @@ If the parameter value is <code>true</code> then it is assumed
 that <code>proxy_autoconfig_url</code> contains the path to the file on the local machine. It will be sent
 browser to set up a proxy. If the value of the parameter is <code>false</code>, then it is assumed that
 that <code>proxy_autoconfig_url</code> contains the URL to the pac file.</p>
-<p>An example of using a proxy can be viewed <a href="https://github.com/zebrunner/carina-demo/blob/c73f1a3c03dd9065c9256f930427a15639475763/src/test/java/com/qaprosoft/carina/demo/ProxySampleTest.java#L110">here</a>.</p>
+<p>An example of using a proxy can be viewed <a href="https://github.com/zebrunner/carina-demo/blob/318b5235b3d100c9f9419dcb274f1e4c25700cf0/src/test/java/com/zebrunner/carina/demo/ProxySampleTest.java#L112">here</a>.</p>
 <h3 id="autodetect-proxy-mode">AUTODETECT proxy mode</h3>
 <p>Specifies whether to autodetect proxy settings. Presumably with <a href="https://en.wikipedia.org/wiki/Web_Proxy_Auto-Discovery_Protocol">WPAD</a>.</p>
 <p>Set by changing the value of the <code>proxy_type</code> parameter in the configuration to <code>AUTODETECT</code>.</p>
-<p>An example of using a proxy can be viewed <a href="https://github.com/zebrunner/carina-demo/blob/c73f1a3c03dd9065c9256f930427a15639475763/src/test/java/com/qaprosoft/carina/demo/ProxySampleTest.java#L150">here</a>.</p>
+<p>An example of using a proxy can be viewed <a href="https://github.com/zebrunner/carina-demo/blob/318b5235b3d100c9f9419dcb274f1e4c25700cf0/src/test/java/com/zebrunner/carina/demo/ProxySampleTest.java#L152">here</a>.</p>
 <h3 id="system-proxy-mode">SYSTEM proxy mode</h3>
 <p>Use system proxy settings. Default Mode on Linux.</p>
 <p>Set by changing the value of the <code>proxy_type</code> parameter in the configuration to <code>SYSTEM</code>.</p>
-<p>An example of using a proxy can be viewed <a href="https://github.com/zebrunner/carina-demo/blob/c73f1a3c03dd9065c9256f930427a15639475763/src/test/java/com/qaprosoft/carina/demo/ProxySampleTest.java#L169">here</a>.</p>
+<p>An example of using a proxy can be viewed <a href="https://github.com/zebrunner/carina-demo/blob/318b5235b3d100c9f9419dcb274f1e4c25700cf0/src/test/java/com/zebrunner/carina/demo/ProxySampleTest.java#L171">here</a>.</p>
 <h3 id="unspecified-proxy-mode-not-recommended-to-use">UNSPECIFIED proxy mode [NOT RECOMMENDED TO USE]</h3>
 <p>The mode set in the Selenium proxy by default and indicates that they should
 use the following settings (for Windows - DIRECT mode, for linux - SYSTEM).</p>
@@ -884,7 +884,7 @@ Values are separated by a comma, such as <code>http,https,ftp</code>.<br />
 <p><code>proxy_set_to_system</code> - if <code>true</code>, then sets proxy values to system properties, i.e.
 the proxy will be applied to all http/https/ftp requests from the application as well (depends on the values listed in <code>proxy_protocols</code>).
 However, this approach is not thread-safe and is therefore not recommended for use in all other modes. Disabled by default.</p>
-<p>An example of using a proxy can be viewed <a href="https://github.com/zebrunner/carina-demo/blob/c73f1a3c03dd9065c9256f930427a15639475763/src/test/java/com/qaprosoft/carina/demo/ProxySampleTest.java#L67">here</a>.</p>
+<p>An example of using a proxy can be viewed <a href="https://github.com/zebrunner/carina-demo/blob/318b5235b3d100c9f9419dcb274f1e4c25700cf0/src/test/java/com/zebrunner/carina/demo/ProxySampleTest.java#L69">here</a>.</p>
 <h3 id="dynamic-proxy-mode">DYNAMIC proxy mode</h3>
 <p>Advanced proxy mode.</p>
 <p>Starts with rules. The rule defines which 'dynamic' proxy should be started
@@ -907,7 +907,7 @@ if the value of <code>proxy_ports</code> is <code>NULL</code>.</p>
 <p>There are also parameters on which the default dynamic proxy implementation depends:</p>
 <p><code>browserup_disabled_mitm</code> - when true, MITM capture will be disabled, false otherwise</p>
 <p>The default dynamic proxy implementation is represented by the <a href="https://github.com/zebrunner/carina-proxy/blob/master/src/main/java/com/zebrunner/carina/proxy/browserup/CarinaBrowserUpProxy.java">CarinaBrowserUpProxy</a> class.</p>
-<p>An example of using a default dynamic proxy can be viewed <a href="https://github.com/zebrunner/carina-demo/blob/c73f1a3c03dd9065c9256f930427a15639475763/src/test/java/com/qaprosoft/carina/demo/ProxySampleTest.java#L207">here</a>.</p>
+<p>An example of using a default dynamic proxy can be viewed <a href="https://github.com/zebrunner/carina-demo/blob/318b5235b3d100c9f9419dcb274f1e4c25700cf0/src/test/java/com/zebrunner/carina/demo/ProxySampleTest.java#L190">here</a>.</p>
 <p>If you want to use a proxy that is not use BrowserUp or use BrowserUp with custom configuration,
 then you can create your own implementation. For this you have to create a class,
 implementing the <a href="https://github.com/zebrunner/carina-proxy/blob/master/src/main/java/com/zebrunner/carina/proxy/IProxy.java">IProxy</a> interface.
@@ -994,7 +994,7 @@ addLastHttpFilterFactory
 </code></pre>
 
 <p>To add and configure content filters, look <a href="https://github.com/browserup/browserup-proxy#littleproxy-interceptors">here</a>.</p>
-<p>An example of using response filtering can be viewed <a href="https://github.com/zebrunner/carina-demo/blob/c73f1a3c03dd9065c9256f930427a15639475763/src/test/java/com/qaprosoft/carina/demo/ProxySampleTest.java#L304">here</a>.</p>
+<p>An example of using response filtering can be viewed <a href="https://github.com/zebrunner/carina-demo/blob/318b5235b3d100c9f9419dcb274f1e4c25700cf0/src/test/java/com/zebrunner/carina/demo/ProxySampleTest.java#L290">here</a>.</p>
 <h3 id="dealing-with-mitm-and-installing-ssl-certificate-into-your-system">Dealing with MITM and installing SSL certificate into your system:</h3>
 <h4 id="for-mac-users">For Mac users:</h4>
 <ol>

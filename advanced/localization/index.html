@@ -724,7 +724,7 @@ Every mismatch will be collected in <code>L10N</code> class. </p>
 <blockquote>
 <p>To assert collected assertions use <code>L10N.assertAll()</code> method.</p>
 </blockquote>
-<p>If you want to do it manually use <a href="https://github.com/zebrunner/carina-demo/blob/64b63927e8c3a1a76d5e567e28f837be82797d56/src/test/java/com/qaprosoft/carina/demo/WebLocalizationSample.java#L53"><code>L10N.getText(key)</code></a>
+<p>If you want to do it manually use <a href="https://github.com/zebrunner/carina-demo/blob/318b5235b3d100c9f9419dcb274f1e4c25700cf0/src/test/java/com/zebrunner/carina/demo/WebLocalizationSample.java#L99"><code>L10N.getText(key)</code></a>
 to get expected translations from resources:</p>
 <pre><code>String welcomeText = wikipediaLocalePage.getWelcomeText();
 String expectedWelcomeText = L10N.getText(&quot;welcomeText&quot;);
@@ -755,7 +755,7 @@ Example:</p>
 </code></pre>
 
 <h2 id="finding-elements-with-a-help-of-locales">Finding elements with a help of locales</h2>
-<p>Declare elements with <a href="https://github.com/zebrunner/carina-demo/blob/64b63927e8c3a1a76d5e567e28f837be82797d56/src/main/java/com/qaprosoft/carina/demo/gui/pages/localizationSample/WikipediaLocalePage.java#L26">L10N</a> 
+<p>Declare elements with <a href="https://github.com/zebrunner/carina-demo/blob/318b5235b3d100c9f9419dcb274f1e4c25700cf0/src/main/java/com/zebrunner/carina/demo/gui/pages/desktop/WikipediaLocalePage.java#L57">L10N</a> 
 prefix where needed.
 Use key after the ":" sign in @FindBy annotations which will be replaced by actual localized translations.</p>
 <pre><code>@FindBy(xpath = &quot;//*[text()='{L10N:welcomeText}'&quot;)
