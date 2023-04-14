@@ -1,5 +1,5 @@
 Modern test automation frameworks should support data-driven testing, when you are able to verify a variety of edge cases providing test data sets into the tests using external data sources. 
-Carina is not an exception, the framework supports multiple ways of test parametrization (see the [TestNG approach samples](https://github.com/zebrunner/carina-demo/blob/master/src/test/java/com/zebrunner/carina/demo/DataprovidersSampleTest.java), [Carina's custom data provider samples](https://github.com/zebrunner/carina-demo/blob/develop/src/test/java/com/qaprosoft/carina/demo/CustomDataProvidersSampleTest.java)):
+Carina is not an exception, the framework supports multiple ways of test parametrization (see the [TestNG approach samples](https://github.com/zebrunner/carina-demo/blob/master/src/test/java/com/zebrunner/carina/demo/DataProvidersSampleTest.java), [Carina's custom data provider samples](https://github.com/zebrunner/carina-demo/blob/master/src/test/java/com/zebrunner/carina/demo/CustomDataProvidersSampleTest.java)):
 
 * Java data providers
 * XML parametrization

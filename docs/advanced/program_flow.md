@@ -14,7 +14,7 @@ These listeners are being attached and created when transform(IListenersAnnotati
 
 Because CarinaListener object is created, the class static field is initialized in it. There are several important steps inside:
 
-* R.reinit(). This method loads default values for all parameters from [carina-core](https://github.com/zebrunner/carina/blob/master/carina-core/src/main/resources), then overrides them with user's configurations (_api.properties, _config.properties, _testdata.properties, _email.properties, _report.properties, _database.properties).
+* R.reinit(). This method loads default values for all parameters from [carina-core](https://github.com/zebrunner/carina/blob/master/src/main/resources), then overrides them with user's configurations (_api.properties, _config.properties, _testdata.properties, _email.properties, _report.properties, _database.properties).
 * Configure log4j2x properties 
 * Initialize L10N feature.
 

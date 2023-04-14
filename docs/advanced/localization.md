@@ -57,7 +57,7 @@ Carina will automatically compare text from the page with text from your locale_
 Every mismatch will be collected in `L10N` class. 
 >To assert collected assertions use `L10N.assertAll()` method.
 
-If you want to do it manually use [`L10N.getText(key)`](https://github.com/zebrunner/carina-demo/blob/64b63927e8c3a1a76d5e567e28f837be82797d56/src/test/java/com/qaprosoft/carina/demo/WebLocalizationSample.java#L53)
+If you want to do it manually use [`L10N.getText(key)`](https://github.com/zebrunner/carina-demo/blob/318b5235b3d100c9f9419dcb274f1e4c25700cf0/src/test/java/com/zebrunner/carina/demo/WebLocalizationSample.java#L99)
 to get expected translations from resources:
 ```
 String welcomeText = wikipediaLocalePage.getWelcomeText();
@@ -89,7 +89,7 @@ public void testAddNewLanguages() {
 ```
 ## Finding elements with a help of locales
 
-Declare elements with [L10N](https://github.com/zebrunner/carina-demo/blob/64b63927e8c3a1a76d5e567e28f837be82797d56/src/main/java/com/qaprosoft/carina/demo/gui/pages/localizationSample/WikipediaLocalePage.java#L26) 
+Declare elements with [L10N](https://github.com/zebrunner/carina-demo/blob/318b5235b3d100c9f9419dcb274f1e4c25700cf0/src/main/java/com/zebrunner/carina/demo/gui/pages/desktop/WikipediaLocalePage.java#L57) 
 prefix where needed.
 Use key after the ":" sign in @FindBy annotations which will be replaced by actual localized translations.
 
