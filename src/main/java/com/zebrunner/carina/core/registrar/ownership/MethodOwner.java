@@ -22,13 +22,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This defines the 'MethodOwner' annotation used to specify the
- * TestNG methods owners.
- * 
+ * Specifies the owner of the test method.<br>
+ * You can specify an annotation both on the test class and on the test method.
+ * An annotation value over a method has the highest precedence.
  */
 @Repeatable(MethodOwner.List.class)
 @Retention(value = RetentionPolicy.RUNTIME)
-@Target(value = ElementType.METHOD)
+@Target(value = { ElementType.METHOD, ElementType.TYPE })
 public @interface MethodOwner {
     String owner() default "";
 

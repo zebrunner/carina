@@ -16,66 +16,86 @@
 package com.zebrunner.carina.core.registrar.ownership;
 
 import java.lang.reflect.Method;
+import java.util.Optional;
 
-import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.agent.core.registrar.maintainer.MaintainerResolver;
-import org.apache.commons.lang3.StringUtils;
+import com.zebrunner.carina.utils.Configuration;
 
 public class Ownership implements MaintainerResolver {
 
     @Override
     public String resolve(Class<?> clazz, Method method) {
-        String owner = StringUtils.EMPTY;
-        // Get a handle to the class and method
-        // We can't use getMethod() because we may have parameterized tests
-        // for which we don't know the matching signature
-        String methodName = method.getName();
-        Method testMethod = null;
-        Method[] possibleMethods = clazz.getMethods();
-        for (Method possibleMethod : possibleMethods) {
-            if (possibleMethod.getName().equals(methodName)) {
-                testMethod = possibleMethod;
-                break;
+        // In order not to check for null further
+        if (method == null || clazz == null) {
+            return null;
+        }
+
+        MethodOwner methodAnnotation = null;
+        // do a scan for single MethodOwner annotation as well)
+        if (method.isAnnotationPresent(MethodOwner.class)) {
+            MethodOwner annotation = method.getAnnotation(MethodOwner.class);
+            if (isSuitablePlatform(annotation) || annotation.platform().isBlank()) {
+                methodAnnotation = annotation;
+            }
+        } else if (method.isAnnotationPresent(MethodOwner.List.class)) {
+            MethodOwner platformSpecificAnnotation = null;
+            MethodOwner anyPlatformAnnotation = null;
+            for (MethodOwner annotation : method.getAnnotation(MethodOwner.List.class).value()) {
+                if (isSuitablePlatform(annotation)) {
+                    if (platformSpecificAnnotation != null) {
+                        throw new IllegalArgumentException(
+                                String.format("There is more than one annotation above the '{%s}' method with the same platform '%s'",
+                                        method.getName(), Configuration.getPlatform()));
+                    }
+                    platformSpecificAnnotation = annotation;
+                } else if (annotation.platform().isBlank()) {
+
+                }
+
             }
         }
-        
-        // do a scan for single Methodowner annotation as well)
-        if (testMethod != null && testMethod.isAnnotationPresent(MethodOwner.class)) {
-            MethodOwner methodAnnotation = testMethod.getAnnotation(MethodOwner.class);
-            owner = methodAnnotation.owner();
-        }
-        
+
         // scan all MethodOwner annotations to find default ownership without any platform
-        if (testMethod != null && testMethod.isAnnotationPresent(MethodOwner.List.class)) {
-            MethodOwner.List methodAnnotation = testMethod.getAnnotation(MethodOwner.List.class);
-            for (MethodOwner methodOwner : methodAnnotation.value()) {
+        if (method != null && method.isAnnotationPresent(MethodOwner.List.class)) {
+            MethodOwner.List methodListAnnotation = method.getAnnotation(MethodOwner.List.class);
+            for (MethodOwner methodOwner : methodListAnnotation.value()) {
                 String actualPlatform = methodOwner.platform();
                 if (actualPlatform.isEmpty()) {
-                    owner = methodOwner.owner();
+                    methodAnnotation = methodOwner;
                     break;
                 }            
             }
         }
         
         //do one more scan using platform ownership filter if any to override default owner value
-        if (testMethod != null && testMethod.isAnnotationPresent(MethodOwner.List.class)) {
-            MethodOwner.List methodAnnotation = testMethod.getAnnotation(MethodOwner.List.class);
-            for (MethodOwner methodOwner : methodAnnotation.value()) {
+        if (method != null && method.isAnnotationPresent(MethodOwner.List.class)) {
+            MethodOwner.List methodListAnnotation = method.getAnnotation(MethodOwner.List.class);
+            for (MethodOwner methodOwner : methodListAnnotation.value()) {
 
                 String actualPlatform = methodOwner.platform();
                 String expectedPlatform = Configuration.getPlatform();
                 
                 if (!actualPlatform.isEmpty() && isValidPlatform(actualPlatform, expectedPlatform)) {
-                    owner = methodOwner.owner();
+                    methodAnnotation = methodOwner;
                 }               
             }
         }
 
-        return owner;
+        return methodAnnotation != null ? methodAnnotation.owner() : null;
     }
     
     private static boolean isValidPlatform(String actualPlatform, String expectedPlatform) {
         return actualPlatform.equalsIgnoreCase(expectedPlatform);
     }
+
+    private static boolean isSuitablePlatform(MethodOwner annotation) {
+        return annotation.platform().equalsIgnoreCase(Configuration.getPlatform());
+    }
+
+    private static Optional<String> getOwner(MethodOwner[] annotations) {
+
+    }
+
+    private static void assert
 
 }
