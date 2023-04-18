@@ -22,9 +22,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Specifies the owner of the test method.<br>
- * You can specify an annotation both on the test class and on the test method.
- * An annotation value over a method has the highest precedence.
+ * Allows to specify the owner of the test method/test class.<br>
+ * The order of priorities when choosing the owner of the test method: <br>
+ * 1. The annotation on a test method containing a suitable plaftorm.<br>
+ * 2. The annotation on a test class containing a suitable platform.<br>
+ * 3. The annotation on a test method without the specified platform.<br>
+ * 4 The annotation on a test class withot the specified platform.<br>
+ * <br>
+ *
+ * The expected platform is determined based on the "capabilities.platformName" in the {@link com.zebrunner.carina.utils.R#CONFIG} (case-insensitive).
  */
 @Repeatable(MethodOwner.List.class)
 @Retention(value = RetentionPolicy.RUNTIME)
