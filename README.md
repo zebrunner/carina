@@ -16,6 +16,67 @@ Carina is a Java-based test automation framework that unites all testing layers:
 
 ![Alt text](https://github.com/zebrunner/carina/raw/master/docs/img/carina_overview.png "Carina Overview")
 
+
+The Carina Framework ecosystem consists of the following modules:
+<table>
+	<tr>
+		<th>Project Name</th>
+		<th>Optional</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>[Carina API]()</td>
+		<td>true</td>
+		<td>For API testing, based on RestAssured</td>
+	</tr>
+    <tr>
+		<td>[Carina AWS S3]()</td>
+		<td>true</td>
+		<td>Designed to work with Amazon S3. Add it if you need access to 
+utilities to interact with S3 or to generate a link to a mobile application on the fly.</td>
+	</tr>
+    <tr>
+		<td>[Carina Azure]()</td>
+		<td>true</td>
+		<td></td>
+	</tr>
+    <tr>
+		<td>[Carina AppCenter]()</td>
+		<td>true</td>
+		<td></td>
+	</tr>
+    <tr>
+		<td>[Carina DataProvider]()</td>
+		<td>true</td>
+		<td></td>
+	</tr>
+    <tr>
+		<td>[Carina WebDriver]()</td>
+		<td>false</td>
+		<td></td>
+	</tr>
+    <tr>
+		<td>[Carina Utils]()</td>
+		<td>false</td>
+		<td></td>
+	</tr>
+    <tr>
+		<td>[Carina Commons]()</td>
+		<td>false</td>
+		<td></td>
+	</tr>
+    <tr>
+		<td>[Carina Proxy]()</td>
+		<td>false</td>
+		<td></td>
+	</tr>
+    <tr>
+		<td>[Carina Crypto]()</td>
+		<td>false</td>
+		<td></td>
+	</tr>
+</table>
+
 ## Sponsor
 <p align="center">
   <a href="https://zebrunner.com/"><img alt="Zebrunner" src="https://github.com/zebrunner/zebrunner/raw/master/docs/img/zebrunner_intro.png"></a>
