@@ -21,59 +21,47 @@ The Carina Framework ecosystem consists of the following modules:
 <table>
 	<tr>
 		<th>Project Name</th>
-		<th>Optional</th>
 		<th>Description</th>
 	</tr>
 	<tr>
-		<td>[Carina API]()</td>
-		<td>true</td>
-		<td>For API testing, based on RestAssured</td>
+		<td>[Carina API](https://github.com/zebrunner/carina-api)</td>
+		<td>For API testing, based on RestAssured library. <b>Optional</b></td>
 	</tr>
     <tr>
-		<td>[Carina AWS S3]()</td>
-		<td>true</td>
-		<td>Designed to work with Amazon S3. Add it if you need access to 
-utilities to interact with S3 or to generate a link to a mobile application on the fly.</td>
+		<td>[Carina AWS S3](https://github.com/zebrunner/carina-aws-s3)</td>
+		<td>A set of utilities for working with Amazon S3. <b>Optional</b></td>
 	</tr>
     <tr>
-		<td>[Carina Azure]()</td>
-		<td>true</td>
-		<td></td>
+		<td>[Carina Azure](https://github.com/zebrunner/carina-azure)</td>
+		<td>A set of utilities for working with Azure. <b>Optional</b></td>
 	</tr>
     <tr>
-		<td>[Carina AppCenter]()</td>
-		<td>true</td>
-		<td></td>
+		<td>[Carina AppCenter](https://github.com/zebrunner/carina-appcenter)</td>
+		<td>A set of utilities for working with AppCenter. <b>Optional</b></td>
 	</tr>
     <tr>
-		<td>[Carina DataProvider]()</td>
-		<td>true</td>
-		<td></td>
+		<td>[Carina DataProvider](https://github.com/zebrunner/carina-dataprovider)</td>
+		<td>Provides the ability to use xls/csv as data sources. <b>Optional</b></td>
 	</tr>
     <tr>
-		<td>[Carina WebDriver]()</td>
-		<td>false</td>
-		<td></td>
+		<td>[Carina WebDriver](https://github.com/zebrunner/carina-webdriver)</td>
+		<td>Contains logic for creating sessions. <b>Part of Carina Core</b></td>
 	</tr>
     <tr>
-		<td>[Carina Utils]()</td>
-		<td>false</td>
-		<td></td>
+		<td>[Carina Utils](https://github.com/zebrunner/carina-utils)</td>
+		<td>Provides a set of tools for all components of Carina Framework. <b>Part of Carina Core</b></td>
 	</tr>
     <tr>
-		<td>[Carina Commons]()</td>
-		<td>false</td>
-		<td></td>
+		<td>[Carina Commons](https://github.com/zebrunner/carina-commons)</td>
+		<td>Contains interfaces for pluggable dependencies (e.g. carina-azure). <b>Part of Carina Core</b></td>
 	</tr>
     <tr>
-		<td>[Carina Proxy]()</td>
-		<td>false</td>
-		<td></td>
+		<td>[Carina Proxy](https://github.com/zebrunner/carina-proxy)</td>
+        <td>Contains utilities for working with proxies. <b>Part of Carina Core</b></td>
 	</tr>
     <tr>
-		<td>[Carina Crypto]()</td>
-		<td>false</td>
-		<td></td>
+		<td>[Carina Crypto](https://github.com/zebrunner/carina-crypto)</td>
+        <td>Contains utilities for encryption/decryption. <b>Part of Carina Core</b></td>
 	</tr>
 </table>
 
