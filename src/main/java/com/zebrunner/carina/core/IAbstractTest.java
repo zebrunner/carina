@@ -29,7 +29,7 @@ import com.zebrunner.carina.core.listeners.FilterTestsListener;
 import com.zebrunner.carina.core.report.testrail.ITestCases;
 import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.Configuration.Parameter;
-import com.zebrunner.carina.utils.common.CommonUtils;
+import com.zebrunner.carina.utils.ICommonUtils;
 import com.zebrunner.carina.utils.factory.ICustomTypePageFactory;
 
 /*
@@ -42,7 +42,7 @@ import com.zebrunner.carina.utils.factory.ICustomTypePageFactory;
 // on start order is FilterTestsListener, TestRunListener and CarinaListener
 // on finish reverse order, i.e. CarinaListener, TestRunListener and FilterTestsListener
 @LinkedListeners({ CarinaListener.class, TestRunListener.class, FilterTestsListener.class })
-public interface IAbstractTest extends ICustomTypePageFactory, ITestCases {
+public interface IAbstractTest extends ICustomTypePageFactory, ITestCases, ICommonUtils {
 
     long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
 
@@ -68,19 +68,6 @@ public interface IAbstractTest extends ICustomTypePageFactory, ITestCases {
     @AfterMethod(alwaysRun = true)
     default void onCarinaAfterMethod() {
         // do nothing
-    }
-
-    /**
-     * Pause for specified timeout.
-     *
-     * @param timeout in seconds.
-     */
-    default void pause(long timeout) {
-        CommonUtils.pause(timeout);
-    }
-
-    default void pause(Double timeout) {
-        CommonUtils.pause(timeout);
     }
 
     default void skipExecution(String message) {
