@@ -50,7 +50,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>11</java.version>
         <carina-webdriver.version>1.0.3.INHERIT.EXT-SNAPSHOT</carina-webdriver.version>
-        <carina-utils.version>1.0.3</carina-utils.version>
+        <carina-utils.version>1.0.4.P1-SNAPSHOT</carina-utils.version>
         <!-- Logging -->
         <slf4j.version>1.7.30</slf4j.version>
         <log4j.version>2.17.1</log4j.version>
