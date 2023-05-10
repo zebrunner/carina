@@ -91,7 +91,7 @@ However, there are methods that cannot be accessed using the interface. In such 
 `com.zebrunner.carina.webdriver.listener.DriverListener` class. However, if you are casting to AndroidDriver for example, you must
 be sure it's AndroidDriver.
 
-### Project side dependency requirements:
+### Project side dependency requirements
 
 * The `net.bytebuddy.byte-buddy` version should be `1.12.10`.
 * The `com.zebrunner.agent-core` version should be `1.9.3`.
