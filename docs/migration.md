@@ -59,6 +59,13 @@ Also when adding carina-dataprovider dependency exclude testng dependency as the
 * The `crypto_key_value` parameter is added to specify the crypto key (specified in [configuration](https://zebrunner.github.io/carina/configuration/)).
 * The presence of a crypto key is optional, as long as there is no encrypted data.
 
+Since a file was used as a key before, you can use the following code to get the key from it and writing it to the 
+`crypto_key_value` parameter (for example, in beforeSuite):
+
+```
+R.CONFIG.put("crypto_key_value", Files.readString(Path.of(R.CONFIG.get("crypto_key_path")), StandardCharsets.UTF_8));
+```
+However, this approach is not recommended. It is recommended to put `crypto_key_value` in environment variables.
 
 For more info check [documentation](https://zebrunner.github.io/carina/advanced/security/).
 
