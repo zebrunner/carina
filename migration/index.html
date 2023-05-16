@@ -604,7 +604,7 @@
       
         <li class="md-nav__item">
   <a href="#project-side-dependency-requirements" class="md-nav__link">
-    Project side dependency requirements:
+    Project side dependency requirements
   </a>
   
 </li>
@@ -704,7 +704,7 @@
       
         <li class="md-nav__item">
   <a href="#project-side-dependency-requirements" class="md-nav__link">
-    Project side dependency requirements:
+    Project side dependency requirements
   </a>
   
 </li>
@@ -799,6 +799,12 @@ Also when adding carina-dataprovider dependency exclude testng dependency as the
 <li>The <code>crypto_key_value</code> parameter is added to specify the crypto key (specified in <a href="https://zebrunner.github.io/carina/configuration/">configuration</a>).</li>
 <li>The presence of a crypto key is optional, as long as there is no encrypted data.</li>
 </ul>
+<p>Since a file was used as a key before, you can use the following code to get the key from it and writing it to the 
+<code>crypto_key_value</code> parameter (for example, in beforeSuite):</p>
+<pre><code>R.CONFIG.put(&quot;crypto_key_value&quot;, Files.readString(Path.of(R.CONFIG.get(&quot;crypto_key_path&quot;)), StandardCharsets.UTF_8));
+</code></pre>
+
+<p>However, this approach is not recommended. It is recommended to put <code>crypto_key_value</code> in environment variables.</p>
 <p>For more info check <a href="https://zebrunner.github.io/carina/advanced/security/">documentation</a>.</p>
 <h3 id="changed-the-process-of-creating-capabilities-for-a-session">Changed the process of creating capabilities for a session</h3>
 <p>In connection with the update of Selenium / Appium, the rules for specifying capabilities have changed. 
@@ -819,7 +825,7 @@ up to which you need to cast the driver to gain access to the method. For exampl
 <p>However, there are methods that cannot be accessed using the interface. In such situation you can use the <code>castDriver</code> method of the 
 <code>com.zebrunner.carina.webdriver.listener.DriverListener</code> class. However, if you are casting to AndroidDriver for example, you must
 be sure it's AndroidDriver.</p>
-<h3 id="project-side-dependency-requirements">Project side dependency requirements:</h3>
+<h3 id="project-side-dependency-requirements">Project side dependency requirements</h3>
 <ul>
 <li>The <code>net.bytebuddy.byte-buddy</code> version should be <code>1.12.10</code>.</li>
 <li>The <code>com.zebrunner.agent-core</code> version should be <code>1.9.3</code>.</li>

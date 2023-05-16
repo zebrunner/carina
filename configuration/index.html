@@ -262,6 +262,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#changing-the-pattern-of-forming-the-name-of-the-test-method" class="md-nav__link">
+    Changing the pattern of forming the name of the test method
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#faq" class="md-nav__link">
     FAQ
   </a>
@@ -619,6 +626,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#changing-the-pattern-of-forming-the-name-of-the-test-method" class="md-nav__link">
+    Changing the pattern of forming the name of the test method
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#faq" class="md-nav__link">
     FAQ
   </a>
@@ -748,6 +762,11 @@ R.TESTDATA.get(&quot;user.email&quot;)
         <td>test_run_rules</td>
         <td>Executing rules logic: test_run_rules={RULE_NAME_ENUM}=&gt;{RULE_VALUE1}&amp;&amp;{RULE_VALUE2};;...</td>
         <td>test_run_rules=PRIORITY=&gt;P1&amp;&amp;P2&amp;&P4;;OWNER=&gt;owner;;TAGS=&gt;tag1=temp||!!feature=reg</td>
+    </tr>
+    <tr>
+        <td>test_naming_pattern</td>
+        <td>The pattern by which the name of the test method will be formed.</td>
+        <td>{tuid} {test_name} - {method_name}</td>
     </tr>
     <tr>
         <td>retry_interval</td>
@@ -1029,6 +1048,18 @@ test_run_rules=PRIORITY=&gt;!!P1;;OWNER=&gt;Josh&amp;&amp;!!Jake;;TAGS=&gt;featu
 #and if they are not for smoke web or if they are for android.
 </code></pre>
 
+<h3 id="changing-the-pattern-of-forming-the-name-of-the-test-method">Changing the pattern of forming the name of the test method</h3>
+<p>The name of the test method is formed based on the pattern provided in the <code>test_naming_pattern</code> parameter. 
+The pattern can be formed from the following parts:
+1) <code>{test_name}</code> - test name  (content of <code>name</code> attribute of <code>&lt;test&gt;</code> tag in xml)
+2) <code>{tuid}</code> - TUID, see <a href="https://zebrunner.github.io/carina/advanced/dataprovider/#adding-test-unique-identifier-tuid-to-the-test-name-using-java-data-provider">doc</a>.
+3) <code>{method_name}</code> - test method name
+4) <code>{method_priority}</code> - test method priority (number)
+5) <code>{method_thread_pool_size}</code> - the number of threads to be used when invoking the method on parallel
+6) <code>{group_names}</code> - the groups this method belongs to, possibly added to the groups declared on the class.
+7) <code>{method_description}</code> - description of test method
+8) <code>{test_class}</code> - simple name of test class this method belongs to</p>
+<p>Default pattern: <code>test_naming_pattern={tuid} {test_name} - {method_name}</code></p>
 <h3 id="faq">FAQ</h3>
 <p><strong>Where is a recommended place to declare configuration parameters?</strong></p>
 <p>Declare default parameters in <code>_config.properties</code>. For multi-maven projects, you can use extra underscore symbol to override default settings on new layer <code>__config.properties</code>, <code>___config.properties</code>, etc.</p>
