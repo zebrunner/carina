@@ -49,16 +49,13 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>11</java.version>
-        <zebrunner-testng-pluggable.version>1.9.3</zebrunner-testng-pluggable.version>
-        <carina-webdriver.version>1.0.2</carina-webdriver.version>
+        <carina-webdriver.version>1.0.3</carina-webdriver.version>
         <carina-utils.version>1.0.3</carina-utils.version>
         <!-- Logging -->
         <slf4j.version>1.7.30</slf4j.version>
         <log4j.version>2.17.1</log4j.version>
         <!-- Commons -->
         <commons-lang3.version>3.5</commons-lang3.version>
-        <!-- Testings -->
-        <testng.version>7.6.1</testng.version>
         <testng-foundation.version>2.0.1</testng-foundation.version>
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
         <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
@@ -107,11 +104,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>com.zebrunner</groupId>
-            <artifactId>agent-testng-pluggable</artifactId>
-            <version>${zebrunner-testng-pluggable.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -140,14 +132,6 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>${commons-lang3.version}</version>
-        </dependency>
-
-        <!-- Test utilities -->
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>${testng.version}</version>
-            <scope>compile</scope>
         </dependency>
 
         <dependency>

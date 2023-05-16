@@ -16,6 +16,55 @@ Carina is a Java-based test automation framework that unites all testing layers:
 
 ![Alt text](https://github.com/zebrunner/carina/raw/master/docs/img/carina_overview.png "Carina Overview")
 
+
+The Carina Framework ecosystem consists of the following modules:
+<table>
+	<tr>
+		<th>Project Name</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>[Carina API](https://github.com/zebrunner/carina-api)</td>
+		<td>For API testing, based on RestAssured library. <b>Optional</b></td>
+	</tr>
+    <tr>
+		<td>[Carina AWS S3](https://github.com/zebrunner/carina-aws-s3)</td>
+		<td>A set of utilities for working with Amazon S3. <b>Optional</b></td>
+	</tr>
+    <tr>
+		<td>[Carina Azure](https://github.com/zebrunner/carina-azure)</td>
+		<td>A set of utilities for working with Azure. <b>Optional</b></td>
+	</tr>
+    <tr>
+		<td>[Carina AppCenter](https://github.com/zebrunner/carina-appcenter)</td>
+		<td>A set of utilities for working with AppCenter. <b>Optional</b></td>
+	</tr>
+    <tr>
+		<td>[Carina DataProvider](https://github.com/zebrunner/carina-dataprovider)</td>
+		<td>Provides the ability to use xls/csv as data sources. <b>Optional</b></td>
+	</tr>
+    <tr>
+		<td>[Carina WebDriver](https://github.com/zebrunner/carina-webdriver)</td>
+		<td>Contains logic for creating sessions. <b>Part of Carina Core</b></td>
+	</tr>
+    <tr>
+		<td>[Carina Utils](https://github.com/zebrunner/carina-utils)</td>
+		<td>Provides a set of tools for all components of Carina Framework. <b>Part of Carina Core</b></td>
+	</tr>
+    <tr>
+		<td>[Carina Commons](https://github.com/zebrunner/carina-commons)</td>
+		<td>Contains interfaces for pluggable dependencies (e.g. carina-azure). <b>Part of Carina Core</b></td>
+	</tr>
+    <tr>
+		<td>[Carina Proxy](https://github.com/zebrunner/carina-proxy)</td>
+        <td>Contains utilities for working with proxies. <b>Part of Carina Core</b></td>
+	</tr>
+    <tr>
+		<td>[Carina Crypto](https://github.com/zebrunner/carina-crypto)</td>
+        <td>Contains utilities for encryption/decryption. <b>Part of Carina Core</b></td>
+	</tr>
+</table>
+
 ## Sponsor
 <p align="center">
   <a href="https://zebrunner.com/"><img alt="Zebrunner" src="https://github.com/zebrunner/zebrunner/raw/master/docs/img/zebrunner_intro.png"></a>
