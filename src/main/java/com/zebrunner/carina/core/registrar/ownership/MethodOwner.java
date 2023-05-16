@@ -41,7 +41,7 @@ public @interface MethodOwner {
     String platform() default "";
     
     @Retention(RetentionPolicy.RUNTIME)
-    @Target({ElementType.METHOD})
+    @Target({ElementType.METHOD, ElementType.TYPE})
     @interface List {
     	MethodOwner[] value();
     }
