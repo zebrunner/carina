@@ -18,8 +18,10 @@ package com.zebrunner.carina.core.report.testrail;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.zebrunner.carina.utils.Configuration;
-import com.zebrunner.carina.utils.Configuration.Parameter;
+import org.openqa.selenium.remote.CapabilityType;
+
+import com.zebrunner.carina.utils.config.Configuration;
+import com.zebrunner.carina.webdriver.config.WebDriverConfiguration;
 
 public interface ITestCases {
     ThreadLocal<List<String>> casesIds = ThreadLocal.withInitial(ArrayList::new);
@@ -35,14 +37,14 @@ public interface ITestCases {
     }
 
     default void clearCases() {
-        casesIds.set(new ArrayList<String>());
+        casesIds.set(new ArrayList<>());
     }
 
     default boolean isValidPlatform(String platform) {
-        return platform.equalsIgnoreCase(Configuration.getPlatform()) || platform.isEmpty();
+        return platform.equalsIgnoreCase(WebDriverConfiguration.getCapability(CapabilityType.PLATFORM_NAME).orElse("*")) || platform.isEmpty();
     }
     
     default boolean isValidLocale(String locale) {
-        return locale.equalsIgnoreCase(Configuration.get(Parameter.LOCALE)) || locale.isEmpty();
+        return locale.equalsIgnoreCase(Configuration.get(WebDriverConfiguration.Parameter.LOCALE).orElse("")) || locale.isEmpty();
     }
 }
