@@ -19,6 +19,7 @@ import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 
+import com.zebrunner.carina.core.config.ReportConfiguration;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -281,7 +282,7 @@ public class EmailReportGenerator {
 
         if (isCucumberReportFolderExists()) {
 
-            String link = ReportContext.getCucumberReportLink();
+            String link = ReportConfiguration.getCucumberReportLink();
             LOGGER.debug("Cucumber Report link: {}", link);
             result = String.format(
                     "<br/><b><a href='%s' style='color: green;' target='_blank' style='display: block'> Open Cucumber Report in a new tab</a></b><br/>",

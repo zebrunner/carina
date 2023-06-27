@@ -19,6 +19,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +27,12 @@ import org.testng.ISuite;
 import org.testng.ISuiteListener;
 import org.testng.ITestNGMethod;
 
+import com.zebrunner.carina.core.config.TestConfiguration;
 import com.zebrunner.carina.core.filter.Filter;
 import com.zebrunner.carina.core.filter.IFilter;
 import com.zebrunner.carina.core.filter.rule.Rule;
-import com.zebrunner.carina.utils.Configuration;
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.config.Configuration;
 
 public class FilterTestsListener implements ISuiteListener {
 
@@ -40,13 +42,12 @@ public class FilterTestsListener implements ISuiteListener {
 
     @Override
     public void onStart(ISuite suite) {
-        rules = parseRules(Configuration.get(Configuration.Parameter.TEST_RUN_RULES));
-
-        // rules are absent
-        if (rules.isEmpty()) {
+        Optional<String> testRunRules = Configuration.get(TestConfiguration.Parameter.TEST_RUN_RULES);
+        if (testRunRules.isEmpty()) {
             LOGGER.debug("There are no any rules and limitations");
             return;
         }
+        rules = parseRules(testRunRules.get());
 
         boolean isPerform;
         LOGGER.info("Extracted rules: ".concat(rules.toString()));
