@@ -10,7 +10,7 @@ import com.zebrunner.carina.api.annotation.ResponseTemplatePath;
 import com.zebrunner.carina.api.annotation.SuccessfulHttpStatus;
 import com.zebrunner.carina.api.http.HttpMethodType;
 import com.zebrunner.carina.api.http.HttpResponseStatusType;
-import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.config.Configuration;
 
 @Endpoint(url = "${base_url}/users", methodType = HttpMethodType.POST)
 @RequestTemplatePath(path = "api/users/_post/rq.json")
@@ -20,6 +20,6 @@ public class PostUserMethod extends AbstractApiMethodV2 {
 
     public PostUserMethod() {
         super("api/users/_post/rq.json", "api/users/_post/rs.json", "api/users/user.properties");
-        replaceUrlPlaceholder("base_url", Configuration.getEnvArg("api_url"));
+        replaceUrlPlaceholder("base_url", Configuration.getRequired("api_url"));
     }
 }

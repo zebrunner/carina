@@ -3,17 +3,18 @@
 #set( $symbol_escape = '\' )
 package ${package}.carina.demo;
 
-import java.io.File;
 
+import com.amazonaws.regions.Regions;
+import com.zebrunner.carina.amazon.AmazonS3Manager;
+import com.zebrunner.carina.amazon.config.AmazonConfiguration;
+import com.zebrunner.carina.core.IAbstractTest;
+import com.zebrunner.carina.utils.R;
+import com.zebrunner.carina.utils.report.SessionContext;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.amazonaws.regions.Regions;
-import com.zebrunner.carina.core.IAbstractTest;
-import com.zebrunner.carina.amazon.AmazonS3Manager;
-import com.zebrunner.carina.utils.Configuration;
-import com.zebrunner.carina.utils.R;
-import com.zebrunner.carina.utils.report.ReportContext;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class AmazonS3Test implements IAbstractTest {
 
@@ -22,11 +23,11 @@ public class AmazonS3Test implements IAbstractTest {
 
     @Test
     public void amazonS3DownloadTest() {
-        R.CONFIG.put(Configuration.Parameter.S3_REGION.getKey(), Regions.US_WEST_2.getName(), true);
+        R.CONFIG.put(AmazonConfiguration.Parameter.S3_REGION.getKey(), Regions.US_WEST_2.getName(), true);
         AmazonS3Manager amazonS3Manager = AmazonS3Manager.getInstance();
-        File artifact = new File(ReportContext.getArtifactsFolder() + File.separator + FILE_NAME);
-        amazonS3Manager.download(BUCKET_NAME, FILE_NAME, artifact);
-        Assert.assertTrue(artifact.exists(), "Artifact should exists");
+        Path artifact = SessionContext.getArtifactsFolder().resolve(FILE_NAME);
+        amazonS3Manager.download("qaprosoft", FILE_NAME, artifact.toFile());
+        Assert.assertTrue(Files.exists(artifact), "Artifact should exists");
     }
 
 }

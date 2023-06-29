@@ -9,7 +9,8 @@ import java.util.Locale;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 
-import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.config.Configuration;
+import com.zebrunner.carina.webdriver.config.WebDriverConfiguration;
 import com.zebrunner.carina.webdriver.decorator.ExtendedWebElement;
 import com.zebrunner.carina.webdriver.gui.AbstractPage;
 
@@ -30,7 +31,7 @@ public class WikipediaHomePage extends AbstractPage {
         openLangList();
         if (!langList.isEmpty()) {
             for (ExtendedWebElement languageBtn : langList) {
-                String localeStr = Configuration.get(Configuration.Parameter.LOCALE);
+                String localeStr = Configuration.getRequired(WebDriverConfiguration.Parameter.LOCALE);
                 Locale locale = parseLocale(localeStr);
                 if (languageBtn.getAttribute("lang").equals(locale.getLanguage())) {
                     languageBtn.click();
