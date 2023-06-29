@@ -27,10 +27,10 @@ import com.zebrunner.agent.testng.listener.TestRunListener;
 import com.zebrunner.carina.core.listeners.CarinaListener;
 import com.zebrunner.carina.core.listeners.FilterTestsListener;
 import com.zebrunner.carina.core.report.testrail.ITestCases;
-import com.zebrunner.carina.utils.Configuration;
-import com.zebrunner.carina.utils.Configuration.Parameter;
 import com.zebrunner.carina.utils.common.CommonUtils;
+import com.zebrunner.carina.utils.config.Configuration;
 import com.zebrunner.carina.utils.factory.ICustomTypePageFactory;
+import com.zebrunner.carina.webdriver.config.WebDriverConfiguration;
 
 /*
  * IAbstractTest - base test for UI and API tests.
@@ -44,7 +44,7 @@ import com.zebrunner.carina.utils.factory.ICustomTypePageFactory;
 @LinkedListeners({ CarinaListener.class, TestRunListener.class, FilterTestsListener.class })
 public interface IAbstractTest extends ICustomTypePageFactory, ITestCases {
 
-    long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
+    long EXPLICIT_TIMEOUT = Configuration.getRequired(WebDriverConfiguration.Parameter.EXPLICIT_TIMEOUT, Long.class);
 
     @BeforeSuite(alwaysRun = true)
     private void onCarinaBeforeSuite() {

@@ -19,6 +19,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Map;
 
+import com.zebrunner.carina.core.config.ReportConfiguration;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -94,7 +95,7 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
     }
 
     private void afterTest(ITestResult result) {
-        ReportContext.generateTestReport();
+        ReportConfiguration.generateTestReport();
         ReportContext.emptyTestDirData();
     }
 
@@ -216,8 +217,8 @@ public class AbstractTestListener extends TestListenerAdapter implements IDriver
             String description) {
         String group = StringEscapeUtils.escapeHtml4(TestNamingService.getPackageName(result));
         
-        String linkToLog = ReportContext.getTestLogLink();
-        String linkToScreenshots = ReportContext.getTestScreenshotsLink();
+        String linkToLog = ReportConfiguration.getTestLogLink();
+        String linkToScreenshots = ReportConfiguration.getTestScreenshotsLink();
 
         String test = StringEscapeUtils.escapeHtml4(TestNameResolverRegistry.get().resolve(result));
         return new TestResultItem(group, test, description, resultType, linkToScreenshots, linkToLog, failReason);

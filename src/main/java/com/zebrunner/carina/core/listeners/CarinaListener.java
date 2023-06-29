@@ -17,13 +17,16 @@ package com.zebrunner.carina.core.listeners;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,12 +34,17 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.ConstructorUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.CapabilityType;
+import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
+import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.IClassListener;
@@ -53,6 +61,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
+import com.zebrunner.agent.core.config.ConfigurationHolder;
 import com.zebrunner.agent.core.registrar.CurrentTest;
 import com.zebrunner.agent.core.registrar.CurrentTestRun;
 import com.zebrunner.agent.core.registrar.Label;
@@ -62,6 +71,8 @@ import com.zebrunner.agent.core.registrar.maintainer.ChainedMaintainerResolver;
 import com.zebrunner.agent.core.webdriver.RemoteWebDriverFactory;
 import com.zebrunner.agent.testng.core.testname.TestNameResolverRegistry;
 import com.zebrunner.carina.core.IAbstractTest;
+import com.zebrunner.carina.core.config.ReportConfiguration;
+import com.zebrunner.carina.core.config.TestConfiguration;
 import com.zebrunner.carina.core.registrar.ownership.Ownership;
 import com.zebrunner.carina.core.registrar.ownership.SuiteOwnerResolver;
 import com.zebrunner.carina.core.registrar.tag.PriorityManager;
@@ -72,12 +83,11 @@ import com.zebrunner.carina.core.report.qtest.IQTestManager;
 import com.zebrunner.carina.core.report.testrail.ITestRailManager;
 import com.zebrunner.carina.core.skip.ExpectedSkipManager;
 import com.zebrunner.carina.core.testng.ZebrunnerNameResolver;
-import com.zebrunner.carina.proxy.browserup.ProxyPool;
-import com.zebrunner.carina.utils.Configuration;
-import com.zebrunner.carina.utils.Configuration.Parameter;
 import com.zebrunner.carina.utils.DateUtils;
 import com.zebrunner.carina.utils.R;
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.config.Configuration;
+import com.zebrunner.carina.utils.encryptor.EncryptorUtils;
 import com.zebrunner.carina.utils.messager.Messager;
 import com.zebrunner.carina.utils.report.ReportContext;
 import com.zebrunner.carina.utils.report.TestResult;
@@ -88,6 +98,7 @@ import com.zebrunner.carina.webdriver.Screenshot;
 import com.zebrunner.carina.webdriver.ScreenshotType;
 import com.zebrunner.carina.webdriver.TestPhase;
 import com.zebrunner.carina.webdriver.TestPhase.Phase;
+import com.zebrunner.carina.webdriver.config.WebDriverConfiguration;
 import com.zebrunner.carina.webdriver.core.capability.CapabilitiesLoader;
 import com.zebrunner.carina.webdriver.screenshot.DefaultSuccessfulDriverActionScreenshotRule;
 import com.zebrunner.carina.webdriver.screenshot.DefaultUnSuccessfulDriverActionScreenshotRule;
@@ -102,7 +113,6 @@ import com.zebrunner.carina.webdriver.screenshot.IScreenshotRule;
  */
 public class CarinaListener extends AbstractTestListener implements ISuiteListener, IQTestManager, ITestRailManager, IClassListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    protected static final long EXPLICIT_TIMEOUT = Configuration.getLong(Parameter.EXPLICIT_TIMEOUT);
     private static final ThreadLocal<Boolean> IS_REMOVE_DRIVER = ThreadLocal.withInitial(() -> Boolean.FALSE);
 
     protected static final String SUITE_TITLE = "%s%s%s - %s (%s)";
@@ -125,16 +135,16 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         R.reinit();
         registerDecryptAgentProperties();
 
-        LOGGER.info(Configuration.asString());
+        LOGGER.info(getTestRunConfigurationDescription());
         // Configuration.validateConfiguration();
 
         // if we initialize the logger in onStart(suite), all classes we access up to that point are initialized with INFO level
         // if me init logger here, we still lose the debug logs for this class only
-        if (!"INFO".equalsIgnoreCase(Configuration.get(Parameter.CORE_LOG_LEVEL))) {
+        if (!"INFO".equalsIgnoreCase(Configuration.getRequired(ReportConfiguration.Parameter.CORE_LOG_LEVEL))) {
             LoggerContext ctx = (LoggerContext) LogManager.getContext(this.getClass().getClassLoader(), false);
             org.apache.logging.log4j.core.config.Configuration config = ctx.getConfiguration();
             LoggerConfig logger = config.getLoggerConfig("com.zebrunner.carina.core");
-            logger.setLevel(Level.getLevel(Configuration.get(Parameter.CORE_LOG_LEVEL)));
+            logger.setLevel(Level.getLevel(Configuration.getRequired(ReportConfiguration.Parameter.CORE_LOG_LEVEL)));
         }
 
         try {
@@ -144,11 +154,10 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         }
 
         // declare global capabilities in configuration if custom_capabilities is declared
-        String customCapabilities = Configuration.get(Parameter.CUSTOM_CAPABILITIES);
-        if (!customCapabilities.isEmpty()) {
+        Configuration.get(TestConfiguration.Parameter.CUSTOM_CAPABILITIES).ifPresent(customCapabilities -> {
             // redefine core CONFIG properties using global custom capabilities file
             new CapabilitiesLoader().loadCapabilities(customCapabilities);
-        }
+        });
 
         // declare global capabilities from Zebrunner Launcher if any
         Capabilities zebrunnerCapabilities = RemoteWebDriverFactory.getCapabilities();
@@ -167,6 +176,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         TestNameResolverRegistry.set(new ZebrunnerNameResolver());
         CompositeLabelResolver.addResolver(new TagManager());
         CompositeLabelResolver.addResolver(new PriorityManager());
+        ReportConfiguration.removeOldReports();
         ReportContext.getBaseDir(); // create directory for logging as soon as possible
     }
 
@@ -180,19 +190,26 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
         setThreadCount(suite);
 
-        if (Configuration.getPlatform().equalsIgnoreCase(SpecialKeywords.API)) {
-            CurrentTestRun.setPlatform(SpecialKeywords.API);
-        }
+        WebDriverConfiguration.getCapability(CapabilityType.PLATFORM_NAME).ifPresent(platformName -> {
+            if (platformName.equalsIgnoreCase(SpecialKeywords.API)) {
+                CurrentTestRun.setPlatform(SpecialKeywords.API);
+            }
+        });
 
-        CurrentTestRun.setLocale(Configuration.get(Parameter.LOCALE));
+        Configuration.get(WebDriverConfiguration.Parameter.LOCALE).ifPresent(CurrentTestRun::setLocale);
 
-        // register app_version/build as artifact if available...
-        Configuration.setBuild(Configuration.get(Parameter.APP_VERSION));
+        Configuration.get(ReportConfiguration.Parameter.APP_VERSION).ifPresent(appVersion -> {
+            // register app_version/build as artifact if available...
+            if (ConfigurationHolder.isReportingEnabled()) {
+                CurrentTestRun.setBuild(appVersion);
+            }
+        });
         
-        String sha1 = Configuration.get(Parameter.GIT_HASH);
-        if (!sha1.isEmpty()) {
-            Label.attachToTestRun("sha1", sha1);
-        }
+        Configuration.get(ReportConfiguration.Parameter.GIT_HASH).ifPresent(hash -> {
+            if (ConfigurationHolder.isReportingEnabled()) {
+                Label.attachToTestRun("sha1", hash);
+            }
+        });
 
         // register owner of the run
         registerOwner();
@@ -372,15 +389,13 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             R.EMAIL.clearTestProperties();
             R.REPORT.clearTestProperties();
             R.ZAFIRA.clearTestProperties();
-            //remove thread proxy rule
-            com.zebrunner.carina.proxy.ProxyPool.clearThreadRule();
             LOGGER.debug("Test result is : {}", result.getStatus());
             // result status == 2 means failure, status == 3 means skip. We need to quit driver anyway for failure and skip
             if (((automaticDriversCleanup &&
                     !hasDependencies(result)) ||
                     result.getStatus() == 2 ||
                     result.getStatus() == 3) &&
-                    !Configuration.getBoolean(Parameter.FORCIBLY_DISABLE_DRIVER_QUIT)) {
+                    !Configuration.get(TestConfiguration.Parameter.FORCIBLY_DISABLE_DRIVER_QUIT, Boolean.class).orElse(false)) {
                 IS_REMOVE_DRIVER.set(Boolean.TRUE);
             }
             attachTestLabels(result);
@@ -412,7 +427,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     public void onFinish(ISuite suite) {
         LOGGER.debug("CarinaListener->onFinish(ISuite suite)");
         try {
-            String browser = getBrowser();
+            String browser = WebDriverConfiguration.getBrowser().orElse("");
             String title = getTitle(suite.getXmlSuite());
 
             TestResult testResult = EmailReportGenerator.getSuiteResult(EmailReportItemCollector.getTestResults());
@@ -420,27 +435,24 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
             title = status + ": " + title;
 
-            String env = "";
-            if (!Configuration.isNull(Parameter.ENV)) {
-                env = Configuration.get(Parameter.ENV);
-            }
-
-            if (!Configuration.get(Parameter.URL).isEmpty()) {
-                env += " - <a href='" + Configuration.get(Parameter.URL) + "'>" + Configuration.get(Parameter.URL)
-                        + "</a>";
-            }
+            AtomicReference<String> env = new AtomicReference<>(Configuration.get(Configuration.Parameter.ENV).orElse(""));
+            Configuration.get(WebDriverConfiguration.Parameter.URL).ifPresent(url -> {
+                String link = String.format(" - <a href='%s'>%s</a>", url, url);
+                env.set(env.get() + link);
+            });
 
             ReportContext.getTempDir().delete();
             LOGGER.debug("Generating email report...");
 
             // Generate emailable html report using regular method
-            EmailReportGenerator report = new EmailReportGenerator(title, env, Configuration.get(Parameter.APP_VERSION),
+            EmailReportGenerator report = new EmailReportGenerator(title, env.get(),
+                    Configuration.get(ReportConfiguration.Parameter.APP_VERSION).orElse(""),
                     browser, DateUtils.now(), EmailReportItemCollector.getTestResults(),
                     EmailReportItemCollector.getCreatedItems());
 
             String emailContent = report.getEmailBody();
             // Store emailable report under emailable-report.html
-            ReportContext.generateHtmlReport(emailContent);
+            ReportConfiguration.generateHtmlReport(emailContent);
 
             printExecutionSummary(EmailReportItemCollector.getTestResults());
 
@@ -460,31 +472,24 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         automaticDriversCleanup = false;
     }
 
-    protected String getBrowser() {
-        return Configuration.getBrowser();
-    }
-
     protected String getTitle(XmlSuite suite) {
-        String browser = getBrowser();
-        if (!browser.isEmpty()) {
-            browser = " " + browser; // insert the space before
-        }
-        String env = !Configuration.isNull(Parameter.ENV) ? Configuration.get(Parameter.ENV)
-                : Configuration.get(Parameter.URL);
+        AtomicReference<String> browser = new AtomicReference<>("");
+        // insert the space before
+        WebDriverConfiguration.getBrowser().ifPresent(b -> browser.set(" " + b));
+
+        String env = Configuration.get(Configuration.Parameter.ENV)
+                .orElse(Configuration.get(WebDriverConfiguration.Parameter.URL).orElse(""));
 
         String title = "";
-        String appVersion = "";
-
-        if (!Configuration.get(Parameter.APP_VERSION).isEmpty()) {
+        AtomicReference<String> appVersion = new AtomicReference<>("");
+        Configuration.get(ReportConfiguration.Parameter.APP_VERSION).ifPresent(version -> {
             // if nothing is specified then title will contain nothing
-            appVersion = Configuration.get(Parameter.APP_VERSION) + " - ";
-        }
+            appVersion.set(version + " - ");
+        });
 
         String suiteName = getSuiteName(suite);
         String xmlFile = getSuiteFileName(suite);
-
-        title = String.format(SUITE_TITLE, appVersion, suiteName, String.format(XML_SUITE_NAME, xmlFile), env, browser);
-
+        title = String.format(SUITE_TITLE, appVersion.get(), suiteName, String.format(XML_SUITE_NAME, xmlFile), env, browser.get());
         return title;
     }
 
@@ -504,17 +509,12 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     }
 
     protected String getSuiteName(XmlSuite suite) {
-
         String suiteName = "";
-
         if (suite != null && !"Default suite".equals(suite.getName())) {
-            suiteName = Configuration.get(Parameter.SUITE_NAME).isEmpty() ? suite.getName()
-                    : Configuration.get(Parameter.SUITE_NAME);
+            suiteName = Configuration.get(ReportConfiguration.Parameter.SUITE_NAME).orElse(suite.getName());
         } else {
-            suiteName = Configuration.get(Parameter.SUITE_NAME).isEmpty() ? R.EMAIL.get("title")
-                    : Configuration.get(Parameter.SUITE_NAME);
+            suiteName = Configuration.get(ReportConfiguration.Parameter.SUITE_NAME).orElse(R.EMAIL.get("title"));
         }
-
         return suiteName;
     }
 
@@ -608,29 +608,32 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
          * suite.getXmlSuite().toXml() add those default values anyway even if the absent in suite xml file declaraton.
          * To make possible to parse correctly we had to reuse external parser and private getAttributeValue
         */
-        
-        if (Configuration.getThreadCount()>= 1) {
+
+        Optional<Integer> threadCount = Configuration.get(TestConfiguration.Parameter.THREAD_COUNT, Integer.class);
+        if (threadCount.isPresent() && threadCount.get() >= 1) {
             // use thread-count from config.properties
-            suite.getXmlSuite().setThreadCount(Configuration.getThreadCount());
+            suite.getXmlSuite().setThreadCount(threadCount.get());
             LOGGER.debug("Updated thread-count={}", suite.getXmlSuite().getThreadCount());
         } else {
             String suiteThreadCount = getAttributeValue(suite, "thread-count");
             LOGGER.debug("thread-count from suite: {}", suiteThreadCount);
             if (suiteThreadCount.isEmpty()) {
                 LOGGER.info("Set thread-count=1");
-                R.CONFIG.put(Parameter.THREAD_COUNT.getKey(), "1");
+                R.CONFIG.put(TestConfiguration.Parameter.THREAD_COUNT.getKey(), "1");
                 suite.getXmlSuite().setThreadCount(1);
             } else {
                 // reuse value from suite xml file
                 LOGGER.debug("Synching thread-count with values from suite xml file...");
-                R.CONFIG.put(Parameter.THREAD_COUNT.getKey(), suiteThreadCount);
+                R.CONFIG.put(TestConfiguration.Parameter.THREAD_COUNT.getKey(), suiteThreadCount);
                 LOGGER.info("Use thread-count='{}' from suite file.", suite.getXmlSuite().getThreadCount());
             }
         }
 
-        if (Configuration.getDataProviderThreadCount() >= 1) {
+        Optional<Integer> dataProviderThreadCount = Configuration.get(TestConfiguration.Parameter.DATA_PROVIDER_THREAD_COUNT, Integer.class);
+
+        if (dataProviderThreadCount.isPresent() && dataProviderThreadCount.get() >= 1) {
             // use thread-count from config.properties
-            suite.getXmlSuite().setDataProviderThreadCount(Configuration.getDataProviderThreadCount());
+            suite.getXmlSuite().setDataProviderThreadCount(dataProviderThreadCount.get());
             LOGGER.debug("Updated data-provider-thread-count={}", suite.getXmlSuite().getDataProviderThreadCount());
         } else {
             String suiteDataProviderThreadCount = getAttributeValue(suite, "data-provider-thread-count");
@@ -638,12 +641,12 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
             if (suiteDataProviderThreadCount.isEmpty()) {
                 LOGGER.info("Set data-provider-thread-count=1");
-                R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(), "1");
+                R.CONFIG.put(TestConfiguration.Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(), "1");
                 suite.getXmlSuite().setDataProviderThreadCount(1);
             } else {
                 // reuse value from suite xml file
                 LOGGER.debug("Synching data-provider-thread-count with values from suite xml file...");
-                R.CONFIG.put(Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(), suiteDataProviderThreadCount);
+                R.CONFIG.put(TestConfiguration.Parameter.DATA_PROVIDER_THREAD_COUNT.getKey(), suiteDataProviderThreadCount);
                 LOGGER.info("Use data-provider-thread-count='{}' from suite file.", suite.getXmlSuite().getDataProviderThreadCount());
             }
         }
@@ -691,35 +694,32 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         if (!trSuite.isEmpty()) {
             TestRail.setSuiteId(trSuite);
         }
-        
+
         // read command line argument to improve test rail integration capabilities.
-        if (!Configuration.getBoolean(Parameter.TESTRAIL_ENABLED)) {
+        if (!Configuration.getRequired(ReportConfiguration.Parameter.TESTRAIL_ENABLED, Boolean.class)) {
             LOGGER.debug("disable TestRail integration!");
             TestRail.disableSync();
         }
         
-        if (Configuration.getBoolean(Parameter.INCLUDE_ALL)) {
+        if (Configuration.getRequired(ReportConfiguration.Parameter.INCLUDE_ALL, Boolean.class)) {
             LOGGER.info("enable include_all for TestRail integration!");
             TestRail.includeAllTestCasesInNewRun();
         }
         
-        String milestone = Configuration.get(Parameter.MILESTONE);
-        if (!milestone.isEmpty()) {
+        Configuration.get(ReportConfiguration.Parameter.MILESTONE).ifPresent(milestone -> {
             LOGGER.info("Set TestRail milestone name: {}", milestone);
             TestRail.setMilestone(milestone);
-        }
+        });
         
-        String runName = Configuration.get(Parameter.RUN_NAME);
-        if (!runName.isEmpty()) {
+        Configuration.get(ReportConfiguration.Parameter.RUN_NAME).ifPresent(runName -> {
             LOGGER.info("Set TestRail run name: {}", runName);
             TestRail.setRunName(runName);
-        }
+        });
         
-        String assignee = Configuration.get(Parameter.ASSIGNEE);
-        if (!assignee.isEmpty()) {
+        Configuration.get(ReportConfiguration.Parameter.ASSIGNEE).ifPresent(assignee -> {
             LOGGER.info("Set TestRail assignee: {}", assignee);
             TestRail.setAssignee(assignee);
-        }
+        });
 
         String qtestProject = getQTestProjectId(suite);
         if (!qtestProject.isEmpty()){
@@ -767,15 +767,12 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                     // do nothing
                 }
             }
-            // stop proxies in legacy and new proxy pools
-            ProxyPool.stopAllProxies();
-            com.zebrunner.carina.proxy.browserup.ProxyPool.stopAllProxies();
         }
 
         @Override
         public void run() {
             LOGGER.debug("Running shutdown hook");
-            if (!Configuration.getBoolean(Parameter.FORCIBLY_DISABLE_DRIVER_QUIT)) {
+            if (!Configuration.get(TestConfiguration.Parameter.FORCIBLY_DISABLE_DRIVER_QUIT, Boolean.class).orElse(false)) {
                 quitAllDriversOnHook();
             }
         }
@@ -829,17 +826,18 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         Properties properties = R.AGENT.getProperties();
         Set<String> propertyNames = properties.stringPropertyNames();
         for (String name : propertyNames) {
-            String value = R.AGENT.getDecrypted(name);
+            String value = EncryptorUtils.decrypt(R.AGENT.get(name));
             String systemPropertyName = convertPropertyToSystemProperty(name);
             String systemValue = System.getProperty(systemPropertyName);
             if (systemValue == null) {
                 System.setProperty(systemPropertyName, value);
             }
         }
-
-        if (!Configuration.get(Parameter.ENV).isBlank()) {
-            System.setProperty("reporting.run.environment", Configuration.get(Parameter.ENV));
-        }
+        Configuration.get(Configuration.Parameter.ENV).ifPresent(env -> {
+            if (System.getProperty("reporting.run.environment") == null) {
+                System.setProperty("reporting.run.environment", env);
+            }
+        });
     }
 
     /**
@@ -866,5 +864,22 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             systemProperty = "reporting.run.substituteRemoteWebDrivers";
         }
         return systemProperty;
+    }
+
+    private static String getTestRunConfigurationDescription() {
+        return StringUtils.chomp(new Configuration().toString()) + new Reflections(new ConfigurationBuilder()
+                .setScanners(Scanners.SubTypes)
+                .forPackages("com.zebrunner.carina")).getSubTypesOf(Configuration.class)
+                        .stream().map(clazz -> {
+                            try {
+                                return ConstructorUtils.invokeConstructor(clazz);
+                            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
+                                throw new RuntimeException(String.format("Cannot create instance of Configuration class: '%s'", clazz));
+                            }
+                        })
+                        .map(Configuration::toString)
+                        .map(StringUtils::chomp)
+                        .reduce("", String::concat)
+                + "\n===============================================\n";
     }
 }

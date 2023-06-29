@@ -30,9 +30,9 @@ import org.testng.annotations.Test;
 
 import com.zebrunner.carina.core.report.testrail.ITestRailManager;
 import com.zebrunner.carina.core.report.testrail.TestRailCases;
-import com.zebrunner.carina.utils.Configuration.Parameter;
 import com.zebrunner.carina.utils.R;
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
+import com.zebrunner.carina.webdriver.config.WebDriverConfiguration;
 
 /**
  * Tests for {@link ITestRailManager}
@@ -173,13 +173,13 @@ public class TestRailTest implements ITestRailManager {
         Assert.assertTrue(testRailUdids.contains(FIRST_TEST_ID), "TestRail should contain id=" + FIRST_TEST_ID);
         Assert.assertEquals(testRailUdids.size(), 1);
 
-        R.CONFIG.put(Parameter.LOCALE.getKey(), "fr", true);
+        R.CONFIG.put(WebDriverConfiguration.Parameter.LOCALE.getKey(), "fr", true);
         testRailUdids = getTestRailCasesUuid(result);
 
         Assert.assertTrue(testRailUdids.contains(SECOND_TEST_ID), "TestRail should contain id=" + SECOND_TEST_ID);
         Assert.assertEquals(testRailUdids.size(), 1);
         
-        R.CONFIG.put(Parameter.LOCALE.getKey(), "en", true);
+        R.CONFIG.put(WebDriverConfiguration.Parameter.LOCALE.getKey(), "en", true);
     }
     
     @Test

@@ -30,9 +30,10 @@ import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 
 import com.zebrunner.agent.testng.listener.RunContextService;
-import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.core.config.ReportConfiguration;
 import com.zebrunner.carina.utils.ParameterGenerator;
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
+import com.zebrunner.carina.utils.config.Configuration;
 
 public class TestNamingService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass()); 
@@ -94,7 +95,7 @@ public class TestNamingService {
 
         ITestNGMethod method = result.getMethod();
 
-        name = Configuration.get(Configuration.Parameter.TEST_NAMING_PATTERN);
+        name = Configuration.getRequired(ReportConfiguration.Parameter.TEST_NAMING_PATTERN);
         name = name.replace(SpecialKeywords.TEST_NAME, getTestNameMap(result))
                 .replace(SpecialKeywords.TEST_NAME_TUID, getMethodUID(result))
                 .replace(SpecialKeywords.METHOD_NAME, method.getMethodName())
@@ -183,7 +184,7 @@ public class TestNamingService {
     public static String getMethodName(ITestResult result) {
         // adjust testName using pattern
         ITestNGMethod m = result.getMethod();
-        String name = Configuration.get(Configuration.Parameter.TEST_NAMING_PATTERN);
+        String name = Configuration.getRequired(ReportConfiguration.Parameter.TEST_NAMING_PATTERN);
         LOGGER.debug("TestNamingPattern: {}", name);
         name = name.replace(SpecialKeywords.METHOD_NAME, m.getMethodName());
         name = name.replace(SpecialKeywords.METHOD_PRIORITY, String.valueOf(m.getPriority()));
