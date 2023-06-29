@@ -56,10 +56,6 @@ The Carina Framework ecosystem consists of the following modules:
 		<td>Contains interfaces for pluggable dependencies (e.g. carina-azure). <b>Part of Carina Core</b></td>
 	</tr>
     <tr>
-		<td>[Carina Proxy](https://github.com/zebrunner/carina-proxy)</td>
-        <td>Contains utilities for working with proxies. <b>Part of Carina Core</b></td>
-	</tr>
-    <tr>
 		<td>[Carina Crypto](https://github.com/zebrunner/carina-crypto)</td>
         <td>Contains utilities for encryption/decryption. <b>Part of Carina Core</b></td>
 	</tr>

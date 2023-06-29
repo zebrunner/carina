@@ -11,7 +11,7 @@ import com.zebrunner.carina.api.annotation.ResponseTemplatePath;
 import com.zebrunner.carina.api.annotation.SuccessfulHttpStatus;
 import com.zebrunner.carina.api.http.HttpMethodType;
 import com.zebrunner.carina.api.http.HttpResponseStatusType;
-import com.zebrunner.carina.utils.Configuration;
+import com.zebrunner.carina.utils.config.Configuration;
 
 @Endpoint(url = "${base_url}", methodType = HttpMethodType.POST)
 @SuccessfulHttpStatus(status = HttpResponseStatusType.OK_200)
@@ -21,7 +21,7 @@ import com.zebrunner.carina.utils.Configuration;
 public class LookupCityMethod extends AbstractApiMethodV2 {
 
     public LookupCityMethod() {
-        replaceUrlPlaceholder("base_url",Configuration.getEnvArg("soap_url"));
+        replaceUrlPlaceholder("base_url", Configuration.getRequired("soap_url"));
         setHeaders(String.format("SOAPAction=%s", "http://tempuri.org/SOAP.Demo.LookupCity"));
     }
 
