@@ -25,7 +25,7 @@ public class ProxyTest implements IAbstractTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Test
-    public void dynamicModeWithResponseFilterTest() throws IOException {
+    public void modifyBodyTest() throws IOException {
         R.CONFIG.put("proxy_type", "Zebrunner", true);
         LOGGER.info("Creating command for Zebrunner proxy.");
         ZebrunnerProxyBuilder.getInstance()
