@@ -3,20 +3,21 @@
 #set( $symbol_escape = '\' )
 package ${package}.carina.demo;
 
-import java.util.Locale;
+import com.zebrunner.agent.core.annotation.TestLabel;
+import com.zebrunner.carina.core.IAbstractTest;
+import com.zebrunner.carina.core.registrar.ownership.MethodOwner;
+import ${package}.carina.demo.gui.pages.desktop.WikipediaHomePage;
+import ${package}.carina.demo.gui.pages.desktop.WikipediaLocalePage;
+import com.zebrunner.carina.utils.config.Configuration;
+import com.zebrunner.carina.utils.resources.L10N;
+import com.zebrunner.carina.webdriver.config.WebDriverConfiguration;
 
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
-import com.zebrunner.carina.core.IAbstractTest;
-import ${package}.carina.demo.gui.pages.desktop.WikipediaHomePage;
-import ${package}.carina.demo.gui.pages.desktop.WikipediaLocalePage;
-import com.zebrunner.agent.core.annotation.TestLabel;
-import com.zebrunner.carina.core.registrar.ownership.MethodOwner;
-import com.zebrunner.carina.utils.Configuration;
-import com.zebrunner.carina.utils.resources.L10N;
+import java.util.Locale;
 
 /**
  * This sample shows how create Web Localization test with Resource Bundle.
@@ -29,7 +30,7 @@ public class WebLocalizationSample implements IAbstractTest {
     public void testLocaleLoad() {
         Locale locale = L10N.getLocale();
         String loadedLocale = locale.getLanguage() + "_" + locale.getCountry();
-        String configLocale = Configuration.get(Configuration.Parameter.LOCALE);
+        String configLocale = Configuration.getRequired(WebDriverConfiguration.Parameter.LOCALE);
         Assert.assertEquals(loadedLocale, configLocale);
     }
 
