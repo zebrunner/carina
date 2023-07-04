@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -62,6 +61,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import com.zebrunner.agent.core.config.ConfigurationHolder;
+import com.zebrunner.agent.core.config.provider.PropertiesConfigurationProvider;
+import com.zebrunner.agent.core.config.provider.YamlConfigurationProvider;
 import com.zebrunner.agent.core.registrar.CurrentTest;
 import com.zebrunner.agent.core.registrar.CurrentTestRun;
 import com.zebrunner.agent.core.registrar.Label;
@@ -133,7 +134,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         // Technically, this happen when the maven-surefire-plugin has not set inherited program arguments (passed to mvn process).
         // That is why it is necessary to reinit R class here when TestNG loads the CarinaListener class.
         R.reinit();
-        registerDecryptAgentProperties();
+        reinitAgentToken();
 
         LOGGER.info(getTestRunConfigurationDescription());
         // Configuration.validateConfiguration();
@@ -804,66 +805,17 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     }
 
     /**
-     * Register agent properties from agent.properties file (if exists) as system properties.
-     * Yaml configuration will be ignored.
-     * If system property already have property(ies), we will no rewrite it
+     * Get the value of the token from the configuration file (yaml/properties)
+     * and write it to the system properties
      */
-    private void registerDecryptAgentProperties() {
-        if (ClassLoader.getSystemResource("agent.properties") == null) {
-            return;
+    private void reinitAgentToken() {
+        String accessToken = new YamlConfigurationProvider().getConfiguration().getServer().getAccessToken();
+        if (StringUtils.isBlank(accessToken)) {
+            accessToken = new PropertiesConfigurationProvider().getConfiguration().getServer().getAccessToken();
         }
-
-        if (ClassLoader.getSystemResource("agent.yaml") != null ||
-                ClassLoader.getSystemResource("agent.yml") != null) {
-            // use sout instead of logger because agent intercept call of logger
-            System.out.println(
-                    "[WARN] You have agent.properties and agent.yaml/agent.yml! Use only one type of config file for agent.\n"
-                            + "Yaml files does not supported by Carina Framework. All properties in your agent.properties file will have"
-                            + " more priority over yaml agent configuration."
-                            + "If you want to support cryptography for agent, use agent.properties.");
+        if (StringUtils.isNotBlank(accessToken) && System.getProperty("reporting.server.accessToken") == null) {
+            System.setProperty("reporting.server.accessToken", EncryptorUtils.decrypt(accessToken));
         }
-
-        Properties properties = R.AGENT.getProperties();
-        Set<String> propertyNames = properties.stringPropertyNames();
-        for (String name : propertyNames) {
-            String value = EncryptorUtils.decrypt(R.AGENT.get(name));
-            String systemPropertyName = convertPropertyToSystemProperty(name);
-            String systemValue = System.getProperty(systemPropertyName);
-            if (systemValue == null) {
-                System.setProperty(systemPropertyName, value);
-            }
-        }
-        Configuration.get(Configuration.Parameter.ENV).ifPresent(env -> {
-            if (System.getProperty("reporting.run.environment") == null) {
-                System.setProperty("reporting.run.environment", env);
-            }
-        });
-    }
-
-    /**
-     * This method is a hotfix for naming difference between agent.properties and system properties
-     */
-    private String convertPropertyToSystemProperty(String propertyName) {
-        String systemProperty = propertyName;
-        if ("reporting.project-key".equals(propertyName)) {
-            systemProperty = "reporting.projectKey";
-        }
-        if ("reporting.server.access-token".equals(propertyName)) {
-            systemProperty = "reporting.server.accessToken";
-        }
-
-        if ("reporting.run.display-name".equals(propertyName)) {
-            systemProperty = "reporting.run.displayName";
-        }
-
-        if ("reporting.run.retry-known-issues".equals(propertyName)) {
-            systemProperty = "reporting.run.retryKnownIssues";
-        }
-
-        if ("reporting.run.substitute-remote-web-drivers".equals(propertyName)) {
-            systemProperty = "reporting.run.substituteRemoteWebDrivers";
-        }
-        return systemProperty;
     }
 
     private static String getTestRunConfigurationDescription() {
