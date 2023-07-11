@@ -135,6 +135,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         // That is why it is necessary to reinit R class here when TestNG loads the CarinaListener class.
         R.reinit();
         reinitAgentToken();
+        ReportConfiguration.removeOldReports();
 
         LOGGER.info(getTestRunConfigurationDescription());
         // Configuration.validateConfiguration();
@@ -177,7 +178,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         TestNameResolverRegistry.set(new ZebrunnerNameResolver());
         CompositeLabelResolver.addResolver(new TagManager());
         CompositeLabelResolver.addResolver(new PriorityManager());
-        ReportConfiguration.removeOldReports();
         ReportContext.getBaseDir(); // create directory for logging as soon as possible
     }
 
