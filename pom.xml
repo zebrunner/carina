@@ -53,7 +53,7 @@
         <!-- Logging -->
         <slf4j.version>1.7.30</slf4j.version>
         <log4j.version>2.17.1</log4j.version>
-        <testng-foundation.version>2.0.1</testng-foundation.version>
+        <testng-foundation.version>5.0.0-j11</testng-foundation.version>
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
         <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
         <maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
