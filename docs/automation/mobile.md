@@ -93,7 +93,7 @@ We can provide any Appium capability in the **_config.properties** file using `c
 	</tr>
 </table>
 
-Actual list of Appium capabilities can be found [here](https://appium.io/docs/en/writing-running-appium/caps/).
+Actual list of Appium capabilities can be found [here](https://appium.io/docs/en/2.0/guides/caps/#appium-capabilities).
 
 ### Example for Android of _config.properties:
 ```properties

@@ -403,15 +403,15 @@ test_run_rules=PRIORITY=>!!P1;;OWNER=>Josh&&!!Jake;;TAGS=>feature=web&&!!type=sm
 
 ### Changing the pattern of forming the name of the test method
 The name of the test method is formed based on the pattern provided in the `test_naming_pattern` parameter. 
-The pattern can be formed from the following parts:
-1) `{test_name}` - test name  (content of `name` attribute of `<test>` tag in xml)
-2) `{tuid}` - TUID, see [doc](https://zebrunner.github.io/carina/advanced/dataprovider/#adding-test-unique-identifier-tuid-to-the-test-name-using-java-data-provider).
-3) `{method_name}` - test method name
-4) `{method_priority}` - test method priority (number)
-5) `{method_thread_pool_size}` - the number of threads to be used when invoking the method on parallel
-6) `{group_names}` - the groups this method belongs to, possibly added to the groups declared on the class.
-7) `{method_description}` - description of test method
-8) `{test_class}` - simple name of test class this method belongs to
+The pattern can be formed from the following parts:<br>
+1) `{test_name}` - test name  (content of `name` attribute of `<test>` tag in xml)<br>
+2) `{tuid}` - TUID, see [doc](https://zebrunner.github.io/carina/advanced/dataprovider/#adding-test-unique-identifier-tuid-to-the-test-name-using-java-data-provider)<br>
+3) `{method_name}` - test method name<br>
+4) `{method_priority}` - test method priority (number)<br>
+5) `{method_thread_pool_size}` - the number of threads to be used when invoking the method on parallel<br>
+6) `{group_names}` - the groups this method belongs to, possibly added to the groups declared on the class<br>
+7) `{method_description}` - description of test method<br>
+8) `{test_class}` - simple name of test class this method belongs to<br>
 
 Default pattern: `test_naming_pattern={tuid} {test_name} - {method_name}`
 
