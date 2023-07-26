@@ -484,13 +484,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#unused-proxy-mode" class="md-nav__link">
-    UNUSED proxy mode
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#manual-proxy-mode" class="md-nav__link">
     MANUAL proxy mode
   </a>
@@ -498,69 +491,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#dynamic-proxy-mode" class="md-nav__link">
-    DYNAMIC proxy mode
+  <a href="#zebrunner-proxy-mode" class="md-nav__link">
+    ZEBRUNNER proxy mode
   </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#legacy-proxy-mode-default-will-be-deprecated-in-future-releases" class="md-nav__link">
-    LEGACY proxy mode [DEFAULT, WILL BE DEPRECATED IN FUTURE RELEASES]
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#using-the-default-dynamic-proxy-implementation-carinabrowserupproxy-in-dynamic-mode-in-java-code" class="md-nav__link">
-    Using the default dynamic proxy implementation (CarinaBrowserUpProxy) in DYNAMIC mode in Java code
-  </a>
-  
-    <nav class="md-nav" aria-label="Using the default dynamic proxy implementation (CarinaBrowserUpProxy) in DYNAMIC mode in Java code">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#dealing-with-mitm-and-installing-ssl-certificate-into-your-system" class="md-nav__link">
-    Dealing with MITM and installing SSL certificate into your system:
-  </a>
-  
-    <nav class="md-nav" aria-label="Dealing with MITM and installing SSL certificate into your system:">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#for-mac-users" class="md-nav__link">
-    For Mac users:
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#adding-ssl-certificate-into-java-keystore" class="md-nav__link">
-    Adding SSL certificate into Java keystore:
-  </a>
-  
-    <nav class="md-nav" aria-label="Adding SSL certificate into Java keystore:">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#for-mac-and-linux-users" class="md-nav__link">
-    For Mac and Linux users:
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -737,13 +670,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#unused-proxy-mode" class="md-nav__link">
-    UNUSED proxy mode
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#manual-proxy-mode" class="md-nav__link">
     MANUAL proxy mode
   </a>
@@ -751,69 +677,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#dynamic-proxy-mode" class="md-nav__link">
-    DYNAMIC proxy mode
+  <a href="#zebrunner-proxy-mode" class="md-nav__link">
+    ZEBRUNNER proxy mode
   </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#legacy-proxy-mode-default-will-be-deprecated-in-future-releases" class="md-nav__link">
-    LEGACY proxy mode [DEFAULT, WILL BE DEPRECATED IN FUTURE RELEASES]
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#using-the-default-dynamic-proxy-implementation-carinabrowserupproxy-in-dynamic-mode-in-java-code" class="md-nav__link">
-    Using the default dynamic proxy implementation (CarinaBrowserUpProxy) in DYNAMIC mode in Java code
-  </a>
-  
-    <nav class="md-nav" aria-label="Using the default dynamic proxy implementation (CarinaBrowserUpProxy) in DYNAMIC mode in Java code">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#dealing-with-mitm-and-installing-ssl-certificate-into-your-system" class="md-nav__link">
-    Dealing with MITM and installing SSL certificate into your system:
-  </a>
-  
-    <nav class="md-nav" aria-label="Dealing with MITM and installing SSL certificate into your system:">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#for-mac-users" class="md-nav__link">
-    For Mac users:
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#adding-ssl-certificate-into-java-keystore" class="md-nav__link">
-    Adding SSL certificate into Java keystore:
-  </a>
-  
-    <nav class="md-nav" aria-label="Adding SSL certificate into Java keystore:">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#for-mac-and-linux-users" class="md-nav__link">
-    For Mac and Linux users:
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -842,8 +708,8 @@
                 <p>Selenium provides the ability to set various proxy settings for the browser session.
 This possibility is implemented and supplemented in Carina Framework through the usage of various configurations.</p>
 <p>First, the type of proxying is controlled by the configuration parameter
-<code>proxy_type</code>. The value of this parameter can be <code>DIRECT</code>, <code>MANUAL</code>, <code>DYNAMIC</code>, <code>PAC</code>, <code>AUTODETECT</code>, 
-<code>SYSTEM</code>, <code>UNSPECIFIED</code>, <code>UNUSED</code>, <code>LEGACY</code>. Let's consider them in more detail.</p>
+<code>proxy_type</code>. The value of this parameter can be <code>ZEBRUNNER</code>, <code>DIRECT</code>, <code>MANUAL</code>, <code>PAC</code>, <code>AUTODETECT</code>, 
+<code>SYSTEM</code>, <code>UNSPECIFIED</code>. Let's consider them in more detail.</p>
 <h3 id="direct-proxy-mode">DIRECT proxy mode</h3>
 <p>Specifies that the session will not use a proxy.</p>
 <p>Set by changing the value of the <code>proxy_type</code> parameter in the configuration to <code>DIRECT</code>.</p>
@@ -878,10 +744,6 @@ use the following settings (for Windows - DIRECT mode, for linux - SYSTEM).</p>
 <p>It is not recommended to use, if you want to specify that the proxy object is not added to
 session, then use <code>UNUSED</code> mode. Only added because Selenium provides
 the ability to explicitly specify the <code>UNSPECIFIED</code> proxy type.</p>
-<h3 id="unused-proxy-mode">UNUSED proxy mode</h3>
-<p>Specifies that the proxy object should not be added to the capability to start the driver.
-However, as practice shows, the proxy object will still be present in the session with the <code>UNSPECIFIED</code> type.</p>
-<p>Set by changing the value of the <code>proxy_type</code> parameter in the configuration to <code>UNUSED</code>.</p>
 <h3 id="manual-proxy-mode">MANUAL proxy mode</h3>
 <p>Proxy mode, in which the host and port of the proxy are explicitly specified.</p>
 <p>Set by changing the value of the <code>proxy_type</code> parameter in the configuration to <code>MANUAL</code>.</p>
@@ -897,152 +759,28 @@ Values are separated by a comma, such as <code>http,https,ftp</code>.<br />
 the proxy will be applied to all http/https/ftp requests from the application as well (depends on the values listed in <code>proxy_protocols</code>).
 However, this approach is not thread-safe and is therefore not recommended for use in all other modes. Disabled by default.</p>
 <p>An example of using a proxy can be viewed <a href="https://github.com/zebrunner/carina-demo/blob/318b5235b3d100c9f9419dcb274f1e4c25700cf0/src/test/java/com/zebrunner/carina/demo/ProxySampleTest.java#L69">here</a>.</p>
-<h3 id="dynamic-proxy-mode">DYNAMIC proxy mode</h3>
-<p>Advanced proxy mode.</p>
-<p>Starts with rules. The rule defines which 'dynamic' proxy should be started
-when forming capabilities before starting the driver. The rule must implement the interface
-<a href="https://github.com/zebrunner/carina-proxy/blob/master/src/main/java/com/zebrunner/carina/proxy/IProxyRule.java">IProxyRule</a>.</p>
-<p>The default rule is <a href="https://github.com/zebrunner/carina-proxy/blob/master/src/main/java/com/zebrunner/carina/proxy/DefaultProxyRule.java">DefaultProxyRule</a>,
-which depends on the value of the <code>browserup_proxy</code> parameter (if true, then the proxy should be started, if false, then not),
-and uses the dynamic proxy implementation, which in turn uses <a href="https://github.com/browserup/browserup-proxy">BrowserUpProxy</a>.</p>
-<p>The rule can be either global or set for a separate test. Setting the rules globally/for the test is done using the methods of the
-class <a href="https://github.com/zebrunner/carina-proxy/blob/master/src/main/java/com/zebrunner/carina/proxy/ProxyPool.java">ProxyPool</a>.
-Also all dynamic proxies are controlled by this class. This class manages the state of the proxy (starting, stopping, getting information about
-running proxy, controlling the use of the specified ports).</p>
-<p>All dynamic proxies depend on the following configuration parameters:</p>
-<p><code>proxy_port</code> - priority parameter when obtaining the port for the proxy to be started.
-The default value is <code>0</code> (dynamic port), but this value is relevant
-for the default dynamic proxy implementation, may not be relevant for other implementations.</p>
-<p><code>proxy_ports</code> - defines the range of ports that can be used for running proxies.
-Example: <code>4000:5000</code> - ports 4000 to 5000 will be used. Only used
-if the value of <code>proxy_ports</code> is <code>NULL</code>.</p>
-<p>There are also parameters on which the default dynamic proxy implementation depends:</p>
-<p><code>browserup_disabled_mitm</code> - when true, MITM capture will be disabled, false otherwise</p>
-<p>The default dynamic proxy implementation is represented by the <a href="https://github.com/zebrunner/carina-proxy/blob/master/src/main/java/com/zebrunner/carina/proxy/browserup/CarinaBrowserUpProxy.java">CarinaBrowserUpProxy</a> class.</p>
-<p>An example of using a default dynamic proxy can be viewed <a href="https://github.com/zebrunner/carina-demo/blob/318b5235b3d100c9f9419dcb274f1e4c25700cf0/src/test/java/com/zebrunner/carina/demo/ProxySampleTest.java#L190">here</a>.</p>
-<p>If you want to use a proxy that is not use BrowserUp or use BrowserUp with custom configuration,
-then you can create your own implementation. For this you have to create a class,
-implementing the <a href="https://github.com/zebrunner/carina-proxy/blob/master/src/main/java/com/zebrunner/carina/proxy/IProxy.java">IProxy</a> interface.
-In your implementation, you manage the state of the proxy yourself, however, you must follow the rules described by the interface,
-so that the proxy pool correctly manages your implementation. You also need to implement your rule.
-To do this, you need to create a class that implements the <a href="https://github.com/zebrunner/carina-proxy/blob/master/src/main/java/com/zebrunner/carina/proxy/IProxyRule.java">IProxyRule</a> interface,
-and then register it using the <a href="https://github.com/zebrunner/carina-proxy/blob/master/src/main/java/com/zebrunner/carina/proxy/ProxyPool.java">ProxyPool</a> class methods.
-This rule will be used instead of the default rule (can be set globally or per test).</p>
-<h3 id="legacy-proxy-mode-default-will-be-deprecated-in-future-releases">LEGACY proxy mode [DEFAULT, WILL BE DEPRECATED IN FUTURE RELEASES]</h3>
-<p>Set by changing the value of the <code>proxy_type</code> parameter in the configuration to <code>LEGACY</code>.</p>
-<p>There is a possibility to send all test traffic via proxy including the embedded light-weight BrowserUp proxy server.
-There are several properties available to manage all kinds of proxy usage:</p>
-<pre><code>proxy_host=NULL
-proxy_port=NULL
-proxy_protocols=http,https,ftp
-proxy_set_to_system=true
-browserup_proxy=false
-browserup_disabled_mitm=false
-browserup_port=0
-</code></pre>
+<h3 id="zebrunner-proxy-mode">ZEBRUNNER proxy mode</h3>
+<p>Proxy mode, designed to work with <a href="https://zebrunner.com/selenium-grid">Zebrunner Selenium Grid</a>.</p>
+<p>Set by changing the value of the <code>proxy_type</code> parameter in the configuration to <code>ZEBRUNNER</code>.</p>
+<p>By simply enabling this type of proxy, incoming/outgoing browser requests will be proxied.
+However, it is also possible to specify additional parameters for the proxy. The class <code>com.zebrunner.carina.webdriver.proxy.ZebrunnerProxyBuilder</code>
+is used for this.</p>
+<p>This builder is used in the test before the driver is created. Usage example:</p>
+<pre><code class="java">   @Test
+    public void proxyBuilderTest() {
+        R.CONFIG.put(WebDriverConfiguration.Parameter.PROXY_TYPE.getKey(), &quot;ZEBRUNNER&quot;, true);
+        // adding a body modification condition (replace text 'Phone finder' with 'MODIFIED PHONE FINDER')
+        ZebrunnerProxyBuilder.getInstance()
+                .addBodyModify(&quot;Phone finder&quot;, &quot;MODIFIED PHONE FINDER&quot;)
+                .build(true);
 
-<p>With the enabled <strong>browserup_proxy</strong>, Carina will start the dedicated proxy instance on every test method.</p>
-<p>Carina automatically detects an IP address for your local browserup proxy and puts it into the capabilities in case if <strong>proxy_host=NULL</strong>. If you want to map some publicly available IP address for your browserup proxy instance then you'll need to override it via <strong>proxy_host</strong> property.
-E.g. <strong>proxy_host=myhostname</strong> is useful in case of running maven process inside a docker container. Override the hostname, and it will be available from Selenium instance.</p>
-<p><strong>browserup_port=0</strong> means that Carina dynamically identifies a free port for a proxy session.</p>
-<p><strong>browserup_ports_range=8001:8003</strong> means that Carina will use only ports from given range for starting of browserup sessions. That's reasonable for cases when only several ports are shared at environment and can be accessed from other machines within the network. If all ports are used then test will wait for the first freed port.</p>
-<p><strong>browserup_disabled_mitm</strong> is disabled by default.</p>
-<p><strong>Important!</strong> If you have troubles with  SSL traffic sniffing, the first thing you should do is to change <strong>browserup_disabled_mitm</strong> property value!</p>
-<p>Declare proxy_host, proxy_port and proxy_protocols to send all Web and API test traffic via your static network proxy.
-Also, to enable proxy for TestNG Java process, <strong>proxy_set_to_system</strong> must be specified to <strong>true</strong>, otherwise only WebDrivers and API clients will be proxied.</p>
-<p>Note: The above settings are mostly required to get public internet access through corporate proxies.</p>
-<h2 id="using-the-default-dynamic-proxy-implementation-carinabrowserupproxy-in-dynamic-mode-in-java-code">Using the default dynamic proxy implementation (CarinaBrowserUpProxy) in DYNAMIC mode in Java code</h2>
-<p><strong>IMPORTANT</strong>: All of the following examples of using ProxyPool in the current section use the class
-<a href="https://github.com/zebrunner/carina-proxy/blob/master/src/main/java/com/zebrunner/carina/proxy/ProxyPool.java">ProxyPool</a>.</p>
-<p>1) Make sure the driver instance is already started:</p>
-<pre><code>getDriver();
+        HomePage homePage = new HomePage(getDriver());
+        homePage.open();
+        Assert.assertTrue(homePage.isPageOpened(), &quot;Home page is not opened!&quot;);
+        Assert.assertEquals(homePage.getPhoneFinderButton().getText(), &quot;MODIFIED PHONE FINDER&quot;,
+                &quot;'Phone Finder' text should be modified in response.&quot;);
+    }
 </code></pre>
-
-<p>Note: During the driver startup, Carina automatically starts proxy (depends on rule) and adjusts browser capabilities to track the desired protocols. 
-To get proxy instance for the current test/thread, you can call:</p>
-<pre><code>Optional&lt;IProxy&gt; proxy = ProxyPool.getProxy();
-</code></pre>
-
-<p>You can get a specific implementation of a dynamic proxy as follows (but you need to be sure which implementation will be in the pool):</p>
-<pre><code>Optional&lt;CarinaBrowserUpProxy&gt; proxy = ProxyPool.getOriginal(CarinaBrowserUpProxy.class);
-</code></pre>
-
-<p>2) Enable the required Har capture type using:</p>
-<pre><code>CarinaBrowserUpProxy proxy = ProxyPool.getOriginal(CarinaBrowserUpProxy.class)
-.orElseThrow();
-BrowserUpProxy browserUpProxy = proxy.getProxy();
-browserUpProxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT);
-</code></pre>
-
-<p>There are a lot of possible content types:</p>
-<pre><code>CaptureType.RESPONSE_COOKIES
-CaptureType.RESPONSE_HEADERS
-CaptureType.REQUEST_HEADERS
-CaptureType.RESPONSE_CONTENT
-CaptureType.REQUEST_CONTENT
-...
-</code></pre>
-
-<p>They all can be set as comma-separated parameters.</p>
-<p>3) You may want to save the captured content into a .har file:</p>
-<pre><code>proxy.newHar(HAR_NAME);
-//Some testing activity...
-//Saving har to a file...
-File file = new File(HAR_NAME + &quot;.har&quot;);
-Assert.assertNotNull(proxy.getHar(), &quot;Har is NULL!&quot;);
-try { 
-  proxy.getHar().writeTo(file); 
-} catch (IOException e) {
-  e.printStackTrace(); 
-}
-</code></pre>
-
-<p>Your .har file will be created in the project root folder.</p>
-<p>4) There are four methods to support request and response interception:</p>
-<pre><code>addRequestFilter
-addResponseFilter
-addFirstHttpFilterFactory
-addLastHttpFilterFactory
-</code></pre>
-
-<p>To add and configure content filters, look <a href="https://github.com/browserup/browserup-proxy#littleproxy-interceptors">here</a>.</p>
-<p>An example of using response filtering can be viewed <a href="https://github.com/zebrunner/carina-demo/blob/318b5235b3d100c9f9419dcb274f1e4c25700cf0/src/test/java/com/zebrunner/carina/demo/ProxySampleTest.java#L290">here</a>.</p>
-<h3 id="dealing-with-mitm-and-installing-ssl-certificate-into-your-system">Dealing with MITM and installing SSL certificate into your system:</h3>
-<h4 id="for-mac-users">For Mac users:</h4>
-<ol>
-<li>Go <a href="https://github.com/browserup/browserup-proxy/blob/master/browserup-proxy-core/src/main/resources/sslSupport/ca-certificate-rsa.cer">here</a> and save it as <strong>ca-certificate-rsa.cer</strong>.</li>
-<li>
-<p>A double click creates a file. The next window should appear:</p>
-<p><img alt="Adding ssl certificate" src="../../img/SSLInstallStep1.png" /></p>
-</li>
-<li>
-<p>After authorization, the certificate will be added into your system certificates,  but it's still untrusted:</p>
-<p><img alt="Adding ssl certificate" src="../../img/SSLInstallStep2.png" /></p>
-</li>
-<li>
-<p>To make it trusted, double click on it. The following window should appear:</p>
-<p><img alt="Adding ssl certificate" src="../../img/SSLInstallStep3.png" /></p>
-</li>
-<li>
-<p>First, click the drop-down menu and select <strong>Always Trust</strong> option. Then close the window (a second authorization will be required):</p>
-<p><img alt="Adding ssl certificate" src="../../img/SSLInstallStep4.png" /></p>
-</li>
-<li>
-<p>Make sure the red cross on your certificate turned into a blue one:</p>
-<p><img alt="Adding ssl certificate" src="../../img/SSLInstallStep5.png" /></p>
-</li>
-</ol>
-<h3 id="adding-ssl-certificate-into-java-keystore">Adding SSL certificate into Java keystore:</h3>
-<p>If you are still receiving the following exception:</p>
-<pre><code>javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
-</code></pre>
-
-<p>you may need to set up <strong>ca-certificate-rsa.cer</strong> into your Java keystore.</p>
-<h4 id="for-mac-and-linux-users">For Mac and Linux users:</h4>
-<pre><code>sudo keytool -importcert -alias browserup -file pathToYourCertificateLocation/BrowserUpCertificate.crt -keystore /Library/Java/JavaVirtualMachines/jdk1.8.0_181.jdk/Contents/Home/jre/lib/security/cacerts
-</code></pre>
-
-<p>You will be asked to enter your Mac profile password and a Java keystore password (by default: changeit).</p>
                 
               
               
