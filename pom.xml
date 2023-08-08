@@ -82,8 +82,19 @@
     <dependencies>
         <dependency>
             <groupId>com.zebrunner</groupId>
+            <artifactId>agent-testng-pluggable</artifactId>
+            <version>1.9.7</version>
+        </dependency>
+        <dependency>
+            <groupId>com.zebrunner</groupId>
             <artifactId>carina-webdriver</artifactId>
             <version>${carina-webdriver.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.zebrunner</groupId>
+                    <artifactId>agent-testng-pluggable</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.zebrunner</groupId>
