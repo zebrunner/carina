@@ -126,6 +126,9 @@ public class Device implements IDriverPool {
         // try to read extra information from slot capabilities object
         @SuppressWarnings("unchecked")
         Map<String, Object> slotCap = (Map<String, Object>) capabilities.getCapability(SpecialKeywords.SLOT_CAPABILITIES);
+        if(slotCap == null) {
+            slotCap =  (Map<String, Object>) capabilities.getCapability("zebrunner:slotCapabilities");
+        }
         try {
             if (slotCap != null && slotCap.containsKey("udid")) {
 
