@@ -16,8 +16,18 @@
       </ReportingAppender>
    </appenders>
    <loggers>
-      <!-- there are a lot of useless warnings from Reflections -->
+      <!-- there are a lot of useless logs from Reflections -->
       <logger name="org.reflections" level="WARN" additivity="false">
+         <appender-ref ref="Console"/>
+         <appender-ref ref="ThreadLogAppender"/>
+         <appender-ref ref="ReportingAppender"/>
+      </logger>
+      <logger name="io.netty" additivity="false">
+         <appender-ref ref="Console"/>
+         <appender-ref ref="ThreadLogAppender"/>
+         <appender-ref ref="ReportingAppender"/>
+      </logger>
+      <logger name="org.asynchttpclient.netty" additivity="false">
          <appender-ref ref="Console"/>
          <appender-ref ref="ThreadLogAppender"/>
          <appender-ref ref="ReportingAppender"/>
