@@ -106,7 +106,12 @@ public class ReportConfiguration extends Configuration {
         /**
          * todo add description
          */
-        GIT_HASH("git_hash");
+        GIT_HASH("git_hash"),
+
+        /**
+         * todo add description
+         */
+        REPORTING_RULE("reporting_rule");
 
         private final String key;
 
