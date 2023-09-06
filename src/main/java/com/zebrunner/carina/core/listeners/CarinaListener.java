@@ -224,7 +224,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
         // register branch if available
         Configuration.get("branch").ifPresent(branch -> {
-            Label.attachToTestRun("branch", branch);
+            Label.attachToTestRun("Branch", branch);
         });
         
         /*
