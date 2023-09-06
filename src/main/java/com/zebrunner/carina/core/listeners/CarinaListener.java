@@ -199,7 +199,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
        String branch =  R.CONFIG.get("branch");
        if(!(branch == null || branch.equalsIgnoreCase(SpecialKeywords.NULL))) {
-           Label.attachToTestRun("branch", branch);
+           Label.attachToTestRun("Branch", branch);
        }
         
         /*
