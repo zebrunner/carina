@@ -196,6 +196,11 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
         // register owner of the run
         registerOwner();
+
+       String branch =  R.CONFIG.get("branch");
+       if(!(branch == null || branch.equalsIgnoreCase(SpecialKeywords.NULL))) {
+           Label.attachToTestRun("branch", branch);
+       }
         
         /*
          * To support multi-suite declaration as below we have to init test run labels at once only!
