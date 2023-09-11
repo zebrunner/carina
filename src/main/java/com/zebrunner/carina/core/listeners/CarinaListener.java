@@ -147,8 +147,15 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             org.apache.logging.log4j.core.config.Configuration config = ctx.getConfiguration();
             LoggerConfig logger = config.getLoggerConfig("com.zebrunner.carina.core");
             logger.setLevel(Level.getLevel(Configuration.getRequired(ReportConfiguration.Parameter.CORE_LOG_LEVEL)));
-        }
 
+            if ("DEBUG".equalsIgnoreCase(Configuration.getRequired(ReportConfiguration.Parameter.CORE_LOG_LEVEL))) {
+                config.getLoggerConfig("io.netty")
+                        .setLevel(Level.OFF);
+                config.getLoggerConfig("org.asynchttpclient.netty")
+                        .setLevel(Level.OFF);
+            }
+        }
+        
         try {
             L10N.load();
         } catch (Exception e) {
@@ -214,6 +221,10 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
         // register owner of the run
         registerOwner();
+
+        // register branch if available
+        Configuration.get("branch")
+                .ifPresent(branch -> Label.attachToTestRun("Branch", branch));
         
         /*
          * To support multi-suite declaration as below we have to init test run labels at once only!
