@@ -33,6 +33,7 @@ import com.qaprosoft.carina.core.foundation.commons.SpecialKeywords;
 import com.qaprosoft.carina.core.foundation.crypto.CryptoTool;
 import com.qaprosoft.carina.core.foundation.exception.InvalidConfigurationException;
 import com.qaprosoft.carina.core.foundation.utils.Configuration.Parameter;
+import com.qaprosoft.carina.core.foundation.utils.resources.ClassLoaderUtil;
 
 /**
  * R - loads properties from resource files.
@@ -63,6 +64,8 @@ public enum R {
     private static Pattern CRYPTO_PATTERN = Pattern.compile(SpecialKeywords.CRYPT);
 
     private String resourceFile;
+    
+    private final static ClassLoader CLASS_LOADER = ClassLoaderUtil.initClassLoader();
 
     // temporary thread/test properties which is cleaned on afterTest phase for current thread. It can override any value from below R enum maps
     private static ThreadLocal<Properties> testProperties = new ThreadLocal<>();
@@ -76,7 +79,7 @@ public enum R {
     static {
         reinit();
     }
-
+    
     public static void reinit() {
         for (R resource : values()) {
             try {
@@ -90,7 +93,7 @@ public enum R {
 
                 URL overrideResource;
                 String resourceName = OVERRIDE_SIGN + resource.resourceFile;
-                while ((overrideResource = ClassLoader.getSystemResource(resourceName)) != null) {
+                while ((overrideResource = CLASS_LOADER.getResource(resourceName)) != null) {
                     properties.load(overrideResource.openStream());
                     resourceName = OVERRIDE_SIGN + resourceName;
                 }
@@ -162,7 +165,7 @@ public enum R {
      * @return true if at least one resource found, false otherwise
      */
     private static boolean isResourceExists(String resourceName) {
-        return ClassLoader.getSystemResource(resourceName) != null;
+        return CLASS_LOADER.getResource(resourceName) != null;
     }
 
     /**
@@ -339,7 +342,7 @@ public enum R {
     }
 
     public static String getResourcePath(String resource) {
-        String path = StringUtils.removeStart(ClassLoader.getSystemResource(resource).getPath(), "/");
+        String path = StringUtils.removeStart(CLASS_LOADER.getResource(resource).getPath(), "/");
         path = StringUtils.replaceChars(path, "/", "\\");
         path = StringUtils.replaceChars(path, "!", "");
         return path;
