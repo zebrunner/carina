@@ -41,18 +41,65 @@ import com.zebrunner.carina.utils.report.TestResultType;
 public class EmailReportGenerator {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static final String CONTAINER = R.EMAIL.get("container");
-    private static final String PACKAGE_TR = R.EMAIL.get("package_tr");
-    private static final String PASS_TEST_LOG_DEMO_TR = R.EMAIL.get("pass_test_log_demo_tr");
-    private static final String FAIL_TEST_LOG_DEMO_TR = R.EMAIL.get("fail_test_log_demo_tr");
-    private static final String SKIP_TEST_LOG_DEMO_TR = R.EMAIL.get("skip_test_log_demo_tr");
-    private static final String FAIL_CONFIG_LOG_DEMO_TR = R.EMAIL.get("fail_config_log_demo_tr");
-    private static final String PASS_TEST_LOG_TR = R.EMAIL.get("pass_test_log_tr");
-    private static final String FAIL_TEST_LOG_TR = R.EMAIL.get("fail_test_log_tr");
-    private static final String SKIP_TEST_LOG_TR = R.EMAIL.get("skip_test_log_tr");
-    private static final String FAIL_CONFIG_LOG_TR = R.EMAIL.get("fail_config_log_tr");
-    private static final String CREATED_ITEMS_LIST = R.EMAIL.get("created_items_list");
-    private static final String CREATED_ITEM = R.EMAIL.get("created_item");
+    //todo move all html to the email-report.html file and read it
+    private static final String CONTAINER = "<div id='container' style='width: 98%; padding: 10px; margin: 0; background: #EBEBE0; color: #717171; "
+            + "font-family: Calibri;'><div id='summary'><h2 align='center' style='background-color: gray; color: white; padding: 10px; margin: 0;'>"
+            + "${title}</h2><br><h2 style='clear: both; margin: 0;'>Summary:</h2><hr/><table style='width: 1000px;'><tr><td style='width: 100px;'>"
+            + "Environment:</td><td>${env}</td></tr><tr><td>Version:</td><td>${version}</td></tr><tr><td>Browser:</td><td>${browser}</td></tr><tr>"
+            + "<td>Finished:</td><td>${finish_date}</td></tr><tr class='pass' style='color: #66C266;'><td>Passed: </td><td>${pass_count}</td></tr>"
+            + "<tr class='fail' style='color: #FF5C33;'><td>Failed:</td><td>${fail_count}</td></tr><tr class='skip' style='color: #FFD700;'>"
+            + "<td>Skipped:</td><td>${skip_count}</td></tr><tr><td>Success rate:</td><td>${pass_rate}%</td></tr></table></div><br>${cucumber_results}"
+            + "<br><div id='results'><h2 style='margin: 0;'>Test results:</h2><hr/><table cellspacing='0' cellpadding='0' style='width: 100%;'><tr>"
+            + "<th width='10%' align='center'>Result</th><th width='75%'>Test name</th><th width='10%'>Test files</th></tr>${result_rows}</table>"
+            + "</div>${created_items_list}</div>\n";
+    private static final String PACKAGE_TR = "<tr><td colspan='4' class='package' style='background: gray; border-style: solid; border-width: 1px; "
+            + "border-color: white; padding: 5px; color: white;'>${package_name}</td></tr>\n";
+    private static final String PASS_TEST_LOG_DEMO_TR = "<tr class='pass' style='background: #66C266;'><td align='center' style='border-style: solid;"
+            + " border-width: 1px; border-color: white; padding: 5px; color: white;'>PASSED</td><td style='border-style: solid; border-width: 1px; "
+            + "border-color: white; padding: 5px; color: white;'>${test_name}</td><td align='center' style='border-style: solid; border-width: 1px; "
+            + "border-color: white; padding: 5px; color: white;'><a target='_blank' href='${log_url}' style='color: white;'>Logs</a><span> | </span>"
+            + "<a target='_blank' href='${screenshots_url}' style='color: white;'>Slides</a></td></tr>\n";
+    private static final String FAIL_TEST_LOG_DEMO_TR = "<tr class='fail' style='background: #FF5C33;'><td align='center' style='border-style: solid;"
+            + " border-width: 1px; border-color: white; padding: 5px; color: white;'>FAILED</td><td style='border-style: solid; border-width: 1px; "
+            + "border-color: white; padding: 5px; color: white;'><span>${test_name}</span><div style=\"background:#ffcccc; color: black; padding: "
+            + "5px; margin: 2px 0px 2px 0px;\">${fail_reason}</div></td><td align='center' style='border-style: solid; border-width: 1px; "
+            + "border-color: white; padding: 5px; color: white;'><a target='_blank' href='${log_url}' style='color: white;'>Logs</a><span> | "
+            + "</span><a target='_blank' href='${screenshots_url}' style='color: white;'>Slides</a></td></tr>\n";
+    private static final String SKIP_TEST_LOG_DEMO_TR = "<tr class='skip' style='background: #DEB887;'><td align='center' style='border-style: solid;"
+            + " border-width: 1px; border-color: white; padding: 5px; color: white;'>SKIPPED</td><td style='border-style: solid; border-width: 1px; "
+            + "border-color: white; padding: 5px; color: white;'><span>${test_name}</span><div style=\"background:#FFE4B5; color: black; padding: 5px;"
+            + " margin: 2px 0px 2px 0px;\">${skip_reason}</div></td><td align='center' style='border-style: solid; border-width: 1px; "
+            + "border-color: white; padding: 5px; color: white;'><a target='_blank' href='${log_url}' style='color: white;'>Logs</a><span> | "
+            + "</span><a target='_blank' href='${screenshots_url}' style='color: white;'>Slides</a></td></tr>\n";
+    private static final String FAIL_CONFIG_LOG_DEMO_TR = "<tr class='fail' style='background: #009999;'><td align='center' style='border-style: "
+            + "solid; border-width: 1px; border-color: white; padding: 5px; color: white;'>SYSTEM ISSUE</td><td style='border-style: solid; "
+            + "border-width: 1px; border-color: white; padding: 5px; color: white;'><span>${test_name}</span><div style=\"background:#5ccccc; "
+            + "color: black; padding: 5px; margin: 2px 0px 2px 0px;\">${fail_config_reason}</div></td><td align='center' style='border-style: "
+            + "solid; border-width: 1px; border-color: white; padding: 5px; color: white;'><a target='_blank' href='${log_url}' style='color: "
+            + "white;'>Logs</a><span> | </span><a target='_blank' href='${screenshots_url}' style='color: white;'>Slides</a></td></tr>\n";
+    private static final String PASS_TEST_LOG_TR = "<tr class='pass' style='background: #66C266;'><td align='center' style='border-style:"
+            + " solid; border-width: 1px; border-color: white; padding: 5px; color: white;'>PASSED</td><td style='border-style: solid; border-width:"
+            + " 1px; border-color: white; padding: 5px; color: white;'>${test_name}</td><td align='center' style='border-style: solid; border-width:"
+            + " 1px; border-color: white; padding: 5px; color: white;'><a target='_blank' href='${log_url}' style='color: white;'>Logs</a></td></tr>\n";
+    private static final String FAIL_TEST_LOG_TR = "<tr class='fail' style='background: #FF5C33;'><td align='center' "
+            + "style='border-style: solid; border-width: 1px; border-color: white; padding: 5px; color: white;'>FAILED</td><td style='border-style: "
+            + "solid; border-width: 1px; border-color: white; padding: 5px; color: white;'><span>${test_name}</span><div style=\"background:#ffcccc; "
+            + "color: black; padding: 5px; margin: 2px 0px 2px 0px;\">${fail_reason}</div></td><td align='center' style='border-style: solid; "
+            + "border-width: 1px; border-color: white; padding: 5px; color: white;'><a target='_blank' href='${log_url}' style='color: white;'>"
+            + "Logs</a></td></tr>\n";
+    private static final String SKIP_TEST_LOG_TR = "<tr class='skip' style='background: #DEB887;'><td align='center' style='border-style: solid; "
+            + "border-width: 1px; border-color: white; padding: 5px; color: white;'>SKIPPED</td><td style='border-style: solid; border-width: 1px; "
+            + "border-color: white; padding: 5px; color: white;'><span>${test_name}</span><div style=\"background:#FFE4B5; color: black; padding: "
+            + "5px; margin: 2px 0px 2px 0px;\">${skip_reason}</div></td><td align='center' style='border-style: solid; border-width: 1px; "
+            + "border-color: white; padding: 5px; color: white;'><a target='_blank' href='${log_url}' style='color: white;'>Logs</a></td></tr>\n";
+    private static final String FAIL_CONFIG_LOG_TR = "<tr class='fail' style='background: #009999;'><td align='center' "
+            + "style='border-style: solid; border-width: 1px; border-color: white; padding: 5px; color: white;'>SYSTEM ISSUE</td><td style='"
+            + "border-style: solid; border-width: 1px; border-color: white; padding: 5px; color: white;'><span>${test_name}</span><div style="
+            + "\"background:#5ccccc; color: black; padding: 5px; margin: 2px 0px 2px 0px;\">${fail_config_reason}</div></td><td align='center' "
+            + "style='border-style: solid; border-width: 1px; border-color: white; padding: 5px; color: white;'><a target='_blank' href='${log_url}' "
+            + "style='color: white;'>Logs</a></td></tr>\n";
+    private static final String CREATED_ITEMS_LIST = "<div><h3>Created items:</h3><ul>${created_items_list}</ul></div>";
+    private static final String CREATED_ITEM = "<li>${created_item}</li>";
     private static final String TITLE_PLACEHOLDER = "${title}";
     private static final String ENV_PLACEHOLDER = "${env}";
     private static final String BROWSER_PLACEHOLDER = "${browser}";
@@ -72,14 +119,14 @@ public class EmailReportGenerator {
     private static final String LOG_URL_PLACEHOLDER = "${log_url}";
     private static final String CREATED_ITEMS_LIST_PLACEHOLDER = "${created_items_list}";
     private static final String CREATED_ITEM_PLACEHOLDER = "${created_item}";
-    private static final int MESSAGE_LIMIT = R.EMAIL.getInt("fail_description_limit");
-    
+    private static final int MESSAGE_LIMIT = 2048;
+
     // Cucumber section
     private static final String CUCUMBER_RESULTS_PLACEHOLDER = "${cucumber_results}";
 
-    private static final boolean INCLUDE_PASS = R.EMAIL.getBoolean("include_pass");
-    private static final boolean INCLUDE_FAIL = R.EMAIL.getBoolean("include_fail");
-    private static final boolean INCLUDE_SKIP = R.EMAIL.getBoolean("include_skip");
+    private static final boolean INCLUDE_PASS = true;
+    private static final boolean INCLUDE_FAIL = true;
+    private static final boolean INCLUDE_SKIP = true;
 
     private String emailBody = CONTAINER;
     private StringBuilder testResults = null;
@@ -101,7 +148,7 @@ public class EmailReportGenerator {
         emailBody = emailBody.replace(SKIP_COUNT_PLACEHOLDER, String.valueOf(skipCount));
         emailBody = emailBody.replace(PASS_RATE_PLACEHOLDER, String.valueOf(getSuccessRate()));
         emailBody = emailBody.replace(CREATED_ITEMS_LIST_PLACEHOLDER, getCreatedItemsList(createdItems));
-        
+
         // Cucumber section
         emailBody = emailBody.replace(CUCUMBER_RESULTS_PLACEHOLDER, getCucumberResultsHTML());
 
@@ -134,7 +181,9 @@ public class EmailReportGenerator {
         if (testResultItem.getResult().name().equalsIgnoreCase("FAIL")) {
             if (INCLUDE_FAIL) {
                 if (testResultItem.isConfig()) {
-                    result = testResultItem.getLinkToScreenshots() != null && !"".equals(testResultItem.getLinkToScreenshots()) ? FAIL_CONFIG_LOG_DEMO_TR : FAIL_CONFIG_LOG_TR;
+                    result = testResultItem.getLinkToScreenshots() != null && !"".equals(testResultItem.getLinkToScreenshots())
+                            ? FAIL_CONFIG_LOG_DEMO_TR
+                            : FAIL_CONFIG_LOG_TR;
                     result = result.replace(TEST_NAME_PLACEHOLDER, testResultItem.getTest());
 
                     failReason = testResultItem.getFailReason();
@@ -146,7 +195,9 @@ public class EmailReportGenerator {
                         result = result.replace(FAIL_CONFIG_REASON_PLACEHOLDER, "Undefined failure: contact qa engineer!");
                     }
                 } else {
-                    result = testResultItem.getLinkToScreenshots() != null && !"".equals(testResultItem.getLinkToScreenshots()) ? FAIL_TEST_LOG_DEMO_TR : FAIL_TEST_LOG_TR;
+                    result = testResultItem.getLinkToScreenshots() != null && !"".equals(testResultItem.getLinkToScreenshots())
+                            ? FAIL_TEST_LOG_DEMO_TR
+                            : FAIL_TEST_LOG_TR;
                     result = result.replace(TEST_NAME_PLACEHOLDER, testResultItem.getTest());
 
                     failReason = testResultItem.getFailReason();
@@ -172,7 +223,9 @@ public class EmailReportGenerator {
             failReason = testResultItem.getFailReason();
             if (!testResultItem.isConfig()) {
                 if (INCLUDE_SKIP) {
-                    result = testResultItem.getLinkToScreenshots() != null && !"".equals(testResultItem.getLinkToScreenshots()) ? SKIP_TEST_LOG_DEMO_TR : SKIP_TEST_LOG_TR;
+                    result = testResultItem.getLinkToScreenshots() != null && !"".equals(testResultItem.getLinkToScreenshots())
+                            ? SKIP_TEST_LOG_DEMO_TR
+                            : SKIP_TEST_LOG_TR;
                     result = result.replace(TEST_NAME_PLACEHOLDER, testResultItem.getTest());
 
                     if (!StringUtils.isEmpty(failReason)) {
@@ -231,7 +284,7 @@ public class EmailReportGenerator {
                 passed++;
                 break;
             case FAIL:
-               failed++;
+                failed++;
                 break;
             case SKIP:
                 skipped++;
@@ -315,5 +368,4 @@ public class EmailReportGenerator {
         }
         return false;
     }
-    
 }

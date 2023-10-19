@@ -32,6 +32,8 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import com.zebrunner.agent.core.webdriver.CapabilitiesCustomizerChain;
+import com.zebrunner.carina.webdriver.core.capability.CarinaCapabilitiesCustomizer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.ConstructorUtils;
 import org.apache.logging.log4j.Level;
@@ -135,6 +137,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         // That is why it is necessary to reinit R class here when TestNG loads the CarinaListener class.
         R.reinit();
         reinitAgentToken();
+        CapabilitiesCustomizerChain.getInstance()
+                        .addLast(new CarinaCapabilitiesCustomizer());
         ReportConfiguration.removeOldReports();
 
         LOGGER.info(getTestRunConfigurationDescription());
@@ -398,7 +402,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             R.CONFIG.clearTestProperties();
             R.TESTDATA.clearTestProperties();
             R.DATABASE.clearTestProperties();
-            R.EMAIL.clearTestProperties();
             R.REPORT.clearTestProperties();
             R.ZAFIRA.clearTestProperties();
             LOGGER.debug("Test result is : {}", result.getStatus());
@@ -525,7 +528,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         if (suite != null && !"Default suite".equals(suite.getName())) {
             suiteName = Configuration.get(ReportConfiguration.Parameter.SUITE_NAME).orElse(suite.getName());
         } else {
-            suiteName = Configuration.get(ReportConfiguration.Parameter.SUITE_NAME).orElse(R.EMAIL.get("title"));
+            suiteName = Configuration.get(ReportConfiguration.Parameter.SUITE_NAME).orElseThrow();
         }
         return suiteName;
     }

@@ -163,9 +163,9 @@ public class ReportConfiguration extends Configuration {
     public static String getTestArtifactsLink() {
         Optional<String> reportURL = Configuration.get(ReportConfiguration.Parameter.REPORT_URL);
         if (reportURL.isPresent()) {
-            return String.format("%s/%s/artifacts", reportURL.get(), ReportContext.getBaseDir().getName());
+            return String.format("%s/%s/artifacts", reportURL.get(), ReportContext.getBaseDirectory().getFileName().toString());
         } else {
-            return String.format("file://%s/artifacts", ReportContext.getBaseDir().getAbsolutePath());
+            return String.format("file://%s/artifacts", ReportContext.getBaseDirectory().toString());
         }
     }
 
@@ -261,11 +261,7 @@ public class ReportConfiguration extends Configuration {
 
                 image = image.replace("${image}", imgName);
 
-                String title = ReportContext.getScreenshotComment(imgName);
-                if (title == null) {
-                    title = "";
-                }
-                image = image.replace("${title}", StringUtils.substring(title, 0, 300));
+                image = image.replace("${title}", StringUtils.substring("", 0, 300));
                 report.append(image);
             }
             String wholeReport = R.REPORT.get("container").replace("${images}", report.toString());
