@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import com.zebrunner.agent.core.config.provider.SystemPropertiesConfigurationProvider;
 import com.zebrunner.agent.core.webdriver.CapabilitiesCustomizerChain;
 import com.zebrunner.carina.webdriver.core.capability.CarinaCapabilitiesCustomizer;
 import org.apache.commons.lang3.StringUtils;
@@ -122,7 +123,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     protected static final String XML_SUITE_NAME = " (%s)";
 
     protected static boolean automaticDriversCleanup = true;
-    
+
     protected boolean isRunLabelsRegistered = false;
 
     public CarinaListener() {
@@ -137,8 +138,9 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         // That is why it is necessary to reinit R class here when TestNG loads the CarinaListener class.
         R.reinit();
         reinitAgentToken();
+        reinitAgentEnv();
         CapabilitiesCustomizerChain.getInstance()
-                        .addLast(new CarinaCapabilitiesCustomizer());
+                .addLast(new CarinaCapabilitiesCustomizer());
         ReportConfiguration.removeOldReports();
 
         LOGGER.info(getTestRunConfigurationDescription());
@@ -159,7 +161,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                         .setLevel(Level.OFF);
             }
         }
-        
+
         try {
             L10N.load();
         } catch (Exception e) {
@@ -216,7 +218,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 CurrentTestRun.setBuild(appVersion);
             }
         });
-        
+
         Configuration.get(ReportConfiguration.Parameter.GIT_HASH).ifPresent(hash -> {
             if (ConfigurationHolder.isReportingEnabled()) {
                 Label.attachToTestRun("sha1", hash);
@@ -229,15 +231,15 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         // register branch if available
         Configuration.get("branch")
                 .ifPresent(branch -> Label.attachToTestRun("Branch", branch));
-        
+
         /*
          * To support multi-suite declaration as below we have to init test run labels at once only!
          * <suite-files>
-         *  <suite-file path="suite1.xml"/>
-         *  <suite-file path="suite2.xml"/>
+         * <suite-file path="suite1.xml"/>
+         * <suite-file path="suite2.xml"/>
          * </suite-files>
          */
-        
+
         if (!this.isRunLabelsRegistered) {
             attachTestRunLabels(suite);
             this.isRunLabelsRegistered = true;
@@ -246,7 +248,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         LOGGER.info("CARINA_CORE_VERSION: {}", getCarinaVersion());
     }
 
-	@Override
+    @Override
     public void onStart(ITestContext context) {
         LOGGER.debug("CarinaListener->OnTestStart(ITestContext context): {}", context.getName());
         super.onStart(context);
@@ -263,7 +265,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             TestPhase.setActivePhase(Phase.BEFORE_SUITE);
         }
 
-        if(result.getMethod().isBeforeTestConfiguration()){
+        if (result.getMethod().isBeforeTestConfiguration()) {
             TestPhase.setActivePhase(Phase.BEFORE_TEST);
         }
 
@@ -283,7 +285,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             TestPhase.setActivePhase(Phase.AFTER_CLASS);
         }
 
-        if (result.getMethod().isAfterTestConfiguration()){
+        if (result.getMethod().isAfterTestConfiguration()) {
             TestPhase.setActivePhase(Phase.AFTER_TEST);
         }
 
@@ -420,7 +422,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     }
 
     @Override
-    public void onAfterClass(ITestClass testClass){
+    public void onAfterClass(ITestClass testClass) {
         LOGGER.debug("CarinaListener->onAfterClass(ITestClass testClass)");
         quitDrivers(Phase.BEFORE_CLASS);
     }
@@ -431,8 +433,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         super.onFinish(context);
 
         // [SZ] it's still needed to close driver from BeforeClass stage.
-        // Otherwise it could be potentially used in other test classes 
-//        quitDrivers(Phase.BEFORE_CLASS); already exited in onAfterClass() method
+        // Otherwise it could be potentially used in other test classes
+        // quitDrivers(Phase.BEFORE_CLASS); already exited in onAfterClass() method
         quitDrivers(Phase.BEFORE_TEST);
 
         LOGGER.debug("CarinaListener->onFinish(context): {}", context.getName());
@@ -480,7 +482,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     /**
      * Disable automatic drivers cleanup after each TestMethod and switch to controlled by tests itself.
-     * But anyway all drivers will be closed forcibly as only suite is finished or aborted 
+     * But anyway all drivers will be closed forcibly as only suite is finished or aborted
      */
     public static void disableDriversCleanup() {
         LOGGER.info("Automatic drivers cleanup will be disabled!");
@@ -544,7 +546,8 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
             if (!tri.isConfig()) {
                 String reportLinks = !StringUtils.isEmpty(tri.getLinkToScreenshots())
-                        ? "screenshots=" + tri.getLinkToScreenshots() + " | " : "";
+                        ? "screenshots=" + tri.getLinkToScreenshots() + " | "
+                        : "";
                 reportLinks += !StringUtils.isEmpty(tri.getLinkToLog()) ? "log=" + tri.getLinkToLog() : "";
                 Messager.TEST_RESULT.info(String.valueOf(num++), tri.getTest(), tri.getResult().toString(),
                         reportLinks);
@@ -559,19 +562,22 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
     /*
      * Parse TestNG <suite ...> tag and return any attribute
+     * 
      * @param ISuite suite
+     * 
      * @param IString attribute
+     * 
      * @return String attribute value or empty string
      *
-    */
+     */
     private String getAttributeValue(ISuite suite, String attribute) {
         String res = "";
-        
+
         if (suite.getXmlSuite() == null || suite.getXmlSuite().getFileName() == null) {
             // #1514 Unable to execute the test classes from maven command line
             return res;
         }
-        
+
         File file = new File(suite.getXmlSuite().getFileName());
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 
@@ -609,20 +615,21 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 }
             }
         } catch (Exception e) {
-            LOGGER.warn("Unable to get attribute '" + attribute +"' from suite: " + suite.getXmlSuite().getFileName(), e);
+            LOGGER.warn("Unable to get attribute '" + attribute + "' from suite: " + suite.getXmlSuite().getFileName(), e);
         }
 
         return res;
 
     }
+
     private void setThreadCount(ISuite suite) {
-        //Reuse default thread-count value from suite TestNG file if it is not overridden in _config.properties
+        // Reuse default thread-count value from suite TestNG file if it is not overridden in _config.properties
 
         /*
          * WARNING! We coudn't override default thread-count="5" and data-provider-thread-count="10"!
          * suite.getXmlSuite().toXml() add those default values anyway even if the absent in suite xml file declaraton.
          * To make possible to parse correctly we had to reuse external parser and private getAttributeValue
-        */
+         */
 
         Optional<Integer> threadCount = Configuration.get(TestConfiguration.Parameter.THREAD_COUNT, Integer.class);
         if (threadCount.isPresent() && threadCount.get() >= 1) {
@@ -715,39 +722,39 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             LOGGER.debug("disable TestRail integration!");
             TestRail.disableSync();
         }
-        
+
         if (Configuration.getRequired(ReportConfiguration.Parameter.INCLUDE_ALL, Boolean.class)) {
             LOGGER.info("enable include_all for TestRail integration!");
             TestRail.includeAllTestCasesInNewRun();
         }
-        
+
         Configuration.get(ReportConfiguration.Parameter.MILESTONE).ifPresent(milestone -> {
             LOGGER.info("Set TestRail milestone name: {}", milestone);
             TestRail.setMilestone(milestone);
         });
-        
+
         Configuration.get(ReportConfiguration.Parameter.RUN_NAME).ifPresent(runName -> {
             LOGGER.info("Set TestRail run name: {}", runName);
             TestRail.setRunName(runName);
         });
-        
+
         Configuration.get(ReportConfiguration.Parameter.ASSIGNEE).ifPresent(assignee -> {
             LOGGER.info("Set TestRail assignee: {}", assignee);
             TestRail.setAssignee(assignee);
         });
 
         String qtestProject = getQTestProjectId(suite);
-        if (!qtestProject.isEmpty()){
+        if (!qtestProject.isEmpty()) {
             Label.attachToTestRun(SpecialKeywords.QTEST_PROJECT_ID, qtestProject);
         }
     }
-    
+
     /*
      * Capture screenshots for all available drivers after test fail/skip.
      * Request full size error screenshots if allowed by IScreenshotRules (allow_fullsize_screenshot property)
      * 
      * @param msg String comment
-     *  
+     * 
      */
     private void takeScreenshot() {
         ConcurrentHashMap<String, CarinaDriver> drivers = getDrivers();
@@ -759,7 +766,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         } catch (Throwable thr) {
             LOGGER.error("Failure detected on screenshot generation after failure: ", thr);
         }
-    }    
+    }
 
     public static class ShutdownHook extends Thread {
 
@@ -808,7 +815,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
         if (owner == null || owner.isEmpty()) {
             owner = System.getenv("BUILD_USER_ID");
         }
-        
+
         if (owner == null || owner.isEmpty()) {
             owner = System.getenv("USERNAME");
         }
@@ -819,17 +826,54 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
     }
 
     /**
-     * Get the value of the token from the configuration file (yaml/properties)
+     * Get the value of the token (system/yaml/properties)
      * and write it to the system properties
      */
-    private void reinitAgentToken() {
-        String accessToken = new YamlConfigurationProvider().getConfiguration().getServer().getAccessToken();
+    private static void reinitAgentToken() {
+        String accessToken = new SystemPropertiesConfigurationProvider()
+                .getConfiguration()
+                .getServer()
+                .getAccessToken();
         if (StringUtils.isBlank(accessToken)) {
-            accessToken = new PropertiesConfigurationProvider().getConfiguration().getServer().getAccessToken();
+            accessToken = new YamlConfigurationProvider()
+                    .getConfiguration()
+                    .getServer()
+                    .getAccessToken();
         }
-        if (StringUtils.isNotBlank(accessToken) && System.getProperty("reporting.server.accessToken") == null) {
+        if (StringUtils.isBlank(accessToken)) {
+            accessToken = new PropertiesConfigurationProvider()
+                    .getConfiguration()
+                    .getServer()
+                    .getAccessToken();
+        }
+        if (StringUtils.isNotBlank(accessToken)) {
             System.setProperty("reporting.server.accessToken", EncryptorUtils.decrypt(accessToken));
         }
+    }
+
+    private static void reinitAgentEnv() {
+        Configuration.get(Configuration.Parameter.ENV).ifPresent(configEnv -> {
+            String agentEnv = new SystemPropertiesConfigurationProvider()
+                    .getConfiguration()
+                    .getRun()
+                    .getEnvironment();
+            if (StringUtils.isBlank(agentEnv)) {
+                agentEnv = new YamlConfigurationProvider()
+                        .getConfiguration()
+                        .getRun()
+                        .getEnvironment();
+            }
+            if (StringUtils.isBlank(agentEnv)) {
+                agentEnv = new PropertiesConfigurationProvider()
+                        .getConfiguration()
+                        .getRun()
+                        .getEnvironment();
+            }
+
+            if (StringUtils.isBlank(agentEnv)) {
+                System.setProperty("reporting.run.environment", configEnv);
+            }
+        });
     }
 
     private static String getTestRunConfigurationDescription() {
