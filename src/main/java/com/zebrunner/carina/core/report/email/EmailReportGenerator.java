@@ -26,7 +26,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zebrunner.carina.utils.R;
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
 import com.zebrunner.carina.utils.report.ReportContext;
 import com.zebrunner.carina.utils.report.TestResult;
@@ -353,7 +352,7 @@ public class EmailReportGenerator {
      */
     private boolean isCucumberReportFolderExists() {
         try {
-            File reportOutputDirectory = new File(String.format("%s/%s", ReportContext.getBaseDir(), SpecialKeywords.CUCUMBER_REPORT_FOLDER));
+            File reportOutputDirectory = new File(String.format("%s/%s", ReportContext.getBaseDirectory().toFile(), SpecialKeywords.CUCUMBER_REPORT_FOLDER));
             if (reportOutputDirectory.exists() && reportOutputDirectory.isDirectory()) {
                 if (reportOutputDirectory.list().length > 0) {
                     LOGGER.debug("Cucumber Report Folder is not empty!");
