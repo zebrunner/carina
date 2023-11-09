@@ -210,7 +210,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             }
         });
 
-        Configuration.get(WebDriverConfiguration.Parameter.LOCALE).ifPresent(CurrentTestRun::setLocale);
+        CurrentTestRun.setLocale(WebDriverConfiguration.getLocale().getCountry());
 
         Configuration.get(ReportConfiguration.Parameter.APP_VERSION).ifPresent(appVersion -> {
             // register app_version/build as artifact if available...
