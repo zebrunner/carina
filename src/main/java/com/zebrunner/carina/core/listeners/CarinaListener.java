@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import com.zebrunner.carina.webdriver.config.WebDriverConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -184,7 +185,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
             CurrentTestRun.setPlatform(SpecialKeywords.API);
         }
 
-        CurrentTestRun.setLocale(Configuration.get(Parameter.LOCALE));
+        CurrentTestRun.setLocale(WebDriverConfiguration.getLocale().getCountry());
 
         // register app_version/build as artifact if available...
         Configuration.setBuild(Configuration.get(Parameter.APP_VERSION));
