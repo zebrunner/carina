@@ -55,5 +55,6 @@ nav:
       - Zebrunner: integration/zebrunner.md
     - Cucumber: cucumber.md
     - Contribution: contribution.md
-    - Migration Guide: migration.md
+    - Migration Guide (7.4.31 -> 1.0.0): migration.md
+    - Migration Guide (1.1.5 -> 1.2.6): migration-1.1.5-1.2.6.md
 
