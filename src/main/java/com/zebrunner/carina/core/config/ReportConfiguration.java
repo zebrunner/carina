@@ -5,11 +5,16 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -124,34 +129,15 @@ public class ReportConfiguration extends Configuration {
      */
     public static void generateHtmlReport(String content) {
         String emailableReport = SpecialKeywords.HTML_REPORT;
-
-        File reportFile = new File(String.format("%s/%s/%s", System.getProperty("user.dir"),
-                Configuration.getRequired(Configuration.Parameter.PROJECT_REPORT_DIRECTORY),
-                emailableReport));
-        File reportFileToBaseDir = new File(String.format("%s/%s", ReportContext.getBaseDir(), emailableReport));
-
-        try (FileWriter reportFileWriter = new FileWriter(reportFile.getAbsoluteFile());
-                BufferedWriter reportBufferedWriter = new BufferedWriter(reportFileWriter);
-                FileWriter baseDirFileWriter = new FileWriter(reportFileToBaseDir.getAbsolutePath());
-                BufferedWriter baseDirBufferedWriter = new BufferedWriter(baseDirFileWriter)) {
-
-            createNewFileIfNotExists(reportFile);
-            reportBufferedWriter.write(content);
-
-            createNewFileIfNotExists(reportFileToBaseDir);
-            baseDirBufferedWriter.write(content);
-
+        try {
+            Files.write(Path.of(System.getProperty("user.dir"))
+                    .resolve(Configuration.getRequired(Configuration.Parameter.PROJECT_REPORT_DIRECTORY))
+                    .resolve(emailableReport),
+                    content.getBytes(StandardCharsets.UTF_8));
+            Files.write(ReportContext.getBaseDirectory().resolve(emailableReport),
+                    content.getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
             LOGGER.error("generateHtmlReport failure", e);
-        }
-    }
-
-    private static void createNewFileIfNotExists(File file) throws IOException {
-        if (!file.exists()) {
-            boolean isCreated = file.createNewFile();
-            if (!isCreated) {
-                throw new RuntimeException("File not created: " + file.getAbsolutePath());
-            }
         }
     }
 
@@ -163,9 +149,9 @@ public class ReportConfiguration extends Configuration {
     public static String getTestArtifactsLink() {
         Optional<String> reportURL = Configuration.get(ReportConfiguration.Parameter.REPORT_URL);
         if (reportURL.isPresent()) {
-            return String.format("%s/%s/artifacts", reportURL.get(), ReportContext.getBaseDir().getName());
+            return String.format("%s/%s/artifacts", reportURL.get(), ReportContext.getBaseDirectory().getFileName().toString());
         } else {
-            return String.format("file://%s/artifacts", ReportContext.getBaseDir().getAbsolutePath());
+            return String.format("file://%s/artifacts", ReportContext.getBaseDirectory().toString());
         }
     }
 
@@ -176,8 +162,11 @@ public class ReportConfiguration extends Configuration {
      */
     public static String getTestScreenshotsLink() {
         String link = "";
-        try {
-            if (FileUtils.listFiles(ReportContext.getTestDir(), new String[] { "png" }, false).isEmpty()) {
+        try(Stream<Path> stream =  Files.list(ReportContext.getTestDirectory())
+                .filter(Files::isRegularFile)
+                .filter(path -> path.endsWith("png"))) {
+
+            if (stream.findAny().isEmpty()) {
                 // no png screenshot files at all
                 return link;
             }
@@ -185,13 +174,16 @@ public class ReportConfiguration extends Configuration {
             LOGGER.error("Exception during report directory scanning", e);
         }
 
-        String test = ReportContext.getTestDir().getName().replaceAll("[^a-zA-Z0-9.-]", "_");
+        String test = ReportContext.getTestDirectory()
+                .getFileName()
+                .toString()
+                .replaceAll("[^a-zA-Z0-9.-]", "_");
         Optional<String> reportURL = Configuration.get(Parameter.REPORT_URL);
         if (reportURL.isPresent()) {
             link = String.format("%s/%s/%s/report.html",
-                    reportURL.get(), ReportContext.getBaseDir().getName(), test);
+                    reportURL.get(), ReportContext.getBaseDirectory().getFileName(), test);
         } else {
-            link = String.format("file://%s/%s/report.html", ReportContext.getBaseDir().getAbsolutePath(), test);
+            link = String.format("file://%s/%s/report.html", ReportContext.getBaseDirectory().toAbsolutePath(), test);
         }
         return link;
     }
@@ -203,20 +195,26 @@ public class ReportConfiguration extends Configuration {
      */
     public static String getTestLogLink() {
         String link = "";
-        File testLogFile = new File(ReportContext.getTestDir() + "/" + "test.log");
-        if (!testLogFile.exists()) {
+        Path testLogFile = ReportContext.getTestDirectory().resolve("test.log");
+        if (!Files.exists(testLogFile)) {
             // no test.log file at all
             return link;
         }
 
-        String test = ReportContext.getTestDir().getName().replaceAll("[^a-zA-Z0-9.-]", "_");
+        String test = ReportContext.getTestDirectory()
+                .getFileName()
+                .toString()
+                .replaceAll("[^a-zA-Z0-9.-]", "_");
         Optional<String> reportURL = Configuration.get(Parameter.REPORT_URL);
 
         if (reportURL.isPresent()) {
             link = String.format("%s/%s/%s/test.log",
-                    reportURL.get(), ReportContext.getBaseDir().getName(), test);
+                    reportURL.get(),
+                    ReportContext.getBaseDirectory()
+                            .getFileName()
+                            .toString(), test);
         } else {
-            link = String.format("file://%s/%s/test.log", ReportContext.getBaseDir().getAbsolutePath(), test);
+            link = String.format("file://%s/%s/test.log", ReportContext.getBaseDirectory().toAbsolutePath(), test);
         }
         return link;
     }
@@ -231,7 +229,7 @@ public class ReportConfiguration extends Configuration {
         if (ciBuildURL.isPresent()) {
             return String.format("%s/%s", ciBuildURL.get(), "CucumberReport");
         } else {
-            return String.format("file://%s/%s/%s/%s", ReportContext.getBaseDir().getAbsolutePath(), CUCUMBER_REPORT_FOLDER,
+            return String.format("file://%s/%s/%s/%s", ReportContext.getBaseDirectory().toAbsolutePath(), CUCUMBER_REPORT_FOLDER,
                     CUCUMBER_REPORT_SUBFOLDER, CUCUMBER_REPORT_FILE_NAME);
         }
     }
@@ -240,7 +238,8 @@ public class ReportConfiguration extends Configuration {
      * Generate test report. <b>For internal usage only</b>
      */
     public static void generateTestReport() {
-        File testDir = ReportContext.getTestDir();
+        File testDir = ReportContext.getTestDirectory()
+                .toFile();
         try {
             List<File> images = FileManager.getFilesInDir(testDir);
             List<String> imgNames = new ArrayList<>();
@@ -261,11 +260,7 @@ public class ReportConfiguration extends Configuration {
 
                 image = image.replace("${image}", imgName);
 
-                String title = ReportContext.getScreenshotComment(imgName);
-                if (title == null) {
-                    title = "";
-                }
-                image = image.replace("${title}", StringUtils.substring(title, 0, 300));
+                image = image.replace("${title}", StringUtils.substring("", 0, 300));
                 report.append(image);
             }
             String wholeReport = R.REPORT.get("container").replace("${images}", report.toString());

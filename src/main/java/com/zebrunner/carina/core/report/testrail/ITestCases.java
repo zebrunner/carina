@@ -20,7 +20,6 @@ import java.util.List;
 
 import org.openqa.selenium.remote.CapabilityType;
 
-import com.zebrunner.carina.utils.config.Configuration;
 import com.zebrunner.carina.webdriver.config.WebDriverConfiguration;
 
 public interface ITestCases {
@@ -45,6 +44,6 @@ public interface ITestCases {
     }
     
     default boolean isValidLocale(String locale) {
-        return locale.equalsIgnoreCase(Configuration.get(WebDriverConfiguration.Parameter.LOCALE).orElse("")) || locale.isEmpty();
+        return locale.equalsIgnoreCase(WebDriverConfiguration.getLocale().getCountry()) || locale.isEmpty();
     }
 }
