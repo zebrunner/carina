@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright 2020-2023 Zebrunner Inc (https://www.zebrunner.com).
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * <p> Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * You may obtain a copy of the License at </p>
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
+ * <p> Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License.
+ * limitations under the License. </p>
  *******************************************************************************/
 package com.zebrunner.carina.core.testng;
 
@@ -88,15 +88,15 @@ public class TestNamingService {
      */     
     @SuppressWarnings("unlikely-arg-type")
     private static String setTestName(ITestResult result) {
-        String name = StringUtils.EMPTY;
+        String formattedTestName = StringUtils.EMPTY;
         if (result.getTestContext() == null) {
             throw new RuntimeException("Unable to set Test name without testContext!");
         }
 
         ITestNGMethod method = result.getMethod();
 
-        name = Configuration.getRequired(ReportConfiguration.Parameter.TEST_NAMING_PATTERN);
-        name = name.replace(SpecialKeywords.TEST_NAME, getTestNameMap(result))
+        formattedTestName = Configuration.getRequired(ReportConfiguration.Parameter.TEST_NAMING_PATTERN);
+        formattedTestName = formattedTestName.replace(SpecialKeywords.TEST_NAME, getTestNameMap(result))
                 .replace(SpecialKeywords.TEST_NAME_TUID, getMethodUID(result))
                 .replace(SpecialKeywords.METHOD_NAME, method.getMethodName())
                 .replace(SpecialKeywords.METHOD_PRIORITY, String.valueOf(method.getPriority()))
@@ -106,14 +106,14 @@ public class TestNamingService {
                 .replace(SpecialKeywords.TEST_NAME_CLASS, method.getTestClass().getRealClass().getSimpleName())
                 .trim();
 
-        LOGGER.debug("testName: {}", name);
+        LOGGER.debug("testName: {}", formattedTestName);
 
         // introduce invocation count calculation here as in multi threading mode TestNG doesn't provide valid
         // getInvocationCount() value
-        name = appendDataProviderLine(result, name);
-        name = appendInvocationCount(result, name);
+        formattedTestName = appendDataProviderLine(result, formattedTestName);
+        formattedTestName = appendInvocationCount(result, formattedTestName);
 
-        testName.set(name);
+        testName.set(formattedTestName);
         return testName.get();
     }
 
