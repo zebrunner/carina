@@ -13,20 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.zebrunner.carina.core.filter;
+package com.zebrunner.carina.core.filter.v1;
 
 import java.lang.invoke.MethodHandles;
 
+import org.apiguardian.api.API;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zebrunner.carina.core.filter.impl.OwnerFilter;
-import com.zebrunner.carina.core.filter.impl.PriorityFilter;
-import com.zebrunner.carina.core.filter.impl.TagFilter;
+import com.zebrunner.carina.core.filter.v1.impl.OwnerFilter;
+import com.zebrunner.carina.core.filter.v1.impl.PriorityFilter;
+import com.zebrunner.carina.core.filter.v1.impl.TagFilter;
 /**
  * Enum to store rules (name and implementation of the rule)
  *
  */
+@API(status = API.Status.INTERNAL)
 public enum Filter {
 
     PRIORITY("PRIORITY", new PriorityFilter()),

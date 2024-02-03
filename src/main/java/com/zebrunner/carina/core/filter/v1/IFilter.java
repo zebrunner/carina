@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.zebrunner.carina.core.filter;
+package com.zebrunner.carina.core.filter.v1;
 
 import java.util.Arrays;
 import java.util.List;
 
+import org.apiguardian.api.API;
 import org.testng.ITestNGMethod;
 
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
@@ -27,7 +28,7 @@ import com.zebrunner.carina.utils.commons.SpecialKeywords;
  * {@code #test_run_rules=PRIORITY=>P1&amp;&amp;P2;;OWNER=>msarychau;;TAGS=>tag1=temp&amp;&amp;feature=reg
  * rules logic: test_run_rules={RULE_NAME_ENUM}=>{RULE_VALUE1}&&{RULE_VALUE2}...}
  */
-
+@API(status = API.Status.INTERNAL)
 public interface IFilter {
 
     boolean isPerform(ITestNGMethod testMethod, List<String> rules);
