@@ -13,17 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.zebrunner.carina.core.filter.rule;
+package com.zebrunner.carina.core.filter.v1.rule;
 
 import java.util.List;
 
-import com.zebrunner.carina.core.filter.IFilter;
+import com.zebrunner.carina.core.filter.v1.IFilter;
+import org.apiguardian.api.API;
 
 /**
  * Java bean for the rule that can be used for suite limit 
  *
  */
-public class Rule {
+@API(status = API.Status.INTERNAL)
+public final class Rule {
 
     private String ruleName;
     

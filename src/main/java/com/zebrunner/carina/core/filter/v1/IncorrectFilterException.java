@@ -13,9 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.zebrunner.carina.core.filter;
+package com.zebrunner.carina.core.filter.v1;
 
-public class IncorrectFilterException extends RuntimeException {
+import org.apiguardian.api.API;
+
+@API(status = API.Status.INTERNAL)
+public final class IncorrectFilterException extends RuntimeException {
 
     /**
      * 

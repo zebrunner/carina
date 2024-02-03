@@ -38,9 +38,15 @@ public class TestConfiguration extends Configuration {
         DATA_PROVIDER_THREAD_COUNT("data_provider_thread_count"),
 
         /**
-         * Executing rules logic
+         * Executing rules logic (tests filter - v1).<br>
+         * <b>Do not use this parameter with the {@link #TEST_RUN_FILTER}</b>
          */
-        TEST_RUN_RULES("test_run_rules");
+        TEST_RUN_RULES("test_run_rules"),
+
+        /**
+         * Test run filter class. Should implement {@link com.zebrunner.carina.core.filter.v2.ITestRunFilter}
+         */
+        TEST_RUN_FILTER("test_run_filter");
 
         private final String key;
 

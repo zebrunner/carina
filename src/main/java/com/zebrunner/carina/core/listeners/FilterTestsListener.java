@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.apiguardian.api.API;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ISuite;
@@ -28,12 +29,13 @@ import org.testng.ISuiteListener;
 import org.testng.ITestNGMethod;
 
 import com.zebrunner.carina.core.config.TestConfiguration;
-import com.zebrunner.carina.core.filter.Filter;
-import com.zebrunner.carina.core.filter.IFilter;
-import com.zebrunner.carina.core.filter.rule.Rule;
+import com.zebrunner.carina.core.filter.v1.Filter;
+import com.zebrunner.carina.core.filter.v1.IFilter;
+import com.zebrunner.carina.core.filter.v1.rule.Rule;
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
 import com.zebrunner.carina.utils.config.Configuration;
 
+@API(status = API.Status.INTERNAL)
 public class FilterTestsListener implements ISuiteListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

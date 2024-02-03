@@ -14,20 +14,22 @@
  * limitations under the License.
  * *****************************************************************************/
 
-package com.zebrunner.carina.core.filter.impl;
+package com.zebrunner.carina.core.filter.v1.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apiguardian.api.API;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestNGMethod;
 
-import com.zebrunner.carina.core.filter.IFilter;
+import com.zebrunner.carina.core.filter.v1.IFilter;
 import com.zebrunner.carina.core.registrar.ownership.MethodOwner;
 
-public class OwnerFilter implements IFilter {
+@API(status = API.Status.INTERNAL)
+public final class OwnerFilter implements IFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
