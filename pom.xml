@@ -49,7 +49,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>11</java.version>
-        <carina-webdriver.version>1.2.11.P1-SNAPSHOT</carina-webdriver.version>
+        <carina-webdriver.version>1.2.11.P2-SNAPSHOT</carina-webdriver.version>
         <!-- Logging -->
         <slf4j.version>1.7.30</slf4j.version>
         <log4j.version>2.17.1</log4j.version>
