@@ -335,7 +335,6 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
                 // (namely, as a result of calling result.getTestContext() on it, we got null, and when we tried to call .getSuite().getAllMethods()
                 // we got a NullPointerException. Also, the test method status was CREATED.
                 if (IS_REMOVE_DRIVER.get()) {
-                    LOGGER.info("Driver will be closed.");
                     quitDrivers(Phase.BEFORE_METHOD, Phase.METHOD, Phase.AFTER_METHOD);
                 }
                 IS_REMOVE_DRIVER.remove();
