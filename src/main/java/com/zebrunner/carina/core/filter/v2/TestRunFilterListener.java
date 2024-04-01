@@ -61,7 +61,8 @@ public class TestRunFilterListener implements ISuiteListener {
                 return;
             }
 
-            for (ITestNGMethod testMethod : suite.getAllMethods()) {
+            for (ITestNGMethod testMethod : suite.getAllMethods().stream().filter(ITestNGMethod::isTest)
+                    .collect(Collectors.toList())) {
                 boolean isPerform = filters.stream()
                         .allMatch(filter -> filter.isPerform(testMethod));
 
