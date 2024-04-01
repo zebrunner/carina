@@ -45,7 +45,7 @@ public class MethodsFilter implements ITestFilter {
             }
             for (Pattern pattern : PATTERN.get()) {
                 if (testMethod != null && pattern.matcher(testMethod.getRealClass().getSimpleName() + "#" + testMethod.getMethodName())
-                        .matches()) {
+                        .find()) {
                     return true;
                 }
             }
