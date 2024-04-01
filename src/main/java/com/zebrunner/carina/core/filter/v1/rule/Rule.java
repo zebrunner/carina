@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.zebrunner.carina.core.filter.rule;
+package com.zebrunner.carina.core.filter.v1.rule;
 
 import java.util.List;
 
-import com.zebrunner.carina.core.filter.IFilter;
+import com.zebrunner.carina.core.filter.v1.IFilter;
 
 /**
  * Java bean for the rule that can be used for suite limit 
