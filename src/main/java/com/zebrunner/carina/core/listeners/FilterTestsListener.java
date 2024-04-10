@@ -28,9 +28,9 @@ import org.testng.ISuiteListener;
 import org.testng.ITestNGMethod;
 
 import com.zebrunner.carina.core.config.TestConfiguration;
-import com.zebrunner.carina.core.filter.Filter;
-import com.zebrunner.carina.core.filter.IFilter;
-import com.zebrunner.carina.core.filter.rule.Rule;
+import com.zebrunner.carina.core.filter.v1.Filter;
+import com.zebrunner.carina.core.filter.v1.IFilter;
+import com.zebrunner.carina.core.filter.v1.rule.Rule;
 import com.zebrunner.carina.utils.commons.SpecialKeywords;
 import com.zebrunner.carina.utils.config.Configuration;
 

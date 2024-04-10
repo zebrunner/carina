@@ -40,7 +40,12 @@ public class TestConfiguration extends Configuration {
         /**
          * Executing rules logic
          */
-        TEST_RUN_RULES("test_run_rules");
+        TEST_RUN_RULES("test_run_rules"),
+
+        /**
+         * todo add description
+         */
+        FILTER_METHOD_PATTERN("filter_method_pattern");
 
         private final String key;
 

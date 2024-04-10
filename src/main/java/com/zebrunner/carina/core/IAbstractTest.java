@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.zebrunner.carina.core;
 
+import com.zebrunner.carina.core.filter.v2.TestRunFilterListener;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -41,7 +42,7 @@ import com.zebrunner.carina.webdriver.config.WebDriverConfiguration;
 
 // on start order is FilterTestsListener, TestRunListener and CarinaListener
 // on finish reverse order, i.e. CarinaListener, TestRunListener and FilterTestsListener
-@LinkedListeners({ CarinaListener.class, TestRunListener.class, FilterTestsListener.class })
+@LinkedListeners({ CarinaListener.class, TestRunListener.class, FilterTestsListener.class, TestRunFilterListener.class})
 public interface IAbstractTest extends ICustomTypePageFactory, ITestCases {
 
     long EXPLICIT_TIMEOUT = Configuration.getRequired(WebDriverConfiguration.Parameter.EXPLICIT_TIMEOUT, Long.class);
