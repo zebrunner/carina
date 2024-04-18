@@ -43,7 +43,8 @@ public class TestRunFilterListener implements ISuiteListener {
                     .ifPresent(pattern -> filters.add(new MethodsFilter(pattern)));
 
             if (Configuration.getRequired(TestConfiguration.Parameter.FILTER_BY_COUNTRY, Boolean.class)) {
-                if (Configuration.get(TestConfiguration.Parameter.FILTER_PATTERN).isPresent()) {
+                if (Configuration.get(TestConfiguration.Parameter.FILTER_PATTERN).isPresent() ||
+                        Configuration.get("test").isPresent()) {
                     LOGGER.warn("Passed a pattern for filtering tests. Filtering by country will be ignored.");
                 } else {
                     filters.add(new CountryFilter());
