@@ -5,53 +5,28 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import com.zebrunner.carina.core.config.TestConfiguration;
-import org.apache.commons.lang3.concurrent.ConcurrentException;
-import org.apache.commons.lang3.concurrent.LazyInitializer;
-import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.testng.ITestNGMethod;
-
-import com.zebrunner.carina.utils.config.Configuration;
 
 public class MethodsFilter implements ITestFilter {
 
-    private static final LazyInitializer<Boolean> IS_PERFORM = new LazyInitializer<>() {
-        @Override
-        protected Boolean initialize() throws ConcurrentException {
-            return Configuration.get(TestConfiguration.Parameter.FILTER_METHOD_PATTERN)
-                    .isPresent();
-        }
-    };
+    private final List<Pattern> patterns;
 
-    private static final LazyInitializer<List<Pattern>> PATTERN = new LazyInitializer<>() {
-        @Override
-        protected List<Pattern> initialize() throws ConcurrentException {
-            return Arrays.stream(Configuration.getRequired(TestConfiguration.Parameter.FILTER_METHOD_PATTERN).split(","))
-                    .map(Pattern::compile)
-                    .collect(Collectors.toList());
-        }
-    };
-
-    @Override
-    public String key() {
-        return "methods";
+    public MethodsFilter(String pattern) {
+        patterns = Arrays.stream(pattern.split(","))
+                .map(StringUtils::trim)
+                .map(Pattern::compile)
+                .collect(Collectors.toList());
     }
 
     @Override
     public boolean isPerform(ITestNGMethod testMethod) {
-        try {
-            if (!IS_PERFORM.get()) {
+        for (Pattern pattern : patterns) {
+            if (testMethod != null && pattern.matcher(testMethod.getRealClass().getSimpleName() + "#" + testMethod.getMethodName())
+                    .find()) {
                 return true;
             }
-            for (Pattern pattern : PATTERN.get()) {
-                if (testMethod != null && pattern.matcher(testMethod.getRealClass().getSimpleName() + "#" + testMethod.getMethodName())
-                        .find()) {
-                    return true;
-                }
-            }
-            return false;
-        } catch (ConcurrentException e) {
-            return ExceptionUtils.rethrow(e);
         }
+        return false;
     }
 }

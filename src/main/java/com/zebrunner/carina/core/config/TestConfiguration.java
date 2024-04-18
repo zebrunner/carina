@@ -42,10 +42,11 @@ public class TestConfiguration extends Configuration {
          */
         TEST_RUN_RULES("test_run_rules"),
 
+        FILTER_BY_COUNTRY("filter_by_country"),
         /**
          * todo add description
          */
-        FILTER_METHOD_PATTERN("filter_method_pattern");
+        FILTER_PATTERN("filter_pattern");
 
         private final String key;
 

@@ -8,8 +8,4 @@ public interface ITestFilter {
 
     boolean isPerform(ITestNGMethod testMethod);
 
-    default String key() {
-        throw new InvalidConfigurationException("Filter should have key.");
-    }
-
 }
