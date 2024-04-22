@@ -21,11 +21,6 @@ public class CountryFilter implements ITestFilter {
     };
 
     @Override
-    public String key() {
-        return "country";
-    }
-
-    @Override
     public boolean isPerform(ITestNGMethod testMethod) {
         try {
             String country = COUNTRY.get();

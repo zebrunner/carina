@@ -16,11 +16,10 @@
 package com.zebrunner.carina.core.filter.v2;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.concurrent.ConcurrentException;
 import org.apache.commons.lang3.concurrent.LazyInitializer;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -30,26 +29,28 @@ import org.testng.ISuite;
 import org.testng.ISuiteListener;
 import org.testng.ITestNGMethod;
 
+import com.zebrunner.carina.core.config.TestConfiguration;
 import com.zebrunner.carina.utils.config.Configuration;
 
 public class TestRunFilterListener implements ISuiteListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private static final LazyInitializer<List<ITestFilter>> FILTERS = new LazyInitializer<>() {
         @Override
         protected List<ITestFilter> initialize() throws ConcurrentException {
-            List<ITestFilter> filters = List.of(new CountryFilter(), new MethodsFilter());
-            List<String> usedFilters = Configuration.get("test_run_filters")
-                    .map(StringUtils::lowerCase)
-                    .map(p -> StringUtils.split(p, ","))
-                    .map(Arrays::asList)
-                    .orElse(List.of());
+            List<ITestFilter> filters = new ArrayList<>(2);
+            Configuration.get(TestConfiguration.Parameter.FILTER_PATTERN)
+                    .ifPresent(pattern -> filters.add(new MethodsFilter(pattern)));
 
-            if (usedFilters.isEmpty()) {
-                return List.of();
+            if (Configuration.getRequired(TestConfiguration.Parameter.FILTER_BY_COUNTRY, Boolean.class)) {
+                if (Configuration.get(TestConfiguration.Parameter.FILTER_PATTERN).isPresent() ||
+                        Configuration.get("test").isPresent()) {
+                    LOGGER.warn("Passed a pattern for filtering tests. Filtering by country will be ignored.");
+                } else {
+                    filters.add(new CountryFilter());
+                }
             }
-            return filters.stream()
-                    .filter(filter -> usedFilters.contains(filter.key()))
-                    .collect(Collectors.toList());
+            return filters;
         }
     };
 
@@ -67,7 +68,7 @@ public class TestRunFilterListener implements ISuiteListener {
                         .allMatch(filter -> filter.isPerform(testMethod));
 
                 if (!isPerform) {
-                    LOGGER.info("Disable test: [{}]", testMethod.getMethodName());
+                    LOGGER.info("Disable test: [{}] -> [{}]", testMethod.getRealClass().getSimpleName(), testMethod.getMethodName());
                     testMethod.setInvocationCount(0);
                 }
             }

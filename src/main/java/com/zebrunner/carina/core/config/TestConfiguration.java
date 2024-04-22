@@ -43,9 +43,20 @@ public class TestConfiguration extends Configuration {
         TEST_RUN_RULES("test_run_rules"),
 
         /**
-         * todo add description
+         * When this option is enabled, tests are filtered by the countries for which they are intended.
+         * Countries should be specified in the `groups` parameter of the `Test` annotation, for example {@code groups = "US"}.
+         * Accordingly, if 'groups' does not contain the current 'locale' value of the test run, then it will be disabled.
          */
-        FILTER_METHOD_PATTERN("filter_method_pattern");
+        FILTER_BY_COUNTRY("filter_by_country"),
+
+        /**
+         * The pattern by which test(s) should be selected. When using this option, the {@link #FILTER_BY_COUNTRY} parameter will be ignored.
+         * <b>Examples:</b><br>
+         * Run single test: TestClass#testMethodName.<br>
+         * Run all tests in the class: TestClass#.<br>
+         * Run several tests: TestClass#testMethodName1, TestClass#testMethodName2.
+         */
+        FILTER_PATTERN("filter_pattern");
 
         private final String key;
 
