@@ -2,6 +2,12 @@
 
 Carina is a Java-based test automation framework that unites all testing layers: Mobile applications (web, native, hybrid), WEB applications, Windows applications, REST services, Databases.
 
+Feel free to support the development with a [**donation**](https://www.paypal.com/donate/?hosted_button_id=MNHYYCYHAKUVA) for the next improvements.
+
+<p align="center">
+  <a href="https://zebrunner.com/"><img alt="Zebrunner" src="https://github.com/zebrunner/zebrunner/raw/master/docs/img/zebrunner_intro.png"></a>
+</p>
+
 <B>[TRY DEMO PROJECT NOW](https://github.com/zebrunner/carina-demo)</B>
 
 * Carina framework is built on top of most popular open-source solutions like Selenium, Appium, TestNG allowing to reduce dependence on specific technology stack.
@@ -60,11 +66,6 @@ The Carina Framework ecosystem consists of the following modules:
         <td>Contains utilities for encryption/decryption. <b>Part of Carina Core</b></td>
 	</tr>
 </table>
-
-## Sponsor
-<p align="center">
-  <a href="https://zebrunner.com/"><img alt="Zebrunner" src="https://github.com/zebrunner/zebrunner/raw/master/docs/img/zebrunner_intro.png"></a>
-</p>
 
 ## Documentation and free support
 * [User Guide](http://zebrunner.github.io/carina)
