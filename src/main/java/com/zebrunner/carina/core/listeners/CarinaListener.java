@@ -19,24 +19,31 @@ import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import com.zebrunner.agent.core.config.provider.SystemPropertiesConfigurationProvider;
 import com.zebrunner.agent.core.webdriver.CapabilitiesCustomizerChain;
+import com.zebrunner.carina.webdriver.IDriverPool;
 import com.zebrunner.carina.webdriver.core.capability.CarinaCapabilitiesCustomizer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.ConstructorUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -757,7 +764,7 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
      * 
      */
     private void takeScreenshot() {
-        ConcurrentHashMap<String, CarinaDriver> drivers = getDrivers();
+        Map<String, CarinaDriver> drivers = IDriverPool.getDrivers();
         try {
             for (Map.Entry<String, CarinaDriver> entry : drivers.entrySet()) {
                 WebDriver drv = entry.getValue().getDriver();
@@ -772,30 +779,26 @@ public class CarinaListener extends AbstractTestListener implements ISuiteListen
 
         private static final Logger LOGGER = LoggerFactory.getLogger(ShutdownHook.class);
 
-        private void quitAllDriversOnHook() {
-            // as it is shutdown hook just try to quit all existing drivers one by one
-            for (CarinaDriver carinaDriver : driversPool) {
-                // it is expected that all drivers are killed in appropriate AfterMethod/Class/Suite blocks
-                String name = carinaDriver.getName();
-                LOGGER.warn("Trying to quit driver '{}' on shutdown hook action!", name);
-                carinaDriver.getDevice().disconnectRemote();
-                try {
-                    LOGGER.debug("Driver closing...{}", name);
-                    carinaDriver.getDriver().close();
-                    LOGGER.debug("Driver exiting...{}", name);
-                    carinaDriver.getDriver().quit();
-                    LOGGER.debug("Driver exited...{}", name);
-                } catch (Exception e) {
-                    // do nothing
-                }
+        private void quitAllDriversOnHook() throws InterruptedException {
+            List<ImmutablePair<Long, String>> drivers4Close = new ArrayList<>();
+            for (Map<String, CarinaDriver> drivers : IDriverPool.DRIVERS_POOL.values()) {
+                drivers.keySet().forEach(key -> drivers4Close.add(new ImmutablePair<>(drivers.get(key).getThreadId(), key)));
             }
+            drivers4Close.forEach(driver -> IDriverPool.quitDriver(driver.getRight(), driver.getLeft()));
+            IDriverPool.EXECUTOR_SERVICE.shutdown();
+
+            IDriverPool.EXECUTOR_SERVICE.awaitTermination(10, TimeUnit.MINUTES);
         }
 
         @Override
         public void run() {
             LOGGER.debug("Running shutdown hook");
             if (!Configuration.get(TestConfiguration.Parameter.FORCIBLY_DISABLE_DRIVER_QUIT, Boolean.class).orElse(false)) {
-                quitAllDriversOnHook();
+                try {
+                    quitAllDriversOnHook();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
 
