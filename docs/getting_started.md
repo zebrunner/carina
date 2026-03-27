@@ -1,6 +1,6 @@
 * Install and configure JDK 11+
 * Install and configure [Apache Maven 3.6.0+](http://maven.apache.org/)
-* Download the latest version of [Eclipse](http://www.eclipse.org/downloads/) and install [TestNG plugin](http://testng.org/doc/download.html), maven-dependency-plugin connector and optionally lombok
+* Download the latest version of [Eclipse](http://www.eclipse.org/downloads/) and install [TestNG plugin](https://testng.org/#_download), maven-dependency-plugin connector and optionally lombok
 
 ### Generating project
 The easiest way to initialize a new project is to use Carina archetype, you will get correct project structure along with test samples. Run below command from any <b>empty folder</b>:
